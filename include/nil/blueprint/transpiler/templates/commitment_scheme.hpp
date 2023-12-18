@@ -86,17 +86,17 @@ library modular_commitment_scheme_$TEST_NAME$ {
     function calculate_2points_interpolation(uint256[] memory xi, uint256[2] memory z)
     internal pure returns(uint256[2] memory U){
 //        require( xi.length == 2 );
-unchecked {
+    unchecked {
         U[0] = addmod(mulmod(z[0], xi[1], modulus),modulus - mulmod(z[1], xi[0], modulus), modulus);
         U[1] = addmod(z[1], modulus - z[0], modulus);
-}
+    }
     }
 
 //  coeffs for zs on each degree can be precomputed if necessary
     function calculate_3points_interpolation(uint256[] memory xi, uint256[3] memory z)
     internal pure returns(uint256[3] memory U){
 //        require( xi.length == 3 );
-unchecked {
+    unchecked {
         z[0] = mulmod(z[0], addmod(xi[1], modulus - xi[2], modulus), modulus);
         z[1] = mulmod(z[1], addmod(xi[2], modulus - xi[0], modulus), modulus);
         z[2] = mulmod(z[2], addmod(xi[0], modulus - xi[1], modulus), modulus);
@@ -110,7 +110,7 @@ unchecked {
         U[1] = addmod(U[1], modulus - mulmod(z[2], addmod(xi[0], xi[1], modulus), modulus), modulus);
 
         U[2] = addmod(z[0], addmod(z[1], z[2], modulus), modulus);
-}
+    }
     }
 
     function prepare_eval_points(uint256[][unique_points] memory result, uint256 xi) internal view {
@@ -119,8 +119,7 @@ $POINTS_INITIALIZATION$
     }
 
     function prepare_U_V(bytes calldata blob, commitment_state memory state, uint256 xi) internal view returns(bool result){
-
-unchecked {
+    unchecked {
         result = true;
         uint64 ind = 0;
         prepare_eval_points(state.unique_eval_points, xi);
@@ -250,12 +249,11 @@ unchecked {
             }
             ind++;
         }
-}
+    }
     }
 
     function compute_combined_Q(bytes calldata blob,commitment_state memory state) internal view returns(uint256[2] memory y){
-
-unchecked {
+    unchecked {
         uint256[2][unique_points] memory values;
         {
             uint256 offset = state.initial_data_offset - state.poly_num * 0x40; // Save initial data offset for future use;
@@ -295,7 +293,7 @@ unchecked {
             y[1] = addmod(y[1], tmp[1], modulus);
             p++;
         }
-}
+    }
     }
 
     function initialize(
@@ -352,77 +350,75 @@ unchecked {
 
     function copy_pairs_and_check(bytes calldata blob, uint256 offset, bytes memory leaf, uint256 size, uint256 proof_offset)
     internal pure returns(bool b){
-unchecked {
-        uint256 offset2 = 0x20;
-        for(uint256 k = 0; k < size;){
-            assembly{
-                mstore(
-                    add(leaf, offset2),
-                    calldataload(add(blob.offset, offset))
-                )
-                mstore(
-                    add(leaf, add(offset2, 0x20)),
-                    calldataload(add(blob.offset, add(offset, 0x20)))
-                )
+        unchecked {
+            uint256 offset2 = 0x20;
+            for(uint256 k = 0; k < size;){
+                assembly{
+                    mstore(
+                        add(leaf, offset2),
+                        calldataload(add(blob.offset, offset))
+                    )
+                    mstore(
+                        add(leaf, add(offset2, 0x20)),
+                        calldataload(add(blob.offset, add(offset, 0x20)))
+                    )
+                }
+                k++; offset2 += 0x40; offset += 0x40;
             }
-            k++; offset2 += 0x40; offset += 0x40;
+            if( !merkle_verifier.parse_verify_merkle_proof_bytes_be(blob, proof_offset, leaf, offset2 - 0x20 )){
+                return false;
+            } else {
+                return true;
+            }
         }
-        if( !merkle_verifier.parse_verify_merkle_proof_bytes_be(blob, proof_offset, leaf, offset2 - 0x20 )){
-            return false;
-        } else {
-            return true;
-        }
-}
     }
 
     function copy_reverted_pairs_and_check(bytes calldata blob, uint256 offset, bytes memory leaf, uint256 size, uint256 proof_offset)
     internal pure returns(bool){
-unchecked {
-        uint256 offset2 = 0x20;
-        for(uint256 k = 0; k < size;){
-            assembly{
-                mstore(
-                    add(leaf, offset2),
-                    calldataload(add(blob.offset, add(offset, 0x20)))
-                )
-                mstore(
-                    add(leaf, add(offset2, 0x20)),
-                    calldataload(add(blob.offset, offset))
-                )
+        unchecked {
+            uint256 offset2 = 0x20;
+            for(uint256 k = 0; k < size;){
+                assembly{
+                    mstore(
+                        add(leaf, offset2),
+                        calldataload(add(blob.offset, add(offset, 0x20)))
+                    )
+                    mstore(
+                        add(leaf, add(offset2, 0x20)),
+                        calldataload(add(blob.offset, offset))
+                    )
+                }
+                k++; offset2 += 0x40; offset += 0x40;
             }
-            k++; offset2 += 0x40; offset += 0x40;
+            if( !merkle_verifier.parse_verify_merkle_proof_bytes_be(blob, proof_offset, leaf, offset2 - 0x20 )){
+                return false;
+            } else {
+                return true;
+            }
         }
-        if( !merkle_verifier.parse_verify_merkle_proof_bytes_be(blob, proof_offset, leaf, offset2 - 0x20 )){
-            return false;
-        } else {
-            return true;
-        }
-}
     }
 
     function colinear_check(uint256 x, uint256[2] memory y, uint256 alpha, uint256 colinear_value) internal pure returns(bool){
-
-unchecked {
-        uint256 tmp;
-        tmp = addmod(y[0], y[1], modulus);
-        tmp = mulmod(tmp, x, modulus);
-        tmp = addmod(
-            tmp,
-            mulmod(
-                alpha,
-                addmod(y[0], modulus-y[1], modulus),
+        unchecked {
+            uint256 tmp;
+            tmp = addmod(y[0], y[1], modulus);
+            tmp = mulmod(tmp, x, modulus);
+            tmp = addmod(
+                tmp,
+                mulmod(
+                    alpha,
+                    addmod(y[0], modulus-y[1], modulus),
+                    modulus
+                ),
                 modulus
-            ),
-            modulus
-        );
-        uint256 tmp1 = mulmod(colinear_value , 2, modulus);
-        tmp1 = mulmod(tmp1 , x, modulus);
-        if( tmp !=  tmp1 ){
-            console.log("Colinear check failed");
-            return false;
-        }
+            );
+            uint256 tmp1 = mulmod(colinear_value , 2, modulus);
+            tmp1 = mulmod(tmp1 , x, modulus);
+            if( tmp !=  tmp1 ){
+                return false;
+            }
         return true;
-}
+        }
     }
 
     function verify_eval(
