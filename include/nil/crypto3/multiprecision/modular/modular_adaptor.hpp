@@ -392,7 +392,7 @@ namespace nil {
                     result = val;
                 }
 
-                size_t window_bits(size_t exp_bits) {
+                inline size_t window_bits(size_t exp_bits) {
                     BOOST_STATIC_CONSTEXPR size_t wsize_count = 6;
                     BOOST_STATIC_CONSTEXPR size_t wsize[wsize_count][2] = {{1434, 7}, {539, 6}, {197, 4},
                                                                            {70, 3},   {17, 2},  {0, 0}};
