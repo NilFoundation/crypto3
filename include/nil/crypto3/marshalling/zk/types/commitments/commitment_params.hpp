@@ -34,7 +34,6 @@
 #include <nil/marshalling/options.hpp>
 
 #include <nil/crypto3/zk/commitments/type_traits.hpp>
-#include <nil/crypto3/zk/commitments/detail/polynomial/basic_fri.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/kzg.hpp>
 
 #include <nil/crypto3/marshalling/algebra/types/field_element.hpp>
