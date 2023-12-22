@@ -514,7 +514,7 @@ namespace nil {
                             N_rows, table_description.usable_rows_amount, max_gates_degree, vk
                         );
 
-                        transcript_type transcript(std::vector<std::uint8_t>({}));
+                        transcript_type transcript;
                         transcript(vk.constraint_system_hash);
                         transcript(vk.fixed_values_commitment);
 
