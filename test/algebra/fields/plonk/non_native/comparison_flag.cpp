@@ -116,6 +116,9 @@ auto test_comparison_flag(typename BlueprintFieldType::value_type x, typename Bl
             nil::crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
                 component_instance, public_input, result_check, instance_input,
                 nil::crypto3::detail::connectedness_check_type::STRONG, R, Mode);
+            nil::crypto3::test_empty_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
+                component_instance, public_input, result_check, instance_input,
+                nil::crypto3::detail::connectedness_check_type::STRONG, R, Mode);
         } else {
             nil::crypto3::test_component_to_fail<component_type, BlueprintFieldType, ArithmetizationParams,
                                                  hash_type, Lambda>(
