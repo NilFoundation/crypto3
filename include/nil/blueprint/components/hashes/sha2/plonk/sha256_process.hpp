@@ -84,6 +84,9 @@ namespace nil {
                                                              std::size_t lookup_column_amount) {
                     return 762;
                 }
+                constexpr static std::size_t get_empty_rows_amount() {
+                    return 1;
+                }
 
                 constexpr static const std::size_t rounds_amount = 64;
 
@@ -102,6 +105,7 @@ namespace nil {
                         0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2};
 
                 const std::size_t rows_amount = get_rows_amount(this->witness_amount(), 0);
+                const std::size_t empty_rows_amount = get_empty_rows_amount();
                 constexpr static const std::size_t gates_amount = 11;
                 constexpr static const std::size_t lookup_gates_amount = 8;
                 struct input_type {
@@ -132,6 +136,21 @@ namespace nil {
                                         var(component.W(1), start_row_index + component.rows_amount - 5, false),
                                         var(component.W(2), start_row_index + component.rows_amount - 5, false),
                                         var(component.W(3), start_row_index + component.rows_amount - 5, false)};
+                    }
+
+                    result_type(const sha256_process<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
+                                                                                                ArithmetizationParams>>
+                                    &component,
+                                std::uint32_t start_row_index,
+                                bool skip) {
+                        output_state = {var(component.W(0), start_row_index, false),
+                                        var(component.W(1), start_row_index, false),
+                                        var(component.W(2), start_row_index, false),
+                                        var(component.W(3), start_row_index, false),
+                                        var(component.W(4), start_row_index, false),
+                                        var(component.W(5), start_row_index, false),
+                                        var(component.W(6), start_row_index, false),
+                                        var(component.W(7), start_row_index, false)};
                     }
 
                     std::vector<var> all_vars() const {
@@ -169,6 +188,268 @@ namespace nil {
                     lookup_tables["sha256_ch/full"] = 0; // REQUIRED_TABLE
 
                     return lookup_tables;
+                }
+
+                static std::array<typename BlueprintFieldType::value_type, 8>
+                        calculate(std::array<typename BlueprintFieldType::value_type, 8> input_state, 
+                                    std::array<typename BlueprintFieldType::value_type, 16> input_words) {
+
+                    std::size_t row = 0;
+                    typename BlueprintFieldType::integral_type one = 1;
+                    std::array<typename BlueprintFieldType::value_type, 64> message_scheduling_words;
+                    for (std::size_t i = 0; i < 16; i++) {
+                        message_scheduling_words[i] = input_words[i];
+                    }
+                    typename BlueprintFieldType::value_type a = input_state[0];
+                    typename BlueprintFieldType::value_type b = input_state[1];
+                    typename BlueprintFieldType::value_type c = input_state[2];
+                    typename BlueprintFieldType::value_type d = input_state[3];
+                    typename BlueprintFieldType::value_type e = input_state[4];
+                    typename BlueprintFieldType::value_type f = input_state[5];
+                    typename BlueprintFieldType::value_type g = input_state[6];
+                    typename BlueprintFieldType::value_type h = input_state[7];
+
+                    std::array<typename BlueprintFieldType::integral_type, 8> sparse_values {};
+                    for (std::size_t i = 0; i < 4; i++) {
+                        typename BlueprintFieldType::integral_type integral_input_state_sparse =
+                            typename BlueprintFieldType::integral_type(input_state[i].data);
+                        std::vector<bool> input_state_sparse(32);
+                        {
+                            nil::marshalling::status_type status;
+                            std::vector<bool> input_state_sparse_all =
+                                nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_input_state_sparse,
+                                                                                            status);
+                            std::copy(input_state_sparse_all.end() - 32, input_state_sparse_all.end(),
+                                    input_state_sparse.begin());
+                        }
+
+                        std::vector<std::size_t> input_state_sparse_sizes = {32};
+                        std::array<std::vector<typename BlueprintFieldType::integral_type>, 2> input_state_sparse_chunks =
+                            detail::split_and_sparse<BlueprintFieldType>(
+                                input_state_sparse, input_state_sparse_sizes, base4);
+                        sparse_values[i] = input_state_sparse_chunks[1][0];
+                    }
+                    for (std::size_t i = 4; i < 8; i++) {
+                        typename BlueprintFieldType::integral_type integral_input_state_sparse =
+                            typename BlueprintFieldType::integral_type(input_state[i].data);
+                        std::vector<bool> input_state_sparse(32);
+                        {
+                            nil::marshalling::status_type status;
+                            std::vector<bool> input_state_sparse_all =
+                                nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_input_state_sparse,
+                                                                                            status);
+                            std::copy(input_state_sparse_all.end() - 32, input_state_sparse_all.end(),
+                                    input_state_sparse.begin());
+                        }
+
+                        std::vector<std::size_t> input_state_sparse_sizes = {32};
+                        std::array<std::vector<typename BlueprintFieldType::integral_type>, 2> input_state_sparse_chunks =
+                            detail::split_and_sparse<BlueprintFieldType>(
+                                input_state_sparse, input_state_sparse_sizes, base7);
+                        sparse_values[i] = input_state_sparse_chunks[1][0];
+                    }
+                    row = row + 2;
+                    std::vector<std::size_t> sigma_sizes = {8, 8, 8, 8};
+                    std::vector<std::size_t> ch_and_maj_sizes = {8, 8, 8, 8};
+                    typename BlueprintFieldType::value_type base4_value = base4;
+                    typename BlueprintFieldType::value_type base7_value = base7;
+                    for (std::size_t i = row; i < row + 236; i = i + 5) {
+                        typename BlueprintFieldType::integral_type integral_a =
+                            typename BlueprintFieldType::integral_type(message_scheduling_words[(i - row) / 5 + 1].data);
+                        std::vector<bool> a(32);
+                        {
+                            nil::marshalling::status_type status;
+                            std::vector<bool> a_all =
+                                nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_a, status);
+                            std::copy(a_all.end() - 32, a_all.end(), a.begin());
+                        }
+
+                        std::vector<std::size_t> a_sizes = {3, 4, 11, 14};
+                        std::array<std::vector<typename BlueprintFieldType::integral_type>, 2> a_chunks =
+                            detail::split_and_sparse<BlueprintFieldType>(
+                                a, a_sizes, base4);
+                        typename BlueprintFieldType::integral_type sparse_sigma0 =
+                            a_chunks[1][1] * (1 + (one << 56) + (one << 34)) +
+                            a_chunks[1][2] * ((1 << 8) + 1 + (one << 42)) + a_chunks[1][3] * ((1 << 30) + (1 << 22) + 1) +
+                            a_chunks[1][0] * ((one << 50) + (1 << 28));
+                        std::array<std::vector<typename BlueprintFieldType::integral_type>, 2> sigma0_chunks =
+                            detail::reversed_sparse_and_split<BlueprintFieldType>(
+                                sparse_sigma0, sigma_sizes, base4);
+
+                        typename BlueprintFieldType::integral_type integral_b =
+                            typename BlueprintFieldType::integral_type(message_scheduling_words[(i - row) / 5 + 14].data);
+                        std::vector<bool> b(32);
+                        {
+                            nil::marshalling::status_type status;
+                            std::vector<bool> b_all =
+                                nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_b, status);
+                            std::copy(b_all.end() - 32, b_all.end(), b.begin());
+                        }
+
+                        std::vector<std::size_t> b_sizes = {10, 7, 2, 13};
+                        std::array<std::vector<typename BlueprintFieldType::integral_type>, 2> b_chunks =
+                            detail::split_and_sparse<BlueprintFieldType>(
+                                b, b_sizes, base4);
+
+                        typename BlueprintFieldType::integral_type sparse_sigma1 =
+                            b_chunks[1][1] * (1 + (one << 50) + (one << 46)) +
+                            b_chunks[1][2] * ((1 << 14) + 1 + (one << 60)) + b_chunks[1][3] * ((1 << 18) + (1 << 4) + 1) +
+                            b_chunks[1][0] * ((1 << 30) + (1 << 26));
+
+                        std::array<std::vector<typename BlueprintFieldType::integral_type>, 2> sigma1_chunks =
+                            detail::reversed_sparse_and_split<BlueprintFieldType>(
+                                sparse_sigma1, sigma_sizes, base4);
+                                
+                        typename BlueprintFieldType::value_type sum =
+                            message_scheduling_words[(i - row) / 5 + 9] + message_scheduling_words[(i - row) / 5] +
+                            sigma1_chunks[0][0] + sigma0_chunks[0][0] +
+                            (one << 8) * (sigma1_chunks[0][1] + sigma0_chunks[0][1]) +
+                            (one << 16) * (sigma1_chunks[0][2] + sigma0_chunks[0][2]) +
+                            (one << 24) * (sigma1_chunks[0][3] + sigma0_chunks[0][3]);
+                        message_scheduling_words[(i - row) / 5 + 16] =
+                            typename BlueprintFieldType::integral_type(sum.data) %
+                            typename BlueprintFieldType::integral_type(
+                                typename BlueprintFieldType::value_type(2).pow(32).data);
+
+                        typename BlueprintFieldType::integral_type integral_a2 =
+                            typename BlueprintFieldType::integral_type(message_scheduling_words[(i - row) / 5 + 16].data);
+                    }
+                    row = row + 240;
+                    for (std::size_t i = row; i < row + 512; i = i + 8) {
+                        typename BlueprintFieldType::integral_type integral_e =
+                            typename BlueprintFieldType::integral_type(e.data);
+                        std::vector<bool> e_bits(32);
+                        {
+                            nil::marshalling::status_type status;
+                            std::vector<bool> e_bits_all =
+                                nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_e, status);
+                            std::copy(e_bits_all.end() - 32, e_bits_all.end(), e_bits.begin());
+                        }
+
+                        std::vector<std::size_t> e_sizes = {6, 5, 14, 7};
+                        std::array<std::vector<typename BlueprintFieldType::integral_type>, 2> e_chunks =
+                            detail::split_and_sparse<BlueprintFieldType>(
+                                e_bits, e_sizes, base7);
+
+                        sparse_values[4] = typename BlueprintFieldType::integral_type(
+                            (e_chunks[1][0] + e_chunks[1][1] * base7_value.pow(e_sizes[0]) +
+                            e_chunks[1][2] * base7_value.pow(e_sizes[0] + e_sizes[1]) +
+                            e_chunks[1][3] * base7_value.pow(e_sizes[0] + e_sizes[1] + e_sizes[2]))
+                                .data);
+                        typename BlueprintFieldType::integral_type sparse_Sigma1 =
+                            typename BlueprintFieldType::integral_type(
+                                (e_chunks[1][1] * (base7_value.pow(27) + base7_value.pow(13) + 1) +
+                                e_chunks[1][2] * (base7_value.pow(5) + base7_value.pow(18) + 1) +
+                                e_chunks[1][3] * (base7_value.pow(19) + base7_value.pow(14) + 1) +
+                                e_chunks[1][0] * (base7_value.pow(26) + base7_value.pow(21) + base7_value.pow(7)))
+                                    .data);
+                        std::array<std::vector<typename BlueprintFieldType::integral_type>, 2> Sigma1_chunks =
+                            detail::reversed_sparse_and_split<BlueprintFieldType>(
+                                sparse_Sigma1, sigma_sizes, base7);
+                        typename BlueprintFieldType::integral_type Sigma1 =
+                            Sigma1_chunks[0][0] + Sigma1_chunks[0][1] * (1 << (sigma_sizes[0])) +
+                            Sigma1_chunks[0][2] * (1 << (sigma_sizes[0] + sigma_sizes[1])) +
+                            Sigma1_chunks[0][3] * (1 << (sigma_sizes[0] + sigma_sizes[1] + sigma_sizes[2]));
+                        typename BlueprintFieldType::integral_type sparse_ch =
+                            sparse_values[4] + 2 * sparse_values[5] + 3 * sparse_values[6];
+
+                        std::array<std::vector<typename BlueprintFieldType::integral_type>, 2> ch_chunks =
+                            detail::reversed_sparse_and_split_ch<BlueprintFieldType>(
+                                sparse_ch, ch_and_maj_sizes, base7);
+
+                        typename BlueprintFieldType::integral_type ch = ch_chunks[0][0] + ch_chunks[0][1] * (1 << 8) +
+                                                                        ch_chunks[0][2] * (1 << 16) +
+                                                                        ch_chunks[0][3] * (1 << 24);
+
+                        typename BlueprintFieldType::value_type tmp1 = h + Sigma1 + ch +
+                                                                    round_constant[(i - row) / 8] +
+                                                                    message_scheduling_words[(i - row) / 8];
+                        typename BlueprintFieldType::value_type sum = tmp1 + d;
+                        typename BlueprintFieldType::value_type e_new =
+                            typename BlueprintFieldType::integral_type(sum.data) %
+                            typename BlueprintFieldType::integral_type(
+                                typename BlueprintFieldType::value_type(2).pow(32).data);
+
+                        typename BlueprintFieldType::integral_type integral_a2 =
+                            typename BlueprintFieldType::integral_type(e_new.data);
+
+                        typename BlueprintFieldType::integral_type integral_a =
+                            typename BlueprintFieldType::integral_type(a.data);
+                        std::vector<bool> a_bits(32);
+                        {
+                            nil::marshalling::status_type status;
+                            std::vector<bool> a_bits_all =
+                                nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_a, status);
+                            std::copy(a_bits_all.end() - 32, a_bits_all.end(), a_bits.begin());
+                        }
+
+                        std::vector<std::size_t> a_sizes = {2, 11, 9, 10};
+                        std::array<std::vector<typename BlueprintFieldType::integral_type>, 2> a_chunks =
+                            detail::split_and_sparse<BlueprintFieldType>(
+                                a_bits, a_sizes, base4);
+
+                        sparse_values[0] = typename BlueprintFieldType::integral_type(
+                            (a_chunks[1][0] + a_chunks[1][1] * base4_value.pow(a_sizes[0]) +
+                            a_chunks[1][2] * base4_value.pow(a_sizes[0] + a_sizes[1]) +
+                            a_chunks[1][3] * base4_value.pow(a_sizes[0] + a_sizes[1] + a_sizes[2]))
+                                .data);
+                        typename BlueprintFieldType::integral_type sparse_Sigma0 =
+                            (a_chunks[1][0] * ((one << 38) + (1 << 20) + (one << 60)) +
+                            a_chunks[1][1] * ((one << 42) + 1 + (1 << 24)) +
+                            a_chunks[1][2] * ((1 << 22) + (one << 46) + 1) +
+                            a_chunks[1][3] * ((one << 40) + (1 << 18) + 1));
+                        std::array<std::vector<typename BlueprintFieldType::integral_type>, 2> Sigma0_chunks =
+                            detail::reversed_sparse_and_split<BlueprintFieldType>(
+                                sparse_Sigma0, sigma_sizes, base4);
+
+                        typename BlueprintFieldType::integral_type Sigma0 =
+                            Sigma0_chunks[0][0] + Sigma0_chunks[0][1] * (1 << sigma_sizes[0]) +
+                            Sigma0_chunks[0][2] * (1 << (sigma_sizes[0] + sigma_sizes[1])) +
+                            Sigma0_chunks[0][3] * (1 << (sigma_sizes[0] + sigma_sizes[1] + sigma_sizes[2]));
+
+                        typename BlueprintFieldType::integral_type sparse_maj =
+                            (sparse_values[0] + sparse_values[1] + sparse_values[2]);
+                        std::array<std::vector<typename BlueprintFieldType::integral_type>, 2> maj_chunks =
+                            detail::reversed_sparse_and_split_maj<BlueprintFieldType>(
+                                sparse_maj, ch_and_maj_sizes, base4);
+                        typename BlueprintFieldType::integral_type maj = maj_chunks[0][0] + maj_chunks[0][1] * (1 << 8) +
+                                                                        maj_chunks[0][2] * (1 << 16) +
+                                                                        maj_chunks[0][3] * (1 << 24);
+                        typename BlueprintFieldType::value_type sum1 = tmp1 + Sigma0 + maj;
+                        typename BlueprintFieldType::value_type a_new =
+                            typename BlueprintFieldType::integral_type(sum1.data) %
+                            typename BlueprintFieldType::integral_type(
+                                typename BlueprintFieldType::value_type(2).pow(32).data);
+
+                        integral_a2 =
+                            typename BlueprintFieldType::integral_type(a_new.data);
+
+                        h = g;
+                        sparse_values[7] = sparse_values[6];
+                        g = f;
+                        sparse_values[6] = sparse_values[5];
+                        f = e;
+                        sparse_values[5] = sparse_values[4];
+                        e = e_new;
+                        d = c;
+                        sparse_values[3] = sparse_values[2];
+                        c = b;
+                        sparse_values[2] = sparse_values[1];
+                        b = a;
+                        sparse_values[1] = sparse_values[0];
+                        a = a_new;
+                    }
+                    std::array<typename BlueprintFieldType::value_type, 8> output_state = {a, b, c, d, e, f, g, h};
+                    std::array<typename BlueprintFieldType::value_type, 8> result;
+                    row = row + 512;
+                    for (std::size_t i = 0; i < 8; i++) {
+                        auto sum = typename BlueprintFieldType::integral_type(input_state[i].data) +
+                                typename BlueprintFieldType::integral_type(output_state[i].data);
+                        result[i] = sum % typename BlueprintFieldType::integral_type(
+                                  typename BlueprintFieldType::value_type(2).pow(32).data);
+                    }
+
+                    return result;
                 }
             };
 
@@ -1583,6 +1864,44 @@ namespace nil {
 
                 return typename plonk_sha256_process<BlueprintFieldType, ArithmetizationParams>::result_type(
                     component, start_row_index);
+            }
+
+            template<typename BlueprintFieldType, typename ArithmetizationParams>
+            typename plonk_sha256_process<BlueprintFieldType, ArithmetizationParams>::result_type
+                generate_empty_assignments(
+                    const plonk_sha256_process<BlueprintFieldType, ArithmetizationParams> &component,
+                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                        &assignment,
+                    const typename plonk_sha256_process<BlueprintFieldType, ArithmetizationParams>::input_type
+                        instance_input,
+                    const std::uint32_t start_row_index) {
+
+                using component_type = plonk_sha256_process<BlueprintFieldType, ArithmetizationParams>;
+
+                std::size_t row = start_row_index;
+                typename BlueprintFieldType::integral_type one = 1;
+                std::array<typename BlueprintFieldType::value_type, 8> input_state = {
+                    var_value(assignment, instance_input.input_state[0]),
+                    var_value(assignment, instance_input.input_state[1]),
+                    var_value(assignment, instance_input.input_state[2]),
+                    var_value(assignment, instance_input.input_state[3]),
+                    var_value(assignment, instance_input.input_state[4]),
+                    var_value(assignment, instance_input.input_state[5]),
+                    var_value(assignment, instance_input.input_state[6]),
+                    var_value(assignment, instance_input.input_state[7])};
+                std::array<typename BlueprintFieldType::value_type, 16> input_words;
+                for (std::size_t i = 0; i < 16; i++) {
+                    input_words[i] = var_value(assignment, instance_input.input_words[i]);
+                }
+
+                std::array<typename BlueprintFieldType::value_type, 8> output_state = component_type::calculate(input_state, input_words);
+
+                for (std::size_t i = 0; i < 8; ++i) {
+                    assignment.witness(component.W(i), start_row_index) = output_state[i];
+                }
+
+                return typename plonk_sha256_process<BlueprintFieldType, ArithmetizationParams>::result_type(
+                    component, start_row_index, true);
             }
         }    // namespace components
     }        // namespace blueprint

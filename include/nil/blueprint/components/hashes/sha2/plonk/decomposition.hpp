@@ -82,8 +82,12 @@ namespace nil {
                                                              std::size_t lookup_column_amount) {
                     return 3;
                 }
+                constexpr static std::size_t get_empty_rows_amount() {
+                    return 1;
+                }
 
                 const std::size_t rows_amount = get_rows_amount(this->witness_amount(), 0);
+                const std::size_t empty_rows_amount = get_empty_rows_amount();
                 constexpr static const std::size_t gates_amount = 1;
 
                 struct input_type {
@@ -108,6 +112,17 @@ namespace nil {
                                   var(component.W(7), start_row_index + 1, false)};
                     }
 
+                    result_type(const decomposition &component, std::uint32_t start_row_index, bool skip) {
+                        output = {var(component.W(0), start_row_index, false),
+                                  var(component.W(1), start_row_index, false),
+                                  var(component.W(2), start_row_index, false),
+                                  var(component.W(3), start_row_index, false),
+                                  var(component.W(4), start_row_index, false),
+                                  var(component.W(5), start_row_index, false),
+                                  var(component.W(6), start_row_index, false),
+                                  var(component.W(7), start_row_index, false)};
+                    }
+
                     std::vector<var> all_vars() const {
                         return {output[0], output[1], output[2], output[3],
                                 output[4], output[5], output[6], output[7]};
@@ -130,6 +145,33 @@ namespace nil {
                               std::initializer_list<typename component_type::public_input_container_type::value_type>
                                   public_inputs) :
                     component_type(witnesses, constants, public_inputs, get_manifest()) {};
+
+                static std::array<typename BlueprintFieldType::value_type, 8>
+                        calculate(std::array<typename BlueprintFieldType::value_type, 2> data) {
+                    std::array<typename BlueprintFieldType::integral_type, 16> range_chunks;
+                    std::size_t shift = 0;
+
+                    for (std::size_t i = 0; i < 8; i++) {
+                        range_chunks[i] = (typename BlueprintFieldType::integral_type(data[0].data) >> shift) & ((65536) - 1);
+                        range_chunks[i + 8] = (typename BlueprintFieldType::integral_type(data[1].data) >> shift) & ((65536) - 1);
+                        shift += 16;
+                    }
+
+                    std::array<typename BlueprintFieldType::integral_type, 8> integral_output = 
+                                                {range_chunks[7] * (65536) + range_chunks[6],
+                                                range_chunks[5] * (65536) + range_chunks[4],
+                                                range_chunks[3] * (65536) + range_chunks[2],
+                                                range_chunks[1] * (65536) + range_chunks[0],
+                                                range_chunks[15] * (65536) + range_chunks[14],
+                                                range_chunks[13] * (65536) + range_chunks[12],
+                                                range_chunks[11] * (65536) + range_chunks[10],
+                                                range_chunks[9] * (65536) + range_chunks[8]};
+                    std::array<typename BlueprintFieldType::value_type, 8> output;
+                    for (std::size_t i = 0; i < output.size(); i++){
+                        output[i] = typename BlueprintFieldType::value_type(integral_output[i]);
+                    }
+                    return output;
+                }
             };
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
@@ -177,6 +219,30 @@ namespace nil {
 
                 return typename plonk_native_decomposition<BlueprintFieldType, ArithmetizationParams>::result_type(
                     component, start_row_index);
+            }
+            template<typename BlueprintFieldType, typename ArithmetizationParams>
+            typename plonk_native_decomposition<BlueprintFieldType, ArithmetizationParams>::result_type
+                generate_empty_assignments(
+                    const plonk_native_decomposition<BlueprintFieldType, ArithmetizationParams> &component,
+                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                        &assignment,
+                    const typename plonk_native_decomposition<BlueprintFieldType, ArithmetizationParams>::input_type
+                        instance_input,
+                    const std::uint32_t start_row_index) {
+                
+                using component_type = plonk_native_decomposition<BlueprintFieldType, ArithmetizationParams>;
+
+                std::size_t row = start_row_index;
+                std::array<typename BlueprintFieldType::value_type, 2> data = {var_value(assignment, instance_input.data[0]).data,
+                                                                                var_value(assignment, instance_input.data[1]).data};
+                
+                std::array<typename BlueprintFieldType::value_type, 8> output = component_type::calculate(data);
+                for (std::size_t i = 0; i < 8; i++) {
+                    assignment.witness(component.W(i), row) = output[i];
+                }
+
+                return typename plonk_native_decomposition<BlueprintFieldType, ArithmetizationParams>::result_type(
+                    component, start_row_index, true);
             }
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>

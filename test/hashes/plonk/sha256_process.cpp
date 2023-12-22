@@ -205,8 +205,21 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sha256_process) {
     };
     typename component_type::input_type instance_input = {input_state_var, input_words_var};
 
+    // check computation
+    std::array<typename ArithmetizationType::field_type::value_type, 8> input_state = {
+        0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19};
+    std::array<typename ArithmetizationType::field_type::value_type, 16> input_words = {
+        s - 5,      s + 5,      s - 6,      s + 6,      s - 7,      s + 7,      s - 8,      s + 8,
+        s - 9,      s + 9,      s + 10,     s - 10,     s + 11,     s - 11,     s + 12,     s - 12};
+    auto output = component_type::calculate(input_state, input_words);
+    for (std::size_t i = 0; i < 8; i++) {
+        assert(result_state[i] == typename ArithmetizationType::field_type::integral_type(output[i].data));
+    }
+
     component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8},{0},{});
     crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
+        component_instance, public_input, result_check, instance_input);
+    crypto3::test_empty_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
         component_instance, public_input, result_check, instance_input);
 }
 
