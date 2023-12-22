@@ -38,7 +38,7 @@ namespace nil {
                         for (std::size_t i = 0; i < policy_type::state_words; i++) {
                             this->state[i] = 0;
                         }
-                        this->state_count = 0;
+                        this->state_count = 1;
                     }
 
                     void absorb(const std::vector<typename policy_type::element_type>& inputs) {
