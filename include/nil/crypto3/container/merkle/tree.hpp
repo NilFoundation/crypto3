@@ -486,7 +486,8 @@ namespace nil {
                     using field_type = nil::crypto3::algebra::curves::pallas::base_field_type;
                     using poseidon_policy = nil::crypto3::hashes::detail::mina_poseidon_policy<field_type>;
                     hashes::detail::poseidon_sponge_construction<poseidon_policy> sponge;
-                    sponge.absorb({0, first, second});
+                    sponge.absorb(first);
+                    sponge.absorb(second);
                     return sponge.squeeze();
                 }
 
@@ -495,9 +496,7 @@ namespace nil {
                 typename T::digest_type generate_poseidon_leaf_hash(const LeafData &leaf) {
                     using field_type = nil::crypto3::algebra::curves::pallas::base_field_type;
                     using poseidon_policy = nil::crypto3::hashes::detail::mina_poseidon_policy<field_type>;
-
                     hashes::detail::poseidon_sponge_construction<poseidon_policy> sponge;
-                    sponge.absorb(0);
                     std::size_t cur = 1;
                     for(std::size_t i = 0; i < leaf.size(); i+=64) {
                         nil::crypto3::multiprecision::cpp_int first = 0;
