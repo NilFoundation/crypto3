@@ -102,9 +102,13 @@ namespace nil {
                                                              std::size_t lookup_column_amount) {
                     return rows_amount_internal(witness_amount);
                 }
+                constexpr static std::size_t get_empty_rows_amount() {
+                    return 1;
+                }
 
                 constexpr static const std::size_t gates_amount = 1;
                 const std::size_t rows_amount = rows_amount_internal(component_type::witness_amount());
+                const std::size_t empty_rows_amount = get_empty_rows_amount();
 
                 struct input_type {
                     var x;
@@ -125,6 +129,12 @@ namespace nil {
                         output =
                             var(component.W(component.witness_amount() - 1),
                                             start_row_index + component.rows_amount - 1, false);
+                    }
+                    result_type(const logic_and_flag<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
+                                                                                                 ArithmetizationParams>
+                                                    > &component,
+                                std::uint32_t start_row_index, bool skip) {
+                        output = var(component.W(0), start_row_index, false);
                     }
 
                     std::vector<var> all_vars() const {
@@ -148,6 +158,19 @@ namespace nil {
                                std::initializer_list<typename component_type::public_input_container_type::value_type>
                                    public_inputs) :
                     component_type(witnesses, constants, public_inputs, get_manifest()) {};
+
+                static typename BlueprintFieldType::value_type calculate(typename BlueprintFieldType::value_type x,
+                                                                         typename BlueprintFieldType::value_type y) {
+                    
+                    std::array<typename BlueprintFieldType::value_type, 5> t;
+                    t[0] = x;
+                    t[1] = y;
+                    t[2] = t[0] * t[1];                                // p
+                    t[3] = t[2].is_zero() ? t[2] : t[2].inversed();    // v
+                    t[4] = t[3] * t[2];                                // f
+
+                    return t[4];
+                }
             };
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
@@ -190,6 +213,26 @@ namespace nil {
                 return
                     typename plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams>::result_type
                         (component, start_row_index);
+            }
+
+            template<typename BlueprintFieldType, typename ArithmetizationParams>
+            typename plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams>::result_type
+                generate_empty_assignments(
+                    const plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams>
+                        &component,
+                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                        &assignment,
+                    const typename plonk_logic_and_flag_component<BlueprintFieldType,
+                                                                  ArithmetizationParams>::input_type &instance_input,
+                    const std::uint32_t start_row_index) {
+                using component_type = plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams>;
+
+                assignment.witness(component.W(0), start_row_index) = component_type::calculate(var_value(assignment, instance_input.x),
+                                                                                                var_value(assignment, instance_input.y));
+
+                return
+                    typename plonk_logic_and_flag_component<BlueprintFieldType, ArithmetizationParams>::result_type
+                        (component, start_row_index, true);
             }
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>

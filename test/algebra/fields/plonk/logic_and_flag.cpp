@@ -84,6 +84,8 @@ auto test_logic_and_flag(std::vector<typename BlueprintFieldType::value_type> pu
 
     nil::crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
         component_instance, public_input, result_check, instance_input);
+    nil::crypto3::test_empty_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
+        component_instance, public_input, result_check, instance_input);
 }
 
 template<typename FieldType, std::size_t RandomTestsAmount, std::uint32_t WitnessesAmount>
