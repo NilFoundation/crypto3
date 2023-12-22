@@ -119,6 +119,8 @@ void test_field_sub(const std::vector<typename BlueprintFieldType::value_type> &
 
     crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
         component_instance, public_input, result_check, instance_input);
+    crypto3::test_empty_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
+        component_instance, public_input, result_check, instance_input);
 }
 
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)

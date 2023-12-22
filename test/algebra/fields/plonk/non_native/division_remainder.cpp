@@ -102,6 +102,9 @@ auto test_division_remainder(typename BlueprintFieldType::value_type x,
             nil::crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
                 component_instance, public_input, result_check, instance_input,
                 nil::crypto3::detail::connectedness_check_type::STRONG, R, CheckInputs);
+            nil::crypto3::test_empty_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
+                component_instance, public_input, result_check, instance_input,
+                nil::crypto3::detail::connectedness_check_type::STRONG, R, CheckInputs);
         } else {
             nil::crypto3::test_component_to_fail<component_type, BlueprintFieldType, ArithmetizationParams,
                                                  hash_type, Lambda>(

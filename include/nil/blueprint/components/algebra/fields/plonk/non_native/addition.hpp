@@ -109,10 +109,14 @@ namespace nil {
                                                              std::size_t lookup_column_amount) {
                     return rows_amount_internal(witness_amount, lookup_column_amount);
                 }
+                constexpr static std::size_t get_empty_rows_amount() {
+                    return 1;
+                }
 
                 constexpr static const std::size_t T = 257;
 
                 const std::size_t rows_amount = rows_amount_internal(this->witness_amount(), 0);
+                const std::size_t empty_rows_amount = get_empty_rows_amount();
                 constexpr static const std::size_t gates_amount = 1;
 
                 struct input_type {
@@ -132,6 +136,12 @@ namespace nil {
                                   var(component.W(1), start_row_index + 2, false),
                                   var(component.W(2), start_row_index + 2, false),
                                   var(component.W(3), start_row_index + 2, false)};
+                    }
+                    result_type(const addition &component, std::uint32_t start_row_index, bool skip) {
+                        output = {var(component.W(0), start_row_index, false),
+                                  var(component.W(1), start_row_index, false),
+                                  var(component.W(2), start_row_index, false),
+                                  var(component.W(3), start_row_index, false)};
                     }
 
                     std::vector<var> all_vars() const {
@@ -154,6 +164,64 @@ namespace nil {
                          std::initializer_list<typename component_type::public_input_container_type::value_type>
                              public_inputs) :
                     component_type(witnesses, constants, public_inputs, get_manifest()) {};
+
+                static std::array<typename BlueprintFieldType::value_type, 4>
+                        calculate(std::array<typename BlueprintFieldType::value_type, 4> a,
+                                 std::array<typename BlueprintFieldType::value_type, 4> b) {
+                    using ed25519_field_type = crypto3::algebra::fields::curve25519_base_field;
+
+                    typename ed25519_field_type::integral_type base = 1;
+                    typename BlueprintFieldType::integral_type pasta_base = 1;
+                    typename ed25519_field_type::extended_integral_type extended_base = 1;
+                    typename ed25519_field_type::value_type eddsa_a =
+                        typename ed25519_field_type::integral_type(a[0].data) +
+                        typename ed25519_field_type::integral_type(a[1].data) * (base << 66) +
+                        typename ed25519_field_type::integral_type(a[2].data) * (base << 132) +
+                        typename ed25519_field_type::integral_type(a[3].data) * (base << 198);
+
+                    typename ed25519_field_type::value_type eddsa_b =
+                        typename ed25519_field_type::integral_type(b[0].data) +
+                        typename ed25519_field_type::integral_type(b[1].data) * (base << 66) +
+                        typename ed25519_field_type::integral_type(b[2].data) * (base << 132) +
+                        typename ed25519_field_type::integral_type(b[3].data) * (base << 198);
+
+                    typename ed25519_field_type::value_type eddsa_r = eddsa_a + eddsa_b;
+                    typename ed25519_field_type::integral_type integral_eddsa_r =
+                        typename ed25519_field_type::integral_type(eddsa_r.data);
+                    typename ed25519_field_type::extended_integral_type eddsa_p = ed25519_field_type::modulus;
+                    typename ed25519_field_type::extended_integral_type integral_eddsa_q =
+                        (typename ed25519_field_type::extended_integral_type(eddsa_a.data) +
+                        typename ed25519_field_type::extended_integral_type(eddsa_b.data) -
+                        typename ed25519_field_type::extended_integral_type(eddsa_r.data)) /
+                        eddsa_p;
+                    typename ed25519_field_type::extended_integral_type pow = extended_base << 257;
+                    typename ed25519_field_type::extended_integral_type minus_eddsa_p = pow - eddsa_p;
+
+                    std::array<typename BlueprintFieldType::value_type, 4> r;
+                    std::array<typename BlueprintFieldType::value_type, 4> q;
+                    std::array<typename BlueprintFieldType::value_type, 4> p;
+                    typename BlueprintFieldType::integral_type mask = (pasta_base << 66) - 1;
+                    r[0] = (integral_eddsa_r) & (mask);
+                    q[0] = (integral_eddsa_q) & (mask);
+                    p[0] = (minus_eddsa_p) & (mask);
+                    for (std::size_t i = 1; i < 4; i++) {
+                        r[i] = (integral_eddsa_r >> (66 * i)) & (mask);
+                    }
+                    typename BlueprintFieldType::value_type t = a[0] + b[0] + p[0] * q[0];
+
+                    typename BlueprintFieldType::value_type u0 = t - r[0];
+
+                    typename BlueprintFieldType::integral_type u0_integral =
+                        typename BlueprintFieldType::integral_type(u0.data) >> 66;
+                    std::array<typename BlueprintFieldType::value_type, 4> u0_chunks;
+
+                    u0_chunks[0] = u0_integral & ((1 << 22) - 1);
+                    u0_chunks[1] = (u0_integral >> 22) & ((1 << 22) - 1);
+                    u0_chunks[2] = (u0_integral >> 44) & ((1 << 22) - 1);
+                    u0_chunks[3] = (u0_integral >> 66) & (1);
+
+                    return {r[0], r[1], r[2], r[3]};
+                }
             };
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
@@ -274,6 +342,43 @@ namespace nil {
 
                 return typename plonk_ed25519_addition<BlueprintFieldType, ArithmetizationParams>::result_type(
                     component, start_row_index);
+            }
+
+            template<typename BlueprintFieldType, typename ArithmetizationParams>
+            typename plonk_ed25519_addition<BlueprintFieldType, ArithmetizationParams>::result_type
+                generate_empty_assignments(
+                    const plonk_ed25519_addition<BlueprintFieldType, ArithmetizationParams> &component,
+                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                        &assignment,
+                    const typename plonk_ed25519_addition<BlueprintFieldType, ArithmetizationParams>::input_type
+                        instance_input,
+                    const std::uint32_t start_row_index) {
+
+                using component_type = plonk_ed25519_addition<BlueprintFieldType, ArithmetizationParams>;
+
+                using var = typename plonk_ed25519_addition<BlueprintFieldType, ArithmetizationParams>::var;
+
+                std::array<typename BlueprintFieldType::value_type, 4> a = {
+                    typename BlueprintFieldType::integral_type(var_value(assignment, instance_input.A[0]).data),
+                    typename BlueprintFieldType::integral_type(var_value(assignment, instance_input.A[1]).data),
+                    typename BlueprintFieldType::integral_type(var_value(assignment, instance_input.A[2]).data),
+                    typename BlueprintFieldType::integral_type(var_value(assignment, instance_input.A[3]).data)};
+                
+                std::array<typename BlueprintFieldType::value_type, 4> b = {
+                    typename BlueprintFieldType::integral_type(var_value(assignment, instance_input.B[0]).data),
+                    typename BlueprintFieldType::integral_type(var_value(assignment, instance_input.B[1]).data),
+                    typename BlueprintFieldType::integral_type(var_value(assignment, instance_input.B[2]).data),
+                    typename BlueprintFieldType::integral_type(var_value(assignment, instance_input.B[3]).data)};
+                
+                auto r = component_type::calculate(a, b);
+
+                assignment.witness(component.W(0), start_row_index) = r[0];
+                assignment.witness(component.W(1), start_row_index) = r[1];
+                assignment.witness(component.W(2), start_row_index) = r[2];
+                assignment.witness(component.W(3), start_row_index) = r[3];
+
+                return typename plonk_ed25519_addition<BlueprintFieldType, ArithmetizationParams>::result_type(
+                    component, start_row_index, true);
             }
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>

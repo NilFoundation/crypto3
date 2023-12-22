@@ -109,10 +109,14 @@ namespace nil {
                                                              std::size_t lookup_column_amount) {
                     return rows_amount_internal(witness_amount, lookup_column_amount);
                 }
+                constexpr static std::size_t get_empty_rows_amount() {
+                    return 1;
+                }
 
                 constexpr static const std::size_t T = 257;
 
                 const std::size_t rows_amount = rows_amount_internal(this->witness_amount(), 0);
+                const std::size_t empty_rows_amount = get_empty_rows_amount();
                 static constexpr const std::size_t gates_amount = 1;
 
                 struct input_type {
@@ -132,6 +136,12 @@ namespace nil {
                                   var(component.W(4), start_row_index + component.rows_amount - 2, false),
                                   var(component.W(5), start_row_index + component.rows_amount - 2, false),
                                   var(component.W(6), start_row_index + component.rows_amount - 2, false)};
+                    }
+                    result_type(const multiplication &component, std::uint32_t start_row_index, bool skip) {
+                        output = {var(component.W(0), start_row_index, false),
+                                  var(component.W(1), start_row_index, false),
+                                  var(component.W(2), start_row_index, false),
+                                  var(component.W(3), start_row_index, false)};
                     }
 
                     std::vector<var> all_vars() const {
@@ -155,6 +165,90 @@ namespace nil {
                                std::initializer_list<typename component_type::public_input_container_type::value_type>
                                    public_inputs) :
                     component_type(witnesses, constants, public_inputs, get_manifest()) {};
+
+                static std::array<typename BlueprintFieldType::value_type, 4>
+                        calculate(std::array<typename BlueprintFieldType::value_type, 4> a,
+                                 std::array<typename BlueprintFieldType::value_type, 4> b) {
+                    using ed25519_field_type = crypto3::algebra::fields::curve25519_base_field;
+
+                    using native_value_type = typename BlueprintFieldType::value_type;
+                    using native_integral_type = typename BlueprintFieldType::integral_type;
+                    using foreign_value_type = typename ed25519_field_type::value_type;
+                    using foreign_integral_type = typename ed25519_field_type::integral_type;
+                    using foreign_extended_integral_type = typename ed25519_field_type::extended_integral_type;
+
+                    foreign_integral_type base = 1;
+                    native_integral_type pasta_base = 1;
+                    foreign_extended_integral_type extended_base = 1;
+                    foreign_value_type eddsa_a =
+                        foreign_integral_type(a[0].data) +
+                        foreign_integral_type(a[1].data) * (base << 66) +
+                        foreign_integral_type(a[2].data) * (base << 132) +
+                        foreign_integral_type(a[3].data) * (base << 198);
+                    foreign_value_type eddsa_b =
+                        foreign_integral_type(b[0].data) +
+                        foreign_integral_type(b[1].data) * (base << 66) +
+                        foreign_integral_type(b[2].data) * (base << 132) +
+                        foreign_integral_type(b[3].data) * (base << 198);
+                    foreign_value_type eddsa_r = eddsa_a * eddsa_b;
+                    foreign_integral_type integral_eddsa_r =
+                        foreign_integral_type(eddsa_r.data);
+                    foreign_extended_integral_type eddsa_p = ed25519_field_type::modulus;
+                    foreign_extended_integral_type integral_eddsa_q =
+                        (foreign_extended_integral_type(eddsa_a.data) *
+                            foreign_extended_integral_type(eddsa_b.data) -
+                        foreign_extended_integral_type(eddsa_r.data)) /
+                        eddsa_p;
+                    foreign_extended_integral_type pow = extended_base << 257;
+                    foreign_extended_integral_type minus_eddsa_p = pow - eddsa_p;
+
+                    std::array<native_value_type, 4> r;
+                    std::array<native_value_type, 4> q;
+                    std::array<native_value_type, 4> p;
+                    native_integral_type mask = (pasta_base << 66) - 1;
+                    r[0] = (integral_eddsa_r) & (mask);
+                    q[0] = (integral_eddsa_q) & (mask);
+                    p[0] = (minus_eddsa_p) & (mask);
+                    p[1] = (minus_eddsa_p >> 66) & (mask);
+                    p[2] = (minus_eddsa_p >> 132) & (mask);
+                    p[3] = (minus_eddsa_p >> 198) & (mask);
+                    for (std::size_t i = 1; i < 4; i++) {
+                        r[i] = (integral_eddsa_r >> (66 * i)) & (mask);
+                        q[i] = (integral_eddsa_q >> (66 * i)) & (mask);
+                    }
+                    std::array<native_value_type, 4> t;
+                    t[0] = a[0] * b[0] + p[0] * q[0];
+                    t[1] = a[1] * b[0] + a[0] * b[1] + p[0] * q[1] + p[1] * q[0];
+                    t[2] = a[2] * b[0] + a[0] * b[2] + a[1] * b[1] + p[2] * q[0] + q[2] * p[0] + p[1] * q[1];
+                    t[3] = a[3] * b[0] + b[3] * a[0] + a[1] * b[2] + b[1] * a[2] + p[3] * q[0] + q[3] * p[0] + p[1] * q[2] +
+                        q[1] * p[2];
+
+                    native_value_type u0 =
+                        t[0] - r[0] + t[1] * (pasta_base << 66) - r[1] * (pasta_base << 66);
+
+                    native_integral_type u0_integral =
+                        native_integral_type(u0.data) >> 132;
+                    std::array<native_value_type, 4> u0_chunks;
+
+                    u0_chunks[0] = u0_integral & ((1 << 22) - 1);
+                    u0_chunks[1] = (u0_integral >> 22) & ((1 << 22) - 1);
+                    u0_chunks[2] = (u0_integral >> 44) & ((1 << 22) - 1);
+                    u0_chunks[3] = (u0_integral >> 66) & ((1 << 4) - 1);
+
+                    native_value_type u1 = t[2] - r[2] + t[3] * (pasta_base << 66) -
+                                                                r[3] * (pasta_base << 66) +
+                                                                native_value_type(u0_integral);
+
+                    native_integral_type u1_integral =
+                        native_integral_type(u1.data) >> 125;
+                    std::array<native_value_type, 4> u1_chunks;
+                    u1_chunks[0] = u1_integral & ((1 << 22) - 1);
+                    u1_chunks[1] = (u1_integral >> 22) & ((1 << 22) - 1);
+                    u1_chunks[2] = (u1_integral >> 44) & ((1 << 22) - 1);
+                    u1_chunks[3] = (u1_integral >> 66) & ((1 << 8) - 1);
+
+                    return {r[0], r[1], r[2], r[3]};
+                }
             };
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
@@ -315,6 +409,42 @@ namespace nil {
                 generate_assignments(range_component_instance, assignment, non_range_input_r, row + 2);
 
                 return typename component_type::result_type(component, start_row_index);
+            }
+
+            template<typename BlueprintFieldType, typename ArithmetizationParams>
+            typename plonk_ed25519_multiplication<BlueprintFieldType, ArithmetizationParams>::result_type
+                generate_empty_assignments(
+                    const plonk_ed25519_multiplication<BlueprintFieldType, ArithmetizationParams> &component,
+                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                        &assignment,
+                    const typename plonk_ed25519_multiplication<BlueprintFieldType, ArithmetizationParams>::input_type
+                        &instance_input,
+                    const std::uint32_t start_row_index) {
+
+                using var = typename plonk_ed25519_multiplication<BlueprintFieldType, ArithmetizationParams>::var;
+                using component_type = plonk_ed25519_multiplication<BlueprintFieldType, ArithmetizationParams>;
+
+                using native_value_type = typename BlueprintFieldType::value_type;
+                using native_integral_type = typename BlueprintFieldType::integral_type;
+
+                std::array<native_value_type, 4> a = {
+                    native_integral_type(var_value(assignment, instance_input.A[0]).data),
+                    native_integral_type(var_value(assignment, instance_input.A[1]).data),
+                    native_integral_type(var_value(assignment, instance_input.A[2]).data),
+                    native_integral_type(var_value(assignment, instance_input.A[3]).data)};
+                std::array<native_value_type, 4> b = {
+                    native_integral_type(var_value(assignment, instance_input.B[0]).data),
+                    native_integral_type(var_value(assignment, instance_input.B[1]).data),
+                    native_integral_type(var_value(assignment, instance_input.B[2]).data),
+                    native_integral_type(var_value(assignment, instance_input.B[3]).data)};
+
+                auto r = component_type::calculate(a, b);
+                assignment.witness(component.W(0), start_row_index) = r[0];
+                assignment.witness(component.W(1), start_row_index) = r[1];
+                assignment.witness(component.W(2), start_row_index) = r[2];
+                assignment.witness(component.W(3), start_row_index) = r[3];
+
+                return typename component_type::result_type(component, start_row_index, true);
             }
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>

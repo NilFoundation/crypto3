@@ -133,6 +133,9 @@ namespace nil {
                                                              bool check_inputs) {
                     return rows_amount_internal(witness_amount, bits_amount, check_inputs);
                 }
+                constexpr static std::size_t get_empty_rows_amount() {
+                    return 1;
+                }
 
                 /*
                    It's CRITICAL that these two variables remain on top
@@ -148,6 +151,7 @@ namespace nil {
 
                 const bool needs_bonus_row = needs_bonus_row_internal(this->witness_amount());
                 const std::size_t rows_amount = rows_amount_internal(this->witness_amount(), bits_amount, check_inputs);
+                const std::size_t empty_rows_amount = get_empty_rows_amount();
                 constexpr static const std::size_t gates_amount = 1;
 
                 enum var_address {
@@ -185,6 +189,14 @@ namespace nil {
                         quotient = var(component.W(q_address.second), q_address.first);
                         remainder = var(component.W(r_address.second), r_address.first);
                     }
+                    result_type(const division_remainder &component, std::size_t start_row_index, bool skip) {
+                        std::pair<std::size_t, std::size_t>
+                            r_address = component.get_var_address(var_address::R_, start_row_index),
+                            q_address = component.get_var_address(var_address::Q, start_row_index);
+
+                        quotient = var(component.W(0), start_row_index);
+                        remainder = var(component.W(1), start_row_index);
+                    }
 
                     std::vector<var> all_vars() const {
                         return {quotient, remainder};
@@ -215,6 +227,18 @@ namespace nil {
                         range_checks(range_check_amount, range_check_component_type(witnesses, constants,
                                                                                     public_inputs, bits_amount_))
                 {};
+
+                static std::array<typename BlueprintFieldType::value_type, 2> calculate(
+                    std::array<typename BlueprintFieldType::value_type, 2> input) {
+                    using value_type = typename BlueprintFieldType::value_type;
+                    using integral_type = typename BlueprintFieldType::integral_type;
+
+                    integral_type x_integral = integral_type(input[0].data),
+                                y_integral = integral_type(input[1].data);
+                    integral_type q_integral = y_integral != 0 ? x_integral / y_integral : 0,
+                                r_integral = y_integral != 0 ? x_integral % y_integral : 0;
+                    return {value_type(q_integral), value_type(r_integral)};
+                }
             };
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
@@ -406,6 +430,32 @@ namespace nil {
                 BOOST_ASSERT(row == start_row_index + component.rows_amount);
 
                 return typename component_type::result_type(component, start_row_index);
+            }
+
+            template<typename BlueprintFieldType, typename ArithmetizationParams>
+            typename plonk_division_remainder<BlueprintFieldType, ArithmetizationParams>::result_type
+            generate_empty_assignments(
+                const plonk_division_remainder<BlueprintFieldType, ArithmetizationParams>
+                    &component,
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
+                                                                       ArithmetizationParams>>
+                    &assignment,
+                const typename plonk_division_remainder<BlueprintFieldType, ArithmetizationParams>::input_type
+                    &instance_input,
+                const std::uint32_t start_row_index) {
+
+                using component_type = plonk_division_remainder<BlueprintFieldType, ArithmetizationParams>;
+                using value_type = typename BlueprintFieldType::value_type;
+                using integral_type = typename BlueprintFieldType::integral_type;
+
+                value_type x = var_value(assignment, instance_input.x),
+                           y = var_value(assignment, instance_input.y);
+                auto res = component_type::calculate({x, y});
+
+                assignment.witness(component.W(0), start_row_index) = res[0];
+                assignment.witness(component.W(1), start_row_index) = res[1];
+
+                return typename component_type::result_type(component, start_row_index, true);
             }
         }    // namespace components
     }        // namespace blueprint
