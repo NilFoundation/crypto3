@@ -317,6 +317,85 @@ namespace nil {
             return std::make_tuple(desc, bp, assignment);
         }
 
+        template<
+            typename ComponentType, typename BlueprintFieldType, typename ArithmetizationParams, typename Hash,
+            std::size_t Lambda, typename PublicInputContainerType, typename FunctorResultCheck, bool PrivateInput,
+            typename... ComponentStaticInfoArgs>
+        auto prepare_empty_component(ComponentType component_instance, const PublicInputContainerType &public_input,
+                               const FunctorResultCheck &result_check,
+                               typename ComponentType::input_type instance_input,
+                               detail::connectedness_check_type connectedness_check,
+                               ComponentStaticInfoArgs... component_static_info_args) {
+
+            using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+            using component_type = ComponentType;
+
+            blueprint::circuit<ArithmetizationType> bp;
+            blueprint::assignment<ArithmetizationType> assignment;
+
+            static boost::random::mt19937 gen;
+            static boost::random::uniform_int_distribution<> dist(0, 100);
+            std::size_t start_row = dist(gen);
+
+            if constexpr (PrivateInput) {
+                for (std::size_t i = 0; i < public_input.size(); i++) {
+                    assignment.private_storage(i) = public_input[i];
+                }
+            } else {
+                for (std::size_t i = 0; i < public_input.size(); i++) {
+                    assignment.public_input(0, i) = public_input[i];
+                }
+            }
+
+            auto component_result = boost::get<typename component_type::result_type>(
+                blueprint::components::generate_empty_assignments<BlueprintFieldType, ArithmetizationParams>(
+                component_instance, assignment, instance_input, start_row));
+            assignment.export_table(std::cout);
+            bp.export_circuit(std::cout);
+            result_check(assignment, component_result);
+
+            zk::snark::plonk_table_description<BlueprintFieldType, ArithmetizationParams> desc;
+            desc.usable_rows_amount = assignment.rows_amount();
+
+            if (start_row + component_instance.empty_rows_amount >= public_input.size()) {
+                BOOST_ASSERT_MSG(assignment.rows_amount() - start_row == component_instance.empty_rows_amount,
+                                "Component rows amount does not match actual rows amount.");
+            }
+            BOOST_ASSERT(bp.num_gates() == 0);
+            BOOST_ASSERT(bp.num_lookup_gates() == 0);
+
+            desc.rows_amount = zk::snark::basic_padding(assignment);
+
+#ifdef BLUEPRINT_PLONK_PROFILING_ENABLED
+            std::cout << "Usable rows: " << desc.usable_rows_amount << std::endl;
+            std::cout << "Padded rows: " << desc.rows_amount << std::endl;
+
+            profiling(assignment);
+#endif
+
+            return std::make_tuple(desc, bp, assignment);
+        }
+
+        template<typename ComponentType, typename BlueprintFieldType, typename ArithmetizationParams, typename Hash,
+                 std::size_t Lambda, typename PublicInputContainerType, typename FunctorResultCheck,
+                 typename... ComponentStaticInfoArgs>
+        typename std::enable_if<
+            std::is_same<typename BlueprintFieldType::value_type,
+                         typename std::iterator_traits<typename PublicInputContainerType::iterator>::value_type>::value>::type
+            test_empty_component(ComponentType component_instance, const PublicInputContainerType &public_input,
+                           FunctorResultCheck result_check,
+                           typename ComponentType::input_type instance_input,
+                           detail::connectedness_check_type connectedness_check =
+                            detail::connectedness_check_type::STRONG,
+                           ComponentStaticInfoArgs... component_static_info_args) {
+            auto [desc, bp, assignments] =
+                prepare_empty_component<ComponentType, BlueprintFieldType, ArithmetizationParams, Hash, Lambda,
+                                  PublicInputContainerType, FunctorResultCheck, false,
+                                  ComponentStaticInfoArgs...>
+                                  (component_instance, public_input, result_check, instance_input,
+                                   connectedness_check, component_static_info_args...);
+        }
+
         template<typename ComponentType, typename BlueprintFieldType, typename ArithmetizationParams, typename Hash,
                  std::size_t Lambda, typename PublicInputContainerType, typename FunctorResultCheck, bool PrivateInput,
                  typename... ComponentStaticInfoArgs>
