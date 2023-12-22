@@ -75,9 +75,13 @@ namespace nil {
                                                              std::size_t lookup_column_amount) {
                     return 1;
                 }
+                constexpr static std::size_t get_empty_rows_amount() {
+                    return 1;
+                }
 
                 constexpr static const std::size_t gates_amount = 1;
                 const std::size_t rows_amount = get_rows_amount(this->witness_amount(), 0);
+                const std::size_t empty_rows_amount = get_empty_rows_amount();
 
                 using var = typename component_type::var;
                 using manifest_type = plonk_component_manifest;
@@ -130,6 +134,11 @@ namespace nil {
                             std::initializer_list<typename component_type::public_input_container_type::value_type>
                                 public_inputs) :
                     component_type(witnesses, constants, public_inputs, get_manifest()) {};
+                
+                static typename BlueprintFieldType::value_type calculate(typename BlueprintFieldType::value_type x,
+                                                                         typename BlueprintFieldType::value_type y) {
+                    return x - y;
+                }
             };
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
@@ -152,6 +161,23 @@ namespace nil {
                 assignment.witness(component.W(1), j) = var_value(assignment, instance_input.y);
                 assignment.witness(component.W(2), j) =
                     var_value(assignment, instance_input.x) - var_value(assignment, instance_input.y);
+                return typename plonk_subtraction<BlueprintFieldType, ArithmetizationParams>::result_type(
+                    component, start_row_index);
+            }
+
+            template<typename BlueprintFieldType, typename ArithmetizationParams>
+            typename plonk_subtraction<BlueprintFieldType, ArithmetizationParams>::result_type
+                    generate_empty_assignments(
+                const plonk_subtraction<BlueprintFieldType, ArithmetizationParams> &component,
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                    &assignment,
+                const typename plonk_subtraction<BlueprintFieldType, ArithmetizationParams>::input_type
+                    instance_input,
+                const std::uint32_t start_row_index) {
+
+                using component_type = plonk_subtraction<BlueprintFieldType, ArithmetizationParams>;
+                assignment.witness(component.W(2), start_row_index) = component_type::calculate(
+                    var_value(assignment, instance_input.x), var_value(assignment, instance_input.y));
                 return typename plonk_subtraction<BlueprintFieldType, ArithmetizationParams>::result_type(
                     component, start_row_index);
             }
