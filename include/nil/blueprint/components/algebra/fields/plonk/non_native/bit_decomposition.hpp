@@ -103,7 +103,12 @@ namespace nil {
                                                            bits_amount, true);
                 }
 
+                constexpr static std::size_t get_empty_rows_amount(std::size_t bits_amount) {
+                    return bits_amount / 9 + (bits_amount % 9 != 0);
+                }
+
                 const bit_composition_mode mode;
+                const std::size_t empty_rows_amount = get_empty_rows_amount(this->bits_amount);
 
                 struct input_type {
                     var input;
@@ -127,6 +132,13 @@ namespace nil {
                         for (std::size_t i = 0; i < component.bits_amount; i++) {
                             auto pos = component.bit_position(start_row_index, padded_bit_index(i));
                             output[i] = var(component.W(pos.second), pos.first, false);
+                        }
+                    }
+                    result_type(const bit_decomposition &component, std::uint32_t start_row_index, bool skip) {
+                        output.resize(component.bits_amount);
+
+                        for (std::size_t i = 0; i < component.bits_amount; i++) {
+                            output[i] = var(component.W(i % 9), start_row_index + i / 9, false);
                         }
                     }
 
@@ -167,6 +179,26 @@ namespace nil {
 
                     check_params(bits_amount, mode);
                 };
+
+                static std::vector<bool> calculate(typename BlueprintFieldType::value_type input,
+                                                    std::uint32_t bits_amount, bit_composition_mode mode) {
+                    auto bit_index = [&mode, &bits_amount](std::size_t i) {
+                        return mode == bit_composition_mode::MSB ? i : bits_amount - i - 1;
+                    };
+                    std::vector<bool> bits(bits_amount);
+                    {
+                        nil::marshalling::status_type status;
+                        std::array<bool, BlueprintFieldType::modulus_bits> bytes_all =
+                            nil::marshalling::pack<nil::marshalling::option::big_endian>(input, status);
+                        std::copy(bytes_all.end() - bits_amount, bytes_all.end(), bits.begin());
+                        assert(status == nil::marshalling::status_type::success);
+                    }
+                    std::vector<bool> true_bits(bits_amount);
+                    for (std::size_t i = 0; i < bits_amount; i++) {
+                        true_bits[i] = bits[bit_index(i)];
+                    }
+                    return true_bits;
+                }
             };
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
@@ -183,6 +215,7 @@ namespace nil {
                     const typename plonk_bit_decomposition<BlueprintFieldType, ArithmetizationParams>::input_type
                         &instance_input,
                     const std::uint32_t start_row_index) {
+                using component_type = plonk_bit_decomposition<BlueprintFieldType, ArithmetizationParams>;
 
                 typename BlueprintFieldType::integral_type input_data =
                     typename BlueprintFieldType::integral_type(var_value(assignment, instance_input.input).data);
@@ -202,6 +235,31 @@ namespace nil {
 
                 return typename plonk_bit_decomposition<BlueprintFieldType, ArithmetizationParams>::result_type(
                             component, start_row_index);
+            }
+
+            template<typename BlueprintFieldType, typename ArithmetizationParams>
+            typename plonk_bit_decomposition<BlueprintFieldType, ArithmetizationParams>::result_type
+                generate_empty_assignments(
+                    const plonk_bit_decomposition<BlueprintFieldType, ArithmetizationParams>
+                        &component,
+                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                        &assignment,
+                    const typename plonk_bit_decomposition<BlueprintFieldType, ArithmetizationParams>::input_type
+                        &instance_input,
+                    const std::uint32_t start_row_index) {
+                using component_type = plonk_bit_decomposition<BlueprintFieldType, ArithmetizationParams>;
+                using value_type = typename BlueprintFieldType::value_type;
+
+                value_type input_data = var_value(assignment, instance_input.input);
+
+                std::vector<bool> bits = component_type::calculate(input_data, component.bits_amount, component.mode);
+
+                for (std::size_t i = 0; i < component.bits_amount; i++) {
+                    assignment.witness(component.W(i % 9), start_row_index + i / 9) = value_type(bits[i] ? 1 : 0);
+                }
+
+                return typename plonk_bit_decomposition<BlueprintFieldType, ArithmetizationParams>::result_type(
+                            component, start_row_index, true);
             }
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>

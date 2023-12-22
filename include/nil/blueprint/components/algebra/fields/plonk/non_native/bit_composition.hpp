@@ -106,7 +106,12 @@ namespace nil {
                                                            bits_amount, check_input);
                 }
 
+                constexpr static std::size_t get_empty_rows_amount() {
+                    return 1;
+                }
+
                 const bit_composition_mode mode;
+                const std::size_t empty_rows_amount = get_empty_rows_amount();
 
                 struct input_type {
                     std::vector<var> bits;
@@ -125,6 +130,9 @@ namespace nil {
                     result_type(const bit_composition &component, std::uint32_t start_row_index) {
                         auto pos = component.sum_bit_position(start_row_index, component.sum_bits_amount() - 1);
                         output = var(component.W(pos.second), pos.first, false);
+                    }
+                    result_type(const bit_composition &component, std::uint32_t start_row_index, bool skip) {
+                        output = var(component.W(0), start_row_index, false);
                     }
 
                     std::vector<var> all_vars() const {
@@ -164,6 +172,26 @@ namespace nil {
 
                     check_params(bits_amount, mode);
                 };
+
+                static typename BlueprintFieldType::value_type calculate(std::vector<bool> input_bits,
+                                                                         bit_composition_mode mode = bit_composition_mode::MSB) {
+                    using field_value_type = typename BlueprintFieldType::value_type;
+
+                    std::vector<bool> true_input_bits(input_bits.size());
+                    auto bit_index = [&mode, &input_bits](std::size_t i) {
+                        return mode == bit_composition_mode::MSB ? i : input_bits.size() - i - 1;
+                    };
+
+                    for (std::uint32_t i = 0; i < input_bits.size(); ++i) {
+                        true_input_bits[i] = input_bits[bit_index(i)] != 0 ? true : false;
+                    }
+
+                    field_value_type sum = 0;
+                    for (std::size_t i = 0; i < true_input_bits.size(); i++) {
+                        sum = 2 * sum + static_cast<bool>(true_input_bits[i]);
+                    }
+                    return sum;
+                }
             };
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
@@ -196,6 +224,30 @@ namespace nil {
 
                 return typename plonk_bit_composition<BlueprintFieldType, ArithmetizationParams>::result_type(
                                     component, start_row_index);
+            }
+
+            template<typename BlueprintFieldType, typename ArithmetizationParams>
+            typename plonk_bit_composition<BlueprintFieldType, ArithmetizationParams>::result_type
+                generate_empty_assignments(
+                    const plonk_bit_composition<BlueprintFieldType, ArithmetizationParams>
+                        &component,
+                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                        &assignment,
+                    const typename plonk_bit_composition<BlueprintFieldType, ArithmetizationParams>::input_type
+                        &instance_input,
+                    const std::uint32_t start_row_index) {
+                using component_type = plonk_bit_composition<BlueprintFieldType, ArithmetizationParams>;
+
+                std::vector<bool> input_bits(component.bits_amount);
+
+                for (std::uint32_t i = 0; i < component.bits_amount; ++i) {
+                    input_bits[i] = var_value(assignment, instance_input.bits[i]) != 0 ? true : false;
+                }
+                
+                assignment.witness(component.W(0), start_row_index) = component_type::calculate(input_bits, component.mode);
+
+                return typename plonk_bit_composition<BlueprintFieldType, ArithmetizationParams>::result_type(
+                                    component, start_row_index, true);
             }
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>

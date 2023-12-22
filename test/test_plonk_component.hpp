@@ -350,13 +350,13 @@ namespace nil {
             auto component_result = boost::get<typename component_type::result_type>(
                 blueprint::components::generate_empty_assignments<BlueprintFieldType, ArithmetizationParams>(
                 component_instance, assignment, instance_input, start_row));
-            assignment.export_table(std::cout);
-            bp.export_circuit(std::cout);
+            // assignment.export_table(std::cout);
+            // bp.export_circuit(std::cout);
             result_check(assignment, component_result);
 
             zk::snark::plonk_table_description<BlueprintFieldType, ArithmetizationParams> desc;
             desc.usable_rows_amount = assignment.rows_amount();
-
+            
             if (start_row + component_instance.empty_rows_amount >= public_input.size()) {
                 BOOST_ASSERT_MSG(assignment.rows_amount() - start_row == component_instance.empty_rows_amount,
                                 "Component rows amount does not match actual rows amount.");

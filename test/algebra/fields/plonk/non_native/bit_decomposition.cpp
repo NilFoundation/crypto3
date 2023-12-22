@@ -112,6 +112,9 @@ void test_bit_decomposition(typename BlueprintFieldType::value_type input,
             crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
                 component_instance, public_input, result_check, instance_input,
                 crypto3::detail::connectedness_check_type::STRONG, BitsAmount);
+            crypto3::test_empty_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
+                component_instance, public_input, result_check, instance_input,
+                crypto3::detail::connectedness_check_type::STRONG, BitsAmount);
         } else {
             crypto3::test_component_to_fail<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
                 component_instance, public_input, result_check, instance_input,

@@ -108,6 +108,9 @@ void test_bit_composition(const std::vector<typename BlueprintFieldType::value_t
             crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
                 component_instance, bits, result_check, instance_input,
                 crypto3::detail::connectedness_check_type::STRONG, BitsAmount, CheckInput);
+            crypto3::test_empty_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
+                component_instance, bits, result_check, instance_input,
+                crypto3::detail::connectedness_check_type::STRONG, BitsAmount, CheckInput);
         } else {
             crypto3::test_component_to_fail<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
                 component_instance, bits, result_check, instance_input,

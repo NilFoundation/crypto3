@@ -44,7 +44,7 @@ namespace nil {
             namespace detail {
                 /*
                     This is a component base, which is used for both bit_decomposition and
-                    bit_builder_component components, as they are similar.
+                    bit_composition components, as they are similar.
 
                     Only the case of bits_amount < BlueprintFieldType::modulus_bits is supported.
 
