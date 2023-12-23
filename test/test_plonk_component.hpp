@@ -68,6 +68,17 @@
 #include <map>
 
 namespace nil {
+    namespace blueprint {
+        namespace components {
+            template<typename BlueprintFieldType, typename ArithmetizationParams>
+            std::tuple<
+                nil::crypto3::zk::snark::plonk_table_description<BlueprintFieldType, ArithmetizationParams>,
+                circuit<nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>,
+                assignment<nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>>
+                    generate_empty_assignments();
+        }
+    }
+
     namespace crypto3 {
         namespace detail {
             enum class connectedness_check_type {
@@ -326,8 +337,8 @@ namespace nil {
                                typename ComponentType::input_type instance_input,
                                detail::connectedness_check_type connectedness_check,
                                ComponentStaticInfoArgs... component_static_info_args) {
-
-            using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+            using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType,
+                                                                            ArithmetizationParams>;
             using component_type = ComponentType;
 
             blueprint::circuit<ArithmetizationType> bp;
@@ -356,7 +367,7 @@ namespace nil {
 
             zk::snark::plonk_table_description<BlueprintFieldType, ArithmetizationParams> desc;
             desc.usable_rows_amount = assignment.rows_amount();
-            
+
             if (start_row + component_instance.empty_rows_amount >= public_input.size()) {
                 BOOST_ASSERT_MSG(assignment.rows_amount() - start_row == component_instance.empty_rows_amount,
                                 "Component rows amount does not match actual rows amount.");
@@ -390,10 +401,10 @@ namespace nil {
                            ComponentStaticInfoArgs... component_static_info_args) {
             auto [desc, bp, assignments] =
                 prepare_empty_component<ComponentType, BlueprintFieldType, ArithmetizationParams, Hash, Lambda,
-                                  PublicInputContainerType, FunctorResultCheck, false,
-                                  ComponentStaticInfoArgs...>
-                                  (component_instance, public_input, result_check, instance_input,
-                                   connectedness_check, component_static_info_args...);
+                                PublicInputContainerType, FunctorResultCheck, false,
+                                ComponentStaticInfoArgs...>
+                                (component_instance, public_input, result_check, instance_input,
+                                connectedness_check, component_static_info_args...);
         }
 
         template<typename ComponentType, typename BlueprintFieldType, typename ArithmetizationParams, typename Hash,
