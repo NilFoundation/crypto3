@@ -214,7 +214,9 @@ namespace nil {
 
                     template<typename InputRange>
                     fiat_shamir_heuristic_sequential(const InputRange &r) {
-                        sponge.absorb(hash<hash_type>(r));
+                        if(r.size() != 0) {
+                            sponge.absorb(hash<hash_type>(r));
+                        }
                     }
 
                     template<typename InputIterator>
@@ -246,7 +248,7 @@ namespace nil {
                         auto c = challenge<field_type>();
                         nil::marshalling::status_type status;
 
-                        nil::crypto3::multiprecision::cpp_int intermediate_result = 
+                        nil::crypto3::multiprecision::cpp_int intermediate_result =
                             c.data.template convert_to<nil::crypto3::multiprecision::cpp_int>();
                         Integral result = 0;
                         Integral factor = 1;
