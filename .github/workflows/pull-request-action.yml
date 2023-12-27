@@ -1,0 +1,42 @@
+name: Reusable PR testing for mac and linux
+
+on:
+  workflow_call:
+    inputs:
+      targets:
+        type: string
+        description: "Make and CTest targets. If not specified, everything is tested"
+        required: false
+
+jobs:
+  handle-syncwith:
+    name: Call Reusable SyncWith Handler
+    uses: NilFoundation/ci-cd/.github/workflows/reusable-handle-syncwith.yml@v1.2.0
+    with:
+      ci-cd-ref: 'v1.2.0'
+    secrets: inherit
+
+  matrix-test-linux:
+    name: Linux Reusable Crypto3 Testing
+    needs:
+      - handle-syncwith
+    uses: NilFoundation/ci-cd/.github/workflows/reusable-crypto3-testing-linux.yml@v1.2.0
+
+    secrets: inherit
+    with:
+      submodules-refs: ${{ needs.handle-syncwith.outputs.prs-refs }}
+
+      targets: ${{ inputs.targets }} 
+
+  matrix-test-mac:
+    name: Mac Reusable Crypto3 Testing
+    needs:
+      - handle-syncwith
+    uses: NilFoundation/ci-cd/.github/workflows/reusable-crypto3-testing-mac.yml@v1.2.0
+
+    secrets: inherit
+    with:
+      submodules-refs: ${{ needs.handle-syncwith.outputs.prs-refs }}
+
+      targets: ${{ inputs.targets }} 
+

@@ -83,7 +83,7 @@ namespace nil {
 
                 template<typename Endianness, typename LPC>
                 typename eval_proof<nil::marshalling::field_type<Endianness>, LPC>::type 
-                fill_eval_proof( const typename LPC::proof_type &proof ){
+                fill_eval_proof( const typename LPC::proof_type &proof, const typename LPC::fri_type::params_type& fri_params){
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
 
                     nil::crypto3::marshalling::types::batch_info_type batch_info = proof.z.get_batch_info();
@@ -91,7 +91,7 @@ namespace nil {
                     auto filled_z = fill_eval_storage<Endianness, typename LPC::eval_storage_type>(proof.z);
 
                     typename fri_proof<TTypeBase, typename LPC::basic_fri>::type filled_fri_proof = fill_fri_proof<Endianness, typename LPC::basic_fri>(
-                        proof.fri_proof, batch_info
+                        proof.fri_proof, batch_info, fri_params
                     );
 
                     return typename eval_proof<TTypeBase, LPC>::type(
