@@ -254,7 +254,7 @@ namespace nil {
 
                 template <typename Endianness, typename FRI>
                 typename fri_proof<nil::marshalling::field_type<Endianness>, FRI>::type
-                fill_fri_proof(const typename FRI::proof_type &proof, const batch_info_type &batch_info){
+                fill_fri_proof(const typename FRI::proof_type &proof, const batch_info_type &batch_info, const typename FRI::params_type& params) {
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
 
                     // merkle roots
@@ -266,8 +266,6 @@ namespace nil {
                         filled_fri_roots.value().push_back(fill_merkle_node_value<typename FRI::commitment_type, Endianness>(proof.fri_roots[i]));
                     }
 
-                    std::vector<std::uint8_t> step_list(proof.query_proofs[0].round_proofs.size());
-
                     // initial_polynomials values
                     std::vector<typename FRI::field_type::value_type> initial_val;
                     for( std::size_t i = 0; i < FRI::lambda; i++ ){
@@ -276,15 +274,12 @@ namespace nil {
                             auto &initial_proof = it.second;
                             BOOST_ASSERT(initial_proof.values.size() == batch_info.at(it.first));
                             for( std::size_t j = 0; j < initial_proof.values.size(); j++ ){
-                                if( step_list[0] == 0) {
-                                    step_list[0] = log2(initial_proof.values[j].size()) + 1;
-                                }
                                 for(std::size_t k = 0; k < initial_proof.values[j].size(); k++ ){
                                     for( std::size_t l = 0; l < FRI::m; l++ ){
                                         initial_val.push_back(initial_proof.values[j][k][l]);
                                     }
                                 }
-                                BOOST_ASSERT((1 << (step_list[0] - 1)) == initial_proof.values[j].size());
+                                BOOST_ASSERT((1 << (params.step_list[0] - 1)) == initial_proof.values[j].size());
                             }
                         }
                     }
@@ -300,9 +295,6 @@ namespace nil {
                         auto &query_proof = proof.query_proofs[i];
                         for( std::size_t j = 0; j < query_proof.round_proofs.size(); j++ ){
                             auto &round_proof = query_proof.round_proofs[j];
-                            if(log2(round_proof.y.size()) + 1 != 0 && j != query_proof.round_proofs.size()){
-                                step_list[j+1] = log2(round_proof.y.size()) + 1;
-                            }
                             for( std::size_t k = 0; k < round_proof.y.size(); k++){
                                 round_val.push_back(round_proof.y[k][0]);
                                 round_val.push_back(round_proof.y[k][1]);
@@ -321,8 +313,8 @@ namespace nil {
                         nil::marshalling::types::integral<TTypeBase, std::uint8_t>,
                         nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, std::size_t>>
                     > filled_step_list;
-                    for( std::size_t i = 0; i < step_list.size(); i++ ){
-                        filled_step_list.value().push_back(nil::marshalling::types::integral<TTypeBase, std::uint8_t>(step_list[i]));
+                    for (const auto& step : params.step_list) {
+                        filled_step_list.value().push_back(nil::marshalling::types::integral<TTypeBase, std::uint8_t>(step));
                     }
 
                     // initial merkle proofs

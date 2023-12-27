@@ -61,9 +61,9 @@ namespace nil {
                 >;
 
 
-                template<typename Endianness, typename Proof>
+                template<typename Endianness, typename Proof, typename CommitmentParamsType>
                 placeholder_evaluation_proof<nil::marshalling::field_type<Endianness>, Proof>
-                    fill_placeholder_evaluation_proof(const typename Proof::evaluation_proof &proof) {
+                    fill_placeholder_evaluation_proof(const typename Proof::evaluation_proof &proof, const CommitmentParamsType& commitment_params) {
 
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
                     using uint64_t_marshalling_type = nil::marshalling::types::integral<TTypeBase, std::uint64_t>;
@@ -75,7 +75,7 @@ namespace nil {
 
                     // typename commitment_scheme_type::proof_type eval_proof;
                     auto filled_eval_proof =
-                        fill_eval_proof<Endianness, typename Proof::commitment_scheme_type>(proof.eval_proof);
+                        fill_eval_proof<Endianness, typename Proof::commitment_scheme_type>(proof.eval_proof, commitment_params);
 
                     return placeholder_evaluation_proof<TTypeBase, Proof>(std::make_tuple(
                         filled_challenge,
@@ -118,9 +118,9 @@ namespace nil {
                     >
                 >;
 
-                template<typename Endianness, typename Proof>
+                template<typename Endianness, typename Proof, typename CommitmentParamsType>
                 placeholder_proof<nil::marshalling::field_type<Endianness>, Proof>
-                    fill_placeholder_proof(const Proof &proof) {
+                    fill_placeholder_proof(const Proof &proof, const CommitmentParamsType& commitment_params) {
 
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
 
@@ -137,7 +137,7 @@ namespace nil {
 
                     return placeholder_proof<TTypeBase, Proof>(std::make_tuple(
                         filled_commitments,
-                        fill_placeholder_evaluation_proof<Endianness, Proof>(proof.eval_proof)
+                        fill_placeholder_evaluation_proof<Endianness, Proof>(proof.eval_proof, commitment_params)
                     ));
                 }
 

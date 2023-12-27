@@ -171,15 +171,15 @@ print_curve_point(std::ostream &os,
     os << "] )" << std::endl;
 }
 
-template<typename Endianness, typename ProofType>
-void test_placeholder_proof(const ProofType &proof, std::string output_file = "") {
+template<typename Endianness, typename ProofType, typename CommitmentParamsType>
+void test_placeholder_proof(const ProofType &proof, const CommitmentParamsType& params, std::string output_file = "") {
 
     using namespace nil::crypto3::marshalling;
 
     using TTypeBase = nil::marshalling::field_type<Endianness>;
     using proof_marshalling_type = types::placeholder_proof<TTypeBase, ProofType>;
 
-    auto filled_placeholder_proof = types::fill_placeholder_proof<Endianness, ProofType>(proof);
+    auto filled_placeholder_proof = types::fill_placeholder_proof<Endianness, ProofType>(proof, params);
     ProofType _proof = types::make_placeholder_proof<Endianness, ProofType>(filled_placeholder_proof);
     BOOST_CHECK(_proof == proof);
 
@@ -217,7 +217,8 @@ void print_placeholder_proof_with_params(
     std::string folder_name
 ){
     std::filesystem::create_directory(folder_name);
-    test_placeholder_proof<Endianness, placeholder_proof<typename PlaceholderParams::field_type, PlaceholderParams>>(proof, folder_name + "/proof.bin");
+    test_placeholder_proof<Endianness, placeholder_proof<typename PlaceholderParams::field_type, PlaceholderParams>>(
+        proof, commitment_scheme.get_commitment_params(), folder_name + "/proof.bin");
     print_placeholder_params<PlaceholderParams> (
         preprocessed_data, commitment_scheme, folder_name + "/params.json", folder_name
     );
@@ -366,13 +367,13 @@ BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_initializer) {
         lpc_preprocessed_public_data, lpc_preprocessed_private_data, desc, constraint_system, assignments, lpc_scheme
     );
 
-    if( has_argv("--print") ){
+    if (has_argv("--print")) {
         print_placeholder_proof_with_params<Endianness, lpc_placeholder_params_type>(
             lpc_preprocessed_public_data,
             lpc_proof, lpc_scheme, "circuit1"
         );
-    }else {
-        test_placeholder_proof<Endianness, placeholder_proof<field_type, lpc_placeholder_params_type>>(lpc_proof);
+    } else {
+        test_placeholder_proof<Endianness, placeholder_proof<field_type, lpc_placeholder_params_type>>(lpc_proof, fri_params);
     }
     auto verifier_res = placeholder_verifier<field_type, lpc_placeholder_params_type>::process(
         lpc_preprocessed_public_data, lpc_proof, constraint_system, lpc_scheme
@@ -471,7 +472,7 @@ BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_initializer){
             lpc_proof, lpc_scheme, "circuit2"
         );
     }else {
-        test_placeholder_proof<Endianness, placeholder_proof<field_type, lpc_placeholder_params_type>>(lpc_proof);
+        test_placeholder_proof<Endianness, placeholder_proof<field_type, lpc_placeholder_params_type>>(lpc_proof, fri_params);
     }
 
     std::size_t max_non_zero = 0;
@@ -571,13 +572,13 @@ BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_initializer) {
 
     auto proof = placeholder_prover<field_type, lpc_placeholder_params_type>::process(
         preprocessed_public_data, preprocessed_private_data, desc, constraint_system, assignments, lpc_scheme);
-    if( has_argv("--print") ){
+    if (has_argv("--print")) {
         print_placeholder_proof_with_params<Endianness, lpc_placeholder_params_type>(
             preprocessed_public_data,
             proof, lpc_scheme, "circuit3"
         );
-    }else {
-        test_placeholder_proof<Endianness, placeholder_proof<field_type, lpc_placeholder_params_type>>(proof);
+    } else {
+        test_placeholder_proof<Endianness, placeholder_proof<field_type, lpc_placeholder_params_type>>(proof, fri_params);
     }
 
     bool verifier_res = placeholder_verifier<field_type, lpc_placeholder_params_type>::process(
@@ -667,7 +668,7 @@ BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_initializer) {
             proof, lpc_scheme, "circuit4"
         );
     }else {
-        test_placeholder_proof<Endianness, placeholder_proof<field_type, lpc_placeholder_params_type>>(proof);
+        test_placeholder_proof<Endianness, placeholder_proof<field_type, lpc_placeholder_params_type>>(proof, fri_params);
     }
 
     bool verifier_res = placeholder_verifier<field_type, lpc_placeholder_params_type>::process(
@@ -756,7 +757,7 @@ BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_initializer) {
             proof, lpc_scheme, "circuit6"
         );
     }else {
-        test_placeholder_proof<Endianness, placeholder_proof<field_type, lpc_placeholder_params_type>>(proof);
+        test_placeholder_proof<Endianness, placeholder_proof<field_type, lpc_placeholder_params_type>>(proof, fri_params);
     }
     bool verifier_res = placeholder_verifier<field_type, lpc_placeholder_params_type>::process(
         preprocessed_public_data, proof, constraint_system, lpc_scheme);
@@ -843,7 +844,7 @@ BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_initializer) {
             proof, lpc_scheme, "circuit7"
         );
     }else {
-        test_placeholder_proof<Endianness, placeholder_proof<field_type, lpc_placeholder_params_type>>(proof);
+        test_placeholder_proof<Endianness, placeholder_proof<field_type, lpc_placeholder_params_type>>(proof, fri_params);
     }
     bool verifier_res = placeholder_verifier<field_type, lpc_placeholder_params_type>::process(
         preprocessed_public_data, proof, constraint_system, lpc_scheme);

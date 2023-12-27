@@ -356,11 +356,13 @@ generate_random_polynomial_dfs_batch(std::size_t batch_size,
 // * Test marshalling function
 // ******************************************************************************* /
 
+
+
 template<typename Endianness, typename LPC>
-void test_lpc_proof(typename LPC::proof_type &proof, std::string filename = "") {
+void test_lpc_proof(typename LPC::proof_type &proof, typename LPC::fri_type::params_type fri_params, std::string filename = "") {
     using TTypeBase = nil::marshalling::field_type<Endianness>;
 
-    auto filled_proof = nil::crypto3::marshalling::types::fill_eval_proof<Endianness, LPC>(proof);
+    auto filled_proof = nil::crypto3::marshalling::types::fill_eval_proof<Endianness, LPC>(proof, fri_params);
     auto _proof = nil::crypto3::marshalling::types::make_eval_proof<Endianness, LPC>(filled_proof);
     BOOST_CHECK(proof == _proof);
 
@@ -428,6 +430,19 @@ struct test_initializer {
     }
 };
 
+template<typename fri_type, typename FieldType>
+typename fri_type::params_type create_fri_params(
+        std::size_t degree_log, const int max_step = 1, std::size_t expand_factor = 4) {
+    std::size_t r = degree_log - 1;
+
+    return typename fri_type::params_type(
+        (1 << degree_log) - 1, // max_degree
+        math::calculate_domain_set<FieldType>(degree_log + expand_factor, r),
+        generate_random_step_list(r, max_step, test_global_rnd_engine),
+        expand_factor
+    );
+}
+
 BOOST_AUTO_TEST_SUITE(marshalling_random)
     // setup
     static constexpr std::size_t lambda = 40;
@@ -452,13 +467,16 @@ BOOST_AUTO_TEST_SUITE(marshalling_random)
     using LPC = typename nil::crypto3::zk::commitments::batched_list_polynomial_commitment<field_type, lpc_params_type>;
 
 BOOST_FIXTURE_TEST_CASE(lpc_proof_test, test_initializer) {
+
+    typename FRI::params_type fri_params = create_fri_params<FRI, field_type>(r + 1, 4);
+
     auto proof = generate_random_lpc_proof<LPC>(
             final_polynomial_degree, 5,
-            generate_random_step_list(r, 4, test_global_rnd_engine),
+            fri_params.step_list,
             test_global_alg_rnd_engine<typename LPC::basic_fri::field_type>,
             test_global_rnd_engine
     );
-    test_lpc_proof<Endianness, LPC>(proof);
+    test_lpc_proof<Endianness, LPC>(proof, fri_params);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -540,7 +558,7 @@ BOOST_FIXTURE_TEST_CASE(batches_num_3_test, test_initializer){
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(x_data);
     auto proof = lpc_scheme_prover.proof_eval(transcript);
 
-    test_lpc_proof<Endianness, lpc_type>(proof);
+    test_lpc_proof<Endianness, lpc_type>(proof, fri_params);
 
     // Verify
 /*  zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);
