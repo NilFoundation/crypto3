@@ -86,22 +86,32 @@ namespace nil {
                         }
                     }
                     return result_type(std::make_tuple(
-                        nil::marshalling::types::integral<TTypeBase, std::size_t>(usable_rows),    
-                        nil::marshalling::types::integral<TTypeBase, std::size_t>(PlonkTable::arithmetization_params::total_columns),    
+                        nil::marshalling::types::integral<TTypeBase, std::size_t>(usable_rows),
+                        nil::marshalling::types::integral<TTypeBase, std::size_t>(PlonkTable::arithmetization_params::total_columns),
                         fill_field_element_vector<typename PlonkTable::field_type::value_type, Endianness>(table_values)
                     ));
                 }
                 template<typename Endianness, typename PlonkTable>
                 std::pair<std::size_t, PlonkTable> make_assignment_table(const plonk_assignment_table<nil::marshalling::field_type<Endianness>, PlonkTable> filled_assignments){
-                    BOOST_ASSERT(PlonkTable::arithmetization_params::total_columns == std::get<1>(filled_assignments.value()).value());
-
-                    std::size_t usable_rows =  std::get<0>(filled_assignments.value()).value();
-
                     auto values = make_field_element_vector<typename PlonkTable::field_type::value_type, Endianness>(std::get<2>(filled_assignments.value()));
                     auto rows_amount = values.size()/PlonkTable::arithmetization_params::total_columns;
-                    BOOST_ASSERT(values.size() % PlonkTable::arithmetization_params::total_columns == 0);
-                    BOOST_ASSERT(usable_rows < rows_amount);
+                    std::size_t usable_rows =  std::get<0>(filled_assignments.value()).value();
 
+                    // Size correctness check.
+                    if (PlonkTable::arithmetization_params::total_columns != std::get<1>(filled_assignments.value()).value() ||
+                        values.size() % PlonkTable::arithmetization_params::total_columns != 0
+                    )
+                        throw std::invalid_argument(
+                            "Invalid arithmetization params. Expected columns number = " +
+                            std::to_string(PlonkTable::arithmetization_params::total_columns) +
+                            ", real columns number = " +
+                            std::to_string(std::get<1>(filled_assignments.value()).value()) + ".");
+
+                    if ( usable_rows >= rows_amount )
+                        throw std::invalid_argument(
+                            "Rows amount should be greater than usable rows amount. Rows amount = " +
+                            std::to_string(rows_amount) +
+                            ", usable rows amount = " + std::to_string(usable_rows));
 
                     typename PlonkTable::witnesses_container_type witnesses;
                     std::size_t cur = 0;
@@ -133,7 +143,7 @@ namespace nil {
                         }
                     }
                     return std::make_pair( usable_rows, PlonkTable(
-                        typename PlonkTable::private_table_type(witnesses), 
+                        typename PlonkTable::private_table_type(witnesses),
                         typename PlonkTable::public_table_type(public_inputs, constants, selectors)
                     ));
                 }
