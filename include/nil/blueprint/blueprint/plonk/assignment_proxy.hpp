@@ -425,108 +425,21 @@ namespace nil {
         }
 
         template<typename BlueprintFieldType,
-                typename ArithmetizationParams>
-        bool is_accessible(const circuit_proxy<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                ArithmetizationParams>> &bp,
+                 typename ArithmetizationParams>
+        bool is_satisfied(const circuit_proxy<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
+                                                                                          ArithmetizationParams>> &bp,
                           const assignment_proxy<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                  ArithmetizationParams>> &assignments){
-
-            using variable_type = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
-            const auto& private_rows = assignments.get_used_selector_rows();
-            const auto& lookup_selector_cols = assignments.get_lookup_selector_cols();
-
-            const std::vector<crypto3::zk::snark::plonk_gate<BlueprintFieldType,
-                              crypto3::zk::snark::plonk_constraint<BlueprintFieldType>>> &gates = bp.gates();
+                                                                                             ArithmetizationParams>> &assignments){
             const auto& used_gates = bp.get_used_gates();
 
-            const std::vector<crypto3::zk::snark::plonk_copy_constraint<BlueprintFieldType>> &copy_constraints =
-                    bp.copy_constraints();
-            const auto& used_copy_constraints = bp.get_used_copy_constraints();
-
-            const auto& lookup_gates = bp.lookup_gates();
             const auto& used_lookup_gates = bp.get_used_lookup_gates();
 
-            std::uint32_t row_index = 0;
-            auto check_var = [&assignments, &row_index](const variable_type& var) {
-                BLUEPRINT_ASSERT((row_index + var.rotation) >= 0);
-                switch (var.type) {
-                    case variable_type::column_type::witness:
-                        assignments.witness(var.index, row_index + var.rotation);
-                        return;
-                    case variable_type::column_type::public_input:
-                        if (var.index > 0) {
-                            assignments.shared(var.index - 1, var.rotation);
-                        } else {
-                            assignments.public_input(var.index,
-                                                     row_index + var.rotation);
-                        }
-                        return;
-                    case variable_type::column_type::constant:
-                        assignments.constant(var.index, row_index + var.rotation);
-                        return;
-                    default:
-                        BLUEPRINT_ASSERT(false);
-                        return;
-                }
-            };
+            const auto& used_copy_constraints = bp.get_used_copy_constraints();
 
-            for (const auto& i : used_gates) {
-                if (i >= gates.size()) {
-                    std::cout << "No gate " << i << "\n";
-                    return false;
-                }
-                row_index = 0;
-                crypto3::math::expression_for_each_variable_visitor<variable_type> visitor(check_var);
+            const auto& private_rows = assignments.get_used_selector_rows();
 
-                crypto3::zk::snark::plonk_column<BlueprintFieldType> selector =
-                        assignments.selector(gates[i].selector_index);
-
-                for (std::size_t selector_row = 0; selector_row < selector.size(); selector_row++) {
-                    if (!selector[selector_row].is_zero() && private_rows.find(selector_row) != private_rows.end()) {
-                        row_index = selector_row;
-                        for (const auto& constraint : gates[i].constraints) {
-                            visitor.visit(constraint);
-                        }
-                    }
-                }
-            }
-
-            row_index = 0;
-            for (const auto& i : used_copy_constraints) {
-                if (i >= copy_constraints.size()) {
-                    std::cout << "No copy constraint " << i << "\n";
-                    return false;
-                }
-                check_var(copy_constraints[i].first);
-                check_var(copy_constraints[i].second);
-            }
-
-            for (const auto& i : used_lookup_gates) {
-                if (i >= lookup_gates.size()) {
-                    std::cout << "No lookup gate " << i << "\n";
-                    return false;
-                }
-                row_index = 0;
-                crypto3::math::expression_for_each_variable_visitor<variable_type> visitor(check_var);
-
-                crypto3::zk::snark::plonk_column <BlueprintFieldType> selector =
-                        assignments.selector(lookup_gates[i].tag_index);
-
-                for (std::size_t selector_row = 0;
-                     selector_row < selector.size(); selector_row++) {
-                    if (!selector[selector_row].is_zero() && private_rows.find(selector_row) != private_rows.end()) {
-                        row_index = selector_row;
-                        for (const auto &lookup_constraint: lookup_gates[i].constraints) {
-                            for (const auto &constraint : lookup_constraint.lookup_input) {
-                                visitor.visit(constraint);
-                            }
-                        }
-                    }
-                }
-            }
-            return true;
+            return is_satisfied(bp, assignments, used_gates, used_lookup_gates, used_copy_constraints, private_rows);
         }
-
     }    // namespace blueprint
 }    // namespace nil
 #endif    // CRYPTO3_BLUEPRINT_ASSIGNMENT_PROXY_PLONK_HPP
