@@ -225,11 +225,12 @@ namespace nil {
                     }
 
                     struct cycle_representation {
-                        typedef std::pair<std::size_t, std::size_t> key_type;
+                        // Using std::uint32_t reduces RAM usage a bit. Our table size (rows_amount * width) will never be > 2^32 elements.
+                        typedef std::pair<std::uint32_t, std::uint32_t> key_type;
 
                         std::map<key_type, key_type> _mapping;
                         std::map<key_type, key_type> _aux;
-                        std::map<key_type, std::size_t> _sizes;
+                        std::map<key_type, std::uint32_t> _sizes;
 
                         cycle_representation(
                             const plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params>  &constraint_system,
@@ -367,9 +368,10 @@ namespace nil {
                             S_id[i] = polynomial_dfs_type(
                                 domain->size() - 1, domain->size(), FieldType::value_type::zero());
 
-                            for (std::size_t j = 0; j < domain->size(); j++) {
-                                S_id[i][j] = delta.pow(i) * omega.pow(j);
-                            }
+                            S_id[i][0] = delta.pow(i);
+                            for (std::size_t j = 1; j < domain->size(); j++) {
+                                S_id[i][j] = S_id[i][j-1] * omega;
+                             }
                         }
 
                         return S_id;
@@ -431,7 +433,7 @@ namespace nil {
                     // TODO: columns_with_copy_constraints -- It should be extracted from constraint_system
                     static inline preprocessed_data_type process(
                         const plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params> &constraint_system,
-                        const typename policy_type::variable_assignment_type::public_table_type &public_assignment,
+                        typename policy_type::variable_assignment_type::public_table_type public_assignment,
                         const plonk_table_description<FieldType, typename ParamsType::arithmetization_params>
                             &table_description,
                         typename ParamsType::commitment_scheme_type &commitment_scheme,
@@ -472,11 +474,11 @@ namespace nil {
                             public_polynomial_table =
                                 plonk_public_polynomial_dfs_table<FieldType,
                                                                   typename ParamsType::arithmetization_params>(
-                                    detail::column_range_polynomial_dfs<FieldType>(public_assignment.public_inputs(),
+                                    detail::column_range_polynomial_dfs<FieldType>(public_assignment.move_public_inputs(),
                                                                                    basic_domain),
-                                    detail::column_range_polynomial_dfs<FieldType>(public_assignment.constants(),
+                                    detail::column_range_polynomial_dfs<FieldType>(public_assignment.move_constants(),
                                                                                    basic_domain),
-                                    detail::column_range_polynomial_dfs<FieldType>(public_assignment.selectors(),
+                                    detail::column_range_polynomial_dfs<FieldType>(public_assignment.move_selectors(),
                                                                                    basic_domain));
 
                         // prepare commitments for short verifier
@@ -508,7 +510,8 @@ namespace nil {
 
                         typename preprocessed_data_type::verification_key vk = {circuit_hash, public_commitments.fixed_values};
                         typename preprocessed_data_type::common_data_type common_data (
-                            public_commitments, c_rotations,  N_rows, table_description.usable_rows_amount, max_gates_degree, vk
+                            std::move(public_commitments), std::move(c_rotations),
+                            N_rows, table_description.usable_rows_amount, max_gates_degree, vk
                         );
 
                         transcript_type transcript(std::vector<std::uint8_t>({}));
@@ -551,7 +554,7 @@ namespace nil {
 
                     static inline preprocessed_data_type process(
                         const plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params>  &constraint_system,
-                        const typename policy_type::variable_assignment_type::private_table_type &private_assignment,
+                        typename policy_type::variable_assignment_type::private_table_type private_assignment,
                         const plonk_table_description<FieldType, typename ParamsType::arithmetization_params>  &table_description
                     ) {
                         std::size_t N_rows = table_description.rows_amount;
@@ -561,7 +564,7 @@ namespace nil {
 
                         plonk_private_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params>
                             private_polynomial_table(detail::column_range_polynomial_dfs<FieldType>(
-                                private_assignment.witnesses(), basic_domain));
+                                private_assignment.move_witnesses(), basic_domain));
                         return preprocessed_data_type({basic_domain, std::move(private_polynomial_table)});
                     }
                 };

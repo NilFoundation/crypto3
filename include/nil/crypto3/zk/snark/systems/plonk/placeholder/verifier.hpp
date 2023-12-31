@@ -93,7 +93,7 @@ namespace nil {
                         _commitment_scheme.append_eval_point(PERMUTATION_BATCH, challenge);
                         _commitment_scheme.append_eval_point(PERMUTATION_BATCH, challenge * _omega);
 
-                        if(_is_lookup_enabled){
+                        if (_is_lookup_enabled) {
                             _commitment_scheme.append_eval_point(LOOKUP_BATCH, challenge);
                             _commitment_scheme.append_eval_point(LOOKUP_BATCH, challenge * _omega);
                             _commitment_scheme.append_eval_point(LOOKUP_BATCH, challenge * _omega.pow(preprocessed_public_data.common_data.usable_rows_amount));
@@ -273,11 +273,9 @@ namespace nil {
                         // 6. lookup argument
                         bool is_lookup_enabled = (constraint_system.lookup_gates().size() > 0);
                         std::array<typename FieldType::value_type, lookup_parts> lookup_argument;
-                        if( is_lookup_enabled ){
-                            lookup_argument = placeholder_lookup_argument<
-                                FieldType, commitment_scheme_type,
-                                ParamsType
-                            >::verify_eval(
+                        if (is_lookup_enabled) {
+                            placeholder_lookup_argument_verifier<FieldType, commitment_scheme_type, ParamsType> lookup_argument_verifier;
+                            lookup_argument = lookup_argument_verifier.verify_eval(
                                 preprocessed_public_data,
                                 constraint_system.lookup_gates(),
                                 constraint_system.lookup_tables(),

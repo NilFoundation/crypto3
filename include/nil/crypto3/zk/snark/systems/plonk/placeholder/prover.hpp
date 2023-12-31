@@ -99,37 +99,35 @@ namespace nil {
 
                     static inline placeholder_proof<FieldType, ParamsType> process(
                         const typename public_preprocessor_type::preprocessed_data_type &preprocessed_public_data,
-                        const typename private_preprocessor_type::preprocessed_data_type &preprocessed_private_data,
+                        typename private_preprocessor_type::preprocessed_data_type preprocessed_private_data,
                         const plonk_table_description<FieldType, typename ParamsType::arithmetization_params>
                             &table_description,
                         const plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params>
                             &constraint_system,
-                        const typename policy_type::variable_assignment_type &assignments,
                         commitment_scheme_type commitment_scheme
                     ) {
 
                         auto prover = placeholder_prover<FieldType, ParamsType>(
-                            preprocessed_public_data, preprocessed_private_data, table_description,
-                            constraint_system, assignments, commitment_scheme);
+                            preprocessed_public_data, std::move(preprocessed_private_data), table_description,
+                            constraint_system, commitment_scheme);
                         return prover.process();
                     }
 
                     placeholder_prover(
                         const typename public_preprocessor_type::preprocessed_data_type &preprocessed_public_data,
-                        const typename private_preprocessor_type::preprocessed_data_type &preprocessed_private_data,
+                        typename private_preprocessor_type::preprocessed_data_type preprocessed_private_data,
                         const plonk_table_description<FieldType, typename ParamsType::arithmetization_params> &table_description,
                         const plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params> &constraint_system,
-                        const typename policy_type::variable_assignment_type &assignments,
                         const commitment_scheme_type &commitment_scheme
                     )
                             : preprocessed_public_data(preprocessed_public_data)
-                            , preprocessed_private_data(preprocessed_private_data)
                             , table_description(table_description)
                             , constraint_system(constraint_system)
-                            , assignments(assignments)
                             , _commitment_scheme(commitment_scheme)
-                            , _polynomial_table(preprocessed_private_data.private_polynomial_table,
-                                                preprocessed_public_data.public_polynomial_table)
+                            , _polynomial_table(new plonk_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params>(
+                                std::move(preprocessed_private_data.private_polynomial_table),
+                                preprocessed_public_data.public_polynomial_table))
+
                             , _is_lookup_enabled(constraint_system.lookup_gates().size() > 0)
                             , transcript(std::vector<std::uint8_t>())
                     {
@@ -156,8 +154,8 @@ namespace nil {
                         PROFILE_PLACEHOLDER_SCOPE("Placeholder prover, total time");
 
                         // 2. Commit witness columns and public_input columns
-                        _commitment_scheme.append_to_batch(VARIABLE_VALUES_BATCH, _polynomial_table.witnesses());
-                        _commitment_scheme.append_to_batch(VARIABLE_VALUES_BATCH, _polynomial_table.public_inputs());
+                        _commitment_scheme.append_to_batch(VARIABLE_VALUES_BATCH, _polynomial_table->witnesses());
+                        _commitment_scheme.append_to_batch(VARIABLE_VALUES_BATCH, _polynomial_table->public_inputs());
                         {
                             PROFILE_PLACEHOLDER_SCOPE("variable_values_precommit_time");
                             _proof.commitments[VARIABLE_VALUES_BATCH] = _commitment_scheme.commit(VARIABLE_VALUES_BATCH);
@@ -165,24 +163,28 @@ namespace nil {
                         transcript(_proof.commitments[VARIABLE_VALUES_BATCH]);
 
                         // 4. permutation_argument
-                        auto permutation_argument = placeholder_permutation_argument<FieldType, ParamsType>::prove_eval(
-                            constraint_system,
-                            preprocessed_public_data,
-                            table_description,
-                            _polynomial_table,
-                            _commitment_scheme,
-                            transcript);
+                        {
+                            auto permutation_argument = placeholder_permutation_argument<FieldType, ParamsType>::prove_eval(
+                                constraint_system,
+                                preprocessed_public_data,
+                                table_description,
+                                *_polynomial_table,
+                                _commitment_scheme,
+                                transcript);
 
-                        _F_dfs[0] = std::move(permutation_argument.F_dfs[0]);
-                        _F_dfs[1] = std::move(permutation_argument.F_dfs[1]);
-                        _F_dfs[2] = std::move(permutation_argument.F_dfs[2]);
+                            _F_dfs[0] = std::move(permutation_argument.F_dfs[0]);
+                            _F_dfs[1] = std::move(permutation_argument.F_dfs[1]);
+                            _F_dfs[2] = std::move(permutation_argument.F_dfs[2]);
+                        }
 
                         // 5. lookup_argument
-                        auto lookup_argument_result = lookup_argument();
-                        _F_dfs[3] = std::move(lookup_argument_result.F_dfs[0]);
-                        _F_dfs[4] = std::move(lookup_argument_result.F_dfs[1]);
-                        _F_dfs[5] = std::move(lookup_argument_result.F_dfs[2]);
-                        _F_dfs[6] = std::move(lookup_argument_result.F_dfs[3]);
+                        {
+                            auto lookup_argument_result = lookup_argument();
+                            _F_dfs[3] = std::move(lookup_argument_result.F_dfs[0]);
+                            _F_dfs[4] = std::move(lookup_argument_result.F_dfs[1]);
+                            _F_dfs[5] = std::move(lookup_argument_result.F_dfs[2]);
+                            _F_dfs[6] = std::move(lookup_argument_result.F_dfs[3]);
+                        }
 
                         _proof.commitments[PERMUTATION_BATCH] = _commitment_scheme.commit(PERMUTATION_BATCH);
                         transcript(_proof.commitments[PERMUTATION_BATCH]);
@@ -196,7 +198,7 @@ namespace nil {
                         mask_polynomial -= preprocessed_public_data.q_last;
                         mask_polynomial -= preprocessed_public_data.q_blind;
                         _F_dfs[7] = placeholder_gates_argument<FieldType, ParamsType>::prove_eval(
-                            constraint_system, _polynomial_table,
+                            constraint_system, *_polynomial_table,
                             preprocessed_public_data.common_data.basic_domain,
                             preprocessed_public_data.common_data.max_gates_degree,
                             mask_polynomial,
@@ -208,11 +210,16 @@ namespace nil {
                         placeholder_debug_output();
 #endif
 
-                        // 7. Aggregate quotient polynomial
-                        std::vector<polynomial_dfs_type> T_splitted_dfs =
-                            quotient_polynomial_split_dfs();
+                        // _polynomial_table not needed, clean its memory
+                        _polynomial_table.reset(nullptr);
 
-                        _proof.commitments[QUOTIENT_BATCH] = T_commit(T_splitted_dfs);
+                        // 7. Aggregate quotient polynomial
+                        {
+                            std::vector<polynomial_dfs_type> T_splitted_dfs =
+                                quotient_polynomial_split_dfs();
+
+                            _proof.commitments[QUOTIENT_BATCH] = T_commit(T_splitted_dfs);
+                        }
                         transcript(_proof.commitments[QUOTIENT_BATCH]);
 
                         // 8. Run evaluation proofs
@@ -224,6 +231,7 @@ namespace nil {
                             PROFILE_PLACEHOLDER_SCOPE("commitment scheme proof eval time");
                             _proof.eval_proof.eval_proof = _commitment_scheme.proof_eval(transcript);
                         }
+
                         return _proof;
                     }
 
@@ -290,26 +298,30 @@ namespace nil {
                         return T_consolidated;
                     }
 
-                    typename placeholder_lookup_argument<FieldType, commitment_scheme_type, ParamsType>::prover_lookup_result
-                    lookup_argument() {
-                      PROFILE_PLACEHOLDER_SCOPE("lookup_argument_time");
+                    typename placeholder_lookup_argument_prover<FieldType, commitment_scheme_type, ParamsType>::prover_lookup_result
+                        lookup_argument() {
+                        PROFILE_PLACEHOLDER_SCOPE("lookup_argument_time");
 
-                        typename placeholder_lookup_argument<
+                        typename placeholder_lookup_argument_prover<
                             FieldType,
                             commitment_scheme_type,
                             ParamsType>::prover_lookup_result lookup_argument_result;
+
                         lookup_argument_result.F_dfs[0] = polynomial_dfs_type(0, table_description.rows_amount, FieldType::value_type::zero());
                         lookup_argument_result.F_dfs[1] = polynomial_dfs_type(0, table_description.rows_amount, FieldType::value_type::zero());
                         lookup_argument_result.F_dfs[2] = polynomial_dfs_type(0, table_description.rows_amount, FieldType::value_type::zero());
                         lookup_argument_result.F_dfs[3] = polynomial_dfs_type(0, table_description.rows_amount, FieldType::value_type::zero());
-                        if( _is_lookup_enabled ){
-                            lookup_argument_result = placeholder_lookup_argument< FieldType,  commitment_scheme_type, ParamsType>::prove_eval(
+
+                        if (_is_lookup_enabled) {
+                            placeholder_lookup_argument_prover<FieldType, commitment_scheme_type, ParamsType> lookup_argument_prover(
                                 constraint_system,
                                 preprocessed_public_data,
-                                _polynomial_table,
+                                *_polynomial_table,
                                 _commitment_scheme,
                                 transcript
                             );
+;
+                            lookup_argument_result = lookup_argument_prover.prove_eval();
                             _proof.commitments[LOOKUP_BATCH] = lookup_argument_result.lookup_commitment;
                         }
                         return lookup_argument_result;
@@ -336,7 +348,7 @@ namespace nil {
                             for (std::size_t j = 0; j < gates[i].constraints.size(); j++) {
                                 polynomial_dfs_type constraint_result =
                                     gates[i].constraints[j].evaluate(
-                                        _polynomial_table, preprocessed_public_data.common_data.basic_domain) *
+                                        *_polynomial_table, preprocessed_public_data.common_data.basic_domain) *
                                     _polynomial_table.selector(gates[i].selector_index);
                                 // for (std::size_t k = 0; k < table_description.rows_amount; k++) {
                                 if (constraint_result.evaluate(
@@ -374,7 +386,8 @@ namespace nil {
                         if(_is_lookup_enabled){
                             _commitment_scheme.append_eval_point(LOOKUP_BATCH, _proof.eval_proof.challenge);
                             _commitment_scheme.append_eval_point(LOOKUP_BATCH, _proof.eval_proof.challenge * _omega);
-                            _commitment_scheme.append_eval_point(LOOKUP_BATCH, _proof.eval_proof.challenge * _omega.pow(preprocessed_public_data.common_data.usable_rows_amount));
+                            _commitment_scheme.append_eval_point(LOOKUP_BATCH, _proof.eval_proof.challenge * 
+                                _omega.pow(preprocessed_public_data.common_data.usable_rows_amount));
                         }
 
                         _commitment_scheme.append_eval_point(QUOTIENT_BATCH, _proof.eval_proof.challenge);
@@ -450,13 +463,11 @@ namespace nil {
                 private:
                     // Structures passed from outside by reference.
                     const typename public_preprocessor_type::preprocessed_data_type &preprocessed_public_data;
-                    const typename private_preprocessor_type::preprocessed_data_type &preprocessed_private_data;
                     const plonk_table_description<FieldType, typename ParamsType::arithmetization_params> &table_description;
                     const plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params> &constraint_system;
-                    const typename policy_type::variable_assignment_type &assignments;
 
                     // Members created during proof generation.
-                    plonk_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params> _polynomial_table;
+                    std::unique_ptr<plonk_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params>> _polynomial_table;
                     placeholder_proof<FieldType, ParamsType> _proof;
                     std::array<polynomial_dfs_type, f_parts> _F_dfs;
                     transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript;

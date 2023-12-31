@@ -596,7 +596,7 @@ namespace nil {
                                     FRI>::value,
                             bool>::type = true>
                 static typename FRI::proof_type proof_eval( 
-                    std::map<std::size_t, std::vector<PolynomialType>> &g,
+                    const std::map<std::size_t, std::vector<PolynomialType>> &g,
                     const PolynomialType combined_Q,
                     const std::map<std::size_t, typename FRI::precommitment_type> &precommitments,
                     const typename FRI::precommitment_type &combined_Q_precommitment,
@@ -609,18 +609,21 @@ namespace nil {
                     // TODO: add necessary checks
                     //BOOST_ASSERT(check_initial_precommitment<FRI>(precommitments, fri_params));
 
-                    // Think about resizing polynomials. Problems with const.
-                    if constexpr (std::is_same<math::polynomial_dfs<typename FRI::field_type::value_type>, PolynomialType>::value) {
-                        for( auto const &it:g ){
-                            auto k = it.first;
-                            for (int i = 0; i < g[k].size(); ++i ){
-                                // If LPC works properly this if is never executed.
-                                if (g[k][i].size() != fri_params.D[0]->size()) {
-                                    g[k][i].resize(fri_params.D[0]->size());
-                                }
-                            }
-                        }
-                    }
+                    // This resizes actually happens when called at the end of prover:
+                    // _proof.eval_proof.eval_proof = _commitment_scheme.proof_eval(transcript);
+                    // We DO NOT resize it here, it takes waaay too much RAM, resize it when needed.
+
+                    //if constexpr (std::is_same<math::polynomial_dfs<typename FRI::field_type::value_type>, PolynomialType>::value) {
+                    //    for( auto const &it:g ){
+                    //        auto k = it.first;
+                    //        for (int i = 0; i < g[k].size(); ++i ){
+                    //            // If LPC works properly this if is never executed.
+                    //            if (g[k][i].size() != fri_params.D[0]->size()) {
+                    //                g[k][i].resize(fri_params.D[0]->size());
+                    //            }
+                    //        }
+                    //    }
+                    //}
 
                     // Commit phase
                     auto f = combined_Q;
@@ -667,6 +670,26 @@ namespace nil {
 
                     // Query phase
                     std::array<typename FRI::query_proof_type, FRI::lambda> query_proofs;
+
+                    // If we have DFS polynomials, and we are going to resize them, better convert them to coefficients form,
+                    // and compute their values in those 2 * FRI::lambda points each, which is normally 2 * 20.
+                    // In case lambda becomes much larger than log(2, average polynomial size), then this will not be optimal.
+                    // For lambda = 20 and 2^20 rows in assignment table, it's faster and uses less RAM.
+                    std::map<std::size_t, std::vector<math::polynomial<typename FRI::field_type::value_type>>> g_coeffs;
+                    if constexpr (std::is_same<
+                        math::polynomial_dfs<typename FRI::field_type::value_type>,
+                        PolynomialType>::value
+                    ) {
+                        for (const auto &[key, poly_vector]: g) {
+                            for (const auto& poly: poly_vector) {
+                                // All the polynomials have the same size, so we have no bugs here.
+                                if (poly.size() != fri_params.D[0]->size()) {
+                                    g_coeffs[key].emplace_back(poly.coefficients());
+                                }
+                            }
+                        }
+                    }
+
                     for (std::size_t query_id = 0; query_id < FRI::lambda; query_id++) {
                         std::size_t domain_size = fri_params.D[0]->size();
                         std::uint64_t x_index = (transcript.template int_challenge<std::uint64_t>()) % domain_size;
@@ -679,7 +702,7 @@ namespace nil {
 
                         //Initial proof
                         std::map<std::size_t, typename FRI::initial_proof_type> initial_proof;
-                        for( const auto &it: g ){
+                        for (const auto &it: g) {
                             auto k = it.first;
                             initial_proof[k] = {};
                             initial_proof[k].values.resize(it.second.size());
@@ -689,25 +712,37 @@ namespace nil {
 
                             //Fill values
                             t = 0;
-                            for (std::size_t polynomial_index = 0; polynomial_index < g[k].size(); ++polynomial_index) {
+                            const auto& g_k = it.second; // g[k]
+
+                            for (std::size_t polynomial_index = 0; polynomial_index < g_k.size(); ++polynomial_index) {
                                 initial_proof[k].values[polynomial_index].resize(coset_size / FRI::m);
-                                for (std::size_t j = 0; j < coset_size / FRI::m; j++) {
-                                    if constexpr (std::is_same<
+                                if constexpr (std::is_same<
                                             math::polynomial_dfs<typename FRI::field_type::value_type>,
                                             PolynomialType>::value
                                     ) {
-                                        initial_proof[k].values[polynomial_index][j][0] = std::move(g[k][polynomial_index][s_indices[j][0]]);
-                                        initial_proof[k].values[polynomial_index][j][1] = std::move(g[k][polynomial_index][s_indices[j][1]]);
+                                    if (g_k[polynomial_index].size() == fri_params.D[0]->size()) {
+                                        for (std::size_t j = 0; j < coset_size / FRI::m; j++) {
+                                            initial_proof[k].values[polynomial_index][j][0] = g_k[polynomial_index][s_indices[j][0]];
+                                            initial_proof[k].values[polynomial_index][j][1] = g_k[polynomial_index][s_indices[j][1]];
+                                        }
                                     } else {
-                                        initial_proof[k].values[polynomial_index][j][0] = g[k][polynomial_index].evaluate(
-                                                s[j][0]);
-                                        initial_proof[k].values[polynomial_index][j][1] = g[k][polynomial_index].evaluate(
-                                                s[j][1]);
+                                        // Convert to coefficients form and evaluate. coset_size / FRI::m is usually just 1,
+                                        // It makes no sense to resize in dfs form to then use just 2 values in 2 points.
+                                        for (std::size_t j = 0; j < coset_size / FRI::m; j++) {
+                                            initial_proof[k].values[polynomial_index][j][0] = g_coeffs[k][polynomial_index].evaluate(s[j][0]);
+                                            initial_proof[k].values[polynomial_index][j][1] = g_coeffs[k][polynomial_index].evaluate(s[j][1]);
+                                        }
+                                    }
+                                } else {
+                                    // Same for poly in coefficients form.
+                                    for (std::size_t j = 0; j < coset_size / FRI::m; j++) {
+                                        initial_proof[k].values[polynomial_index][j][0] = g_k[polynomial_index].evaluate(s[j][0]);
+                                        initial_proof[k].values[polynomial_index][j][1] = g_k[polynomial_index].evaluate(s[j][1]);
                                     }
                                 }
                             }
 
-                            //Fill merkle proofs
+                            // Fill merkle proofs
                             initial_proof[k].p = make_proof_specialized<FRI>(
                                 get_folded_index<FRI>(x_index, fri_params.D[0]->size(), fri_params.step_list[0]),
                                 fri_params.D[0]->size(), precommitments.at(k)
@@ -758,13 +793,14 @@ namespace nil {
                                 round_proofs[i].y[0][1] = final_polynomial.evaluate(-x);
                             }
                         }
-                        typename FRI::query_proof_type query_proof = {initial_proof, round_proofs};
-                        query_proofs[query_id] = query_proof;
+                        typename FRI::query_proof_type query_proof = {std::move(initial_proof), std::move(round_proofs)};
+                        query_proofs[query_id] = std::move(query_proof);
                     }
 
-                    proof.fri_roots = fri_roots;
-                    proof.final_polynomial = final_polynomial;
-                    proof.query_proofs = query_proofs;
+                    proof.fri_roots = std::move(fri_roots);
+                    proof.final_polynomial = std::move(final_polynomial);
+                    proof.query_proofs = std::move(query_proofs);
+
                     return proof;//typename FRI::proof_type{fri_roots, final_polynomial, query_proofs};
                 }
 

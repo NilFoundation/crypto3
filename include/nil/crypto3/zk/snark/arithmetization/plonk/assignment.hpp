@@ -81,6 +81,10 @@ namespace nil {
                         return _witnesses;
                     }
 
+                    witnesses_container_type move_witnesses() {
+                        return std::move(_witnesses);
+                    }
+
                     const ColumnType& operator[](std::uint32_t index) const {
                         if (index < ArithmetizationParams::witness_columns)
                             return _witnesses[index];
@@ -147,6 +151,11 @@ namespace nil {
                         return _public_inputs;
                     }
 
+                    public_input_container_type move_public_inputs() {
+
+                        return std::move(_public_inputs);
+                    }
+
                     std::uint32_t constants_amount() const {
                         return _constants.size();
                     }
@@ -164,6 +173,11 @@ namespace nil {
                         return _constants;
                     }
 
+                    constant_container_type move_constants() {
+
+                        return std::move(_constants);
+                    }
+
                     constexpr std::uint32_t selectors_amount() const {
                         return _selectors.size();
                     }
@@ -179,6 +193,11 @@ namespace nil {
 
                     const selector_container_type& selectors() const {
                         return _selectors;
+                    }
+
+                    selector_container_type move_selectors() {
+
+                        return std::move(_selectors);
                     }
 
                     void fill_constant(std::uint32_t index, const ColumnType& column) {
@@ -246,6 +265,7 @@ namespace nil {
                     using selector_container_type = typename public_table_type::selector_container_type;
 
                 protected:
+                    // These are normally created by the assigner, or read from a file.
                     private_table_type _private_table;
                     public_table_type _public_table;
 
@@ -309,8 +329,16 @@ namespace nil {
                         return _private_table;
                     }
 
+                    private_table_type move_private_table() {
+                        return std::move(_private_table);
+                    }
+
                     const public_table_type& public_table() const {
                         return _public_table;
+                    }
+
+                    public_table_type move_public_table() {
+                        return std::move(_public_table);
                     }
 
                     std::uint32_t size() const {
