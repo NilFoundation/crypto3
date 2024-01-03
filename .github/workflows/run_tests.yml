@@ -80,6 +80,11 @@ jobs:
             blueprint_verifiers_placeholder_gate_component_test,
             blueprint_proxy_test
           ]  # Tests to execute
+        include: # Abused to enable proof generation for some tests; add more as needed
+          - target: blueprint_algebra_fields_plonk_non_native_logic_ops_test
+            add-args: "-DBLUEPRINT_PLACEHOLDER_PROOF_GEN=True"
+          - target: blueprint_algebra_fields_plonk_non_native_lookup_logic_ops_test
+            add-args: "-DBLUEPRINT_PLACEHOLDER_PROOF_GEN=True"
     steps:
       - uses: cachix/install-nix-action@v23
       - uses: DeterminateSystems/magic-nix-cache-action@main
@@ -122,7 +127,7 @@ jobs:
             -DBUILD_TESTS=TRUE
             -DCMAKE_C_COMPILER=clang
             -DCMAKE_CXX_COMPILER=clang++
-            "
+            ${{ matrix.add-args || ''}}"
         run: |
           mkdir build
           nix develop ./libs/blueprint -c cmake -B build ${{ env.CMAKE_ARGS }} .

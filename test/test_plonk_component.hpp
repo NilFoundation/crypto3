@@ -112,18 +112,19 @@ namespace nil {
 
         template<typename fri_type, typename FieldType>
         typename fri_type::params_type create_fri_params(std::size_t degree_log, const std::size_t expand_factor = 4, const std::size_t max_step = 1) {
-            typename fri_type::params_type params;
             math::polynomial<typename FieldType::value_type> q = {0, 0, 1};
 
-            std::size_t r = degree_log - 1;
+            const std::size_t r = degree_log - 1;
 
             std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> domain_set =
                 math::calculate_domain_set<FieldType>(degree_log + expand_factor, r);
 
-            params.r = r;
-            params.D = domain_set;
-            params.max_degree = (1 << degree_log) - 1;
-            params.step_list = generate_random_step_list(r, max_step);
+            typename fri_type::params_type params(
+                (1 << degree_log) - 1,
+                domain_set,
+                generate_random_step_list(r, max_step),
+                expand_factor
+            );
 
             return params;
         }
