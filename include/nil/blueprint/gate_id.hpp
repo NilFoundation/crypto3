@@ -88,7 +88,7 @@ namespace nil {
 
                 for (std::size_t p = 0; p < 2; p++) {
                     for (std::size_t i = 0; i < 3; i++) {
-                        constants[p][i].reserve(ArithmetizationParams::witness_columns);
+                        constants[p][i].reserve(ArithmetizationParams::constant_columns);
                     }
                 }
 
