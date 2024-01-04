@@ -103,7 +103,7 @@ namespace nil {
                         using polynomial_type = math::polynomial<typename FieldType::value_type>;
 
                         struct params_type {
-                            
+
                             using field_type = FieldType;
                             using merkle_tree_type = containers::merkle_tree<MerkleTreeHashType, 2>;
                             using merkle_proof_type =  typename containers::merkle_proof<MerkleTreeHashType, 2>;
@@ -143,7 +143,7 @@ namespace nil {
 
                             const std::size_t max_degree;
                             const std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D;
- 
+
                             // The total number of FRI-rounds, the sum of 'step_list'.
                             const std::size_t r;
                             const std::vector<std::size_t> step_list;
@@ -584,7 +584,7 @@ namespace nil {
 
                     return correct_order_idx;
                 }
-                 
+
                 template<typename FRI, typename PolynomialType,
                     typename std::enable_if<
                             std::is_base_of<
@@ -595,7 +595,7 @@ namespace nil {
                                             FRI::use_grinding, typename FRI::grinding_type>,
                                     FRI>::value,
                             bool>::type = true>
-                static typename FRI::proof_type proof_eval( 
+                static typename FRI::proof_type proof_eval(
                     const std::map<std::size_t, std::vector<PolynomialType>> &g,
                     const PolynomialType combined_Q,
                     const std::map<std::size_t, typename FRI::precommitment_type> &precommitments,
@@ -604,7 +604,7 @@ namespace nil {
                     typename FRI::transcript_type &transcript
                 ) {
                     typename FRI::proof_type proof;
-                    
+
                     BOOST_ASSERT(check_step_list<FRI>(fri_params));
                     // TODO: add necessary checks
                     //BOOST_ASSERT(check_initial_precommitment<FRI>(precommitments, fri_params));
@@ -682,9 +682,11 @@ namespace nil {
                     ) {
                         for (const auto &[key, poly_vector]: g) {
                             for (const auto& poly: poly_vector) {
-                                // All the polynomials have the same size, so we have no bugs here.
                                 if (poly.size() != fri_params.D[0]->size()) {
-                                    g_coeffs[key].emplace_back(poly.coefficients());
+                                   g_coeffs[key].emplace_back(poly.coefficients());
+                                } else {
+                                    // These polynomials won't be used
+                                    g_coeffs[key].emplace_back(math::polynomial<typename FRI::field_type::value_type>());
                                 }
                             }
                         }
@@ -819,7 +821,7 @@ namespace nil {
                     BOOST_ASSERT(combined_U.size() == denominators.size());
                     std::size_t evals_num = combined_U.size();
                     // TODO: Add size correcness checks.
-                
+
                     if (proof.final_polynomial.degree() >
                         std::pow(2, std::log2(fri_params.max_degree + 1) - fri_params.r + 1) - 1) {
                         return false;
