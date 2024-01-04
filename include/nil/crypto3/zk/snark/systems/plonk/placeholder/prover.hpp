@@ -245,7 +245,7 @@ namespace nil {
                         PROFILE_PLACEHOLDER_SCOPE("split_polynomial_dfs_conversion_time");
 
                         std::size_t split_polynomial_size = std::max(
-                            (preprocessed_public_data.identity_polynomials.size() + 1) * (preprocessed_public_data.common_data.rows_amount -1 ),
+                            (preprocessed_public_data.identity_polynomials.size() + 2) * (preprocessed_public_data.common_data.rows_amount -1 ),
                             (constraint_system.lookup_poly_degree_bound() + 1) * (preprocessed_public_data.common_data.rows_amount -1 )//,
                         );
                         split_polynomial_size = std::max(
@@ -386,7 +386,7 @@ namespace nil {
                         if(_is_lookup_enabled){
                             _commitment_scheme.append_eval_point(LOOKUP_BATCH, _proof.eval_proof.challenge);
                             _commitment_scheme.append_eval_point(LOOKUP_BATCH, _proof.eval_proof.challenge * _omega);
-                            _commitment_scheme.append_eval_point(LOOKUP_BATCH, _proof.eval_proof.challenge * 
+                            _commitment_scheme.append_eval_point(LOOKUP_BATCH, _proof.eval_proof.challenge *
                                 _omega.pow(preprocessed_public_data.common_data.usable_rows_amount));
                         }
 
