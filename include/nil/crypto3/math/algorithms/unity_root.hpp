@@ -30,16 +30,118 @@
 #include <complex>
 
 #include <boost/math/constants/constants.hpp>
+
+#include <nil/crypto3/algebra/totient.hpp>
+#include <nil/crypto3/algebra/type_traits.hpp>
 #include <nil/crypto3/algebra/fields/params.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace math {
 
+            /*
+             A helper function to RootOfUnity function. This finds a generator for a given
+             prime q. Input: BigInteger q which is a prime. Output: A generator of prime q
+             */
+            template<typename IntegerType>
+            static typename std::enable_if<!algebra::is_field_element<IntegerType>::value, IntegerType>::type
+            find_generator(const IntegerType &q) {
+                std::set<IntegerType> primeFactors;
+
+                IntegerType qm1 = q - IntegerType(1);
+                IntegerType qm2 = q - IntegerType(2);
+                algebra::prime_factorize<IntegerType>(qm1, primeFactors);
+                bool generatorFound = false;
+                IntegerType gen;
+                while (!generatorFound) {
+                    uint32_t count = 0;
+
+                    // gen = RNG(qm2).ModAdd(IntegerType::ONE, q); //modadd note needed
+                    gen = RNG(qm2) + IntegerType(1);
+
+                    for (auto it = primeFactors.begin(); it != primeFactors.end(); ++it) {
+                        if (gen.ModExp(qm1 / (*it), q) == IntegerType(1))
+                            break;
+                        else
+                            count++;
+                    }
+                    if (count == primeFactors.size())
+                        generatorFound = true;
+                }
+                return gen;
+            }
+
+            /**
+             * Finds roots of unity for given input.  Assumes the the input is a power of
+             * two.
+             *
+             * @param m as number which is cyclotomic(in format of int).
+             * @param &modulo which is used to find generator.
+             *
+             * finds roots of unity for given input.  Assumes the the input is a power of two.
+             Mostly likely does not give correct results otherwise. input:  m as number
+             which is cyclotomic(in format of int), modulo which is used to find generator
+             (in format of BigInteger)
+
+             output:  root of unity (in format of BigInteger)
+             *
+             * @return a root of unity.
+             */
+            template<typename IntegerType>
+            typename std::enable_if<!algebra::is_field_element<IntegerType>::value, IntegerType>::type
+            unity_root(uint32_t m, const IntegerType &modulo) {
+                IntegerType M(m);
+
+                if ((modulo - IntegerType(1)).Mod(M) != IntegerType(0)) {
+                    return {};
+                }
+
+                IntegerType result;
+                IntegerType gen = find_generator(modulo);
+                result = gen.ModExp((modulo - IntegerType(1)).DividedBy(M), modulo);
+                if (result == 1) {
+                    result = unity_root(m, modulo);
+                }
+
+                /*
+                 * At this point, result contains a primitive root of unity. However,
+                 * we want to return the minimum root of unity, to avoid different
+                 * crypto contexts having different roots of unity for the same
+                 * cyclotomic order and moduli. Therefore, we are going to cycle over
+                 * all primitive roots of unity and select the smallest one (minRU).
+                 *
+                 * To cycle over all primitive roots of unity, we raise the root of
+                 * unity in result to all the powers that are co-prime to the
+                 * cyclotomic order. In power-of-two cyclotomics, this will be the
+                 * set of all odd powers, but here we use a more general routine
+                 * to support arbitrary cyclotomics.
+                 *
+                 */
+
+                IntegerType mu = modulo.ComputeMu();
+                IntegerType x(1);
+                x.ModMulEq(result, modulo, mu);
+                IntegerType minRU(x);
+                IntegerType curPowIdx(1);
+                std::vector<IntegerType> coprimes = algebra::totient_list<IntegerType>(m);
+                for (uint32_t i = 0; i < coprimes.size(); i++) {
+                    auto nextPowIdx = coprimes[i];
+                    IntegerType diffPow(nextPowIdx - curPowIdx);
+                    for (IntegerType j(0); j < diffPow; j += IntegerType(1)) {
+                        x.ModMulEq(result, modulo, mu);
+                    }
+                    if (x < minRU && x != IntegerType(1)) {
+                        minRU = x;
+                    }
+                    curPowIdx = nextPowIdx;
+                }
+                return minRU;
+            }
+
             template<typename FieldType>
             constexpr typename std::enable_if<std::is_same<typename FieldType::value_type, std::complex<double>>::value,
-                                              typename FieldType::value_type>::type
-                unity_root(const std::size_t n) {
+                    typename FieldType::value_type>::type
+            unity_root(const std::size_t n) {
                 const double PI = boost::math::constants::pi<double>();
 
                 return typename FieldType::value_type(cos(2 * PI / n), sin(2 * PI / n));
@@ -47,9 +149,9 @@ namespace nil {
 
             template<typename FieldType>
             constexpr
-                typename std::enable_if<!std::is_same<typename FieldType::value_type, std::complex<double>>::value,
-                                        typename FieldType::value_type>::type
-                unity_root(const std::size_t n) {
+            typename std::enable_if<!std::is_same<typename FieldType::value_type, std::complex<double>>::value,
+                    typename FieldType::value_type>::type
+            unity_root(const std::size_t n) {
 
                 typedef typename FieldType::value_type value_type;
 
@@ -71,6 +173,6 @@ namespace nil {
             }
         }    // namespace math
     }        // namespace crypto3
-}    // namespace nil
+}
 
 #endif    // CRYPTO3_MATH_UNITY_ROOT_HPP

@@ -37,13 +37,13 @@ namespace nil {
             // Default implementation according to Wikipedia
             // https://en.wikipedia.org/wiki/Lagrange_polynomial
             template<typename InputRange,
-                     typename FieldValueType =
-                         typename std::iterator_traits<typename InputRange::iterator>::value_type::first_type>
+                    typename FieldValueType =
+                    typename std::iterator_traits<typename InputRange::iterator>::value_type::first_type>
             typename std::enable_if<
-                std::is_same<std::pair<FieldValueType, FieldValueType>,
-                             typename std::iterator_traits<typename InputRange::iterator>::value_type>::value,
-                polynomial<FieldValueType>>::type
-                lagrange_interpolation(const InputRange &points) {
+                    std::is_same<std::pair<FieldValueType, FieldValueType>,
+                            typename std::iterator_traits<typename InputRange::iterator>::value_type>::value,
+                    polynomial<FieldValueType>>::type
+            lagrange_interpolation(const InputRange &points) {
 
                 std::size_t k = std::size(points);
 
