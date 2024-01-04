@@ -430,15 +430,16 @@ namespace nil {
                                                                                           ArithmetizationParams>> &bp,
                           const assignment_proxy<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
                                                                                              ArithmetizationParams>> &assignments){
+
             const auto& used_gates = bp.get_used_gates();
 
             const auto& used_lookup_gates = bp.get_used_lookup_gates();
 
             const auto& used_copy_constraints = bp.get_used_copy_constraints();
 
-            const auto& private_rows = assignments.get_used_selector_rows();
+            const auto& selector_rows = assignments.get_used_selector_rows();
 
-            return is_satisfied(bp, assignments, used_gates, used_lookup_gates, used_copy_constraints, private_rows);
+            return is_satisfied(bp, assignments, used_gates, used_lookup_gates, used_copy_constraints, selector_rows);
         }
     }    // namespace blueprint
 }    // namespace nil
