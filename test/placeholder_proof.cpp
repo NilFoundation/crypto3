@@ -364,7 +364,7 @@ BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_initializer) {
         );
 
     auto lpc_proof = placeholder_prover<field_type, lpc_placeholder_params_type>::process(
-        lpc_preprocessed_public_data, lpc_preprocessed_private_data, desc, constraint_system, assignments, lpc_scheme
+        lpc_preprocessed_public_data, lpc_preprocessed_private_data, desc, constraint_system, lpc_scheme
     );
 
     if (has_argv("--print")) {
@@ -464,7 +464,7 @@ BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_initializer){
         );
 
     auto lpc_proof = placeholder_prover<field_type, lpc_placeholder_params_type>::process(
-        lpc_preprocessed_public_data, lpc_preprocessed_private_data, desc, constraint_system, assignments, lpc_scheme
+        lpc_preprocessed_public_data, lpc_preprocessed_private_data, desc, constraint_system, lpc_scheme
     );
     if( has_argv("--print") ){
         print_placeholder_proof_with_params<Endianness, lpc_placeholder_params_type>(
@@ -571,7 +571,7 @@ BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_initializer) {
             constraint_system, assignments.private_table(), desc);
 
     auto proof = placeholder_prover<field_type, lpc_placeholder_params_type>::process(
-        preprocessed_public_data, preprocessed_private_data, desc, constraint_system, assignments, lpc_scheme);
+        preprocessed_public_data, preprocessed_private_data, desc, constraint_system, lpc_scheme);
     if (has_argv("--print")) {
         print_placeholder_proof_with_params<Endianness, lpc_placeholder_params_type>(
             preprocessed_public_data,
@@ -660,7 +660,7 @@ BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_initializer) {
             constraint_system, assignments.private_table(), desc);
 
     auto proof = placeholder_prover<field_type, lpc_placeholder_params_type>::process(
-        preprocessed_public_data, preprocessed_private_data, desc, constraint_system, assignments, lpc_scheme);
+        preprocessed_public_data, preprocessed_private_data, desc, constraint_system, lpc_scheme);
 
     if( has_argv("--print") ){
         print_placeholder_proof_with_params<Endianness, lpc_placeholder_params_type>(
@@ -749,7 +749,7 @@ BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_initializer) {
             constraint_system, assignments.private_table(), desc);
 
     auto proof = placeholder_prover<field_type, lpc_placeholder_params_type>::process(
-        preprocessed_public_data, preprocessed_private_data, desc, constraint_system, assignments, lpc_scheme
+        preprocessed_public_data, preprocessed_private_data, desc, constraint_system, lpc_scheme
     );
     if( has_argv("--print") ){
         print_placeholder_proof_with_params<Endianness, lpc_placeholder_params_type>(
@@ -837,7 +837,7 @@ BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_initializer) {
             constraint_system, assignments.private_table(), desc);
 
     auto proof = placeholder_prover<field_type, lpc_placeholder_params_type>::process(
-        preprocessed_public_data, preprocessed_private_data, desc, constraint_system, assignments, lpc_scheme);
+        preprocessed_public_data, preprocessed_private_data, desc, constraint_system, lpc_scheme);
     if( has_argv("--print") ){
         print_placeholder_proof_with_params<Endianness, lpc_placeholder_params_type>(
             preprocessed_public_data,
