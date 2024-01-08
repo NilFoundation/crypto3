@@ -689,7 +689,7 @@ namespace nil {
 
                         std::vector<std::uint8_t> result = {};
                         for (std::size_t i = 0; i < this->_polys[index].size(); ++i) {
-                            BOOST_ASSERT(this->_polys[index][i].size() <= _params.commitment_key.size());
+                            BOOST_ASSERT(this->_polys[index][i].degree() <= _params.commitment_key.size());
                             auto single_commitment = nil::crypto3::zk::algorithms::commit_one<KZGScheme>(_params, this->_polys[index][i]);
                             this->_ind_commitments[index].push_back(single_commitment);
                             auto single_commitment_bytes = KZGScheme::serializer::point_to_octets(single_commitment);
