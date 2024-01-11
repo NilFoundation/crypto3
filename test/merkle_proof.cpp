@@ -44,6 +44,7 @@
 
 #include <nil/crypto3/hash/sha2.hpp>
 #include <nil/crypto3/hash/keccak.hpp>
+#include <nil/crypto3/hash/poseidon.hpp>
 
 #include <nil/crypto3/marshalling/containers/types/merkle_proof.hpp>
 
@@ -118,7 +119,6 @@ void test_merkle_proof(std::size_t tree_depth) {
     auto write_iter = cv.begin();
     nil::marshalling::status_type status = filled_merkle_proof.write(write_iter, cv.size());
 
-    std::cout << "Proof size: " << cv.size() << std::endl;
     print_merkle_proof(cv.cbegin(), cv.cend(), data[proof_idx].cbegin(), data[proof_idx].cend(), true);
 
     merkle_proof_marshalling_type test_val_read;
@@ -130,27 +130,42 @@ void test_merkle_proof(std::size_t tree_depth) {
 
 BOOST_AUTO_TEST_SUITE(marshalling_merkle_proof_test_suite)
 
-    BOOST_AUTO_TEST_CASE(marshalling_merkle_proof_arity_2_test) {
+using curve_type = nil::crypto3::algebra::curves::pallas;
+using field_type = typename curve_type::base_field_type;
+
+using HashTypes = boost::mpl::list<
+        nil::crypto3::hashes::sha2<256>,
+        nil::crypto3::hashes::keccak_1600<512>,
+        nil::crypto3::hashes::poseidon<nil::crypto3::hashes::detail::mina_poseidon_policy<field_type>> 
+    >;
+
+    
+    BOOST_AUTO_TEST_CASE_TEMPLATE(marshalling_merkle_proof_arity_2_test, HashType, HashTypes) {
         std::srand(std::time(0));
-        test_merkle_proof<nil::marshalling::option::big_endian, nil::crypto3::hashes::sha2<256>, 2>(5);
-        test_merkle_proof<nil::marshalling::option::big_endian, nil::crypto3::hashes::keccak_1600<256>, 2>(10);
-        test_merkle_proof<nil::marshalling::option::big_endian, nil::crypto3::hashes::keccak_1600<256>, 2, 300>(15);
+        test_merkle_proof<nil::marshalling::option::big_endian, HashType, 2>(5);
+        test_merkle_proof<nil::marshalling::option::big_endian, HashType, 2>(10);
+        test_merkle_proof<nil::marshalling::option::big_endian, HashType, 2, 300>(15);
     }
 
-// TODO: fix test case for arity 3
-    BOOST_AUTO_TEST_CASE(marshalling_merkle_proof_arity_3_test) {
-        test_merkle_proof<nil::marshalling::option::big_endian, nil::crypto3::hashes::sha2<256>, 3>(5);
-        test_merkle_proof<nil::marshalling::option::big_endian, nil::crypto3::hashes::keccak_1600<256>, 3>(5);
+// Poseidon hash function supports only Arity 2.
+using BlockHashTypes = boost::mpl::list<
+        nil::crypto3::hashes::sha2<256>,
+        nil::crypto3::hashes::keccak_1600<512>
+    >;
+
+    BOOST_AUTO_TEST_CASE_TEMPLATE(marshalling_merkle_proof_arity_3_test, HashType, BlockHashTypes) {
+        test_merkle_proof<nil::marshalling::option::big_endian, HashType, 3>(5);
+        test_merkle_proof<nil::marshalling::option::big_endian, HashType, 3>(10);
     }
 
-    BOOST_AUTO_TEST_CASE(marshalling_merkle_proof_arity_4_test) {
-        test_merkle_proof<nil::marshalling::option::big_endian, nil::crypto3::hashes::sha2<256>, 4>(5);
-        test_merkle_proof<nil::marshalling::option::big_endian, nil::crypto3::hashes::keccak_1600<256>, 4>(5);
+    BOOST_AUTO_TEST_CASE_TEMPLATE(marshalling_merkle_proof_arity_4_test, HashType, BlockHashTypes) {
+        test_merkle_proof<nil::marshalling::option::big_endian, HashType, 4>(5);
+        test_merkle_proof<nil::marshalling::option::big_endian, HashType, 4>(10);
     }
 
-    BOOST_AUTO_TEST_CASE(marshalling_merkle_proof_arity_5_test) {
-        test_merkle_proof<nil::marshalling::option::big_endian, nil::crypto3::hashes::sha2<256>, 5>(5);
-        test_merkle_proof<nil::marshalling::option::big_endian, nil::crypto3::hashes::keccak_1600<256>, 5>(5);
+    BOOST_AUTO_TEST_CASE_TEMPLATE(marshalling_merkle_proof_arity_5_test, HashType, BlockHashTypes) {
+        test_merkle_proof<nil::marshalling::option::big_endian, HashType, 5>(5);
+        test_merkle_proof<nil::marshalling::option::big_endian, HashType, 5>(10);
     }
 
 BOOST_AUTO_TEST_SUITE_END()

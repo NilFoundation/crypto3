@@ -44,6 +44,8 @@
 #include <nil/crypto3/marshalling/containers/types/merkle_proof.hpp>
 #include <nil/crypto3/marshalling/zk/types/commitments/fri.hpp>
 #include <nil/crypto3/marshalling/zk/types/commitments/eval_storage.hpp>
+#include <nil/crypto3/marshalling/containers/types/merkle_proof.hpp>
+
 
 namespace nil {
     namespace crypto3 {
