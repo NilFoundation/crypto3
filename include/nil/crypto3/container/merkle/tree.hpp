@@ -63,7 +63,7 @@ namespace nil {
                     if (branches == 2) {
                         return std::log2(leafs) + 1;
                     } else {
-                        return std::log(leafs) / std::log(branches) + 1;
+                        return round(std::log(leafs) / std::log(branches)) + 1;
                     }
                 }
 
@@ -200,8 +200,8 @@ namespace nil {
                     merkle_tree_impl(size_t n) :
                             _size(detail::merkle_tree_length(n, Arity)), _leaves(n),
                             _rc(detail::merkle_tree_row_count(n, Arity)) {
-                        BOOST_ASSERT_MSG(std::log(n) / std::log(Arity) == (std::size_t) (std::log(n) / std::log(Arity)),
-                                         "Wrong leaves number");
+                        BOOST_ASSERT_MSG(pow(Arity, round(std::log(n) / std::log(Arity))) == n,
+                                         "Wrong leaves number, it must be a power of Arity.");
                     }
 
                     merkle_tree_impl(const merkle_tree_impl &x) :
