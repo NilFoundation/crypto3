@@ -26,6 +26,4 @@ jobs:
           marshalling_r1cs_gg_ppzksnark_primary_input_test
           marshalling_r1cs_gg_ppzksnark_proof_test
           marshalling_r1cs_gg_ppzksnark_verification_key_test
-
-#         Test should be fixed
-#          marshalling_merkle_proof_test
+          marshalling_merkle_proof_test
