@@ -22,8 +22,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef PROOF_OF_WORK_HPP
-#define PROOF_OF_WORK_HPP
+#ifndef CRYPTO3_PROOF_OF_WORK_HPP
+#define CRYPTO3_PROOF_OF_WORK_HPP
 
 #include <boost/property_tree/ptree.hpp>
 
@@ -88,4 +88,4 @@ namespace nil {
     }
 }
 
-#endif
+#endif  // CRYPTO3_PROOF_OF_WORK_HPP

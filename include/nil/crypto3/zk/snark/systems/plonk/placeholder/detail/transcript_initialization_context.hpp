@@ -30,6 +30,8 @@
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/params.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
+
 #include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
 
 #include <nil/crypto3/marshalling/zk/types/placeholder/transcript_initialization_context.hpp>
@@ -64,7 +66,6 @@ namespace nil {
  
                         // All fields below this line must be included in the transcript initilization, including
                         // static const fields.
-
                         constexpr static const std::size_t witness_columns = PlaceholderParamsType::witness_columns;
                         constexpr static const std::size_t public_input_columns = PlaceholderParamsType::public_input_columns;
                         constexpr static const std::size_t constant_columns = PlaceholderParamsType::constant_columns;
@@ -86,8 +87,9 @@ namespace nil {
                     };
 
                     template <typename PlaceholderParamsType, typename transcript_hash_type>
-                    void init_transcript(
-                            transcript::fiat_shamir_heuristic_sequential<transcript_hash_type>& transcript,
+                    typename transcript_hash_type::digest_type compute_constraint_system_with_params_hash(
+                            const plonk_constraint_system<typename PlaceholderParamsType::field_type, 
+                                typename PlaceholderParamsType::arithmetization_params> &constraint_system,
                             std::size_t rows_amount,
                             std::size_t usable_rows_amount,
                             const typename PlaceholderParamsType::commitment_scheme_type::params_type& commitment_params,
@@ -104,15 +106,29 @@ namespace nil {
                         using TTypeBase = nil::marshalling::field_type<Endianness>;
                         using value_marshalling_type = nil::crypto3::marshalling::types::transcript_initialization_context<
                             TTypeBase, nil::crypto3::zk::snark::detail::transcript_initialization_context<PlaceholderParamsType>>;
-                        auto filled_val = nil::crypto3::marshalling::types::fill_transcript_initialization_context<
+                        auto filled_context = nil::crypto3::marshalling::types::fill_transcript_initialization_context<
                             Endianness, nil::crypto3::zk::snark::detail::transcript_initialization_context<PlaceholderParamsType>>(context);
 
-                        std::vector<std::uint8_t> cv(filled_val.length(), 0x00);
+                        std::vector<std::uint8_t> cv(filled_context.length(), 0x00);
                         auto write_iter = cv.begin();
-                        nil::marshalling::status_type status = filled_val.write(write_iter, cv.size());
+                        nil::marshalling::status_type status = filled_context.write(write_iter, cv.size());
+                        BOOST_CHECK(status == nil::marshalling::status_type::success);
 
-                        // TODO(martun): uncomment this after fix.
-                        // transcript(cv);
+                        // Append constraint_system to the buffer "cv".
+                        using FieldType = typename PlaceholderParamsType::field_type;
+                        using ConstraintSystem = plonk_constraint_system<FieldType, typename PlaceholderParamsType::arithmetization_params>;
+                        using constraint_system_marshalling_type = nil::crypto3::marshalling::types::plonk_constraint_system<TTypeBase, ConstraintSystem>;
+
+                        auto filled_constraint_system = nil::crypto3::marshalling::types::fill_plonk_constraint_system<Endianness, ConstraintSystem>(constraint_system);
+                        cv.resize(filled_context.length() + filled_constraint_system.length(), 0x00);
+
+                        // Function write wants an lvalue as 1st parameter.
+                        write_iter = cv.begin() + filled_context.length();
+                        status = filled_constraint_system.write(write_iter, filled_constraint_system.length());
+                        BOOST_CHECK(status == nil::marshalling::status_type::success);
+
+                        // Return hash of "cv", which contains concatenated constraint system and other initialization parameters.
+                        return hash<transcript_hash_type>(cv);
                     }
                 }    // namespace detail
             }        // namespace snark

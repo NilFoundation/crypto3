@@ -83,11 +83,11 @@ namespace nil {
                         };
 
                         struct verification_key {
-                            typename transcript_hash_type::digest_type constraint_system_hash;
+                            typename transcript_hash_type::digest_type constraint_system_with_params_hash;
                             commitment_type                            fixed_values_commitment;
 
                             bool operator==(const verification_key &rhs) const {
-                                return  constraint_system_hash == rhs.constraint_system_hash &&
+                                return  constraint_system_with_params_hash == rhs.constraint_system_with_params_hash &&
                                         fixed_values_commitment == rhs.fixed_values_commitment;
                             }
 
@@ -98,7 +98,7 @@ namespace nil {
                             std::string to_string() const{
                                 std::stringstream ss;
 
-                                ss << constraint_system_hash <<" " <<fixed_values_commitment;
+                                ss << constraint_system_with_params_hash <<" " <<fixed_values_commitment;
                                 return ss.str();
                             }
                         };
@@ -494,39 +494,26 @@ namespace nil {
                         std::array<std::set<int>, ParamsType::arithmetization_params::total_columns> c_rotations =
                             columns_rotations(constraint_system, table_description);
 
-                        // Push fixed values and marshalled circuit to transcript.
-                        using Endianness = nil::marshalling::option::big_endian;
-                        using TTypeBase = nil::marshalling::field_type<Endianness>;
-                        using ConstraintSystem = plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params>;
-                        using value_marshalling_type = nil::crypto3::marshalling::types::plonk_constraint_system<TTypeBase, ConstraintSystem>;
+                        typename transcript_hash_type::digest_type constraint_system_with_params_hash = 
+                            nil::crypto3::zk::snark::detail::compute_constraint_system_with_params_hash<ParamsType, transcript_hash_type>(
+                                constraint_system,
+                                N_rows,
+                                table_description.usable_rows_amount,
+                                commitment_scheme.get_commitment_params(),
+                                "Default application dependent transcript initialization string");
 
-                        auto filled_val = nil::crypto3::marshalling::types::fill_plonk_constraint_system<Endianness, ConstraintSystem>(constraint_system);
-                        std::vector<std::uint8_t> cv(filled_val.length(), 0x00);
-
-                        // Function write wants an lvalue as 1st parameter.
-                        auto write_iter = cv.begin();
-                        nil::marshalling::status_type status = filled_val.write(write_iter, cv.size());
-                        typename transcript_hash_type::digest_type circuit_hash = hash<transcript_hash_type>(cv);
-
-                        typename preprocessed_data_type::verification_key vk = {circuit_hash, public_commitments.fixed_values};
+                        typename preprocessed_data_type::verification_key vk = {constraint_system_with_params_hash, public_commitments.fixed_values};
                         typename preprocessed_data_type::common_data_type common_data (
                             std::move(public_commitments), std::move(c_rotations),
                             N_rows, table_description.usable_rows_amount, max_gates_degree, vk
                         );
 
                         transcript_type transcript(std::vector<std::uint8_t>({}));
-                        transcript(vk.constraint_system_hash);
+                        transcript(vk.constraint_system_with_params_hash);
                         transcript(vk.fixed_values_commitment);
 
-                        nil::crypto3::zk::snark::detail::init_transcript<ParamsType, transcript_hash_type>(
-                            transcript,
-                            common_data.rows_amount,
-                            common_data.usable_rows_amount,
-                            commitment_scheme.get_commitment_params(),
-                            "Default application dependent transcript initialization string"
-                        );
-
                         common_data.commitment_scheme_data = commitment_scheme.preprocess(transcript);
+
                         // Push circuit description to transcript
                         preprocessed_data_type preprocessed_data({
                             std::move(public_polynomial_table),

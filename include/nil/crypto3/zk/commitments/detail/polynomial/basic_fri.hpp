@@ -69,7 +69,8 @@ namespace nil {
                      * <https://eprint.iacr.org/2019/1400.pdf>
                      */
                     template<typename FieldType, typename MerkleTreeHashType, typename TranscriptHashType,
-                            std::size_t Lambda, std::size_t M, bool UseGrinding = false, typename GrindingType = proof_of_work<TranscriptHashType>>
+                            std::size_t Lambda, std::size_t M, bool UseGrinding = false,
+                            typename GrindingType = nil::crypto3::zk::commitments::proof_of_work<TranscriptHashType>>
                     struct basic_batched_fri {
                         BOOST_STATIC_ASSERT_MSG(M == 2, "unsupported m value!");
 

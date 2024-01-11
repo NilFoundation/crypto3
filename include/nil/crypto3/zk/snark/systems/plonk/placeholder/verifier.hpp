@@ -34,8 +34,11 @@
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/detail/placeholder_policy.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/permutation_argument.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/placeholder/lookup_argument.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/placeholder/gates_argument.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/params.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/preprocessor.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/placeholder/detail/transcript_initialization_context.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -166,19 +169,10 @@ namespace nil {
                         const plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params> &constraint_system,
                         commitment_scheme_type commitment_scheme
                     ) {
-                        // 1. Add circuit definition to transcript
-                        // transcript(short_description);
                         transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(std::vector<std::uint8_t>({}));
-                        transcript(preprocessed_public_data.common_data.vk.constraint_system_hash);
-                        transcript(preprocessed_public_data.common_data.vk.fixed_values_commitment);
 
-                        nil::crypto3::zk::snark::detail::init_transcript<ParamsType, transcript_hash_type>(
-                            transcript,
-                            preprocessed_public_data.common_data.rows_amount,
-                            preprocessed_public_data.common_data.usable_rows_amount,
-                            commitment_scheme.get_commitment_params(),
-                            "Default application dependent transcript initialization string"
-                        );
+                        transcript(preprocessed_public_data.common_data.vk.constraint_system_with_params_hash);
+                        transcript(preprocessed_public_data.common_data.vk.fixed_values_commitment);
 
                         // Setup commitment scheme. LPC adds an additional point here.
                         commitment_scheme.setup(transcript, preprocessed_public_data.common_data.commitment_scheme_data);
