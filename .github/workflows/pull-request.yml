@@ -7,18 +7,27 @@ on:
       - synchronize
 
 jobs:
-  handle-syncwith:
-    name: Call Reusable SyncWith Handler
-    uses: NilFoundation/ci-cd/.github/workflows/reusable-handle-syncwith.yml@v1.1.2
-    with:
-      ci-cd-ref: 'v1'
-    secrets: inherit
+  run-pull-request-actions:
+    name: Reusable Crypto3 Testing
+    uses: ./.github/workflows/pull-request-action.yml
 
-  matrix-test:
-    name: Call Reusable Crypto3 Testing
-    needs:
-      - handle-syncwith
-    uses: NilFoundation/ci-cd/.github/workflows/reusable-crypto3-testing.yml@v1.1.2
-    with:
-      submodules-refs: ${{ needs.handle-syncwith.outputs.prs-refs }}
     secrets: inherit
+    with:
+      targets: |
+        algebra_curves_example
+        algebra_fields_example
+        algebra_fields_static_test
+        algebra_fields_test
+        algebra_hash_to_curve_example
+        algebra_hash_to_curve_test
+        algebra_multiexp_example
+        algebra_multiexp_test
+        algebra_pairing_example
+        algebra_pairing_test
+        algebra_random_element_example
+        algebra_short_weierstrass_coordinates_example
+        algebra_short_weierstrass_coordinates_test
+        algebra_vector_compile_test
+
+#        This one fails on GCC: https://github.com/NilFoundation/crypto3-algebra/issues/124
+#        algebra_curves_static_test
