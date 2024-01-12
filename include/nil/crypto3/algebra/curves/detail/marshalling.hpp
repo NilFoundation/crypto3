@@ -154,8 +154,7 @@ namespace nil {
                 const std::uint8_t m_byte = *octets.begin() & 0xE0;
                 BOOST_ASSERT(m_byte != 0x20 && m_byte != 0x60 && m_byte != 0xE0);
 
-                PointOctetsRange point_octets(octets.size());
-                std::copy(octets.begin(), octets.end(), point_octets.begin());
+                PointOctetsRange point_octets = octets;
                 *point_octets.begin() &= 0x1F;
 
                 if (m_byte & C_bit) {
