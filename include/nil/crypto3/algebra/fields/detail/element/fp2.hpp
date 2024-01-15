@@ -318,10 +318,28 @@ namespace nil {
                     constexpr const typename element_fp2<FieldParams>::non_residue_type
                         element_fp2<FieldParams>::non_residue;
 
+                    template<typename FieldParams>
+                    std::ostream& operator<<(std::ostream& os, const element_fp2<FieldParams>& elem) {
+                        os << elem.data[0] << " " << elem.data[1];
+                        return os;
+                    }
                 }    // namespace detail
             }        // namespace fields
         }            // namespace algebra
     }                // namespace crypto3
 }    // namespace nil
+
+template<typename FieldParams>
+struct std::hash<typename nil::crypto3::algebra::fields::detail::element_fp2<FieldParams>>
+{
+    std::hash<typename nil::crypto3::algebra::fields::detail::element_fp2<FieldParams>::modular_type> hasher;
+    size_t operator()(const nil::crypto3::algebra::fields::detail::element_fp2<FieldParams>& elem) const
+    {
+        std::size_t result = hasher(elem.data[0]);
+        boost::hash_combine(result, hasher(elem.data[1]));
+        return result;
+    }
+};
+
 
 #endif    // CRYPTO3_ALGEBRA_FIELDS_ELEMENT_FP2_HPP
