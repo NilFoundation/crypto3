@@ -31,18 +31,18 @@
 
 #include <nil/crypto3/detail/inline_variable.hpp>
 
-#include <nil/crypto3/stream/detail/basic_functions.hpp>
+#include <nil/crypto3/detail/basic_functions.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace stream {
             namespace detail {
                 template<std::size_t Rounds, std::size_t IVBits, std::size_t KeyBits>
-                struct chacha_policy : public basic_functions<32> {
-                    typedef typename basic_functions<32>::byte_type byte_type;
+                struct chacha_policy : public nil::crypto3::detail::basic_functions<32> {
+                    typedef typename nil::crypto3::detail::basic_functions<32>::byte_type byte_type;
 
-                    constexpr static const std::size_t word_bits = basic_functions<32>::word_bits;
-                    typedef typename basic_functions<32>::word_type word_type;
+                    constexpr static const std::size_t word_bits = nil::crypto3::detail::basic_functions<32>::word_bits;
+                    typedef typename nil::crypto3::detail::basic_functions<32>::word_type word_type;
 
                     constexpr static const std::size_t rounds = Rounds;
                     BOOST_STATIC_ASSERT(Rounds % 2 == 0);
