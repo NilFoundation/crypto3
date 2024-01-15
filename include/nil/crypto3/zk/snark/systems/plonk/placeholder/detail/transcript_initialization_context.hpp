@@ -112,7 +112,6 @@ namespace nil {
                         std::vector<std::uint8_t> cv(filled_context.length(), 0x00);
                         auto write_iter = cv.begin();
                         nil::marshalling::status_type status = filled_context.write(write_iter, cv.size());
-                        BOOST_CHECK(status == nil::marshalling::status_type::success);
 
                         // Append constraint_system to the buffer "cv".
                         using FieldType = typename PlaceholderParamsType::field_type;
@@ -125,7 +124,6 @@ namespace nil {
                         // Function write wants an lvalue as 1st parameter.
                         write_iter = cv.begin() + filled_context.length();
                         status = filled_constraint_system.write(write_iter, filled_constraint_system.length());
-                        BOOST_CHECK(status == nil::marshalling::status_type::success);
 
                         // Return hash of "cv", which contains concatenated constraint system and other initialization parameters.
                         return hash<transcript_hash_type>(cv);
