@@ -87,7 +87,7 @@ namespace nil {
                     }
                 };
 
-                template<typename TranscriptHashType, typename FieldType, std::uint64_t MASK=0x1FFFFFFFF0000000>
+                template<typename TranscriptHashType, typename FieldType, std::uint64_t MASK=0xFFFF800000000000>
                 class field_proof_of_work {
                 public:
                     using transcript_hash_type = TranscriptHashType;
