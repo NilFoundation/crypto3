@@ -27,6 +27,9 @@
 
 #include <boost/property_tree/ptree.hpp>
 
+#include <cstdint>
+
+#include <nil/crypto3/random/algebraic_engine.hpp>
 #include <nil/crypto3/marshalling/algebra/types/field_element.hpp>
 #include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
 
@@ -80,6 +83,48 @@ namespace nil {
                         bytes[3] = std::uint8_t(proof_of_work&0x000000FF);
                         transcript(bytes);
                         output_type result = transcript.template int_challenge<output_type>();
+                        return ((result & mask) == 0);
+                    }
+                };
+
+                template<typename TranscriptHashType, typename FieldType, std::uint64_t MASK=0x1FFFFFFFF0000000>
+                class field_proof_of_work {
+                public:
+                    using transcript_hash_type = TranscriptHashType;
+                    using transcript_type = transcript::fiat_shamir_heuristic_sequential<transcript_hash_type>;
+                    using value_type = typename FieldType::value_type;
+                    using integral_type = typename FieldType::integral_type;
+
+                    constexpr static const integral_type mask = integral_type(MASK) << FieldType::modulus_bits - 64;
+
+                    static inline boost::property_tree::ptree get_params() {
+                        boost::property_tree::ptree params;
+                        params.put("mask", mask);
+                        return params;
+                    }
+
+                    static inline value_type generate(transcript_type &transcript) {
+                        static boost::random::random_device dev;
+                        static nil::crypto3::random::algebraic_engine<FieldType> random_engine(dev);
+                        value_type proof_of_work = random_engine();
+                        integral_type result;
+
+                        while( true ) {
+                            transcript_type tmp_transcript = transcript;
+                            tmp_transcript(proof_of_work);
+                            result = integral_type(tmp_transcript.template challenge<FieldType>().data);
+                            if ((result & mask) == 0)
+                                break;
+                            proof_of_work++;
+                        }
+                        transcript(proof_of_work);
+                        result = integral_type(transcript.template challenge<FieldType>().data);
+                        return proof_of_work;
+                    }
+
+                    static inline bool verify(transcript_type &transcript, value_type proof_of_work) {
+                        transcript(proof_of_work);
+                        integral_type result = integral_type(transcript.template challenge<FieldType>().data);
                         return ((result & mask) == 0);
                     }
                 };

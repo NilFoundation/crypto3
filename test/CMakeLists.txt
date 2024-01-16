@@ -82,6 +82,7 @@ set(TESTS_NAMES
     "commitment/r1cs_gg_ppzksnark_mpc"
     "commitment/type_traits"
     "commitment/kimchi_pedersen"
+    "commitment/proof_of_work"
 
     "math/expression"
 
@@ -96,7 +97,7 @@ set(TESTS_NAMES
     "systems/plonk/pickles/oracles"
     "systems/plonk/pickles/to_field"
     "systems/plonk/pickles/to_group"
-    
+
     "systems/plonk/placeholder/placeholder"
     "systems/plonk/placeholder/performance"
 
