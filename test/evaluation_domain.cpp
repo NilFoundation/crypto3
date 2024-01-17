@@ -45,6 +45,8 @@
 #include <nil/crypto3/algebra/fields/mnt6/base_field.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/mnt6.hpp>
 
+#include <nil/crypto3/algebra/random_element.hpp>
+
 #include <nil/crypto3/math/coset.hpp>
 #include <nil/crypto3/math/domains/arithmetic_sequence_domain.hpp>
 #include <nil/crypto3/math/domains/basic_radix2_domain.hpp>
@@ -73,9 +75,7 @@ void test_fft() {
     const std::size_t m = 4;
     std::vector<value_type> f = {2, 5, 3, 8};
 
-    std::shared_ptr<evaluation_domain<FieldType>> domain;
-
-    domain = make_evaluation_domain<FieldType>(m);
+    std::shared_ptr<evaluation_domain<FieldType>> domain = make_evaluation_domain<FieldType>(m);
 
     std::vector<value_type> a(f);
 
@@ -102,14 +102,43 @@ void test_fft() {
 }
 
 template<typename FieldType>
+void test_fft_performance(std::string field_name, size_t poly_size, size_t domain_size) {
+    typedef typename FieldType::value_type value_type;
+
+    std::vector<value_type> f;
+
+    for (int i = 0; i < poly_size; ++i) {
+        f.push_back(nil::crypto3::algebra::random_element<FieldType>());
+    }
+
+    std::shared_ptr<evaluation_domain<FieldType>> domain = make_evaluation_domain<FieldType>(domain_size);
+
+    std::vector<value_type> a(f);
+
+    std::chrono::time_point<std::chrono::high_resolution_clock> start(std::chrono::high_resolution_clock::now());
+
+    size_t SAMPLES = 20;
+
+    for (int i = 0; i < SAMPLES; ++i) {
+        a.resize(poly_size);
+        domain->fft(a);
+    }
+
+    auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
+        std::chrono::high_resolution_clock::now() - start);
+
+    size_t time = elapsed.count() / SAMPLES / 1000 / 1000;
+    std::cout << "FFT on " << field_name << " of poly size " << poly_size << " and domain size " << domain_size << " took: " << std::fixed << std::setprecision(3)
+        << time / 1000 << " sec " << time % 1000  << " ms" << std::endl;
+}
+
+template<typename FieldType>
 void test_inverse_fft_of_fft() {
     typedef typename FieldType::value_type value_type;
     const std::size_t m = 4;
     std::vector<value_type> f = {2, 5, 3, 8};
 
-    std::shared_ptr<evaluation_domain<FieldType>> domain;
-
-    domain = make_evaluation_domain<FieldType>(m);
+    std::shared_ptr<evaluation_domain<FieldType>> domain = make_evaluation_domain<FieldType>(m);
 
     std::vector<value_type> a(f);
     domain->fft(a);
@@ -353,6 +382,12 @@ BOOST_AUTO_TEST_SUITE(fft_evaluation_domain_test_suite)
 BOOST_AUTO_TEST_CASE(fft) {
     test_fft<fields::bls12<381>>();
     test_fft<fields::mnt4<298>>();
+}
+
+BOOST_AUTO_TEST_CASE(fft_perf_test, *boost::unit_test::disabled()) {
+    for (int i = 15; i <= 22; ++i) {
+        test_fft_performance<fields::bls12_scalar_field<381>>("BLS12<381> Scalar", 1 << i, 1 << i);
+    }
 }
 
 BOOST_AUTO_TEST_CASE(inverse_fft_to_fft) {
