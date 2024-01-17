@@ -73,7 +73,7 @@ namespace nil {
 //                      std::size_t max_gates_degree;
                         nil::marshalling::types::integral<TTypeBase, std::size_t>,
 
-//                      verification_key.constraint_system_hash
+//                      verification_key.constraint_system_with_params_hash
                         nil::marshalling::types::array_list <TTypeBase, 
                             nil::marshalling::types::integral<TTypeBase, octet_type>,
                             nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, std::size_t>>
@@ -117,10 +117,10 @@ namespace nil {
                     nil::marshalling::types::array_list <TTypeBase, 
                         nil::marshalling::types::integral<TTypeBase, octet_type>,
                         nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, std::size_t>>
-                    > filled_constraint_system_hash;
-                    for( std::size_t i = 0; i < common_data.vk.constraint_system_hash.size(); i++){
-                        filled_constraint_system_hash.value().push_back(
-                            nil::marshalling::types::integral<TTypeBase, octet_type>(common_data.vk.constraint_system_hash[i])
+                    > filled_constraint_system_with_params_hash;
+                    for( std::size_t i = 0; i < common_data.vk.constraint_system_with_params_hash.size(); i++){
+                        filled_constraint_system_with_params_hash.value().push_back(
+                            nil::marshalling::types::integral<TTypeBase, octet_type>(common_data.vk.constraint_system_with_params_hash[i])
                         );
                     }
 
@@ -130,7 +130,7 @@ namespace nil {
                         nil::marshalling::types::integral<TTypeBase, std::size_t>(common_data.rows_amount),
                         nil::marshalling::types::integral<TTypeBase, std::size_t>(common_data.usable_rows_amount),
                         nil::marshalling::types::integral<TTypeBase, std::size_t>(common_data.max_gates_degree),
-                        filled_constraint_system_hash
+                        filled_constraint_system_with_params_hash
                     ));
                 }
 
@@ -162,7 +162,7 @@ namespace nil {
                     typename CommonDataType::verification_key_type vk;
                     vk.fixed_values_commitment = fixed_values;
                     for( std::size_t i = 0; i < std::get<5>(filled_common_data.value()).value().size(); i++){
-                        vk.constraint_system_hash[i] = (std::get<5>(filled_common_data.value()).value()[i].value());
+                        vk.constraint_system_with_params_hash[i] = (std::get<5>(filled_common_data.value()).value()[i].value());
                     }
 
                     return CommonDataType(commitments, columns_rotations, rows_amount, usable_rows_amount, max_gates_degree, vk);
