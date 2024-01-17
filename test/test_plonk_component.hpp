@@ -462,7 +462,7 @@ namespace nil {
                 );
 
             auto proof = nil::crypto3::zk::snark::placeholder_prover<BlueprintFieldType, placeholder_params_type>::process(
-                preprocessed_public_data, preprocessed_private_data, desc, bp, assignments, lpc_scheme
+                preprocessed_public_data, preprocessed_private_data, desc, bp, lpc_scheme
             );
 
             bool verifier_res = nil::crypto3::zk::snark::placeholder_verifier<BlueprintFieldType, placeholder_params_type>::process(

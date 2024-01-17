@@ -259,10 +259,10 @@ namespace nil {
 
                 std::vector<std::size_t> selector_indices;
 
-                std::size_t offset = component.rows_amount == 3 ? -1 : 0;
-                std::size_t witness_amount = component.witness_amount();
+                const int offset = component.rows_amount >= 3 ? -1 : 0;
+                const std::size_t witness_amount = component.witness_amount();
 
-                std::array<std::pair<std::size_t, std::size_t>, 6> wl;
+                std::array<std::pair<std::size_t, int>, 6> wl;
 
                 int _idx;
                 for (int i = 0; i < component.rows_amount; i++) {
@@ -339,7 +339,7 @@ namespace nil {
                 std::vector<std::size_t> selector_indices =
                     generate_gates(component, bp, assignment, instance_input);
                 assignment.enable_selector(selector_indices[0],
-                                           start_row_index + (component.rows_amount == 3 ? 1 : 0));
+                                           start_row_index + (component.rows_amount >= 3 ? 1 : 0));
                 if (component.witness_amount() == 2) {
                     if (selector_indices.size() != 2) {
                         std::cerr << "Internal error: logic_or_flag component returned the wrong selector amount."
