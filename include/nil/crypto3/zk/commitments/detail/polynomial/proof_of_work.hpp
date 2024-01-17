@@ -87,7 +87,11 @@ namespace nil {
                     }
                 };
 
-                template<typename TranscriptHashType, typename FieldType, std::uint64_t MASK=0xFFFF800000000000>
+                // Note that the interface here is slightly different from the one above:
+                // amount of bits for grinding instead of the mask.
+                // This was done because the actual mask is applied to the high bits instead of the low bits
+                // which makes manually setting the mask error-prone.
+                template<typename TranscriptHashType, typename FieldType, std::uint8_t GrindingBits=16>
                 class field_proof_of_work {
                 public:
                     using transcript_hash_type = TranscriptHashType;
@@ -95,7 +99,10 @@ namespace nil {
                     using value_type = typename FieldType::value_type;
                     using integral_type = typename FieldType::integral_type;
 
-                    constexpr static const integral_type mask = integral_type(MASK) << FieldType::modulus_bits - 64;
+                    constexpr static const integral_type mask =
+                        (GrindingBits > 0 ?
+                            ((integral_type(2) << GrindingBits - 1) - 1) << (FieldType::modulus_bits - GrindingBits)
+                            : 0);
 
                     static inline boost::property_tree::ptree get_params() {
                         boost::property_tree::ptree params;
