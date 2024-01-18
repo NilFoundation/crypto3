@@ -163,6 +163,7 @@ namespace nil {
                 const std::size_t nine_bl_per_line = WA / 9; // 9-blocks per line
                 const std::size_t bits_blocks_count = total_bits-n; // number of bit blocks
 
+                const std::size_t gates_amount = gates_amount_internal(this->witness_amount(), n, total_bits);
                 const std::size_t rows_amount = rows_amount_internal(this->witness_amount(), n, total_bits);
 
                 struct input_type {
