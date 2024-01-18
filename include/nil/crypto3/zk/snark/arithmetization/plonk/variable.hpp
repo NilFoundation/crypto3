@@ -168,14 +168,18 @@ namespace nil {
                 template<typename AssignmentType>
                 std::ostream &operator<<(std::ostream &os, const plonk_variable<AssignmentType> &var) {
                     std::map<typename plonk_variable<AssignmentType>::column_type, std::string> type_map = {
-                            {plonk_variable<AssignmentType>::column_type::witness,      "witness"},
-                            {plonk_variable<AssignmentType>::column_type::public_input, "public_input"},
-                            {plonk_variable<AssignmentType>::column_type::constant,     "constant"},
-                            {plonk_variable<AssignmentType>::column_type::selector,     "selector"}
+                            {plonk_variable<AssignmentType>::column_type::witness,      "w"},
+                            {plonk_variable<AssignmentType>::column_type::public_input, "pub"},
+                            {plonk_variable<AssignmentType>::column_type::constant,     "c"},
+                            {plonk_variable<AssignmentType>::column_type::selector,     "sel"}
                     };
-                    os << "var_" << var.index << '_' << var.rotation << '_'
-                       << type_map[var.type]
-                       << (var.relative ? "_relative" : "");
+                    os << type_map[var.type] << "_" << var.index;
+                    if (!var.relative) {
+                        os << "_abs";
+                    }
+                    if (var.rotation != 0) {
+                        os << "_rot(" << var.rotation << ")";
+                    }
                     return os;
                 }
             }    // namespace snark

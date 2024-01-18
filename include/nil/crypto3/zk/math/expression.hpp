@@ -611,18 +611,25 @@ namespace nil {
                 return !(*this == other);
             }
 
+            template<typename VariableType>
+            void print_coefficient(std::ostream& os, const term<VariableType>& term) {
+                if (term.get_coeff() == -VariableType::assignment_type::one())
+                    os << "(-1)";
+                else
+                    os << term.get_coeff();
+            }
+
             // Used in the unit tests, so we can use BOOST_CHECK_EQUALS, and see
             // the values of terms, when the check fails.
             template<typename VariableType>
             std::ostream& operator<<(std::ostream& os, const term<VariableType>& term) {
                 if (!term.get_coeff().is_one()) {
+                    print_coefficient(os, term);
                     if (term.get_vars().size() != 0) {
-                        os << term.get_coeff() << " * ";
-                    } else {
-                        os << term.get_coeff();
+                        os << " * ";
                     }
                 } else if (term.get_vars().size() == 0) {
-                    os << term.get_coeff();
+                    print_coefficient(os, term);
                 }
                 bool first = true;
                 for (const auto& var : term.get_vars()) {
