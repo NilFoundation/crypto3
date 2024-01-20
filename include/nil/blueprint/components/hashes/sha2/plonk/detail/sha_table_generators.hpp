@@ -22,10 +22,6 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-
-#include <nil/blueprint/components/hashes/sha2/plonk/detail/split_functions.hpp>
-#include <nil/crypto3/marshalling/zk/types/commitments/fri.hpp>
-
 #include <array>
 #include <string>
 #include <vector>
@@ -36,8 +32,18 @@
 #include <mutex>
 #include <unordered_set>
 
-#include <boost/spirit/include/qi.hpp>
-#include <boost/spirit/include/phoenix.hpp>
+#include <nil/blueprint/components/hashes/sha2/plonk/detail/split_functions.hpp>
+
+#include <nil/crypto3/multiprecision/cpp_int.hpp>
+
+#include <nil/marshalling/status_type.hpp>
+#include <nil/marshalling/field_type.hpp>
+#include <nil/marshalling/endianness.hpp>
+#include <nil/marshalling/field_type.hpp>
+#include <nil/crypto3/algebra/marshalling.hpp>
+#include <nil/crypto3/marshalling/zk/types/plonk/constraint_system.hpp>
+#include <nil/crypto3/marshalling/zk/types/plonk/assignment_table.hpp>
+
 
 namespace nil {
     namespace blueprint {
@@ -62,7 +68,7 @@ namespace nil {
                     using value_type = typename BlueprintFieldType::value_type;
                     using Endianness = nil::marshalling::option::big_endian;
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
-                    using marshalling_value_type = nil::crypto3::marshalling::types::field_element<TTypeBase, value_type>;
+                    using marshalling_value_type = crypto3::marshalling::types::field_element<TTypeBase, value_type>;
                     stream << input.size() << std::endl;
                     for (const auto &[preimage, image] : input) {
                         std::vector<marshalling_value_type> pair = {
@@ -335,82 +341,6 @@ namespace nil {
                     std::cerr << "Time elapsed: " << duration.count() << " seconds" << std::endl;
                     std::cerr << "Total size: " << std::dec << output_set.size() << std::endl;
                 }
-
-                template<typename Iterator, typename BlueprintFieldType>
-                struct value_pair_parser : boost::spirit::qi::grammar<Iterator,
-                        std::pair<typename BlueprintFieldType::value_type,
-                                  typename BlueprintFieldType::value_type>(),
-                        boost::spirit::qi::ascii::space_type> {
-                    using value_type = typename BlueprintFieldType::value_type;
-                    using integral_type = typename BlueprintFieldType::integral_type;
-                    using return_type = std::pair<value_type, value_type>;
-
-                    value_pair_parser() : value_pair_parser::base_type(start) {
-                        using boost::spirit::qi::uint_parser;
-                        using boost::spirit::qi::_val;
-                        using boost::spirit::qi::_1;
-                        using boost::spirit::qi::_2;
-                        using boost::phoenix::construct;
-                        using boost::phoenix::val;
-                        auto nubmer = uint_parser<integral_type, 16, 1,
-                                                  (BlueprintFieldType::modulus_bits + 16 - 1) / 16>();
-                        start = (nubmer >> nubmer)
-                                [_val = construct<std::pair<value_type, value_type>>(_1, _2)];
-
-                        boost::spirit::qi::on_error<boost::spirit::qi::fail>(
-                            start,
-                            std::cerr << val("Error! Expecting ") << boost::spirit::qi::_4 << val(" here: \"")
-                                      << construct<std::string>(boost::spirit::_3, boost::spirit::_2) << val("\"\n")
-                        );
-                    }
-
-                    boost::spirit::qi::rule<Iterator, return_type(), boost::spirit::qi::ascii::space_type> start;
-                };
-
-                // Loads the table from file, trying multiple different filen paths if one fails
-                template <typename BlueprintFieldType>
-                std::vector<std::vector<typename BlueprintFieldType::value_type>> load_sha_table(
-                        const std::set<std::string> &candidate_file_paths) {
-                    using value_type = typename BlueprintFieldType::value_type;
-                    std::vector<std::vector<value_type>> result;
-                    result.resize(2);
-                    for (const auto &path : candidate_file_paths) {
-                        // try opening the file
-                        std::ifstream file(path);
-                        if (!file.is_open()) {
-                            continue;
-                        }
-                        std::string line;
-                        // Get the table size
-                        std::getline(file, line);
-                        std::size_t table_size = std::stoull(line);
-                        result[0].resize(table_size);
-                        result[1].resize(table_size);
-                        bool parsing_failed = false;
-                        for (std::size_t i = 0; i < table_size; i++) {
-                            std::getline(file, line);
-                            std::pair<value_type, value_type> pair;
-                            value_pair_parser<decltype(line.begin()), BlueprintFieldType> parser;
-                            boost::spirit::qi::ascii::space_type space;
-                            bool parsing_result =
-                                boost::spirit::qi::phrase_parse(line.begin(), line.end(), parser, space, pair);
-                            if (!parsing_result) {
-                                std::cerr << "Failed to parse file " << path << " as table, retrying..." << std::endl;
-                                parsing_failed = true;
-                                break;
-                            }
-                            result[0][i] = pair.first;
-                            result[1][i] = pair.second;
-                        }
-                        if (!parsing_failed) {
-                            return result;
-                        }
-                    }
-                    // if all the attempts failed, return empty vector
-                    result.resize(0);
-                    return result;
-                }
-
             }   // namespace detail
         }       // namespace components
     }           // namespace blueprint

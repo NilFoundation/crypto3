@@ -33,7 +33,7 @@
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/lookup_table_definition.hpp>
 #include <nil/blueprint/components/hashes/sha2/plonk/detail/split_functions.hpp>
-#include <nil/blueprint/components/hashes/sha2/plonk/detail/sha_table_generators.hpp>
+#include <nil/blueprint/detail/lookup_table_loaders.hpp>
 #include <nil/blueprint/manifest.hpp>
 #include <nil/blueprint/assert.hpp>
 
@@ -137,13 +137,11 @@ namespace nil {
                 };
 
                 virtual void generate() {
-                    std::string blueprint_path = BLUEPRINT_PATH;
-                    this->_table = components::detail::load_sha_table<BlueprintFieldType>(
-                        {blueprint_path + "/include/nil/blueprint/components/hashes/sha2/plonk/detail/8_split_4.txt"});
-                    if (this->_table.size() == 0 || this->_table[0].size() == 0) {
-                        std::cerr << "Failed to load table 8_split_4.txt!"
-                                        " Please check the paths and generate the table."
-                                    << std::endl;
+                    bool status = components::detail::load_lookup_table_from_bin<BlueprintFieldType>(
+                        "8_split_4",
+                        this->_table);
+                    if (!status) {
+                        std::cerr << "Failed to load table 8_split_4 from binary!" << std::endl;
                         BLUEPRINT_RELEASE_ASSERT(0);
                     }
                 }
@@ -186,13 +184,11 @@ namespace nil {
                     this->subtables["full"] = {{0,1}, 0, 43903};
                 };
                 virtual void generate() {
-                    std::string blueprint_path = BLUEPRINT_PATH;
-                    this->_table = components::detail::load_sha_table<BlueprintFieldType>(
-                        {blueprint_path + "/include/nil/blueprint/components/hashes/sha2/plonk/detail/8_split_7.txt"});
-                    if (this->_table.size() == 0 || this->_table[0].size() == 0) {
-                        std::cerr << "Failed to load table 8_split_7.txt!"
-                                     " Please check the paths and generate the table."
-                                  << std::endl;
+                    bool status = components::detail::load_lookup_table_from_bin<BlueprintFieldType>(
+                        "8_split_7",
+                        this->_table);
+                    if (!status) {
+                        std::cerr << "Failed to load table 8_split_7 from binary!" << std::endl;
                         BLUEPRINT_RELEASE_ASSERT(0);
                     }
                 }
