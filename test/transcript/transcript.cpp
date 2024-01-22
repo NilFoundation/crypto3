@@ -79,9 +79,9 @@ BOOST_AUTO_TEST_CASE(zk_poseidon_transcript_init_test) {
     auto ch2 = tr.challenge<field_type>();
     int ch_int = tr.int_challenge<int>();
 
-    BOOST_CHECK_EQUAL(ch1.data, field_type::value_type(0x7f034babb3066560c2597048bdbbd61327f13734ebe59a225e0c162e869e8f4_cppui256).data);
-    BOOST_CHECK_EQUAL(ch2.data, field_type::value_type(0x3a60c875ae6475d5ac1d73178284ee752e8ad78066aa688752b1436960948b93_cppui256).data);
-    BOOST_CHECK_EQUAL(ch_int, 0x7574);
+    BOOST_CHECK_EQUAL(ch1.data, field_type::value_type(0x27B1BE8A820DE1A5E91A441F59F29D42D9DB9FC7778A0852819F331D5CD60B43_cppui256).data);
+    BOOST_CHECK_EQUAL(ch2.data, field_type::value_type(0x12096E03B2ADEC9B317042D36F048C06AF123EED4A3FC040579E66DCE46C0AEE_cppui256).data);
+    BOOST_CHECK_EQUAL(ch_int, 0x6296);
 }
 
 BOOST_AUTO_TEST_CASE(zk_poseidon_transcript_no_init_test) {

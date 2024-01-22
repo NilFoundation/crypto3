@@ -46,9 +46,6 @@ namespace nil {
                     constexpr static const std::size_t constant_columns = ArithmetizationParams::constant_columns;
                     constexpr static const std::size_t selector_columns = ArithmetizationParams::selector_columns;
 
-                    constexpr static const typename FieldType::value_type delta =
-                        algebra::fields::arithmetic_params<FieldType>::multiplicative_generator;                    
-
                     using arithmetization_params = ArithmetizationParams;
                     using field_type = FieldType;
                     using public_input_type = std::array<std::vector<typename field_type::value_type>, arithmetization_params::public_input_columns>;
@@ -65,8 +62,6 @@ namespace nil {
                     constexpr static const std::size_t total_columns = witness_columns + public_input_columns + constant_columns + selector_columns;
 
                     using field_type = typename CircuitParams::field_type;
-
-                    constexpr static const typename field_type::value_type delta = CircuitParams::delta;
 
                     using arithmetization_params = typename CircuitParams::arithmetization_params;
                     using constraint_system_type = typename CircuitParams::constraint_system_type;

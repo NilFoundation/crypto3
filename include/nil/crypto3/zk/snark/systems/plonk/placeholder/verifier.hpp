@@ -38,7 +38,6 @@
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/gates_argument.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/params.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/preprocessor.hpp>
-#include <nil/crypto3/zk/snark/systems/plonk/placeholder/detail/transcript_initialization_context.hpp>
 
 namespace nil {
     namespace crypto3 {

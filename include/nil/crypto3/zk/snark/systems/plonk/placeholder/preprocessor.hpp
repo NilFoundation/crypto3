@@ -437,7 +437,9 @@ namespace nil {
                         const plonk_table_description<FieldType, typename ParamsType::arithmetization_params>
                             &table_description,
                         typename ParamsType::commitment_scheme_type &commitment_scheme,
-                        std::size_t columns_with_copy_constraints
+                        std::size_t columns_with_copy_constraints,
+                        // TODO(martun): move delta back to placeholder_params, once template arguments are reduced.
+                        const typename FieldType::value_type& delta=algebra::fields::arithmetic_params<FieldType>::multiplicative_generator
                     ) {
                         PROFILE_PLACEHOLDER_SCOPE("Placeholder public preprocessor");
 
@@ -458,11 +460,11 @@ namespace nil {
 
                         std::vector<polynomial_dfs_type> id_perm_polys =
                             identity_polynomials(columns_with_copy_constraints, basic_domain->get_domain_element(1),
-                                                 ParamsType::delta, basic_domain);
+                                                 delta, basic_domain);
 
                         std::vector<polynomial_dfs_type> sigma_perm_polys =
                             permutation_polynomials(columns_with_copy_constraints, basic_domain->get_domain_element(1),
-                                                    ParamsType::delta, permutation, basic_domain);
+                                                    delta, permutation, basic_domain);
 
                         polynomial_dfs_type lagrange_0 = lagrange_polynomial(basic_domain, 0);
 
@@ -500,7 +502,8 @@ namespace nil {
                                 N_rows,
                                 table_description.usable_rows_amount,
                                 commitment_scheme.get_commitment_params(),
-                                "Default application dependent transcript initialization string");
+                                "Default application dependent transcript initialization string",
+                                delta);
 
                         typename preprocessed_data_type::verification_key vk = {constraint_system_with_params_hash, public_commitments.fixed_values};
                         typename preprocessed_data_type::common_data_type common_data (
