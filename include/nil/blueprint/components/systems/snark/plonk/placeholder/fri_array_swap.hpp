@@ -105,6 +105,7 @@ namespace nil {
 
                 constexpr static const std::size_t gates_amount = 1;
                 const std::size_t rows_amount = get_rows_amount(this->witness_amount(), 0, half_array_size);
+                const std::string component_name = "fri array swap component";
 
                 struct input_type {
                     var t; // swap control bit

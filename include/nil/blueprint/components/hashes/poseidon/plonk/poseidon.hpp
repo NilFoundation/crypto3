@@ -70,6 +70,7 @@ namespace nil {
                 constexpr static const std::size_t rate = 2;
                 constexpr static const std::size_t gates_amount = 11;
                 const std::size_t rows_amount = get_rows_amount(this->witness_amount(), 0);
+                const std::string component_name = "poseidon hash";
 
                 using var = typename component_type::var;
                 using manifest_type = nil::blueprint::plonk_component_manifest;

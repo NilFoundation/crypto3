@@ -153,6 +153,7 @@ namespace nil {
                 const std::size_t rows_amount = rows_amount_internal(this->witness_amount(), bits_amount, check_inputs);
                 const std::size_t empty_rows_amount = get_empty_rows_amount();
                 constexpr static const std::size_t gates_amount = 1;
+                const std::string component_name = "native integer division remainder";
 
                 enum var_address {
                     X, Y, Q, R_, Y_MINUS_R

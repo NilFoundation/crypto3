@@ -126,6 +126,7 @@ namespace nil {
                                          lookup_table_lookup_options_sizes, lookup_table_columns_numbers);
 
                 constexpr static std::size_t gates_amount = 3;
+                const std::string component_name = "lookup argument verifier component";
 
                 class gate_manifest_type : public component_gate_manifest {
                 public:

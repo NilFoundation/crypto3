@@ -60,6 +60,7 @@ namespace nil {
 
                 std::size_t rows_amount = rows_amount_internal(this->witness_amount(), m);
                 constexpr static const std::size_t gates_amount = 4;
+                const std::string component_name = "permutation argument verifier component";
 
                 constexpr static std::size_t get_rows_amount(std::size_t witness_amount,
                                                              std::size_t lookup_column_amount, std::size_t m) {

@@ -90,6 +90,7 @@ namespace nil {
                 const std::vector<std::size_t> gate_sizes;
                 const std::size_t rows_amount = rows_amount_internal(this->witness_amount(), gate_sizes);
                 constexpr static const std::size_t gates_amount = 0;
+                const std::string component_name = "gate argument verifier component";
 
                 class gate_manifest_type : public component_gate_manifest {
                 public:

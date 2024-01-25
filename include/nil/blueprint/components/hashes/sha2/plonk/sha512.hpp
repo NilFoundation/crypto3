@@ -89,6 +89,7 @@ namespace nil {
 
                 constexpr static const std::size_t gates_amount = 5;
                 constexpr static const std::size_t rows_amount_creating_input_words_component = 15;
+                const std::string component_name = "sha512 hash";
 //
                 const std::size_t rows_amount = get_rows_amount(this->witness_amount(), 0);
 

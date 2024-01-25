@@ -112,6 +112,7 @@ namespace nil {
 
                 const bit_composition_mode mode;
                 const std::size_t empty_rows_amount = get_empty_rows_amount();
+                const std::string component_name = "bit_composition";
 
                 struct input_type {
                     std::vector<var> bits;
@@ -243,7 +244,7 @@ namespace nil {
                 for (std::uint32_t i = 0; i < component.bits_amount; ++i) {
                     input_bits[i] = var_value(assignment, instance_input.bits[i]) != 0 ? true : false;
                 }
-                
+
                 assignment.witness(component.W(0), start_row_index) = component_type::calculate(input_bits, component.mode);
 
                 return typename plonk_bit_composition<BlueprintFieldType, ArithmetizationParams>::result_type(

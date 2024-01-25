@@ -126,6 +126,7 @@ namespace nil {
 
                 const std::size_t rows_amount = rows_amount_internal(this->witness_amount(), 0, decomposition_subcomponent.bits_amount);
                 constexpr static const std::size_t gates_amount = 0;
+                const std::string component_name = "non-native curve multiplication";
 
                 struct input_type {
                     struct var_ec_point {

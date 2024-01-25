@@ -84,6 +84,7 @@ namespace nil {
 
                 constexpr static const std::size_t gates_amount = 1;
                 const std::size_t rows_amount = get_rows_amount(this->witness_amount(), 0);
+                const std::string component_name = "fri linear interpolation component";
 
                 struct input_type {
                     var s, y0, y1, alpha;

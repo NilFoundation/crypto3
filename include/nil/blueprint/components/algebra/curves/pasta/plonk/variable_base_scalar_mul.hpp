@@ -150,6 +150,7 @@ namespace nil {
                     add_component::get_rows_amount(11, 0);
                 constexpr static const std::size_t rows_amount = add_component_rows_amount + mul_rows_amount + 1;
                 constexpr static const std::size_t gates_amount = 3;
+                const std::string component_name = "native curve multiplication by shifted const (https://arxiv.org/pdf/math/0208038.pdf)";
 
                 constexpr static const std::size_t aux_bits_rows_amount = 44;
                 constexpr static const std::size_t aux_bits_start_row = rows_amount - aux_bits_rows_amount - 1; // = 59

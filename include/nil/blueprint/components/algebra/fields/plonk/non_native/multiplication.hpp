@@ -118,6 +118,7 @@ namespace nil {
                 const std::size_t rows_amount = rows_amount_internal(this->witness_amount(), 0);
                 const std::size_t empty_rows_amount = get_empty_rows_amount();
                 static constexpr const std::size_t gates_amount = 1;
+                const std::string component_name = "non-native field multiplication";
 
                 struct input_type {
                     typename non_native_policy_type::template field<operating_field_type>::non_native_var_type A;

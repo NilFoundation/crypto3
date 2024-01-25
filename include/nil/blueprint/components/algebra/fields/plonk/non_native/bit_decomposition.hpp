@@ -109,6 +109,7 @@ namespace nil {
 
                 const bit_composition_mode mode;
                 const std::size_t empty_rows_amount = get_empty_rows_amount(this->bits_amount);
+                const std::string component_name = "bit_decomposition";
 
                 struct input_type {
                     var input;

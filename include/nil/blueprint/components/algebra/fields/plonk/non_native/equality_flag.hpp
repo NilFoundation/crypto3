@@ -82,6 +82,7 @@ namespace nil {
                 bool inequality;
                 constexpr static const std::size_t gates_amount = 1;
                 const std::size_t rows_amount = get_rows_amount(this->witness_amount(), 0, inequality);
+                const std::string component_name = "equaluty flag (returns 1 if x==y and 0 otherwise)";
 
                 using var = typename component_type::var;
                 using manifest_type = plonk_component_manifest;

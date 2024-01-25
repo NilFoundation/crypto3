@@ -89,6 +89,7 @@ namespace nil {
 
                 const std::size_t rows_amount = get_rows_amount(this->witness_amount(), 0);
                 static const std::size_t gates_amount = 2;
+                const std::string component_name = "sha512 input preparation component";
 
                 struct input_type {
                     std::array<var, 8> k;

@@ -165,7 +165,7 @@ namespace nil {
 
                 const std::size_t gates_amount = gates_amount_internal(this->witness_amount(), n, total_bits);
                 const std::size_t rows_amount = rows_amount_internal(this->witness_amount(), n, total_bits);
-
+                const std::string component_name = "fri cosets component";
                 struct input_type {
                     var x = var(0, 0, false);
 

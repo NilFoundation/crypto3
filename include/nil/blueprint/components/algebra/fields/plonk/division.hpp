@@ -92,6 +92,7 @@ namespace nil {
                 constexpr static const std::size_t gates_amount = 1;
                 const std::size_t rows_amount = get_rows_amount(this->witness_amount(), 0);
                 const std::size_t empty_rows_amount = get_empty_rows_amount();
+                const std::string component_name = "native field division";
 
                 struct input_type {
                     var x = var(0, 0, false);

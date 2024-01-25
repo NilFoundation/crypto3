@@ -117,6 +117,8 @@ namespace nil {
                 const std::size_t rows_amount = get_rows_amount(this->witness_amount(), 0);
                 const std::size_t empty_rows_amount = get_empty_rows_amount();
                 constexpr static const std::size_t gates_amount = 1;
+                const std::string component_name = "non_native field subtraction";
+
 
                 struct input_type {
                     typename non_native_policy_type::template field<operating_field_type>::non_native_var_type A;

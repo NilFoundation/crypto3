@@ -234,6 +234,7 @@ namespace nil {
                 const std::size_t padding_size = padding_size_internal(this->witness_amount(), bits_amount);
 
                 const std::size_t gates_amount = gates_amount_internal(bits_amount);
+                const std::string component_name = "comparison (==, !=)";
 
                 struct input_type {
                     var x, y;

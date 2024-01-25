@@ -105,6 +105,7 @@ namespace nil {
                 const std::size_t empty_rows_amount = get_empty_rows_amount();
 
                 constexpr static const std::size_t gates_amount = 1;
+                const std::string component_name = "sha256 hash";
 
                 struct input_type {
                     std::array<var, 4> block_data;

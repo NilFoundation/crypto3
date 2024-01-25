@@ -143,6 +143,7 @@ namespace nil {
                 // But both of them are inside subcomponents.
                 static constexpr const std::size_t gates_amount = 0;
                 const std::size_t rows_amount = rows_amount_internal(this->witness_amount(), bits_amount, shift, mode);
+                const std::string component_name = "bit shift (constant)";
 
                 struct input_type {
                     var input;

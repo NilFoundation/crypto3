@@ -85,6 +85,7 @@ namespace nil {
 
                 const std::size_t rows_amount = get_rows_amount(this->witness_amount(), 0);
                 static constexpr const std::size_t gates_amount = 1;
+                const std::string component_name = "native curve addition";
 
                 struct input_type {
                     struct var_ec_point {

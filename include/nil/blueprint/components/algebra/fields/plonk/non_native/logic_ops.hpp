@@ -85,6 +85,8 @@ namespace nil {
                                                              std::size_t lookup_column_amount) {
                     return component_type::get_rows_amount(witness_amount, lookup_column_amount);
                 }
+                const std::size_t rows_amount = get_rows_amount(this->witness_amount(), 0);
+                const std::string component_name = "logic_not";
 
                 virtual crypto3::zk::snark::plonk_constraint<BlueprintFieldType>
                         op_constraint(const std::array<var, 2> &witnesses) const {
@@ -155,6 +157,8 @@ namespace nil {
                                                              std::size_t lookup_column_amount) {
                     return component_type::get_rows_amount(witness_amount, lookup_column_amount);
                 }
+                const std::size_t rows_amount = get_rows_amount(this->witness_amount(), 0);
+                const std::string component_name = "logic_and";
 
                 virtual crypto3::zk::snark::plonk_constraint<BlueprintFieldType>
                         op_constraint(const std::array<var, 3> &witnesses) const {
@@ -225,6 +229,8 @@ namespace nil {
                                                              std::size_t lookup_column_amount) {
                     return component_type::get_rows_amount(witness_amount, lookup_column_amount);
                 }
+                const std::size_t rows_amount = get_rows_amount(this->witness_amount(), 0);
+                const std::string component_name = "logic_or";
 
                 virtual crypto3::zk::snark::plonk_constraint<BlueprintFieldType>
                         op_constraint(const std::array<var, 3> &witnesses) const {
@@ -295,6 +301,8 @@ namespace nil {
                                                              std::size_t lookup_column_amount) {
                     return component_type::get_rows_amount(witness_amount, lookup_column_amount);
                 }
+                const std::size_t rows_amount = get_rows_amount(this->witness_amount(), 0);
+                const std::string component_name = "logic_xor";
 
                 virtual crypto3::zk::snark::plonk_constraint<BlueprintFieldType>
                         op_constraint(const std::array<var, 3> &witnesses) const {
@@ -367,6 +375,8 @@ namespace nil {
                                                              std::size_t lookup_column_amount) {
                     return component_type::get_rows_amount(witness_amount, lookup_column_amount);
                 }
+                const std::size_t rows_amount = get_rows_amount(this->witness_amount(), 0);
+                const std::string component_name = "logic_nand";
 
                 virtual crypto3::zk::snark::plonk_constraint<BlueprintFieldType>
                         op_constraint(const std::array<var, 3> &witnesses) const {
@@ -436,6 +446,8 @@ namespace nil {
                                                              std::size_t lookup_column_amount) {
                     return component_type::get_rows_amount(witness_amount, lookup_column_amount);
                 }
+                const std::size_t rows_amount = get_rows_amount(this->witness_amount(), 0);
+                const std::string component_name = "logic_nor";
 
                 virtual crypto3::zk::snark::plonk_constraint<BlueprintFieldType>
                         op_constraint(const std::array<var, 3> &witnesses) const {
