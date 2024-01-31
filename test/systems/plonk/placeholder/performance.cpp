@@ -206,7 +206,7 @@ public:
 
         auto lpc_proof = placeholder_prover<field_type, lpc_placeholder_params_type>::process(
             lpc_preprocessed_public_data, lpc_preprocessed_private_data, table_description,
-            constraint_system, assignments, lpc_scheme
+            constraint_system, lpc_scheme
         );
 
         bool verifier_res = placeholder_verifier<field_type, lpc_placeholder_params_type>::process(
@@ -423,7 +423,7 @@ BOOST_FIXTURE_TEST_CASE(placeholder_large_fibonacci_test, placeholder_performanc
 
     auto lpc_proof = placeholder_prover<field_type, lpc_placeholder_params_type>::process(
         lpc_preprocessed_public_data, lpc_preprocessed_private_data, desc,
-        constraint_system, assignments, lpc_scheme
+        constraint_system, lpc_scheme
     );
 
     bool verifier_res = placeholder_verifier<field_type, lpc_placeholder_params_type>::process(

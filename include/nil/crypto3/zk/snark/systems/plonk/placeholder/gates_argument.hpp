@@ -86,7 +86,8 @@ namespace nil {
                             [&variable_counts](const polynomial_dfs_variable_type& var) {
                                 variable_counts[var]++;
                         });
-
+                        std::shared_ptr<math::evaluation_domain<FieldType>> extended_domain =
+                            math::make_evaluation_domain<FieldType>(extended_domain_size);
                         visitor.visit(expr);
                         for (const auto& [var, count]: variable_counts) {
                             // We may have variable values in required sizes in some cases.
@@ -112,7 +113,7 @@ namespace nil {
                                 assignment = math::polynomial_shift(assignment, var.rotation, domain->m);
                             }
                             if (count > 1) {
-                                assignment.resize(extended_domain_size);
+                                assignment.resize(extended_domain_size, domain, extended_domain);
                             }
                             variable_values_out[var] = assignment;
                         }

@@ -102,18 +102,18 @@ namespace nil {
                         math::polynomial_dfs<typename FieldType::value_type> one_polynomial(
                             0, basic_domain->m, FieldType::value_type::one());
                         math::polynomial_dfs<typename FieldType::value_type> zero_polynomial(
-                            0, basic_domain->m, FieldType::value_type::zero());      
-                        math::polynomial_dfs<typename FieldType::value_type> mask_assignment = 
+                            0, basic_domain->m, FieldType::value_type::zero());
+                        math::polynomial_dfs<typename FieldType::value_type> mask_assignment =
                             one_polynomial -  preprocessed_data.q_last - preprocessed_data.q_blind;
 
-                        std::unique_ptr<std::vector<math::polynomial_dfs<typename FieldType::value_type>>> lookup_value_ptr = 
+                        std::unique_ptr<std::vector<math::polynomial_dfs<typename FieldType::value_type>>> lookup_value_ptr =
                             prepare_lookup_value(mask_assignment);
                         auto& lookup_value = *lookup_value_ptr;
-                        
-                        std::unique_ptr<std::vector<math::polynomial_dfs<typename FieldType::value_type>>> lookup_input_ptr = 
+
+                        std::unique_ptr<std::vector<math::polynomial_dfs<typename FieldType::value_type>>> lookup_input_ptr =
                             prepare_lookup_input();
                         auto& lookup_input = *lookup_input_ptr;
-                        
+
                         // 3. Lookup_input and lookup_value are ready
                         //    Now sort them!
                         //    Reduce value and input:
@@ -154,7 +154,7 @@ namespace nil {
                         commitment_scheme.append_to_batch(PERMUTATION_BATCH, V_L);
 
                         BOOST_CHECK(V_L[preprocessed_data.common_data.usable_rows_amount] ==  FieldType::value_type::one());
-                        
+
                         // After this call of compute_g lookup_input_ptr and lookup_value_ptr are deleted.
                         math::polynomial_dfs<typename FieldType::value_type> g = compute_g(
                             std::move(lookup_input_ptr), std::move(lookup_value_ptr), beta, gamma);
@@ -207,7 +207,7 @@ namespace nil {
 
                         auto& lookup_value = *lookup_value_ptr;
                         auto& lookup_input = *lookup_input_ptr;
- 
+
                         auto g = math::polynomial_dfs<typename FieldType::value_type>::one();
                         auto one = FieldType::value_type::one();
                         g *= (one + beta).pow(lookup_input.size());
@@ -229,7 +229,7 @@ namespace nil {
                         // We don't use lookup_value after this line.
                         lookup_value_ptr.reset(nullptr);
 
-                        g *= polynomial_product(std::move(g_multipliers));
+                        g *= math::polynomial_product<FieldType>(std::move(g_multipliers));
                         return g;
                     }
 
@@ -245,15 +245,15 @@ namespace nil {
                             auto sorted_shifted = math::polynomial_shift(sorted[i], 1, basic_domain->m);
                             h_multipliers.push_back((one + beta) * gamma + sorted[i] + beta * sorted_shifted);
                         }
-                        return polynomial_product(h_multipliers);
+                        return math::polynomial_product<FieldType>(h_multipliers);
                     }
 
                     math::polynomial_dfs<typename FieldType::value_type> compute_V_L(
                         const std::vector<math::polynomial_dfs<typename FieldType::value_type>>& sorted,
                         const std::vector<math::polynomial_dfs<typename FieldType::value_type>>& reduced_input,
-                        const std::vector<math::polynomial_dfs<typename FieldType::value_type>>& reduced_value, 
+                        const std::vector<math::polynomial_dfs<typename FieldType::value_type>>& reduced_value,
                         const typename FieldType::value_type& beta,
-                        const typename FieldType::value_type& gamma) { 
+                        const typename FieldType::value_type& gamma) {
 
                         math::polynomial_dfs<typename FieldType::value_type> V_L(
                             basic_domain->m-1,basic_domain->m, FieldType::value_type::zero());
@@ -262,7 +262,7 @@ namespace nil {
 
                         for (std::size_t k = 1; k <= preprocessed_data.common_data.usable_rows_amount; k++) {
                             V_L[k] = V_L[k-1];
-                        
+
                             typename FieldType::value_type g_tmp = (one + beta).pow(reduced_input.size());
                             for (std::size_t i = 0; i < reduced_input.size(); i++) {
                                 g_tmp *= gamma + reduced_input[i][k-1];
@@ -344,10 +344,10 @@ namespace nil {
 
                         typename FieldType::value_type theta_acc;
 
-                        // Prepare lookup input                        
+                        // Prepare lookup input
                         auto lookup_input_ptr = std::make_unique<std::vector<math::polynomial_dfs<typename FieldType::value_type>>>();
                         for (const auto &gate : lookup_gates) {
-                            math::expression<DfsVariableType> expr; 
+                            math::expression<DfsVariableType> expr;
                             math::polynomial_dfs<typename FieldType::value_type> lookup_selector = plonk_columns.selector(gate.tag_index);
                             for (const auto &constraint : gate.constraints) {
                                 math::polynomial_dfs<typename FieldType::value_type> l = lookup_selector * (typename FieldType::value_type(constraint.table_id));
@@ -370,7 +370,7 @@ namespace nil {
 
                     math::polynomial_dfs<typename FieldType::value_type> reduce_dfs_polynomial_domain(
                         const math::polynomial_dfs<typename FieldType::value_type> &polynomial,
-                        std::size_t &new_domain_size
+                        const std::size_t &new_domain_size
                     ) {
                         math::polynomial_dfs<typename FieldType::value_type> reduced(
                             new_domain_size - 1, new_domain_size, FieldType::value_type::zero());
@@ -380,7 +380,7 @@ namespace nil {
                             reduced = polynomial;
                         } else {
                             BOOST_ASSERT(polynomial.size() % new_domain_size == 0);
-                        
+
                             std::size_t step = polynomial.size() / new_domain_size;
                             for (std::size_t i = 0; i < new_domain_size; i++) {
                                 reduced[i] = polynomial[i * step];
@@ -390,16 +390,16 @@ namespace nil {
                     };
 
                     math::polynomial_dfs<typename FieldType::value_type> get_constraint_tag_from_gate_tag_column(
-                        math::polynomial_dfs<typename FieldType::value_type> tag_column, 
+                        math::polynomial_dfs<typename FieldType::value_type> tag_column,
                         std::size_t constraints_num,
-                        std::size_t constraint_id, 
+                        std::size_t constraint_id,
                         std::size_t table_id
                     ){
                         math::polynomial_dfs<typename FieldType::value_type> result = tag_column;
                         for (std::size_t i = 1; i <= constraints_num; i++) {
                             if (i != constraint_id) {
                                 auto tmp = tag_column - typename FieldType::value_type(i);
-                                tmp /=  (typename FieldType::value_type(constraint_id) - typename FieldType::value_type(i)); 
+                                tmp /=  (typename FieldType::value_type(constraint_id) - typename FieldType::value_type(i));
                                 result *= tmp;
                             }
                         }
@@ -409,16 +409,16 @@ namespace nil {
                     }
 
                     typename FieldType::value_type get_constraint_tag_value_from_gate_tag_value(
-                        typename FieldType::value_type tag_value, 
+                        typename FieldType::value_type tag_value,
                         std::size_t constraints_num,
-                        std::size_t constraint_id, 
+                        std::size_t constraint_id,
                         std::size_t table_id
                     ) {
                         typename FieldType::value_type result = tag_value;
                         for (std::size_t i = 1; i <= constraints_num; i++) {
                             if (i != constraint_id) {
                                 auto tmp = tag_value - typename FieldType::value_type(i);
-                                tmp /= typename FieldType::value_type(constraint_id) - typename FieldType::value_type(i); 
+                                tmp /= typename FieldType::value_type(constraint_id) - typename FieldType::value_type(i);
                                 result *= tmp;
                             }
                         }
@@ -429,14 +429,14 @@ namespace nil {
 
                     // Each lookup table should fill full rectangle inside assignment table
                     // Lookup tables may contain repeated values, but they shoul be placed into one
-                    // option one under another. 
+                    // option one under another.
                     // Because of theta randomness compressed lookup tables' vectors for different table may contain
                     // similar values only with negligible probability.
-                    // So similar values in compressed lookup tables vectors repeated values may be only in one column 
+                    // So similar values in compressed lookup tables vectors repeated values may be only in one column
                     // near each other.
                     std::vector<math::polynomial_dfs<typename FieldType::value_type>> sort_polynomials(
                         const std::vector<math::polynomial_dfs<typename FieldType::value_type>>& reduced_input,
-                        const std::vector<math::polynomial_dfs<typename FieldType::value_type>>& reduced_value, 
+                        const std::vector<math::polynomial_dfs<typename FieldType::value_type>>& reduced_value,
                         std::size_t domain_size,
                         std::size_t usable_rows_amount
                     ) {
@@ -444,9 +444,9 @@ namespace nil {
                         std::unordered_map<typename FieldType::value_type, std::size_t> sorting_map;
                         for (std::size_t i = 0; i < reduced_value.size(); i++) {
                             for (std::size_t j = 0; j < usable_rows_amount; j++) {
-                                if(sorting_map.find(reduced_value[i][j]) != sorting_map.end()) 
-                                    sorting_map[reduced_value[i][j]]++; 
-                                else 
+                                if(sorting_map.find(reduced_value[i][j]) != sorting_map.end())
+                                    sorting_map[reduced_value[i][j]]++;
+                                else
                                     sorting_map[reduced_value[i][j]] = 1;
                             }
                         }
@@ -455,7 +455,7 @@ namespace nil {
                             for (std::size_t j = 0; j < usable_rows_amount; j++) {
                                 // This assert means that every value \in keys of sorting_map = set of values of reduced_value
                                 BOOST_ASSERT(sorting_map.find(reduced_input[i][j]) != sorting_map.end());
-                                sorting_map[reduced_input[i][j]]++; 
+                                sorting_map[reduced_input[i][j]]++;
                             }
                         }
 
@@ -503,21 +503,6 @@ namespace nil {
                             sorted[i][usable_rows_amount] = sorted[i+1][0];
                         }
                         return sorted;
-                    }
-
-                    math::polynomial_dfs<typename FieldType::value_type> polynomial_product(
-                        std::vector<math::polynomial_dfs<typename FieldType::value_type>> multipliers)
-                    {
-                        std::size_t stride = 1;
-                        while (stride < multipliers.size() ) {
-                            for(std::size_t i = 0; i + stride < multipliers.size(); i += stride*2) {
-                                multipliers[i] *= multipliers[ i + stride ];
-                                // Free the memeory we don't use. any more.
-                                multipliers[ i + stride ] = math::polynomial_dfs<typename FieldType::value_type>();
-                            }
-                            stride *= 2;
-                        }
-                        return std::move(multipliers[0]);
                     }
 
                     const plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params>& constraint_system;
@@ -645,7 +630,7 @@ namespace nil {
                         auto V_L_shifted = V_L_values[1];
 
                         F[0] = (one - V_L_value) * preprocessed_data.common_data.lagrange_0.evaluate(challenge);
-                        F[1] = preprocessed_data.q_last.evaluate(challenge) * (V_L_value * V_L_value - V_L_value); 
+                        F[1] = preprocessed_data.q_last.evaluate(challenge) * (V_L_value * V_L_value - V_L_value);
                         F[2] = (one - (preprocessed_data.q_last.evaluate(challenge) + preprocessed_data.q_blind.evaluate(challenge))) *
                                    (V_L_shifted * h - V_L_value * g);
                         F[3] = 0;

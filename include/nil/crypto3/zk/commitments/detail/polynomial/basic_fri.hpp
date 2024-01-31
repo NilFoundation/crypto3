@@ -30,6 +30,10 @@
 #ifndef CRYPTO3_ZK_COMMITMENTS_BASIC_FRI_HPP
 #define CRYPTO3_ZK_COMMITMENTS_BASIC_FRI_HPP
 
+#include <memory>
+#include <unordered_map>
+#include <map>
+
 #include <nil/crypto3/marshalling/algebra/types/field_element.hpp>
 
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
@@ -281,7 +285,7 @@ namespace nil {
                           const std::size_t fri_step) {
 
                     if (f.size() != D->size()) {
-                        f.resize(D->size());
+                        f.resize(D->size(), nullptr, D);
                     }
                     std::size_t domain_size = D->size();
                     std::size_t coset_size = 1 << fri_step;
@@ -360,15 +364,14 @@ namespace nil {
                         (std::is_same<typename ContainerType::value_type, math::polynomial_dfs<typename FRI::field_type::value_type>>::value),
                         typename FRI::precommitment_type>::type
                 precommit(ContainerType poly,
-                          std::shared_ptr<math::evaluation_domain<typename FRI::field_type>>
-                          D,
+                          std::shared_ptr<math::evaluation_domain<typename FRI::field_type>> D,
                           const std::size_t fri_step
                 ) {
                     PROFILE_PLACEHOLDER_SCOPE("Basic FRI Precommit time");
 
                     for (int i = 0; i < poly.size(); ++i) {
                         if (poly[i].size() != D->size()) {
-                            poly[i].resize(D->size());
+                            poly[i].resize(D->size(), nullptr, D);
                         }
                     }
 
@@ -439,7 +442,7 @@ namespace nil {
                     std::vector<math::polynomial_dfs<typename FRI::field_type::value_type>> poly_dfs(list_size);
                     for (std::size_t i = 0; i < list_size; i++) {
                         poly_dfs[i].from_coefficients(poly[i]);
-                        poly_dfs[i].resize(D->size());
+                        poly_dfs[i].resize(D->size(), nullptr, D);
                     }
 
                     return precommit<FRI>(poly_dfs, D, fri_step);
@@ -559,18 +562,17 @@ namespace nil {
                     }
                     std::vector<std::pair<std::size_t, std::size_t>> correct_order_idx(coset_size / FRI::m);
                     for (i = 0; i < coset_size / FRI::m; i++) {
+                        const std::size_t paired_index = get_paired_index<FRI>(correctly_ordered_s_indices[i],
+                                                                               domain_size);
                         auto found_it =
                                 std::find_if(std::cbegin(input_s_indices), std::cend(input_s_indices),
                                              [&](const auto &v) {
                                                  if (v[0] == correctly_ordered_s_indices[i] &&
-                                                     v[1] == get_paired_index<FRI>(correctly_ordered_s_indices[i],
-                                                                                   domain_size)) {
+                                                     v[1] == paired_index) {
                                                      correct_order_idx[i].second = 0;
                                                      return true;
                                                  } else if (v[1] == correctly_ordered_s_indices[i] &&
-                                                            v[0] ==
-                                                            get_paired_index<FRI>(correctly_ordered_s_indices[i],
-                                                                                  domain_size)) {
+                                                            v[0] == paired_index) {
                                                      correct_order_idx[i].second = 1;
                                                      return true;
                                                  }
@@ -681,10 +683,16 @@ namespace nil {
                         math::polynomial_dfs<typename FRI::field_type::value_type>,
                         PolynomialType>::value
                     ) {
+                        std::unordered_map<std::size_t,
+                                           std::shared_ptr<math::evaluation_domain<typename FRI::field_type>>> d_cache;
                         for (const auto &[key, poly_vector]: g) {
                             for (const auto& poly: poly_vector) {
                                 if (poly.size() != fri_params.D[0]->size()) {
-                                   g_coeffs[key].emplace_back(poly.coefficients());
+                                    if (d_cache.find(poly.size()) == d_cache.end()) {
+                                        d_cache[poly.size()] =
+                                            math::make_evaluation_domain<typename FRI::field_type>(poly.size());
+                                    }
+                                    g_coeffs[key].emplace_back(poly.coefficients(d_cache[poly.size()]));
                                 } else {
                                     // These polynomials won't be used
                                     g_coeffs[key].emplace_back(math::polynomial<typename FRI::field_type::value_type>());

@@ -67,19 +67,6 @@ namespace nil {
                         math::polynomial_dfs<typename FieldType::value_type> permutation_polynomial_dfs;
                     };
 
-                    static inline math::polynomial_dfs<typename FieldType::value_type> polynomial_product(
-                        std::vector<math::polynomial_dfs<typename FieldType::value_type>> multipliers)
-                    {
-                        std::size_t stride = 1;
-                        while (stride < multipliers.size() ) {
-                            for(std::size_t i = 0; i + stride < multipliers.size(); i += stride*2) {
-                                multipliers[i] *= multipliers[ i + stride ];
-                            }
-                            stride *= 2;
-                        }
-                        return multipliers[0];
-                    }
-
                     static inline prover_result_type prove_eval(
                         const plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params>
                             &constraint_system,
@@ -144,8 +131,10 @@ namespace nil {
                         commitment_scheme.append_to_batch(PERMUTATION_BATCH, V_P);
 
                         // 5. Calculate g_perm, h_perm
-                        math::polynomial_dfs<typename FieldType::value_type> g = polynomial_product(std::move(g_v));
-                        math::polynomial_dfs<typename FieldType::value_type> h = polynomial_product(std::move(h_v));
+                        math::polynomial_dfs<typename FieldType::value_type> g =
+                            math::polynomial_product<FieldType>(std::move(g_v));
+                        math::polynomial_dfs<typename FieldType::value_type> h =
+                            math::polynomial_product<FieldType>(std::move(h_v));
 
                         math::polynomial_dfs<typename FieldType::value_type> one_polynomial(
                             0, V_P.size(), FieldType::value_type::one());
