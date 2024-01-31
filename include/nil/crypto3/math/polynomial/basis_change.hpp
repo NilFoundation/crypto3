@@ -157,7 +157,6 @@ namespace nil {
                                          size_t n) {
 
                 typedef typename Range::value_type value_type;
-                typedef typename FieldType::value_type field_vale_type;
 
                 std::size_t m = log2(n);
                 // if (T.size() != m + 1u)

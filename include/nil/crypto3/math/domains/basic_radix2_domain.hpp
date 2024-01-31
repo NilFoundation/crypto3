@@ -48,13 +48,22 @@ namespace nil {
             class basic_radix2_domain : public evaluation_domain<FieldType, ValueType> {
                 typedef typename FieldType::value_type field_value_type;
                 typedef ValueType value_type;
+                typedef std::pair<std::vector<field_value_type>, std::vector<field_value_type>> cache_type;
+                std::unique_ptr<cache_type> fft_cache;
 
+                void create_fft_cache() {
+                    fft_cache = std::make_unique<cache_type>(std::vector<field_value_type>(), std::vector<field_value_type>());
+                    detail::create_fft_cache<FieldType>(this->m, omega, fft_cache->first);
+                    detail::create_fft_cache<FieldType>(this->m, omega.inversed(), fft_cache->second);
+                }
             public:
                 typedef FieldType field_type;
 
-                field_value_type omega;
+                const field_value_type omega;
 
-                basic_radix2_domain(const std::size_t m) : evaluation_domain<FieldType, ValueType>(m) {
+                basic_radix2_domain(const std::size_t m)
+                        : evaluation_domain<FieldType, ValueType>(m),
+                          omega(unity_root<FieldType>(m)) {
                     if (m <= 1)
                         throw std::invalid_argument("basic_radix2(): expected m > 1");
 
@@ -64,8 +73,6 @@ namespace nil {
                             throw std::invalid_argument(
                                 "basic_radix2(): expected logm <= fields::arithmetic_params<FieldType>::s");
                     }
-
-                    omega = unity_root<FieldType>(m);
                 }
 
                 void fft(std::vector<value_type> &a) override {
@@ -77,7 +84,10 @@ namespace nil {
                         }
                     }
 
-                    detail::basic_radix2_fft<FieldType>(a, omega);
+                    if (fft_cache == nullptr) {
+                        create_fft_cache();
+                    }
+                    detail::basic_radix2_fft_cached<FieldType>(a, fft_cache->first);
                 }
 
                 void inverse_fft(std::vector<value_type> &a) override {
@@ -89,7 +99,10 @@ namespace nil {
                         }
                     }
 
-                    detail::basic_radix2_fft<FieldType>(a, omega.inversed());
+                    if (fft_cache == nullptr) {
+                        create_fft_cache();
+                    }
+                    detail::basic_radix2_fft_cached<FieldType>(a, fft_cache->second);
 
                     const field_value_type sconst = field_value_type(a.size()).inversed();
                     for (std::size_t i = 0; i < a.size(); ++i) {

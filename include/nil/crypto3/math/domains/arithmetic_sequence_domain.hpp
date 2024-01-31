@@ -202,11 +202,11 @@ namespace nil {
                 }
 
                 std::vector<value_type> evaluate_all_lagrange_polynomials(const typename std::vector<value_type>::const_iterator &t_powers_begin,
-                                                                          const typename std::vector<value_type>::const_iterator &t_powers_end) override { 
+                                                                          const typename std::vector<value_type>::const_iterator &t_powers_end) override {
                     if(std::distance(t_powers_begin, t_powers_end) < this->m) {
                         throw std::invalid_argument("arithmetic_sequence_radix2: expected std::distance(t_powers_begin, t_powers_end) >= this->m");
                     }
-                
+
                     /* Compute Lagrange polynomial of size m, with m+1 points (x_0, y_0), ... ,(x_m, y_m) */
                     /* Evaluate for x = t */
                     /* Return coeffs for each l_j(x) = (l / l_i[j]) * w[j] */
@@ -263,14 +263,14 @@ namespace nil {
 
                         for(std::size_t j = 0; j < l[i].size(); ++j) {
                             result[i] = result[i] + t_powers_begin[j] * l[i][j];
-                        }                  
+                        }
                         result[i] = result[i] * w[i];
                     }
 
                     return result;
                 }
 
-                // This one is not the unity root actually, but it's ok for our purposes. 
+                // This one is not the unity root actually, but it's ok for our purposes.
                 const field_value_type& get_unity_root() override {
                     return arithmetic_generator;
                 }

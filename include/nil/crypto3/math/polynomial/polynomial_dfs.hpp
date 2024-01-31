@@ -28,11 +28,14 @@
 #define CRYPTO3_MATH_POLYNOMIAL_POLYNOM_DFT_HPP
 
 #include <algorithm>
+#include <memory>
 #include <vector>
 #include <ostream>
 #include <iterator>
+#include <unordered_map>
 
 #include <nil/crypto3/math/polynomial/basic_operations.hpp>
+#include <nil/crypto3/math/domains/evaluation_domain.hpp>
 #include <nil/crypto3/math/algorithms/make_evaluation_domain.hpp>
 
 namespace nil {
@@ -121,7 +124,7 @@ namespace nil {
                     , _d(x._d) {
                 }
 
-                polynomial_dfs(polynomial_dfs&& x, const allocator_type& a) 
+                polynomial_dfs(polynomial_dfs&& x, const allocator_type& a)
                     : val(std::move(x.val), a)
                     , _d(x._d) {
                 }
@@ -350,7 +353,9 @@ namespace nil {
                     val.clear();
                 }
 
-                void resize(size_type _sz) {
+                void resize(size_type _sz,
+                            std::shared_ptr<evaluation_domain<typename value_type::field_type>> old_domain = nullptr,
+                            std::shared_ptr<evaluation_domain<typename value_type::field_type>> new_domain = nullptr) {
                     if (this->size() == _sz)
                     {
                         return;
@@ -358,13 +363,23 @@ namespace nil {
                     BOOST_ASSERT_MSG(_sz >= _d, "Resizing DFS polynomial to a size less than degree is prohibited: can't restore the polynomial in the future.");
                     if (this->degree() == 0) {
                         // Here we cannot write this->val.resize(_sz, this->val[0]), it will segfault.
-                        auto value = this->val[0]; 
+                        auto value = this->val[0];
                         this->val.resize(_sz, value);
                     } else {
                         typedef typename value_type::field_type FieldType;
-                        make_evaluation_domain<FieldType>(this->size())->inverse_fft(this->val);
+                        if (old_domain == nullptr) {
+                            old_domain = make_evaluation_domain<FieldType>(this->size());
+                        } else {
+                            BOOST_ASSERT_MSG(old_domain->size() == this->size(), "Old domain size is not equal to the polynomial size");
+                        }
+                        old_domain->inverse_fft(this->val);
                         this->val.resize(_sz, FieldValueType::zero());
-                        make_evaluation_domain<FieldType>(_sz)->fft(this->val);
+                        if (new_domain == nullptr) {
+                            new_domain = make_evaluation_domain<FieldType>(_sz);
+                        } else {
+                            BOOST_ASSERT_MSG(new_domain->size() == _sz, "New domain size is not equal to the polynomial size");
+                        }
+                        new_domain->fft(this->val);
                     }
                 }
 
@@ -393,7 +408,7 @@ namespace nil {
                     }
                     return true;
                 }
-                
+
                 /**
                  * Returns true if polynomial is a one polynomial.
                  */
@@ -406,11 +421,11 @@ namespace nil {
                 }
 
                 inline static polynomial_dfs zero() {
-                    return polynomial_dfs(); 
+                    return polynomial_dfs();
                 }
 
                 inline static polynomial_dfs one() {
-                    return polynomial_dfs(0, size_type(1), value_type(1)); 
+                    return polynomial_dfs(0, size_type(1), value_type(1));
                 }
 
                 /**
@@ -446,7 +461,7 @@ namespace nil {
                 }
 
                 /**
-                 * Computes the standard polynomial addition, polynomial A + polynomial B, 
+                 * Computes the standard polynomial addition, polynomial A + polynomial B,
                  * and stores result in polynomial A.
                  */
                 polynomial_dfs& operator+=(const polynomial_dfs& other) {
@@ -466,16 +481,16 @@ namespace nil {
                 }
 
                 /**
-                 * Computes polynomial A + constant c, 
+                 * Computes polynomial A + constant c,
                  * and stores result in polynomial A.
                  */
                 polynomial_dfs& operator+=(const FieldValueType& c) {
                     for( auto it = this->begin(); it!=this->end(); it++) *it += c;
                     return *this;
                 }
-                
+
                 /**
-                 * Computes polynomial A - constant c, 
+                 * Computes polynomial A - constant c,
                  * and stores result in polynomial A.
                  */
                 polynomial_dfs operator-() const {
@@ -485,7 +500,7 @@ namespace nil {
                 }
 
                 /**
-                 * Computes the standard polynomial subtraction, polynomial A - polynomial B, 
+                 * Computes the standard polynomial subtraction, polynomial A - polynomial B,
                  * and stores result in polynomial C.
                  */
                 polynomial_dfs operator-(const polynomial_dfs& other) const {
@@ -507,7 +522,7 @@ namespace nil {
                 }
 
                 /**
-                 * Computes the standard polynomial subtraction, polynomial A - polynomial B, 
+                 * Computes the standard polynomial subtraction, polynomial A - polynomial B,
                  * and stores result in polynomial A.
                  */
                 polynomial_dfs& operator-=(const polynomial_dfs& other) {
@@ -527,7 +542,7 @@ namespace nil {
                 }
 
                 /**
-                 * Computes tpolynomial A - constant c 
+                 * Computes tpolynomial A - constant c
                  * and stores result in polynomial A.
                  */
                 polynomial_dfs& operator-=(const FieldValueType& c) {
@@ -536,18 +551,19 @@ namespace nil {
                 }
 
                 /**
-                 * Perform the multiplication of two polynomials, polynomial A * polynomial B, 
+                 * Perform the multiplication of two polynomials, polynomial A * polynomial B,
                  * and stores result in polynomial C.
                  */
                 polynomial_dfs operator*(const polynomial_dfs& other) const {
                     polynomial_dfs result = *this;
 
-                    size_t polynomial_s =
+                    const size_t polynomial_s =
                         detail::power_of_two(std::max({this->size(), other.size(), this->degree() + other.degree() + 1}));
 
-                    if (result.size() < polynomial_s) {
-                        result.resize(polynomial_s);
+                    if (this->size() < polynomial_s) {
+                         result.resize(polynomial_s);
                     }
+
                     // Change the degree only here, after a possible resize, otherwise we have a polynomial
                     // with a high degree but small size, which sometimes segfaults.
                     result._d = this->degree() + other.degree();
@@ -559,16 +575,16 @@ namespace nil {
                         return result;
                     }
                     std::transform(other.begin(), other.end(), result.begin(), result.begin(), std::multiplies<FieldValueType>());
-                    
+
                     return result;
                 }
 
                 /**
-                 * Perform the multiplication of two polynomials, polynomial A * polynomial B, 
+                 * Perform the multiplication of two polynomials, polynomial A * polynomial B,
                  * and stores result in polynomial A.
                  */
                 polynomial_dfs& operator*=(const polynomial_dfs& other) {
-                    size_t polynomial_s =
+                    const size_t polynomial_s =
                         detail::power_of_two(std::max({this->size(), other.size(), this->degree() + other.degree() + 1}));
 
                     if (this->size() < polynomial_s) {
@@ -589,16 +605,47 @@ namespace nil {
                     std::transform(this->begin(), this->end(), other.begin(), this->begin(), std::multiplies<FieldValueType>());
                     return *this;
                 }
-                
+
                 /**
-                 * Perform the multiplication of two polynomials, polynomial A * constant alpha, 
+                 * Performs multiplication of two polynomials, but with domain caches
+                 */
+                polynomial_dfs& cached_multiplication(
+                        const polynomial_dfs& other,
+                        std::shared_ptr<evaluation_domain<typename value_type::field_type>> domain = nullptr,
+                        std::shared_ptr<evaluation_domain<typename value_type::field_type>> other_domain = nullptr,
+                        std::shared_ptr<evaluation_domain<typename value_type::field_type>> new_domain = nullptr) {
+
+                    const size_t polynomial_s =
+                        detail::power_of_two(std::max({this->size(), other.size(), this->degree() + other.degree() + 1}));
+
+                    if (this->size() < polynomial_s) {
+                        this->resize(polynomial_s, domain, new_domain);
+                    }
+
+                    // Change the degree only here, after a possible resize, otherwise we have a polynomial
+                    // with a high degree but small size, which sometimes segfaults.
+                    this->_d += other._d;
+
+                    if (other.size() < polynomial_s) {
+                        polynomial_dfs tmp(other);
+                        tmp.resize(polynomial_s, other_domain, new_domain);
+
+                        std::transform(tmp.begin(), tmp.end(), this->begin(), this->begin(), std::multiplies<FieldValueType>());
+                        return *this;
+                    }
+                    std::transform(this->begin(), this->end(), other.begin(), this->begin(), std::multiplies<FieldValueType>());
+                    return *this;
+                }
+
+                /**
+                 * Perform the multiplication of two polynomials, polynomial A * constant alpha,
                  * and stores result in polynomial A.
                  */
                 polynomial_dfs& operator*=(const FieldValueType& alpha) {
                     for( auto it = this->begin(); it!=this->end(); it++) *it *= alpha;
                     return *this;
                 }
-                
+
                 /**
                  * Perform the standard Euclidean Division algorithm.
                  * Input: Polynomial A, Polynomial B, where A / B
@@ -650,18 +697,23 @@ namespace nil {
                     detail::basic_radix2_fft<FieldType>(val, omega);
                 }
 
-                std::vector<FieldValueType> coefficients() const {
+                std::vector<FieldValueType> coefficients(
+                        std::shared_ptr<evaluation_domain<typename value_type::field_type>> domain = nullptr) const {
                     typedef typename value_type::field_type FieldType;
                     value_type omega = unity_root<FieldType>(this->size());
                     std::vector<FieldValueType> tmp(this->begin(), this->end());
 
-                    detail::basic_radix2_fft<FieldType>(tmp, omega.inversed());
+                    if (domain == nullptr) {
+                        detail::basic_radix2_fft<FieldType>(tmp, omega.inversed());
+                        const value_type sconst = value_type(this->size()).inversed();
+                        std::transform(tmp.begin(),
+                                    tmp.end(),
+                                    tmp.begin(),
+                                    std::bind(std::multiplies<value_type>(), sconst, std::placeholders::_1));
+                    } else {
+                        domain->inverse_fft(tmp);
+                    }
 
-                    const value_type sconst = value_type(this->size()).inversed();
-                    std::transform(tmp.begin(),
-                                   tmp.end(),
-                                   tmp.begin(),
-                                   std::bind(std::multiplies<value_type>(), sconst, std::placeholders::_1));
                     size_t r_size = tmp.size();
                     while (r_size > 1 && tmp[r_size - 1] == FieldValueType::zero()) {
                         --r_size;
@@ -677,13 +729,13 @@ namespace nil {
 
                     polynomial_dfs power_of_2 = *this;
                     size_t expected_size = detail::power_of_two(
-                        std::max({this->size(), this->degree() * power + 1})); 
+                        std::max({this->size(), this->degree() * power + 1}));
                     power_of_2.resize(expected_size);
                     polynomial_dfs result(0, expected_size, FieldValueType::one());
                     while (power) {
                         if (power % 2 == 1) {
                             result *= power_of_2;
-                        } 
+                        }
                         power /= 2;
                         if (power == 0)
                             break;
@@ -715,7 +767,7 @@ namespace nil {
                 }
                 return result;
             }
-            
+
 
             template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>,
                      typename = typename std::enable_if<detail::is_field_element<FieldValueType>::value>::type>
@@ -794,6 +846,37 @@ namespace nil {
                     os << "]";
                 }
                 return os;
+            }
+
+            template<typename FieldType>
+            static inline polynomial_dfs<typename FieldType::value_type> polynomial_product(
+                    std::vector<math::polynomial_dfs<typename FieldType::value_type>> multipliers) {
+                std::unordered_map<std::size_t, std::shared_ptr<evaluation_domain<FieldType>>> domain_cache;
+                for (std::size_t stride = 1; stride < multipliers.size(); stride <<= 1) {
+                    const std::size_t double_stride = stride << 1;
+                    for(std::size_t i = 0; i + stride < multipliers.size(); i += double_stride) {
+                        const std::size_t current_domain_size = multipliers[i].size();
+                        const std::size_t next_domain_size = multipliers[i + stride].size();
+                        const std::size_t new_domain_size =
+                            detail::power_of_two(std::max(
+                                {current_domain_size,
+                                 next_domain_size,
+                                 multipliers[i].degree() + multipliers[i + stride].degree() + 1}));
+                        for (auto domain_size : {current_domain_size, next_domain_size, new_domain_size}) {
+                            if (domain_cache.find(domain_size) == domain_cache.end()) {
+                                domain_cache[domain_size] = make_evaluation_domain<FieldType>(domain_size);
+                            }
+                        }
+                        multipliers[i].cached_multiplication(
+                            multipliers[i + stride],
+                            domain_cache[current_domain_size],
+                            domain_cache[next_domain_size],
+                            domain_cache[new_domain_size]);
+                        // Free memory we are not going to use anymore.
+                        multipliers[i + stride] = polynomial_dfs<typename FieldType::value_type>();
+                    }
+                }
+                return multipliers[0];
             }
 
         }    // namespace math

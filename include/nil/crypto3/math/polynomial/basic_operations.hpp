@@ -187,11 +187,11 @@ namespace nil {
                 detail::basic_radix2_fft<FieldType>(c, omega.inversed());
 
                 const field_value_type sconst = field_value_type(n).inversed();
-                
+
                 for(std::size_t i = 0; i < n; ++i) {
                     c[i] = c[i] * sconst;
                 }
-                
+
                 condense(c);
             }
 
@@ -202,9 +202,6 @@ namespace nil {
              */
             template<typename AlgebraicRange, typename FieldRange>
             AlgebraicRange transpose_multiplication(const std::size_t &n, const AlgebraicRange &a, const FieldRange &c) {
-
-                typedef
-                    typename std::iterator_traits<decltype(std::begin(std::declval<AlgebraicRange>()))>::value_type value_type;
 
                 const std::size_t m = a.size();
                 // if (c.size() - 1 > m + n)

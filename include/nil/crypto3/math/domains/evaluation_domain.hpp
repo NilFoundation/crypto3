@@ -47,9 +47,8 @@ namespace nil {
             public:
                 typedef FieldType field_type;
 
-                std::size_t m;
-                std::size_t log2_size;
-                std::size_t generator_size;
+                const std::size_t m;
+                const std::size_t log2_size;
 
                 /**
                  * Construct an evaluation domain S of size m, if possible.
@@ -61,6 +60,11 @@ namespace nil {
                 inline std::size_t size() const {
                     return m;
                 }
+
+                /*
+                 * Virtual destructor.
+                 */
+                virtual ~evaluation_domain() {};
 
                 /**
                  * Get the unity root.
@@ -127,8 +131,7 @@ namespace nil {
                 virtual void divide_by_z_on_coset(std::vector<field_value_type> &P) = 0;
 
                 bool operator==(const evaluation_domain &rhs) const {
-                    return m == rhs.m && log2_size == rhs.log2_size &&
-                           generator_size == rhs.generator_size;
+                    return m == rhs.m && log2_size == rhs.log2_size;
                 }
             };
         }    // namespace math
