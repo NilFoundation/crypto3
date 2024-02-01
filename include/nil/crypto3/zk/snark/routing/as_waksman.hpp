@@ -149,7 +149,7 @@ namespace nil {
                 /**
                  * Return the height of the AS-Waksman network's top sub-network.
                  */
-                std::size_t as_waksman_top_height(const std::size_t num_packets) {
+                inline std::size_t as_waksman_top_height(const std::size_t num_packets) {
                     return num_packets / 2;
                 }
 
@@ -164,7 +164,7 @@ namespace nil {
                  *
                  * If top = true, return the top wire, otherwise return bottom wire.
                  */
-                std::size_t as_waksman_switch_output(size_t num_packets, std::size_t row_offset, std::size_t row_idx,
+                inline std::size_t as_waksman_switch_output(size_t num_packets, std::size_t row_offset, std::size_t row_idx,
                                                      bool use_top) {
                     std::size_t relpos = row_idx - row_offset;
                     assert(relpos % 2 == 0 && relpos + 1 < num_packets);
@@ -177,13 +177,13 @@ namespace nil {
                  *
                  * This function is analogous to as_waksman_switch_output above.
                  */
-                std::size_t as_waksman_switch_input(size_t num_packets, std::size_t row_offset, std::size_t row_idx,
+                inline std::size_t as_waksman_switch_input(size_t num_packets, std::size_t row_offset, std::size_t row_idx,
                                                     bool use_top) {
                     /* Due to symmetry, this function equals as_waksman_switch_output. */
                     return as_waksman_switch_output(num_packets, row_offset, row_idx, use_top);
                 }
 
-                std::size_t as_waksman_num_columns(size_t num_packets) {
+                inline std::size_t as_waksman_num_columns(size_t num_packets) {
                     return (num_packets > 1 ? 2 * static_cast<std::size_t>(std::ceil(std::log2(num_packets))) - 1 : 0);
                 }
 
@@ -199,7 +199,7 @@ namespace nil {
                  *
                  * This function fills out neighbors[left] and neighbors[right-1].
                  */
-                void construct_as_waksman_inner(size_t left,
+                inline void construct_as_waksman_inner(size_t left,
                                                 std::size_t right,
                                                 std::size_t lo,
                                                 std::size_t hi,
@@ -296,7 +296,7 @@ namespace nil {
                     }
                 }
 
-                as_waksman_topology generate_as_waksman_topology(size_t num_packets) {
+                inline as_waksman_topology generate_as_waksman_topology(size_t num_packets) {
                     assert(num_packets > 1);
                     const std::size_t width = as_waksman_num_columns(num_packets);
 
@@ -321,7 +321,7 @@ namespace nil {
                  * This function is agnostic to column_idx, given row_offset, so we omit
                  * column_idx.
                  */
-                std::size_t as_waksman_get_canonical_row_idx(size_t row_offset, std::size_t row_idx) {
+                inline std::size_t as_waksman_get_canonical_row_idx(size_t row_offset, std::size_t row_idx) {
                     /* translate back relative to row_offset, clear LSB, and then translate forward */
                     return (((row_idx - row_offset) & ~1) + row_offset);
                 }
@@ -336,7 +336,7 @@ namespace nil {
                  * - the input position for the LHS switches, and
                  * - the output position for the RHS switches.
                  */
-                bool as_waksman_get_switch_setting_from_top_bottom_decision(size_t row_offset,
+                inline bool as_waksman_get_switch_setting_from_top_bottom_decision(size_t row_offset,
                                                                             std::size_t packet_idx,
                                                                             bool use_top) {
                     const std::size_t row_idx = as_waksman_get_canonical_row_idx(row_offset, packet_idx);
@@ -353,7 +353,7 @@ namespace nil {
                  * - the input position for the RHS switches, and
                  * - the output position for the LHS switches.
                  */
-                bool as_waksman_get_top_bottom_decision_from_switch_setting(size_t row_offset,
+                inline bool as_waksman_get_top_bottom_decision_from_switch_setting(size_t row_offset,
                                                                             std::size_t packet_idx,
                                                                             bool switch_setting) {
                     const std::size_t row_idx = as_waksman_get_canonical_row_idx(row_offset, packet_idx);
@@ -364,7 +364,7 @@ namespace nil {
                  * Given an output wire of a RHS switch, compute and return the output
                  * position of the other wire also connected to this switch.
                  */
-                std::size_t as_waksman_other_output_position(size_t row_offset, std::size_t packet_idx) {
+                inline std::size_t as_waksman_other_output_position(size_t row_offset, std::size_t packet_idx) {
                     const std::size_t row_idx = as_waksman_get_canonical_row_idx(row_offset, packet_idx);
                     return (1 - (packet_idx - row_idx)) + row_idx;
                 }
@@ -373,7 +373,7 @@ namespace nil {
                  * Given an input wire of a LHS switch, compute and return the input
                  * position of the other wire also connected to this switch.
                  */
-                std::size_t as_waksman_other_input_position(size_t row_offset, std::size_t packet_idx) {
+                inline std::size_t as_waksman_other_input_position(size_t row_offset, std::size_t packet_idx) {
                     /* Due to symmetry, this function equals as_waksman_other_output_position. */
                     return as_waksman_other_output_position(row_offset, packet_idx);
                 }
@@ -391,7 +391,7 @@ namespace nil {
                  *
                  * NOTE: due to offsets, neither pi or piinv are instances of integer_permutation.
                  */
-                void as_waksman_route_inner(size_t left,
+                inline void as_waksman_route_inner(size_t left,
                                             std::size_t right,
                                             std::size_t lo,
                                             std::size_t hi,
@@ -609,7 +609,7 @@ namespace nil {
                     }
                 }
 
-                as_waksman_routing get_as_waksman_routing(const math::integer_permutation &permutation) {
+                inline as_waksman_routing get_as_waksman_routing(const math::integer_permutation &permutation) {
                     const std::size_t num_packets = permutation.size();
                     const std::size_t width = as_waksman_num_columns(num_packets);
 
@@ -619,7 +619,7 @@ namespace nil {
                     return routing;
                 }
 
-                bool valid_as_waksman_routing(const math::integer_permutation &permutation,
+                inline bool valid_as_waksman_routing(const math::integer_permutation &permutation,
                                               const as_waksman_routing &routing) {
                     const std::size_t num_packets = permutation.size();
                     const std::size_t width = as_waksman_num_columns(num_packets);

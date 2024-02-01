@@ -63,6 +63,8 @@ namespace nil {
                             return std::max(left, right);
                         case ArithmeticOperator::MULT:
                             return left + right;
+                        default:
+                            throw std::invalid_argument("ArithmeticOperator not found");
                     }
                 }
             };
@@ -84,7 +86,7 @@ namespace nil {
                 void operator()(const math::term<VariableType>& term) {
                     for (const auto& var: term.get_vars()) {
                         callback(var);
-                    }                    
+                    }
                 }
 
                 void operator()(
@@ -102,17 +104,17 @@ namespace nil {
             };
 
             // Converts tree-structured expression to flat one, a vector of terms.
-            // Used for generating solidity code for constraints, because we want 
+            // Used for generating solidity code for constraints, because we want
             // to use minimal number of variables in the stack.
             template<typename VariableType>
-            class expression_to_non_linear_combination_visitor 
+            class expression_to_non_linear_combination_visitor
                 : public boost::static_visitor<math::non_linear_combination<VariableType>> {
             public:
                 expression_to_non_linear_combination_visitor() {}
 
                 math::non_linear_combination<VariableType> convert(
                         const math::expression<VariableType>& expr) {
-                    math::non_linear_combination<VariableType> result = 
+                    math::non_linear_combination<VariableType> result =
                         boost::apply_visitor(*this, expr.get_expr());
                     result.merge_equal_terms();
                     return result;
@@ -157,7 +159,7 @@ namespace nil {
 
             // Changes the underlying variable type of an expression. This is useful, when
             // we have a constraint with variable type plonk_variable<AssignmentType>
-            // but we need a constraint of variable type 
+            // but we need a constraint of variable type
             // plonk_variable<math::polynomial_dfs<typename FieldType::value_type>>.
             // You can convert between types if the coefficient types are convertable.
             template<typename SourceVariableType, typename DestinationVariableType>
@@ -165,12 +167,12 @@ namespace nil {
                 : public boost::static_visitor<math::expression<DestinationVariableType>> {
             public:
                 /*
-                 * @param convert_coefficient - A function that can convert a coefficient of Source Type, into a coefficient 
+                 * @param convert_coefficient - A function that can convert a coefficient of Source Type, into a coefficient
                                                 of the destination type.
                  */
                 expression_variable_type_converter(
                     std::function<typename DestinationVariableType::assignment_type(
-                        const typename SourceVariableType::assignment_type&)> convert_coefficient = 
+                        const typename SourceVariableType::assignment_type&)> convert_coefficient =
                             [](const typename SourceVariableType::assignment_type& coeff) {return coeff;})
                     : _convert_coefficient(convert_coefficient) {
                 }
@@ -211,6 +213,8 @@ namespace nil {
                             return left - right;
                         case ArithmeticOperator::MULT:
                             return left * right;
+                        default:
+                            throw std::invalid_argument("ArithmeticOperator not found");
                     }
                 }
             private:
