@@ -69,7 +69,7 @@ namespace nil {
                 std::uint32_t right_index;
             };
 
-            // Storing the crypto3::math::expression class in a flat way, 
+            // Storing the crypto3::math::expression class in a flat way,
             // to be able to use it in marshalling. We put different types of nodes
             // into different vectors, and use indexes instead of pointers.
             template<typename ExpressionType>
@@ -99,10 +99,12 @@ namespace nil {
                         case flat_node_type::BINARY_ARITHMETIC: {
                             const auto& bin_op = binary_operations[node_index];
                             return binary_arithmetic_operation_type(
-                                to_expression(bin_op.left_type, bin_op.left_index), 
-                                to_expression(bin_op.right_type, bin_op.right_index), 
+                                to_expression(bin_op.left_type, bin_op.left_index),
+                                to_expression(bin_op.right_type, bin_op.right_index),
                                 bin_op.op);
                         }
+                        default:
+                            throw std::invalid_argument("Invalid flat_node_type passed");
                     }
                 }
 
@@ -112,14 +114,14 @@ namespace nil {
 
                 // Type of the base expression.
                 flat_node_type root_type;
-                    
+
                 // Index in corresponding array.
                 // if type == TERM, then this is index in array 'terms'.
                 std::uint32_t root_index;
 
             };
-    
-            // Class for creating a flat_expression from expression. 
+
+            // Class for creating a flat_expression from expression.
             template<typename ExpressionType>
             class expression_flattener : public boost::static_visitor<void> {
             public:
@@ -135,7 +137,7 @@ namespace nil {
                 const flat_expression<ExpressionType>& get_result() const {
                     return result;
                 }
-    
+
                 void operator()(const term_type& term) {
                     result.terms.push_back(term);
 
@@ -157,11 +159,11 @@ namespace nil {
 
                     boost::apply_visitor(*this, op.get_expr_left().get_expr());
                     flat_op.left_type = result.root_type;
-                    flat_op.left_index = result.root_index; 
+                    flat_op.left_index = result.root_index;
 
                     boost::apply_visitor(*this, op.get_expr_right().get_expr());
                     flat_op.right_type = result.root_type;
-                    flat_op.right_index = result.root_index; 
+                    flat_op.right_index = result.root_index;
 
                     result.binary_operations.push_back(flat_op);
 
