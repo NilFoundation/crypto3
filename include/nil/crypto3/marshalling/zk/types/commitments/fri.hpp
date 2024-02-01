@@ -27,8 +27,9 @@
 #ifndef CRYPTO3_MARSHALLING_FRI_COMMITMENT_HPP
 #define CRYPTO3_MARSHALLING_FRI_COMMITMENT_HPP
 
-#include <ratio>
 #include <limits>
+#include <map>
+#include <ratio>
 #include <type_traits>
 
 #include <boost/assert.hpp>
@@ -101,7 +102,7 @@ namespace nil {
                     using filled_type = merkle_proof_vector_type<TTypeBase, FRI>;
 
                     filled_type filled;
-                    
+
 
                     for( size_t i = 0; i < merkle_proofs.size(); i++){
                         filled.value().push_back(
@@ -112,7 +113,7 @@ namespace nil {
                 }
 
                 template<typename Endianness, typename FRI>
-                std::vector<typename FRI::merkle_proof_type> 
+                std::vector<typename FRI::merkle_proof_type>
                 make_merkle_proof_vector(merkle_proof_vector_type<nil::marshalling::field_type<Endianness>, FRI> &filled) {
                     std::vector<typename FRI::merkle_proof_type> merkle_proofs;
                     for( std::size_t i = 0; i < filled.value().size(); i++ ){
@@ -127,7 +128,7 @@ namespace nil {
                 // fri::proof_type marshalling
                 ///////////////////////////////////////////////////
                 template <typename TTypeBase, typename FRI, bool b = FRI::use_grinding> struct fri_proof;
-                template <typename TTypeBase, typename FRI> struct fri_proof<TTypeBase, FRI, true>  {   
+                template <typename TTypeBase, typename FRI> struct fri_proof<TTypeBase, FRI, true>  {
                     using type = nil::marshalling::types::bundle<
                         TTypeBase,
                         std::tuple<
@@ -138,7 +139,7 @@ namespace nil {
                                 nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, std::size_t>>
                             >,
 
-                            // step_list. 
+                            // step_list.
                             // We'll check is it good for current EVM instance
                             nil::marshalling::types::array_list<
                                 TTypeBase,
@@ -168,7 +169,7 @@ namespace nil {
                             // Fixed size lambda * batches_num
                             nil::marshalling::types::array_list<
                                 TTypeBase,
-                                typename types::merkle_proof<TTypeBase, typename FRI::merkle_proof_type>,         
+                                typename types::merkle_proof<TTypeBase, typename FRI::merkle_proof_type>,
                                 nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, std::size_t>>
                             >,
 
@@ -176,11 +177,11 @@ namespace nil {
                             // Fixed size lambda * |step_list|
                             nil::marshalling::types::array_list<
                                 TTypeBase,
-                                typename types::merkle_proof<TTypeBase, typename FRI::merkle_proof_type>,         
+                                typename types::merkle_proof<TTypeBase, typename FRI::merkle_proof_type>,
                                 nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, std::size_t>>
                             >,
 
-                            // std::select_container<math::polynomial> final_polynomials 
+                            // std::select_container<math::polynomial> final_polynomials
                             // May be different size, because real degree may be less than before. So put int in the end
                             fri_math_polynomial<TTypeBase, typename FRI::polynomial_type>,
 
@@ -188,9 +189,9 @@ namespace nil {
                             // proof of work. TODO: how to do it optional?
                             nil::marshalling::types::integral<TTypeBase, typename FRI::grinding_type::output_type>  //proof of work*/
                         >
-                    >;                
+                    >;
                 };
-                template <typename TTypeBase, typename FRI> struct fri_proof<TTypeBase, FRI, false> {    
+                template <typename TTypeBase, typename FRI> struct fri_proof<TTypeBase, FRI, false> {
                     using type = nil::marshalling::types::bundle<
                         TTypeBase,
                         std::tuple<
@@ -201,7 +202,7 @@ namespace nil {
                                 nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, std::size_t>>
                             >,
 
-                            // step_list. 
+                            // step_list.
                             // We'll check is it good for current EVM instance
                             nil::marshalling::types::array_list<
                                 TTypeBase,
@@ -231,7 +232,7 @@ namespace nil {
                             // Fixed size lambda * batches_num
                             nil::marshalling::types::array_list<
                                 TTypeBase,
-                                typename types::merkle_proof<TTypeBase, typename FRI::merkle_proof_type>,         
+                                typename types::merkle_proof<TTypeBase, typename FRI::merkle_proof_type>,
                                 nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, std::size_t>>
                             >,
 
@@ -239,11 +240,11 @@ namespace nil {
                             // Fixed size lambda * |step_list|
                             nil::marshalling::types::array_list<
                                 TTypeBase,
-                                typename types::merkle_proof<TTypeBase, typename FRI::merkle_proof_type>,         
+                                typename types::merkle_proof<TTypeBase, typename FRI::merkle_proof_type>,
                                 nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, std::size_t>>
                             >,
 
-                            // std::select_container<math::polynomial> final_polynomials 
+                            // std::select_container<math::polynomial> final_polynomials
                             // May be different size, because real degree may be less than before. So put int in the end
                             fri_math_polynomial<TTypeBase, typename FRI::polynomial_type>
                         >
@@ -320,7 +321,7 @@ namespace nil {
                     // initial merkle proofs
                     nil::marshalling::types::array_list<
                         TTypeBase,
-                        typename types::merkle_proof<TTypeBase, typename FRI::merkle_proof_type>,         
+                        typename types::merkle_proof<TTypeBase, typename FRI::merkle_proof_type>,
                         nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, std::size_t>>
                     > filled_initial_merkle_proofs;
                     for( std::size_t i = 0; i < FRI::lambda; i++){
@@ -332,11 +333,11 @@ namespace nil {
                             );
                         }
                     }
-                
+
                     // round merkle proofs
                     nil::marshalling::types::array_list<
                         TTypeBase,
-                        typename types::merkle_proof<TTypeBase, typename FRI::merkle_proof_type>,         
+                        typename types::merkle_proof<TTypeBase, typename FRI::merkle_proof_type>,
                         nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, std::size_t>>
                     > filled_round_merkle_proofs;
                     for( std::size_t i = 0; i < FRI::lambda; i++){
@@ -356,7 +357,7 @@ namespace nil {
                     if constexpr(FRI::use_grinding){
                         return typename fri_proof<nil::marshalling::field_type<Endianness>, FRI>::type(
                             std::tuple(
-                                filled_fri_roots, filled_step_list, filled_initial_val, filled_round_val, 
+                                filled_fri_roots, filled_step_list, filled_initial_val, filled_round_val,
                                 filled_initial_merkle_proofs, filled_round_merkle_proofs, filled_final_polynomial,
                                 nil::marshalling::types::integral<TTypeBase, typename FRI::grinding_type::output_type>(proof.proof_of_work)
                             )
@@ -364,10 +365,10 @@ namespace nil {
                     } else {
                         return typename fri_proof<nil::marshalling::field_type<Endianness>, FRI>::type(
                             std::tuple(
-                                filled_fri_roots, filled_step_list, filled_initial_val, filled_round_val, 
+                                filled_fri_roots, filled_step_list, filled_initial_val, filled_round_val,
                                 filled_initial_merkle_proofs, filled_round_merkle_proofs, filled_final_polynomial
                             )
-                        );                        
+                        );
                     }
                 }
 
