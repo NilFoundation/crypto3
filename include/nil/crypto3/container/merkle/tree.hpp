@@ -48,17 +48,17 @@ namespace nil {
             namespace detail {
                 // returns next highest power of two from a given number if it is not
                 // already a power of two.
-                size_t next_pow2(size_t n) {
+                inline size_t next_pow2(size_t n) {
                     return std::pow(2, std::ceil(std::log(n)));
                 }
 
                 // find power of 2 of a number which is power of 2
-                size_t log2_pow2(size_t n) {
+                inline size_t log2_pow2(size_t n) {
                     return next_pow2(n);
                 }
 
                 // Row_Count calculation given the number of _leaves in the tree and the branches.
-                size_t merkle_tree_row_count(size_t leafs, size_t branches) {
+                inline size_t merkle_tree_row_count(size_t leafs, size_t branches) {
                     // Optimization
                     if (branches == 2) {
                         return std::log2(leafs) + 1;
@@ -68,7 +68,7 @@ namespace nil {
                 }
 
                 // Tree length calculation given the number of _leaves in the tree and the branches.
-                size_t merkle_tree_length(size_t leafs, size_t branches) {
+                inline size_t merkle_tree_length(size_t leafs, size_t branches) {
                     // Optimization
                     size_t len = leafs;
                     if (branches == 2) {
@@ -86,7 +86,7 @@ namespace nil {
                 // This method returns the number of '_leaves' given a merkle tree
                 // length of 'len', where _leaves must be a power of 2, respecting the
                 // number of branches.
-                size_t merkle_tree_leaves(size_t tree_s, size_t branches) {
+                inline size_t merkle_tree_leaves(size_t tree_s, size_t branches) {
                     // Optimization
                     size_t len = tree_s;
                     if (branches == 2) {
@@ -103,7 +103,7 @@ namespace nil {
 
                 // Tree length calculation given the number of _leaves in the tree, the
                 // rows_to_discard, and the branches.
-                size_t merkle_tree_cache_size(size_t leafs, size_t branches, size_t rows_to_discard) {
+                inline size_t merkle_tree_cache_size(size_t leafs, size_t branches, size_t rows_to_discard) {
                     size_t shift = log2_pow2(branches);
                     size_t len = merkle_tree_length(leafs, branches);
                     size_t row_count = merkle_tree_row_count(leafs, branches);
@@ -124,7 +124,7 @@ namespace nil {
                     return cache_size;
                 }
 
-                bool is_merkle_tree_size_valid(size_t leafs, size_t branches) {
+                inline bool is_merkle_tree_size_valid(size_t leafs, size_t branches) {
                     if (branches == 0 || leafs != next_pow2(leafs) || branches != next_pow2(branches)) {
                         return false;
                     }
@@ -143,7 +143,7 @@ namespace nil {
 
                 // Given a tree of '_rc' with the specified number of 'branches',
                 // calculate the length of _hashes required for the proof.
-                size_t merkle_proof_lemma_length(size_t row_count, size_t branches) {
+                inline size_t merkle_proof_lemma_length(size_t row_count, size_t branches) {
                     return 2 + ((branches - 1) * (row_count - 1));
                 }
 
