@@ -817,18 +817,20 @@ namespace nil {
 
                 template<typename FRI>
                 static bool verify_eval(
-                    const typename FRI::proof_type                                                  &proof,
-                    const typename FRI::params_type                                                 &fri_params,
-                    const std::map<std::size_t, typename FRI::commitment_type>                      &commitments,
-                    const typename FRI::field_type::value_type                                      theta,
-                    const std::map<std::size_t, std::vector<std::size_t>>                           &evals_map,
-                    const std::vector<math::polynomial<typename FRI::field_type::value_type>>       &combined_U,
-                    const std::vector<math::polynomial<typename FRI::field_type::value_type>>       &denominators,
+                    const typename FRI::proof_type                                                      &proof,
+                    const typename FRI::params_type                                                     &fri_params,
+                    const std::map<std::size_t, typename FRI::commitment_type>                          &commitments,
+                    const typename FRI::field_type::value_type                                          theta,
+                    const std::vector<std::vector<std::tuple<std::size_t, std::size_t>>>                &poly_ids,
+                    const std::vector<typename FRI::field_type::value_type>                             &combined_U,
+                    const std::vector<math::polynomial<typename FRI::field_type::value_type>>           &denominators,
                     typename FRI::transcript_type &transcript
                 ) {
                     BOOST_ASSERT(check_step_list<FRI>(fri_params));
                     BOOST_ASSERT(combined_U.size() == denominators.size());
-                    std::size_t evals_num = combined_U.size();
+                    BOOST_ASSERT(combined_U.size() == poly_ids.size());
+
+                    std::size_t points_num = combined_U.size();
                     // TODO: Add size correcness checks.
 
                     if (proof.final_polynomial.degree() >
@@ -886,11 +888,13 @@ namespace nil {
                                 }
                             }
                             if (!query_proof.initial_proof.at(k).p.validate(leaf_data)) {
+                                std::cout << "Wrong initial proof" << std::endl;
                                 return false;
                             }
                         }
 
                         //Calculate combinedQ values
+                        typename FRI::field_type::value_type theta_acc(1);
                         typename FRI::polynomial_values_type y;
                         typename FRI::polynomial_values_type combined_eval_values;
                         y.resize(coset_size / FRI::m);
@@ -899,37 +903,27 @@ namespace nil {
                             y[j][0] = FRI::field_type::value_type::zero();
                             y[j][1] = FRI::field_type::value_type::zero();
                         }
-                        for (size_t eval_ind = 0; eval_ind < evals_num; eval_ind++) {
-                            std::size_t ind = 0;
-                            for (size_t j = 0; j < coset_size / FRI::m; j++) {
-                                combined_eval_values[j][0] = FRI::field_type::value_type::zero();
-                                combined_eval_values[j][1] = FRI::field_type::value_type::zero();
-                            }
-                            for( auto const &it:evals_map ){
-                                auto k = it.first;
-                                for( size_t i = 0; i < query_proof.initial_proof.at(k).values.size(); i++, ind++ ){
-                                    for( size_t j = 0; j < coset_size / FRI::m; j++ ){
-                                        combined_eval_values[j][0] *= theta;
-                                        combined_eval_values[j][1] *= theta;
-                                        if( evals_map.at(k)[i] == eval_ind ){
-                                            combined_eval_values[j][0] += query_proof.initial_proof.at(k).values[i][j][0];
-                                            combined_eval_values[j][1] += query_proof.initial_proof.at(k).values[i][j][1];
-                                        }
-                                    }
+                        for( std::size_t p = 0; p < poly_ids.size(); p++){
+                            typename FRI::polynomial_values_type Q;
+                            Q.resize(coset_size / FRI::m);
+                            for( auto const &poly_id: poly_ids[p] ){
+                                for (size_t j = 0; j < coset_size / FRI::m; j++) {
+                                    Q[j][0] += query_proof.initial_proof.at(std::get<0>(poly_id)).values[std::get<1>(poly_id)][j][0] * theta_acc;
+                                    Q[j][1] += query_proof.initial_proof.at(std::get<0>(poly_id)).values[std::get<1>(poly_id)][j][1] * theta_acc;
                                 }
+                                theta_acc *= theta;
                             }
                             for (size_t j = 0; j < coset_size / FRI::m; j++) {
-                                combined_eval_values[j][0] -= combined_U[eval_ind].evaluate(s[j][0]);
-                                combined_eval_values[j][1] -= combined_U[eval_ind].evaluate(s[j][1]);
-                                combined_eval_values[j][0] /= denominators[eval_ind].evaluate(s[j][0]);
-                                combined_eval_values[j][1] /= denominators[eval_ind].evaluate(s[j][1]);
-
-                                y[j][0] += combined_eval_values[j][0];
-                                y[j][1] += combined_eval_values[j][1];
+                                Q[j][0] -= combined_U[p];
+                                Q[j][1] -= combined_U[p];
+                                Q[j][0] /= denominators[p].evaluate(s[j][0]);
+                                Q[j][1] /= denominators[p].evaluate(s[j][1]);
+                                y[j][0] += Q[j][0];
+                                y[j][1] += Q[j][1];
                             }
                         }
 
-                        // Check query proofs
+                        // Check round proofs
                         std::size_t t = 0;
                         typename FRI::polynomial_values_type y_next;
                         for (std::size_t i = 0; i < fri_params.step_list.size(); i++) {
@@ -949,6 +943,7 @@ namespace nil {
                                 leaf_val1.write(write_iter, FRI::field_element_type::length());
                             }
                             if (!query_proof.round_proofs[i].p.validate(leaf_data)) {
+                                std::cout << "Wrong round merkle proof on " << i << "-th round" << std::endl;
                                 return false;
                             }
 

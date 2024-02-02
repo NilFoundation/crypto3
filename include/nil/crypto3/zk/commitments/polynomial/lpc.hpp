@@ -128,79 +128,41 @@ namespace nil {
 
                         // Prepare z-s and combined_Q;
                         auto theta = transcript.template challenge<field_type>();
+                        typename field_type::value_type theta_acc(1);
                         poly_type combined_Q;
+                        math::polynomial<value_type> V;
 
-                        if constexpr (std::is_same<math::polynomial_dfs<value_type>, PolynomialType>::value
-                        ) {
+                        auto points = this->get_unique_points();
+                        math::polynomial<value_type> combined_Q_normal;
+
+                        for (auto const &point: points){
                             bool first = true;
-                            // prepare U and V
-                            for (auto const &it: this->_polys) {
-                                auto b_ind = it.first;
-                                BOOST_ASSERT(this->_points[b_ind].size() == this->_polys[b_ind].size());
-                                BOOST_ASSERT(this->_points[b_ind].size() == this->_z.get_batch_size(b_ind));
-
-                                for (std::size_t poly_ind = 0; poly_ind < this->_polys[b_ind].size(); poly_ind++) {
-                                    // All evaluation points are filled successfully.
-                                    auto& points = this->_points[b_ind][poly_ind];
-                                    BOOST_ASSERT(points.size() == this->_z.get_poly_points_number(b_ind, poly_ind));
-
-                                    std::vector<math::polynomial<value_type>> V_multipliers = this->get_V_multipliers(points);
-
-                                    math::polynomial<value_type> U = this->get_U(b_ind, poly_ind);
-
-                                    math::polynomial<value_type> g_normal(this->_polys[b_ind][poly_ind].coefficients());
-                                    math::polynomial<value_type> Q = g_normal - U;
-
-                                    for (const auto& V_mult: V_multipliers) {
-                                        Q /= V_mult;
-                                    }
-
-                                    math::polynomial_dfs<value_type> Q_dfs(0, _fri_params.D[0]->size());
-                                    Q_dfs.from_coefficients(Q);
-
-                                    if (first) {
-                                        first = false;
-                                        combined_Q = Q_dfs;
+                            V = {-point, 1};
+                            math::polynomial<value_type> Q_normal;
+                            for(std::size_t i: this->_z.get_batches()){
+                                for(std::size_t j = 0; j < this->_z.get_batch_size(i); j++){
+                                    auto it = std::find(this->_points[i][j].begin(), this->_points[i][j].end(), point);
+                                    if( it == this->_points[i][j].end()) continue;
+                                    math::polynomial<value_type> g_normal;
+                                    if constexpr(std::is_same<math::polynomial_dfs<value_type>, PolynomialType>::value ) {
+                                        g_normal = math::polynomial<value_type>(this->_polys[i][j].coefficients());
                                     } else {
-                                        combined_Q *= theta;
-                                        combined_Q += Q_dfs;
+                                        g_normal = this->_polys[i][j];
                                     }
+                                    g_normal *= theta_acc;
+                                    Q_normal += g_normal;
+                                    Q_normal -= this->_z.get(i, j, it - this->_points[i][j].begin()) * theta_acc;
+                                    theta_acc *= theta;
                                 }
                             }
+                            Q_normal = Q_normal / V;
+                            combined_Q_normal += Q_normal;
+                        }
+
+                        if constexpr (std::is_same<math::polynomial_dfs<value_type>, PolynomialType>::value ) {
+                            combined_Q.from_coefficients(combined_Q_normal);
                         } else {
-                            bool first = true;
-
-                            // prepare U and V
-                            for(auto const &it: this->_polys) {
-                                auto b_ind = it.first;
-
-                                BOOST_ASSERT(this->_points[b_ind].size() == this->_polys[b_ind].size());
-                                BOOST_ASSERT(this->_points[b_ind].size() == this->_z.get_batch_size(b_ind));
-
-                                for(std::size_t poly_ind = 0; poly_ind < this->_polys[b_ind].size(); poly_ind++) {
-                                    // All evaluation points are filled successfully.
-                                    const auto& points = this->_points[b_ind][poly_ind];
-                                    BOOST_ASSERT(points.size() == this->_z.get_poly_points_number(b_ind, poly_ind));
-
-                                    std::vector<math::polynomial<value_type>> V_multipliers = this->get_V_multipliers(points);
-                                    math::polynomial<value_type> U =  this->get_U(b_ind, poly_ind);
-
-                                    math::polynomial<value_type> g_normal = this->_polys[b_ind][poly_ind];
-                                    math::polynomial<value_type> Q = g_normal - U;
-
-                                    for (const auto& V_mult: V_multipliers) {
-                                        Q /= V_mult;
-                                    }
-
-                                    if (first) {
-                                        first = false;
-                                        combined_Q = Q;
-                                    } else {
-                                        combined_Q *= theta;
-                                        combined_Q += Q;
-                                    }
-                                }
-                            }
+                            combined_Q = combined_Q_normal;
                         }
 
                         precommitment_type combined_Q_precommitment = nil::crypto3::zk::algorithms::precommit<fri_type>(
@@ -242,33 +204,28 @@ namespace nil {
                             transcript(commitments.at(it.first));
                         }
 
+                        auto points = this->get_unique_points();
                         // List of unique eval points set. [id=>points]
-                        auto unique_points = this->get_unique_points_list();
-                        // Point identifier for each polynomial. poly=>id
-                        typename std::map<std::size_t, std::vector<std::size_t>> eval_map = this->get_eval_map(unique_points);
-                        // combined U for each polynomials with id eval points. id=>eval_points.
-                        typename std::vector<math::polynomial<value_type>> combined_U;
-                        // V for each polynoial
-                        typename std::vector<math::polynomial<value_type>> denominators;
+                        typename std::vector<typename field_type::value_type> U(points.size());
+                        // V is product of (x - eval_point) polynomial for each eval_point
+                        typename std::vector<math::polynomial<value_type>> V(points.size());
+                        // List of involved polynomials for each eval point [batch_id, poly_id, point_id]
+                        typename std::vector<std::vector<std::tuple<std::size_t, std::size_t>>> poly_map(points.size());
 
                         value_type theta = transcript.template challenge<field_type>();
+                        value_type theta_acc(1);
 
-                        combined_U.resize(unique_points.size());
-                        denominators.resize(unique_points.size());
-
-                        // For each eval_point compute combined_U
-                        for (std::size_t point_index = 0; point_index < unique_points.size(); point_index++) {
-                            // Compute V
-                            denominators[point_index] = this->get_V(unique_points[point_index]);
-                            combined_U[point_index] = {0};
-
-                            for( auto const &it: this->_points){
-                                auto k = it.first;
-                                for (std::size_t i = 0; i < proof.z.get_batch_size(k); i++) {
-                                    combined_U[point_index] *= theta;
-                                    if (eval_map[k][i] == point_index) {
-                                        combined_U[point_index] += this->get_U(k, i);
-                                    }
+                        for (std::size_t p = 0; p < points.size(); p++){
+                            auto &point = points[p];
+                            bool first = true;
+                            V[p] = {-point, 1};
+                            for(std::size_t i:this->_z.get_batches()){
+                                for(std::size_t j = 0; j < this->_z.get_batch_size(i); j++){
+                                    auto it = std::find(this->_points[i][j].begin(), this->_points[i][j].end(), point);
+                                    if( it == this->_points[i][j].end()) continue;
+                                    U[p] += this->_z.get(i, j, it - this->_points[i][j].begin()) * theta_acc;
+                                    poly_map[p].push_back(std::make_tuple(i, j));
+                                    theta_acc *= theta;
                                 }
                             }
                         }
@@ -278,14 +235,13 @@ namespace nil {
                             _fri_params,
                             commitments,
                             theta,
-                            eval_map,
-                            combined_U,
-                            denominators,
+                            poly_map,
+                            U,
+                            V,
                             transcript
                         )) {
                             return false;
                         }
-
                         return true;
                     }
 

@@ -66,13 +66,13 @@ namespace nil {
                         typename TranscriptHashType,
                         std::size_t Lambda,
                         std::size_t M,
-                        bool UseGrinding =false, 
+                        bool UseGrinding =false,
                         typename GrindingType = proof_of_work<TranscriptHashType>
                 >
                 struct fri : public detail::basic_batched_fri<FieldType,
                         MerkleTreeHashType,
                         TranscriptHashType,
-                        Lambda, M, 
+                        Lambda, M,
                         UseGrinding, GrindingType
                 > {
                     using basic_fri = detail::basic_batched_fri<FieldType,
@@ -115,7 +115,7 @@ namespace nil {
                     typename FRI::basic_fri::merkle_tree_type &tree,
                     const typename FRI::params_type &fri_params,
                     typename FRI::transcript_type &transcript = typename FRI::transcript_type()
-                ){  
+                ){
                     std::map<std::size_t, std::vector<PolynomialType>> gs;
                     gs[0]={g};
                     std::map<std::size_t, typename FRI::basic_fri::merkle_tree_type> trees;
@@ -142,9 +142,9 @@ namespace nil {
                     typename FRI::basic_fri::transcript_type &transcript = typename FRI::basic_fri::transcript_type()
                 ) {
                     std::map<std::size_t, typename FRI::basic_fri::commitment_type> t_roots; t_roots[0] = {t_root};
-                    std::map<std::size_t,std::vector<std::size_t>> evals_map; evals_map[0] = {0};
+                    std::vector<std::vector<std::tuple<std::size_t, std::size_t>>> evals_map(1); evals_map[0] = {{0,0}};
 
-                    std::vector<math::polynomial<typename FRI::field_type::value_type>> combined_U = {{0}};
+                    std::vector<typename FRI::field_type::value_type> combined_U = {0};
                     std::vector<math::polynomial<typename FRI::field_type::value_type>> combined_V = {{1}};
 
                     return verify_eval<typename FRI::basic_fri>(
@@ -153,6 +153,8 @@ namespace nil {
                             evals_map, combined_U, combined_V,
                             transcript
                     );
+
+                    return true;
                 }
             }    // namespace algorithms
         }        // namespace zk
