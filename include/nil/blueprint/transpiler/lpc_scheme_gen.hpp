@@ -157,7 +157,7 @@ namespace nil {
 
             std::vector<std::uint8_t> init_blob = {};
             nil::crypto3::zk::transcript::fiat_shamir_heuristic_sequential<typename PlaceholderParams::transcript_hash_type> transcript(init_blob);
-            transcript(common_data.vk.constraint_system_hash);
+            transcript(common_data.vk.constraint_system_with_params_hash);
             transcript(common_data.vk.fixed_values_commitment);
             auto etha = transcript.template challenge<typename PlaceholderParams::field_type>();
 

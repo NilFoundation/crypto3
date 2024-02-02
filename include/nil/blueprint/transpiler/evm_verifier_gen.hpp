@@ -895,7 +895,7 @@ namespace nil {
                 reps["$LOOKUP_LIBRARY_CALL$"] = _use_lookups ? lookup_library_call :"        //No lookups";
                 reps["$TEST_NAME$"] = _test_name;
                 reps["$MODULUS$"] = to_string(PlaceholderParams::field_type::modulus);
-                reps["$VERIFICATION_KEY1$"] = "0x" + to_string(_common_data.vk.constraint_system_hash);
+                reps["$VERIFICATION_KEY1$"] = "0x" + to_string(_common_data.vk.constraint_system_with_params_hash);
                 reps["$VERIFICATION_KEY2$"] = "0x" + to_string(_common_data.vk.fixed_values_commitment);
                 reps["$BATCHES_NUM$"] = _use_lookups ? "5" :"4";
                 reps["$EVAL_PROOF_OFFSET$"] = _use_lookups ? "0xa1" :"0x79";
