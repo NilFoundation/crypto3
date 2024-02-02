@@ -534,11 +534,7 @@ namespace nil {
                     ret.reserve(ret.complete_size());
 
                     while (first != last) {
-                        auto leaf = *first;
-                        auto leaf2 = leaf;
-                        ret.emplace_back(generate_poseidon_leaf_hash<hash_type>(leaf));
-                        first++;
-
+                        ret.emplace_back(generate_poseidon_leaf_hash<hash_type>(*first++));
                     }
 
                     std::size_t row_idx = ret.leaves(), row_size = row_idx / Arity;
@@ -546,7 +542,7 @@ namespace nil {
 
                     for (size_t row_number = 1; row_number < ret.row_count(); ++row_number, row_size /= Arity) {
                         for (size_t i = 0; i < row_size; ++i, it += Arity) {
-                            ret.emplace_back(generate_poseidon_hash<hash_type>(*it, *(it +1 )));
+                            ret.emplace_back(generate_poseidon_hash<hash_type>(*it, *(it + 1)));
                         }
                     }
                     return ret;
