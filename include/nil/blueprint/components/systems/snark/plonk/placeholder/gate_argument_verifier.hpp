@@ -296,8 +296,8 @@ namespace nil {
 
                     typename gate_component::input_type gate_input = {instance_input.theta, constraints, q};
 
-                    typename gate_component::result_type gate_i_result =
-                        generate_assignments(final_gate, assignment, gate_input, row);
+                    // gate_i_result
+                    generate_assignments(final_gate, assignment, gate_input, row);
 
                     row += final_gate.rows_amount;
                 }
@@ -414,8 +414,8 @@ namespace nil {
 
                     typename gate_component::input_type gate_input = {instance_input.theta, constraints, q};
 
-                    typename gate_component::result_type gate_i_result =
-                        generate_circuit(final_gate, bp, assignment, gate_input, row);
+                    // gate_i_result
+                    generate_circuit(final_gate, bp, assignment, gate_input, row);
 
                     row += final_gate.rows_amount;
                 }

@@ -307,14 +307,8 @@ namespace nil {
                     typename BlueprintFieldType::integral_type mask18 = ((integral_one<<18) - 1);
                     typename BlueprintFieldType::integral_type mask17 = ((integral_one<<17) - 1);
                     typename BlueprintFieldType::integral_type mask16 = ((integral_one<<16) - 1);
-                    typename BlueprintFieldType::integral_type mask15 = ((integral_one<<15) - 1);
                     typename BlueprintFieldType::integral_type mask14 = ((integral_one<<14) - 1);
                     typename BlueprintFieldType::integral_type mask13 = ((integral_one<<13) - 1);
-                    typename BlueprintFieldType::integral_type mask12 = ((integral_one<<12) - 1);
-                    typename BlueprintFieldType::integral_type mask11 = ((integral_one<<11) - 1);
-                    typename BlueprintFieldType::integral_type mask10 = ((integral_one<<10) - 1);
-                    typename BlueprintFieldType::integral_type mask9 = ((integral_one<<9) - 1);
-                    typename BlueprintFieldType::integral_type mask8 = ((integral_one<<8) - 1);
 
                     auto row_witness = row + 1;
 
@@ -1032,14 +1026,14 @@ namespace nil {
                 static var deconvert_var(const input_type &input,
                                          var variable) {
                     BOOST_ASSERT(variable.type == var::column_type::public_input);
-                    if (variable.rotation < input.R.x.size()) {
+                    if (std::size_t(variable.rotation) < input.R.x.size()) {
                         return input.R.x[variable.rotation];
-                    } else if (variable.rotation < input.R.x.size() + input.R.y.size()) {
+                    } else if (std::size_t(variable.rotation) < input.R.x.size() + input.R.y.size()) {
                         return input.R.y[variable.rotation - input.R.x.size()];
-                    } else if (variable.rotation < input.R.x.size() + input.R.y.size() + input.A.x.size()) {
+                    } else if (std::size_t(variable.rotation) < input.R.x.size() + input.R.y.size() + input.A.x.size()) {
                         return input.A.x[variable.rotation - input.R.x.size() - input.R.y.size()];
-                    } else if (variable.rotation < input.R.x.size() + input.R.y.size() +
-                                                   input.A.x.size() + input.A.y.size()) {
+                    } else if (std::size_t(variable.rotation) < input.R.x.size() + input.R.y.size() +
+                                                                input.A.x.size() + input.A.y.size()) {
                         return input.A.y[variable.rotation - input.R.x.size() - input.R.y.size() - input.A.x.size()];
                     } else {
                         return input.M[variable.rotation - input.R.x.size() - input.R.y.size()

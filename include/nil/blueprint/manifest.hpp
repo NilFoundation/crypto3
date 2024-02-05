@@ -401,7 +401,7 @@ namespace nil {
                 : start(start), finish(finish_), step(step) {}
 
             bool is_satisfiable() override {
-                return start < finish && std::abs(start - finish) >= (start % step);
+                return start < finish && std::abs(start - finish) >= int(start % step);
             }
 
             bool check_manifest_param(std::uint32_t value, bool strict = true) override {
@@ -432,7 +432,7 @@ namespace nil {
 
             it_type next(it_type prev) const override {
                 std::uint32_t prev_value = boost::get<std::uint32_t>(prev);
-                return (prev_value + step < finish) ? (prev_value + step) : finish;
+                return (prev_value + step < std::uint32_t(finish)) ? (prev_value + step) : finish;
             }
 
             std::uint32_t max_value_if_sat() const override {
@@ -566,7 +566,7 @@ namespace nil {
                 std::uint32_t new_start = std::max<std::int32_t>(
                     this->value + (range->step - (this->value % range->step)) % range->step,
                     range->start);
-                if (new_start < range->finish) {
+                if (new_start < std::uint32_t(range->finish)) {
                     return std::shared_ptr<manifest_param>(
                             new manifest_range_param(new_start, range->finish, range->step));
                 } else {
@@ -621,7 +621,7 @@ namespace nil {
                     new_set.insert(*it);
                 }
                 std::uint32_t step = range->step;
-                for (auto it = new_start + (step - new_start % step) % step; it < range->finish; it += step) {
+                for (auto it = new_start + (step - new_start % step) % step; std::int32_t(it) < range->finish; it += step) {
                     new_set.insert(it);
                 }
                 if (new_set.empty()) {
@@ -643,7 +643,7 @@ namespace nil {
                 std::uint32_t new_start = std::max<std::int32_t>(
                     other_value + (step - (other_value % step)) % step,
                     start);
-                if (new_start < finish) {
+                if (new_start < std::uint32_t(finish)) {
                     return std::shared_ptr<manifest_param>(
                             new manifest_range_param(new_start, finish, step));
                 } else {
@@ -658,7 +658,7 @@ namespace nil {
                 for (auto it = other_set->set.lower_bound(new_start); it !=  other_set->set.end(); it++) {
                     new_set.insert(*it);
                 }
-                for (auto it = new_start + (step - new_start % step) % step; it < finish; it += step) {
+                for (auto it = new_start + (step - new_start % step) % step; it < std::uint32_t(finish); it += step) {
                     new_set.insert(it);
                 }
                 if (new_set.empty()) {
@@ -668,13 +668,13 @@ namespace nil {
                 }
             } if (other_type == type::RANGE) {
                 auto other_range = dynamic_cast<manifest_range_param*>(other.get());
-                std::uint32_t new_start = std::max<std::int32_t>(
+                std::int32_t new_start = std::max<std::int32_t>(
                     start,
                     other_range->start);
                 // technically, there are some other cases there this might be resolved as range
                 // this might be good enough though
                 if (step == other_range->step) {
-                    std::uint32_t new_finish = std::max(finish, other_range->finish);
+                    std::int32_t new_finish = std::max(finish, other_range->finish);
                     if (new_start < new_finish) {
                         return std::shared_ptr<manifest_param>(
                                 new manifest_range_param(new_start, new_finish, step));
@@ -686,14 +686,14 @@ namespace nil {
                 } else if (new_start >= finish) {
                     return std::shared_ptr<manifest_param>(new manifest_range_param(other_range->start, other_range->finish, other_range->step));
                 }
-                std::set<std::uint32_t> new_set = {new_start};
+                std::set<std::uint32_t> new_set = {std::uint32_t(new_start)};
                 for (auto value : *this) {
-                    if (value > new_start) {
+                    if (value > std::uint32_t(new_start)) {
                         new_set.insert(value);
                     }
                 }
                 for (auto value : *other_range) {
-                    if (value > new_start) {
+                    if (value > std::uint32_t(new_start)) {
                         new_set.insert(value);
                     }
                 }
@@ -784,9 +784,9 @@ namespace nil {
                 bool start_contigious = false;
 
                 std::uint32_t count = 0;
-                std::uint32_t curr_value = start;
+                std::int32_t curr_value = start;
                 for (auto value : filtered_set) {
-                    if (value != curr_value) {
+                    if (std::int32_t(value) != curr_value) {
                         break;
                     } else {
                         curr_value += step;
@@ -806,7 +806,7 @@ namespace nil {
                 count = 0;
                 curr_value = finish - finish % step;
                 for (auto it = filtered_set.rbegin(); it != filtered_set.rend(); it++) {
-                    if (*it != curr_value) {
+                    if (*it != std::uint32_t(curr_value)) {
                         break;
                     } else {
                         curr_value -= step;
@@ -825,7 +825,7 @@ namespace nil {
                 }
 
                 std::set<std::uint32_t> new_set;
-                for (std::uint32_t i = start; i < finish; i += step) {
+                for (std::uint32_t i = start; i < std::uint32_t(finish); i += step) {
                     if (filtered_set.find(i) == filtered_set.end()) {
                         new_set.insert(i);
                     }
@@ -939,7 +939,7 @@ namespace nil {
                     return false;
                 }
                 if (constant_required == manifest_constant_type::type::UNSAT ||
-                    constant_required == manifest_constant_type::type::REQUIRED && constant_amount == 0) {
+                    (constant_required == manifest_constant_type::type::REQUIRED && constant_amount == 0)) {
                     return false;
                 }
                 // We do not check what happens to lookups if they are unused.
@@ -1140,7 +1140,7 @@ namespace nil {
         manifest_constant_type manifest_constant_type::intersect(
                 const compiler_manifest &manifest) const {
             if (t == manifest_constant_type::type::UNSAT ||
-                t == manifest_constant_type::type::REQUIRED && manifest.has_constant == false) {
+               (t == manifest_constant_type::type::REQUIRED && manifest.has_constant == false)) {
                 return manifest_constant_type::type::UNSAT;
             } else if (t == manifest_constant_type::type::REQUIRED && manifest.has_constant == true) {
                 return manifest_constant_type::type::REQUIRED;
@@ -1152,6 +1152,7 @@ namespace nil {
         // Base class for all component gate manifests
         class component_gate_manifest {
         public:
+            virtual ~component_gate_manifest() = default;
             virtual std::uint32_t gates_amount() const = 0;
             // This is called in comparison function
             // Derived classes should only support compariosn with instances of themselves
@@ -1192,6 +1193,8 @@ namespace nil {
             }
 
         public:
+            virtual ~gate_manifest() = default;
+
             std::set<std::shared_ptr<component_gate_manifest>, component_gate_manifest_comparison>
                 component_gate_manifests = {};
 

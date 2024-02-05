@@ -310,12 +310,12 @@ namespace nil {
                         typename subtraction_component::input_type({t0.output, t1.output}), row);
                     row += subtraction_instance.rows_amount;
 
-                    typename addition_component::result_type t4 = generate_assignments(
+                    generate_assignments( // t4
                         addition_instance, assignment,
                         typename addition_component::input_type({t2.output, t2.output}), row);
                     row += addition_instance.rows_amount;
 
-                    typename addition_component::result_type t5 = generate_assignments(
+                    generate_assignments( // t5
                         addition_instance, assignment,
                         typename addition_component::input_type({t1.output, t0.output}), row);
                     row += addition_instance.rows_amount;
@@ -325,7 +325,7 @@ namespace nil {
                         typename subtraction_component::input_type({t1.output, t0.output}), row);
                     row += subtraction_instance.rows_amount;
 
-                    typename multiplication_component::result_type t7 = generate_assignments(
+                    generate_assignments( // t7
                         multiplication_instance, assignment,
                         typename multiplication_component::input_type({P_x, t3.output}), row);
                     row += multiplication_instance.rows_amount;
@@ -340,7 +340,7 @@ namespace nil {
                         typename multiplication_component::input_type({P_y, t6.output}), row);
                     row += multiplication_instance.rows_amount;
 
-                    typename addition_component::result_type t10 = generate_assignments(
+                    generate_assignments( // t10
                         addition_instance, assignment,
                         typename addition_component::input_type({t8.output, t9.output}), row);
                     row += addition_instance.rows_amount;
@@ -439,12 +439,12 @@ namespace nil {
                         typename subtraction_component::input_type({t0.output, t1.output}), row);
                     row += subtraction_instance.rows_amount;
 
-                    typename addition_component::result_type t4 = generate_circuit(
+                    generate_circuit( // t4
                         addition_instance, bp, assignment,
                         typename addition_component::input_type({t2.output, t2.output}), row);
                     row += addition_instance.rows_amount;
 
-                    typename addition_component::result_type t5 = generate_circuit(
+                    generate_circuit( // t5
                         addition_instance, bp, assignment,
                         typename addition_component::input_type({t1.output, t0.output}), row);
                     row += addition_instance.rows_amount;
@@ -454,7 +454,7 @@ namespace nil {
                         typename subtraction_component::input_type({t1.output, t0.output}), row);
                     row += subtraction_instance.rows_amount;
 
-                    typename multiplication_component::result_type t7 = generate_circuit(
+                    generate_circuit( // t7
                         multiplication_instance, bp, assignment,
                         typename multiplication_component::input_type({P_x, t3.output}), row);
                     row += multiplication_instance.rows_amount;
@@ -469,7 +469,7 @@ namespace nil {
                         typename multiplication_component::input_type({P_y, t6.output}), row);
                     row += multiplication_instance.rows_amount;
 
-                    typename addition_component::result_type t10 = generate_circuit(
+                    generate_circuit( // t10
                         addition_instance, bp, assignment,
                         typename addition_component::input_type({t8.output, t9.output}), row);
                     row += addition_instance.rows_amount;
@@ -561,7 +561,7 @@ namespace nil {
                 static var deconvert_var(const input_type &input,
                                          var variable) {
                     BOOST_ASSERT(variable.type == var::column_type::public_input);
-                    if (variable.rotation < input.T.x.size()) {
+                    if (std::size_t(variable.rotation) < input.T.x.size()) {
                         return input.T.x[variable.rotation];
                     } else {
                         return input.T.y[variable.rotation - input.T.x.size()];

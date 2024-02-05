@@ -187,7 +187,6 @@ BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_non_native_comparison_unchecked_vesta_15_4_less_than) {
     using field_type = nil::crypto3::algebra::curves::vesta::scalar_field_type;
-    using value_type = typename field_type::value_type;
     test_comparison_unchecked_specific_inputs<field_type, 15, 4, comparison_mode::LESS_THAN>();
     test_comparison_unchecked_random_inputs<field_type, 15, 4, comparison_mode::LESS_THAN, random_tests_amount>();
 }

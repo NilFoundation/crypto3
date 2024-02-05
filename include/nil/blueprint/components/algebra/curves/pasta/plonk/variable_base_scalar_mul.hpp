@@ -278,7 +278,6 @@ namespace nil {
                 typename BlueprintFieldType::value_type n = 0;
                 typename BlueprintFieldType::value_type n_next = 0;
 
-                using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
                 add_component unified_addition_instance(
                         {component.W(0), component.W(1), component.W(2), component.W(3), component.W(4),
                             component.W(5), component.W(6), component.W(7), component.W(8), component.W(9),
@@ -438,7 +437,6 @@ namespace nil {
                 assignment.enable_selector(selectors[2], start_row_index + component.aux_bits_start_row,
                                             start_row_index + component.aux_bits_start_row + component.aux_bits_rows_amount - 4, 2);
 
-                using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
                 typename add_component::input_type addition_input = {{instance_input.T.x, instance_input.T.y},
                                                                         {instance_input.T.x, instance_input.T.y}};
 
@@ -760,8 +758,6 @@ namespace nil {
                 using var = typename plonk_curve_element_variable_base_scalar_mul<BlueprintFieldType, ArithmetizationParams, CurveType>::var;
                 using add_component = typename plonk_curve_element_variable_base_scalar_mul<
                     BlueprintFieldType, ArithmetizationParams, CurveType>::add_component;
-
-                using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
 
                 add_component unified_addition_instance(
                         {component.W(0), component.W(1), component.W(2), component.W(3), component.W(4),

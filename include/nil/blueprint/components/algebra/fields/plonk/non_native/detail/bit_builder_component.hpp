@@ -310,10 +310,6 @@ namespace nil {
 
                     assert(input_bits.size() == component.bits_amount);
 
-                    using ArithmetizationType =
-                        crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
-                    using var = typename plonk_bit_builder<BlueprintFieldType, ArithmetizationParams>::var;
-
                     using field_value_type = typename BlueprintFieldType::value_type;
 
                     std::size_t padding = 0;
@@ -408,8 +404,6 @@ namespace nil {
                         assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
                             &assignment,
                         const std::size_t start_row_index) {
-
-                    using var = typename plonk_bit_builder<BlueprintFieldType, ArithmetizationParams>::var;
 
                     assignment.constant(component.C(0), start_row_index) = 0;
                 }

@@ -141,8 +141,6 @@ BOOST_AUTO_TEST_CASE(blueprint_circuit_proxy_lookup_tables_test) {
         using ArithmetizationParams =
         nil::crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
         using ArithmetizationType = nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
-        using var = nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
-        typedef nil::crypto3::zk::snark::plonk_lookup_table<BlueprintFieldType> lookup_table_type;
 
         auto bp_ptr = std::make_shared<circuit<ArithmetizationType>>();
         std::vector<circuit_proxy<ArithmetizationType>> circuits;
@@ -398,9 +396,6 @@ BOOST_AUTO_TEST_CASE(blueprint_proxy_call_pack_lookup_tables_test) {
         using ArithmetizationParams =
         nil::crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
         using ArithmetizationType = nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
-        using var = nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
-        using column_type = typename nil::crypto3::zk::snark::plonk_column<BlueprintFieldType>;
-        typedef nil::crypto3::zk::snark::plonk_lookup_table<BlueprintFieldType> lookup_table_type;
 
         auto bp_ptr = std::make_shared<circuit<ArithmetizationType>>();
         circuit_proxy<ArithmetizationType> bp(bp_ptr, 0);

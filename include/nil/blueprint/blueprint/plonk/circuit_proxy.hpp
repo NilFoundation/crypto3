@@ -51,8 +51,8 @@ namespace nil {
             using lookup_constraint_type = crypto3::zk::snark::plonk_lookup_constraint<BlueprintFieldType>;
             using lookup_table_definition = typename nil::crypto3::zk::snark::lookup_table_definition<BlueprintFieldType>;
 
-            std::uint32_t id;
             std::shared_ptr<circuit<ArithmetizationType>> circuit_ptr;
+            std::uint32_t id;
             std::set<std::uint32_t> used_gates;
             std::set<std::uint32_t> used_copy_constraints;
             std::set<std::uint32_t> used_lookup_gates;
@@ -258,7 +258,7 @@ namespace nil {
                 std::cout << "\nlookup tables:\n";
                 for (const auto& i : used_lookup_tables) {
                     bool found = false;
-                    for (const auto it : lookup_table_indexes) {
+                    for (const auto& it : lookup_table_indexes) {
                         if (it.second == (i + 1)) {
                             os << i << ": " << it.first << "\n";
                             found = true;

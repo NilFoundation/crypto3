@@ -72,13 +72,13 @@ void test(std::vector<typename BlueprintFieldType::value_type> &public_input,
     std::vector<var> selectors;
     std::size_t ctr = 0;
     std::vector<var> si, ti, alphai;
-    for (int i = 0; i < m; i++) {
+    for (std::uint32_t i = 0; i < m; i++) {
         alphai.push_back(var(0, ctr++, false, var::column_type::public_input));
     }
-    for (int i = 0; i < m; i++) {
+    for (std::uint32_t i = 0; i < m; i++) {
         si.push_back(var(0, ctr++, false, var::column_type::public_input));
     }
-    for (int i = 0; i < m; i++) {
+    for (std::uint32_t i = 0; i < m; i++) {
         ti.push_back(var(0, ctr++, false, var::column_type::public_input));
     }
 

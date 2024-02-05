@@ -263,10 +263,10 @@ namespace nil {
                 const std::size_t witness_amount = component.witness_amount();
 
                 std::array<std::pair<std::size_t, int>, 6> wl;
-
+//ww
                 int _idx;
-                for (int i = 0; i < component.rows_amount; i++) {
-                    for (int j = 0; j < witness_amount; j++) {
+                for (std::uint32_t i = 0; i < component.rows_amount; i++) {
+                    for (std::uint32_t j = 0; j < witness_amount; j++) {
                         _idx = i * witness_amount + j;
                         if (_idx < 6) {
                             wl[_idx] = std::make_pair(j, i + offset);

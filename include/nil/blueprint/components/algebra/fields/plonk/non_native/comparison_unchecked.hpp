@@ -226,9 +226,6 @@ namespace nil {
 
                 using var = typename plonk_comparison_unchecked<BlueprintFieldType, ArithmetizationParams>::var;
                 using constraint_type = crypto3::zk::snark::plonk_constraint<BlueprintFieldType>;
-                using gate_type = typename crypto3::zk::snark::plonk_gate<BlueprintFieldType, constraint_type>;
-
-                typename BlueprintFieldType::value_type base_two = 2;
 
                 std::vector<constraint_type> correctness_constraints;
                 constraint_type diff_constraint = var(component.W(2), 0, true) - var(component.W(1), 0, true) +
@@ -336,7 +333,6 @@ namespace nil {
 
                 using component_type = plonk_comparison_unchecked<BlueprintFieldType, ArithmetizationParams>;
                 using value_type = typename BlueprintFieldType::value_type;
-                using integral_type = typename BlueprintFieldType::integral_type;
                 using var = typename component_type::var;
 
                 value_type x = var_value(assignment, instance_input.x),

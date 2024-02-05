@@ -66,13 +66,13 @@ void test(std::vector<typename BlueprintFieldType::value_type> &public_input,
     std::vector<var> f, Se, Ssigma;
     var L0, V, V_zeta, q_last, q_pad;
     std::array<var, 2> thetas;
-    for (int i = 0; i < m; i++) {
+    for (std::uint32_t i = 0; i < m; i++) {
         f.push_back(var(0, i, false, var::column_type::public_input));
     }
-    for (int i = 0; i < m; i++) {
+    for (std::uint32_t i = 0; i < m; i++) {
         Se.push_back(var(0, m + i, false, var::column_type::public_input));
     }
-    for (int i = 0; i < m; i++) {
+    for (std::uint32_t i = 0; i < m; i++) {
         Ssigma.push_back(var(0, 2 * m + i, false, var::column_type::public_input));
     }
     L0 = var(0, 3 * m, false, var::column_type::public_input);

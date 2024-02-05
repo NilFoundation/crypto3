@@ -161,7 +161,7 @@ namespace nil {
 
                 static typename BlueprintFieldType::value_type calculate(typename BlueprintFieldType::value_type x,
                                                                          typename BlueprintFieldType::value_type y) {
-                    
+
                     std::array<typename BlueprintFieldType::value_type, 5> t;
                     t[0] = x;
                     t[1] = y;
@@ -253,8 +253,8 @@ namespace nil {
                 std::array<std::pair<std::size_t, std::size_t>, 4> wl;
 
                 int _idx;
-                for (int i = 0; i < component.rows_amount; i++) {
-                    for (int j = 0; j < witness_amount; j++) {
+                for (std::size_t i = 0; i < component.rows_amount; i++) {
+                    for (std::size_t j = 0; j < witness_amount; j++) {
                         _idx = i * witness_amount + j;
                         if (_idx < 4) {
                             wl[_idx] = std::make_pair(j, i + offset);

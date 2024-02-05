@@ -213,19 +213,8 @@ namespace nil {
                         const typename plonk_exponentiation<BlueprintFieldType, ArithmetizationParams, ExponentSize>::input_type &instance_input,
                         const std::uint32_t start_row_index) {
 
-                        using component_type = plonk_exponentiation<BlueprintFieldType, ArithmetizationParams,
-                                                                    ExponentSize>;
                         typename BlueprintFieldType::value_type base = var_value(assignment, instance_input.base);
                         typename BlueprintFieldType::value_type exponent = var_value(assignment, instance_input.exponent);
-
-                        typename BlueprintFieldType::integral_type integral_exp =
-                            typename BlueprintFieldType::integral_type(exponent.data);
-
-                        // {
-                        //     nil::marshalling::status_type status;
-                        //     std::array<bool, 255> bits_all = nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_exp, status);
-                        //     std::copy(bits_all.end() - padded_exponent_size, bits_all.end(), bits.begin());
-                        // }
 
                         std::vector<bool> bits(component.padded_exponent_size, false);
                         {
@@ -235,10 +224,10 @@ namespace nil {
                                 bbb.push_back((data - (data >> 1 << 1)) != 0);
                                 data = data >> 1;
                             }
-                            for (int i = 1; i < component.padded_exponent_size - bbb.size(); ++i) {
+                            for (std::uint32_t i = 1; i < component.padded_exponent_size - bbb.size(); ++i) {
                                 bits[i] = false;
                             }
-                            for (int i = 0; i < bbb.size(); ++i) {
+                            for (std::uint32_t i = 0; i < bbb.size(); ++i) {
                                 bits[component.padded_exponent_size - 1 - i] = bbb[i];
                             }
                         }

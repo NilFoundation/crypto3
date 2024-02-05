@@ -126,8 +126,6 @@ auto test_division_remainder(typename BlueprintFieldType::value_type x,
 
 template<typename BlueprintFieldType, std::size_t WitnessesAmount, std::uint32_t R, bool CheckInputs>
 void test_division_remainder_specific_inputs() {
-    using value_type = typename BlueprintFieldType::value_type;
-
     test_division_remainder<BlueprintFieldType, WitnessesAmount, R, CheckInputs>(42, 12);
     test_division_remainder<BlueprintFieldType, WitnessesAmount, R, CheckInputs>(120, 0);
 
@@ -262,7 +260,6 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_non_native_division_remainder_oops_y_minus_
     patches[std::make_pair(0, 3)] = 0;
     patches[std::make_pair(0, 4)] = 0;
 
-    using field_type_2 = nil::crypto3::algebra::curves::vesta::scalar_field_type;
     test_division_remainder<field_type, 15, 64, true>(x, y, patches);
 }
 
@@ -277,7 +274,6 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_non_native_division_remainder_oops_divide_b
     patches[std::make_pair(0, 3)] = 0;
     patches[std::make_pair(0, 4)] = -8;
 
-    using field_type_2 = nil::crypto3::algebra::curves::vesta::scalar_field_type;
     test_division_remainder<field_type, 15, 64, true>(x, y, patches);
 }
 

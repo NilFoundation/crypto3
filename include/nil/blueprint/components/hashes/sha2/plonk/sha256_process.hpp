@@ -191,7 +191,7 @@ namespace nil {
                 }
 
                 static std::array<typename BlueprintFieldType::value_type, 8>
-                        calculate(std::array<typename BlueprintFieldType::value_type, 8> input_state, 
+                        calculate(std::array<typename BlueprintFieldType::value_type, 8> input_state,
                                     std::array<typename BlueprintFieldType::value_type, 16> input_words) {
 
                     std::size_t row = 0;
@@ -299,7 +299,7 @@ namespace nil {
                         std::array<std::vector<typename BlueprintFieldType::integral_type>, 2> sigma1_chunks =
                             detail::reversed_sparse_and_split<BlueprintFieldType>(
                                 sparse_sigma1, sigma_sizes, base4);
-                                
+
                         typename BlueprintFieldType::value_type sum =
                             message_scheduling_words[(i - row) / 5 + 9] + message_scheduling_words[(i - row) / 5] +
                             sigma1_chunks[0][0] + sigma0_chunks[0][0] +
@@ -310,9 +310,6 @@ namespace nil {
                             typename BlueprintFieldType::integral_type(sum.data) %
                             typename BlueprintFieldType::integral_type(
                                 typename BlueprintFieldType::value_type(2).pow(32).data);
-
-                        typename BlueprintFieldType::integral_type integral_a2 =
-                            typename BlueprintFieldType::integral_type(message_scheduling_words[(i - row) / 5 + 16].data);
                     }
                     row = row + 240;
                     for (std::size_t i = row; i < row + 512; i = i + 8) {
@@ -881,7 +878,6 @@ namespace nil {
                     using var = typename plonk_sha256_process<BlueprintFieldType, ArithmetizationParams>::var;
                     using lookup_constraint = crypto3::zk::snark::plonk_lookup_constraint<BlueprintFieldType>;
 
-                    typename BlueprintFieldType::integral_type one = 1;
                     typename BlueprintFieldType::value_type base7_value =
                         plonk_sha256_process<BlueprintFieldType, ArithmetizationParams>::base7;
                     std::array<var, 4> e_chunks_0 = {
@@ -1878,8 +1874,6 @@ namespace nil {
 
                 using component_type = plonk_sha256_process<BlueprintFieldType, ArithmetizationParams>;
 
-                std::size_t row = start_row_index;
-                typename BlueprintFieldType::integral_type one = 1;
                 std::array<typename BlueprintFieldType::value_type, 8> input_state = {
                     var_value(assignment, instance_input.input_state[0]),
                     var_value(assignment, instance_input.input_state[1]),

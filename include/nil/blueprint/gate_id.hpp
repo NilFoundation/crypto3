@@ -171,14 +171,15 @@ namespace nil {
                 BOOST_ASSERT_MSG(point == 0 || point == 1, "Index must be either 0 or 1.");
                 BOOST_ASSERT_MSG(var.relative == true, "Absolute variables should not belong to a gate.");
                 switch (var.type) {
-                case var::column_type::witness:
-                    return this->get_witness(point, var.index, var.rotation);
-                case var::column_type::constant:
-                    return this->get_constant(point, var.index, var.rotation);
-                case var::column_type::public_input:
-                case var::column_type::selector:
-                    BOOST_ASSERT_MSG(false, "Public input/selectors should not be in a gate.");
+                    case var::column_type::witness:
+                        return this->get_witness(point, var.index, var.rotation);
+                    case var::column_type::constant:
+                        return this->get_constant(point, var.index, var.rotation);
+                    case var::column_type::public_input:
+                    case var::column_type::selector:
+                        BOOST_ASSERT_MSG(false, "Public input/selectors should not be in a gate.");
                 }
+                __builtin_unreachable();
             };
 
             value_type get_first_value(const var &var) const {

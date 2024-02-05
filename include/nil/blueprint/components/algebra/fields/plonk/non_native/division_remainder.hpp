@@ -189,11 +189,8 @@ namespace nil {
                         quotient = var(component.W(q_address.second), q_address.first);
                         remainder = var(component.W(r_address.second), r_address.first);
                     }
-                    result_type(const division_remainder &component, std::size_t start_row_index, bool skip) {
-                        std::pair<std::size_t, std::size_t>
-                            r_address = component.get_var_address(var_address::R_, start_row_index),
-                            q_address = component.get_var_address(var_address::Q, start_row_index);
 
+                    result_type(const division_remainder &component, std::size_t start_row_index, bool skip) {
                         quotient = var(component.W(0), start_row_index);
                         remainder = var(component.W(1), start_row_index);
                     }
@@ -263,8 +260,6 @@ namespace nil {
                 using var = typename component_type::var;
                 using var_address = typename component_type::var_address;
                 using constraint_type = crypto3::zk::snark::plonk_constraint<BlueprintFieldType>;
-                using gate_type = typename crypto3::zk::snark::plonk_gate<BlueprintFieldType, constraint_type>;
-                using value_type = typename BlueprintFieldType::value_type;
 
                 var x = component.get_var_for_gate(var_address::X),
                     y = component.get_var_for_gate(var_address::Y),
@@ -298,7 +293,6 @@ namespace nil {
                 using component_type = plonk_division_remainder<BlueprintFieldType, ArithmetizationParams>;
                 using var = typename component_type::var;
                 using var_address = typename component_type::var_address;
-                std::uint32_t row = start_row_index;
 
                 std::pair<std::size_t, std::size_t>
                     x_address = component.get_var_address(var_address::X, start_row_index),
@@ -332,7 +326,6 @@ namespace nil {
                 std::pair<std::size_t, std::size_t>
                     x_address = component.get_var_address(var_address::X, start_row_index),
                     y_address = component.get_var_address(var_address::Y, start_row_index),
-                    r_address = component.get_var_address(var_address::R_, start_row_index),
                     q_address = component.get_var_address(var_address::Q, start_row_index),
                     y_minus_r_address = component.get_var_address(var_address::Y_MINUS_R, start_row_index);
 
@@ -446,7 +439,6 @@ namespace nil {
 
                 using component_type = plonk_division_remainder<BlueprintFieldType, ArithmetizationParams>;
                 using value_type = typename BlueprintFieldType::value_type;
-                using integral_type = typename BlueprintFieldType::integral_type;
 
                 value_type x = var_value(assignment, instance_input.x),
                            y = var_value(assignment, instance_input.y);

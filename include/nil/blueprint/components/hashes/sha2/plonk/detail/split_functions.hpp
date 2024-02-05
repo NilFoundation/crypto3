@@ -82,7 +82,6 @@ namespace nil {
                     reversed_sparse_and_split(const typename BlueprintFieldType::integral_type sparse_value,
                                               const std::vector<std::size_t> &sizes, std::size_t base) {
                     using integral_type = typename BlueprintFieldType::integral_type;
-                    using value_type = typename BlueprintFieldType::value_type;
                     std::size_t size = sizes.size();
                     std::array<std::vector<typename BlueprintFieldType::integral_type>, 2> res = {
                         std::vector<integral_type>(size),
@@ -114,7 +113,6 @@ namespace nil {
                     reversed_sparse_and_split_maj(const typename BlueprintFieldType::integral_type sparse_value,
                                               const std::vector<std::size_t> &sizes, std::size_t base) {
                     using integral_type = typename BlueprintFieldType::integral_type;
-                    using value_type = typename BlueprintFieldType::value_type;
 
                     std::size_t size = sizes.size();
                     std::array<std::vector<integral_type>, 2> res = {
@@ -147,7 +145,6 @@ namespace nil {
                     reversed_sparse_and_split_ch(const typename BlueprintFieldType::integral_type sparse_value,
                                               const std::vector<std::size_t> &sizes, std::size_t base) {
                     using integral_type = typename BlueprintFieldType::integral_type;
-                    using value_type = typename BlueprintFieldType::value_type;
 
                     std::size_t size = sizes.size();
                     std::array<std::vector<integral_type>, 2> res = {

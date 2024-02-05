@@ -57,7 +57,6 @@ void test_variable_base_scalar_mul (
     constexpr std::size_t ConstantColumns = 1;
     constexpr std::size_t SelectorColumns = 4;
 	using BlueprintFieldType = typename CurveType::base_field_type;
-    using BlueprintScalarType = typename CurveType::scalar_field_type;
     using ArithmetizationParams = nil::crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns,
         PublicInputColumns, ConstantColumns, SelectorColumns>;
     using ArithmetizationType = nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
@@ -212,7 +211,6 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_variable_base_scalar_mul_random_scalar_pall
 
 	// regular test (base field larger than scalar field)
     using curve_type = nil::crypto3::algebra::curves::vesta;
-    using BlueprintFieldType = typename curve_type::base_field_type;
     using BlueprintScalarType = typename curve_type::scalar_field_type;
 
 	nil::crypto3::random::algebraic_engine<typename curve_type::template g1_type<nil::crypto3::algebra::curves::coordinates::affine>> random_point;

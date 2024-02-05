@@ -199,8 +199,6 @@ namespace nil {
                 std::size_t row = start_row_index;
                 std::size_t witness_amount = component.witness_amount();
 
-                using var = typename plonk_gate_component<BlueprintFieldType, ArithmetizationParams>::var;
-
                 typename BlueprintFieldType::value_type q = var_value(assignment, instance_input.selector);
                 typename BlueprintFieldType::value_type theta = var_value(assignment, instance_input.theta);
 
@@ -387,7 +385,7 @@ namespace nil {
                             assignment.enable_selector(selector_indices[i], row + r);
                         }
                         r++;
-                    } 
+                    }
                     if( !component.need_extra_row && r == component.rows_amount - 2) {
                         for (std::size_t i = tmp; i < witness_amount; i = i + 2) {
                             assignment.enable_selector(selector_indices[i], row + r);

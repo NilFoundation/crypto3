@@ -388,9 +388,6 @@ namespace nil {
                 assignment.witness(component.W(6), row + 6) = u1_chunks[2];
                 assignment.witness(component.W(7), row + 6) = u1_chunks[3];
 
-                using ArithmetizationType =
-                    crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
-
                 range_type range_component_instance({component.W(0), component.W(1), component.W(2), component.W(3),
                                                      component.W(4), component.W(5), component.W(6), component.W(7),
                                                      component.W(8)},
@@ -421,7 +418,6 @@ namespace nil {
                         &instance_input,
                     const std::uint32_t start_row_index) {
 
-                using var = typename plonk_ed25519_multiplication<BlueprintFieldType, ArithmetizationParams>::var;
                 using component_type = plonk_ed25519_multiplication<BlueprintFieldType, ArithmetizationParams>;
 
                 using native_value_type = typename BlueprintFieldType::value_type;
@@ -461,8 +457,6 @@ namespace nil {
 
                 using native_value_type = typename BlueprintFieldType::value_type;
                 using native_integral_type = typename BlueprintFieldType::integral_type;
-                using foreign_value_type = typename ed25519_field_type::value_type;
-                using foreign_integral_type = typename ed25519_field_type::integral_type;
                 using foreign_extended_integral_type = typename ed25519_field_type::extended_integral_type;
 
                 native_integral_type base = 1;
@@ -564,8 +558,6 @@ namespace nil {
 
                 generate_copy_constraints(component, bp, assignment, instance_input, j);
 
-                using ArithmetizationType =
-                    crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
                 using var = typename plonk_ed25519_multiplication<BlueprintFieldType, ArithmetizationParams>::var;
 
                 range_type range_component_instance({component.W(0), component.W(1), component.W(2), component.W(3),
@@ -627,7 +619,7 @@ namespace nil {
                 static var deconvert_var(const input_type &input,
                                          var variable) {
                     BOOST_ASSERT(variable.type == var::column_type::public_input);
-                    if (variable.rotation < input.A.size()) {
+                    if (std::size_t(variable.rotation) < input.A.size()) {
                         return input.A[variable.rotation];
                     } else {
                         return input.B[variable.rotation - input.A.size()];

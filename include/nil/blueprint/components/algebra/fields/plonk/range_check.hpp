@@ -109,8 +109,8 @@ namespace nil {
 
                 class gate_manifest_type : public component_gate_manifest {
                 public:
-                    std::size_t bits_amount;
                     std::size_t witness_amount;
+                    std::size_t bits_amount;
 
                     gate_manifest_type(std::size_t witness_amount_, std::size_t bits_amount_)
                         : witness_amount(witness_amount_), bits_amount(bits_amount_) {}
@@ -334,7 +334,7 @@ namespace nil {
 
                 auto generate_chunk_size_constraint = [](var v, std::size_t size) {
                     constraint_type constraint = v;
-                    for (std::size_t i = 1; i < (1 << size); i++) {
+                    for (std::size_t i = 1; i < (std::size_t(1) << size); i++) {
                         constraint = constraint * (v - i);
                     }
                     return constraint;

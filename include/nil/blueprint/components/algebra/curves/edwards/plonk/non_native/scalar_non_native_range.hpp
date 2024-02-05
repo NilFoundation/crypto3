@@ -143,7 +143,6 @@ namespace nil {
                         ArithmetizationParams>::input_type &instance_input,
                     const std::uint32_t start_row_index) {
                 using Ed25519Type = typename crypto3::algebra::curves::ed25519;
-                using var = typename plonk_scalar_range<BlueprintFieldType, ArithmetizationParams>::var;
 
                 std::size_t row = start_row_index;
                 typename Ed25519Type::scalar_field_type::integral_type base = 1;

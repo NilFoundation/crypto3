@@ -129,9 +129,6 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_range_test0) {
 }
 
 BOOST_AUTO_TEST_CASE(blueprint_non_native_range_test_must_fail) {
-    using non_native_field_type = typename crypto3::algebra::fields::curve25519_base_field;
-    using field_type = crypto3::algebra::curves::pallas::base_field_type;
-
     test_field_range<typename crypto3::algebra::curves::pallas::base_field_type>( //ed25519 modulus
         {0x3ffffffffffffffed_cppui255, 0x3ffffffffffffffff_cppui255, 0x3ffffffffffffffff_cppui255, 0x1ffffffffffffff_cppui255}, false
     );

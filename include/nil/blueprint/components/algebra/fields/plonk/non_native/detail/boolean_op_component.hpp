@@ -62,6 +62,8 @@ namespace nil {
                     using var = typename component_type::var;
                     using manifest_type = nil::blueprint::plonk_component_manifest;
 
+                    virtual ~boolean_op_component() = default;
+
                     static manifest_type get_manifest() {
                         static manifest_type manifest = manifest_type(
                             std::shared_ptr<manifest_param>(new manifest_single_value_param(ArgNum + 1)),

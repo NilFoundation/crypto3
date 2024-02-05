@@ -165,8 +165,6 @@ namespace nil {
 
                 std::size_t row = start_row_index;
 
-                using var = typename plonk_permutation_verifier<BlueprintFieldType, ArithmetizationParams>::var;
-
                 assert(instance_input.f.size() == component.m);
 
                 std::size_t m = component.m;

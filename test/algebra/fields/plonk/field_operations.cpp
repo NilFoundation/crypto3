@@ -290,9 +290,6 @@ void test_div_or_zero(std::vector<typename FieldType::value_type> public_input){
 
 template <typename FieldType>
 void test_5_components(int i, int j) {
-    typename FieldType::value_type x = i;
-    typename FieldType::value_type y = j;
-
     test_add<FieldType>({i, j});
     test_sub<FieldType>({i, j});
     test_mul<FieldType>({i, j});

@@ -162,9 +162,6 @@ namespace nil {
                 typename CurveType::template g1_type<crypto3::algebra::curves::coordinates::affine>::value_type Q(q_x,
                                                                                                          q_y);
 
-                const typename CurveType::template g1_type<crypto3::algebra::curves::coordinates::affine>::value_type R =
-                    P + Q;
-
                 assignment.witness(component.W(0), j) = P.X;
                 assignment.witness(component.W(1), j) = P.Y;
                 assignment.witness(component.W(2), j) = Q.X;

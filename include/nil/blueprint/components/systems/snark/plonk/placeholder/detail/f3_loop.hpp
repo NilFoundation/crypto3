@@ -182,8 +182,6 @@ namespace nil {
                 assert(instance_input.s.size() == instance_input.alphas.size());
                 assert(instance_input.s.size() == component.m);
 
-                using var = typename plonk_f3_loop<BlueprintFieldType, ArithmetizationParams>::var;
-
                 typename BlueprintFieldType::value_type f3 = BlueprintFieldType::value_type::zero();
                 std::vector<typename BlueprintFieldType::value_type> assignments;
                 for (std::size_t i = 0; i < component.m; i++) {

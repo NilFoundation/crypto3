@@ -88,7 +88,7 @@ namespace nil {
             };
         }   // namespace detail
 
-        inline std::vector<std::size_t> generate_random_step_list(const std::size_t r, const int max_step) {
+        inline std::vector<std::size_t> generate_random_step_list(const std::size_t r, const std::uint32_t max_step) {
             using dist_type = std::uniform_int_distribution<int>;
             static std::random_device random_engine;
 
@@ -440,7 +440,6 @@ namespace nil {
             using commitment_type = typename nil::crypto3::zk::commitments::list_polynomial_commitment<BlueprintFieldType, lpc_params_type>;
             using commitment_scheme_type = typename nil::crypto3::zk::commitments::lpc_commitment_scheme<commitment_type>;
             using placeholder_params_type = typename nil::crypto3::zk::snark::placeholder_params<circuit_params, commitment_scheme_type>;
-            using policy_type = typename nil::crypto3::zk::snark::detail::placeholder_policy<BlueprintFieldType, placeholder_params_type>;
 
             using fri_type = typename commitment_type::fri_type;
 

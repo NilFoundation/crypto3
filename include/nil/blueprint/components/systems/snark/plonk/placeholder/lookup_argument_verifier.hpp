@@ -238,11 +238,11 @@ namespace nil {
                                 std::vector<std::size_t> &lookup_table_columns_numbers_) :
                     component_type(witness, {}, {}, get_manifest()),
                     lookup_gates_size(lookup_gates_size_),
-                    lookup_gate_constraints_sizes(lookup_gate_constraints_sizes_),
-                    lookup_gate_constraints_lookup_input_sizes(lookup_gate_constraints_lookup_input_sizes_),
                     lookup_tables_size(lookup_tables_size_),
                     lookup_table_lookup_options_sizes(lookup_table_lookup_options_sizes_),
-                    lookup_table_columns_numbers(lookup_table_columns_numbers_) {};
+                    lookup_table_columns_numbers(lookup_table_columns_numbers_),
+                    lookup_gate_constraints_sizes(lookup_gate_constraints_sizes_),
+                    lookup_gate_constraints_lookup_input_sizes(lookup_gate_constraints_lookup_input_sizes_) {}
 
                 template<typename WitnessContainerType, typename ConstantContainerType,
                          typename PublicInputContainerType>
@@ -255,12 +255,11 @@ namespace nil {
                                 std::vector<std::size_t> &lookup_table_columns_numbers_) :
                     component_type(witness, constant, public_input, get_manifest()),
                     lookup_gates_size(lookup_gates_size_),
-                    lookup_gate_constraints_sizes(lookup_gate_constraints_sizes_),
-                    lookup_gate_constraints_lookup_input_sizes(lookup_gate_constraints_lookup_input_sizes_),
                     lookup_tables_size(lookup_tables_size_),
                     lookup_table_lookup_options_sizes(lookup_table_lookup_options_sizes_),
-                    lookup_table_columns_numbers(lookup_table_columns_numbers_) {};
-                ;
+                    lookup_table_columns_numbers(lookup_table_columns_numbers_),
+                    lookup_gate_constraints_sizes(lookup_gate_constraints_sizes_),
+                    lookup_gate_constraints_lookup_input_sizes(lookup_gate_constraints_lookup_input_sizes_) {}
 
                 lookup_verifier(
                     std::initializer_list<typename component_type::witness_container_type::value_type> witnesses,
@@ -273,11 +272,11 @@ namespace nil {
                     std::vector<std::size_t> &lookup_table_columns_numbers_) :
                     component_type(witnesses, constants, public_inputs, get_manifest()),
                     lookup_gates_size(lookup_gates_size_),
-                    lookup_gate_constraints_sizes(lookup_gate_constraints_sizes_),
-                    lookup_gate_constraints_lookup_input_sizes(lookup_gate_constraints_lookup_input_sizes_),
                     lookup_tables_size(lookup_tables_size_),
                     lookup_table_lookup_options_sizes(lookup_table_lookup_options_sizes_),
-                    lookup_table_columns_numbers(lookup_table_columns_numbers_) {};
+                    lookup_table_columns_numbers(lookup_table_columns_numbers_),
+                    lookup_gate_constraints_sizes(lookup_gate_constraints_sizes_),
+                    lookup_gate_constraints_lookup_input_sizes(lookup_gate_constraints_lookup_input_sizes_) {}
             };
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
@@ -329,9 +328,6 @@ namespace nil {
                 }
 
                 typename BlueprintFieldType::value_type one = BlueprintFieldType::value_type::one();
-                typename BlueprintFieldType::value_type theta = var_value(assignment, instance_input.theta);
-                typename BlueprintFieldType::value_type beta = var_value(assignment, instance_input.beta);
-                typename BlueprintFieldType::value_type gamma = var_value(assignment, instance_input.gamma);
                 typename BlueprintFieldType::value_type q_last = var_value(assignment, instance_input.q_last[0]);
                 typename BlueprintFieldType::value_type q_last_shifted =
                     var_value(assignment, instance_input.q_last[1]);
@@ -366,7 +362,7 @@ namespace nil {
                 std::vector<var> lookup_values;
                 std::vector<var> shifted_lookup_values;
 
-                std::size_t start_pos = 0, shifted_start_pos = 0, offset = 0;
+                std::size_t start_pos = 0, offset = 0;
                 std::size_t num_tables = instance_input.lookup_table_selectors.size();
                 assert(num_tables == component.lookup_tables_size);
                 for (std::size_t i = 0; i < num_tables; i++) {
@@ -510,7 +506,6 @@ namespace nil {
                 typename mul::input_type mul_input = {g_loop_result.output, g_loop_result_2.output};
                 typename mul::result_type mul_result = generate_assignments(mul_instance, assignment, mul_input, row);
                 row += mul_instance.rows_amount;
-                var g_var = mul_result.output;
 
                 typename BlueprintFieldType::value_type F2 = mask_value * (V_L_shifted * h - V_L * g);
 
@@ -744,7 +739,7 @@ namespace nil {
                 std::vector<var> lookup_values;
                 std::vector<var> shifted_lookup_values;
 
-                std::size_t start_pos = 0, shifted_start_pos = 0, offset = 0;
+                std::size_t start_pos = 0, offset = 0;
                 std::size_t num_tables = instance_input.lookup_table_selectors.size();
                 assert(num_tables == component.lookup_tables_size);
                 for (std::size_t i = 0; i < num_tables; i++) {
@@ -852,8 +847,8 @@ namespace nil {
                     f1_loop(witnesses, std::array<std::uint32_t, 0>(), std::array<std::uint32_t, 1>(), s0.size());
                 typename f1_loop::input_type h_loop_input = {instance_input.beta, instance_input.gamma, s0, s1};
 
-                typename f1_loop::result_type h_loop_result =
-                    generate_circuit(h_loop, bp, assignment, h_loop_input, row);
+                // h_loop_result
+                generate_circuit(h_loop, bp, assignment, h_loop_input, row);
 
                 row += h_loop.rows_amount;
 
@@ -883,7 +878,6 @@ namespace nil {
                 typename mul::input_type mul_input = {g_loop_result.output, g_loop_result_2.output};
                 typename mul::result_type mul_result = generate_circuit(mul_instance, bp, assignment, mul_input, row);
                 row += mul_instance.rows_amount;
-                var g_var = mul_result.output;
 
                 s0.erase(s0.begin());
                 assert(s0.size() == s2.size());

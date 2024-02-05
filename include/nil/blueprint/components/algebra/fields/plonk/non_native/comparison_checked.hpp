@@ -290,7 +290,7 @@ namespace nil {
 
                 auto generate_chunk_size_constraint = [](var v, std::size_t size) {
                     constraint_type constraint = v;
-                    for (std::size_t i = 1; i < (1 << size); i++) {
+                    for (std::size_t i = 1; i < std::size_t(1 << size); i++) {
                         constraint = constraint * (v - i);
                     }
                     return constraint;

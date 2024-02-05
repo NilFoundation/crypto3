@@ -347,8 +347,6 @@ void test_complete_addition(){
         var(0, 12, false, var::column_type::public_input), var(0, 13, false, var::column_type::public_input),
         var(0, 14, false, var::column_type::public_input), var(0, 15, false, var::column_type::public_input)};
 
-    var b = var(0, 16, false, var::column_type::public_input);
-
     typename component_type::input_type instance_input = {{input_var_Xa, input_var_Xb}, {input_var_Ya, input_var_Yb}};
 
     ed25519_type::template g1_type<crypto3::algebra::curves::coordinates::affine>::value_type T = crypto3::algebra::random_element<ed25519_type::template g1_type<crypto3::algebra::curves::coordinates::affine>>();

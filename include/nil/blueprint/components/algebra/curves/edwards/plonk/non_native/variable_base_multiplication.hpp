@@ -225,13 +225,7 @@ namespace nil {
 
                     using component_type =
                         plonk_ed25519_var_base_mul<BlueprintFieldType, ArithmetizationParams, CurveType>;
-                    using non_native_policy_type = typename component_type::non_native_policy_type;
                     using var = typename plonk_ed25519_mul_per_bit<BlueprintFieldType, ArithmetizationParams, CurveType>::var;
-                    using Ed25519Type = typename crypto3::algebra::curves::ed25519;
-                    typedef crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
-                        ArithmetizationType;
-
-
 
                     using mul_per_bit_component = typename component_type::mul_per_bit_component;
                     using decomposition_component_type = typename component_type::decomposition_component_type;
@@ -279,11 +273,7 @@ namespace nil {
 
                     using component_type =
                         plonk_ed25519_var_base_mul<BlueprintFieldType, ArithmetizationParams, CurveType>;
-                    using non_native_policy_type = typename component_type::non_native_policy_type;
                     using var = typename plonk_ed25519_mul_per_bit<BlueprintFieldType, ArithmetizationParams, CurveType>::var;
-                    using Ed25519Type = typename crypto3::algebra::curves::ed25519;
-                    typedef crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
-                        ArithmetizationType;
 
                     using mul_per_bit_component = typename component_type::mul_per_bit_component;
                     using decomposition_component_type = typename component_type::decomposition_component_type;
@@ -366,9 +356,9 @@ namespace nil {
                 static var deconvert_var(const input_type &input,
                                          var variable) {
                     BOOST_ASSERT(variable.type == var::column_type::public_input);
-                    if (variable.rotation < input.T.x.size()) {
+                    if (std::size_t(variable.rotation) < input.T.x.size()) {
                         return input.T.x[variable.rotation];
-                    } else if (variable.rotation < input.T.x.size() + input.T.y.size()) {
+                    } else if (std::size_t(variable.rotation) < input.T.x.size() + input.T.y.size()) {
                         return input.T.y[variable.rotation - input.T.x.size()];
                     } else {
                         return input.k;

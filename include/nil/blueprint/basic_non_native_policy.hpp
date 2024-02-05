@@ -81,7 +81,6 @@ namespace nil {
 
                 static non_native_field_type::value_type glue_non_native(chopped_value_type input) {
                     non_native_field_type::value_type result;
-                    native_field_type::integral_type integral_input;
                     result = non_native_field_type::value_type(native_field_type::integral_type(input[0].data));
                     for (std::size_t i = 1; i < ratio; i++) {
                         std::size_t shift = 0;
@@ -151,7 +150,6 @@ namespace nil {
 
                 static non_native_field_type::value_type glue_non_native(chopped_value_type input) {
                     non_native_field_type::value_type result;
-                    native_field_type::integral_type integral_input;
                     result = non_native_field_type::value_type(native_field_type::integral_type(input[0].data));
                     for (std::size_t i = 1; i < ratio; i++) {
                         std::size_t shift = 0;

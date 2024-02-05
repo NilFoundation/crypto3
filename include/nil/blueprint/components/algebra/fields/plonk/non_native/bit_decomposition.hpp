@@ -215,10 +215,6 @@ namespace nil {
                     const typename plonk_bit_decomposition<BlueprintFieldType, ArithmetizationParams>::input_type
                         &instance_input,
                     const std::uint32_t start_row_index) {
-                using component_type = plonk_bit_decomposition<BlueprintFieldType, ArithmetizationParams>;
-
-                typename BlueprintFieldType::integral_type input_data =
-                    typename BlueprintFieldType::integral_type(var_value(assignment, instance_input.input).data);
 
                 std::vector<bool> input_bits(component.bits_amount);
                 {

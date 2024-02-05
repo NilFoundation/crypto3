@@ -70,7 +70,6 @@ void test_exponentiation(std::vector<typename FieldType::value_type> public_inpu
     typename component_type::input_type instance_input = {base, exponent};
 
     typename BlueprintFieldType::value_type base_value = public_input[0];
-    typename BlueprintFieldType::value_type exponent_value = public_input[1];
     typename BlueprintFieldType::integral_type exponent_value_integral = typename BlueprintFieldType::integral_type(public_input[1].data);
     typename BlueprintFieldType::value_type expected_res = power(base_value, exponent_value_integral);
 

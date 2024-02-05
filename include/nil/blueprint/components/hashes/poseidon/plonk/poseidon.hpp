@@ -188,7 +188,7 @@ namespace nil {
                 static_assert(state_size == 3);
 
                 for (std::size_t i = row; i < row + component.rows_amount - 1; i++) {
-                    for (int j = 0; j < state_size; j++) {
+                    for (std::size_t j = 0; j < state_size; j++) {
                         next_state[j] = state[0].pow(component_type::sbox_alpha) * component_type::mds[j][0] +
                                         state[1].pow(component_type::sbox_alpha) * component_type::mds[j][1] +
                                         state[2].pow(component_type::sbox_alpha) * component_type::mds[j][2] +
@@ -199,7 +199,7 @@ namespace nil {
                     assignment.witness(component.W(4), i) = next_state[1];
                     assignment.witness(component.W(5), i) = next_state[2];
                     state = next_state;
-                    for (int j = 0; j < state_size; j++) {
+                    for (std::uint32_t j = 0; j < state_size; j++) {
                         next_state[j] = state[0].pow(component_type::sbox_alpha) * component_type::mds[j][0] +
                                         state[1].pow(component_type::sbox_alpha) * component_type::mds[j][1] +
                                         state[2].pow(component_type::sbox_alpha) * component_type::mds[j][2] +
@@ -209,7 +209,7 @@ namespace nil {
                     assignment.witness(component.W(7), i) = next_state[1];
                     assignment.witness(component.W(8), i) = next_state[2];
                     state = next_state;
-                    for (int j = 0; j < state_size; j++) {
+                    for (std::uint32_t j = 0; j < state_size; j++) {
                         next_state[j] = state[0].pow(component_type::sbox_alpha) * component_type::mds[j][0] +
                                         state[1].pow(component_type::sbox_alpha) * component_type::mds[j][1] +
                                         state[2].pow(component_type::sbox_alpha) * component_type::mds[j][2] +
@@ -219,7 +219,7 @@ namespace nil {
                     assignment.witness(component.W(10), i) = next_state[1];
                     assignment.witness(component.W(11), i) = next_state[2];
                     state = next_state;
-                    for (int j = 0; j < state_size; j++) {
+                    for (std::uint32_t j = 0; j < state_size; j++) {
                         next_state[j] = state[0].pow(component_type::sbox_alpha) * component_type::mds[j][0] +
                                         state[1].pow(component_type::sbox_alpha) * component_type::mds[j][1] +
                                         state[2].pow(component_type::sbox_alpha) * component_type::mds[j][2] +
@@ -229,7 +229,7 @@ namespace nil {
                     assignment.witness(component.W(13), i) = next_state[1];
                     assignment.witness(component.W(14), i) = next_state[2];
                     state = next_state;
-                    for (int j = 0; j < state_size; j++) {
+                    for (std::uint32_t j = 0; j < state_size; j++) {
                         next_state[j] = state[0].pow(component_type::sbox_alpha) * component_type::mds[j][0] +
                                         state[1].pow(component_type::sbox_alpha) * component_type::mds[j][1] +
                                         state[2].pow(component_type::sbox_alpha) * component_type::mds[j][2] +

@@ -251,8 +251,8 @@ namespace nil {
                         typename doubling_component::input_type({R_x, R_y}), row);
                     row += doubling_instance.rows_amount;
 
-                    typename complete_addition_component::result_type add_res =
-                        generate_assignments(complete_addition_instance, assignment,
+                    // add_res
+                    generate_assignments(complete_addition_instance, assignment,
                         typename complete_addition_component::input_type(
                             {{doubling_res.output.x, doubling_res.output.y},
                              {bool_mul_res.output.x, bool_mul_res.output.y}}), row);
@@ -314,8 +314,8 @@ namespace nil {
                         typename doubling_component::input_type({R_x, R_y}), row);
                     row += doubling_instance.rows_amount;
 
-                    typename complete_addition_component::result_type add_res =
-                        generate_circuit(complete_addition_instance, bp, assignment,
+                    // add_res
+                    generate_circuit(complete_addition_instance, bp, assignment,
                         typename complete_addition_component::input_type(
                             {{doubling_res.output.x, doubling_res.output.y},
                              {bool_mul_res.output.x, bool_mul_res.output.y}}), row);
@@ -380,13 +380,13 @@ namespace nil {
                 static var deconvert_var(const input_type &input,
                                          var variable) {
                     BOOST_ASSERT(variable.type == var::column_type::public_input);
-                    if (variable.rotation < input.T.x.size()) {
+                    if (std::size_t(variable.rotation) < input.T.x.size()) {
                         return input.T.x[variable.rotation];
-                    } else if (variable.rotation < input.T.x.size() + input.T.y.size()) {
+                    } else if (std::size_t(variable.rotation) < input.T.x.size() + input.T.y.size()) {
                         return input.T.y[variable.rotation - input.T.x.size()];
-                    } else if (variable.rotation < input.T.x.size() + input.T.y.size() + input.R.x.size()) {
+                    } else if (std::size_t(variable.rotation) < input.T.x.size() + input.T.y.size() + input.R.x.size()) {
                         return input.R.x[variable.rotation - input.T.x.size() - input.T.y.size()];
-                    } else if (variable.rotation < input.T.x.size() + input.T.y.size() +
+                    } else if (std::size_t(variable.rotation) < input.T.x.size() + input.T.y.size() +
                                                    input.R.x.size() + input.R.y.size()) {
                         return input.R.y[variable.rotation - input.T.x.size() - input.T.y.size() - input.R.x.size()];
                     } else {

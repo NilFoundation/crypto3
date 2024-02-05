@@ -182,7 +182,6 @@ namespace nil {
                 const std::uint32_t start_row_index) {
 
                 using component_type = plonk_fri_array_swap<BlueprintFieldType, ArithmetizationParams>;
-                using var = typename component_type::var;
                 using value_type = typename BlueprintFieldType::value_type;
 
                 BOOST_ASSERT(2 * component.half_array_size == instance_input.arr.size());
@@ -232,9 +231,7 @@ namespace nil {
                 using var = typename component_type::var;
                 using constraint_type = crypto3::zk::snark::plonk_constraint<BlueprintFieldType>;
 
-                const std::size_t four_amount = (component.witness_amount() - 1) / 4;
                 BOOST_ASSERT(2 * component.half_array_size == instance_input.arr.size());
-                const std::size_t array_size = instance_input.arr.size();
 
                 std::vector<constraint_type> constraints;
                 constraints.reserve(component.half_array_size);
@@ -297,7 +294,6 @@ namespace nil {
                 const std::size_t start_row_index) {
 
                 using component_type = plonk_fri_array_swap<BlueprintFieldType, ArithmetizationParams>;
-                using var = typename component_type::var;
 
                 std::size_t selector_index = generate_gates(component, bp, assignment, instance_input);
                 assignment.enable_selector(

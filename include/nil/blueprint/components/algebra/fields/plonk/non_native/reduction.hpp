@@ -143,9 +143,6 @@ namespace nil {
 
                 using ArithmetizationType =
                     crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
-                using component_type = plonk_reduction<BlueprintFieldType, ArithmetizationParams>;
-
-                using var = typename plonk_reduction<BlueprintFieldType, ArithmetizationParams>::var;
 
                 std::size_t row = start_row_index;
                 std::array<typename ArithmetizationType::field_type::integral_type, 8> data = {

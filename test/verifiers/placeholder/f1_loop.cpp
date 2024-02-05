@@ -74,10 +74,10 @@ void test(std::vector<typename BlueprintFieldType::value_type> &public_input,
     var beta = var(0, ctr++, false, var::column_type::public_input);
     var gamma = var(0, ctr++, false, var::column_type::public_input);
     std::vector<var> si, ti;
-    for (int i = 0; i < m; i++) {
+    for (std::uint32_t i = 0; i < m; i++) {
         si.push_back(var(0, ctr++, false, var::column_type::public_input));
     }
-    for (int i = 0; i < m; i++) {
+    for (std::uint32_t i = 0; i < m; i++) {
         ti.push_back(var(0, ctr++, false, var::column_type::public_input));
     }
 

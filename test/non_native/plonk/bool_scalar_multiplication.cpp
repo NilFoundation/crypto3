@@ -66,7 +66,6 @@ void test_bool_scalar_multiplication(const std::vector<typename BlueprintFieldTy
     using AssignmentType = blueprint::assignment<ArithmetizationType>;
     using hash_type = crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 1;
-    using NonNativeFieldType = typename NonNativeCurveType::base_field_type;
 
     using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
@@ -184,7 +183,6 @@ BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 BOOST_AUTO_TEST_CASE(blueprint_non_native_bool_scalar_mul_test1) {
     using field_type = typename crypto3::algebra::curves::pallas::base_field_type;
     using non_native_curve_type = crypto3::algebra::curves::ed25519;
-    using non_native_field_type = non_native_curve_type::base_field_type;
 
     nil::crypto3::random::algebraic_engine<
         crypto3::algebra::curves::ed25519::template g1_type<crypto3::algebra::curves::coordinates::affine>>
@@ -204,7 +202,6 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_bool_scalar_mul_test1) {
 BOOST_AUTO_TEST_CASE(blueprint_non_native_bool_scalar_mul_must_fail) {
     using field_type = typename crypto3::algebra::curves::pallas::base_field_type;
     using non_native_curve_type = crypto3::algebra::curves::ed25519;
-    using non_native_field_type = non_native_curve_type::base_field_type;
 
     nil::crypto3::random::algebraic_engine<
         crypto3::algebra::curves::ed25519::template g1_type<crypto3::algebra::curves::coordinates::affine>>

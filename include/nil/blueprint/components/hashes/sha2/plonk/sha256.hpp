@@ -186,7 +186,7 @@ namespace nil {
                     return lookup_tables;
                 }
 
-                static std::array<typename BlueprintFieldType::value_type, 2> 
+                static std::array<typename BlueprintFieldType::value_type, 2>
                         calculate(std::array<typename BlueprintFieldType::value_type, 4> block_data) {
                     std::array<typename BlueprintFieldType::value_type, 2> decomposition_input = {block_data[0], block_data[1]};
                     std::array<typename BlueprintFieldType::value_type, 8> sha_block_part_1 = decomposition_type::calculate(decomposition_input);
@@ -204,7 +204,7 @@ namespace nil {
                     };
                     std::array<typename BlueprintFieldType::value_type, 8> first_block_state =
                             sha256_process_type::calculate(constants, input_words);
-                    
+
                     std::array<typename BlueprintFieldType::value_type, 16> constants2 = {
                         2147483648, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 << 9
                     };
@@ -243,7 +243,6 @@ namespace nil {
                 using ArithmetizationType =
                     crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
                 using component_type = plonk_sha256<BlueprintFieldType, ArithmetizationParams>;
-                using sha256_process_type = typename component_type::sha256_process_type;
                 using decomposition_type = typename component_type::decomposition_type;
 
                 decomposition_type decomposition_instance(
@@ -256,14 +255,14 @@ namespace nil {
                 typename decomposition_type::result_type sha_block_part_1 =
                     generate_assignments(decomposition_instance, assignment, decomposition_input, row);
                 row += decomposition_instance.rows_amount;
-                
+
                 std::array<var, 2> input_2 = {instance_input.block_data[2], instance_input.block_data[3]};
                 decomposition_input = {input_2};
 
                 typename decomposition_type::result_type sha_block_part_2 =
                     generate_assignments(decomposition_instance, assignment, decomposition_input, row);
                 row += decomposition_instance.rows_amount;
-                
+
                 sha256_process<ArithmetizationType> sha256_process_instance(
                     {component.W(0), component.W(1), component.W(2), component.W(3), component.W(4), component.W(5),
                      component.W(6), component.W(7), component.W(8)},
@@ -291,7 +290,7 @@ namespace nil {
                 std::array<var, 8> first_block_state =
                     generate_assignments(sha256_process_instance, assignment, sha256_process_input, row).output_state;
                 row += sha256_process_instance.rows_amount;
-                
+
                 std::array<var, 16> input_words2_vars = {
                     var(component.C(0), start_row_index + 8, false, var::column_type::constant),
                     var(component.C(0), start_row_index + 9, false, var::column_type::constant),
@@ -315,7 +314,7 @@ namespace nil {
 
                 std::array<var, 8> second_block_state =
                     generate_assignments(sha256_process_instance, assignment, sha256_process_input_2, row).output_state;
-                
+
                 row += sha256_process_instance.rows_amount;
                 typename ArithmetizationType::field_type::integral_type one = 1;
                 for (std::size_t i = 0; i < 8; i++) {
@@ -344,14 +343,9 @@ namespace nil {
 
                 std::size_t row = start_row_index;
 
-                using var = typename plonk_sha256<BlueprintFieldType, ArithmetizationParams>::var;
-                using ArithmetizationType =
-                    crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
                 using component_type = plonk_sha256<BlueprintFieldType, ArithmetizationParams>;
-                using sha256_process_type = typename component_type::sha256_process_type;
-                using decomposition_type = typename component_type::decomposition_type;
 
-                std::array<typename BlueprintFieldType::value_type, 4> input = 
+                std::array<typename BlueprintFieldType::value_type, 4> input =
                                             {var_value(assignment, instance_input.block_data[0]),
                                             var_value(assignment, instance_input.block_data[1]),
                                             var_value(assignment, instance_input.block_data[2]),
@@ -409,8 +403,6 @@ namespace nil {
                 std::size_t row = start_row_index;
 
                 using var = typename plonk_sha256<BlueprintFieldType, ArithmetizationParams>::var;
-                using ArithmetizationType =
-                    crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
                 using component_type = plonk_sha256<BlueprintFieldType, ArithmetizationParams>;
                 using sha256_process_type = typename component_type::sha256_process_type;
                 using decomposition_type = typename component_type::decomposition_type;
@@ -504,14 +496,14 @@ namespace nil {
                 std::array<typename BlueprintFieldType::value_type, 8> constants = {
                     0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19
                 };
-                for (int i = 0; i < constants.size(); i++) {
+                for (std::size_t i = 0; i < constants.size(); i++) {
                     assignment.constant(component.C(0), start_row_index + i) = constants[i];
                 }
 
                 std::array<typename BlueprintFieldType::value_type, 16> constants2 = {
                     2147483648, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 << 9
                 };
-                for (int i = 0; i < constants2.size(); i++) {
+                for (std::size_t i = 0; i < constants2.size(); i++) {
                     assignment.constant(component.C(0), start_row_index + constants.size() + i) = constants2[i];
                 }
             }

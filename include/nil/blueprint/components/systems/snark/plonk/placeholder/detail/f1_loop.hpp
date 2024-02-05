@@ -187,8 +187,6 @@ namespace nil {
                 assert(instance_input.s.size() == instance_input.t.size());
                 assert(instance_input.s.size() == component.m);
 
-                using var = typename plonk_f1_loop<BlueprintFieldType, ArithmetizationParams>::var;
-
                 typename BlueprintFieldType::value_type beta = var_value(assignment, instance_input.beta);
                 typename BlueprintFieldType::value_type gamma = var_value(assignment, instance_input.gamma);
                 typename BlueprintFieldType::value_type one = BlueprintFieldType::value_type::one();
@@ -523,8 +521,6 @@ namespace nil {
                 assert(instance_input.s.size() == instance_input.t.size());
                 assert(instance_input.s.size() == component.m);
 
-                using var = typename plonk_f1_loop<BlueprintFieldType, ArithmetizationParams>::var;
-
                 std::vector<std::size_t> selectors = generate_gates(component, bp, assignment, instance_input);
 
                 assignment.enable_selector(selectors[0], row);
@@ -552,8 +548,7 @@ namespace nil {
                                                        row + r);
                         }
                     } else if (witness_amount % 3 == 2) {
-                        std::size_t pos = 0, start_j = 0, end_j = witness_amount - 1;
-                        std::size_t scale = 1;
+                        std::size_t pos = 0, start_j = 0;
                         for (r = 0; r < component.rows_amount - 1; r++) {
                             start_j = 3 - (r % 3);
                             for (std::size_t j = start_j; j < witness_amount; j = j + 3) {
@@ -574,7 +569,7 @@ namespace nil {
                             assignment.enable_selector(selectors[pos], row + r - (r % 3 == 0));
                         }
                     } else {
-                        std::size_t pos = 0, start_j = 0, end_j = witness_amount - 1;
+                        std::size_t pos = 0, start_j = 0;
                         for (r = 0; r < component.rows_amount - 1; r++) {
                             start_j = r % 3 + 3 * ((r % 3) == 0);
                             for (std::size_t j = start_j; j < witness_amount; j = j + 3) {

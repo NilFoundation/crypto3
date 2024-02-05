@@ -63,8 +63,6 @@ void test(std::vector<typename BlueprintFieldType::value_type> &public_input,
 
     std::size_t m = signature.size();
 
-    std::vector<std::size_t>::iterator min_degree = std::min_element(signature.begin(), signature.end());
-
     std::array<std::uint32_t, WitnessColumns> witnesses;
     for (std::uint32_t i = 0; i < WitnessColumns; i++) {
         witnesses[i] = i;
@@ -76,8 +74,8 @@ void test(std::vector<typename BlueprintFieldType::value_type> &public_input,
     std::vector<var> selectors;
     std::size_t ctr = 0;
     var theta = var(0, ctr++, false, var::column_type::public_input);
-    for (int i = 0; i < m; i++) {
-        for (int j = 0; j < signature[i]; j++) {
+    for (std::uint32_t i = 0; i < m; i++) {
+        for (std::uint32_t j = 0; j < signature[i]; j++) {
             constraints.push_back(var(0, ctr++, false, var::column_type::public_input));
         }
         selectors.push_back(var(0, ctr++, false, var::column_type::public_input));

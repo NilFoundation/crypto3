@@ -90,7 +90,7 @@ void test(std::vector<typename BlueprintFieldType::value_type> &public_input,
     var beta = var(0, ctr++, false, var::column_type::public_input);
     var gamma = var(0, ctr++, false, var::column_type::public_input);
     std::vector<var> alphas;
-    for (int i = 0; i < m - 1; i++) {
+    for (std::uint32_t i = 0; i < m - 1; i++) {
         alphas.push_back(var(0, ctr++, false, var::column_type::public_input));
     }
 
@@ -109,42 +109,42 @@ void test(std::vector<typename BlueprintFieldType::value_type> &public_input,
     var L0 = var(0, ctr++, false, var::column_type::public_input);
 
     std::vector<var> lookup_gate_selectors;
-    for (int i = 0; i < num_gates; i++) {
+    for (std::uint32_t i = 0; i < num_gates; i++) {
         lookup_gate_selectors.push_back(var(0, ctr++, false, var::column_type::public_input));
     }
 
     std::vector<var> lookup_gate_constraints_table_ids;
-    for (int i = 0; i < num_constraints; i++) {
+    for (std::uint32_t i = 0; i < num_constraints; i++) {
         lookup_gate_constraints_table_ids.push_back(var(0, ctr++, false, var::column_type::public_input));
     }
 
     std::vector<var> lookup_gate_constraints_lookup_inputs;
-    for (int i = 0; i < num_lu_inputs; i++) {
+    for (std::uint32_t i = 0; i < num_lu_inputs; i++) {
         lookup_gate_constraints_lookup_inputs.push_back(var(0, ctr++, false, var::column_type::public_input));
     }
 
     std::vector<var> lookup_table_selectors;
-    for (int i = 0; i < num_tables; i++) {
+    for (std::uint32_t i = 0; i < num_tables; i++) {
         lookup_table_selectors.push_back(var(0, ctr++, false, var::column_type::public_input));
     }
 
     std::vector<var> lookup_table_lookup_options;
-    for (int i = 0; i < num_lu_options; i++) {
+    for (std::uint32_t i = 0; i < num_lu_options; i++) {
         lookup_table_lookup_options.push_back(var(0, ctr++, false, var::column_type::public_input));
     }
 
     std::vector<var> shifted_lookup_table_selectors;
-    for (int i = 0; i < num_tables; i++) {
+    for (std::uint32_t i = 0; i < num_tables; i++) {
         shifted_lookup_table_selectors.push_back(var(0, ctr++, false, var::column_type::public_input));
     }
 
     std::vector<var> shifted_lookup_table_lookup_options;
-    for (int i = 0; i < num_lu_options; i++) {
+    for (std::uint32_t i = 0; i < num_lu_options; i++) {
         shifted_lookup_table_lookup_options.push_back(var(0, ctr++, false, var::column_type::public_input));
     }
 
     std::vector<var> sorted;
-    for (int i = 0; i < 3 * m - 1; i++) {
+    for (std::uint32_t i = 0; i < 3 * m - 1; i++) {
         sorted.push_back(var(0, ctr++, false, var::column_type::public_input));
     }
 
@@ -192,7 +192,6 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_gate_argument_verifier_test) {
 
     std::size_t lookup_gates_size = 3;
     std::size_t lookup_tables_size = 3;
-    std::size_t alphas_size = 8;
     std::vector<std::size_t> gate_constraints_sizes = {1, 1, 1};
     std::vector<std::size_t> gate_constraint_lookup_input_sizes = {7, 2, 1};
     std::vector<std::size_t> lookup_table_lookup_options_sizes = {1, 2, 3};
@@ -326,7 +325,6 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_gate_argument_verifier_test1) {
 
     std::size_t lookup_gates_size = 2;
     std::size_t lookup_tables_size = 2;
-    std::size_t alphas_size = 6;
     std::vector<std::size_t> gate_constraints_sizes = {2, 1};
     std::vector<std::size_t> gate_constraint_lookup_input_sizes = {1, 1, 1};
     std::vector<std::size_t> lookup_table_lookup_options_sizes = {1, 3};

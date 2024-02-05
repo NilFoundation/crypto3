@@ -92,8 +92,6 @@ namespace nil {
 
                 using var = nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
                 const std::size_t row_size = get_row_size<ArithmetizationParams>();
-                const std::size_t ouptutless_var_amount =
-                    get_outputless_var_amount<ArithmetizationParams>(start_row_index, rows_amount);
                 const std::size_t end_row = start_row_index + rows_amount;
 
                 nil::blueprint::assignment<
@@ -212,7 +210,6 @@ namespace nil {
                         return (row - start_row_index + variable.rotation) * row_size + row_size - 1;
                     }
                 };
-                constexpr std::size_t gate_size = 3 * row_size;
                 const std::size_t end_row_index = start_row_index + rows_amount;
                 for (const auto &gate : bp.gates()) {
                     std::set<var> variable_set;

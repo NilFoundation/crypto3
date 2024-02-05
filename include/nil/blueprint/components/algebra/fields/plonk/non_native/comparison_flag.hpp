@@ -293,7 +293,7 @@ namespace nil {
                                                                          typename BlueprintFieldType::value_type x,
                                                                          typename BlueprintFieldType::value_type y,
                                                                          std::size_t arg_bits_amount, comparison_mode arg_mode) {
-                    
+
                     using value_type = typename BlueprintFieldType::value_type;
                     using integral_type = typename BlueprintFieldType::integral_type;
                     using chunk_type = std::uint8_t;
@@ -328,7 +328,7 @@ namespace nil {
                         chunks[i].resize(padded_chunks);
                         for (std::size_t j = 0; j < padded_chunks; j++) {
                             chunk_type chunk_value = 0;
-                            for (std::size_t k = 0; k < chunk_size; k++) {
+                            for (std::size_t k = 0; k < std::size_t(chunk_size); k++) {
                                 chunk_value <<= 1;
                                 chunk_value |= bits[i][j * chunk_size + k];
                             }
@@ -350,9 +350,6 @@ namespace nil {
                             return last_flag != 0 ? last_flag
                                                   : (current_chunk[0] > current_chunk[1] ? 1
                                                   : current_chunk[0] == current_chunk[1] ? 0 : greater_val);
-                        };
-                        auto calculate_temp = [&current_chunk](value_type last_flag) {
-                            return last_flag != 0 ? last_flag : current_chunk[0] - current_chunk[1];
                         };
                         // WARNING: this one is impure! But the code after it gets to look nicer.
                         auto place_chunk_pair = [&current_chunk, &chunks, &sum, &chunk_size](
@@ -512,7 +509,7 @@ namespace nil {
 
                         // I basically used lambdas instead of macros to cut down on code reuse.
                         // Note that the captures are by reference!
-                        auto calculate_flag = [&current_chunk, &greater_val, &component](value_type last_flag) {
+                        auto calculate_flag = [&current_chunk, &greater_val](value_type last_flag) {
                             return last_flag != 0 ? last_flag
                                                   : (current_chunk[0] > current_chunk[1] ? 1
                                                   : current_chunk[0] == current_chunk[1] ? 0 : greater_val);
@@ -598,12 +595,11 @@ namespace nil {
 
                     using component_type = plonk_comparison_flag<BlueprintFieldType, ArithmetizationParams>;
                     using value_type = typename BlueprintFieldType::value_type;
-                    using integral_type = typename BlueprintFieldType::integral_type;
 
                     value_type x = var_value(assignment, instance_input.x),
                                y = var_value(assignment, instance_input.y);
 
-                    assignment.witness(component.W(0), start_row_index) = 
+                    assignment.witness(component.W(0), start_row_index) =
                             component_type::calculate(component.witness_amount(), x, y, component.bits_amount, component.mode);
 
                     return typename component_type::result_type(component, start_row_index, true);
@@ -635,7 +631,7 @@ namespace nil {
 
                     auto generate_chunk_size_constraint = [](var v, std::size_t size) {
                         constraint_type constraint = v;
-                        for (std::size_t i = 1; i < (1 << size); i++) {
+                        for (std::size_t i = 1; i < std::size_t(1 << size); i++) {
                             constraint = constraint * (v - i);
                         }
                         return constraint;
@@ -655,7 +651,7 @@ namespace nil {
                     };
                     auto generate_difference_constraint = [](var t, var f, std::size_t size) {
                         constraint_type constraint = t - f;
-                        for (std::size_t i = 1; i < (1 << size); i++) {
+                        for (std::size_t i = 1; i < std::size_t(1 << size); i++) {
                             constraint = constraint * (t - f - i);
                         }
                         return constraint;

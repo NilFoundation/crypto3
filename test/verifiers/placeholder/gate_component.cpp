@@ -73,7 +73,7 @@ void test(std::vector<typename BlueprintFieldType::value_type> &public_input,
     std::size_t ctr = 0;
     var theta = var(0, ctr++, false, var::column_type::public_input);
     std::vector<var> constraints;
-    for (int i = 0; i <= m; i++) {
+    for (std::uint32_t i = 0; i <= m; i++) {
         constraints.push_back(var(0, ctr++, false, var::column_type::public_input));
     }
     var selector = var(0, ctr++, false, var::column_type::public_input);
@@ -170,7 +170,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_gate_component_test4) {
         0x1f36ae1c91b093f88ab05c97230c85bdd79c4d791ac2b0e8bf5c7889bb80aafd_cppui255,  // c4
         0x27b1ece6c803fcf6de3fd9aa5207378466f574a6e9b30e188b1158962fec34cf_cppui255,  // c5
         0x31acc41a65db47a663c27d691157e2f9dcf92de98d482f347c6fa0a78e67d988_cppui255,  // c6
-        0x2f971ec81c0309f69e82434a3c6596a509f586fa36712e7fd965ab31ce83b8c2_cppui255,  // c7 
+        0x2f971ec81c0309f69e82434a3c6596a509f586fa36712e7fd965ab31ce83b8c2_cppui255,  // c7
         0xcb0e17a777c9ade431b8751afd8057cdd15f74a6795dedd6c1f56bdcdfcff41_cppui255};  // q
 
     typename BlueprintFieldType::value_type expected_res =

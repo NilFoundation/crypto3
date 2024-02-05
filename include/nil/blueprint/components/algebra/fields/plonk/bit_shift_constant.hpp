@@ -131,17 +131,13 @@ namespace nil {
                                                          : bits_amount;
                 }
 
-                /*
-                   It's CRITICAL that these three variables remain on top
-                   Otherwise initialization goes in wrong order, leading to arbitrary values.
-                */
-                const std::uint32_t shift;
-                const bit_shift_mode mode;
-                const std::size_t bits_amount;
-                /* Do NOT move the above variables! */
 
                 decomposition_component_type decomposition_subcomponent;
                 composition_component_type composition_subcomponent;
+
+                const std::size_t bits_amount;
+                const std::uint32_t shift;
+                const bit_shift_mode mode;
 
                 // Technically, this component uses two gates.
                 // But both of them are inside subcomponents.
@@ -258,8 +254,7 @@ namespace nil {
                     std::move(decomposition.output.begin(), decomposition.output.end() - component.shift,
                               composition_input.bits.begin());
                 }
-                typename composition_component_type::result_type composition =
-                    generate_assignments(component.composition_subcomponent, assignment, composition_input, row);
+                generate_assignments(component.composition_subcomponent, assignment, composition_input, row);
                 row += component.composition_subcomponent.rows_amount;
 
                 assert(row == start_row_index + component.rows_amount);

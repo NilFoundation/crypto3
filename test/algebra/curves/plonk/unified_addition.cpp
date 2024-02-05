@@ -97,7 +97,6 @@ void test_unified_addition_with_zeroes() {
     boost::random::mt19937 seed_seq;
     generate_random_point.seed(seed_seq);
 
-    typename CurveType::template g1_type<nil::crypto3::algebra::curves::coordinates::affine>::value_type zero_algebraic = {0, 1};
     typename CurveType::template g1_type<nil::crypto3::algebra::curves::coordinates::affine>::value_type zero_circuits  = {0, 0};
     typename CurveType::template g1_type<nil::crypto3::algebra::curves::coordinates::affine>::value_type P = generate_random_point();
     typename CurveType::template g1_type<nil::crypto3::algebra::curves::coordinates::affine>::value_type Q = -P;

@@ -117,7 +117,6 @@ BOOST_AUTO_TEST_CASE(blueprint_variable_base_decomposition_edward25519) {
 
     using curve_type = nil::crypto3::algebra::curves::pallas;
     using BlueprintFieldType = typename curve_type::base_field_type;
-    using extended_integral = typename crypto3::algebra::curves::ed25519::scalar_field_type::extended_integral_type;
 
     test_reduction_input_expended_integral_calculate_expected<BlueprintFieldType>(max512);
     test_reduction_input_expended_integral_calculate_expected<BlueprintFieldType>(0);

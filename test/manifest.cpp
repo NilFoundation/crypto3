@@ -53,13 +53,13 @@ void test_manifest_range_intersect(std::int32_t start_1, std::int32_t end_1, std
         } else if (new_start == new_end - 1) {
             BOOST_ASSERT(get_manifest_param_type(result) == manifest_param::type::SINGLE_VALUE);
             manifest_single_value_param* res = dynamic_cast<manifest_single_value_param*>(result.get());
-            BOOST_ASSERT(res->value == new_start);
+            BOOST_ASSERT(res->value == std::size_t(new_start));
         } else {
             BOOST_ASSERT(get_manifest_param_type(result) == manifest_param::type::RANGE);
             manifest_range_param* res = dynamic_cast<manifest_range_param*>(result.get());
             BOOST_ASSERT(res->start == new_start);
             BOOST_ASSERT(res->finish == new_end);
-            BOOST_ASSERT(res->step == new_step);
+            BOOST_ASSERT(res->step == std::size_t(new_step));
         }
     } else {
         auto [gcd, m, n] = boost::integer::extended_euclidean<std::int32_t>(step_1, step_2);
@@ -77,13 +77,13 @@ void test_manifest_range_intersect(std::int32_t start_1, std::int32_t end_1, std
             } else if (new_start == new_end - 1) {
                 BOOST_ASSERT(get_manifest_param_type(result) == manifest_param::type::SINGLE_VALUE);
                 manifest_single_value_param* res = dynamic_cast<manifest_single_value_param*>(result.get());
-                BOOST_ASSERT(res->value == new_start);
+                BOOST_ASSERT(res->value == std::size_t(new_start));
             } else {
                 BOOST_ASSERT(get_manifest_param_type(result) == manifest_param::type::RANGE);
                 manifest_range_param* res = dynamic_cast<manifest_range_param*>(result.get());
                 BOOST_ASSERT(res->start == new_start);
                 BOOST_ASSERT(res->finish == new_end);
-                BOOST_ASSERT(res->step == new_step);
+                BOOST_ASSERT(res->step == std::size_t(new_step));
             }
         }
     }

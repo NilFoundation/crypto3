@@ -326,8 +326,6 @@ namespace nil {
                 assignment.witness(component.W(2), row + 2) = r[2];
                 assignment.witness(component.W(3), row + 2) = r[3];
 
-                using ArithmetizationType =
-                    crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
                 using range_type = typename plonk_ed25519_subtraction<BlueprintFieldType,
                                                                       ArithmetizationParams>::range_type;
 
@@ -355,7 +353,6 @@ namespace nil {
                     const std::uint32_t start_row_index) {
 
                 using component_type = plonk_ed25519_subtraction<BlueprintFieldType, ArithmetizationParams>;
-                using var = typename plonk_ed25519_subtraction<BlueprintFieldType, ArithmetizationParams>::var;
 
                 std::array<typename BlueprintFieldType::value_type, 4> a = {
                     typename BlueprintFieldType::integral_type(var_value(assignment, instance_input.A[0]).data),
@@ -467,8 +464,6 @@ namespace nil {
 
                 generate_copy_constraints(component, bp, assignment, instance_input, j);
 
-                using ArithmetizationType =
-                    crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
                 using var = typename plonk_ed25519_subtraction<BlueprintFieldType, ArithmetizationParams>::var;
                 using range_type = typename plonk_ed25519_subtraction<BlueprintFieldType,
                                                                       ArithmetizationParams>::range_type;

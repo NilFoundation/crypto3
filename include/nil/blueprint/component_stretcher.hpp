@@ -77,7 +77,6 @@ namespace nil {
                 }
 
                 void count_zones() {
-                    std::size_t count = 0;
                     std::set<std::size_t> seen;
                     for (std::size_t i = 0; i < rows_amount; i++) {
                         auto zone = zones.find_set(i);
@@ -233,6 +232,8 @@ namespace nil {
                                 return left - right;
                             case nil::crypto3::math::ArithmeticOperator::MULT:
                                 return left * right;
+                            default:
+                                __builtin_unreachable();
                         }
                     }
                 private:
@@ -240,9 +241,9 @@ namespace nil {
                     const std::size_t selector;
                 };
 
+                ComponentType &component;
                 const std::size_t old_witness_amount;
                 const std::size_t stretched_witness_amount;
-                ComponentType &component;
 
                 mutable std::size_t stretch_coeff;
                 mutable zone_type zones;

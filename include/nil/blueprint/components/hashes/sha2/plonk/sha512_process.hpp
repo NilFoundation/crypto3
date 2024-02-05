@@ -439,8 +439,6 @@ namespace nil {
                         ArithmetizationParams>::input_type instance_input,
                     const std::uint32_t start_row_index) {
 
-                using component_type = plonk_sha512_process<BlueprintFieldType, ArithmetizationParams>;
-
                 std::size_t row = start_row_index;
 
                 typename BlueprintFieldType::integral_type one = 1;
