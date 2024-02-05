@@ -149,7 +149,7 @@ namespace nil {
                 /**
                  * Return the height of the AS-Waksman network's top sub-network.
                  */
-                inline std::size_t as_waksman_top_height(const std::size_t num_packets) {
+                inline std::size_t as_waksman_top_height(std::size_t num_packets) const {
                     return num_packets / 2;
                 }
 
@@ -165,7 +165,7 @@ namespace nil {
                  * If top = true, return the top wire, otherwise return bottom wire.
                  */
                 inline std::size_t as_waksman_switch_output(size_t num_packets, std::size_t row_offset, std::size_t row_idx,
-                                                     bool use_top) {
+                                                     bool use_top) const{
                     std::size_t relpos = row_idx - row_offset;
                     assert(relpos % 2 == 0 && relpos + 1 < num_packets);
                     return row_offset + (relpos / 2) + (use_top ? 0 : as_waksman_top_height(num_packets));

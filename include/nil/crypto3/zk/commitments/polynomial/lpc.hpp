@@ -136,7 +136,6 @@ namespace nil {
                         math::polynomial<value_type> combined_Q_normal;
 
                         for (auto const &point: points){
-                            bool first = true;
                             V = {-point, 1};
                             math::polynomial<value_type> Q_normal;
                             for(std::size_t i: this->_z.get_batches()){
@@ -217,7 +216,6 @@ namespace nil {
 
                         for (std::size_t p = 0; p < points.size(); p++){
                             auto &point = points[p];
-                            bool first = true;
                             V[p] = {-point, 1};
                             for(std::size_t i:this->_z.get_batches()){
                                 for(std::size_t j = 0; j < this->_z.get_batch_size(i); j++){

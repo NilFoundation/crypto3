@@ -27,6 +27,8 @@
 
 #include <unordered_set>
 #include <set>
+#include <vector>
+#include <utility>
 #include <map>
 
 #include <boost/property_tree/ptree.hpp>
@@ -105,7 +107,7 @@ namespace nil {
                     }
 
                     // We call them singles in recursive verifier
-                    std::vector<typename field_type::value_type> get_unique_points(){
+                    std::vector<typename field_type::value_type> get_unique_points() const {
                         std::vector<typename field_type::value_type> result;
 //                        std::unordered_set<typename field_type::value_type> result_set;
 

@@ -153,8 +153,6 @@ namespace nil {
                             evals_map, combined_U, combined_V,
                             transcript
                     );
-
-                    return true;
                 }
             }    // namespace algorithms
         }        // namespace zk
