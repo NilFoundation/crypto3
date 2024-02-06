@@ -663,13 +663,18 @@ namespace nil {
 
                 template<class T>
                 inline BOOST_MP_CXX14_CONSTEXPR void eval_bitwise_and_default(T& t, const T& u, const T& v) {
-                    if (&t == &v) {
-                        eval_bitwise_and(t, u);
-                    } else if (&t == &u) {
-                        eval_bitwise_and(t, v);
-                    } else {
+                    if (__builtin_is_constant_evaluated()) {
                         t = u;
                         eval_bitwise_and(t, v);
+                    } else {
+                        if (&t == &v) {
+                            eval_bitwise_and(t, u);
+                        } else if (&t == &u) {
+                            eval_bitwise_and(t, v);
+                        } else {
+                            t = u;
+                            eval_bitwise_and(t, v);
+                        }
                     }
                 }
                 template<class T, class U>

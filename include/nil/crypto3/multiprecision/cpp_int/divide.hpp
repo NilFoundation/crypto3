@@ -13,19 +13,44 @@ namespace nil {
         namespace multiprecision {
             namespace backends {
 
-                template<class CppInt1, class CppInt2, class CppInt3>
+                template<class CppInt1, class CppInt2, class CppInt3, bool ConstRec = false>
                 BOOST_MP_CXX14_CONSTEXPR void
                     divide_unsigned_helper(CppInt1* result, const CppInt2& x, const CppInt3& y, CppInt1& r) {
-                    if (((void*)result == (void*)&x) || ((void*)&r == (void*)&x)) {
-                        CppInt2 t(x);
-                        divide_unsigned_helper(result, t, y, r);
-                        return;
+                    // Here there are cursed bugs with gcc if the pointer comparisons are constexpr evaluated
+                    // causing compilation to fail.
+                    // I've implemented the following fix: if we are being evaluated at compile time
+                    // we switch to forcefully creating copies of x/y/r.
+                    // At runtime we use the usual version for performance.
+                    if (!ConstRec) {
+                        if (__builtin_is_constant_evaluated()) {
+                            CppInt2 x_(x);
+                            CppInt3 y_(y);
+                            CppInt1 r_(r);
+                            divide_unsigned_helper<CppInt1, CppInt2, CppInt3, true>(result, x_, y_, r_);
+                            r = r_;
+                            return;
+                        } else {
+                            if (((void*)result == (void*)&x) || ((void*)&r == (void*)&x)) {
+                                CppInt2 t(x);
+                                divide_unsigned_helper<CppInt1, CppInt2, CppInt3, false>(result, t, y, r);
+                                return;
+                            }
+                            if (((void*)result == (void*)&y) || ((void*)&r == (void*)&y)) {
+                                CppInt3 t(y);
+                                divide_unsigned_helper<CppInt1, CppInt2, CppInt3, false>(result, x, t, r);
+                                return;
+                            }
+
+                            if (result == &r) {
+                                CppInt1 rem;
+                                divide_unsigned_helper<CppInt1, CppInt2, CppInt3, false>(result, x, y, rem);
+                                r = rem;
+                                return;
+                            }
+                        }
                     }
-                    if (((void*)result == (void*)&y) || ((void*)&r == (void*)&y)) {
-                        CppInt3 t(y);
-                        divide_unsigned_helper(result, x, t, r);
-                        return;
-                    }
+
+                    using default_ops::eval_subtract;
 
                     /*
                      Very simple, fairly braindead long division.
@@ -44,15 +69,6 @@ namespace nil {
                      numbers of limbs this generally outperforms the alternatives
                      and avoids the normalisation step which would require extra storage.
                      */
-
-                    using default_ops::eval_subtract;
-
-                    if (result == &r) {
-                        CppInt1 rem;
-                        divide_unsigned_helper(result, x, y, rem);
-                        r = rem;
-                        return;
-                    }
 
                     //
                     // Find the most significant words of numerator and denominator.
@@ -276,20 +292,30 @@ namespace nil {
                                  0);    // remainder must be less than the divisor or our code has failed
                 }
 
-                template<class CppInt1, class CppInt2>
+                template<class CppInt1, class CppInt2, bool ConstRec = false>
                 BOOST_MP_CXX14_CONSTEXPR void
                     divide_unsigned_helper(CppInt1* result, const CppInt2& x, limb_type y, CppInt1& r) {
-                    if (((void*)result == (void*)&x) || ((void*)&r == (void*)&x)) {
-                        CppInt2 t(x);
-                        divide_unsigned_helper(result, t, y, r);
-                        return;
-                    }
+                    if (!ConstRec) {
+                        if (__builtin_is_constant_evaluated()) {
+                            CppInt2 x_(x);
+                            CppInt1 r_(r);
+                            divide_unsigned_helper<CppInt1, CppInt2, true>(result, x_, y, r_);
+                            r = r_;
+                            return;
+                        } else {
+                            if (((void*)result == (void*)&x) || ((void*)&r == (void*)&x)) {
+                                CppInt2 t(x);
+                                divide_unsigned_helper<CppInt1, CppInt2, false>(result, t, y, r);
+                                return;
+                            }
 
-                    if (result == &r) {
-                        CppInt1 rem;
-                        divide_unsigned_helper(result, x, y, rem);
-                        r = rem;
-                        return;
+                            if (result == &r) {
+                                CppInt1 rem;
+                                divide_unsigned_helper<CppInt1, CppInt2, false>(result, x, y, rem);
+                                r = rem;
+                                return;
+                            }
+                        }
                     }
 
                     // As above, but simplified for integer divisor:

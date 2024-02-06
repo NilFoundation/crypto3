@@ -41,8 +41,12 @@ namespace nil {
                         result = static_cast<limb_type>(0);
                         return;
                     }
-                    if ((void *)&a != (void *)&result)
+                    if (__builtin_is_constant_evaluated()) {
                         result.resize(a.size(), a.size());
+                    } else {
+                        if ((void *)&a != (void *)&result)
+                            result.resize(a.size(), a.size());
+                    }
                     double_limb_type carry = 0;
                     typename cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>::limb_pointer p =
                         result.limbs();

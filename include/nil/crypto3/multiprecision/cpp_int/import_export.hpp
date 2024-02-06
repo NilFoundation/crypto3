@@ -252,9 +252,6 @@ namespace nil {
                     return out;
                 }
                 unsigned bitcount = nil::crypto3::multiprecision::backends::eval_msb_imp(val.backend()) + 1;
-                unsigned chunks = bitcount / chunk_size;
-                if (bitcount % chunk_size)
-                    ++chunks;
 
                 int bit_location = msv_first ? bitcount - chunk_size : 0;
                 int bit_step = msv_first ? -static_cast<int>(chunk_size) : chunk_size;
