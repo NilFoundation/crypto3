@@ -31,16 +31,16 @@
     do {                                 \
         a += b;                          \
         d ^= a;                          \
-        d = policy_type::rotl<16>(d);    \
+        d = policy_type::template rotl<16>(d);    \
         c += d;                          \
         b ^= c;                          \
-        b = policy_type::rotl<12>(b);    \
+        b = policy_type::template rotl<12>(b);    \
         a += b;                          \
         d ^= a;                          \
-        d = policy_type::rotl<8>(d);     \
+        d = policy_type::template rotl<8>(d);     \
         c += d;                          \
         b ^= c;                          \
-        b = policy_type::rotl<7>(b);     \
+        b = policy_type::template rotl<7>(b);     \
     } while (0)
 
 namespace nil {
