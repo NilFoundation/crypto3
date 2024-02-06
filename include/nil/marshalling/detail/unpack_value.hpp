@@ -145,7 +145,7 @@ namespace nil {
                     marshalling_vector values;
 
                     auto k = iterator;
-                    for (int i = 0; i < count_elements; ++i, ++k) {
+                    for (std::size_t i = 0; i < count_elements; ++i, ++k) {
                         values.emplace_back(*k);
                     }
 
@@ -176,7 +176,7 @@ namespace nil {
                     using marshalling_vector = std::vector<marshalling_internal_type>;
                     marshalling_vector values;
                     auto k = iterator;
-                    for (int i = 0; i < count_elements; ++i, ++k) {
+                    for (std::size_t i = 0; i < count_elements; ++i, ++k) {
                         values.emplace_back(*k);
                     }
                     marshalling_type m_val = marshalling_type(values);

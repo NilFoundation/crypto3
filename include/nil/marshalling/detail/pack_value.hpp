@@ -122,8 +122,6 @@ namespace nil {
                 inline operator TOutput() const {
                     using marshalling_type = typename is_compatible<TOutput>::template type<TEndian>;
 
-                    TOutput x;
-
                     marshalling_type m_val;
 
                     *status = m_val.read(iterator, count_elements);

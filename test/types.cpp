@@ -175,22 +175,22 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test_minus2) {
 
 BOOST_AUTO_TEST_CASE(types_accumulator_test_minus3) {
 
-    using big_endian_array_type = 
+    using big_endian_array_type =
     types::array_list<
         field_type<option::big_endian>,
         types::integral<
-            field_type<option::big_endian>, 
+            field_type<option::big_endian>,
             std::uint32_t>,
         option::sequence_fixed_size<5>
     >;
 
-    static const std::vector<std::uint8_t> Buf = {0x01, 0x02, 0x03, 0x04, 
-                               0x05, 0x06, 0x07, 0x08, 
-                               0x09, 0x0a, 0x0b, 0x0c, 
+    static const std::vector<std::uint8_t> Buf = {0x01, 0x02, 0x03, 0x04,
+                               0x05, 0x06, 0x07, 0x08,
+                               0x09, 0x0a, 0x0b, 0x0c,
                                0x0d, 0x0e, 0x0f, 0x10,
-                               0x11, 0x12, 0x13, 0x14, 
-                               0x15, 0x16, 0x17, 0x18, 
-                               0x19, 0x1a, 0x1b, 0x1c, 
+                               0x11, 0x12, 0x13, 0x14,
+                               0x15, 0x16, 0x17, 0x18,
+                               0x19, 0x1a, 0x1b, 0x1c,
                                0x1d, 0x1e, 0x1f, 0x20};
 
     status_type status;
@@ -227,7 +227,7 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test2) {
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
 
     static const std::vector<std::uint8_t> Buf = {0x01, 0x02, 0x03, 0x04};
-    
+
     status_type status;
     testing_type field = pack<testing_type>(Buf, status);
     BOOST_CHECK_EQUAL(field.length(), 3);
@@ -242,7 +242,7 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test3) {
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
 
     static const std::vector<std::uint8_t> Buf = {0x01, 0x02};
-    
+
     status_type status;
     testing_type field = pack<testing_type>(Buf, status);
     BOOST_CHECK_EQUAL(field.length(), sizeof(std::int16_t));
@@ -254,7 +254,7 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test4) {
     typedef types::integral<field_type<option::big_endian>, std::int16_t> testing_type;
 
     static const std::vector<char> Buf = {(char)0xff, (char)0xff};
-    
+
     status_type status;
     testing_type field = pack<testing_type>(Buf, status);
     BOOST_CHECK_EQUAL(field.length(), sizeof(std::int16_t));
@@ -266,7 +266,7 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test5) {
     typedef types::integral<field_type<option::little_endian>, std::int16_t> testing_type;
 
     static const std::vector<char> Buf = {0x0, (char)0x80};
-    
+
     status_type status;
     testing_type field = pack<testing_type>(Buf, status);
     BOOST_CHECK_EQUAL(field.length(), sizeof(std::int16_t));
@@ -278,7 +278,7 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test6) {
     typedef types::integral<field_type<option::big_endian>, std::int16_t, option::fixed_length<1>> testing_type;
 
     static const std::vector<char> Buf = {(char)0xff, 0x00};
-    
+
     status_type status;
     testing_type field = pack<testing_type>(Buf, status);
     BOOST_CHECK_EQUAL(field.length(), 1);
@@ -294,7 +294,7 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test7) {
     static_assert(!testing_type::is_version_dependent(), "Invalid version dependency assumption");
 
     static const std::vector<char> Buf = {13};
-    
+
     status_type status;
     testing_type field = pack<testing_type>(Buf, status);
 
@@ -507,7 +507,7 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test13) {
     BOOST_CHECK(field.value() == Enum2::NumOfValues);
 
     static const std::vector<char> Buf = {0x0, (char)Enum2::Value4, (char)0x3f};
-    
+
     status_type status;
     field = pack<testing_type>(Buf, status);
     BOOST_CHECK(field.length() == 2);
@@ -533,7 +533,7 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test14) {
     BOOST_CHECK(field.valid());
 
     static const std::vector<char> Buf = {0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9};
-    
+
     status_type status;
     field = pack<testing_type>(Buf, status);
     BOOST_CHECK(field.length() == Buf.size());
@@ -552,14 +552,14 @@ BOOST_AUTO_TEST_CASE(types_accumulator_test15) {
     BOOST_CHECK(field.valid());
 
     static const std::vector<char> Buf = {0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9};
-    
+
     status_type status;
     field = pack<testing_type>(Buf, status);
     BOOST_CHECK(field.length() == Buf.size());
     BOOST_CHECK(field.valid());
 
     static const std::vector<char> Buf2 = {0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc};
-    
+
     field = pack<testing_type>(Buf2, status);
     BOOST_CHECK(field.length() == Buf2.size());
     BOOST_CHECK(field.valid());
@@ -2853,7 +2853,7 @@ BOOST_AUTO_TEST_CASE(test77) {
     static const std::vector<char> ExpectedBuf = {0x3, 0x4, 0x5, 0x0, 0x0, 0x0};
 
     std::vector<char> outDataBuf(ExpectedBuf.size());
-    // pack<testing_type>(field, outDataBuf.begin());
+    pack<testing_type>(field, outDataBuf.begin());
 
     bool bufAsExpected = std::equal(ExpectedBuf.begin(), ExpectedBuf.end(), outDataBuf.begin());
     BOOST_CHECK(bufAsExpected);
@@ -3162,9 +3162,9 @@ BOOST_AUTO_TEST_CASE(test87) {
     write_read_field(field, ExpectedBuf.begin(), ExpectedBuf.size());
 
     static const std::vector<char> Buf2 = {0x0, 0x4, 0x2, 0x0, 0x1, 0x2, 0x3, 0x4, 0x2, 0x5, 0x6, 0x2, 0x7, 0x8};
-    
+
     field = pack<testing_type>(Buf2, status);
-    
+
     BOOST_CHECK(field.length() == Buf2.size() - 4U);
     BOOST_CHECK(!field.valid());
     BOOST_CHECK(field.value().size() == 4U);
