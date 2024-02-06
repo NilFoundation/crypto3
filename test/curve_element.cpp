@@ -111,7 +111,6 @@ BOOST_AUTO_TEST_CASE(curve_element_jubjub_g1) {
                                                              nil::crypto3::algebra::curves::forms::twisted_edwards>;
     using group_value_type = typename group_type::value_type;
     using field_type = typename group_value_type::field_type;
-    using field_value_type = typename field_type::value_type;
     using integral_type = typename field_type::integral_type;
 
     /// deserialization of correct blobs
@@ -184,7 +183,7 @@ BOOST_AUTO_TEST_CASE(curve_element_jubjub_g1) {
         1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0};
     std::vector<std::uint8_t> cv =
         nil::marshalling::pack<nil::marshalling::option::little_endian>(point, status);
-    for (auto i = 0; i < expected_bits.size(); ++i) {
+    for (std::size_t i = 0; i < expected_bits.size(); ++i) {
         BOOST_CHECK(expected_bits[i] == ((cv[i / 8] >> (i % 8)) & 1));
     }
 
@@ -205,7 +204,6 @@ BOOST_AUTO_TEST_CASE(curve_element_ed25519_g1) {
     using group_value_type = typename group_type::value_type;
     using group_affine_value_type = typename group_affine_type::value_type;
     using base_field_type = typename group_type::params_type::base_field_type;
-    using base_field_value_type = typename base_field_type::value_type;
     using base_integral_type = typename base_field_type::integral_type;
 
     using curve_element_type = nil::crypto3::marshalling::types::
@@ -217,7 +215,7 @@ BOOST_AUTO_TEST_CASE(curve_element_ed25519_g1) {
     encoded_point.resize(32);
     auto write_iter = encoded_point.begin();
     nil::marshalling::status_type status = test_val.write(write_iter, 32 * 8);
-
+    BOOST_CHECK(status == nil::marshalling::status_type::success);
     for (auto c : encoded_point) {
         std::cout << c;
     }

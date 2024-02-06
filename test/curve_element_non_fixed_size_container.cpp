@@ -57,12 +57,11 @@ template<typename Endianness, class T>
 void test_curve_element_non_fixed_size_container(std::vector<T> val_container) {
 
     using namespace nil::crypto3::marshalling;
-    
-    std::size_t units_bits = 8;
+
     using unit_type = unsigned char;
 
     nil::marshalling::status_type status;
-    std::vector<unit_type> cv = 
+    std::vector<unit_type> cv =
         nil::marshalling::pack<Endianness>(val_container, status);
 
     BOOST_CHECK(status == nil::marshalling::status_type::success);
