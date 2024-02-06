@@ -28,6 +28,7 @@
 #define CRYPTO3_MATH_POLYNOMIAL_POLYNOM_DFT_HPP
 
 #include <algorithm>
+#include <limits>
 #include <memory>
 #include <vector>
 #include <ostream>
@@ -761,29 +762,61 @@ namespace nil {
             template<typename FieldType>
             static inline polynomial_dfs<typename FieldType::value_type> polynomial_product(
                     std::vector<math::polynomial_dfs<typename FieldType::value_type>> multipliers) {
+                // Pre-create all the domains. We could do this on-the-go, but we want this function to be more
+                // parallelization-friendly. This single-threaded version may look a bit complicated,
+                // but it's now very similar to what we have in parallel code.
                 std::unordered_map<std::size_t, std::shared_ptr<evaluation_domain<FieldType>>> domain_cache;
+
+                std::size_t min_domain_size = std::numeric_limits<std::size_t>::max();
+                std::size_t max_domain_size = 0;
+                std::size_t total_degree = 0;
+                for (std::size_t i = 0; i < multipliers.size(); i++) {
+                    min_domain_size = std::min(min_domain_size, multipliers[i].size());
+                    max_domain_size = std::max(max_domain_size, multipliers[i].size());
+                    total_degree += multipliers[i].degree();
+                }
+                max_domain_size = std::max(max_domain_size, detail::power_of_two(total_degree + 1));
+
+                std::vector<std::size_t> needed_domain_sizes;
+                for (std::size_t i = min_domain_size; i <= max_domain_size; i *= 2) {
+                    needed_domain_sizes.push_back(i);
+                    // On the next line I want to create the tree structure, then create the evaluation domains.
+                    // This way filling of this structure can be done in parallel.
+                    domain_cache[i] = nullptr; 
+                }
+
+                // This loop will run in parallel.
+                for (const auto& domain_size: needed_domain_sizes) {
+                    domain_cache[domain_size] = make_evaluation_domain<FieldType>(domain_size);
+                }
+
                 for (std::size_t stride = 1; stride < multipliers.size(); stride <<= 1) {
                     const std::size_t double_stride = stride << 1;
-                    for(std::size_t i = 0; i + stride < multipliers.size(); i += double_stride) {
-                        const std::size_t current_domain_size = multipliers[i].size();
-                        const std::size_t next_domain_size = multipliers[i + stride].size();
+                    // This loop will run in parallel.
+                    std::size_t max_i = (multipliers.size() - stride) / double_stride;
+                    if ((multipliers.size() - stride) % double_stride != 0)
+                        max_i++;
+
+                    for(std::size_t i = 0; i < max_i; i++) {
+                        std::size_t index1 = i * double_stride;
+                        std::size_t index2 = index1 + stride;
+
+                        const std::size_t current_domain_size = multipliers[index1].size();
+                        const std::size_t next_domain_size = multipliers[index2].size();
                         const std::size_t new_domain_size =
                             detail::power_of_two(std::max(
                                 {current_domain_size,
                                  next_domain_size,
-                                 multipliers[i].degree() + multipliers[i + stride].degree() + 1}));
-                        for (auto domain_size : {current_domain_size, next_domain_size, new_domain_size}) {
-                            if (domain_cache.find(domain_size) == domain_cache.end()) {
-                                domain_cache[domain_size] = make_evaluation_domain<FieldType>(domain_size);
-                            }
-                        }
-                        multipliers[i].cached_multiplication(
-                            multipliers[i + stride],
+                                 multipliers[index1].degree() + multipliers[index2].degree() + 1}));
+
+                        multipliers[index1].cached_multiplication(
+                            multipliers[index2],
                             domain_cache[current_domain_size],
                             domain_cache[next_domain_size],
                             domain_cache[new_domain_size]);
-                        // Free memory we are not going to use anymore.
-                        multipliers[i + stride] = polynomial_dfs<typename FieldType::value_type>();
+
+                        // Free the memory we are not going to use anymore.
+                        multipliers[index2] = polynomial_dfs<typename FieldType::value_type>();
                     }
                 }
                 return multipliers[0];
