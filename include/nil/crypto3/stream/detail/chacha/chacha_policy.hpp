@@ -58,7 +58,7 @@ namespace nil {
                     constexpr static const std::size_t max_key_bits = 32 * CHAR_BIT;
                     constexpr static const std::size_t key_bits = KeyBits;
                     constexpr static const std::size_t key_size = key_bits / CHAR_BIT;
-                    BOOST_STATIC_ASSERT(min_key_bits <= KeyBits <= max_key_bits);
+                    BOOST_STATIC_ASSERT(min_key_bits <= KeyBits && KeyBits <= max_key_bits);
                     BOOST_STATIC_ASSERT(key_size % 16 == 0);
                     typedef std::array<byte_type, key_size> key_type;
 

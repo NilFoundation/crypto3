@@ -170,7 +170,7 @@ namespace nil {
                         schedule[14] = boost::endian::native_to_little(make_uint_t(iv[0], iv[1], iv[2], iv[3]));
                         schedule[15] = boost::endian::native_to_little(make_uint_t(iv[4], iv[5], iv[6], iv[7]));
 
-                        impl_type::chacha_x<4>(block, schedule);
+                        impl_type::template chacha_x<4>(block, schedule);
                     }
 
                     static void schedule_key(key_schedule_type &schedule, const key_type &key) {
@@ -225,7 +225,7 @@ namespace nil {
                         schedule[14] = boost::endian::native_to_little(make_uint_t(iv[4], iv[5], iv[6], iv[7]));
                         schedule[15] = boost::endian::native_to_little(make_uint_t(iv[8], iv[9], iv[10], iv[11]));
 
-                        impl_type::chacha_x<4>(block, schedule);
+                        impl_type::template chacha_x<4>(block, schedule);
                     }
 
                     static void schedule_key(key_schedule_type &schedule, const key_type &key) {
@@ -327,7 +327,7 @@ namespace nil {
                         schedule[14] = boost::endian::native_to_little(make_uint_t(iv[0], iv[1], iv[2], iv[3]));
                         schedule[15] = boost::endian::native_to_little(make_uint_t(iv[4], iv[5], iv[6], iv[7]));
 
-                        impl_type::chacha_x<4>(block, schedule);
+                        impl_type::template chacha_x<4>(block, schedule);
                     }
 
                     static void schedule_key(key_schedule_type &schedule, const key_type &key) {
@@ -381,7 +381,7 @@ namespace nil {
                         schedule[14] = boost::endian::native_to_little(make_uint_t(iv[4], iv[5], iv[6], iv[7]));
                         schedule[15] = boost::endian::native_to_little(make_uint_t(iv[8], iv[9], iv[10], iv[11]));
 
-                        impl_type::chacha_x<4>(block, schedule);
+                        impl_type::template chacha_x<4>(block, schedule);
                     }
 
                     static void schedule_key(key_schedule_type &schedule, const key_type &key) {
