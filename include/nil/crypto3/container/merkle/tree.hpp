@@ -155,9 +155,9 @@ namespace nil {
                 // child nodes. A diagram for merkle_tree_impl arity = 2:
                 //
                 //         root = h1234 = h(h12 + h34)
-                //        /                           \
+                //       ./                           \.
                 //  h12 = h(h1 + h2)            h34 = h(h3 + h4)
-                //   /            \              /            \
+                //  ./            \.            ./            \.
                 // h1 = h(tx1)  h2 = h(tx2)    h3 = h(tx3)  h4 = h(tx4)
                 // ```
                 //
@@ -193,7 +193,7 @@ namespace nil {
                     typedef typename container_type::reverse_iterator reverse_iterator;
                     typedef typename container_type::const_reverse_iterator const_reverse_iterator;
 
-                    merkle_tree_impl() : _leaves(0), _size(0), _rc(0) {};
+                    merkle_tree_impl() : _size(0), _leaves(0), _rc(0) {};
 
                     ~merkle_tree_impl() = default;
 
@@ -460,8 +460,8 @@ namespace nil {
                 protected:
                     container_type _hashes;
 
-                    size_t _leaves;
                     size_t _size;
+                    size_t _leaves;
                     // Note: The former 'upstream' merkle_light project uses 'height'
                     // (with regards to the tree property) incorrectly, so we've
                     // renamed it since it's actually a '_rc'.  For example, a
@@ -527,7 +527,6 @@ namespace nil {
                     BOOST_ASSERT_MSG(Arity == 2, "Only arity 2 is supported for poseidon hash function");
                     typedef T node_type;
                     typedef typename node_type::hash_type hash_type;
-                    typedef typename node_type::value_type value_type;
 
                     merkle_tree_impl<T, Arity> ret(std::distance(first, last));
 
@@ -553,7 +552,6 @@ namespace nil {
                 merkle_tree_impl<T, Arity> make_merkle_tree(LeafIterator first, LeafIterator last) {
                     typedef T node_type;
                     typedef typename node_type::hash_type hash_type;
-                    typedef typename node_type::value_type value_type;
 
                     merkle_tree_impl<T, Arity> ret(std::distance(first, last));
                     ret.reserve(ret.complete_size());
