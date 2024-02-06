@@ -187,7 +187,7 @@ BOOST_AUTO_TEST_CASE(hash_pedersen_jubjub_sha256_default_params_manual_test) {
     BOOST_CHECK(expected_bits == point_bits);
 
     input.resize(3 * 63 * 20);
-    for (auto i = 0; i < input.size(); i++) {
+    for (std::size_t i = 0; i < input.size(); i++) {
         input[i] = std::vector<bool> {0, 0, 1}[i % 3];
     }
     expected = typename hash_to_curve_type::group_value_type(

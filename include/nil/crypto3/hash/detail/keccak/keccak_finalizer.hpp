@@ -63,7 +63,7 @@ namespace nil {
                     typedef typename policy_func_type::const_impl_type const_impl_type;
 
                 public:
-                    void operator()(state_type &state) {
+                    constexpr void operator()(state_type &state) {
                         state_type temp_state;
                         std::fill(temp_state.begin(), temp_state.end(), 0);
 

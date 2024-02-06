@@ -59,7 +59,7 @@ namespace nil {
                 constexpr static const std::size_t block_words = policy_type::block_words;
                 typedef typename policy_type::block_type block_type;
 
-                static void process_block(state_type &state, const block_type &block) {
+                static constexpr void process_block(state_type &state, const block_type &block) {
                     for (std::size_t i = 0; i != block_words; ++i)
                         state[i] ^= block[i];
 
