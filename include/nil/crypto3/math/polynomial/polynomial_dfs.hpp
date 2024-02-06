@@ -90,15 +90,17 @@ namespace nil {
 
                 template<typename InputIterator>
                 polynomial_dfs(size_t d, InputIterator first, InputIterator last) : val(first, last), _d(d) {
-                    BOOST_ASSERT_MSG(std::distance(first, last) == detail::power_of_two(std::distance(first, last)),
-                                     "DFS optimal polynomial size must be a power of two");
+                    BOOST_ASSERT_MSG(
+                        std::size_t(std::distance(first, last)) == detail::power_of_two(std::distance(first, last)),
+                        "DFS optimal polynomial size must be a power of two");
                 }
 
                 template<typename InputIterator>
                 polynomial_dfs(size_t d, InputIterator first, InputIterator last, const allocator_type& a) :
                     val(first, last, a), _d(d) {
-                    BOOST_ASSERT_MSG(std::distance(first, last) == detail::power_of_two(std::distance(first, last)),
-                                     "DFS optimal polynomial size must be a power of two");
+                    BOOST_ASSERT_MSG(
+                        std::size_t(std::distance(first, last)) == detail::power_of_two(std::distance(first, last)),
+                        "DFS optimal polynomial size must be a power of two");
                 }
 
                 ~polynomial_dfs() = default;

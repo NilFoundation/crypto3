@@ -333,8 +333,6 @@ namespace nil {
 
                 FieldValueType evaluate(const FieldValueType& value) const {
 
-                    typedef typename value_type::field_type FieldType;
-
                     std::vector<FieldValueType> tmp = this->coefficients();
                     FieldValueType result = 0;
                     auto end = tmp.end();

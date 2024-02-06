@@ -38,7 +38,7 @@ namespace nil {
                                  const FieldValueType &x) {
                 polynomial<FieldValueType> f_shifted(f);
                 FieldValueType x_power = x;
-                for (int i = 1; i < f.size(); i++) {
+                for (std::size_t i = 1; i < f.size(); i++) {
                     f_shifted[i] = f_shifted[i] * x_power;
                     x_power *= x;
                 }

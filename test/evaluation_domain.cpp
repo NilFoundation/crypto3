@@ -107,7 +107,7 @@ void test_fft_performance(std::string field_name, size_t poly_size, size_t domai
 
     std::vector<value_type> f;
 
-    for (int i = 0; i < poly_size; ++i) {
+    for (std::size_t i = 0; i < poly_size; ++i) {
         f.push_back(nil::crypto3::algebra::random_element<FieldType>());
     }
 
@@ -119,7 +119,7 @@ void test_fft_performance(std::string field_name, size_t poly_size, size_t domai
 
     size_t SAMPLES = 20;
 
-    for (int i = 0; i < SAMPLES; ++i) {
+    for (std::size_t i = 0; i < SAMPLES; ++i) {
         a.resize(poly_size);
         domain->fft(a);
     }
@@ -231,7 +231,7 @@ void test_fft_curve_elements() {
     typedef typename FieldType::value_type field_value_type;
 
     std::size_t m = 4;
-    
+
     // Make sure the results are reproducible.
     std::srand(0);
     std::vector<field_value_type> f(m);
@@ -240,7 +240,7 @@ void test_fft_curve_elements() {
     for(std::size_t i = 0; i < m; ++i) {
         g[i] = value_type::one() * f[i];
     }
- 
+
     std::shared_ptr<evaluation_domain<FieldType>> domain;
 
     domain.reset(new EvaluationDomainType(m));
@@ -253,7 +253,7 @@ void test_fft_curve_elements() {
     curve_element_domain->fft(g);
 
     BOOST_CHECK_EQUAL(f.size(), g.size());
-    
+
     for(std::size_t i = 0; i < f.size(); ++i) {
         BOOST_CHECK(f[i] * value_type::one() == g[i]);
     }
@@ -276,7 +276,7 @@ void test_inverse_fft_curve_elements() {
     for(std::size_t i = 0; i < m; ++i) {
         g[i] = value_type::one() * f[i];
     }
- 
+
     std::shared_ptr<evaluation_domain<FieldType>> domain;
 
     domain.reset(new EvaluationDomainType(m));
@@ -289,7 +289,7 @@ void test_inverse_fft_curve_elements() {
     curve_element_domain->inverse_fft(g);
 
     BOOST_CHECK_EQUAL(f.size(), g.size());
-    
+
     for(std::size_t i = 0; i < f.size(); ++i) {
         BOOST_CHECK(f[i] * value_type::one() == g[i]);
     }
@@ -309,7 +309,7 @@ void test_lagrange_coefficients_from_powers(std::size_t m) {
     for(std::size_t i = 1; i < m; ++i) {
         t_powers[i] = t_powers[i-1] * t;
     }
- 
+
     std::shared_ptr<evaluation_domain<FieldType>> domain;
 
     domain.reset(new EvaluationDomainType(m));
@@ -339,10 +339,10 @@ void test_lagrange_coefficients_curve_elements(std::size_t m) {
     for(std::size_t i = 1; i < m; ++i) {
         t_powers[i] = t_powers[i-1] * t;
     }
- 
+
     std::shared_ptr<evaluation_domain<FieldType>> domain;
     domain.reset(new EvaluationDomainType(m));
-    
+
     std::shared_ptr<evaluation_domain<FieldType, value_type>> curve_element_domain;
     curve_element_domain.reset(new GroupEvaluationDomainType(m));
 
@@ -365,7 +365,7 @@ void test_get_vanishing_polynomial(std::size_t m) {
     // Make sure the results are reproducible.
     std::srand(0);
     field_value_type t = std::rand();
- 
+
     std::shared_ptr<evaluation_domain<FieldType>> domain;
 
     domain.reset(new EvaluationDomainType(m));
@@ -414,12 +414,12 @@ BOOST_AUTO_TEST_CASE(curve_elements_fft) {
     typedef curves::bls12<381>::scalar_field_type field_type;
     typedef curves::bls12<381>::g1_type<> group_type;
     using group_value_type = group_type::value_type;
-    
+
     test_fft_curve_elements<field_type,
                             group_type,
                             basic_radix2_domain<field_type>,
                             basic_radix2_domain<field_type, group_value_type>>();
-    // not applicable for any m < 100 for this field 
+    // not applicable for any m < 100 for this field
     // test_fft_curve_elements<field_type,
     //                         group_type,
     //                         extended_radix2_domain<field_type>,
@@ -442,7 +442,7 @@ BOOST_AUTO_TEST_CASE(curve_elements_inverse_fft) {
     typedef curves::bls12<381>::scalar_field_type field_type;
     typedef curves::bls12<381>::g1_type<> group_type;
     using group_value_type = group_type::value_type;
-    
+
     test_inverse_fft_curve_elements<field_type,
                             group_type,
                             basic_radix2_domain<field_type>,
@@ -468,7 +468,7 @@ BOOST_AUTO_TEST_CASE(curve_elements_inverse_fft) {
 
 BOOST_AUTO_TEST_CASE(lagrange_coefficients_from_powers) {
     typedef curves::bls12<381>::scalar_field_type field_type;
-    
+
     test_lagrange_coefficients_from_powers<field_type,
                             basic_radix2_domain<field_type>>(4);
     // not applicable for any m < 100 for this field, testing with base field instead
@@ -486,12 +486,12 @@ BOOST_AUTO_TEST_CASE(curve_elements_lagrange_coefficients) {
     typedef curves::bls12<381>::scalar_field_type field_type;
     typedef curves::bls12<381>::g1_type<> group_type;
     using group_value_type = group_type::value_type;
-    
+
     test_lagrange_coefficients_curve_elements<field_type,
                             group_type,
                             basic_radix2_domain<field_type>,
                             basic_radix2_domain<field_type, group_value_type>>(4);
-    // not applicable for any m < 100 for this field 
+    // not applicable for any m < 100 for this field
     // test_lagrange_coefficients_curve_elements<field_type,
     //                         group_type,
     //                         extended_radix2_domain<field_type>,
@@ -512,7 +512,7 @@ BOOST_AUTO_TEST_CASE(curve_elements_lagrange_coefficients) {
 
 BOOST_AUTO_TEST_CASE(get_vanishing_polynomial) {
     typedef curves::bls12<381>::scalar_field_type field_type;
-    
+
     test_get_vanishing_polynomial<field_type,
                             basic_radix2_domain<field_type>>(4);
     // not applicable for any m < 100 for this field, testing with base field instead

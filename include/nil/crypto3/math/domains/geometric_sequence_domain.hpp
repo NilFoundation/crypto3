@@ -224,11 +224,11 @@ namespace nil {
                 }
 
                 std::vector<value_type> evaluate_all_lagrange_polynomials(const typename std::vector<value_type>::const_iterator &t_powers_begin,
-                                                                          const typename std::vector<value_type>::const_iterator &t_powers_end) override { 
-                    if(std::distance(t_powers_begin, t_powers_end) < this->m) {
+                                                                          const typename std::vector<value_type>::const_iterator &t_powers_end) override {
+                    if(std::size_t(std::distance(t_powers_begin, t_powers_end)) < this->m) {
                         throw std::invalid_argument("geometric_sequence_radix2: expected std::distance(t_powers_begin, t_powers_end) >= this->m");
                     }
-                    
+
                     /* Compute Lagrange polynomial of size m, with m+1 points (x_0, y_0), ... ,(x_m, y_m) */
                     /* Evaluate for x = t */
                     /* Return coeffs for each l_j(x) = (l / l_i[j]) * w[j] */
@@ -284,18 +284,18 @@ namespace nil {
                     }
 
                     std::vector<value_type> result(this->m, value_type::zero());
-                    
+
                     for(std::size_t j = 0; j < l[0].size(); ++j) {
                         result[0] = result[0] + t_powers_begin[j] * l[0][j];
                     }
                     result[0] = result[0] * g_i[0];
                     for (std::size_t i = 1; i < this->m; i++) {
                         g_i[i] = g_i[i - 1] * g[this->m - i] * -g[i].inversed() * geometric_sequence[i];
-                        
+
                         for(std::size_t j = 0; j < l[i].size(); ++j) {
                             result[i] = result[i] + t_powers_begin[j] * l[i][j];
                         }
-                        
+
                         result[i] = result[i] * (r_i * g_i[i]);
                         r_i *= r;
                     }
@@ -303,7 +303,7 @@ namespace nil {
                     return result;
                 }
 
-                // This one is not the unity root actually, but it's ok for our purposes. 
+                // This one is not the unity root actually, but it's ok for our purposes.
                 const field_value_type& get_unity_root() override {
                     return geometric_generator;
                 }

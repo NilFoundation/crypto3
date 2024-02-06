@@ -47,7 +47,7 @@ namespace nil {
             template<typename FieldValueType, typename ContiguousIterator>
             inline FieldValueType evaluate_polynomial(ContiguousIterator first, ContiguousIterator last,
                                                       const FieldValueType &t, std::size_t m) {
-                BOOST_ASSERT(std::distance(first, last) == m);
+                BOOST_ASSERT(std::size_t(std::distance(first, last)) == m);
 
                 return boost::math::tools::evaluate_polynomial(&*first, t, m);
             }
@@ -77,7 +77,7 @@ namespace nil {
 
                 BOOST_STATIC_ASSERT(std::is_same<value_type, FieldValueType>::value);
 
-                if (m != std::distance(first, last)) {
+                if (m != std::size_t(std::distance(first, last))) {
                     throw std::invalid_argument("expected m == domain.size()");
                 }
                 if (idx >= m) {

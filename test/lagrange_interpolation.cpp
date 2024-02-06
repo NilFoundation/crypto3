@@ -69,8 +69,7 @@ BOOST_AUTO_TEST_CASE(polynomial_lagrange_interpolation_manual_test) {
 
 BOOST_AUTO_TEST_CASE(polynomial_lagrange_interpolation_random_test) {
     using field_type = fields::bls12_fr<381>;
-    using integral_type = typename field_type::integral_type;
-    auto one = field_type::value_type::one();    
+    auto one = field_type::value_type::one();
 
     std::size_t n = std::rand() % 50 + 1;
     std::vector<typename field_type::value_type> p_coeffs(2 * n);

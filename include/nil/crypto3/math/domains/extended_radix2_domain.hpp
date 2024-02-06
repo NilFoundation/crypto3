@@ -171,7 +171,7 @@ namespace nil {
 
                 std::vector<value_type> evaluate_all_lagrange_polynomials(const typename std::vector<value_type>::const_iterator &t_powers_begin,
                                                                           const typename std::vector<value_type>::const_iterator &t_powers_end) override {
-                    if(std::distance(t_powers_begin, t_powers_end) < this->m) {
+                    if(std::size_t(std::distance(t_powers_begin, t_powers_end)) < this->m) {
                         throw std::invalid_argument("extended_radix2: expected std::distance(t_powers_begin, t_powers_end) >= this->m");
                     }
 
