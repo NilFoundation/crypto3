@@ -151,41 +151,12 @@ namespace nil {
                     return *this;
                 }
 
-                //                polynomial_dfs& operator=(const container_type& x) {
-                //                    val = x;
-                //                    return *this;
-                //                }
-                //
-                //                polynomial_dfs& operator=(container_type&& x) {
-                //                    val = x;
-                //                    return *this;
-                //                }
-
-                //                polynomial_dfs& operator=(std::initializer_list<value_type> il) {
-                //                    val.assign(il.begin(), il.end());
-                //                    return *this;
-                //                }
-
                 bool operator==(const polynomial_dfs& rhs) const {
                     return val == rhs.val && _d == rhs._d;
                 }
                 bool operator!=(const polynomial_dfs& rhs) const {
                     return !(rhs == *this && _d == rhs._d);
                 }
-
-                //                template<typename InputIterator>
-                //                typename std::iterator_traits<InputIterator>::reference assign(InputIterator first,
-                //                                                                               InputIterator last) {
-                //                    return val.assign(first, last);
-                //                }
-                //
-                //                void assign(size_type n, const_reference u) {
-                //                    return val.assign(n, u);
-                //                }
-                //
-                //                void assign(std::initializer_list<value_type> il) {
-                //                    assign(il.begin(), il.end());
-                //                }
 
                 allocator_type get_allocator() const BOOST_NOEXCEPT {
                     return this->val.__alloc();
@@ -444,19 +415,7 @@ namespace nil {
                  */
                 polynomial_dfs operator+(const polynomial_dfs& other) const {
                     polynomial_dfs result = *this;
-                    if (other.size() > this->size()) {
-                        result.resize(other.size());
-                    }
-                    result._d = std::max(this->_d, other._d);
-                    if (this->size() > other.size()) {
-                        polynomial_dfs tmp(other);
-                        tmp.resize(this->size());
-                        std::transform(tmp.begin(), tmp.end(), result.begin(), result.begin(),
-                                       std::plus<FieldValueType>());
-                        return result;
-                    }
-                    std::transform(other.begin(), other.end(), result.begin(), result.begin(),
-                                   std::plus<FieldValueType>());
+                    result += other;
                     return result;
                 }
 
@@ -505,19 +464,7 @@ namespace nil {
                  */
                 polynomial_dfs operator-(const polynomial_dfs& other) const {
                     polynomial_dfs result = *this;
-                    if (other.size() > this->size()) {
-                        result.resize(other.size());
-                    }
-                    result._d = std::max(_d, other._d);
-                    if (this->size() > other.size()) {
-                        polynomial_dfs tmp(other);
-                        tmp.resize(this->size());
-                        std::transform(result.begin(), result.end(), tmp.begin(), result.begin(),
-                                       std::minus<FieldValueType>());
-                        return result;
-                    }
-                    std::transform(result.begin(), result.end(), other.begin(), result.begin(),
-                                   std::minus<FieldValueType>());
+                    result -= other;
                     return result;
                 }
 
@@ -556,25 +503,7 @@ namespace nil {
                  */
                 polynomial_dfs operator*(const polynomial_dfs& other) const {
                     polynomial_dfs result = *this;
-
-                    const size_t polynomial_s =
-                        detail::power_of_two(std::max({this->size(), other.size(), this->degree() + other.degree() + 1}));
-
-                    if (this->size() < polynomial_s) {
-                         result.resize(polynomial_s);
-                    }
-
-                    // Change the degree only here, after a possible resize, otherwise we have a polynomial
-                    // with a high degree but small size, which sometimes segfaults.
-                    result._d = this->degree() + other.degree();
-
-                    if (other.size() < polynomial_s) {
-                        polynomial_dfs tmp(other);
-                        tmp.resize(polynomial_s);
-                        std::transform(tmp.begin(), tmp.end(), result.begin(), result.begin(), std::multiplies<FieldValueType>());
-                        return result;
-                    }
-                    std::transform(other.begin(), other.end(), result.begin(), result.begin(), std::multiplies<FieldValueType>());
+                    result *= other;
 
                     return result;
                 }
@@ -584,26 +513,7 @@ namespace nil {
                  * and stores result in polynomial A.
                  */
                 polynomial_dfs& operator*=(const polynomial_dfs& other) {
-                    const size_t polynomial_s =
-                        detail::power_of_two(std::max({this->size(), other.size(), this->degree() + other.degree() + 1}));
-
-                    if (this->size() < polynomial_s) {
-                        this->resize(polynomial_s);
-                    }
-
-                    // Change the degree only here, after a possible resize, otherwise we have a polynomial
-                    // with a high degree but small size, which sometimes segfaults.
-                    this->_d += other._d;
-
-                    if (other.size() < polynomial_s) {
-                        polynomial_dfs tmp(other);
-                        tmp.resize(polynomial_s);
-
-                        std::transform(tmp.begin(), tmp.end(), this->begin(), this->begin(), std::multiplies<FieldValueType>());
-                        return *this;
-                    }
-                    std::transform(this->begin(), this->end(), other.begin(), this->begin(), std::multiplies<FieldValueType>());
-                    return *this;
+                    return cached_multiplication(other);
                 }
 
                 /**

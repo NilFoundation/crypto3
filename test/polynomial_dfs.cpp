@@ -34,6 +34,7 @@
 #include <boost/test/data/monomorphic.hpp>
 
 #include <nil/crypto3/algebra/fields/arithmetic_params/bls12.hpp>
+#include <nil/crypto3/algebra/random_element.hpp>
 
 #include <nil/crypto3/math/algorithms/make_evaluation_domain.hpp>
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
@@ -1291,6 +1292,60 @@ BOOST_AUTO_TEST_CASE(polynomial_dfs_zero_one_test) {
 
     one.resize(100);
     BOOST_CHECK((small_poly - one * small_poly).is_zero());
+}
+
+BOOST_AUTO_TEST_CASE(polynomial_dfs_multiplication_perf_test, *boost::unit_test::disabled()) {
+    size_t size = 131072 * 4;
+
+    polynomial_dfs<typename FieldType::value_type> poly = {
+        size / 128, size, nil::crypto3::algebra::random_element<FieldType>()};
+
+    std::vector<polynomial_dfs<typename FieldType::value_type>> poly4(64, poly);
+
+    auto start = std::chrono::high_resolution_clock::now();
+    for (int i = 0; i < poly4.size(); ++i) {
+        for (int j = 0; j < 32; ++j)
+            poly4[i] *= poly;
+    }
+
+    for (int i = 1; i < poly4.size(); ++i) {
+        BOOST_CHECK(poly4[i] == poly4[0]);
+    }
+
+    // Record the end time
+    auto end = std::chrono::high_resolution_clock::now();
+
+    // Calculate the duration
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+
+    std::cout << "Multiplication time: " << duration.count() << " microseconds." << std::endl;
+}
+
+BOOST_AUTO_TEST_CASE(polynomial_dfs_resize_perf_test, *boost::unit_test::disabled()) {
+    std::vector<typename FieldType::value_type> values;
+    size_t size = 131072 * 16;
+    for (int i = 0; i < size; i++) {
+        values.push_back(nil::crypto3::algebra::random_element<FieldType>());
+    }
+
+    polynomial_dfs<typename FieldType::value_type> poly = {
+        size - 1, values};
+
+    auto start = std::chrono::high_resolution_clock::now();
+    for (int i = 0; i < 10; ++i) {
+        auto poly2 = poly;
+        poly2.resize(8 * size);
+
+        BOOST_CHECK(poly2.size() == 8 * size);
+    }
+
+    // Record the end time
+    auto end = std::chrono::high_resolution_clock::now();
+
+    // Calculate the duration
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+
+    std::cout << "Resize time: " << duration.count() << " microseconds." << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()
