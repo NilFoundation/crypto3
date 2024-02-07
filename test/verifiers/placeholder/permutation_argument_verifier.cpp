@@ -98,7 +98,7 @@ void test(std::vector<typename BlueprintFieldType::value_type> &public_input,
         public_input,
         result_check,
         instance_input,
-        nil::crypto3::detail::connectedness_check_type::STRONG,
+        nil::blueprint::connectedness_check_type::type::STRONG,
         m);
 }
 

@@ -180,7 +180,7 @@ void test(std::vector<typename BlueprintFieldType::value_type> &public_input,
 
     crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
         component_instance, public_input, result_check, instance_input,
-        nil::crypto3::detail::connectedness_check_type::STRONG, num_gates, gate_constraints_sizes,
+        nil::blueprint::connectedness_check_type::type::STRONG, num_gates, gate_constraints_sizes,
         gate_constraint_lookup_input_sizes, num_tables, lookup_table_lookup_options_sizes, lookup_table_columns_number);
 }
 

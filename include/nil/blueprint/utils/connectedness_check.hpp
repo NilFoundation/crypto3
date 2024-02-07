@@ -40,6 +40,7 @@
 
 #include <vector>
 #include <set>
+#include <unordered_set>
 #include <array>
 #include <iostream>
 #include <algorithm>
@@ -123,21 +124,18 @@ namespace nil {
                     }
                 }
                 for (auto &variable : input_variables) {
+                    const auto output_value =
+                        zones.find_set(copy_var_address<BlueprintFieldType, ArithmetizationParams>(
+                                       start_row_index, rows_amount, variable)) + 1;
                     switch (variable.type) {
                         case var::column_type::constant:
-                            output_assignment.constant(variable.index, variable.rotation) =
-                                zones.find_set(copy_var_address<BlueprintFieldType, ArithmetizationParams>(
-                                    start_row_index, rows_amount, variable)) + 1;
+                            output_assignment.constant(variable.index, variable.rotation) = output_value;
                             break;
                         case var::column_type::public_input:
-                            output_assignment.public_input(variable.index, variable.rotation) =
-                                zones.find_set(copy_var_address<BlueprintFieldType, ArithmetizationParams>(
-                                    start_row_index, rows_amount, variable)) + 1;
+                            output_assignment.public_input(variable.index, variable.rotation) = output_value;
                             break;
                         case var::column_type::witness:
-                            output_assignment.witness(variable.index, variable.rotation) =
-                                zones.find_set(copy_var_address<BlueprintFieldType, ArithmetizationParams>(
-                                    start_row_index, rows_amount, variable)) + 1;
+                            output_assignment.witness(variable.index, variable.rotation) = output_value;
                             break;
                         case var::column_type::selector:
                             BOOST_ASSERT_MSG(false, "Selector variables should not be input variables.");
@@ -181,6 +179,37 @@ namespace nil {
                         }
                     }
                 }
+            }
+
+            template<typename BlueprintFieldType, typename ArithmetizationParams>
+            bool check_set(
+                const nil::blueprint::assignment<
+                    nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                    &assignment,
+                boost::disjoint_sets_with_storage<> &zones,
+                const std::set<nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>>
+                    &variable_set,
+                const std::unordered_set<std::size_t> &expected_zones,
+                const std::function<std::size_t(std::size_t, std::size_t,
+                    nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>)>
+                    &gate_var_address,
+                std::size_t selector_index,
+                std::size_t start_row_index,
+                std::size_t end_row_index) {
+
+                std::size_t last_row =
+                    std::min<std::size_t>(end_row_index, assignment.selector_column_size(selector_index));
+                for (std::size_t row = start_row_index; row < last_row; row++) {
+                    if (assignment.selector(selector_index, row) != 0) {
+                        for (const auto &variable : variable_set) {
+                            const auto var_address = gate_var_address(start_row_index, row, variable);
+                            if (expected_zones.count(zones.find_set(var_address)) == 0) {
+                                return false;
+                            }
+                        }
+                    }
+                }
+                return true;
             }
 
             template<typename BlueprintFieldType, typename ArithmetizationParams>
@@ -248,6 +277,110 @@ namespace nil {
             }
         }    // namespace detail
 
+
+        struct connectedness_check_type {
+            enum class type {
+                NONE,
+                WEAK,
+                STRONG
+            } t;
+
+            enum class island_type {
+                NONE,
+                ISLANDS
+            } it;
+
+            connectedness_check_type(type t) : t(t), it(island_type::ISLANDS) {}
+            connectedness_check_type(type t, island_type it) : t(t), it(it) {}
+        };
+
+        // Checks if there are connected components which are separate from inputs/outputs
+        // This should always be true for a correct component.
+        // If this fails, either the component is wrong or the check is busted.
+        template<typename BlueprintFieldType, typename ArithmetizationParams>
+        bool check_islands(
+            const nil::blueprint::assignment<
+                nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                &assignment,
+            const nil::blueprint::circuit<
+                nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                &bp,
+            boost::disjoint_sets_with_storage<> &zones,
+            const std::vector<std::reference_wrapper<
+                              nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>>>
+                &input_variables,
+            const std::vector<nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>>
+                &output_variables,
+            std::size_t start_row_index, std::size_t rows_amount) {
+
+            using var = nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
+
+            constexpr std::size_t row_size = detail::get_row_size<ArithmetizationParams>();
+            std::unordered_set<std::size_t> expected_zones;
+            for (const auto &input_var : input_variables) {
+                expected_zones.insert(zones.find_set(
+                    detail::copy_var_address<BlueprintFieldType, ArithmetizationParams>(
+                        start_row_index, rows_amount, input_var)));
+            }
+            for (const auto &output_var : output_variables) {
+                expected_zones.insert(zones.find_set(
+                    detail::copy_var_address<BlueprintFieldType, ArithmetizationParams>(
+                        start_row_index, rows_amount, output_var)));
+            }
+            auto gate_var_address = [](std::size_t start_row_index, std::size_t row, const var &variable) {
+                if (variable.type == var::column_type::witness) {
+                    return (row - start_row_index + variable.rotation) * row_size + variable.index;
+                } else {
+                    // Constant
+                    return (row - start_row_index + variable.rotation) * row_size + row_size - 1;
+                }
+            };
+            const std::size_t end_row_index = start_row_index + rows_amount;
+            for (const auto &gate : bp.gates()) {
+                std::set<var> variable_set;
+                std::function<void(var)> variable_extractor = [&variable_set](var variable) {
+                    variable_set.insert(variable);
+                };
+                nil::crypto3::math::expression_for_each_variable_visitor<var> visitor(variable_extractor);
+                for (const auto &constraint : gate.constraints) {
+                    visitor.visit(constraint);
+                }
+                if (!detail::check_set(assignment, zones, variable_set, expected_zones, gate_var_address,
+                                      gate.selector_index, start_row_index, end_row_index)) {
+                    return false;
+                }
+            }
+            for (auto &lookup_gate : bp.lookup_gates()) {
+                std::set<var> variable_set;
+                std::function<void(var)> variable_extractor = [&variable_set](var variable) {
+                    variable_set.insert(variable);
+                };
+                nil::crypto3::math::expression_for_each_variable_visitor<var> visitor(variable_extractor);
+                for (const auto &lookup_constraint : lookup_gate.constraints) {
+                    for (const auto &lookup_input : lookup_constraint.lookup_input) {
+                        visitor.visit(lookup_input);
+                    }
+                }
+                if (!detail::check_set(assignment, zones, variable_set, expected_zones, gate_var_address,
+                                      lookup_gate.tag_index, start_row_index, end_row_index)) {
+                    return false;
+                }
+            }
+            for (auto &constraint : bp.copy_constraints()) {
+                const auto first_address =
+                    detail::copy_var_address<BlueprintFieldType, ArithmetizationParams>(
+                        start_row_index, rows_amount, constraint.first);
+                const auto second_address =
+                    detail::copy_var_address<BlueprintFieldType, ArithmetizationParams>(
+                        start_row_index, rows_amount, constraint.second);
+                if (expected_zones.count(zones.find_set(first_address)) == 0 ||
+                    expected_zones.count(zones.find_set(second_address)) == 0) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
         // Ensure that output and input variables are connected via constraints.
         // This failing basically guarantees that the circuit is broken (or the check is).
         // There might exists rare components for which a lower level of connectedness is sufficient:
@@ -255,21 +388,15 @@ namespace nil {
         // For a weaker version, see check_weak_connectedness
         template<typename BlueprintFieldType, typename ArithmetizationParams>
         bool check_strong_connectedness(
-            const nil::blueprint::assignment<
-                nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
-                &assignment,
-            const nil::blueprint::circuit<
-                nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
-                &bp,
-            const std::vector<std::reference_wrapper<nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>>>
+            boost::disjoint_sets_with_storage<> &zones,
+            const std::vector<std::reference_wrapper<
+                              nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>>>
                 &input_variables,
             const std::vector<nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>>
                 &output_variables,
             std::size_t start_row_index, std::size_t rows_amount) {
 
             using detail::copy_var_address;
-            auto zones = detail::generate_connectedness_zones(assignment, bp, input_variables,
-                                                              start_row_index, rows_amount);
             std::size_t expected_zone = zones.find_set(
                 copy_var_address<BlueprintFieldType, ArithmetizationParams>(
                     start_row_index, rows_amount, input_variables[0]));
@@ -295,21 +422,15 @@ namespace nil {
         // For a stronger version, see check_strong_connectedness
         template<typename BlueprintFieldType, typename ArithmetizationParams>
         bool check_weak_connectedness(
-            const nil::blueprint::assignment<
-                nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
-                &assignment,
-            const nil::blueprint::circuit<
-                nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
-                &bp,
-            const std::vector<std::reference_wrapper<nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>>>
+            boost::disjoint_sets_with_storage<> &zones,
+            const std::vector<std::reference_wrapper<
+                              nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>>>
                 &input_variables,
             const std::vector<nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>>
                 &output_variables,
             std::size_t start_row_index, std::size_t rows_amount) {
 
             using detail::copy_var_address;
-            auto zones = detail::generate_connectedness_zones(assignment, bp, input_variables,
-                                                              start_row_index, rows_amount);
             std::set<std::size_t> expected_input_zones,
                                   expected_output_zones;
             // check that all outputs are connected to at least some input
@@ -342,6 +463,51 @@ namespace nil {
             }
 
             return true;
+        }
+
+        template<typename BlueprintFieldType, typename ArithmetizationParams>
+        bool check_connectedness(
+            const nil::blueprint::assignment<
+                nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                &assignment,
+            const nil::blueprint::circuit<
+                nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                &bp,
+            const std::vector<std::reference_wrapper<
+                              nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>>>
+                &input_variables,
+            const std::vector<nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>>
+                &output_variables,
+            std::size_t start_row_index, std::size_t rows_amount,
+            connectedness_check_type type) {
+
+            if (type.t == connectedness_check_type::type::NONE) {
+                return true;
+            }
+            auto zones = detail::generate_connectedness_zones(assignment, bp, input_variables,
+                                                              start_row_index, rows_amount);
+            bool check_result;
+            switch(type.t) {
+                case connectedness_check_type::type::NONE:
+                    return true;
+                case connectedness_check_type::type::WEAK:
+                    check_result = check_weak_connectedness<BlueprintFieldType, ArithmetizationParams>(
+                        zones, input_variables, output_variables, start_row_index, rows_amount);
+                    break;
+                case connectedness_check_type::type::STRONG:
+                    check_result = check_strong_connectedness<BlueprintFieldType, ArithmetizationParams>(
+                        zones, input_variables, output_variables, start_row_index, rows_amount);
+                    break;
+            }
+
+            switch(type.it) {
+                case connectedness_check_type::island_type::NONE:
+                    return check_result;
+                case connectedness_check_type::island_type::ISLANDS:
+                    return check_result && check_islands<BlueprintFieldType, ArithmetizationParams>(
+                        assignment, bp, zones, input_variables, output_variables, start_row_index, rows_amount);
+            }
+            return false;
         }
     }   // namespace blueprint
 }    // namespace nil

@@ -120,7 +120,7 @@ void test_fri_cosets(std::vector<typename FieldType::value_type> public_input,
                                       std::array<std::uint32_t, 0>{},  // public inputs
                                       n, omega);
 
-    nil::crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (component_instance, public_input, result_check, instance_input, nil::crypto3::detail::connectedness_check_type::STRONG, n, omega);
+    nil::crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (component_instance, public_input, result_check, instance_input, nil::blueprint::connectedness_check_type::type::STRONG, n, omega);
 }
 
 template <typename FieldType>

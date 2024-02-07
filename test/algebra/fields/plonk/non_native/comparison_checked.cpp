@@ -107,12 +107,12 @@ auto test_comparison_checked(typename BlueprintFieldType::value_type x,
         if (expected_to_pass) {
             nil::crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
                 component_instance, public_input, result_check, instance_input,
-                nil::crypto3::detail::connectedness_check_type::STRONG, R, Mode);
+                nil::blueprint::connectedness_check_type::type::STRONG, R, Mode);
         } else {
             nil::crypto3::test_component_to_fail<component_type, BlueprintFieldType, ArithmetizationParams,
                                                  hash_type, Lambda>(
                                                     component_instance, public_input, result_check, instance_input,
-                                                    nil::crypto3::detail::connectedness_check_type::STRONG, R, Mode);
+                                                    nil::blueprint::connectedness_check_type::type::STRONG, R, Mode);
         }
     } else {
         auto custom_assignment = nil::crypto3::generate_patched_assignments<
@@ -123,13 +123,13 @@ auto test_comparison_checked(typename BlueprintFieldType::value_type x,
                     hash_type, Lambda>(
                         component_instance, public_input,
                         result_check, custom_assignment, instance_input,
-                        nil::crypto3::detail::connectedness_check_type::STRONG, R, Mode);
+                        nil::blueprint::connectedness_check_type::type::STRONG, R, Mode);
         } else {
             nil::crypto3::test_component_to_fail_custom_assignments<component_type, BlueprintFieldType,
                     ArithmetizationParams, hash_type, Lambda>(
                             component_instance, public_input, result_check,
                             custom_assignment, instance_input,
-                            nil::crypto3::detail::connectedness_check_type::STRONG, R, Mode);
+                            nil::blueprint::connectedness_check_type::type::STRONG, R, Mode);
         }
     }
 }

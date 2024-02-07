@@ -90,11 +90,11 @@ void test(std::vector<typename BlueprintFieldType::value_type> &public_input,
     if (signature.size() == 1 && signature[0] == 1) {
         crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
             component_instance, public_input, result_check, instance_input,
-            nil::crypto3::detail::connectedness_check_type::NONE, signature);
+            nil::blueprint::connectedness_check_type::type::NONE, signature);
     } else {
         crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
             component_instance, public_input, result_check, instance_input,
-            nil::crypto3::detail::connectedness_check_type::STRONG, signature);
+            nil::blueprint::connectedness_check_type::type::STRONG, signature);
     }
 }
 
