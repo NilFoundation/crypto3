@@ -71,7 +71,6 @@ namespace nil {
                     constexpr GroupValueType
                         operator*(const GroupValueType &left,
                                   const multiprecision::number<nil::crypto3::multiprecision::backends::modular_adaptor<Backend, SafeType>, ExpressionTemplates> &right) {
-                        multiprecision::number<Backend, ExpressionTemplates> tmp = right.template convert_to<multiprecision::number<Backend, ExpressionTemplates>>();
                         return scalar_mul(left, right);
                     }
 

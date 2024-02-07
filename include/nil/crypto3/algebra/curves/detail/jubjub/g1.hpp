@@ -38,7 +38,7 @@ namespace nil {
         namespace algebra {
             namespace curves {
 
-                struct jubjub;
+                class jubjub;
 
                 namespace detail {
                     /** @brief A struct representing a group G1 of JubJub curve.

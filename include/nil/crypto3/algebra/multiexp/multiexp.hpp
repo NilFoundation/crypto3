@@ -44,7 +44,6 @@ namespace nil {
                          InputFieldIterator scalar_end, const std::size_t chunks_count) {
 
                 typedef typename std::iterator_traits<InputBaseIterator>::value_type base_value_type;
-                typedef typename std::iterator_traits<InputFieldIterator>::value_type field_value_type;
 
                 const std::size_t total_size = std::distance(vec_start, vec_end);
 

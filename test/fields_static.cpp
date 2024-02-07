@@ -369,8 +369,6 @@ BOOST_AUTO_TEST_CASE(field_operation_test_bls12_381_fq2) {
 BOOST_AUTO_TEST_CASE(field_operation_test_bls12_381_fq6) {
     using policy_type = fields::fp6_3over2<fields::bls12_fq<381>>;
     using value_type = typename policy_type::value_type;
-    using test_set_t = std::array<value_type, elements_set_size - 1>;
-    using const_set_t = std::array<constant_type, constants_set_size>;
 
     constexpr value_type element1(
         {{0xe35bdcd1e6bea40fb5a65a36a415ef84cb2260e7c7a21b479352a56a257128bbd2f6b8e5d96dca7917292801387ca3f_cppui381,
@@ -606,8 +604,6 @@ BOOST_AUTO_TEST_CASE(field_operation_test_mnt4_fq2) {
 BOOST_AUTO_TEST_CASE(field_operation_test_mnt4_fq4) {
     using policy_type = fields::fp4<fields::mnt4<298>>;
     using value_type = typename policy_type::value_type;
-    using test_set_t = std::array<value_type, elements_set_size - 1>;
-    using const_set_t = std::array<constant_type, constants_set_size>;
 
     constexpr value_type element1(
         {{
@@ -820,8 +816,6 @@ BOOST_AUTO_TEST_CASE(field_operation_test_mnt6_fq3) {
 BOOST_AUTO_TEST_CASE(field_operation_test_mnt6_fq6) {
     using policy_type = fields::fp6_2over3<fields::mnt6<298>>;
     using value_type = typename policy_type::value_type;
-    using test_set_t = std::array<value_type, elements_set_size - 1>;
-    using const_set_t = std::array<constant_type, constants_set_size>;
 
     constexpr value_type element1(
         {{

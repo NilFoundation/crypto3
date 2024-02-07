@@ -83,7 +83,8 @@ namespace nil {
                             BOOST_ASSERT(len_in_bytes < 0x10000);
                             BOOST_ASSERT(std::distance(dst.begin(), dst.end()) >= 16 &&
                                          std::distance(dst.begin(), dst.end()) <= 255);
-                            BOOST_ASSERT(std::distance(uniform_bytes.begin(), uniform_bytes.end()) >= len_in_bytes);
+                            BOOST_ASSERT(
+                                std::size_t(std::distance(uniform_bytes.begin(), uniform_bytes.end())) >= len_in_bytes);
 
                             const std::array<std::uint8_t, 2> l_i_b_str = {
                                 static_cast<std::uint8_t>(len_in_bytes >> 8u),

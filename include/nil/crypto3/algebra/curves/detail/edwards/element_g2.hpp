@@ -42,7 +42,7 @@ namespace nil {
                      *
                      */
                     template<std::size_t Version, typename Form, typename Coordinates>
-                    class edwards_g2;
+                    struct edwards_g2;
                     /** @brief A struct representing an element from the group G2 of Edwards curve.
                      *    @tparam Version version of the curve
                      *
@@ -83,8 +83,8 @@ namespace nil {
                          */
                         constexpr element_edwards_g2(const underlying_field_value_type& X,
                                                 const underlying_field_value_type& Y,
-                                                const underlying_field_value_type& Z) 
-                            : X(X), Y(Y), Z(Z) 
+                                                const underlying_field_value_type& Z)
+                            : X(X), Y(Y), Z(Z)
                         { }
 
                         template<typename Backend,

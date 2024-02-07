@@ -35,7 +35,7 @@ namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace curves {
-                struct pallas;
+                class pallas;
 
                 namespace detail {
                     /** @brief A struct representing a group G1 of pallas curve.

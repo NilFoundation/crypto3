@@ -38,7 +38,7 @@ namespace nil {
             namespace curves {
                 namespace detail {
                     template<typename GroupType>
-                    struct iso_map;
+                    class iso_map;
 
                     // 11-isogeny map for BLS12-381 G1
                     // https://tools.ietf.org/html/draft-irtf-cfrg-hash-to-curve-10#appendix-E.2
@@ -210,7 +210,6 @@ namespace nil {
                             std::vector<field_value_type> xi_powers = [&ci]() {
                                 std::vector<field_value_type> xi_powers {field_value_type::one()};
                                 for (std::size_t i = 0; i < 3; i++) {
-                                    auto v = xi_powers.back();
                                     xi_powers.emplace_back(xi_powers.back() * ci.X);
                                 }
                                 return xi_powers;

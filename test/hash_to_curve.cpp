@@ -458,7 +458,6 @@ BOOST_AUTO_TEST_CASE(hash_to_curve_bls12_381_g1_h2c_sha256_test) {
     using group_type = typename curve_type::g1_type<>;
     using h2c_type = ep_map<group_type>;
     typedef typename group_type::value_type group_value_type;
-    typedef typename group_type::field_type::value_type field_value_type;
     typedef typename group_type::field_type::integral_type integral_type;
 
     std::string default_tag_str = "QUUX-V01-CS02-with-";

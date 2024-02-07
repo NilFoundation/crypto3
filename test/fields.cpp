@@ -758,8 +758,6 @@ BOOST_AUTO_TEST_CASE(field_not_square_manual_test_bls12_381_fq) {
 
 BOOST_AUTO_TEST_CASE(field_not_square_manual_test_bls12_381_fq2) {
     using policy_type = fields::fp2<fields::bls12_fq<381>>;
-    typedef typename policy_type::value_type value_type;
-    typedef typename value_type::underlying_type::integral_type integral_type;
 
     std::vector<std::array<const char *, 2>> not_squares = {
         {"3524621578887081555995618340212814089553799753665493370168024281656572217651956527488772586862482092190213449"

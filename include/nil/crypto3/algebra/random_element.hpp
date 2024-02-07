@@ -61,7 +61,6 @@ namespace nil {
 
                 using field_type = FieldType;
                 using distribution_type = DistributionType;
-                using generator_type = GeneratorType;
 
                 distribution_type d(0, field_type::modulus);
 
@@ -89,7 +88,7 @@ namespace nil {
                 typename field_type::value_type::data_type data;
                 const std::size_t data_dimension = field_type::arity / field_type::underlying_field_type::arity;
 
-                for (int n = 0; n < data_dimension; ++n) {
+                for (std::size_t n = 0; n < data_dimension; ++n) {
                     data[n] =
                         random_element<typename FieldType::underlying_field_type, distribution_type, generator_type>(rng);
                 }

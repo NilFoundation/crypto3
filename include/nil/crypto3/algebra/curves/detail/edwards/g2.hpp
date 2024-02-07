@@ -36,7 +36,7 @@ namespace nil {
             namespace curves {
 
                 template<std::size_t Version>
-                struct edwards;
+                class edwards;
 
                 namespace detail {
                     /** @brief A struct representing a group G2 of Edwards curve.

@@ -71,7 +71,6 @@ namespace nil {
                                 InputFieldIterator scalar_end) {
 
                         typedef typename std::iterator_traits<InputBaseIterator>::value_type base_value_type;
-                        typedef typename std::iterator_traits<InputFieldIterator>::value_type field_value_type;
 
                         base_value_type result = base_value_type::zero();
 
@@ -106,7 +105,6 @@ namespace nil {
                                 InputFieldIterator exponents_end) {
 
                         typedef typename std::iterator_traits<InputBaseIterator>::value_type base_value_type;
-                        typedef typename std::iterator_traits<InputFieldIterator>::value_type field_value_type;
 
                         std::size_t length = std::distance(bases, bases_end);
                         std::size_t scalars_length = std::distance(exponents, exponents_end);
@@ -221,7 +219,6 @@ namespace nil {
                                 InputFieldIterator scalar_end) {
 
                         typedef typename std::iterator_traits<InputBaseIterator>::value_type base_value_type;
-                        typedef typename std::iterator_traits<InputFieldIterator>::value_type field_value_type;
 
                         // temporary added until fixed-precision modular adaptor is ready:
                         typedef multiprecision::number<multiprecision::backends::cpp_int_backend<>>

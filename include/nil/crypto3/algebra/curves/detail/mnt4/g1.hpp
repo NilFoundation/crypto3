@@ -36,7 +36,7 @@ namespace nil {
             namespace curves {
 
                 template<std::size_t Version>
-                struct mnt4;
+                class mnt4;
 
                 namespace detail {
                     /** @brief A struct representing a group G1 of mnt4 curve.

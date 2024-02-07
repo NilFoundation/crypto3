@@ -42,7 +42,7 @@ namespace nil {
             namespace curves {
 
                 template<std::size_t Version>
-                struct bls12;
+                class bls12;
 
                 namespace detail {
 

@@ -36,7 +36,7 @@ namespace nil {
         namespace algebra {
             namespace curves {
                 template<std::size_t Version>
-                struct secp_k1;
+                class secp_k1;
 
                 namespace detail {
                     /** @brief A struct representing a group G1 of SECP curves.

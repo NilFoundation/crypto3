@@ -38,7 +38,7 @@ namespace nil {
             namespace curves {
 
                 template<std::size_t Version>
-                struct alt_bn128;
+                class alt_bn128;
 
                 namespace detail {
 

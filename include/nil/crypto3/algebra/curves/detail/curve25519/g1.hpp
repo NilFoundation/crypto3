@@ -40,7 +40,7 @@ namespace nil {
         namespace algebra {
             namespace curves {
                 class curve25519;
-                struct ed25519;
+                class ed25519;
 
                 namespace detail {
                     /** @brief A struct representing a group G1 of curve25519 curve.
