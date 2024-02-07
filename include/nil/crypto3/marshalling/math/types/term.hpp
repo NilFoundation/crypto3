@@ -93,7 +93,7 @@ namespace nil {
                     std::vector<typename NonLinearTerm::variable_type> vars;
                     auto coeff = std::get<0>(filled_term.value()).value();
                     vars.reserve(std::get<1>(filled_term.value()).value().size());
-                    for (auto i = 0; i < std::get<1>(filled_term.value()).value().size(); i++) {
+                    for (std::size_t i = 0; i < std::get<1>(filled_term.value()).value().size(); i++) {
                         vars.emplace_back(make_variable<Endianness, typename NonLinearTerm::variable_type>(
                             std::get<1>(filled_term.value()).value().at(i)));
                     }

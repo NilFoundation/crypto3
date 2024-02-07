@@ -81,7 +81,7 @@ using namespace nil::crypto3;
 using namespace nil::crypto3::zk;
 using namespace nil::crypto3::zk::snark;
 
-inline std::vector<std::size_t> generate_random_step_list(const std::size_t r, const int max_step) {
+inline std::vector<std::size_t> generate_random_step_list(const std::size_t r, const std::size_t max_step) {
     using dist_type = std::uniform_int_distribution<int>;
     static std::random_device random_engine;
 
@@ -186,7 +186,8 @@ void test_placeholder_proof(const ProofType &proof, const CommitmentParamsType& 
     std::vector<std::uint8_t> cv;
     cv.resize(filled_placeholder_proof.length(), 0x00);
     auto write_iter = cv.begin();
-    nil::marshalling::status_type status = filled_placeholder_proof.write(write_iter, cv.size());
+    auto status = filled_placeholder_proof.write(write_iter, cv.size());
+    BOOST_CHECK(status == nil::marshalling::status_type::success);
 
     if (output_file != "") {
         print_placeholder_proof(cv.cbegin(), cv.cend(), false, output_file.c_str());
@@ -195,13 +196,14 @@ void test_placeholder_proof(const ProofType &proof, const CommitmentParamsType& 
     proof_marshalling_type test_val_read;
     auto read_iter = cv.begin();
     status = test_val_read.read(read_iter, cv.size());
+    BOOST_CHECK(status == nil::marshalling::status_type::success);
     auto constructed_val_read = types::make_placeholder_proof<Endianness, ProofType>(test_val_read);
     BOOST_CHECK(proof == constructed_val_read);
 }
 
 bool has_argv(std::string name){
     bool result = false;
-    for (std::size_t i = 0; i < boost::unit_test::framework::master_test_suite().argc; i++) {
+    for (std::size_t i = 0; i < std::size_t(boost::unit_test::framework::master_test_suite().argc); i++) {
         if (std::string(boost::unit_test::framework::master_test_suite().argv[i]) == "--print") {
             result = true;
         }
@@ -255,7 +257,7 @@ struct test_initializer {
     test_initializer() {
         test_global_seed = 0;
 
-        for (std::size_t i = 0; i < boost::unit_test::framework::master_test_suite().argc - 1; i++) {
+        for (std::size_t i = 0; i < std::size_t(boost::unit_test::framework::master_test_suite().argc - 1); i++) {
             if (std::string(boost::unit_test::framework::master_test_suite().argv[i]) == "--seed") {
                 if (std::string(boost::unit_test::framework::master_test_suite().argv[i + 1]) == "random") {
                     std::random_device rd;
@@ -391,7 +393,6 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit2)
 
     constexpr static const std::size_t table_rows_log = 3;
     constexpr static const std::size_t table_rows = 1 << table_rows_log;
-    constexpr static const std::size_t permutation_size = 4;
     constexpr static const std::size_t usable_rows = (1 << table_rows_log) - 3;
 
     struct placeholder_test_params {
@@ -507,7 +508,6 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit3)
 
     constexpr static const std::size_t table_rows_log = 3;
     constexpr static const std::size_t table_rows = 1 << table_rows_log;
-    constexpr static const std::size_t permutation_size = 4;
     constexpr static const std::size_t usable_rows = 4;
 
     struct placeholder_test_params {
@@ -596,7 +596,6 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit4)
 
     constexpr static const std::size_t table_rows_log = 3;
     constexpr static const std::size_t table_rows = 1 << table_rows_log;
-    constexpr static const std::size_t permutation_size = 4;
     constexpr static const std::size_t usable_rows = 5;
 
     struct placeholder_test_params {
@@ -685,7 +684,6 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit6)
 
     constexpr static const std::size_t table_rows_log = 3;
     constexpr static const std::size_t table_rows = 1 << table_rows_log;
-    constexpr static const std::size_t permutation_size = 4;
     constexpr static const std::size_t usable_rows = 6;
 
     struct placeholder_test_params {
@@ -770,11 +768,6 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit7)
     using TTypeBase = nil::marshalling::field_type<Endianness>;
     using curve_type = algebra::curves::pallas;
     using field_type = typename curve_type::base_field_type;
-
-    constexpr static const std::size_t table_rows_log = 4;
-    constexpr static const std::size_t table_rows = 1 << table_rows_log;
-    constexpr static const std::size_t permutation_size = 3;
-    constexpr static const std::size_t usable_rows = 14;
 
     struct placeholder_test_params {
         using merkle_hash_type = hashes::keccak_1600<256>;

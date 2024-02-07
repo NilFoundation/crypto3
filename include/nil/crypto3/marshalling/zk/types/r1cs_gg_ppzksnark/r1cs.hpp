@@ -134,7 +134,6 @@ namespace nil {
                 template<typename LC, typename Endianness>
                 linear_combination<nil::marshalling::field_type<Endianness>, LC> fill_linear_combination(const LC &lc) {
 
-                    using TTypeBase = nil::marshalling::field_type<Endianness>;
                     using lt_type = linear_term<nil::marshalling::field_type<Endianness>,
                                                 math::linear_term<math::linear_variable<typename LC::field_type>>>;
                     using lc_type = linear_combination<nil::marshalling::field_type<Endianness>, LC>;
@@ -170,8 +169,6 @@ namespace nil {
                 r1cs_constraint<nil::marshalling::field_type<Endianness>, Constraint>
                     fill_r1cs_constraint(const Constraint &c) {
 
-                    using TTypeBase = nil::marshalling::field_type<Endianness>;
-
                     return r1cs_constraint<nil::marshalling::field_type<Endianness>, Constraint>(std::make_tuple(
                         fill_linear_combination<math::linear_combination<math::linear_variable<typename Constraint::field_type>>,
                                                 Endianness>(c.a),
@@ -206,7 +203,6 @@ namespace nil {
                         nil::marshalling::types::integral<nil::marshalling::field_type<Endianness>, std::size_t>>>
                     fill_r1cs_constraint_vector(const std::vector<Constraint> &cs_vec) {
 
-                    using TTypeBase = nil::marshalling::field_type<Endianness>;
                     using constraint_type = r1cs_constraint<nil::marshalling::field_type<Endianness>, Constraint>;
                     using constraint_vector_type = nil::marshalling::types::array_list<
                         nil::marshalling::field_type<Endianness>,

@@ -77,7 +77,6 @@ void test_verification_key(const VerificationKey &val) {
 
     using namespace nil::crypto3::marshalling;
 
-    std::size_t units_bits = 8;
     using unit_type = unsigned char;
     using verification_key_marshalling_type = VerificationKeyMarshalling;
 
@@ -96,11 +95,12 @@ void test_verification_key(const VerificationKey &val) {
     auto write_iter = cv.begin();
 
     nil::marshalling::status_type status = filled_val.write(write_iter, cv.size());
-
+    BOOST_CHECK(status == nil::marshalling::status_type::success);
     verification_key_marshalling_type test_val_read;
 
     auto read_iter = cv.begin();
     status = test_val_read.read(read_iter, cv.size());
+    BOOST_CHECK(status == nil::marshalling::status_type::success);
 
     VerificationKey constructed_val_read =
             types::make_r1cs_gg_ppzksnark_verification_key<VerificationKey, Endianness>(test_val_read);
@@ -115,7 +115,6 @@ void test_pubkey(const Key &val) {
 
     using namespace nil::crypto3::marshalling;
 
-    std::size_t units_bits = 8;
     using unit_type = unsigned char;
     using key_marshalling_type = KeyMarshalling;
 
@@ -132,11 +131,12 @@ void test_pubkey(const Key &val) {
     auto write_iter = cv.begin();
 
     nil::marshalling::status_type status = filled_val.write(write_iter, cv.size());
-
+    BOOST_CHECK(status == nil::marshalling::status_type::success);
     key_marshalling_type test_val_read;
 
     auto read_iter = cv.begin();
     status = test_val_read.read(read_iter, cv.size());
+    BOOST_CHECK(status == nil::marshalling::status_type::success);
 
     Key constructed_val_read = types::make_public_key<Key, Endianness>(test_val_read);
 
@@ -275,9 +275,6 @@ BOOST_AUTO_TEST_SUITE(verification_key_test_suite)
     BOOST_AUTO_TEST_CASE(r1cs_gg_ppzksnark_extended_verification_key_bls12_381_be_error_length) {
         using endianness = nil::marshalling::option::big_endian;
         using curve_type = nil::crypto3::algebra::curves::bls12<381>;
-        using key_type = nil::crypto3::zk::snark::r1cs_gg_ppzksnark_extended_verification_key<curve_type>;
-        using key_marshalling_type = nil::crypto3::marshalling::types::r1cs_gg_ppzksnark_extended_verification_key<
-                nil::marshalling::field_type<endianness>, key_type>;
 
         using g1_type = typename curve_type::template g1_type<>;
         using g2_type = typename curve_type::template g2_type<>;

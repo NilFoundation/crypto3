@@ -48,7 +48,7 @@ namespace nil {
                         nil::marshalling::types::integral<TTypeBase, std::size_t>, // columns_number
 
                         nil::marshalling::types::array_list<
-                            TTypeBase, 
+                            TTypeBase,
                             typename variable<TTypeBase, typename LookupTable::variable_type>::type,
                             nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, std::size_t>>
                         >
@@ -62,11 +62,11 @@ namespace nil {
                     using variable_type = typename LookupTable::variable_type;
 
                     nil::marshalling::types::array_list<
-                        TTypeBase, 
+                        TTypeBase,
                         typename variable<TTypeBase, typename LookupTable::variable_type>::type,
                         nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, std::size_t>>
                     > filled_options;
-                    
+
                     for( std::size_t i = 0; i < table.lookup_options.size(); i++ ){
                         BOOST_ASSERT(table.lookup_options[i].size() == table.columns_number);
                         for( std::size_t j = 0; j < table.lookup_options[i].size(); j++){
@@ -138,7 +138,7 @@ namespace nil {
                 std::vector<PlonkTable> make_plonk_lookup_tables(
                     const plonk_lookup_tables<nil::marshalling::field_type<Endianness>, PlonkTable> &filled_tables) {
                     std::vector<PlonkTable> tables;
-                    for (auto i = 0; i < filled_tables.value().size(); i++) {
+                    for (std::size_t i = 0; i < filled_tables.value().size(); i++) {
                         tables.emplace_back(make_plonk_lookup_table<Endianness, PlonkTable>(filled_tables.value().at(i)));
                     }
                     return tables;

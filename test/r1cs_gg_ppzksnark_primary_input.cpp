@@ -74,7 +74,6 @@ void test_primary_input(typename SchemeType::primary_input_type val) {
 
     using namespace nil::crypto3::marshalling;
 
-    std::size_t units_bits = 8;
     using unit_type = unsigned char;
     using primary_input_type = types::r1cs_gg_ppzksnark_primary_input<nil::marshalling::field_type<Endianness>,
             typename SchemeType::primary_input_type>;
@@ -95,11 +94,13 @@ void test_primary_input(typename SchemeType::primary_input_type val) {
     auto write_iter = cv.begin();
 
     nil::marshalling::status_type status = filled_val.write(write_iter, cv.size());
+    BOOST_CHECK(status == nil::marshalling::status_type::success);
 
     primary_input_type test_val_read;
 
     auto read_iter = cv.begin();
     status = test_val_read.read(read_iter, cv.size());
+    BOOST_CHECK(status == nil::marshalling::status_type::success);
 
     typename SchemeType::primary_input_type constructed_val_read =
             types::make_r1cs_gg_ppzksnark_primary_input<typename SchemeType::primary_input_type, Endianness>(

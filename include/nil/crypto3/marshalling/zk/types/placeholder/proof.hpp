@@ -66,7 +66,6 @@ namespace nil {
                     fill_placeholder_evaluation_proof(const typename Proof::evaluation_proof &proof, const CommitmentParamsType& commitment_params) {
 
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
-                    using uint64_t_marshalling_type = nil::marshalling::types::integral<TTypeBase, std::uint64_t>;
 
                     using field_marhsalling_type = field_element<TTypeBase, typename Proof::field_type::value_type>;
 
@@ -88,7 +87,6 @@ namespace nil {
                     const placeholder_evaluation_proof<nil::marshalling::field_type<Endianness>, Proof> &filled_proof) {
 
                     typename Proof::evaluation_proof proof;
-                    using TTypeBase = nil::marshalling::field_type<Endianness>;
 
                     // typename FieldType::value_type challenge
                     proof.challenge = std::get<0>(filled_proof.value()).value();
@@ -96,7 +94,7 @@ namespace nil {
                     // typename commitment_scheme_type::proof_type combined_value
                     proof.eval_proof = make_eval_proof<Endianness, typename Proof::commitment_scheme_type>(
                         std::get<1>(filled_proof.value()));
-                    
+
                     return proof;
                 }
 

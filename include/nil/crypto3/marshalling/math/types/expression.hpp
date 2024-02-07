@@ -47,7 +47,7 @@ namespace nil {
                 // Marshalling struct for flat_pow_operation.
                 template<typename TTypeBase>
                 struct flat_pow_operation {
-                    using type = 
+                    using type =
                         nil::marshalling::types::bundle<
                             TTypeBase,
                             std::tuple<
@@ -64,7 +64,7 @@ namespace nil {
                 // Marshalling struct for flat_binary_arithmetic_operation.
                 template<typename TTypeBase>
                 struct flat_binary_arithmetic_operation {
-                    using type = 
+                    using type =
                         nil::marshalling::types::bundle<
                             TTypeBase,
                             std::tuple<
@@ -86,7 +86,7 @@ namespace nil {
                 template<typename TTypeBase, typename ExpressionType>
                 struct expression
                 {
-                    using type = 
+                    using type =
                         nil::marshalling::types::bundle<
                             TTypeBase,
                             std::tuple<
@@ -104,7 +104,7 @@ namespace nil {
                                     nil::marshalling::option::sequence_size_field_prefix<
                                         nil::marshalling::types::integral<TTypeBase, std::size_t>>
                                 >,
-                                // std::vector<flat_binary_arithmetic_operation> binary_operations 
+                                // std::vector<flat_binary_arithmetic_operation> binary_operations
                                 nil::marshalling::types::array_list<
                                     TTypeBase,
                                     typename flat_binary_arithmetic_operation<TTypeBase>::type,
@@ -138,7 +138,7 @@ namespace nil {
                         std::make_tuple(
                             nil::marshalling::types::integral<TTypeBase, std::uint8_t>((std::uint8_t)bin_op.op),
                             nil::marshalling::types::integral<TTypeBase, std::uint8_t>((std::uint8_t)bin_op.left_type),
-                            nil::marshalling::types::integral<TTypeBase, std::uint32_t>(bin_op.left_index), 
+                            nil::marshalling::types::integral<TTypeBase, std::uint32_t>(bin_op.left_index),
                             nil::marshalling::types::integral<TTypeBase, std::uint8_t>((std::uint8_t)bin_op.right_type),
                             nil::marshalling::types::integral<TTypeBase, std::uint32_t>(bin_op.right_index)));
                 }
@@ -153,7 +153,7 @@ namespace nil {
 
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
                     using size_t_marshalling_type = nil::marshalling::types::integral<TTypeBase, std::size_t>;
-                    // Fill the terms. 
+                    // Fill the terms.
                     using term_marshalling_type =
                         typename term<TTypeBase, typename ExpressionType::term_type>::type;
                     using term_vector_marshalling_type = nil::marshalling::types::array_list<
@@ -165,7 +165,7 @@ namespace nil {
                             fill_term<Endianness, typename ExpressionType::term_type>(term));
                     }
 
-                    // Fill the power operations. 
+                    // Fill the power operations.
                     using pow_operation_type = typename flat_pow_operation<TTypeBase>::type;
                     using pow_vector_marshalling_type = nil::marshalling::types::array_list<
                         TTypeBase, pow_operation_type, nil::marshalling::option::sequence_size_field_prefix<
@@ -175,7 +175,7 @@ namespace nil {
                         filled_powers.value().push_back(fill_power_operation<Endianness>(power));
                     }
 
-                    // Fill the binary operations. 
+                    // Fill the binary operations.
                     using binary_operation_type = typename flat_binary_arithmetic_operation<TTypeBase>::type;
                     using binary_operation_vector_marshalling_type = nil::marshalling::types::array_list<
                         TTypeBase, binary_operation_type,
@@ -193,11 +193,11 @@ namespace nil {
                             filled_binary_opeations,
                             nil::marshalling::types::integral<TTypeBase, std::uint8_t>((std::uint8_t)flat_expr.root_type),
                             nil::marshalling::types::integral<TTypeBase, std::uint32_t>(flat_expr.root_index)));
- 
+
                 }
 
                 template<typename Endianness>
-                math::flat_pow_operation 
+                math::flat_pow_operation
                     make_power_operation(const typename flat_pow_operation<nil::marshalling::field_type<Endianness>>::type& filled_power_op) {
                     math::flat_pow_operation power_op;
                     power_op.power = std::get<0>(filled_power_op.value()).value();
@@ -228,21 +228,21 @@ namespace nil {
 
                     // Get the terms.
                     const auto& terms = std::get<0>(filled_expr.value()).value();
-                    for (auto i = 0; i < terms.size(); i++) {
+                    for (std::size_t i = 0; i < terms.size(); i++) {
                         flat_expr.terms.emplace_back(
                             make_term<Endianness, typename ExpressionType::term_type>(terms.at(i)));
                     }
 
                     // Get the power operations.
                     const auto& powers = std::get<1>(filled_expr.value()).value();
-                    for (auto i = 0; i < powers.size(); i++) {
+                    for (std::size_t i = 0; i < powers.size(); i++) {
                         flat_expr.pow_operations.emplace_back(
                             make_power_operation<Endianness>(powers.at(i)));
                     }
 
                     // Get the binary arithmetic operations.
                     const auto& bin_ops = std::get<2>(filled_expr.value()).value();
-                    for (auto i = 0; i < bin_ops.size(); i++) {
+                    for (std::size_t i = 0; i < bin_ops.size(); i++) {
                         flat_expr.binary_operations.emplace_back(
                             make_binary_operation<Endianness, ArithmeticOperatorType>(bin_ops.at(i)));
                     }

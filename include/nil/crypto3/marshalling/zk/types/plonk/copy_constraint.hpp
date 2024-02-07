@@ -18,13 +18,13 @@ namespace nil {
             namespace types {
 
                 // *********************** Plonk copy constraint **************************** //
-                template<typename TTypeBase, typename VariableType> 
+                template<typename TTypeBase, typename VariableType>
                     using plonk_copy_constraint = nil::marshalling::types::bundle<TTypeBase, std::tuple<
-                        typename variable<TTypeBase, VariableType>::type, 
+                        typename variable<TTypeBase, VariableType>::type,
                         typename variable<TTypeBase, VariableType>::type
                     >>;
 
-                template<typename Endianness, typename VariableType> 
+                template<typename Endianness, typename VariableType>
                 plonk_copy_constraint<typename nil::marshalling::field_type<Endianness>, VariableType>
                 fill_plonk_copy_constraint(const std::pair<VariableType, VariableType> &copy_constraint){
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
@@ -43,19 +43,17 @@ namespace nil {
                 make_plonk_copy_constraint(const plonk_copy_constraint<typename nil::marshalling::field_type<Endianness>, VariableType> &filled_copy_constraint
                 ){
 
-                    using TTypeBase = nil::marshalling::field_type<Endianness>;
-
                     return std::make_pair(
                         make_variable<Endianness, VariableType>(std::get<0>(filled_copy_constraint.value())),
                         make_variable<Endianness, VariableType>(std::get<1>(filled_copy_constraint.value()))
-                    );      
+                    );
                 }
 
 
                 // *********************** Plonk copy constraints **************************** //
                 template<typename TTypeBase, typename VariableType>
                 using plonk_copy_constraints = nil::marshalling::types::array_list<
-                    TTypeBase, 
+                    TTypeBase,
                     plonk_copy_constraint<TTypeBase, VariableType>,
                     nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, std::size_t>>
                 >;
@@ -81,7 +79,7 @@ namespace nil {
                     const plonk_copy_constraints<nil::marshalling::field_type<Endianness>, VariableType> &filled_constraints
                 ){
                     std::vector< std::pair< VariableType, VariableType > > constraints;
-                    for (auto i = 0; i < filled_constraints.value().size(); i++) {
+                    for (std::size_t i = 0; i < filled_constraints.value().size(); i++) {
                         constraints.emplace_back(make_plonk_copy_constraint<Endianness, VariableType>(filled_constraints.value()[i]));
                     }
                     return constraints;

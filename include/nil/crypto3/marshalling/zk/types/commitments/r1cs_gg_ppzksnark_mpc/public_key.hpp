@@ -70,8 +70,6 @@ namespace nil {
                 r1cs_gg_ppzksnark_mpc_public_key<nil::marshalling::field_type<Endianness>, PublicKey>
                     fill_r1cs_gg_ppzksnark_mpc_public_key(const PublicKey &public_key) {
 
-                    using TTypeBase = nil::marshalling::field_type<Endianness>;
-
                     return r1cs_gg_ppzksnark_mpc_public_key<nil::marshalling::field_type<Endianness>, PublicKey>(
                         std::make_tuple(
                             std::move(

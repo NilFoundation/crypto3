@@ -100,10 +100,6 @@ namespace nil {
                     fill_powers_of_tau_accumulator(const Accumulator &accumulator) {
 
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
-                    using curve_g1_element_type =
-                        fast_curve_element<TTypeBase, typename Accumulator::curve_type::template g1_type<>>;
-                    using curve_g2_element_type =
-                        fast_curve_element<TTypeBase, typename Accumulator::curve_type::template g2_type<>>;
 
                     return powers_of_tau_accumulator<TTypeBase, Accumulator>(std::make_tuple(
                         std::move(

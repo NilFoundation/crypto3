@@ -45,7 +45,7 @@ using namespace nil::crypto3::zk::snark;
 
 bool has_argv(std::string name){
     bool result = false;
-    for (std::size_t i = 0; i < boost::unit_test::framework::master_test_suite().argc; i++) {
+    for (std::size_t i = 0; i < std::size_t(boost::unit_test::framework::master_test_suite().argc); i++) {
         if (std::string(boost::unit_test::framework::master_test_suite().argv[i]) == "--print") {
             result = true;
         }
@@ -113,7 +113,7 @@ struct test_initializer {
     test_initializer() {
         test_global_seed = 0;
 
-        for (std::size_t i = 0; i < boost::unit_test::framework::master_test_suite().argc - 1; i++) {
+        for (std::size_t i = 0; i < std::size_t(boost::unit_test::framework::master_test_suite().argc - 1); i++) {
             if (std::string(boost::unit_test::framework::master_test_suite().argv[i]) == "--seed") {
                 if (std::string(boost::unit_test::framework::master_test_suite().argv[i + 1]) == "random") {
                     std::random_device rd;
@@ -214,7 +214,6 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit2)
 
     constexpr static const std::size_t table_rows_log = 4;
     constexpr static const std::size_t table_rows = 1 << table_rows_log;
-    constexpr static const std::size_t permutation_size = 4;
     constexpr static const std::size_t usable_rows = (1 << table_rows_log) - 3;
 
     struct placeholder_test_params {
@@ -278,7 +277,6 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit3)
 
     constexpr static const std::size_t table_rows_log = 3;
     constexpr static const std::size_t table_rows = 1 << table_rows_log;
-    constexpr static const std::size_t permutation_size = 4;
     constexpr static const std::size_t usable_rows = 4;
 
     struct placeholder_test_params {
@@ -344,7 +342,6 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit4)
 
     constexpr static const std::size_t table_rows_log = 3;
     constexpr static const std::size_t table_rows = 1 << table_rows_log;
-    constexpr static const std::size_t permutation_size = 4;
     constexpr static const std::size_t usable_rows = 5;
 
     struct placeholder_test_params {
@@ -477,7 +474,6 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit6)
 
     constexpr static const std::size_t table_rows_log = 3;
     constexpr static const std::size_t table_rows = 1 << table_rows_log;
-    constexpr static const std::size_t permutation_size = 3;
     constexpr static const std::size_t usable_rows = 6;
 
     struct placeholder_test_params {
@@ -541,7 +537,6 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit7)
 
     constexpr static const std::size_t table_rows_log = 4;
     constexpr static const std::size_t table_rows = 1 << table_rows_log;
-    constexpr static const std::size_t permutation_size = 3;
     constexpr static const std::size_t usable_rows = 14;
 
     struct placeholder_test_params {

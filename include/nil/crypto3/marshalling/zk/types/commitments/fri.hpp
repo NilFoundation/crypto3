@@ -280,7 +280,7 @@ namespace nil {
                                         initial_val.push_back(initial_proof.values[j][k][l]);
                                     }
                                 }
-                                BOOST_ASSERT((1 << (params.step_list[0] - 1)) == initial_proof.values[j].size());
+                                BOOST_ASSERT(std::size_t(1 << (params.step_list[0] - 1)) == initial_proof.values[j].size());
                             }
                         }
                     }
@@ -377,8 +377,6 @@ namespace nil {
                 make_fri_proof(
                     const typename fri_proof<nil::marshalling::field_type<Endianness>, FRI>::type &filled_proof, const batch_info_type &batch_info
                 ){
-                    using TTypeBase = nil::marshalling::field_type<Endianness>;
-                    using field_marhsalling_type = field_element<TTypeBase, typename FRI::field_type::value_type>;
                     typename FRI::proof_type proof;
                     // merkle roots
                     for( std::size_t i = 0; i < std::get<0>(filled_proof.value()).value().size(); i++){
@@ -394,7 +392,7 @@ namespace nil {
                     }
 
                     // initial_polynomials values
-                    auto coset_size = 1 << (step_list[0] - 1);
+                    std::size_t coset_size = 1 << (step_list[0] - 1);
                     std::size_t cur = 0;
                     for( std::size_t i = 0; i < FRI::lambda; i++ ){
                         for( const auto &it:batch_info){

@@ -39,7 +39,7 @@ using namespace nil::crypto3::zk::snark;
 
 bool has_argv(std::string name){
     bool result = false;
-    for (std::size_t i = 0; i < boost::unit_test::framework::master_test_suite().argc; i++) {
+    for (std::size_t i = 0; i < std::size_t(boost::unit_test::framework::master_test_suite().argc); i++) {
         if (std::string(boost::unit_test::framework::master_test_suite().argv[i]) == "--print") {
             result = true;
         }
@@ -178,7 +178,7 @@ struct test_initializer {
     test_initializer() {
         test_global_seed = 0;
 
-        for (std::size_t i = 0; i < boost::unit_test::framework::master_test_suite().argc - 1; i++) {
+        for (std::size_t i = 0; i < std::size_t(boost::unit_test::framework::master_test_suite().argc - 1); i++) {
             if (std::string(boost::unit_test::framework::master_test_suite().argv[i]) == "--seed") {
                 if (std::string(boost::unit_test::framework::master_test_suite().argv[i + 1]) == "random") {
                     std::random_device rd;

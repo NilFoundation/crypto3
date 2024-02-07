@@ -56,8 +56,8 @@ namespace nil {
                         typename commitment<TTypeBase, typename CommonDataType::commitment_scheme_type>::type,
 
 //                      std::array<std::set<int>, ParamsType::arithmetization_params::TotalColumns> columns_rotations;
-                        nil::marshalling::types::array_list <TTypeBase, 
-                            nil::marshalling::types::array_list <TTypeBase, 
+                        nil::marshalling::types::array_list <TTypeBase,
+                            nil::marshalling::types::array_list <TTypeBase,
                                 nil::marshalling::types::integral<TTypeBase, int>,
                                 nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, std::size_t>>
                             >,
@@ -74,7 +74,7 @@ namespace nil {
                         nil::marshalling::types::integral<TTypeBase, std::size_t>,
 
 //                      verification_key.constraint_system_with_params_hash
-                        nil::marshalling::types::array_list <TTypeBase, 
+                        nil::marshalling::types::array_list <TTypeBase,
                             nil::marshalling::types::integral<TTypeBase, octet_type>,
                             nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, std::size_t>>
                         >
@@ -88,14 +88,13 @@ namespace nil {
                     using result_type = placeholder_common_data<TTypeBase, CommonDataType>;
 
                     result_type result;
-                    using FieldType = typename CommonDataType::field_type;
 
-                    using array_int_marshalling_type = nil::marshalling::types::array_list <TTypeBase, 
+                    using array_int_marshalling_type = nil::marshalling::types::array_list <TTypeBase,
                         nil::marshalling::types::integral<TTypeBase, int>,
                         nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, std::size_t>>
                     >;
 
-                    using column_r_marshalling_type = nil::marshalling::types::array_list <TTypeBase, 
+                    using column_r_marshalling_type = nil::marshalling::types::array_list <TTypeBase,
                         array_int_marshalling_type,
                         nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, std::size_t>>
                     >;
@@ -109,12 +108,12 @@ namespace nil {
                         filled_columns_rotations.value().push_back(filled_column);
                     }
 
-                    auto filled_commitments = 
+                    auto filled_commitments =
                     fill_commitment<Endianness, typename CommonDataType::commitment_scheme_type>(
                         common_data.commitments.fixed_values
                     );
 
-                    nil::marshalling::types::array_list <TTypeBase, 
+                    nil::marshalling::types::array_list <TTypeBase,
                         nil::marshalling::types::integral<TTypeBase, octet_type>,
                         nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, std::size_t>>
                     > filled_constraint_system_with_params_hash;
@@ -136,12 +135,9 @@ namespace nil {
 
                 template<typename Endianness, typename CommonDataType>
                 CommonDataType
-                make_placeholder_common_data(const  
+                make_placeholder_common_data(const
                     placeholder_common_data<nil::marshalling::field_type<Endianness>, CommonDataType> &filled_common_data
                 ){
-                    using TTypeBase = typename nil::marshalling::field_type<Endianness>;
-                    using FieldType = typename CommonDataType::field_type;
-
                     auto fixed_values = make_commitment<Endianness, typename CommonDataType::commitment_scheme_type>(std::get<0>(filled_common_data.value()));
 
                     typename CommonDataType::columns_rotations_type columns_rotations;
@@ -151,7 +147,7 @@ namespace nil {
                             columns_rotations[i].insert(filled_column.value()[j].value());
                         }
                     }
-                    
+
                     auto rows_amount = std::get<2>(filled_common_data.value()).value();
                     auto usable_rows_amount = std::get<3>(filled_common_data.value()).value();
                     auto max_gates_degree = std::get<4>(filled_common_data.value()).value();

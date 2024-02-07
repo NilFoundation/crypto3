@@ -66,8 +66,6 @@ namespace nil {
                 element_pok<nil::marshalling::field_type<Endianness>, POK>
                     fill_element_pok(const POK &pok) {
 
-                    using TTypeBase = nil::marshalling::field_type<Endianness>;
-
                     return element_pok<nil::marshalling::field_type<Endianness>, POK>(
                         std::make_tuple(
                             std::move(

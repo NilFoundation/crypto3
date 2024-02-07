@@ -118,12 +118,13 @@ void test_merkle_proof(std::size_t tree_depth) {
     cv.resize(filled_merkle_proof.length(), 0x00);
     auto write_iter = cv.begin();
     nil::marshalling::status_type status = filled_merkle_proof.write(write_iter, cv.size());
-
+    BOOST_CHECK(status == nil::marshalling::status_type::success);
     print_merkle_proof(cv.cbegin(), cv.cend(), data[proof_idx].cbegin(), data[proof_idx].cend(), true);
 
     merkle_proof_marshalling_type test_val_read;
     auto read_iter = cv.begin();
     status = test_val_read.read(read_iter, cv.size());
+    BOOST_CHECK(status == nil::marshalling::status_type::success);
     merkle_proof_type constructed_val_read = types::make_merkle_proof<merkle_proof_type, Endianness>(test_val_read);
     BOOST_CHECK(proof == constructed_val_read);
 }
@@ -136,10 +137,10 @@ using field_type = typename curve_type::base_field_type;
 using HashTypes = boost::mpl::list<
         nil::crypto3::hashes::sha2<256>,
         nil::crypto3::hashes::keccak_1600<512>,
-        nil::crypto3::hashes::poseidon<nil::crypto3::hashes::detail::mina_poseidon_policy<field_type>> 
+        nil::crypto3::hashes::poseidon<nil::crypto3::hashes::detail::mina_poseidon_policy<field_type>>
     >;
 
-    
+
     BOOST_AUTO_TEST_CASE_TEMPLATE(marshalling_merkle_proof_arity_2_test, HashType, HashTypes) {
         std::srand(std::time(0));
         test_merkle_proof<nil::marshalling::option::big_endian, HashType, 2>(5);

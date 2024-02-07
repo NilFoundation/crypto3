@@ -71,7 +71,6 @@ void test_accumulation_vector(nil::crypto3::container::accumulation_vector<Group
 
     using namespace nil::crypto3::marshalling;
 
-    std::size_t units_bits = 8;
     using unit_type = unsigned char;
     using accumulation_vector_type =
             types::accumulation_vector<nil::marshalling::field_type<Endianness>, nil::crypto3::container::accumulation_vector<GroupType>>;

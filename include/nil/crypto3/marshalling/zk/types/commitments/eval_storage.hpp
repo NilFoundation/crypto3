@@ -52,7 +52,7 @@ namespace nil {
                     using eval_storage = nil::marshalling::types::bundle<
                     TTypeBase,
                     std::tuple<
-                        // batch_info. 
+                        // batch_info.
                         // We'll check is it good for current EVM instance
                         // All z-s are placed into plain array
                         nil::marshalling::types::array_list<
@@ -67,7 +67,7 @@ namespace nil {
                             nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, std::size_t>>
                         >,
 
-                        // evaluation_points_num. 
+                        // evaluation_points_num.
                         nil::marshalling::types::array_list<
                             TTypeBase,
                             nil::marshalling::types::integral<TTypeBase, uint8_t>,
@@ -77,7 +77,7 @@ namespace nil {
                 >;
 
                 template<typename Endianness, typename EvalStorage>
-                eval_storage<nil::marshalling::field_type<Endianness>, EvalStorage> 
+                eval_storage<nil::marshalling::field_type<Endianness>, EvalStorage>
                 fill_eval_storage( const EvalStorage &z ){
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
 
@@ -131,8 +131,6 @@ namespace nil {
                 EvalStorage make_eval_storage(
                     const eval_storage<nil::marshalling::field_type<Endianness>, EvalStorage> &filled_storage
                 ){
-                    using TTypeBase = nil::marshalling::field_type<Endianness>;
-
                     EvalStorage z;
                     typename nil::crypto3::marshalling::types::batch_info_type batch_info;
                     std::vector<std::uint8_t> eval_points_num;

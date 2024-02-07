@@ -50,10 +50,10 @@ namespace nil {
                 struct is_fri_commitment {
                     template <typename U>
                     static std::true_type test(typename U::precommitment_type*);
-                
+
                     template <typename>
                     static std::false_type test(...);
-                
+
                     // A constexpr boolean indicating if the field exists in T
                     static constexpr bool value = decltype(test<CommitmentType>(nullptr))::value;
                 };
@@ -62,10 +62,10 @@ namespace nil {
                 struct is_kzg_commitment {
                     template <typename U>
                     static std::true_type test(typename U::verification_key_type*);
-                
+
                     template <typename>
                     static std::false_type test(...);
-                
+
                     // A constexpr boolean indicating if the field exists in T
                     static constexpr bool value = decltype(test<CommitmentType>(nullptr))::value;
                 };
@@ -122,7 +122,7 @@ namespace nil {
 
                 // Define commitment_params marshalling type for FRI.
                 template<typename Endianness, typename CommitmentParamsType>
-                struct commitment_params<Endianness, CommitmentParamsType, 
+                struct commitment_params<Endianness, CommitmentParamsType,
                     typename std::enable_if_t<is_fri_commitment<CommitmentParamsType>::value>> {
                     using TTypeBase = typename nil::marshalling::field_type<Endianness>;
                     using integral_type = nil::marshalling::types::integral<TTypeBase, std::size_t>;
@@ -162,7 +162,6 @@ namespace nil {
                     using TTypeBase = typename nil::marshalling::field_type<Endianness>;
                     using FieldType = typename CommitmentParamsType::field_type;
                     using result_type = typename commitment_params<Endianness, CommitmentParamsType>::type;
-                    using integral_type = nil::marshalling::types::integral<TTypeBase, std::size_t>;
 
                     std::vector<typename FieldType::value_type> D_unity_roots;
                     for (const auto& domain : fri_params.D) {
@@ -194,7 +193,7 @@ namespace nil {
                             std::tuple<
 //                              std::vector<typename curve_type::template g1_type<>::value_type> commitment_key;
                                 field_element_vector_type<TTypeBase, typename CommitmentParamsType::field_type::value_type>,
-//                              verification_key_type verification_key;                        
+//                              verification_key_type verification_key;
                                 field_element<TTypeBase, typename CommitmentParamsType::field_type::value_type>
                             >
                         >;
@@ -206,7 +205,6 @@ namespace nil {
                 typename commitment_params<Endianness, CommitmentParamsType>::type
                 fill_commitment_params(const CommitmentParamsType &kzg_params) {
                     using TTypeBase = typename nil::marshalling::field_type<Endianness>;
-                    using FieldType = typename CommitmentParamsType::field_type;
                     using result_type = typename commitment_params<Endianness, CommitmentParamsType>::type;
 
                     return result_type(std::make_tuple(

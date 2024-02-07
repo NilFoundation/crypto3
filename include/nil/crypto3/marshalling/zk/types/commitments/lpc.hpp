@@ -61,7 +61,7 @@ namespace nil {
                 fill_commitment(typename CommitmentSchemeType::commitment_type commitment){
                     return fill_merkle_node_value<typename CommitmentSchemeType::commitment_type, Endianness>( commitment );
                 }
-                
+
                 template <typename Endianness, typename CommitmentSchemeType >
                 typename CommitmentSchemeType::commitment_type
                 make_commitment(const typename commitment<nil::marshalling::field_type<Endianness>, CommitmentSchemeType>::type &filled_commitment){
@@ -69,7 +69,7 @@ namespace nil {
                 }
 
                 // FOR LPC only because of basic_fri field
-                template <typename TTypeBase, typename LPC > 
+                template <typename TTypeBase, typename LPC >
                 struct eval_proof{
                     using type = nil::marshalling::types::bundle<
                         TTypeBase,
@@ -84,7 +84,7 @@ namespace nil {
                 };
 
                 template<typename Endianness, typename LPC>
-                typename eval_proof<nil::marshalling::field_type<Endianness>, LPC>::type 
+                typename eval_proof<nil::marshalling::field_type<Endianness>, LPC>::type
                 fill_eval_proof( const typename LPC::proof_type &proof, const typename LPC::fri_type::params_type& fri_params){
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
 
@@ -103,7 +103,6 @@ namespace nil {
 
                 template<typename Endianness, typename LPC>
                 typename LPC::proof_type make_eval_proof(const typename eval_proof<nil::marshalling::field_type<Endianness>, LPC>::type &filled_proof){
-                    using TTypeBase = nil::marshalling::field_type<Endianness>;
                     typename LPC::proof_type proof;
 
                     proof.z = make_eval_storage<Endianness, typename LPC::eval_storage_type>(std::get<0>(filled_proof.value()));

@@ -107,7 +107,7 @@ generate_random_data(std::size_t leaf_number, boost::random::mt11213b &rnd) {
     }
     return v;
 }
- 
+
 std::vector<std::vector<std::uint8_t>>
 generate_random_data_for_merkle_tree(size_t leafs_number, size_t leaf_bytes, boost::random::mt11213b &rnd) {
     std::vector<std::vector<std::uint8_t>> rdata(leafs_number, std::vector<std::uint8_t>(leaf_bytes));
@@ -136,7 +136,7 @@ typename FRI::merkle_proof_type generate_random_merkle_proof(std::size_t tree_de
 }
 
 inline std::vector<std::size_t>
-generate_random_step_list(const std::size_t r, const int max_step, boost::random::mt11213b &rnd) {
+generate_random_step_list(const std::size_t r, const std::size_t max_step, boost::random::mt11213b &rnd) {
     using dist_type = std::uniform_int_distribution<int>;
 
     std::vector<std::size_t> step_list;
@@ -176,7 +176,7 @@ typename FRI::polynomial_values_type generate_random_polynomial_values(
     }
     return values;
 }
- 
+
 template<typename FieldType>
 math::polynomial<typename FieldType::value_type> generate_random_polynomial(
         size_t degree,
@@ -279,7 +279,7 @@ typename FRI::proof_type generate_random_fri_proof(
 }
 
 template<typename Endianness, typename FRI>
-void test_fri_proof(typename FRI::proof_type &proof, typename nil::crypto3::marshalling::types::batch_info_type batch_info, 
+void test_fri_proof(typename FRI::proof_type &proof, typename nil::crypto3::marshalling::types::batch_info_type batch_info,
         const typename FRI::params_type& params) {
     using TTypeBase = nil::marshalling::field_type<Endianness>;
 
@@ -306,19 +306,21 @@ void test_fri_proof(typename FRI::proof_type &proof, typename nil::crypto3::mars
     std::vector<std::uint8_t> cv;
     cv.resize(filled_proof.length(), 0x00);
     auto write_iter = cv.begin();
-    nil::marshalling::status_type status = filled_proof.write(write_iter, cv.size());
+    auto status = filled_proof.write(write_iter, cv.size());
+    BOOST_CHECK(status == nil::marshalling::status_type::success);
 
     typename nil::crypto3::marshalling::types::fri_proof<TTypeBase, FRI>::type test_val_read;
     auto read_iter = cv.begin();
     status = test_val_read.read(read_iter, cv.size());
+    BOOST_CHECK(status == nil::marshalling::status_type::success);
     typename FRI::proof_type constructed_val_read = nil::crypto3::marshalling::types::make_fri_proof<Endianness, FRI>(
             test_val_read, batch_info);
     BOOST_CHECK(proof == constructed_val_read);
 }
 
-// 
+//
 // Randomness setup
-// 
+//
 std::size_t test_global_seed = 0;
 boost::random::mt11213b test_global_rnd_engine;
 template<typename FieldType>
@@ -331,7 +333,7 @@ struct test_initializer {
     test_initializer() {
         test_global_seed = 0;
 
-        for (std::size_t i = 0; i < boost::unit_test::framework::master_test_suite().argc - 1; i++) {
+        for (std::size_t i = 0; i < std::size_t(boost::unit_test::framework::master_test_suite().argc - 1); i++) {
             if (std::string(boost::unit_test::framework::master_test_suite().argv[i]) == "--seed") {
                 if (std::string(boost::unit_test::framework::master_test_suite().argv[i + 1]) == "random") {
                     std::random_device rd;
@@ -425,19 +427,18 @@ BOOST_AUTO_TEST_SUITE(marshalling_fri_proof_elements)
         std::vector<std::uint8_t> cv;
         cv.resize(filled.length(), 0x00);
         auto write_iter = cv.begin();
-        nil::marshalling::status_type status = filled.write(write_iter, cv.size());
+        auto status = filled.write(write_iter, cv.size());
+        BOOST_CHECK(status == nil::marshalling::status_type::success);
 
         nil::crypto3::marshalling::types::merkle_proof_vector_type<TTypeBase, FRI> test_val_read;
         auto read_iter = cv.begin();
-        status = test_val_read.read(read_iter, cv.size());
+        test_val_read.read(read_iter, cv.size());
+        BOOST_CHECK(status == nil::marshalling::status_type::success);
         auto constructed_val_read = nil::crypto3::marshalling::types::make_merkle_proof_vector<Endianness, FRI>(test_val_read);
         BOOST_CHECK(mp == constructed_val_read);
     }
 
     BOOST_AUTO_TEST_CASE(fri_proof_test){
-        using TTypeBase = nil::marshalling::field_type<Endianness>;
-        using filled = nil::crypto3::marshalling::types::fri_proof<TTypeBase, FRI>;
-
         nil::crypto3::marshalling::types::batch_info_type batch_info;
         batch_info[0] = 1;
         batch_info[1] = 5;
@@ -457,8 +458,6 @@ BOOST_AUTO_TEST_SUITE(marshalling_fri_proof_elements)
     }
 
     BOOST_AUTO_TEST_CASE(fri_grinding_proof_test){
-        using TTypeBase = nil::marshalling::field_type<Endianness>;
-        using filled = nil::crypto3::marshalling::types::fri_proof<TTypeBase, FRI_gr>;
         nil::crypto3::marshalling::types::batch_info_type batch_info;
         batch_info[0] = 1;
         batch_info[1] = 5;
@@ -489,8 +488,6 @@ BOOST_AUTO_TEST_CASE(marshalling_fri_basic_test) {
 
     typedef hashes::sha2<256> merkle_hash_type;
     typedef hashes::sha2<256> transcript_hash_type;
-
-    typedef typename containers::merkle_tree<merkle_hash_type, 2> merkle_tree_type;
 
     constexpr static const std::size_t d = 16;
 

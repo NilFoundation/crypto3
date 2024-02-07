@@ -74,7 +74,6 @@ void test_proof(typename SchemeType::proof_type val) {
 
     using namespace nil::crypto3::marshalling;
 
-    std::size_t units_bits = 8;
     using unit_type = unsigned char;
     using proof_type =
             types::r1cs_gg_ppzksnark_proof<nil::marshalling::field_type<Endianness>, typename SchemeType::proof_type>;
@@ -93,11 +92,12 @@ void test_proof(typename SchemeType::proof_type val) {
     auto write_iter = cv.begin();
 
     nil::marshalling::status_type status = filled_val.write(write_iter, cv.size());
-
+    BOOST_CHECK(status == nil::marshalling::status_type::success);
     proof_type test_val_read;
 
     auto read_iter = cv.begin();
     status = test_val_read.read(read_iter, cv.size());
+    BOOST_CHECK(status == nil::marshalling::status_type::success);
 
     typename SchemeType::proof_type constructed_val_read =
             types::make_r1cs_gg_ppzksnark_proof<typename SchemeType::proof_type, Endianness>(test_val_read);

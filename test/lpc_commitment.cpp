@@ -115,7 +115,7 @@ generate_random_data(std::size_t leaf_number, boost::random::mt11213b &rnd) {
     }
     return v;
 }
- 
+
 std::vector<std::vector<std::uint8_t>>
 generate_random_data_for_merkle_tree(size_t leafs_number, size_t leaf_bytes, boost::random::mt11213b &rnd) {
     std::vector<std::vector<std::uint8_t>> rdata(leafs_number, std::vector<std::uint8_t>(leaf_bytes));
@@ -144,7 +144,7 @@ typename FRI::merkle_proof_type generate_random_merkle_proof(std::size_t tree_de
 }
 
 inline std::vector<std::size_t>
-generate_random_step_list(const std::size_t r, const int max_step, boost::random::mt11213b &rnd) {
+generate_random_step_list(const std::size_t r, const std::size_t max_step, boost::random::mt11213b &rnd) {
     using dist_type = std::uniform_int_distribution<int>;
 
     std::vector<std::size_t> step_list;
@@ -183,7 +183,7 @@ typename FRI::polynomial_values_type generate_random_polynomial_values(
     }
     return values;
 }
- 
+
 template<typename FieldType>
 math::polynomial<typename FieldType::value_type> generate_random_polynomial(
         size_t degree,
@@ -292,7 +292,7 @@ typename LPC::proof_type generate_random_lpc_proof(
     std::vector<std::size_t> step_list,
     nil::crypto3::random::algebraic_engine<typename LPC::basic_fri::field_type> &alg_rnd,
     boost::random::mt11213b &rnd
-) { 
+) {
     typename LPC::proof_type res;
 
     nil::crypto3::marshalling::types::batch_info_type batch_info;
@@ -330,7 +330,7 @@ std::vector<math::polynomial<typename FieldType::value_type>> generate_random_po
 ) {
     std::vector<math::polynomial<typename FieldType::value_type>> result;
 
-    for (uint i = 0; i < batch_size; i++) {
+    for (std::size_t i = 0; i < batch_size; i++) {
         result.push_back(generate_random_polynomial<FieldType>(degree, rnd));
     }
     return result;
@@ -344,7 +344,7 @@ generate_random_polynomial_dfs_batch(std::size_t batch_size,
     auto data = generate_random_polynomial_batch(batch_size, degree, rnd);
     std::vector<math::polynomial_dfs<typename FieldType::value_type>> result;
 
-    for (uint i = 0; i < data.size(); i++) {
+    for (std::size_t i = 0; i < data.size(); i++) {
         math::polynomial_dfs<typename FieldType::value_type> dfs;
         dfs.from_coefficients(data[i]);
         result.push_back(dfs);
@@ -369,11 +369,13 @@ void test_lpc_proof(typename LPC::proof_type &proof, typename LPC::fri_type::par
     std::vector<std::uint8_t> cv;
     cv.resize(filled_proof.length(), 0x00);
     auto write_iter = cv.begin();
-    nil::marshalling::status_type status = filled_proof.write(write_iter, cv.size());
+    auto status = filled_proof.write(write_iter, cv.size());
+    BOOST_CHECK(status == nil::marshalling::status_type::success);
 
     typename nil::crypto3::marshalling::types::eval_proof<TTypeBase, LPC>::type test_val_read;
     auto read_iter = cv.begin();
-    status = test_val_read.read(read_iter, cv.size());
+    test_val_read.read(read_iter, cv.size());
+    BOOST_CHECK(status == nil::marshalling::status_type::success);
     typename LPC::proof_type constructed_val_read =
             nil::crypto3::marshalling::types::make_eval_proof<Endianness, LPC>(test_val_read);
     BOOST_CHECK(proof == constructed_val_read);
@@ -399,7 +401,7 @@ struct test_initializer {
     test_initializer() {
         test_global_seed = 0;
 
-        for (std::size_t i = 0; i < boost::unit_test::framework::master_test_suite().argc - 1; i++) {
+        for (std::size_t i = 0; i < std::size_t(boost::unit_test::framework::master_test_suite().argc - 1); i++) {
             if (std::string(boost::unit_test::framework::master_test_suite().argv[i]) == "--seed") {
                 if (std::string(boost::unit_test::framework::master_test_suite().argv[i + 1]) == "random") {
                     std::random_device rd;
@@ -447,7 +449,6 @@ BOOST_AUTO_TEST_SUITE(marshalling_random)
     // setup
     static constexpr std::size_t lambda = 40;
     static constexpr std::size_t m = 2;
-    static constexpr std::size_t batches_num = 5;
 
     constexpr static const std::size_t d = 16;
     constexpr static const std::size_t final_polynomial_degree = 1; // final polynomial degree
@@ -513,8 +514,6 @@ BOOST_FIXTURE_TEST_CASE(batches_num_3_test, test_initializer){
     static_assert(!zk::is_commitment<merkle_tree_type>::value);
     static_assert(!zk::is_commitment<std::size_t>::value);
 
-    typedef typename lpc_type::proof_type proof_type;
-
     constexpr static const std::size_t d_extended = d;
     std::size_t extended_log = boost::static_log2<d_extended>::value;
     std::vector<std::shared_ptr<math::evaluation_domain<field_type>>> D =
@@ -551,7 +550,7 @@ BOOST_FIXTURE_TEST_CASE(batches_num_3_test, test_initializer){
     lpc_scheme_prover.append_eval_point(0, point);
     lpc_scheme_prover.append_eval_point(2, point);
     lpc_scheme_prover.append_eval_point(3, point);
-    
+
     std::array<std::uint8_t, 96> x_data {};
 
     // Prove
@@ -572,7 +571,7 @@ BOOST_FIXTURE_TEST_CASE(batches_num_3_test, test_initializer){
     lpc_scheme_verifier.append_eval_point(3, point);
     BOOST_CHECK(lpc_scheme_verifier.verify_eval(proof, commitments, transcript_verifier));
 
-    // Check transcript state    
+    // Check transcript state
     typename field_type::value_type verifier_next_challenge = transcript_verifier.template challenge<field_type>();
     typename field_type::value_type prover_next_challenge = transcript.template challenge<field_type>();
     BOOST_CHECK(verifier_next_challenge == prover_next_challenge);*/

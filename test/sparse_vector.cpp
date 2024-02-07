@@ -70,7 +70,6 @@ void test_sparse_vector(nil::crypto3::container::sparse_vector<GroupType> val) {
 
     using namespace nil::crypto3::marshalling;
 
-    std::size_t units_bits = 8;
     using unit_type = unsigned char;
     using sparse_vector_type = types::sparse_vector<nil::marshalling::field_type<Endianness>,
             nil::crypto3::container::sparse_vector<GroupType>>;
@@ -89,12 +88,14 @@ void test_sparse_vector(nil::crypto3::container::sparse_vector<GroupType> val) {
 
     auto write_iter = cv.begin();
 
-    nil::marshalling::status_type status = filled_val.write(write_iter, cv.size());
+    auto status = filled_val.write(write_iter, cv.size());
+    BOOST_CHECK(status == nil::marshalling::status_type::success);
 
     sparse_vector_type test_val_read;
 
     auto read_iter = cv.begin();
     status = test_val_read.read(read_iter, cv.size());
+    BOOST_CHECK(status == nil::marshalling::status_type::success);
 
     nil::crypto3::container::sparse_vector<GroupType> constructed_val_read =
             types::make_sparse_vector<nil::crypto3::container::sparse_vector<GroupType>, Endianness>(test_val_read);
