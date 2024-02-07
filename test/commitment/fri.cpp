@@ -56,7 +56,7 @@
 
 using namespace nil::crypto3;
 
-inline std::vector<std::size_t> generate_random_step_list(const std::size_t r, const int max_step) {
+inline std::vector<std::size_t> generate_random_step_list(const std::size_t r, const std::size_t max_step) {
     using dist_type = std::uniform_int_distribution<int>;
     static std::random_device random_engine;
 
@@ -89,14 +89,11 @@ BOOST_AUTO_TEST_CASE(fri_basic_test) {
     typedef hashes::sha2<256> merkle_hash_type;
     typedef hashes::sha2<256> transcript_hash_type;
 
-    typedef typename containers::merkle_tree<merkle_hash_type, 2> merkle_tree_type;
-
     constexpr static const std::size_t d = 16;
 
     constexpr static const std::size_t r = boost::static_log2<d>::value;
     constexpr static const std::size_t m = 2;
     constexpr static const std::size_t lambda = 40;
-    constexpr static const std::size_t batches_num = 1;
 
     typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, lambda, m, true /* use_grinding */> fri_type;
 
@@ -124,7 +121,7 @@ BOOST_AUTO_TEST_CASE(fri_basic_test) {
 
     // commit
     math::polynomial<typename FieldType::value_type> f = {1, 3, 4, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1};
-    
+
     typename fri_type::merkle_tree_type tree = zk::algorithms::precommit<fri_type>(f, params.D[0], params.step_list[0]);
     auto root = zk::algorithms::commit<fri_type>(tree);
 
@@ -133,7 +130,7 @@ BOOST_AUTO_TEST_CASE(fri_basic_test) {
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(init_blob);
 
     proof_type proof = zk::algorithms::proof_eval<fri_type>(f, tree, params, transcript);
- 
+
     // verify
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(init_blob);
 

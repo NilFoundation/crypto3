@@ -103,10 +103,8 @@ BOOST_AUTO_TEST_CASE(mpc_generator_compare_keypairs_without_delta_contribution_t
 BOOST_AUTO_TEST_CASE(mpc_generator_proof_verification_without_delta_contribution_test) {
 
     using curve_type = curves::bls12<381>;
-    using scalar_field_type = curve_type::scalar_field_type;
     using powers_of_tau_scheme_type = powers_of_tau<curve_type, 32>;
     using proving_scheme_type = r1cs_gg_ppzksnark<curve_type>;
-    using crs_mpc_type = r1cs_gg_ppzksnark_mpc<curve_type>;
 
     auto acc = powers_of_tau_scheme_type::accumulator_type();
     auto sk = powers_of_tau_scheme_type::generate_private_key();
@@ -127,7 +125,6 @@ BOOST_AUTO_TEST_CASE(mpc_generator_proof_verification_without_delta_contribution
 BOOST_AUTO_TEST_CASE(mpc_generator_proof_verification_with_delta_contribution_test) {
 
     using curve_type = curves::bls12<381>;
-    using scalar_field_type = curve_type::scalar_field_type;
     using powers_of_tau_scheme_type = powers_of_tau<curve_type, 32>;
     using proving_scheme_type = r1cs_gg_ppzksnark<curve_type>;
     using crs_mpc_type = r1cs_gg_ppzksnark_mpc<curve_type>;

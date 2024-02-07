@@ -41,7 +41,7 @@ namespace nil {
             namespace snark {
 
                 template<typename FieldType, typename ArithmetizationParams>
-                class plonk_constraint_system;
+                struct plonk_constraint_system;
 
                 template<typename FieldType>
                 using plonk_column = std::vector<typename FieldType::value_type>;
@@ -107,7 +107,7 @@ namespace nil {
                         typename nil::crypto3::random::algebraic_engine<FieldType> alg_rnd
                     );
 
-                    friend struct nil::blueprint::assignment<plonk_constraint_system<FieldType,
+                    friend class nil::blueprint::assignment<plonk_constraint_system<FieldType,
                         ArithmetizationParams>>;
                 };
 
@@ -247,7 +247,7 @@ namespace nil {
                         typename nil::crypto3::random::algebraic_engine<FieldType> alg_rnd
                     );
 
-                    friend struct nil::blueprint::assignment<plonk_constraint_system<FieldType,
+                    friend class nil::blueprint::assignment<plonk_constraint_system<FieldType,
                         ArithmetizationParams>>;
                 };
 
@@ -270,6 +270,8 @@ namespace nil {
                     public_table_type _public_table;
 
                 public:
+                    virtual ~plonk_table() = default;
+
                     plonk_table(private_table_type private_table = {},
                                 public_table_type public_table = {})
                         : _private_table(std::move(private_table))

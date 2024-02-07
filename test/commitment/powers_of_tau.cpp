@@ -20,7 +20,6 @@ BOOST_AUTO_TEST_CASE(powers_of_tau_result_basic_test) {
     using g1_value_type = curve_type::g1_type<>::value_type;
     using g2_value_type = curve_type::g2_type<>::value_type;
     using scalar_field_type = curve_type::scalar_field_type;
-    using scalar_field_value_type = scalar_field_type::value_type;
 
     constexpr const unsigned tau_powers = 1 << 5;
 

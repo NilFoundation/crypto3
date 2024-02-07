@@ -56,11 +56,8 @@ BOOST_AUTO_TEST_SUITE(kzg_test_suite)
 BOOST_AUTO_TEST_CASE(kzg_basic_test) {
 
     typedef algebra::curves::bls12<381> curve_type;
-    typedef typename curve_type::base_field_type::value_type base_value_type;
-    typedef typename curve_type::base_field_type base_field_type;
-    typedef typename curve_type::scalar_field_type scalar_field_type;
     typedef typename curve_type::scalar_field_type::value_type scalar_value_type;
-    
+
     typedef zk::commitments::kzg<curve_type> kzg_type;
 
     scalar_value_type alpha = 10;
@@ -87,11 +84,9 @@ BOOST_AUTO_TEST_CASE(kzg_basic_test) {
 BOOST_AUTO_TEST_CASE(kzg_random_test) {
 
     typedef algebra::curves::bls12<381> curve_type;
-    typedef typename curve_type::base_field_type::value_type base_value_type;
-    typedef typename curve_type::base_field_type base_field_type;
     typedef typename curve_type::scalar_field_type scalar_field_type;
     typedef typename curve_type::scalar_field_type::value_type scalar_value_type;
-    
+
     typedef zk::commitments::kzg<curve_type> kzg_type;
 
     std::size_t n = 298;
@@ -110,9 +105,6 @@ BOOST_AUTO_TEST_CASE(kzg_random_test) {
 BOOST_AUTO_TEST_CASE(kzg_false_test) {
 
     typedef algebra::curves::bls12<381> curve_type;
-    typedef typename curve_type::base_field_type::value_type base_value_type;
-    typedef typename curve_type::base_field_type base_field_type;
-    typedef typename curve_type::scalar_field_type scalar_field_type;
     typedef typename curve_type::scalar_field_type::value_type scalar_value_type;
 
     typedef zk::commitments::kzg<curve_type> kzg_type;
@@ -207,10 +199,10 @@ BOOST_AUTO_TEST_SUITE_END()
 //     auto params = typename kzg_type::params_type(n, alpha);
 
 //     typename kzg_type::batched_public_key_type pk = zk::algorithms::setup_public_key<kzg_type>(params, polys, zs);
-//     transcript_type transcript = 
+//     transcript_type transcript =
 //     auto proof = zk::algorithms::proof_eval<kzg_type>(params, polys, pk, transcript);
 
-//     transcript_type transcript_verification = 
+//     transcript_type transcript_verification =
 //     BOOST_CHECK(zk::algorithms::verify_eval<kzg_type>(params, proof, pk, transcript_verification));
 // }
 
@@ -249,10 +241,10 @@ BOOST_AUTO_TEST_SUITE_END()
 //     auto params = typename kzg_type::params_type(n);
 
 //     typename kzg_type::batched_public_key_type pk = zk::algorithms::setup_public_key<kzg_type>(params, polys, zs);
-//     transcript_type transcript = 
+//     transcript_type transcript =
 //     auto proof = zk::algorithms::proof_eval<kzg_type>(params, polys, pk, transcript);
 
-//     transcript_type transcript_verification = 
+//     transcript_type transcript_verification =
 //     BOOST_CHECK(zk::algorithms::verify_eval<kzg_type>(params, proof, pk, transcript_verification));
 // }
 
@@ -290,43 +282,43 @@ BOOST_AUTO_TEST_SUITE_END()
 //     auto params = typename kzg_type::params_type(n, alpha);
 
 //     typename kzg_type::batched_public_key_type pk = zk::algorithms::setup_public_key<kzg_type>(params, polys, zs);;
-//     transcript_type transcript = 
+//     transcript_type transcript =
 //     auto proof = zk::algorithms::proof_eval<kzg_type>(params, polys, pk, transcript);
 
-//     transcript_type transcript_verification = 
+//     transcript_type transcript_verification =
 //     BOOST_CHECK(zk::algorithms::verify_eval<kzg_type>(params, proof, pk, transcript_verification));
 
 //     // wrong params
 //     auto ck2 = params.commitment_key;
 //     ck2[0] = ck2[0] * 2;
 //     auto params2 = kzg_type::params_type(ck2, params.verification_key * 2);
-//     transcript_type transcript_verification_wp = 
+//     transcript_type transcript_verification_wp =
 //     BOOST_CHECK(!zk::algorithms::verify_eval<kzg_type>(params2, proof, pk, transcript_verification_wp));
 
 //     // wrong transcript - used
 //     BOOST_CHECK(!zk::algorithms::verify_eval<kzg_type>(params, proof, pk, transcript_verification));
 
 //     // wrong transcript - wrong params
-//     transcript_type transcript_verification_wpt = 
+//     transcript_type transcript_verification_wpt =
 //     BOOST_CHECK(!zk::algorithms::verify_eval<kzg_type>(params, proof, pk, transcript_verification_wpt));
 
 //     // wrong evals
 //     auto pk_we = pk;
 //     pk_we.evals[0].back() = pk_we.evals[0].back() * 2;
-//     transcript_type transcript_verification_we = 
+//     transcript_type transcript_verification_we =
 //     BOOST_CHECK(!zk::algorithms::verify_eval<kzg_type>(params, proof, pk_we, transcript_verification_we));
 
 //     // wrong commitments
 //     auto pk_wc = pk;
 //     pk_wc.commits[0].back() = pk_wc.commits[0].back() * 2;
-//     transcript_type transcript_verification_wc = 
+//     transcript_type transcript_verification_wc =
 //     BOOST_CHECK(!zk::algorithms::verify_eval<kzg_type>(params, proof, pk_wc, transcript_verification_wc));
 
 //     // wrong pk
 //     auto pk2 = pk;
 //     pk2.commits[0].back() = pk2.commits[0].back() * 2;
 //     pk2.evals[0].back() = pk2.evals[0].back() * 2;
-//     transcript_type transcript_verification_wpk = 
+//     transcript_type transcript_verification_wpk =
 //     BOOST_CHECK(!zk::algorithms::verify_eval<kzg_type>(params, proof, pk2, transcript_verification_wpk));
 
 //     // wrong proof
@@ -335,12 +327,12 @@ BOOST_AUTO_TEST_SUITE_END()
 //         typename kzg_type::batched_proof_type proof2;
 //         typename kzg_type::batched_public_key_type pk2 = zk::algorithms::setup_public_key<kzg_type>(params2, polys, zs);
 //         bool exception = false;
-//         transcript_type transcript_wpp = 
+//         transcript_type transcript_wpp =
 //         try {auto proof2 = zk::algorithms::proof_eval<kzg_type>(params2, polys, pk, transcript_wpp);}
 //         catch (std::runtime_error& e) {exception = true;}
 //         if (!exception) {
 //             BOOST_CHECK(proof2 != proof);
-//             transcript_type transcript_verification_wpp = 
+//             transcript_type transcript_verification_wpp =
 //             BOOST_CHECK_MESSAGE(!zk::algorithms::verify_eval<kzg_type>(params, proof2, pk, transcript_verification_wpp), "wrong params");
 //         }
 
@@ -350,18 +342,18 @@ BOOST_AUTO_TEST_SUITE_END()
 //         catch (std::runtime_error& e) {exception = true;}
 //         if (!exception) {
 //             BOOST_CHECK(proof2 != proof);
-//             transcript_type transcript_verification_wpt = 
+//             transcript_type transcript_verification_wpt =
 //             BOOST_CHECK_MESSAGE(!zk::algorithms::verify_eval<kzg_type>(params, proof2, pk, transcript_verification_wpt), "wrong transcript");
 //         }
-        
+
 //         // wrong evals
 //         exception = false;
-//         transcript_type transcript_wpe = 
+//         transcript_type transcript_wpe =
 //         try {auto proof2 = zk::algorithms::proof_eval<kzg_type>(params, polys, pk_we, transcript_wpe);}
 //         catch (std::runtime_error& e) {exception = true;}
 //         if (!exception) {
 //             BOOST_CHECK(proof2 != proof);
-//             transcript_type transcript_verification_wpe = 
+//             transcript_type transcript_verification_wpe =
 //             BOOST_CHECK_MESSAGE(!zk::algorithms::verify_eval<kzg_type>(params, proof2, pk, transcript_verification_wpe), "wrong evals");
 //         }
 
@@ -369,44 +361,44 @@ BOOST_AUTO_TEST_SUITE_END()
 //         auto pk_zs = pk;
 //         pk_zs.zs[0] = pk_zs.zs[0] * 2;
 //         exception = false;
-//         transcript_type transcript_wzs = 
+//         transcript_type transcript_wzs =
 //         try {auto proof2 = zk::algorithms::proof_eval<kzg_type>(params, polys, pk_zs, transcript_wzs);}
 //         catch (std::runtime_error& e) {exception = true;}
 //         if (!exception) {
 //             BOOST_CHECK(proof2 != proof);
-//             transcript_type transcript_verification_wpp = 
+//             transcript_type transcript_verification_wpp =
 //             BOOST_CHECK_MESSAGE(!zk::algorithms::verify_eval<kzg_type>(params, proof2, pk, transcript_verification_wpp), "wrong params");
 //         }
 
 //         // wrong commits
 //         exception = false;
-//         transcript_type transcript_wcs = 
+//         transcript_type transcript_wcs =
 //         try {auto proof2 = zk::algorithms::proof_eval<kzg_type>(params, polys, pk_we, transcript_wcs);}
 //         catch (std::runtime_error& e) {exception = true;}
 //         if (!exception) {
 //             BOOST_CHECK(proof2 != proof);
-//             transcript_type transcript_verification_wpp = 
+//             transcript_type transcript_verification_wpp =
 //             BOOST_CHECK_MESSAGE(!zk::algorithms::verify_eval<kzg_type>(params, proof2, pk, transcript_verification_wpp), "wrong params");
 //         }
 
 //         // wrong pk
 //         exception = false;
-//         transcript_type transcript_wpk = 
+//         transcript_type transcript_wpk =
 //         try {auto proof2 = zk::algorithms::proof_eval<kzg_type>(params, polys, pk2, transcript_wpk);}
 //         catch (std::runtime_error& e) {exception = true;}
 //         if (!exception) {
 //             BOOST_CHECK(proof2 != proof);
-//             transcript_type transcript_verification_wpp = 
+//             transcript_type transcript_verification_wpp =
 //             BOOST_CHECK_MESSAGE(!zk::algorithms::verify_eval<kzg_type>(params, proof2, pk, transcript_verification_wpp), "wrong params");
 //         }
 //     }
 //     auto proof2 = proof;
 //     proof2.back() = proof2.back() * 2;
-//     transcript_type transcript_verification_wpr = 
+//     transcript_type transcript_verification_wpr =
 //     BOOST_CHECK(!zk::algorithms::verify_eval<kzg_type>(params, proof2, pk, transcript_verification_wpr));
 
 //     // wrong combination of all
-//     transcript_type transcript_verification_2 = 
+//     transcript_type transcript_verification_2 =
 //     BOOST_CHECK(!zk::algorithms::verify_eval<kzg_type>(params2, proof2, pk2, transcript_verification_2));
 // }
 
@@ -417,9 +409,6 @@ BOOST_AUTO_TEST_SUITE(batched_kzg_test_suite)
 BOOST_AUTO_TEST_CASE(batched_kzg_basic_test) {
 
     typedef algebra::curves::bls12<381> curve_type;
-    typedef typename curve_type::base_field_type::value_type base_value_type;
-    typedef typename curve_type::base_field_type base_field_type;
-    typedef typename curve_type::scalar_field_type scalar_field_type;
     typedef typename curve_type::scalar_field_type::value_type scalar_value_type;
 
     typedef hashes::sha2<256> transcript_hash_type;
@@ -452,15 +441,12 @@ BOOST_AUTO_TEST_CASE(batched_kzg_basic_test) {
     auto proof = zk::algorithms::proof_eval<kzg_type>(params, polys, pk, transcript);
 
     transcript_type transcript_verification;
-    
+
     BOOST_CHECK(zk::algorithms::verify_eval<kzg_type>(params, proof, pk, transcript_verification));
 }
 
 BOOST_AUTO_TEST_CASE(batched_kzg_bigger_basic_test) {
     typedef algebra::curves::bls12<381> curve_type;
-    typedef typename curve_type::base_field_type::value_type base_value_type;
-    typedef typename curve_type::base_field_type base_field_type;
-    typedef typename curve_type::scalar_field_type scalar_field_type;
     typedef typename curve_type::scalar_field_type::value_type scalar_value_type;
 
     typedef hashes::sha2<256> transcript_hash_type;
@@ -468,8 +454,6 @@ BOOST_AUTO_TEST_CASE(batched_kzg_bigger_basic_test) {
     typedef typename kzg_type::transcript_type transcript_type;
 
     scalar_value_type alpha = 7;
-    std::size_t n = 8;
-
     typename kzg_type::batch_of_polynomials_type polys = {{{{1, 2, 3, 4, 5, 6, 7, 8}},
                                                         {{11, 12, 13, 14, 15, 16, 17, 18}},
                                                         {{21, 22, 23, 24, 25, 26, 27, 28}},

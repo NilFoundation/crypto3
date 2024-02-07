@@ -54,10 +54,10 @@ namespace nil {
                 using namespace nil::crypto3::math;
 
                 template<typename FieldType>
-                struct qap_witness;
+                class qap_witness;
 
                 template<typename FieldType>
-                struct qap_instance_evaluation;
+                class qap_instance_evaluation;
 
                 /*************************  INSTATNCE  ***********************************/
 

@@ -59,7 +59,7 @@ namespace nil {
                     typedef VariableType variable_type;
                     typedef math::expression<VariableType> base_type;
 
-                    plonk_constraint() 
+                    plonk_constraint()
                         : math::expression<VariableType>(VariableType::assignment_type::zero()) {
                     };
 
@@ -86,8 +86,8 @@ namespace nil {
                         evaluate(std::size_t row_index,
                                  const plonk_assignment_table<FieldType, ArithmetizationParams> &assignments) const {
                         math::expression_evaluator<VariableType> evaluator(
-                            *this, 
-                            [this, &assignments, row_index](const VariableType &var) {
+                            *this,
+                            [&assignments, row_index](const VariableType &var) {
                                 switch (var.type) {
                                     case VariableType::column_type::witness:
                                         return assignments.witness(var.index)[row_index + var.rotation];
@@ -97,6 +97,9 @@ namespace nil {
                                         return assignments.constant(var.index)[row_index + var.rotation];
                                     case VariableType::column_type::selector:
                                         return assignments.selector(var.index)[row_index + var.rotation];
+                                    default:
+                                        BOOST_ASSERT_MSG(false, "Invalid column type");
+                                        return VariableType::assignment_type::zero();
                                 }
                             });
 
@@ -111,9 +114,9 @@ namespace nil {
                        using polynomial_type = math::polynomial<typename VariableType::assignment_type>;
                        using polynomial_variable_type = plonk_variable<polynomial_type>;
                        math::expression_variable_type_converter<VariableType, polynomial_variable_type> converter;
-                       
+
                        math::expression_evaluator<polynomial_variable_type> evaluator(
-                           converter.convert(*this),                          
+                           converter.convert(*this),
                            [&domain, &assignments](const VariableType &var) {
                                 polynomial_type assignment;
                                 switch (var.type) {
@@ -182,10 +185,9 @@ namespace nil {
 
                     typename VariableType::assignment_type
                         evaluate(detail::plonk_evaluation_map<VariableType> &assignments) const {
-                        typename VariableType::assignment_type acc = VariableType::assignment_type::zero();
                         math::expression_evaluator<VariableType> evaluator(
-                            *this, 
-                            [this, &assignments](const VariableType &var) {
+                            *this,
+                            [&assignments](const VariableType &var) {
                                 std::tuple<std::size_t, int, typename VariableType::column_type> key =
                                     std::make_tuple(var.index, var.rotation, var.type);
 

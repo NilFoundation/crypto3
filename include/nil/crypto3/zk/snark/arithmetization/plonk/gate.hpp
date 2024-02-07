@@ -42,8 +42,8 @@ namespace nil {
                     typedef ConstraintType constraint_type;
                     typedef typename ConstraintType::variable_type variable_type;
 
-                    std::size_t selector_index;
                     std::vector<ConstraintType> constraints;
+                    std::size_t selector_index;
 
                     plonk_gate(std::size_t selector_index, const ConstraintType &constraint) :
                         constraints(std::vector<ConstraintType>({constraint})), selector_index(selector_index) {
@@ -56,7 +56,7 @@ namespace nil {
                     plonk_gate(std::size_t selector_index, const std::vector<ConstraintType> &constraints) :
                         constraints(constraints), selector_index(selector_index) {
                     }
-                    
+
                     bool operator==(const plonk_gate &other) const {
                         return selector_index == other.selector_index && constraints == other.constraints;
                     }

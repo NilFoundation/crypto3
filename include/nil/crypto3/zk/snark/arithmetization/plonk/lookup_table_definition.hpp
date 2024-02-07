@@ -133,7 +133,6 @@ namespace nil {
                     std::vector<plonk_column<FieldType>> selector_columns;
 
                     std::size_t start_row = 1;
-                    std::size_t table_index = 0;
                     std::vector<plonk_lookup_table<FieldType>> bp_lookup_tables(lookup_table_ids.size());
                     for( const auto&[k, table]:lookup_tables ){
                         // std::cout << "Packing table " << table->table_name << std::endl;
@@ -173,7 +172,6 @@ namespace nil {
                             assignment.fill_selector(cur_selector_id, selector_column);
                             selector_columns.push_back(std::move(selector_column));
                             // Create table declaration
-                            table_index++;
                             cur_selector_id++;
                         }
                         start_row += table->get_rows_number();

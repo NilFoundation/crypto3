@@ -78,6 +78,8 @@ namespace nil {
                     plonk_constraint_system() {
                     }
 
+                    virtual ~plonk_constraint_system() = default;
+
                     plonk_constraint_system(const gates_container_type &gates,
                                             const copy_constraints_container_type &copy_constraints,
                                             const lookup_gates_container_type &lookup_gates = {},

@@ -328,7 +328,7 @@ namespace nil {
                         transcript(KZG::serializer::point_to_octets(commit));
                     }
                     for (const auto &S : public_key.S) {
-                        for (const auto s : S) {
+                        for (const auto &s : S) {
                             KZG::bincode::template field_element_to_bytes<std::vector<std::uint8_t>::iterator>(s, byteblob.begin(), byteblob.end());
                             transcript(byteblob);
                         }
@@ -716,7 +716,7 @@ namespace nil {
                         this->eval_polys();
                         this->merge_eval_points();
 
-                        for( auto const it: this->_commitments ){
+                        for( auto const &it: this->_commitments ){
                             auto k = it.first;
                             update_transcript(k, transcript);
                         }
@@ -760,7 +760,7 @@ namespace nil {
                         this->_commitments = commitments;
                         this->_z = proof.z;
 
-                        for (auto const it: this->_commitments) {
+                        for (auto const &it: this->_commitments) {
                             auto k = it.first;
                             update_transcript(k, transcript);
                         }
@@ -779,9 +779,7 @@ namespace nil {
                                 }
                                 auto i_th_commitment = KZGScheme::serializer::octets_to_g1_point(byteblob);
                                 auto U_commit = nil::crypto3::zk::algorithms::commit_one<KZGScheme>(_params, this->get_U(k,i));
-                                auto poly_commit = factor*(i_th_commitment - U_commit);
 
-                                auto result_bytes = KZGScheme::serializer::point_to_octets(poly_commit);
                                 auto left_side_pairing = nil::crypto3::algebra::pair_reduced<curve_type>(
                                     factor*(i_th_commitment - U_commit),
                                     commit_g2(set_difference_polynom(_merged_points, this->_points.at(k)[i]))
@@ -799,7 +797,7 @@ namespace nil {
 
                         return left_side_accum == right_side_pairing;
                     }
-                    
+
                     const params_type& get_commitment_params() const {
                         return _params;
                     }

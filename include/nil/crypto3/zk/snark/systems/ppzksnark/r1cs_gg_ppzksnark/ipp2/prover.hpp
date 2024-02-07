@@ -177,7 +177,6 @@ namespace nil {
                         const typename GroupType::curve_type::scalar_field_type::value_type &eval_poly,
                         const typename GroupType::curve_type::scalar_field_type::value_type &kzg_challenge) {
                     // TODO: check correctness after updating math module
-                    typedef math::polynomial<typename GroupType::curve_type::scalar_field_type::value_type> poly_type;
                     typename GroupType::curve_type::scalar_field_type::value_type neg_kzg_challenge = -kzg_challenge;
 
                     BOOST_ASSERT(poly.size() == std::distance(srs_powers_alpha_first, srs_powers_alpha_last));

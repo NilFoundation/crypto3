@@ -129,8 +129,6 @@ BOOST_AUTO_TEST_CASE(step_list_1) {
     typedef hashes::keccak_1600<256> merkle_hash_type;
     typedef hashes::keccak_1600<256> transcript_hash_type;
 
-    typedef typename containers::merkle_tree<merkle_hash_type, 2> merkle_tree_type;
-
     constexpr static const std::size_t lambda = 40;
     constexpr static const std::size_t k = 1;
 
@@ -143,20 +141,18 @@ BOOST_AUTO_TEST_CASE(step_list_1) {
     typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, lambda, m > fri_type;
     typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, m>  lpc_params_type;
     typedef zk::commitments::list_polynomial_commitment<FieldType, lpc_params_type> lpc_type;
-    typedef typename lpc_type::proof_type proof_type;
 
     constexpr static const std::size_t d_extended = d;
     std::size_t extended_log = boost::static_log2<d_extended>::value;
     std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
         math::calculate_domain_set<FieldType>(extended_log, r);
 
-    typename fri_type::params_type fri_params;
-
-    fri_params.r = r;
-    fri_params.D = D;
-    fri_params.max_degree = d - 1;
-    fri_params.step_list = generate_random_step_list(r, 1);
-
+    typename fri_type::params_type fri_params(
+        d - 1,
+        D,
+        generate_random_step_list(r, 1),
+        r
+    );
 
     using lpc_scheme_type = nil::crypto3::zk::commitments::lpc_commitment_scheme<lpc_type, math::polynomial<typename FieldType::value_type>>;
     lpc_scheme_type lpc_scheme_prover(fri_params);
@@ -188,7 +184,7 @@ BOOST_AUTO_TEST_CASE(step_list_1) {
         {
             PROFILE_PLACEHOLDER_SCOPE("polynomial commitment");
             lpc_scheme_prover.append_to_batch(0,poly);
-            commitments[0] = lpc_scheme_prover.commit(0);        
+            commitments[0] = lpc_scheme_prover.commit(0);
         }
 
 
@@ -200,7 +196,7 @@ BOOST_AUTO_TEST_CASE(step_list_1) {
             zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(x_data);
             proof = lpc_scheme_prover.proof_eval(transcript);
         }
-        
+
         {
             PROFILE_PLACEHOLDER_SCOPE("verification");
             zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);
@@ -220,8 +216,6 @@ BOOST_AUTO_TEST_CASE(step_list_3) {
     typedef hashes::keccak_1600<256> merkle_hash_type;
     typedef hashes::keccak_1600<256> transcript_hash_type;
 
-    typedef typename containers::merkle_tree<merkle_hash_type, 2> merkle_tree_type;
-
     constexpr static const std::size_t lambda = 40;
     constexpr static const std::size_t k = 1;
 
@@ -234,20 +228,18 @@ BOOST_AUTO_TEST_CASE(step_list_3) {
     typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, lambda, m > fri_type;
     typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, m>  lpc_params_type;
     typedef zk::commitments::list_polynomial_commitment<FieldType, lpc_params_type> lpc_type;
-    typedef typename lpc_type::proof_type proof_type;
 
     constexpr static const std::size_t d_extended = d;
     std::size_t extended_log = boost::static_log2<d_extended>::value;
     std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
         math::calculate_domain_set<FieldType>(extended_log, r);
 
-    typename fri_type::params_type fri_params;
-
-    fri_params.r = r;
-    fri_params.D = D;
-    fri_params.max_degree = d - 1;
-    fri_params.step_list = generate_random_step_list(r, 3);
-
+    typename fri_type::params_type fri_params(
+        d - 1,
+        D,
+        generate_random_step_list(r, 3),
+        r
+    );
 
     using lpc_scheme_type = nil::crypto3::zk::commitments::lpc_commitment_scheme<lpc_type, math::polynomial<typename FieldType::value_type>>;
     lpc_scheme_type lpc_scheme_prover(fri_params);
@@ -279,7 +271,7 @@ BOOST_AUTO_TEST_CASE(step_list_3) {
         {
             PROFILE_PLACEHOLDER_SCOPE("polynomial commitment");
             lpc_scheme_prover.append_to_batch(0,poly);
-            commitments[0] = lpc_scheme_prover.commit(0);        
+            commitments[0] = lpc_scheme_prover.commit(0);
         }
 
 
@@ -291,7 +283,7 @@ BOOST_AUTO_TEST_CASE(step_list_3) {
             zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(x_data);
             proof = lpc_scheme_prover.proof_eval(transcript);
         }
-        
+
         {
             PROFILE_PLACEHOLDER_SCOPE("verification");
             zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);
@@ -311,8 +303,6 @@ BOOST_AUTO_TEST_CASE(step_list_5) {
     typedef hashes::keccak_1600<256> merkle_hash_type;
     typedef hashes::keccak_1600<256> transcript_hash_type;
 
-    typedef typename containers::merkle_tree<merkle_hash_type, 2> merkle_tree_type;
-
     constexpr static const std::size_t lambda = 40;
     constexpr static const std::size_t k = 1;
 
@@ -324,20 +314,18 @@ BOOST_AUTO_TEST_CASE(step_list_5) {
     typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, lambda, m > fri_type;
     typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, m>  lpc_params_type;
     typedef zk::commitments::list_polynomial_commitment<FieldType, lpc_params_type> lpc_type;
-    typedef typename lpc_type::proof_type proof_type;
 
     constexpr static const std::size_t d_extended = d;
     std::size_t extended_log = boost::static_log2<d_extended>::value;
     std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
         math::calculate_domain_set<FieldType>(extended_log, r);
 
-    typename fri_type::params_type fri_params;
-
-    fri_params.r = r;
-    fri_params.D = D;
-    fri_params.max_degree = d - 1;
-    fri_params.step_list = generate_random_step_list(r, 5);
-
+    typename fri_type::params_type fri_params(
+        d - 1,
+        D,
+        generate_random_step_list(r, 5),
+        r
+    );
 
     using lpc_scheme_type = nil::crypto3::zk::commitments::lpc_commitment_scheme<lpc_type, math::polynomial<typename FieldType::value_type>>;
     lpc_scheme_type lpc_scheme_prover(fri_params);
@@ -369,7 +357,7 @@ BOOST_AUTO_TEST_CASE(step_list_5) {
         {
             PROFILE_PLACEHOLDER_SCOPE("polynomial commitment");
             lpc_scheme_prover.append_to_batch(0,poly);
-            commitments[0] = lpc_scheme_prover.commit(0);        
+            commitments[0] = lpc_scheme_prover.commit(0);
         }
 
 
@@ -381,7 +369,7 @@ BOOST_AUTO_TEST_CASE(step_list_5) {
             zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(x_data);
             proof = lpc_scheme_prover.proof_eval(transcript);
         }
-        
+
         {
             PROFILE_PLACEHOLDER_SCOPE("verification");
             zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);

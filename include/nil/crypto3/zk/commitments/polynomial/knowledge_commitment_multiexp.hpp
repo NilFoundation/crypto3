@@ -61,7 +61,6 @@ namespace nil {
                                                     InputFieldIterator scalar_start, InputFieldIterator scalar_end,
                                                     const std::size_t chunks) {
                     typedef typename std::iterator_traits<InputFieldIterator>::value_type field_value_type;
-                    typedef typename std::iterator_traits<InputFieldIterator>::value_type::field_type field_type;
 
                     const size_t scalar_length = std::distance(scalar_start, scalar_end);
                     assert((size_t)(scalar_length) <= vec.domain_size_);

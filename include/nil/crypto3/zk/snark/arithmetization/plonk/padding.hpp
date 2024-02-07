@@ -35,7 +35,7 @@ namespace nil {
             namespace snark {
 
                 template<typename FieldType, typename ArithmetizationParams, typename ColumnType>
-                struct plonk_table;
+                class plonk_table;
 
                 template<typename FieldType, typename ArithmetizationParams, typename ColumnType>
                 std::uint32_t basic_padding(plonk_table<FieldType, ArithmetizationParams, ColumnType> &table) {

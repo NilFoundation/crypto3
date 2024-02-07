@@ -31,13 +31,14 @@
 #include <nil/crypto3/zk/commitments/detail/polynomial/basic_fri.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/lpc.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/fri.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
                 template<
-                    typename FieldType, 
+                    typename FieldType,
                     typename ArithmetizationParams
                 >
                 struct placeholder_circuit_params {

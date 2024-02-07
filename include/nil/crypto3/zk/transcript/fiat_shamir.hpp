@@ -246,7 +246,6 @@ namespace nil {
                     template<typename Integral>
                     Integral int_challenge() {
                         auto c = challenge<field_type>();
-                        nil::marshalling::status_type status;
 
                         nil::crypto3::multiprecision::cpp_int intermediate_result =
                             c.data.template convert_to<nil::crypto3::multiprecision::cpp_int>();

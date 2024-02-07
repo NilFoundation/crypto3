@@ -377,7 +377,6 @@ namespace nil {
                     boost::random::mt11213b rnd = boost::random::mt11213b()
                 ) {
                     using assignment_type = typename FieldType::value_type;
-                    using field_type = typename FieldType::value_type;
 
                     constexpr static const std::size_t permutation = permutation_size_3;
                     constexpr static const std::size_t witness_columns = witness_columns_3;
@@ -398,8 +397,6 @@ namespace nil {
                     }
 
                     // lookup inputs
-                    typename FieldType::value_type one = FieldType::value_type::one();
-                    typename FieldType::value_type zero = FieldType::value_type::zero();
                     table[0] = {1, 0, 0, 0}; // Witness 1
                     table[1] = {0, 0, 0, 0};
                     table[2] = {0, 0, 0, 0};
@@ -513,8 +510,6 @@ namespace nil {
                     }
 
                     // lookup inputs
-                    typename FieldType::value_type one = FieldType::value_type::one();
-                    typename FieldType::value_type zero = FieldType::value_type::zero();
                     table[0] = {rnd() % 2, rnd() % 2, rnd(), rnd() % 2, rnd() % 2, 0, 0, 0};
                     table[1] = {rnd() % 2, rnd() % 2, rnd(), rnd() % 2, rnd() % 2, 0, 0, 0};;
                     table[2] = {table[0][0] * table[1][0], table[0][1] * table[1][1], table[0][2] * table[1][2], table[0][3] * table[1][3], table[0][4] * table[1][4], 0, 0, 0};
@@ -742,7 +737,6 @@ namespace nil {
                     constexpr static const std::size_t selector_columns = selector_columns_6;
                     constexpr static const std::size_t table_columns =
                             witness_columns + public_columns + constant_columns + selector_columns;
-                    constexpr static const std::size_t usable_rows = usable_rows_6;
 
                     typedef placeholder_circuit_params<FieldType, arithmetization_params_6> circuit_params;
 
@@ -754,8 +748,6 @@ namespace nil {
                     }
 
                     // lookup inputs
-                    typename FieldType::value_type one = FieldType::value_type::one();
-                    typename FieldType::value_type zero = FieldType::value_type::zero();
                     table[0] = {rnd() % 5 + 2, rnd() % 5 + 2, rnd() % 5 + 2, rnd() % 5 + 2, rnd() % 5 + 2, rnd() % 5 + 2};
                     table[1] = {7, table[0][0] + table[0][1],  table[0][1] + table[0][2],  table[0][2] + table[0][3],  table[0][3] + table[0][4],  table[0][4] + table[0][5]};
 
@@ -892,7 +884,6 @@ namespace nil {
                     constexpr static const std::size_t selector_columns = selector_columns_7;
                     constexpr static const std::size_t table_columns =
                             witness_columns + public_columns + constant_columns + selector_columns;
-                    constexpr static const std::size_t usable_rows = usable_rows_7;
 
                     typedef placeholder_circuit_params<FieldType, arithmetization_params_7> circuit_params;
 
@@ -904,9 +895,6 @@ namespace nil {
                     }
 
                     // lookup inputs
-                    typename FieldType::value_type one = FieldType::value_type::one();
-                    typename FieldType::value_type zero = FieldType::value_type::zero();
-
                     auto r = rnd() % 7;
                     table[0] = std::vector<typename FieldType::value_type>(16);
                     std::size_t j = 0;

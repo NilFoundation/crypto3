@@ -305,9 +305,6 @@ namespace nil {
                             commitment_scheme.set_batch_size(LOOKUP_BATCH, proof.eval_proof.eval_proof.z.get_batch_size(LOOKUP_BATCH));
                         generate_evaluation_points(commitment_scheme, preprocessed_public_data, constraint_system, challenge, is_lookup_enabled);
 
-                        typename FieldType::value_type omega =
-                            preprocessed_public_data.common_data.basic_domain->get_domain_element(1);
-
                         std::map<std::size_t, typename commitment_scheme_type::commitment_type> commitments = proof.commitments;
                         commitments[FIXED_VALUES_BATCH] = preprocessed_public_data.common_data.commitments.fixed_values;
                         if (!commitment_scheme.verify_eval( proof.eval_proof.eval_proof, commitments, transcript )) {

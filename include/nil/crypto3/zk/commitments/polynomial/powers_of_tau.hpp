@@ -52,7 +52,7 @@ namespace nil {
                     static auto rng_from_beacon(const std::vector<std::uint8_t> &beacon) {
                         std::size_t n = 42;
                         std::vector<std::uint8_t> cur_hash = beacon;
-                        for (std::size_t i = 0; i < (1 << n); ++i) {
+                        for (std::size_t i = 0; i < std::size_t(1 << n); ++i) {
                             std::vector<std::uint8_t> hash = nil::crypto3::hash<hashes::sha2<256>>(cur_hash);
                             cur_hash = hash;
                         }

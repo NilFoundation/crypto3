@@ -44,8 +44,8 @@ namespace nil {
                     typedef plonk_variable<typename FieldType::value_type> variable_type;
                     using lookup_options_type = std::vector<std::vector<variable_type>>;
 
-                    std::size_t tag_index;
                     std::size_t columns_number;
+                    std::size_t tag_index;
                     lookup_options_type lookup_options;
 
                     bool operator==(const plonk_lookup_table<FieldType> &other) const {

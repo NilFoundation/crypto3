@@ -310,7 +310,7 @@ namespace nil {
                     std::unique_ptr<std::vector<math::polynomial_dfs<typename FieldType::value_type>>> prepare_lookup_input() {
                         // Copied from gate argument.
                         // TODO: remove code duplication.
-                        auto value_type_to_polynomial_dfs = [&assignments=plonk_columns](
+                        auto value_type_to_polynomial_dfs = [](
                             const typename VariableType::assignment_type& coeff) {
                                 return polynomial_dfs_type(0, 1, coeff);
                             };

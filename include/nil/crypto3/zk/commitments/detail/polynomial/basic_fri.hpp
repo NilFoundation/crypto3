@@ -369,7 +369,7 @@ namespace nil {
                 ) {
                     PROFILE_PLACEHOLDER_SCOPE("Basic FRI Precommit time");
 
-                    for (int i = 0; i < poly.size(); ++i) {
+                    for (std::size_t i = 0; i < poly.size(); ++i) {
                         if (poly[i].size() != D->size()) {
                             poly[i].resize(D->size(), nullptr, D);
                         }
@@ -535,7 +535,7 @@ namespace nil {
                         prev_half_size <<= 1;
                     }
 
-                    return std::move(std::make_pair(std::move(s), std::move(s_indices)));
+                    return std::make_pair(std::move(s), std::move(s_indices));
                 }
 
                 template<typename FRI>
@@ -665,7 +665,6 @@ namespace nil {
                         final_polynomial = f;
                     }
 
-                    typename FRI::grinding_type::output_type proof_of_work;
                     // Grinding
                     if( FRI::use_grinding ){
                         proof.proof_of_work = FRI::grinding_type::generate(transcript);
@@ -830,7 +829,6 @@ namespace nil {
                     BOOST_ASSERT(combined_U.size() == denominators.size());
                     BOOST_ASSERT(combined_U.size() == poly_ids.size());
 
-                    std::size_t points_num = combined_U.size();
                     // TODO: Add size correcness checks.
 
                     if (proof.final_polynomial.degree() >
@@ -866,7 +864,7 @@ namespace nil {
                                                                         s_indices);
 
                         // Check initial proof.
-                        for( auto const it: query_proof.initial_proof ){
+                        for( auto const &it: query_proof.initial_proof ){
                             auto k = it.first;
                             if (query_proof.initial_proof.at(k).p.root() != commitments.at(k) ) {
                                 return false;

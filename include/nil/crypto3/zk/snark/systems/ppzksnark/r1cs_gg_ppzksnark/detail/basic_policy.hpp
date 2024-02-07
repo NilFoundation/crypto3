@@ -245,7 +245,8 @@ namespace nil {
                     };
 
                     template<typename CurveType>
-                    class r1cs_gg_ppzksnark_basic_policy<CurveType, proving_mode::encrypted_input> {
+                    struct r1cs_gg_ppzksnark_basic_policy<CurveType, proving_mode::encrypted_input> {
+                    private:
                         typedef r1cs_gg_ppzksnark_basic_policy<CurveType, proving_mode::basic> basic_policy;
 
                     public:

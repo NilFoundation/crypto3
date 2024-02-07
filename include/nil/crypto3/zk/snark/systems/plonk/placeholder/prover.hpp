@@ -57,7 +57,6 @@ namespace nil {
                                          std::size_t max_degree) {
                         PROFILE_PLACEHOLDER_SCOPE("split_polynomial_time");
 
-                        std::size_t parts = ((f.size() - 1) / (max_degree + 1)) + 1;
                         std::vector<math::polynomial<typename FieldType::value_type>> f_splitted;
 
                         std::size_t chunk_size = max_degree + 1;    // polynomial contains max_degree + 1 coeffs
@@ -122,13 +121,13 @@ namespace nil {
                             : preprocessed_public_data(preprocessed_public_data)
                             , table_description(table_description)
                             , constraint_system(constraint_system)
-                            , _commitment_scheme(commitment_scheme)
                             , _polynomial_table(new plonk_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params>(
                                 std::move(preprocessed_private_data.private_polynomial_table),
                                 preprocessed_public_data.public_polynomial_table))
 
-                            , _is_lookup_enabled(constraint_system.lookup_gates().size() > 0)
                             , transcript(std::vector<std::uint8_t>({}))
+                            , _is_lookup_enabled(constraint_system.lookup_gates().size() > 0)
+                            , _commitment_scheme(commitment_scheme)
                     {
                         // Initialize transcript.
                         transcript(preprocessed_public_data.common_data.vk.constraint_system_with_params_hash);

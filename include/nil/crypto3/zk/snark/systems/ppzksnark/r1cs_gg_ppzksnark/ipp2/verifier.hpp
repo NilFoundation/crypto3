@@ -286,7 +286,7 @@ namespace nil {
 
                     // TODO: parallel
                     // first check on w1
-                    // e(w_1 / g^{f_w(z)},h) == e(\pi_{w,1},h^a/h^z) \\
+                    // e(w_1 / g^{f_w(z)},h) == e(\pi_{w,1},h^a/h^z)
                     // e(g^{f_w(a) - f_w(z)},
                     std::vector<typename CurveType::template g1_type<>::value_type> a_input1 {
                         final_wkey.first - (v_srs.g * fwz),

@@ -136,11 +136,11 @@ namespace nil {
                                 std::size_t usable_rows,
                                 std::uint32_t max_gates_degree,
                                 verification_key vk
-                            ):  basic_domain(D),
-                                lagrange_0(D->size() - 1, D->size(), FieldType::value_type::zero()),
-                                commitments(commts),
+                            ):  commitments(commts),
                                 columns_rotations(col_rotations), rows_amount(rows), usable_rows_amount(usable_rows),
+                                lagrange_0(D->size() - 1, D->size(), FieldType::value_type::zero()),
                                 Z(std::vector<typename FieldType::value_type>(rows + 1, FieldType::value_type::zero())),
+                                basic_domain(D),
                                 max_gates_degree(max_gates_degree), vk(vk)
                             {
                                 // Z is polynomial -1, 0,..., 0, 1
@@ -159,9 +159,9 @@ namespace nil {
                                 std::size_t usable_rows,
                                 std::uint32_t max_gates_degree,
                                 verification_key vk
-                            ):  lagrange_0(rows - 1, rows, FieldType::value_type::zero()),
-                                commitments(commts),
+                            ):  commitments(commts),
                                 columns_rotations(col_rotations), rows_amount(rows), usable_rows_amount(usable_rows),
+                                lagrange_0(rows - 1, rows, FieldType::value_type::zero()),
                                 Z(std::vector<typename FieldType::value_type>(rows + 1, FieldType::value_type::zero())),
                                 max_gates_degree(max_gates_degree), vk(vk)
                             {
@@ -496,7 +496,7 @@ namespace nil {
                         std::array<std::set<int>, ParamsType::arithmetization_params::total_columns> c_rotations =
                             columns_rotations(constraint_system, table_description);
 
-                        typename transcript_hash_type::digest_type constraint_system_with_params_hash = 
+                        typename transcript_hash_type::digest_type constraint_system_with_params_hash =
                             nil::crypto3::zk::snark::detail::compute_constraint_system_with_params_hash<ParamsType, transcript_hash_type>(
                                 constraint_system,
                                 N_rows,

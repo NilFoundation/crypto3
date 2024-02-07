@@ -58,7 +58,7 @@ using namespace nil::crypto3;
 
 using dist_type = std::uniform_int_distribution<int>;
 
-inline std::vector<std::size_t> generate_random_step_list(const std::size_t r, const int max_step, boost::random::mt11213b &rnd) {
+inline std::vector<std::size_t> generate_random_step_list(const std::size_t r, const std::size_t max_step, boost::random::mt11213b &rnd) {
     std::vector<std::size_t> step_list;
     std::size_t steps_sum = 0;
     while (steps_sum != r) {
@@ -106,7 +106,7 @@ inline std::vector<math::polynomial<typename FieldType::value_type>> generate_ra
 ){
     std::vector<math::polynomial<typename FieldType::value_type>> result;
 
-    for( uint i = 0; i < batch_size; i++ ){
+    for( std::size_t i = 0; i < batch_size; i++ ){
         result.push_back(generate_random_polynomial(degree, rnd));
     }
     return result;
@@ -121,7 +121,7 @@ inline std::vector<math::polynomial_dfs<typename FieldType::value_type>> generat
     auto data = generate_random_polynomial_batch(batch_size, degree, rnd);
     std::vector<math::polynomial_dfs<typename FieldType::value_type>> result;
 
-    for( uint i = 0; i < data.size(); i++ ){
+    for( std::size_t i = 0; i < data.size(); i++ ){
         math::polynomial_dfs<typename FieldType::value_type> dfs;
         dfs.from_coefficients(data[i]);
         result.push_back(dfs);
@@ -141,7 +141,7 @@ struct test_fixture {
     test_fixture(){
         test_global_seed = 0;
 
-        for( std::size_t i = 0; i < boost::unit_test::framework::master_test_suite().argc - 1; i++){
+        for( std::size_t i = 0; i < std::size_t(boost::unit_test::framework::master_test_suite().argc - 1); i++){
             if(std::string(boost::unit_test::framework::master_test_suite().argv[i]) == "--seed"){
                 if(std::string(boost::unit_test::framework::master_test_suite().argv[i+1]) == "random"){
                     std::random_device rd;
@@ -192,8 +192,6 @@ BOOST_FIXTURE_TEST_CASE(lpc_basic_test, test_fixture) {
     static_assert(!zk::is_commitment<merkle_hash_type>::value);
     static_assert(!zk::is_commitment<merkle_tree_type>::value);
     static_assert(!zk::is_commitment<std::size_t>::value);
-
-    typedef typename lpc_type::proof_type proof_type;
 
     constexpr static const std::size_t d_extended = d;
     std::size_t extended_log = boost::static_log2<d_extended>::value;
@@ -292,8 +290,6 @@ BOOST_FIXTURE_TEST_CASE(lpc_basic_skipping_layers_test, test_fixture) {
     static_assert(!zk::is_commitment<merkle_tree_type>::value);
     static_assert(!zk::is_commitment<std::size_t>::value);
 
-    typedef typename lpc_type::proof_type proof_type;
-
     constexpr static const std::size_t d_extended = d;
     std::size_t extended_log = boost::static_log2<d_extended>::value;
     std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
@@ -388,7 +384,6 @@ BOOST_FIXTURE_TEST_CASE(lpc_dfs_basic_test, test_fixture) {
     static_assert(!zk::is_commitment<merkle_tree_type>::value);
     static_assert(!zk::is_commitment<std::size_t>::value);
 
-    typedef typename lpc_type::proof_type proof_type;
     // Setup params
     constexpr static const std::size_t d_extended = d;
     std::size_t extended_log = boost::static_log2<d_extended>::value;
@@ -484,8 +479,6 @@ BOOST_FIXTURE_TEST_CASE(lpc_batches_num_3_test, test_fixture){
     static_assert(!zk::is_commitment<merkle_tree_type>::value);
     static_assert(!zk::is_commitment<std::size_t>::value);
 
-    typedef typename lpc_type::proof_type proof_type;
-
     constexpr static const std::size_t d_extended = d;
     std::size_t extended_log = boost::static_log2<d_extended>::value;
     std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
@@ -574,8 +567,6 @@ BOOST_FIXTURE_TEST_CASE(lpc_different_hash_types_test, test_fixture) {
     static_assert(!zk::is_commitment<merkle_hash_type>::value);
     static_assert(!zk::is_commitment<merkle_tree_type>::value);
     static_assert(!zk::is_commitment<std::size_t>::value);
-
-    typedef typename lpc_type::proof_type proof_type;
 
     constexpr static const std::size_t d_extended = d;
     std::size_t extended_log = boost::static_log2<d_extended>::value;

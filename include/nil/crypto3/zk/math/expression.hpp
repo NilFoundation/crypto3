@@ -372,6 +372,8 @@ namespace nil {
                             return "-";
                         case ArithmeticOperator::MULT:
                             return "*";
+                        default:
+                            __builtin_unreachable();
                     }
                 }
 

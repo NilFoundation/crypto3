@@ -61,11 +61,11 @@ namespace nil {
                                 const typename field_type::value_type& delta)
                             : rows_amount(rows_amount)
                             , usable_rows_amount(usable_rows_amount)
+                            , delta(delta)
                             , commitment_params(commitment_params)
                             , application_id(application_id)
-                            , delta(delta)
                         { }
- 
+
                         // All fields below this line must be included in the transcript initilization, including
                         // static const fields.
                         constexpr static const std::size_t witness_columns = PlaceholderParamsType::witness_columns;
@@ -73,7 +73,7 @@ namespace nil {
                         constexpr static const std::size_t constant_columns = PlaceholderParamsType::constant_columns;
                         constexpr static const std::size_t selector_columns = PlaceholderParamsType::selector_columns;
 
- 
+
                         std::size_t rows_amount;
                         std::size_t usable_rows_amount;
 
@@ -90,7 +90,7 @@ namespace nil {
 
                     template <typename PlaceholderParamsType, typename transcript_hash_type>
                     typename transcript_hash_type::digest_type compute_constraint_system_with_params_hash(
-                            const plonk_constraint_system<typename PlaceholderParamsType::field_type, 
+                            const plonk_constraint_system<typename PlaceholderParamsType::field_type,
                                 typename PlaceholderParamsType::arithmetization_params> &constraint_system,
                             std::size_t rows_amount,
                             std::size_t usable_rows_amount,
@@ -107,27 +107,24 @@ namespace nil {
 
                         // Marshall the initialization context and push it to the transcript.
                         using Endianness = nil::marshalling::option::big_endian;
-                        using TTypeBase = nil::marshalling::field_type<Endianness>;
-                        using value_marshalling_type = nil::crypto3::marshalling::types::transcript_initialization_context<
-                            TTypeBase, nil::crypto3::zk::snark::detail::transcript_initialization_context<PlaceholderParamsType>>;
                         auto filled_context = nil::crypto3::marshalling::types::fill_transcript_initialization_context<
                             Endianness, nil::crypto3::zk::snark::detail::transcript_initialization_context<PlaceholderParamsType>>(context);
 
                         std::vector<std::uint8_t> cv(filled_context.length(), 0x00);
                         auto write_iter = cv.begin();
                         nil::marshalling::status_type status = filled_context.write(write_iter, cv.size());
+                        BOOST_CHECK(status == nil::marshalling::status_type::success);
 
                         // Append constraint_system to the buffer "cv".
                         using FieldType = typename PlaceholderParamsType::field_type;
                         using ConstraintSystem = plonk_constraint_system<FieldType, typename PlaceholderParamsType::arithmetization_params>;
-                        using constraint_system_marshalling_type = nil::crypto3::marshalling::types::plonk_constraint_system<TTypeBase, ConstraintSystem>;
 
                         auto filled_constraint_system = nil::crypto3::marshalling::types::fill_plonk_constraint_system<Endianness, ConstraintSystem>(constraint_system);
                         cv.resize(filled_context.length() + filled_constraint_system.length(), 0x00);
 
                         // Function write wants an lvalue as 1st parameter.
                         write_iter = cv.begin() + filled_context.length();
-                        status = filled_constraint_system.write(write_iter, filled_constraint_system.length());
+                        filled_constraint_system.write(write_iter, filled_constraint_system.length());
 
                         // Return hash of "cv", which contains concatenated constraint system and other initialization parameters.
                         return hash<transcript_hash_type>(cv);

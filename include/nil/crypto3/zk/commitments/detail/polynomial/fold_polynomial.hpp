@@ -72,8 +72,6 @@ namespace nil {
                                     std::shared_ptr<math::evaluation_domain<FieldType>>
                                     domain) {
 
-                        std::size_t d = f.degree();
-
                         // codeword = [two.inverse() * ( (one + alpha / (offset * (omega^i)) ) * codeword[i]
                         //  + (one - alpha / (offset * (omega^i)) ) * codeword[len(codeword)//2 + i] ) for i in
                         //  range(len(codeword)//2)]

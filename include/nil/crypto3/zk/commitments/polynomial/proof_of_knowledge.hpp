@@ -30,7 +30,8 @@
 #include <nil/crypto3/algebra/random_element.hpp>
 #include <nil/crypto3/algebra/algorithms/pair.hpp>
 #include <nil/crypto3/marshalling/algebra/types/fast_curve_element.hpp>
-#include <nil/crypto3/random/chacha.hpp>
+#include <nil/crypto3/hash/algorithm/hash.hpp>
+#include <nil/crypto3/hash/sha2.hpp>
 #include <nil/crypto3/hash/blake2b.hpp>
 
 namespace nil {

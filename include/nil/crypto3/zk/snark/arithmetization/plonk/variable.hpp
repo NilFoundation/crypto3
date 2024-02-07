@@ -44,13 +44,13 @@ namespace nil {
              * Forward declaration.
              */
             template<typename VariableType>
-            struct term;
+            class term;
 
             /**
              * Forward declaration.
              */
             template<typename VariableType>
-            struct expression;
+            class expression;
         }    // namespace math
 
         namespace zk {
@@ -74,10 +74,10 @@ namespace nil {
                     /**
                      * Mnemonic typedefs.
                      */
-                    std::int32_t rotation;
-                    column_type type;
                     std::size_t index;
+                    std::int32_t rotation;
                     bool relative;
+                    column_type type;
 
                     constexpr plonk_variable() : index(0), rotation(0), relative(false), type(column_type::witness) {};
 
