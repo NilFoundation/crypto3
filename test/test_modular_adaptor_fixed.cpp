@@ -714,4 +714,17 @@ BOOST_AUTO_TEST_CASE(secp256k1_incorrect_multiplication) {
 //    bool res = base_operations_test_mixed(test_data);
 // }
 
+BOOST_AUTO_TEST_CASE(bad_negation) {
+    using Backend = cpp_int_backend<256, 256>;
+    using standart_number = number<Backend>;
+    using params_safe_type = nil::crypto3::multiprecision::backends::modular_params_rt<Backend>;
+    using modular_number = number<modular_adaptor<Backend, params_safe_type>>;
+    constexpr standart_number modulus = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F_cppui256;
+    constexpr modular_number x(0, modulus);
+    constexpr modular_number res = -x;
+    assert(res == 0);
+    assert(res == x);
+    assert(-res == x);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

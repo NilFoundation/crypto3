@@ -179,11 +179,14 @@ namespace nil {
 
                     constexpr void negate() {
                         m_base.negate();
-                        eval_add(m_base, this->mod_data().get_mod().backend());
+                        if (m_base.compare(m_zero) != 0) {
+                            eval_add(m_base, this->mod_data().get_mod().backend());
+                        }
                     }
 
                 protected:
                     Backend m_base;
+                    static constexpr Backend m_zero = static_cast<typename std::tuple_element<0, unsigned_types>::type>(0u);
                 };
 
                 template<unsigned MinBits, cpp_integer_type SignType, cpp_int_check_type Checked, typename Backend1,
