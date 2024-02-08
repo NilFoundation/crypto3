@@ -113,7 +113,7 @@ namespace nil {
                         std::vector<std::uint8_t> cv(filled_context.length(), 0x00);
                         auto write_iter = cv.begin();
                         nil::marshalling::status_type status = filled_context.write(write_iter, cv.size());
-                        BOOST_CHECK(status == nil::marshalling::status_type::success);
+                        BOOST_ASSERT(status == nil::marshalling::status_type::success);
 
                         // Append constraint_system to the buffer "cv".
                         using FieldType = typename PlaceholderParamsType::field_type;
