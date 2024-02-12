@@ -618,7 +618,6 @@ namespace nil {
                         ++gate_modules_count;
                     }
                 }
-                std::cout << "Finished" << std::endl;
 
                 if (_term_powers.size() > 0) {
                     std::stringstream power_functions;
@@ -818,9 +817,7 @@ namespace nil {
 
                 result << std::showbase << std::hex;
 
-                result << "\t\t\t// 1. 2*permutation_size" << std::endl;
                 poly_points = 2;
-
                 while (j < 2*_permutation_size) {
                     result << "\t\t\tpoints[" << i << "] = basic_marshalling.get_uint256_be(blob,";
                     result << point_offset + (poly_points-1)*32 << ");" << std::endl;
@@ -831,7 +828,6 @@ namespace nil {
                     ++j;
                 }
 
-                result << "\t\t\t// 2. special selectors " << std::endl;
                 poly_points = 3;
 
                 j = 0;
@@ -845,7 +841,6 @@ namespace nil {
                     ++j;
                 }
 
-                result << "\t\t\t// 3. constant columns " << std::endl;
                 std::size_t column_rotation_offset = PlaceholderParams::witness_columns + PlaceholderParams::public_input_columns;
                 j = 0;
                 while (j < PlaceholderParams::arithmetization_params::constant_columns) {
@@ -859,7 +854,6 @@ namespace nil {
                     ++j;
                 }
 
-                result << "\t\t\t// 4. selector columns " << std::endl;
                 column_rotation_offset += PlaceholderParams::constant_columns;
                 j = 0;
                 while (j < PlaceholderParams::arithmetization_params::selector_columns) {
@@ -919,7 +913,18 @@ namespace nil {
                 reps["$COMMITMENT_CODE$"] = commitment_code;
                 reps["$ETA_VALUES_VERIFICATION$"] = eta_point_verification_code();
 
-                commitment_scheme_replaces<PlaceholderParams>(reps, _common_data, _lpc_scheme, _permutation_size, _use_lookups);
+                std::size_t _lookup_degree = _constraint_system.lookup_poly_degree_bound();
+                std::size_t _rows_amount = _common_data.rows_amount;
+                std::size_t _quotient_degree = std::max(
+                    (_permutation_size + 2) * (_common_data.rows_amount -1 ),
+                    (_lookup_degree + 1) * (_common_data.rows_amount -1 )
+                );
+
+                std::size_t _quotient_polys = (_quotient_degree % _rows_amount != 0)? (_quotient_degree / _rows_amount + 1): (_quotient_degree / _rows_amount);
+
+                commitment_scheme_replaces<PlaceholderParams>(
+                    reps, _common_data, _lpc_scheme, _permutation_size, _quotient_polys,
+                    _use_lookups?_constraint_system.sorted_lookup_columns_number():0, _use_lookups);
 
                 replace_and_print(modular_verifier_template, reps, _folder_name + "/modular_verifier.sol");
                 replace_and_print(modular_permutation_argument_library_template, reps, _folder_name + "/permutation_argument.sol");

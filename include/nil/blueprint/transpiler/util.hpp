@@ -30,8 +30,8 @@
 #include <fstream>
 #include <sstream>
 #include <filesystem>
-
-#include <boost/algorithm/string.hpp>
+#include <iostream>
+//#include <boost/algorithm/string.hpp>
 
 namespace nil {
     namespace blueprint {
@@ -47,6 +47,29 @@ namespace nil {
             std::stringstream strstr;
             strstr << std::hex << val << std::dec;
             return strstr.str();
+        }
+
+        static inline std::string rot_string (int j, std::size_t rows_amount, std::string mode){
+            int abs_j = j>0? j: -j;
+            int other_j = rows_amount - abs_j;
+            if(other_j < abs_j) {
+                j = j > 0? -other_j: other_j;
+            }
+
+            if( mode == "recursive"){
+                if(j == 0) return "xi"; else
+                if(j == 1 ) return "xi*omega"; else
+                if(j == -1) return "xi/omega"; else
+                if(j > 0) return "xi*pow(omega, " + to_string(j) + ")"; else
+                if(j < 0) return "xi/pow(omega, " + to_string(-j) + ")";
+            } else if(mode == "evm") {
+                if(j == 0) return "xi"; else
+                if(j == 1 ) return "mulmod(xi, omega, modulus)"; else
+                if(j == -1) return "mulmod(xi, inversed_omega, modulus)"; else
+                if(j > 0) return "mulmod(xi, field.pow_small(omega, " + to_string(j) + ", modulus), modulus)"; else
+                if(j < 0) return "mulmod(xi, field.pow_small(inversed_omega, " + to_string(-j) + ", modulus), modulus)";
+            }
+            return "";
         }
 
         void replace_and_print(std::string input, transpiler_replacements reps, std::string output_file_name){
@@ -69,6 +92,167 @@ namespace nil {
             }
 
             return code;
+        }
+
+
+        // Tuple of singles, poly ids with singles>
+        template<typename PlaceholderParams, typename CommonDataType>
+        static std::tuple<std::vector<std::size_t>, std::vector<std::string>, std::map<std::string, std::size_t>, std::vector<std::vector<std::size_t>>>
+        calculate_unique_points(
+            const CommonDataType &common_data,
+            std::size_t permutation_size,
+            bool use_lookups,
+            std::size_t quotient_size,
+            std::size_t sorted_size,
+            std::string mode
+        ){
+            std::vector<std::size_t> z_points_indices;
+            std::vector<std::string> singles;
+            std::map<std::string, std::size_t> singles_map;
+            std::vector<std::vector<std::size_t>> poly_ids;
+            std::size_t rows_amount = common_data.rows_amount;
+
+            singles.push_back(rot_string(0, rows_amount, mode));
+            singles_map[rot_string(0, rows_amount, mode)] = singles_map.size();
+
+            singles.push_back("eta");
+            singles_map["eta"] = singles_map.size();
+            poly_ids.resize(singles.size());
+
+            // Sigma and permutation polys
+            std::size_t count = 0;
+            for( std::size_t i = 0; i < permutation_size; i++){
+                poly_ids[singles_map[rot_string(0, rows_amount, mode)]].push_back(count);
+                poly_ids[singles_map["eta"]].push_back(count);
+                z_points_indices.push_back(singles_map[rot_string(0, rows_amount, mode)]);
+                z_points_indices.push_back(singles_map["eta"]);
+                poly_ids[singles_map["eta"]].push_back(count+1);
+                poly_ids[singles_map[rot_string(0, rows_amount, mode)]].push_back(count+1);
+                z_points_indices.push_back(singles_map[rot_string(0, rows_amount, mode)]);
+                z_points_indices.push_back(singles_map["eta"]);
+                count += 2;
+            }
+
+            // Special selectors
+            singles.push_back(rot_string(1, rows_amount, mode));
+            singles_map[rot_string(1, rows_amount, mode)] = singles_map.size();
+            poly_ids.resize(singles.size());
+
+            poly_ids[singles_map["eta"]].push_back(count);
+            poly_ids[singles_map[rot_string(0, rows_amount, mode)]].push_back(count);
+            poly_ids[singles_map[rot_string(1, rows_amount, mode)]].push_back(count);
+            z_points_indices.push_back(singles_map[rot_string(0, rows_amount, mode)]);
+            z_points_indices.push_back(singles_map[rot_string(1, rows_amount, mode)]);
+            z_points_indices.push_back(singles_map["eta"]);
+            count++;
+            poly_ids[singles_map["eta"]].push_back(count);
+            poly_ids[singles_map[rot_string(0, rows_amount, mode)]].push_back(count);
+            poly_ids[singles_map[rot_string(1, rows_amount, mode)]].push_back(count);
+            z_points_indices.push_back(singles_map[rot_string(0, rows_amount, mode)]);
+            z_points_indices.push_back(singles_map[rot_string(1, rows_amount, mode)]);
+            z_points_indices.push_back(singles_map["eta"]);
+            count++;
+
+            for(std::size_t i = 0; i < PlaceholderParams::constant_columns; i++){
+                std::stringstream str;
+                for(auto j:common_data.columns_rotations[i + PlaceholderParams::witness_columns + PlaceholderParams::public_input_columns]){
+                    if(singles_map.find(rot_string(j, rows_amount, mode)) == singles_map.end()){
+                        singles_map[rot_string(j, rows_amount, mode)] = singles_map.size();
+                        singles.push_back(rot_string(j, rows_amount, mode));
+                        poly_ids.resize(singles.size());
+                    }
+                    poly_ids[singles_map[rot_string(j, rows_amount, mode)]].push_back(count);
+                    z_points_indices.push_back(singles_map[rot_string(j, rows_amount, mode)]);
+                }
+                poly_ids[singles_map["eta"]].push_back(count);
+                z_points_indices.push_back(singles_map["eta"]);
+                count++;
+            }
+
+            for(std::size_t i = 0; i < PlaceholderParams::selector_columns; i++){
+                std::stringstream str;
+                for(auto j:common_data.columns_rotations[i + PlaceholderParams::witness_columns + PlaceholderParams::public_input_columns + PlaceholderParams::constant_columns]){
+                    if(singles_map.find(rot_string(j, rows_amount, mode)) == singles_map.end()){
+                        singles_map[rot_string(j, rows_amount, mode)] = singles_map.size();
+                        singles.push_back(rot_string(j, rows_amount, mode));
+                        poly_ids.resize(singles.size());
+                    }
+                    poly_ids[singles_map[rot_string(j, rows_amount, mode)]].push_back(count);
+                    z_points_indices.push_back(singles_map[rot_string(j, rows_amount, mode)]);
+                }
+                poly_ids[singles_map["eta"]].push_back(count);
+                z_points_indices.push_back(singles_map["eta"]);
+                count++;
+            }
+
+            for(std::size_t i = 0; i < PlaceholderParams::witness_columns; i++){
+                std::stringstream str;
+                for(auto j:common_data.columns_rotations[i]){
+                    if(singles_map.find(rot_string(j, rows_amount, mode)) == singles_map.end()){
+                        singles_map[rot_string(j, rows_amount, mode)] = singles_map.size();
+                        singles.push_back(rot_string(j, rows_amount, mode));
+                        poly_ids.resize(singles.size());
+                    }
+                    poly_ids[singles_map[rot_string(j, rows_amount, mode)]].push_back(count);
+                    z_points_indices.push_back(singles_map[rot_string(j, rows_amount, mode)]);
+                }
+                count++;
+            }
+
+            for(std::size_t i = 0; i < PlaceholderParams::public_input_columns; i++){
+                std::stringstream str;
+                for(auto j:common_data.columns_rotations[i + PlaceholderParams::witness_columns]){
+                    if(singles_map.find(rot_string(j, rows_amount, mode)) == singles_map.end()){
+                        singles_map[rot_string(j, rows_amount, mode)] = singles_map.size();
+                        singles.push_back(rot_string(j, rows_amount, mode));
+                        poly_ids.resize(singles.size());
+                    }
+                    poly_ids[singles_map[rot_string(j, rows_amount, mode)]].push_back(count);
+                    z_points_indices.push_back(singles_map[rot_string(j, rows_amount, mode)]);
+                }
+                count++;
+            }
+
+            // Permutation argument
+            poly_ids[singles_map[rot_string(0, rows_amount, mode)]].push_back(count);
+            poly_ids[singles_map[rot_string(1, rows_amount, mode)]].push_back(count);
+            z_points_indices.push_back(singles_map[rot_string(0, rows_amount, mode)]);
+            z_points_indices.push_back(singles_map[rot_string(1, rows_amount, mode)]);
+            count++;
+
+            // Lookup permutation
+            if(use_lookups){
+                poly_ids[singles_map[rot_string(0, rows_amount, mode)]].push_back(count);
+                poly_ids[singles_map[rot_string(1, rows_amount, mode)]].push_back(count);
+                z_points_indices.push_back(singles_map[rot_string(0, rows_amount, mode)]);
+                z_points_indices.push_back(singles_map[rot_string(1, rows_amount, mode)]);
+                count++;
+            }
+            // Quotient
+            for(std::size_t i = 0; i < quotient_size; i++){
+                poly_ids[singles_map[rot_string(0, rows_amount, mode)]].push_back(count);
+                z_points_indices.push_back(singles_map[rot_string(0, rows_amount, mode)]);
+                count++;
+            }
+            // Lookup batch
+            if(use_lookups){
+                if(singles_map.find(rot_string(common_data.usable_rows_amount, rows_amount, mode)) == singles_map.end()){
+                    singles_map[rot_string(common_data.usable_rows_amount, rows_amount, mode)] = singles.size();
+                    singles.push_back(rot_string(common_data.usable_rows_amount, rows_amount, mode));
+                    poly_ids.resize(singles.size());
+                }
+                for( std::size_t i = 0; i < sorted_size; i++ ){
+                    poly_ids[singles_map[rot_string(0, rows_amount, mode)]].push_back(count);
+                    z_points_indices.push_back(singles_map[rot_string(0, rows_amount, mode)]);
+                    poly_ids[singles_map[rot_string(1, rows_amount, mode)]].push_back(count);
+                    z_points_indices.push_back(singles_map[rot_string(1, rows_amount, mode)]);
+                    poly_ids[singles_map[rot_string(common_data.usable_rows_amount, rows_amount, mode)]].push_back(count);
+                    z_points_indices.push_back(singles_map[rot_string(common_data.usable_rows_amount, rows_amount, mode)]);
+                    count++;
+                }
+            }
+
+            return std::make_tuple(z_points_indices, singles, singles_map, poly_ids);
         }
     }
 }

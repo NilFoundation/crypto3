@@ -924,7 +924,6 @@ namespace nil {
                     typename FieldType::value_type zero = FieldType::value_type::zero();
 
                     auto r = rnd() % 7;
-                    table[0] = std::vector<typename FieldType::value_type>(16);
                     std::size_t j = 0;
                     for( std::size_t i = 0; i < 7; i++){
                         if( j == r ) j++;

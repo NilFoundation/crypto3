@@ -44,115 +44,44 @@ namespace nil {
             PlaceholderParams
         >::preprocessed_data_type::common_data_type;
 
-        std::string rot_string (int j){
-            if(j == 0) return "xi"; else
-            if(j == 1 ) return "mulmod(xi, omega, modulus)"; else
-            if(j == -1) return "mulmod(xi, inversed_omega, modulus)"; else
-            if(j > 0) return "mulmod(xi, field.pow_small(omega, " + to_string(j) + ", modulus), modulus)"; else
-            if(j < 0) return "mulmod(xi, field.pow_small(inversed_omega, " + to_string(-j) + ", modulus), modulus)";
-            return "";
-        }
-
-
         template<typename PlaceholderParams>
         void commitment_scheme_replaces(
             transpiler_replacements& replacements,
             const common_data_type<PlaceholderParams> &common_data,
             const typename PlaceholderParams::commitment_scheme_type& lpc_scheme,
             std::size_t permutation_size,
+            std::size_t quotient_polys,
+            std::size_t lookup_polys,
             bool use_lookups
         ){
             std::set<std::string> unique_points;
             std::vector<std::string> points;
 
-            for(std::size_t i = 0; i < permutation_size*2; i++){
-                points.push_back(rot_string(0) + "& _etha& ");
-            }
-            unique_points.insert(rot_string(0) + "& _etha& ");
-            points.push_back(rot_string(0) + "& "+ rot_string(1) + "& _etha& ");
-            points.push_back(rot_string(0) + "& "+ rot_string(1) + "& _etha& ");
-            unique_points.insert(rot_string(0) + "& "+ rot_string(1) + "& _etha& ");
-
-            for(std::size_t i = 0; i < PlaceholderParams::constant_columns; i++){
-                std::stringstream str;
-                for(auto j:common_data.columns_rotations[i + PlaceholderParams::witness_columns + PlaceholderParams::public_input_columns]){
-                    str << rot_string(j) << "& ";
-                }
-                str << "_etha& ";
-                unique_points.insert(str.str());
-                points.push_back(str.str());
-            }
-
-            for(std::size_t i = 0; i < PlaceholderParams::selector_columns; i++){
-                std::stringstream str;
-                for(auto j:common_data.columns_rotations[i + PlaceholderParams::witness_columns + PlaceholderParams::public_input_columns + PlaceholderParams::constant_columns]){
-                    str << rot_string(j) << "& ";
-                }
-                str << "_etha& ";
-                unique_points.insert(str.str());
-                points.push_back(str.str());
-            }
-
-            for(std::size_t i = 0; i < PlaceholderParams::witness_columns; i++){
-                std::stringstream str;
-                for(auto j:common_data.columns_rotations[i]){
-                    str << rot_string(j) << "& ";
-                }
-                unique_points.insert(str.str());
-                points.push_back(str.str());
-            }
-
-            for(std::size_t i = 0; i < PlaceholderParams::public_input_columns; i++){
-                std::stringstream str;
-                for(auto j:common_data.columns_rotations[i + PlaceholderParams::witness_columns]){
-                    str << rot_string(j) << "& ";
-                }
-                unique_points.insert(str.str());
-                points.push_back(str.str());
-            }
-
-            unique_points.insert(rot_string(0) + "& " + rot_string(1) + "& ");//Permutation
-            unique_points.insert(rot_string(0) + "& ");// Quotient
-            if(use_lookups)
-                unique_points.insert(rot_string(0) + "& " + rot_string(1) + "& " + rot_string(common_data.usable_rows_amount) + "& "); // Lookups
-
-            std::size_t permutation_point_id;
-            std::size_t quotient_point_id;
-            std::size_t lookup_point_id;
-            std::size_t j = 0;
-            for( const auto &unique_point:unique_points){
-                if( unique_point == rot_string(0) + "& ") quotient_point_id = j;
-                if( unique_point == rot_string(0) + "& " + rot_string(1) + "& " + rot_string(common_data.usable_rows_amount) + "& " ) lookup_point_id = j;
-                if( unique_point == rot_string(0) + "& " + rot_string(1) + "& " ) permutation_point_id = j;
-                j++;
-            }
-
-            std::stringstream points_ids;
-            for(std::size_t i = 0; i < points.size(); i++){
-                std::size_t j = 0;
-                for(const auto &unique_point:unique_points){
-                    if(points[i] == unique_point){
-                        points_ids << std::hex << std::setw(2) << std::setfill('0') << j;
-                        break;
-                    }
-                    j++;
-                }
-            }
+            auto [z_points_indices, singles_strs, singles_map, poly_ids] = calculate_unique_points<PlaceholderParams, common_data_type<PlaceholderParams>>(
+                common_data, permutation_size, use_lookups, quotient_polys, lookup_polys,
+                "evm" // Generator mode
+            );
 
             std::stringstream points_initializer;
             std::size_t i = 0;
-            for(const auto& point: unique_points){
-                points_initializer << "\t\t result[" << i << "] = new uint256[](" << std::count(point.begin(), point.end(), '&') << ");" << std::endl;
-                std::size_t prev = 0;
-                std::size_t found = point.find("& ");
-                std::size_t j = 0;
-                while (found!=std::string::npos){
-                    points_initializer << "\t\t result[" << i << "][" << j << "] = " << point.substr(prev, found-prev) << ";" << std::endl;
-                    prev = found + 2;
-                    found = point.find("& ",prev);
-                    j++;
-                }
+
+            for(const auto& point: singles_strs){
+                points_initializer << "\t\tresult[" << i << "] = " << point << ";" << std::endl;
                 i++;
+            }
+
+            std::stringstream points_ids;
+            for( const auto& point_id: z_points_indices){
+                points_ids << std::hex << std::setw(2) << std::setfill('0') << point_id;
+            }
+
+            std::stringstream poly_ids_str;
+            std::stringstream poly_points_num;
+            for(i = 0; i < poly_ids.size(); i++){
+                poly_points_num << std::hex << std::setw(4) << std::setfill('0') << poly_ids[i].size();
+                for(std::size_t j = 0; j < poly_ids[i].size(); j++){
+                    poly_ids_str << std::hex << std::setw(4) << std::setfill('0') << poly_ids[i][j] * 0x40;
+                }
             }
 
             std::vector<std::uint8_t> init_blob = {};
@@ -167,14 +96,13 @@ namespace nil {
             replacements["$D0_SIZE$"] = to_string(fri_params.D[0]->m);
             replacements["$D0_OMEGA$"] = to_string(fri_params.D[0]->get_domain_element(1));
             replacements["$MAX_DEGREE$"] = to_string(fri_params.max_degree);
-            replacements["$UNIQUE_POINTS$"] = to_string(unique_points.size());
-            replacements["$DIFFERENT_POINTS$"] = to_string(unique_points.size());
-            replacements["$PERMUTATION_POINTS_ID$"] = to_string(permutation_point_id);
-            replacements["$QUOTIENT_POINTS_ID$"] = to_string(quotient_point_id);
-            replacements["$LOOKUP_POINTS_ID$"] = to_string(lookup_point_id);
+            replacements["$UNIQUE_POINTS$"] = to_string(singles_strs.size());
+            replacements["$DIFFERENT_POINTS$"] = to_string(singles_strs.size());
             replacements["$POINTS_IDS$"] = points_ids.str();
+            replacements["$POLY_IDS$"] = poly_ids_str.str();
+            replacements["$POLY_POINTS_NUM$"] = poly_points_num.str();
             replacements["$POINTS_INITIALIZATION$"] = points_initializer.str();
-            replacements["$ETHA$"] = to_string(etha);
+            replacements["$ETA$"] = to_string(etha);
             if( PlaceholderParams::commitment_scheme_type::fri_type::use_grinding){
                 auto params = PlaceholderParams::commitment_scheme_type::fri_type::grinding_type::get_params();
                 uint32_t mask_value = params.template get<uint32_t>("mask", 0);
