@@ -497,7 +497,7 @@ namespace nil {
                     using field_type = nil::crypto3::algebra::curves::pallas::base_field_type;
                     using poseidon_policy = nil::crypto3::hashes::detail::mina_poseidon_policy<field_type>;
                     hashes::detail::poseidon_sponge_construction<poseidon_policy> sponge;
-                    std::size_t cur = 1;
+                    BOOST_ASSERT_MSG(leaf.size() % 64 == 0, "Leaf size must be a multiple of 64");
                     for(std::size_t i = 0; i < leaf.size(); i+=64) {
                         nil::crypto3::multiprecision::cpp_int first = 0;
                         std::size_t j = 0;
@@ -512,9 +512,6 @@ namespace nil {
                         }
                         sponge.absorb(first);
                         sponge.absorb(second);
-                    }
-                    if (cur == 2) {
-                        BOOST_ASSERT("Data size should be multiple of 32 bytes");
                     }
                     return sponge.squeeze();
                 }
