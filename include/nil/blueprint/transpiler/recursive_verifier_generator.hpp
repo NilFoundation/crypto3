@@ -254,74 +254,90 @@ namespace nil {
                 out << "\t\t{\"array\": [" << std::endl;
                 std::size_t cur = 0;
                 for( std::size_t i = 0; i < eval_proof.fri_proof.query_proofs.size(); i++){
+                    if(i != 0) out << "," << std::endl;
+                    out << "\t\t\t{\"array\": [" << std::endl;
+                    cur = 0;
                     for( std::size_t j = 0; j < eval_proof.fri_proof.query_proofs[i].round_proofs.size(); j++){
                         const auto &round_proof = eval_proof.fri_proof.query_proofs[i].round_proofs[j];
                         if(cur != 0) out << "," << std::endl;
                         BOOST_ASSERT_MSG(round_proof.y.size() == 1, "Unsupported step_lis value");
-                        out << "\t\t\t{\"field\":\"" << round_proof.y[0][0] << "\"}," << std::endl;
-                        out << "\t\t\t{\"field\":\"" << round_proof.y[0][1] << "\"}";
+                        out << "\t\t\t\t{\"field\":\"" << round_proof.y[0][0] << "\"}," << std::endl;
+                        out << "\t\t\t\t{\"field\":\"" << round_proof.y[0][1] << "\"}";
                         cur++;
                         cur++;
                     }
+                    out << std::endl << "\t\t\t]}";
                 }
                 out << std::endl << "\t\t]}," << std::endl;
 
                 out << "\t\t{\"array\": [" << std::endl;
-                cur = 0;
                 for( std::size_t i = 0; i < eval_proof.fri_proof.query_proofs.size(); i++){
+                    if( i!= 0 ) out << "," << std::endl;
+                    out << "\t\t\t{\"array\":[" << std::endl;
+                    std::size_t cur = 0;
                     for( const auto &[j, initial_proof]: eval_proof.fri_proof.query_proofs[i].initial_proof){
                         for( std::size_t k = 0; k < initial_proof.p.path().size(); k++){
                             if(cur != 0) out << "," << std::endl;
-                            out << "\t\t\t{\"int\":" << initial_proof.p.path()[k][0].position() << "}";
+                            out << "\t\t\t\t{\"int\":" << initial_proof.p.path()[k][0].position() << "}";
                             cur ++;
                         }
                         break;
                     }
+                    out << std::endl << "\t\t\t]}";
                 }
                 out << std::endl << "\t\t]}," << std::endl;
 
                 out << "\t\t{\"array\": [" << std::endl;
-                cur = 0;
                 for( std::size_t i = 0; i < eval_proof.fri_proof.query_proofs.size(); i++){
+                    if( i!= 0 ) out << "," << std::endl;
+                    out << "\t\t\t{\"array\":[" << std::endl;
+                    std::size_t cur = 0;
                     for( const auto &[j, initial_proof]: eval_proof.fri_proof.query_proofs[i].initial_proof){
                         for( std::size_t k = 0; k < initial_proof.p.path().size(); k++){
                             if(cur != 0) out << "," << std::endl;
-                            out << "\t\t\t" << generate_hash<typename CommitmentSchemeType::lpc::merkle_hash_type>(
+                            out << "\t\t\t\t" << generate_hash<typename CommitmentSchemeType::lpc::merkle_hash_type>(
                                 initial_proof.p.path()[k][0].hash()
                             );
                             cur ++;
                         }
                     }
+                    out << std::endl << "\t\t\t]}";
                 }
                 out << std::endl << "\t\t]}," << std::endl;
 
                 out << "\t\t{\"array\": [" << std::endl;
-                cur = 0;
                 for( std::size_t i = 0; i < eval_proof.fri_proof.query_proofs.size(); i++){
+                    if(i != 0) out << "," << std::endl;
+                    out << "\t\t\t{\"array\": [" << std::endl;
+                    cur = 0;
                     for( std::size_t j = 0; j < eval_proof.fri_proof.query_proofs[i].round_proofs.size(); j++){
                         const auto& p = eval_proof.fri_proof.query_proofs[i].round_proofs[j].p;
                         for( std::size_t k = 0; k < p.path().size(); k++){
                             if(cur != 0) out << "," << std::endl;
-                            out << "\t\t\t{\"int\": " << p.path()[k][0].position() << "}";
+                            out << "\t\t\t\t{\"int\": " << p.path()[k][0].position() << "}";
                             cur++;
                         }
                     }
+                    out << std::endl << "\t\t\t]}";
                 }
                 out << std::endl << "\t\t]}," << std::endl;
 
                 out << "\t\t{\"array\": [" << std::endl;
-                cur = 0;
                 for( std::size_t i = 0; i < eval_proof.fri_proof.query_proofs.size(); i++){
+                    if(i != 0) out << "," << std::endl;
+                    out << "\t\t\t{\"array\": [" << std::endl;
+                    cur = 0;
                     for( std::size_t j = 0; j < eval_proof.fri_proof.query_proofs[i].round_proofs.size(); j++){
                         const auto& p = eval_proof.fri_proof.query_proofs[i].round_proofs[j].p;
                         for( std::size_t k = 0; k < p.path().size(); k++){
                             if(cur != 0) out << "," << std::endl;
-                            out << "\t\t\t" << generate_hash<typename CommitmentSchemeType::lpc::merkle_hash_type>(
+                            out << "\t\t\t\t" << generate_hash<typename CommitmentSchemeType::lpc::merkle_hash_type>(
                                 p.path()[k][0].hash()
                             );
                             cur++;
                         }
                     }
+                    out << std::endl << "\t\t\t]}";
                 }
                 out << std::endl << "\t\t]}," << std::endl;
 
@@ -498,8 +514,8 @@ namespace nil {
                 if(j == 0) return "xi"; else
                 if(j == 1 ) return "xi*omega"; else
                 if(j == -1) return "xi/omega"; else
-                if(j > 0) return "xi*pow(omega, " + to_string(j) + ")"; else
-                if(j < 0) return "xi/pow(omega, " + to_string(-j) + ")";
+                if(j > 0) return "xi*pow<" + to_string(j) + ">(omega)"; else
+                if(j < 0) return "xi/pow<" + to_string(-j) + ">(omega)";
                 return "";
             }
 
@@ -820,15 +836,119 @@ namespace nil {
                     lpc_y_computation << "\t\ty[1] += Q1;" << std::endl;
                 }
 
+                // We need remove loop there because we can't use for loops in for loops
+                cur = 0;
+                std::string full_public_input_check_str = "";
+                full_public_input_check_str += "\tstd::array<pallas::base_field_type::value_type, "+ to_string(full_public_input_size) + "> Omegas = {1};\n";
+                full_public_input_check_str += "\tpallas::base_field_type::value_type result(0);\n";
+                for (std::size_t i = 0; i < arithmetization_params::public_input_columns; i++){
+                    full_public_input_check_str += "\t{\n";
+                    for( std::size_t j = 0; j < public_input_sizes[i]; j++){
+                        full_public_input_check_str += "\tresult = pallas::base_field_type::value_type(0);\n";
+                        full_public_input_check_str += "\t\tresult += public_input[" + to_string(cur) + "] * Omegas["+to_string(j)+"] / (challenges.xi - Omegas["+to_string(j)+"]);";
+                        if( j != public_input_sizes[i] - 1)
+                            full_public_input_check_str += "  Omegas["+to_string(j+1)+"] = Omegas["+to_string(j)+"] * omega;\n";
+                        cur++;
+                    }
+                    full_public_input_check_str += "\n\t\t__builtin_assigner_exit_check(rows_amount * proof.z[zero_indices[witness_amount + " + to_string(i) + " ]] == precomputed_values.Z_at_xi * result);\n";
+                    full_public_input_check_str += "\t}\n";
+                }
+
                 std::size_t fixed_values_size = permutation_size * 2 + 2 + arithmetization_params::constant_columns + arithmetization_params::selector_columns;
                 std::size_t variable_values_size = arithmetization_params::witness_columns + arithmetization_params::public_input_columns;
-                std::string batches_size_list = to_string(fixed_values_size) + ", " + to_string(variable_values_size) + ", " +
-                    to_string(use_lookups?2:1) + ", " + to_string(quotient_polys);
-                if(use_lookups) batches_size_list += ", " + to_string(constraint_system.sorted_lookup_columns_number());
+
+                std::string initial_proof_check_str = "";
+                std::vector<std::size_t> batches_sizes;
+                batches_sizes.push_back(fixed_values_size);
+                batches_sizes.push_back(variable_values_size);
+                batches_sizes.push_back(use_lookups?2:1);
+                batches_sizes.push_back(quotient_polys);
+                if(use_lookups) batches_sizes.push_back(constraint_system.sorted_lookup_columns_number());
+
+                std::size_t start_position = 0;
+                std::size_t initial_merkle_proofs_position_num = (log2(fri_params.D[0]->m) - 1);
+                cur = 0;
+                for(std::size_t i = 0; i < batches_num; i++){
+                    initial_proof_check_str += "\t\thash_state = calculate_leaf_hash<"+to_string(start_position*2)+"," + to_string(batches_sizes[i]) + ">(proof.initial_proof_values[i], res[0][2] == pallas::base_field_type::value_type(0));\n";
+                    for(std::size_t j = 0; j < initial_merkle_proofs_position_num; j++){
+                        initial_proof_check_str += "\t\tpos = pallas::base_field_type::value_type(proof.initial_proof_positions[i][" + to_string(j) + "]);";
+                        initial_proof_check_str += " npos = pallas::base_field_type::value_type(1) - pos;\n";
+                        initial_proof_check_str +=
+                            "\t\thash_state = __builtin_assigner_poseidon_pallas_base({0, pos * hash_state + npos * proof.initial_proof_hashes[i]["
+                                +to_string(cur)+
+                            "], npos * hash_state + pos * proof.initial_proof_hashes[i]["
+                                +to_string(cur)+
+                            "]})[2];\n";
+                        cur++;
+                    }
+                    start_position += batches_sizes[i];
+                    if( i == 0 )
+                        initial_proof_check_str += "\t\t__builtin_assigner_exit_check(hash_state == vk[1]);\n\n";
+                    else
+                        initial_proof_check_str += "\t\t__builtin_assigner_exit_check(hash_state == proof.commitments[" + to_string(i-1) + "]);\n\n";
+                }
+
+                std::string batches_size_list = to_string(batches_sizes[0]) + ", " + to_string(batches_sizes[1]) + ", " +
+                    to_string(batches_sizes[2]) + ", " + to_string(batches_sizes[3]);
+                if(use_lookups) batches_size_list += ", " + to_string(batches_sizes[4]);
+
+                std::string round_proof_check_str = "";
+                cur = 0;
+                for( std::size_t i = 0; i < fri_params.r; i++){
+                    round_proof_check_str += "\t\tpos = res[" + to_string(i) + "][2]; npos = pallas::base_field_type::value_type(1) - pos;\n";
+                    if(i == 0)
+                        round_proof_check_str += "\t\trhash = __builtin_assigner_poseidon_pallas_base({0, npos * y[0] + pos * y[1], pos * y[0] + npos * y[1]})[2];\n";
+                    else
+                        round_proof_check_str += "\t\trhash = __builtin_assigner_poseidon_pallas_base({0, npos * proof.round_proof_values[i]["+to_string(i*2-2)+"] + pos * proof.round_proof_values[i]["+to_string(i*2-1)+"], npos * proof.round_proof_values[i]["+to_string(i*2-1)+"] + pos * proof.round_proof_values[i]["+to_string(i*2-2)+"]})[2];\n";
+                    for ( std::size_t j = 0; j < log2(fri_params.D[0]->m) - i - 1; j++){
+                        round_proof_check_str += "\t\tpos = pallas::base_field_type::value_type(proof.round_merkle_proof_positions[i][" + to_string(cur) + "]); npos = pallas::base_field_type::value_type(1) - pos;\n";
+                        round_proof_check_str += "\t\trhash = __builtin_assigner_poseidon_pallas_base({0, pos * rhash + npos * proof.round_proof_hashes[i]["+to_string(cur)+"], npos * rhash + pos * proof.round_proof_hashes[i]["+to_string(cur)+"]})[2];\n";
+                        cur++;
+                    }
+                    round_proof_check_str += "\t\t__builtin_assigner_exit_check(rhash == proof.fri_roots["+to_string(i)+"]);\n\n";
+                }
+
+                std::string lookup_input_loop = "";
+                cur = 0;
+                std::size_t cur_e = 0;
+                for(std::size_t i=0; i < constraint_system.lookup_gates().size(); i++){
+                    for(std::size_t j = 0; j < constraint_system.lookup_gates()[i].constraints.size(); j++){
+                        lookup_input_loop += "\t\tlookup_input["+to_string(cur) + "] = lookup_gate_constraints_table_ids["+to_string(cur)+"];\n";
+                        lookup_input_loop += "\t\ttheta_acc = theta;\n";
+                        for(std::size_t k = 0; k < constraint_system.lookup_gates()[i].constraints[j].lookup_input.size(); k++){
+                            lookup_input_loop += "\t\tlookup_input["+to_string(cur)+"] += lookup_gate_constraints_lookup_inputs["+to_string(cur_e)+"] * theta_acc; theta_acc *= theta;\n";
+                            cur_e++;
+                        }
+                        lookup_input_loop += "\t\tlookup_input["+to_string(cur) + "] *= lookup_gate_selectors["+to_string(i)+"];\n";
+                        cur++;
+                    }
+                }
+
+                std::string lookup_table_loop = "";
+                cur = 0;
+                std::size_t cur_o = 0;
+                for(std::size_t i = 0; i < constraint_system.lookup_tables().size(); i++){
+                    for(std::size_t j = 0; j < constraint_system.lookup_tables()[i].lookup_options.size(); j++){
+                        lookup_table_loop += "\t\ttheta_acc = theta;\n";
+                        lookup_table_loop += "\t\tlookup_value["+to_string(cur)+"] = lookup_table_selectors["+to_string(i)+"] * pallas::base_field_type::value_type("+to_string(i+1)+");\n";
+                        lookup_table_loop += "\t\tlookup_shifted_value["+to_string(cur)+"] = shifted_lookup_table_selectors["+to_string(i)+"] * pallas::base_field_type::value_type("+to_string(i+1)+");\n";
+                        for(std::size_t k = 0; k < constraint_system.lookup_tables()[i].lookup_options[j].size(); k++){
+                            lookup_table_loop += "\t\tlookup_value["+to_string(cur)+"] += lookup_table_selectors["+to_string(i)+"] * lookup_table_lookup_options["+to_string(cur_o)+"] * theta_acc;\n";
+                            lookup_table_loop += "\t\tlookup_shifted_value["+to_string(cur)+"] += shifted_lookup_table_selectors["+to_string(i)+"] * shifted_lookup_table_lookup_options["+to_string(cur_o)+"] * theta_acc;\n";
+                            lookup_table_loop += "\t\ttheta_acc = theta_acc * theta;\n";
+                            cur_o++;
+                        }
+                        lookup_table_loop += "\t\tlookup_value["+to_string(cur)+"] *= (pallas::base_field_type::value_type(1) - q_last[0] - q_blind[0]);\n";
+                        lookup_table_loop += "\t\tlookup_shifted_value["+to_string(cur)+"] *= (pallas::base_field_type::value_type(1) - q_last[1] - q_blind[1]);\n";
+                        cur++;
+                    }
+                }
 
                 lookup_reps["$LOOKUP_VARS$"] = use_lookups?lookup_vars:"";
                 lookup_reps["$LOOKUP_EXPRESSIONS$"] = use_lookups?lookup_expressions:"";
                 lookup_reps["$LOOKUP_CODE$"] = use_lookups?lookup_code:"";
+                lookup_reps["$LOOKUP_INPUT_LOOP$"] = use_lookups?lookup_input_loop:"";
+                lookup_reps["$LOOKUP_TABLE_LOOP$"] = use_lookups?lookup_table_loop:"";
                 result = replace_all(result, lookup_reps);
 
                 reps["$USE_LOOKUPS_DEFINE$"] = use_lookups?"#define __USE_LOOKUPS__ 1\n":"";
@@ -838,13 +958,15 @@ namespace nil {
                 reps["$POINTS_NUM$"] = to_string(points_num);
                 reps["$POLY_NUM$"] = to_string(poly_num);
                 reps["$INITIAL_PROOF_POINTS_NUM$"] = to_string(poly_num * 2);
-                reps["$ROUND_PROOF_POINTS_NUM$"] = to_string(fri_params.r * 2 * lambda);
+                reps["$ROUND_PROOF_POINTS_NUM$"] = to_string(fri_params.r * 2);
                 reps["$FRI_ROOTS_NUM$"] = to_string(fri_params.r);
                 reps["$INITIAL_MERKLE_PROOFS_NUM$"] = to_string(batches_num * lambda);
-                reps["$INITIAL_MERKLE_PROOFS_POSITION_NUM$"] = to_string(lambda * (log2(fri_params.D[0]->m) - 1));
-                reps["$INITIAL_MERKLE_PROOFS_HASH_NUM$"] = to_string(lambda * (log2(fri_params.D[0]->m) - 1) * batches_num);
-                reps["$ROUND_MERKLE_PROOFS_POSITION_NUM$"] = to_string(lambda * round_proof_layers_num);
-                reps["$ROUND_MERKLE_PROOFS_HASH_NUM$"] = to_string(lambda * round_proof_layers_num);
+                reps["$INITIAL_MERKLE_PROOFS_POSITION_NUM$"] = to_string(initial_merkle_proofs_position_num);
+                reps["$INITIAL_MERKLE_PROOFS_HASH_NUM$"] = to_string((log2(fri_params.D[0]->m) - 1) * batches_num);
+                reps["$INITIAL_PROOF_CHECK$"] = to_string(initial_proof_check_str);
+                reps["$ROUND_MERKLE_PROOFS_POSITION_NUM$"] = to_string(round_proof_layers_num);
+                reps["$ROUND_MERKLE_PROOFS_HASH_NUM$"] = to_string(round_proof_layers_num);
+                reps["$ROUND_PROOF_CHECK$"] = to_string(round_proof_check_str);
                 reps["$FINAL_POLYNOMIAL_SIZE$"] = to_string(std::pow(2, std::log2(fri_params.max_degree + 1) - fri_params.r + 1) - 2);
                 reps["$LAMBDA$"] = to_string(lambda);
                 reps["$PERMUTATION_SIZE$"] = to_string(permutation_size);
@@ -898,7 +1020,7 @@ namespace nil {
                 reps["$FULL_PUBLIC_INPUT_SIZE$"] = to_string(full_public_input_size);
                 reps["$LPC_POLY_IDS_CONSTANT_ARRAYS$"] = lpc_poly_ids_const_arrays;
                 reps["$LPC_Y_COMPUTATION$"] = lpc_y_computation.str();
-                reps["$PUBLIC_INPUT_CHECK$"] = arithmetization_params::public_input_columns == 0 ? "" :public_input_check_str;
+                reps["$PUBLIC_INPUT_CHECK$"] = arithmetization_params::public_input_columns == 0 ? "" :full_public_input_check_str;
                 reps["$PUBLIC_INPUT_INPUT$"] = arithmetization_params::public_input_columns == 0 ? "" : public_input_input_str;
 
                 result = replace_all(result, reps);

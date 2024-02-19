@@ -60,8 +60,8 @@ namespace nil {
                 if(j == 0) return "xi"; else
                 if(j == 1 ) return "xi*omega"; else
                 if(j == -1) return "xi/omega"; else
-                if(j > 0) return "xi*pow(omega, " + to_string(j) + ")"; else
-                if(j < 0) return "xi/pow(omega, " + to_string(-j) + ")";
+                if(j > 0) return "xi*pow< " + to_string(j) + ">(omega)"; else
+                if(j < 0) return "xi/pow< " + to_string(-j) + ">(omega)";
             } else if(mode == "evm") {
                 if(j == 0) return "xi"; else
                 if(j == 1 ) return "mulmod(xi, omega, modulus)"; else
