@@ -140,10 +140,12 @@ namespace nil {
                 ){
                     auto fixed_values = make_commitment<Endianness, typename CommonDataType::commitment_scheme_type>(std::get<0>(filled_common_data.value()));
 
-                    typename CommonDataType::columns_rotations_type columns_rotations;
+                    typename CommonDataType::columns_rotations_type columns_rotations(
+                        std::get<1>(filled_common_data.value()).value().size()
+                    );
                     for(size_t i = 0; i < std::get<1>(filled_common_data.value()).value().size(); i++){
                         auto filled_column = std::get<1>(filled_common_data.value()).value().at(i);
-                        for(size_t j = 0; j < filled_column.value().size(); j++){
+                        for(size_t j = 0; j < filled_column.value().size(); j++) {
                             columns_rotations[i].insert(filled_column.value()[j].value());
                         }
                     }

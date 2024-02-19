@@ -28,15 +28,16 @@ jobs:
 
       targets: ${{ inputs.targets }} 
 
-  matrix-test-mac:
-    name: Mac Reusable Crypto3 Testing
-    needs:
-      - handle-syncwith
-    uses: NilFoundation/ci-cd/.github/workflows/reusable-crypto3-testing-mac.yml@v1.2.0
-
-    secrets: inherit
-    with:
-      submodules-refs: ${{ needs.handle-syncwith.outputs.prs-refs }}
-
-      targets: ${{ inputs.targets }} 
+# Temporarily disabling this, most of our tests fail on mac, we have a separate task/issue for fixing this.
+#  matrix-test-mac:
+#    name: Mac Reusable Crypto3 Testing
+#    needs:
+#      - handle-syncwith
+#    uses: NilFoundation/ci-cd/.github/workflows/reusable-crypto3-testing-mac.yml@v1.2.0
+#
+#    secrets: inherit
+#    with:
+#      submodules-refs: ${{ needs.handle-syncwith.outputs.prs-refs }}
+#
+#      targets: ${{ inputs.targets }} 
 

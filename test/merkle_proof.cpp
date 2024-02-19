@@ -95,7 +95,7 @@ generate_random_data(std::size_t leaf_number) {
     return v;
 }
 
-template<typename Endianness, typename Hash, std::size_t Arity, std::size_t LeafSize = 32>
+template<typename Endianness, typename Hash, std::size_t Arity, std::size_t LeafSize = 64>
 void test_merkle_proof(std::size_t tree_depth) {
 
     using namespace nil::crypto3::marshalling;
@@ -145,7 +145,7 @@ using HashTypes = boost::mpl::list<
         std::srand(std::time(0));
         test_merkle_proof<nil::marshalling::option::big_endian, HashType, 2>(5);
         test_merkle_proof<nil::marshalling::option::big_endian, HashType, 2>(10);
-        test_merkle_proof<nil::marshalling::option::big_endian, HashType, 2, 300>(15);
+        test_merkle_proof<nil::marshalling::option::big_endian, HashType, 2, 320>(15);
     }
 
 // Poseidon hash function supports only Arity 2.

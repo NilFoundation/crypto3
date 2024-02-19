@@ -216,13 +216,10 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit1)
         constexpr static const std::size_t constant_columns = constant_columns_1;
         constexpr static const std::size_t selector_columns = selector_columns_1;
 
-        using arithmetization_params =
-            plonk_arithmetization_params<witness_columns, public_input_columns, constant_columns, selector_columns>;
-
         constexpr static const std::size_t lambda = 40;
         constexpr static const std::size_t m = 2;
     };
-    typedef placeholder_circuit_params<field_type, typename placeholder_test_params::arithmetization_params> circuit_params;
+    typedef placeholder_circuit_params<field_type> circuit_params;
     using transcript_type = typename transcript::fiat_shamir_heuristic_sequential<transcript_hash_type>;
 
     using lpc_params_type = commitments::list_polynomial_commitment_params<
@@ -241,7 +238,12 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit1)
 BOOST_AUTO_TEST_CASE(prover_test) {
     auto circuit = circuit_test_1<field_type>();
 
-    plonk_table_description<field_type, typename circuit_params::arithmetization_params> desc;
+    plonk_table_description<field_type> desc(
+        placeholder_test_params::witness_columns,
+        placeholder_test_params::public_input_columns,
+        placeholder_test_params::constant_columns,
+        placeholder_test_params::selector_columns
+    );
 
     desc.rows_amount = placeholder_test_params::table_rows;
     desc.usable_rows_amount = placeholder_test_params::usable_rows;
@@ -288,16 +290,10 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit2)
         constexpr static const std::size_t constant_columns = 0;
         constexpr static const std::size_t selector_columns = 2;
 
-        using arithmetization_params =
-            plonk_arithmetization_params<witness_columns, public_input_columns, constant_columns, selector_columns>;
-
         constexpr static const std::size_t lambda = 1;
         constexpr static const std::size_t m = 2;
     };
-    using circuit_t_params = placeholder_circuit_params<
-        field_type,
-        typename placeholder_test_params::arithmetization_params
-    >;
+    using circuit_t_params = placeholder_circuit_params<field_type>;
 
     using transcript_type = typename transcript::fiat_shamir_heuristic_sequential<typename placeholder_test_params::transcript_hash_type>;
 
@@ -318,7 +314,12 @@ BOOST_AUTO_TEST_CASE(common_data_marshalling_test) {
     auto pi0 = nil::crypto3::algebra::random_element<field_type>();
     auto circuit = circuit_test_t<field_type>(pi0, test_global_alg_rnd_engine<field_type>, test_global_rnd_engine);
 
-    plonk_table_description<field_type, typename circuit_t_params::arithmetization_params> desc;
+    plonk_table_description<field_type> desc(
+        placeholder_test_params::witness_columns,
+        placeholder_test_params::public_input_columns,
+        placeholder_test_params::constant_columns,
+        placeholder_test_params::selector_columns
+    );
     desc.rows_amount = table_rows;
     desc.usable_rows_amount = usable_rows;
 
@@ -364,14 +365,11 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit3)
         constexpr static const std::size_t constant_columns = constant_columns_3;
         constexpr static const std::size_t selector_columns = selector_columns_3;
 
-        using arithmetization_params =
-            plonk_arithmetization_params<witness_columns, public_input_columns, constant_columns, selector_columns>;
-
         constexpr static const std::size_t lambda = 40;
         constexpr static const std::size_t m = 2;
     };
 
-    using circuit_params = placeholder_circuit_params<field_type, typename placeholder_test_params::arithmetization_params>;
+    using circuit_params = placeholder_circuit_params<field_type>;
     using transcript_type = typename transcript::fiat_shamir_heuristic_sequential<typename placeholder_test_params::transcript_hash_type>;
     using lpc_params_type = commitments::list_polynomial_commitment_params<
         typename placeholder_test_params::merkle_hash_type,
@@ -389,7 +387,12 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit3)
 BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_initializer) {
     auto circuit = circuit_test_3<field_type>();
 
-    plonk_table_description<field_type, typename circuit_params::arithmetization_params> desc;
+    plonk_table_description<field_type> desc(
+        placeholder_test_params::witness_columns,
+        placeholder_test_params::public_input_columns,
+        placeholder_test_params::constant_columns,
+        placeholder_test_params::selector_columns
+    );
 
     desc.rows_amount = table_rows;
     desc.usable_rows_amount = usable_rows;
@@ -439,14 +442,11 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit4)
         constexpr static const std::size_t constant_columns = constant_columns_4;
         constexpr static const std::size_t selector_columns = selector_columns_4;
 
-        using arithmetization_params =
-            plonk_arithmetization_params<witness_columns, public_input_columns, constant_columns, selector_columns>;
-
         constexpr static const std::size_t lambda = 40;
         constexpr static const std::size_t m = 2;
     };
 
-    using circuit_params = placeholder_circuit_params<field_type, typename placeholder_test_params::arithmetization_params>;
+    using circuit_params = placeholder_circuit_params<field_type>;
     using transcript_type = typename transcript::fiat_shamir_heuristic_sequential<typename placeholder_test_params::transcript_hash_type>;
     using lpc_params_type = commitments::list_polynomial_commitment_params<
         typename placeholder_test_params::merkle_hash_type,
@@ -464,7 +464,12 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit4)
 BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_initializer) {
     auto circuit = circuit_test_4<field_type>();
 
-    plonk_table_description<field_type, typename circuit_params::arithmetization_params> desc;
+    plonk_table_description<field_type> desc(
+        placeholder_test_params::witness_columns,
+        placeholder_test_params::public_input_columns,
+        placeholder_test_params::constant_columns,
+        placeholder_test_params::selector_columns
+    );
 
     desc.rows_amount = table_rows;
     desc.usable_rows_amount = usable_rows;
@@ -516,16 +521,10 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit5)
         constexpr static const std::size_t constant_columns = 0;
         constexpr static const std::size_t selector_columns = 2;
 
-        using arithmetization_params =
-            plonk_arithmetization_params<witness_columns, public_input_columns, constant_columns, selector_columns>;
-
         constexpr static const std::size_t lambda = 1;
         constexpr static const std::size_t m = 2;
     };
-    using circuit_t_params = placeholder_circuit_params<
-        field_type,
-        typename placeholder_test_params::arithmetization_params
-    >;
+    using circuit_t_params = placeholder_circuit_params<field_type>;
 
     using transcript_type = typename transcript::fiat_shamir_heuristic_sequential<typename placeholder_test_params::transcript_hash_type>;
 
@@ -547,7 +546,12 @@ BOOST_AUTO_TEST_CASE(common_data_marshalling_test) {
     auto pi1 = nil::crypto3::algebra::random_element<field_type>();
     auto circuit = circuit_test_t<field_type>(pi0, pi1, test_global_alg_rnd_engine<field_type>);
 
-    plonk_table_description<field_type, typename circuit_t_params::arithmetization_params> desc;
+    plonk_table_description<field_type> desc(
+        placeholder_test_params::witness_columns,
+        placeholder_test_params::public_input_columns,
+        placeholder_test_params::constant_columns,
+        placeholder_test_params::selector_columns
+    );
     desc.rows_amount = table_rows;
     desc.usable_rows_amount = usable_rows;
 
@@ -595,14 +599,11 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit6)
         constexpr static const std::size_t constant_columns = constant_columns_6;
         constexpr static const std::size_t selector_columns = selector_columns_6;
 
-        using arithmetization_params =
-            plonk_arithmetization_params<witness_columns, public_input_columns, constant_columns, selector_columns>;
-
         constexpr static const std::size_t lambda = 40;
         constexpr static const std::size_t m = 2;
     };
 
-    using circuit_params = placeholder_circuit_params<field_type, typename placeholder_test_params::arithmetization_params>;
+    using circuit_params = placeholder_circuit_params<field_type>;
     using transcript_type = typename transcript::fiat_shamir_heuristic_sequential<typename placeholder_test_params::transcript_hash_type>;
     using lpc_params_type = commitments::list_polynomial_commitment_params<
         typename placeholder_test_params::merkle_hash_type,
@@ -620,7 +621,12 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit6)
 BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_initializer) {
     auto circuit = circuit_test_6<field_type>();
 
-    plonk_table_description<field_type, typename circuit_params::arithmetization_params> desc;
+    plonk_table_description<field_type> desc(
+        placeholder_test_params::witness_columns,
+        placeholder_test_params::public_input_columns,
+        placeholder_test_params::constant_columns,
+        placeholder_test_params::selector_columns
+    );
 
     desc.rows_amount = table_rows;
     desc.usable_rows_amount = usable_rows;
@@ -667,14 +673,11 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit7)
         constexpr static const std::size_t constant_columns = constant_columns_7;
         constexpr static const std::size_t selector_columns = selector_columns_7;
 
-        using arithmetization_params =
-            plonk_arithmetization_params<witness_columns, public_input_columns, constant_columns, selector_columns>;
-
         constexpr static const std::size_t lambda = 40;
         constexpr static const std::size_t m = 2;
     };
 
-    using circuit_params = placeholder_circuit_params<field_type, typename placeholder_test_params::arithmetization_params>;
+    using circuit_params = placeholder_circuit_params<field_type>;
     using transcript_type = typename transcript::fiat_shamir_heuristic_sequential<typename placeholder_test_params::transcript_hash_type>;
     using lpc_params_type = commitments::list_polynomial_commitment_params<
         typename placeholder_test_params::merkle_hash_type,
@@ -691,7 +694,12 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit7)
 
 BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_initializer) {
     auto circuit = circuit_test_7<field_type>();
-    plonk_table_description<field_type, typename circuit_params::arithmetization_params> desc;
+    plonk_table_description<field_type> desc(
+        placeholder_test_params::witness_columns,
+        placeholder_test_params::public_input_columns,
+        placeholder_test_params::constant_columns,
+        placeholder_test_params::selector_columns
+    );
 
     desc.rows_amount = circuit.table_rows;
     desc.usable_rows_amount = circuit.usable_rows;
