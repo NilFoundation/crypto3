@@ -116,7 +116,7 @@ void testing_validate_template_random_data_compressed_proofs(std::size_t leaf_nu
     for (auto idx : proof_idxs) {
         data_for_validation.emplace_back(data[idx]);
     }
-    
+
     // standard case
     auto start = std::chrono::high_resolution_clock::now();
     std::vector<merkle_proof<Hash, Arity>> compressed_proofs = merkle_proof_type::generate_compressed_proofs(tree, proof_idxs);
@@ -159,7 +159,7 @@ void testing_validate_template_random_data_compressed_proofs(std::size_t leaf_nu
     data_wrong_data[std::rand() % num_idxs] = data_not_in_tree;
     assert(data_wrong_data != data_for_validation);
     bool wrong_data_validate_compressed = merkle_proof_type::validate_compressed_proofs(compressed_proofs, data_wrong_data);
-    
+
     BOOST_CHECK(validate_compressed);
     BOOST_CHECK(validate_compressed_one_idx);
     BOOST_CHECK(validate_compressed_edge_idxs);
@@ -241,7 +241,7 @@ BOOST_AUTO_TEST_SUITE(containers_merkltree_test)
 using curve_type = algebra::curves::pallas;
 using field_type = typename curve_type::base_field_type;
 using poseidon_type = hashes::poseidon<nil::crypto3::hashes::detail::mina_poseidon_policy<field_type>>;
- 
+
 BOOST_AUTO_TEST_CASE(merkletree_construct_test_1) {
     std::vector<std::array<char, 1>> v = {{'0'}, {'1'}, {'2'}, {'3'}, {'4'}, {'5'}, {'6'}, {'7'}};
     merkle_tree<hashes::sha2<256>, 2> tree_res = make_merkle_tree<hashes::sha2<256>, 2>(v.begin(), v.end());
