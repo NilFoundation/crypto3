@@ -47,27 +47,18 @@ namespace nil {
                 namespace detail {
                     template<typename FieldType, typename PlaceholderParams>
                     struct placeholder_policy {
-
-                        constexpr static const std::size_t witness_columns = PlaceholderParams::witness_columns;
-                        constexpr static const std::size_t public_input_columns = PlaceholderParams::public_input_columns;
-                        constexpr static const std::size_t constant_columns = PlaceholderParams::constant_columns;
-                        constexpr static const std::size_t selector_columns = PlaceholderParams::selector_columns;                       
-
-                        using arithmetization_params = typename PlaceholderParams::arithmetization_params;
                         /******************************** Params ********************************/
 
                         /**
                          * Below are various template aliases (used for convenience).
                          */
 
-                        typedef plonk_constraint_system<FieldType, arithmetization_params>
-                            constraint_system_type;
+                        typedef plonk_constraint_system<FieldType> constraint_system_type;
 
                         typedef FieldType field_type;
                         typedef PlaceholderParams placeholder_params_type;
 
-                        typedef plonk_assignment_table<FieldType, arithmetization_params>
-                            variable_assignment_type;
+                        typedef plonk_assignment_table<FieldType> variable_assignment_type;
 
                         typedef detail::plonk_evaluation_map<plonk_variable<typename FieldType::value_type>> evaluation_map;
 

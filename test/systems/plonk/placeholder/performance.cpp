@@ -23,6 +23,7 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
+#include "nil/crypto3/zk/snark/arithmetization/plonk/table_description.hpp"
 #define BOOST_TEST_MODULE placeholder_performance_test
 
 // NOTE: Most of the following code is taken from main.cpp of transpiler.
@@ -143,31 +144,29 @@ public:
     static constexpr std::size_t PublicInputColumns = 1;
     static constexpr std::size_t ConstantColumns = 5;
     static constexpr std::size_t SelectorColumns = 35;
+    static constexpr std::size_t TotalColumns = WitnessColumns + PublicInputColumns + ConstantColumns + SelectorColumns;
 
     using lpc_params_type = commitments::list_polynomial_commitment_params<
         hash_type, hash_type, lambda, m, true /* use grinding */>;
 
-     using arithmetization_params_type = zk::snark::plonk_arithmetization_params<
-        WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
-
     using lpc_type = commitments::list_polynomial_commitment<field_type, lpc_params_type>;
     using lpc_scheme_type = typename commitments::lpc_commitment_scheme<lpc_type>;
-    using circuit_params_type = placeholder_circuit_params<field_type, arithmetization_params_type>;
+    using circuit_params_type = placeholder_circuit_params<field_type>;
     using lpc_placeholder_params_type = zk::snark::placeholder_params<circuit_params_type, lpc_scheme_type>;
     using policy_type = zk::snark::detail::placeholder_policy<field_type, circuit_params_type>;
 
-    using constraint_system_type = zk::snark::plonk_constraint_system<field_type, arithmetization_params_type>;
-    using table_description_type = zk::snark::plonk_table_description<field_type, arithmetization_params_type>;
+    using constraint_system_type = zk::snark::plonk_constraint_system<field_type>;
+    using table_description_type = zk::snark::plonk_table_description<field_type>;
 
     using Endianness = nil::marshalling::option::big_endian;
     using TTypeBase = nil::marshalling::field_type<Endianness>;
     using column_type = zk::snark::plonk_column<field_type>;
 
     using circuit_marshalling_type = marshalling::types::plonk_constraint_system<TTypeBase, constraint_system_type>;
-    using assignment_table_type = zk::snark::plonk_table<field_type, arithmetization_params_type, column_type>;
+    using assignment_table_type = zk::snark::plonk_table<field_type, column_type>;
     using assignment_table_marshalling_type = marshalling::types::plonk_assignment_table<TTypeBase, assignment_table_type>;
 
-    using columns_rotations_type = std::array<std::set<int>, arithmetization_params_type::total_columns>;
+    using columns_rotations_type = std::vector<std::set<int>>;
     using transcript_type = typename transcript::fiat_shamir_heuristic_sequential<hash_type>;
 
     void run_placeholder_perf_test(std::string test_name, std::string circuit_file_path,
@@ -210,7 +209,7 @@ public:
         );
 
         bool verifier_res = placeholder_verifier<field_type, lpc_placeholder_params_type>::process(
-            lpc_preprocessed_public_data, lpc_proof, constraint_system, lpc_scheme
+            lpc_preprocessed_public_data, lpc_proof, table_description, constraint_system, lpc_scheme
         );
 
         BOOST_CHECK(verifier_res);
@@ -259,10 +258,9 @@ private:
         assignment_table_marshalling_type marshalled_data;
         auto read_iter = v.begin();
         auto status = marshalled_data.read(read_iter, v.size());
-        std::tie(table_description.usable_rows_amount, assignments) =
+        BOOST_ASSERT(status == nil::marshalling::status_type::success);
+        std::tie(table_description, assignments) =
             marshalling::types::make_assignment_table<Endianness, assignment_table_type>(marshalled_data);
-
-        table_description.rows_amount = assignments.rows_amount();
     }
 
     void load_circuit(std::string circuit_file_path) {
@@ -277,6 +275,7 @@ private:
         circuit_marshalling_type marshalled_data;
         auto read_iter = v.begin();
         auto status = marshalled_data.read(read_iter, v.size());
+        BOOST_ASSERT(status == nil::marshalling::status_type::success);
         constraint_system = marshalling::types::make_plonk_constraint_system<
             Endianness, constraint_system_type>(marshalled_data);
     }
@@ -310,15 +309,17 @@ private:
         //    }
         //}
 
-        for (std::size_t i = 0; i < arithmetization_params_type::total_columns; i++) {
+        for (std::size_t i = 0; i < TotalColumns; i++) {
             columns_rotations[i].insert(0);
         }
     }
 
     constraint_system_type constraint_system;
-    assignment_table_type assignments;
-    table_description_type table_description;
-    columns_rotations_type columns_rotations;
+    table_description_type table_description = table_description_type(
+        WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns);
+    assignment_table_type assignments = assignment_table_type(
+        WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns);
+    columns_rotations_type columns_rotations = columns_rotations_type(TotalColumns);
 };
 
 BOOST_AUTO_TEST_SUITE(placeholder_transpiler_suite, *boost::unit_test::disabled())
@@ -348,9 +349,6 @@ BOOST_AUTO_TEST_SUITE(placeholder_prover_test_suite)
 using curve_type = algebra::curves::pallas;
 using field_type = typename curve_type::base_field_type;
 
-// lpc params
-constexpr static const std::size_t m = 2;
-
 struct placeholder_fibonacci_params {
     using merkle_hash_type = hashes::keccak_1600<512>;
     using transcript_hash_type = hashes::sha2<256>;
@@ -360,17 +358,11 @@ struct placeholder_fibonacci_params {
     constexpr static const std::size_t constant_columns = 0;
     constexpr static const std::size_t selector_columns = 1;
 
-    using arithmetization_params =
-        plonk_arithmetization_params<witness_columns, public_input_columns, constant_columns, selector_columns>;
-
     constexpr static const std::size_t lambda = 1;
     constexpr static const std::size_t m = 2;
 };
 
-using circuit_fib_params = placeholder_circuit_params<
-    field_type,
-    typename placeholder_fibonacci_params::arithmetization_params
->;
+using circuit_fib_params = placeholder_circuit_params<field_type>;
 
 constexpr static const std::size_t table_columns =
     placeholder_fibonacci_params::witness_columns + placeholder_fibonacci_params::public_input_columns;
@@ -394,7 +386,12 @@ const std::size_t rows_amount = 987;
 BOOST_FIXTURE_TEST_CASE(placeholder_large_fibonacci_test, placeholder_performance_test_base) {
     auto circuit = circuit_test_fib<field_type, rows_amount>();
 
-    plonk_table_description<field_type, typename circuit_fib_params::arithmetization_params> desc;
+    plonk_table_description<field_type> desc(
+        placeholder_fibonacci_params::witness_columns,
+        placeholder_fibonacci_params::public_input_columns,
+        placeholder_fibonacci_params::constant_columns,
+        placeholder_fibonacci_params::selector_columns
+    );
 
     desc.rows_amount = circuit.table_rows;
     desc.usable_rows_amount = circuit.usable_rows;
@@ -427,7 +424,7 @@ BOOST_FIXTURE_TEST_CASE(placeholder_large_fibonacci_test, placeholder_performanc
     );
 
     bool verifier_res = placeholder_verifier<field_type, lpc_placeholder_params_type>::process(
-        lpc_preprocessed_public_data, lpc_proof, constraint_system, lpc_scheme
+        lpc_preprocessed_public_data, lpc_proof, desc, constraint_system, lpc_scheme
     );
     BOOST_CHECK(verifier_res);
     std::cout << "==========================================================="<<std::endl;

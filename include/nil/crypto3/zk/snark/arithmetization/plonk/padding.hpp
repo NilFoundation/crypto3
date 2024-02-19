@@ -34,11 +34,11 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                template<typename FieldType, typename ArithmetizationParams, typename ColumnType>
+                template<typename FieldType, typename ColumnType>
                 class plonk_table;
 
-                template<typename FieldType, typename ArithmetizationParams, typename ColumnType>
-                std::uint32_t basic_padding(plonk_table<FieldType, ArithmetizationParams, ColumnType> &table) {
+                template<typename FieldType, typename ColumnType>
+                std::uint32_t basic_padding(plonk_table<FieldType, ColumnType> &table) {
                     std::uint32_t usable_rows_amount = table.rows_amount();
 
                     std::uint32_t padded_rows_amount = std::pow(2, std::ceil(std::log2(usable_rows_amount)));
@@ -80,9 +80,9 @@ namespace nil {
                 }
 
 
-                template<typename FieldType, typename ArithmetizationParams, typename ColumnType>
+                template<typename FieldType, typename ColumnType>
                 std::uint32_t zk_padding(
-                    plonk_table<FieldType, ArithmetizationParams, ColumnType> &table,
+                    plonk_table<FieldType, ColumnType> &table,
                     typename nil::crypto3::random::algebraic_engine<FieldType> alg_rnd = nil::crypto3::random::algebraic_engine<FieldType>()
                 ) {
                     std::uint32_t usable_rows_amount = table.rows_amount();

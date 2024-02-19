@@ -31,19 +31,17 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                template<std::size_t WitnessColumns, std::size_t PublicInputColumns, std::size_t ConstantColumns,
-                         std::size_t SelectorColumns>
                 struct plonk_arithmetization_params {
-                    constexpr static const std::size_t witness_columns = WitnessColumns;
-                    constexpr static const std::size_t public_input_columns = PublicInputColumns;
-                    constexpr static const std::size_t constant_columns = ConstantColumns;
-                    constexpr static const std::size_t selector_columns = SelectorColumns;
+                    std::size_t witness_columns;
+                    std::size_t public_input_columns;
+                    std::size_t constant_columns;
+                    std::size_t selector_columns;
 
-                    constexpr static const std::size_t private_columns = witness_columns;
-                    constexpr static const std::size_t public_columns =
+                    std::size_t private_columns = witness_columns;
+                    std::size_t public_columns =
                         public_input_columns + constant_columns + selector_columns;
 
-                    constexpr static const std::size_t total_columns = private_columns + public_columns;
+                    std::size_t total_columns = private_columns + public_columns;
                 };
 
 #ifdef ZK_RUNTIME_CIRCUIT_DEFINITION

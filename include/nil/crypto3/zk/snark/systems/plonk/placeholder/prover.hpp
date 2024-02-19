@@ -38,6 +38,7 @@
 #include <nil/crypto3/zk/commitments/polynomial/lpc.hpp>
 #include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/assignment.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/detail/placeholder_policy.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/detail/placeholder_scoped_profiler.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/permutation_argument.hpp>
@@ -70,10 +71,6 @@ namespace nil {
 
                 template<typename FieldType, typename ParamsType>
                 class placeholder_prover {
-                    constexpr static const std::size_t witness_columns = ParamsType::witness_columns;
-                    constexpr static const std::size_t public_columns = ParamsType::public_columns;
-                    constexpr static const std::size_t public_input_columns = ParamsType::public_input_columns;
-                    constexpr static const std::size_t constant_columns = ParamsType::constant_columns;
                     using transcript_hash_type = typename ParamsType::transcript_hash_type;
                     using transcript_type = transcript::fiat_shamir_heuristic_sequential<transcript_hash_type>;
 
@@ -92,16 +89,13 @@ namespace nil {
                     constexpr static const std::size_t permutation_parts = 3;
                     constexpr static const std::size_t lookup_parts = 6;
                     constexpr static const std::size_t f_parts = 8;
-
               public:
 
                     static inline placeholder_proof<FieldType, ParamsType> process(
                         const typename public_preprocessor_type::preprocessed_data_type &preprocessed_public_data,
                         typename private_preprocessor_type::preprocessed_data_type preprocessed_private_data,
-                        const plonk_table_description<FieldType, typename ParamsType::arithmetization_params>
-                            &table_description,
-                        const plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params>
-                            &constraint_system,
+                        const plonk_table_description<FieldType> &table_description,
+                        const plonk_constraint_system<FieldType> &constraint_system,
                         commitment_scheme_type commitment_scheme
                     ) {
 
@@ -114,14 +108,14 @@ namespace nil {
                     placeholder_prover(
                         const typename public_preprocessor_type::preprocessed_data_type &preprocessed_public_data,
                         typename private_preprocessor_type::preprocessed_data_type preprocessed_private_data,
-                        const plonk_table_description<FieldType, typename ParamsType::arithmetization_params> &table_description,
-                        const plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params> &constraint_system,
+                        const plonk_table_description<FieldType> &table_description,
+                        const plonk_constraint_system<FieldType> &constraint_system,
                         const commitment_scheme_type &commitment_scheme
                     )
                             : preprocessed_public_data(preprocessed_public_data)
                             , table_description(table_description)
                             , constraint_system(constraint_system)
-                            , _polynomial_table(new plonk_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params>(
+                            , _polynomial_table(new plonk_polynomial_dfs_table<FieldType>(
                                 std::move(preprocessed_private_data.private_polynomial_table),
                                 preprocessed_public_data.public_polynomial_table))
 
@@ -350,6 +344,10 @@ namespace nil {
                         PROFILE_PLACEHOLDER_SCOPE("evaluation_points_generated_time");
                         _omega = preprocessed_public_data.common_data.basic_domain->get_domain_element(1);
 
+                        const std::size_t witness_columns = table_description.witness_columns;
+                        const std::size_t public_input_columns = table_description.public_input_columns;
+                        const std::size_t constant_columns = table_description.constant_columns;
+
                         // variable_values' rotations
                         for (std::size_t variable_values_index = 0;
                              variable_values_index < witness_columns + public_input_columns;
@@ -416,7 +414,13 @@ namespace nil {
                             preprocessed_public_data.permutation_polynomials.size(),
                             _challenge_point);
 
-                        for (std::size_t k = 0, rotation_index = witness_columns + public_input_columns; k < constant_columns; k++, rotation_index++) {
+                        const std::size_t witness_columns = table_description.witness_columns;
+                        const std::size_t public_input_columns = table_description.public_input_columns;
+                        const std::size_t constant_columns = table_description.constant_columns;
+
+                        for (std::size_t k = 0, rotation_index = witness_columns + public_input_columns;
+                                k < constant_columns; k++, rotation_index++) {
+
                             const std::set<int>& rotations =
                                 preprocessed_public_data.common_data.columns_rotations[rotation_index];
                             std::vector<typename FieldType::value_type> point;
@@ -430,7 +434,10 @@ namespace nil {
                             evaluation_points_public.push_back(std::move(point));
                         }
 
-                        for (std::size_t k = 0, rotation_index = witness_columns + public_input_columns + constant_columns; k < preprocessed_public_data.public_polynomial_table.selectors().size(); k++, rotation_index++) {
+                        for (std::size_t k = 0, rotation_index = witness_columns + public_input_columns + constant_columns;
+                                k < preprocessed_public_data.public_polynomial_table.selectors().size();
+                                k++, rotation_index++) {
+
                             const std::set<int>& rotations =
                                 preprocessed_public_data.common_data.columns_rotations[rotation_index];
                             std::vector<typename FieldType::value_type> point;
@@ -450,11 +457,11 @@ namespace nil {
                 private:
                     // Structures passed from outside by reference.
                     const typename public_preprocessor_type::preprocessed_data_type &preprocessed_public_data;
-                    const plonk_table_description<FieldType, typename ParamsType::arithmetization_params> &table_description;
-                    const plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params> &constraint_system;
+                    const plonk_table_description<FieldType> &table_description;
+                    const plonk_constraint_system<FieldType> &constraint_system;
 
                     // Members created during proof generation.
-                    std::unique_ptr<plonk_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params>> _polynomial_table;
+                    std::unique_ptr<plonk_polynomial_dfs_table<FieldType>> _polynomial_table;
                     placeholder_proof<FieldType, ParamsType> _proof;
                     std::array<polynomial_dfs_type, f_parts> _F_dfs;
                     transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript;

@@ -98,7 +98,7 @@ namespace nil {
                             std::string to_string() const{
                                 std::stringstream ss;
 
-                                ss << constraint_system_with_params_hash <<" " <<fixed_values_commitment;
+                                ss << constraint_system_with_params_hash << " " << fixed_values_commitment;
                                 return ss.str();
                             }
                         };
@@ -107,7 +107,7 @@ namespace nil {
                         // fields outside of the common_data_type are used by prover
                         struct common_data_type {
                             using field_type = FieldType;
-                            using columns_rotations_type = std::array<std::set<int>, ParamsType::arithmetization_params::total_columns>;
+                            using columns_rotations_type = std::vector<std::set<int>>;
                             using commitment_scheme_type = typename ParamsType::commitment_scheme_type;
                             using commitments_type = public_commitments_type;
                             using verification_key_type = verification_key;
@@ -131,7 +131,7 @@ namespace nil {
                             common_data_type(
                                 std::shared_ptr<math::evaluation_domain<FieldType>> D,
                                 public_commitments_type commts,
-                                std::array<std::set<int>, ParamsType::arithmetization_params::total_columns> col_rotations,
+                                std::vector<std::set<int>> col_rotations,
                                 std::size_t rows,
                                 std::size_t usable_rows,
                                 std::uint32_t max_gates_degree,
@@ -154,7 +154,7 @@ namespace nil {
                             // Constructor for marshalling. Domain is regenerated.
                             common_data_type(
                                 public_commitments_type commts,
-                                std::array<std::set<int>, ParamsType::arithmetization_params::total_columns> col_rotations,
+                                std::vector<std::set<int>> col_rotations,
                                 std::size_t rows,
                                 std::size_t usable_rows,
                                 std::uint32_t max_gates_degree,
@@ -193,7 +193,7 @@ namespace nil {
                             }
                         };
 
-                        plonk_public_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params>  public_polynomial_table;
+                        plonk_public_polynomial_dfs_table<FieldType> public_polynomial_table;
 
                         // S_sigma
                         std::vector<polynomial_dfs_type>  permutation_polynomials;
@@ -233,8 +233,8 @@ namespace nil {
                         std::map<key_type, std::uint32_t> _sizes;
 
                         cycle_representation(
-                            const plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params>  &constraint_system,
-                            const plonk_table_description<FieldType, typename ParamsType::arithmetization_params> &table_description
+                            const plonk_constraint_system<FieldType>  &constraint_system,
+                            const plonk_table_description<FieldType> &table_description
                         ) {
                             for (std::size_t i = 0;
                                  i < table_description.table_width() - table_description.selector_columns;
@@ -302,12 +302,12 @@ namespace nil {
                     };
 
                 public:
-                    static inline std::array<std::set<int>, ParamsType::arithmetization_params::total_columns>
+                    static inline std::vector<std::set<int>>
                     columns_rotations(
-                        const plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params> &constraint_system,
-                        const plonk_table_description<FieldType, typename ParamsType::arithmetization_params> &table_description
+                        const plonk_constraint_system<FieldType> &constraint_system,
+                        const plonk_table_description<FieldType> &table_description
                     ) {
-                        std::array<std::set<int>, ParamsType::arithmetization_params::total_columns> result;
+                        std::vector<std::set<int>> result(table_description.table_width());
 
                         for (auto & s : result) {
                             s.insert(0);
@@ -412,7 +412,7 @@ namespace nil {
                     }
 
                     static inline typename preprocessed_data_type::public_commitments_type commitments(
-                        const plonk_public_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params> &public_table,
+                        const plonk_public_polynomial_dfs_table<FieldType> &public_table,
                         std::vector<polynomial_dfs_type> &id_perm_polys,
                         std::vector<polynomial_dfs_type> &sigma_perm_polys,
                         std::array<polynomial_dfs_type, 2> &q_last_q_blind,
@@ -432,9 +432,9 @@ namespace nil {
 
                     // TODO: columns_with_copy_constraints -- It should be extracted from constraint_system
                     static inline preprocessed_data_type process(
-                        const plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params> &constraint_system,
+                        const plonk_constraint_system<FieldType> &constraint_system,
                         typename policy_type::variable_assignment_type::public_table_type public_assignment,
-                        const plonk_table_description<FieldType, typename ParamsType::arithmetization_params>
+                        const plonk_table_description<FieldType>
                             &table_description,
                         typename ParamsType::commitment_scheme_type &commitment_scheme,
                         std::size_t columns_with_copy_constraints,
@@ -472,10 +472,9 @@ namespace nil {
                         q_last_q_blind[0] = lagrange_polynomial(basic_domain, usable_rows);
                         q_last_q_blind[1] = selector_blind(usable_rows, basic_domain);
 
-                        plonk_public_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params>
+                        plonk_public_polynomial_dfs_table<FieldType>
                             public_polynomial_table =
-                                plonk_public_polynomial_dfs_table<FieldType,
-                                                                  typename ParamsType::arithmetization_params>(
+                                plonk_public_polynomial_dfs_table<FieldType>(
                                     detail::column_range_polynomial_dfs<FieldType>(public_assignment.move_public_inputs(),
                                                                                    basic_domain),
                                     detail::column_range_polynomial_dfs<FieldType>(public_assignment.move_constants(),
@@ -493,12 +492,13 @@ namespace nil {
                             sigma_perm_polys, q_last_q_blind, commitment_scheme
                         );
 
-                        std::array<std::set<int>, ParamsType::arithmetization_params::total_columns> c_rotations =
+                        std::vector<std::set<int>> c_rotations =
                             columns_rotations(constraint_system, table_description);
 
                         typename transcript_hash_type::digest_type constraint_system_with_params_hash =
                             nil::crypto3::zk::snark::detail::compute_constraint_system_with_params_hash<ParamsType, transcript_hash_type>(
                                 constraint_system,
+                                table_description,
                                 N_rows,
                                 table_description.usable_rows_amount,
                                 commitment_scheme.get_commitment_params(),
@@ -539,20 +539,20 @@ namespace nil {
                     struct preprocessed_data_type {
                         std::shared_ptr<math::evaluation_domain<FieldType>> basic_domain;
 
-                        plonk_private_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params> private_polynomial_table;
+                        plonk_private_polynomial_dfs_table<FieldType> private_polynomial_table;
                     };
 
                     static inline preprocessed_data_type process(
-                        const plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params>  &constraint_system,
+                        const plonk_constraint_system<FieldType>  &constraint_system,
                         typename policy_type::variable_assignment_type::private_table_type private_assignment,
-                        const plonk_table_description<FieldType, typename ParamsType::arithmetization_params>  &table_description
+                        const plonk_table_description<FieldType>  &table_description
                     ) {
                         std::size_t N_rows = table_description.rows_amount;
 
                         std::shared_ptr<math::evaluation_domain<FieldType>> basic_domain =
                             math::make_evaluation_domain<FieldType>(N_rows);
 
-                        plonk_private_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params>
+                        plonk_private_polynomial_dfs_table<FieldType>
                             private_polynomial_table(detail::column_range_polynomial_dfs<FieldType>(
                                 private_assignment.move_witnesses(), basic_domain));
                         return preprocessed_data_type({basic_domain, std::move(private_polynomial_table)});

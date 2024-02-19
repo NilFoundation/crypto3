@@ -34,6 +34,7 @@
 #include <ostream>
 #include <vector>
 #include <functional>
+#include <map>
 #include <boost/functional/hash.hpp>
 
 namespace nil {

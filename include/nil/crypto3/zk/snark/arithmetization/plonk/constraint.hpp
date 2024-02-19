@@ -81,10 +81,9 @@ namespace nil {
                         }
                     }
 
-                    template<typename ArithmetizationParams>
                     typename VariableType::assignment_type
                         evaluate(std::size_t row_index,
-                                 const plonk_assignment_table<FieldType, ArithmetizationParams> &assignments) const {
+                                 const plonk_assignment_table<FieldType> &assignments) const {
                         math::expression_evaluator<VariableType> evaluator(
                             *this,
                             [&assignments, row_index](const VariableType &var) {
@@ -106,9 +105,8 @@ namespace nil {
                         return evaluator.evaluate();
                     }
 
-                    template<typename ArithmetizationParams>
                     math::polynomial<typename VariableType::assignment_type>
-                       evaluate(const plonk_polynomial_table<FieldType, ArithmetizationParams> &assignments,
+                       evaluate(const plonk_polynomial_table<FieldType> &assignments,
                                 std::shared_ptr<math::evaluation_domain<FieldType>>
                                     domain) const {
                        using polynomial_type = math::polynomial<typename VariableType::assignment_type>;
@@ -143,9 +141,8 @@ namespace nil {
                         return evaluator.evaluate();
                     }
 
-                    template<typename ArithmetizationParams>
                     math::polynomial_dfs<typename VariableType::assignment_type>
-                        evaluate(const plonk_polynomial_dfs_table<FieldType, ArithmetizationParams> &assignments,
+                        evaluate(const plonk_polynomial_dfs_table<FieldType> &assignments,
                                  std::shared_ptr<math::evaluation_domain<FieldType>> domain) const {
                         using polynomial_dfs_type = math::polynomial_dfs<typename VariableType::assignment_type>;
                         using polynomial_dfs_variable_type = plonk_variable<polynomial_dfs_type>;

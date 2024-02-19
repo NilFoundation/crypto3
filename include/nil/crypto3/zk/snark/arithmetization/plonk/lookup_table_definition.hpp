@@ -103,12 +103,12 @@ namespace nil {
 
                 // Returned value -- new usable_rows.
                 // All tables are necessary for circuit generation.
-                template<typename FieldType, typename ArithmetizationParams, typename TableIdsMapType>
+                template<typename FieldType, typename TableIdsMapType>
                 std::size_t pack_lookup_tables(
                     const TableIdsMapType &lookup_table_ids,
                     const std::map<std::string, std::shared_ptr<lookup_table_definition<FieldType>>> &lookup_tables,
-                    plonk_constraint_system<FieldType, ArithmetizationParams> &bp,
-                    plonk_assignment_table<FieldType, ArithmetizationParams> &assignment,
+                    plonk_constraint_system<FieldType> &bp,
+                    plonk_assignment_table<FieldType> &assignment,
                     const std::vector<std::size_t> &constant_columns_ids,
                     std::size_t usable_rows
                 ){
@@ -186,28 +186,18 @@ namespace nil {
                     return usable_rows_after;
                 }
 
-                template<typename FieldType, typename ArithmetizationParams, typename LookupTableIds>
+                template<typename FieldType, typename LookupTableIds>
                 std::size_t pack_lookup_tables_horizontal(
                     const LookupTableIds &lookup_table_ids,
                     const std::map<std::string, std::shared_ptr<lookup_table_definition<FieldType>>> &lookup_tables,
-                    plonk_constraint_system<FieldType, ArithmetizationParams> &bp,
-                    plonk_assignment_table<FieldType, ArithmetizationParams> &assignment,
+                    plonk_constraint_system<FieldType> &bp,
+                    plonk_assignment_table<FieldType> &assignment,
                     const std::vector<std::size_t> &constant_columns_ids,
                     std::size_t cur_selector_id,
                     std::size_t usable_rows,
                     std::size_t max_usable_rows = 524288
                 ){
                     std::size_t usable_rows_after = usable_rows;
-
-                    // Compute first selector index.
-                    /*std::size_t cur_selector_id = 0;
-                    for(const auto &gate: bp.gates()){
-                        cur_selector_id = std::max(cur_selector_id, gate.selector_index);
-                    }
-                    for(const auto &lookup_gate: bp.lookup_gates()){
-                        cur_selector_id = std::max(cur_selector_id, lookup_gate.tag_index);
-                    }
-                    cur_selector_id++;*/
 
                     // Allocate constant columns
                     std::vector<plonk_column<FieldType>> constant_columns(

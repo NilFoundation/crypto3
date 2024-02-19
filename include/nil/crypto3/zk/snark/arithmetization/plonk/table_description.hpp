@@ -34,37 +34,6 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                template<typename FieldType, typename ArithmetizationParams>
-                struct plonk_table_description {
-                    constexpr static const std::size_t witness_columns = ArithmetizationParams::witness_columns;
-                    constexpr static const std::size_t public_input_columns = ArithmetizationParams::public_input_columns;
-                    constexpr static const std::size_t constant_columns = ArithmetizationParams::constant_columns;
-                    constexpr static const std::size_t selector_columns = ArithmetizationParams::selector_columns;
-
-                    std::size_t rows_amount = 0;
-                    std::size_t usable_rows_amount = 0;
-
-                    std::size_t global_index(const plonk_variable<typename FieldType::value_type> &a) const {
-                        switch (a.type) {
-                            case plonk_variable<typename FieldType::value_type>::column_type::witness:
-                                return a.index;
-                            case plonk_variable<typename FieldType::value_type>::column_type::public_input:
-                                return witness_columns + a.index;
-                            case plonk_variable<typename FieldType::value_type>::column_type::constant:
-                                return witness_columns + public_input_columns + a.index;
-                            case plonk_variable<typename FieldType::value_type>::column_type::selector:
-                                return witness_columns + public_input_columns + constant_columns + a.index;
-                            default:
-                                throw std::invalid_argument("Invalid plonk_variable passed");
-                        }
-                    }
-
-                    std::size_t table_width() const {
-                        return witness_columns + public_input_columns + constant_columns + selector_columns;
-                    }
-                };
-
-#ifdef ZK_RUNTIME_CIRCUIT_DEFINITION
                 template<typename FieldType>
                 struct plonk_table_description {
                     std::size_t witness_columns;
@@ -72,8 +41,27 @@ namespace nil {
                     std::size_t constant_columns;
                     std::size_t selector_columns;
 
-                    std::size_t rows_amount = 0;
                     std::size_t usable_rows_amount = 0;
+                    std::size_t rows_amount = 0;
+
+                    plonk_table_description(const std::size_t witness_columns,
+                                            const std::size_t public_input_columns,
+                                            const std::size_t constant_columns,
+                                            const std::size_t selector_columns) :
+                        witness_columns(witness_columns), public_input_columns(public_input_columns),
+                        constant_columns(constant_columns), selector_columns(selector_columns)
+                    {}
+
+                    plonk_table_description(const std::size_t witness_columns,
+                                            const std::size_t public_input_columns,
+                                            const std::size_t constant_columns,
+                                            const std::size_t selector_columns,
+                                            const std::size_t usable_rows_amount,
+                                            const std::size_t rows_amount) :
+                        witness_columns(witness_columns), public_input_columns(public_input_columns),
+                        constant_columns(constant_columns), selector_columns(selector_columns),
+                        usable_rows_amount(usable_rows_amount), rows_amount(rows_amount)
+                    {}
 
                     std::size_t global_index(const plonk_variable<typename FieldType::value_type> &a) const {
                         switch (a.type) {
@@ -92,7 +80,6 @@ namespace nil {
                         return witness_columns + public_input_columns + constant_columns + selector_columns;
                     }
                 };
-#endif
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3

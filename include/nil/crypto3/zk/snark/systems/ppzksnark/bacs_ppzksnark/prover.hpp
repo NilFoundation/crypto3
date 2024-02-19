@@ -69,7 +69,7 @@ namespace nil {
 
                         typedef typename CurveType::scalar_field_type field_type;
 
-                        const r1cs_variable_assignment<field_type> r1cs_va =
+                        const r1cs_variable_assignment<nil::crypto3::zk::snark::plonk_constraint_system<field_type>> r1cs_va =
                             reductions::bacs_to_r1cs<field_type>::witness_map(
                                 proving_key.circuit, primary_input, auxiliary_input);
                         const r1cs_auxiliary_input<field_type> r1cs_ai(

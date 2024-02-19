@@ -34,8 +34,6 @@ BOOST_AUTO_TEST_CASE(mpc_generator_compare_keypairs_without_delta_contribution_t
     using proving_scheme_type = r1cs_gg_ppzksnark<curve_type>;
     using proving_scheme_generator_type = r1cs_gg_ppzksnark_generator<curve_type, proving_mode::basic>;
 
-    using crs_mpc_type = r1cs_gg_ppzksnark_mpc<curve_type>;
-
     auto acc = powers_of_tau_scheme_type::accumulator_type();
     auto sk = powers_of_tau_scheme_type::generate_private_key();
     auto pk = powers_of_tau_scheme_type::proof_eval(sk, acc);

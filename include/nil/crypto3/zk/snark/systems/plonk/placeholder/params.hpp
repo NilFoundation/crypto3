@@ -32,39 +32,25 @@
 #include <nil/crypto3/zk/commitments/polynomial/lpc.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/fri.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/assignment.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-                template<
-                    typename FieldType,
-                    typename ArithmetizationParams
-                >
+                template<typename FieldType>
                 struct placeholder_circuit_params {
-                    constexpr static const std::size_t witness_columns = ArithmetizationParams::witness_columns;
-                    constexpr static const std::size_t public_input_columns = ArithmetizationParams::public_input_columns;
-                    constexpr static const std::size_t constant_columns = ArithmetizationParams::constant_columns;
-                    constexpr static const std::size_t selector_columns = ArithmetizationParams::selector_columns;
-
-                    using arithmetization_params = ArithmetizationParams;
                     using field_type = FieldType;
-                    using public_input_type = std::array<std::vector<typename field_type::value_type>, arithmetization_params::public_input_columns>;
-                    using constraint_system_type = plonk_constraint_system<field_type, arithmetization_params>;
-                    using assignment_table_type = plonk_table<field_type, arithmetization_params, plonk_column<field_type>>;
+                    using value_type = typename field_type::value_type;
+                    using public_input_type = std::vector<std::vector<value_type>>;
+                    using constraint_system_type = plonk_constraint_system<value_type>;
+                    using assignment_table_type = plonk_table<field_type, plonk_column<field_type>>;
                 };
 
                 template<typename CircuitParams, typename CommitmentScheme>
                 struct placeholder_params {
-                    constexpr static const std::size_t witness_columns = CircuitParams::witness_columns;
-                    constexpr static const std::size_t public_input_columns = CircuitParams::public_input_columns;
-                    constexpr static const std::size_t constant_columns = CircuitParams::constant_columns;
-                    constexpr static const std::size_t selector_columns = CircuitParams::selector_columns;
-                    constexpr static const std::size_t total_columns = witness_columns + public_input_columns + constant_columns + selector_columns;
-
                     using field_type = typename CircuitParams::field_type;
 
-                    using arithmetization_params = typename CircuitParams::arithmetization_params;
                     using constraint_system_type = typename CircuitParams::constraint_system_type;
                     using assignment_table_type = typename CircuitParams::assignment_table_type;
 
@@ -74,7 +60,6 @@ namespace nil {
 
                     using transcript_hash_type = typename CommitmentScheme::transcript_hash_type;
                     using circuit_params_type = CircuitParams;
-
                 };
             }    // namespace snark
         }        // namespace zk

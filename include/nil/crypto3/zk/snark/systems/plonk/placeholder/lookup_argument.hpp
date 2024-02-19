@@ -74,11 +74,11 @@ namespace nil {
                     };
 
                     placeholder_lookup_argument_prover(
-                            const plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params>
+                            const plonk_constraint_system<FieldType>
                                 &constraint_system,
                             const typename placeholder_public_preprocessor<FieldType, ParamsType>::preprocessed_data_type
                                 &preprocessed_data,
-                            const plonk_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params>
+                            const plonk_polynomial_dfs_table<FieldType>
                                 &plonk_columns,
                             commitment_scheme_type &commitment_scheme,
                             transcript_type &transcript)
@@ -505,9 +505,9 @@ namespace nil {
                         return sorted;
                     }
 
-                    const plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params>& constraint_system;
+                    const plonk_constraint_system<FieldType> &constraint_system;
                     const typename placeholder_public_preprocessor<FieldType, ParamsType>::preprocessed_data_type& preprocessed_data;
-                    const plonk_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params>& plonk_columns;
+                    const plonk_polynomial_dfs_table<FieldType> &plonk_columns;
                     commitment_scheme_type& commitment_scheme;
                     transcript_type& transcript;
                     std::shared_ptr<math::evaluation_domain<FieldType>> basic_domain;

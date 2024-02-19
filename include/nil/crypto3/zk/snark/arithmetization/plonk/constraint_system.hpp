@@ -52,7 +52,7 @@ namespace nil {
 
                 /************************* PLONK constraint system ****************************/
 
-                template<typename FieldType, typename ArithmetizationParams>
+                template<typename FieldType>
                 struct plonk_constraint_system {
                     typedef std::vector<plonk_gate<FieldType, plonk_constraint<FieldType>>> gates_container_type;
                     typedef plonk_variable<typename FieldType::value_type> variable_type;
@@ -99,19 +99,6 @@ namespace nil {
                     std::size_t num_lookup_gates() const {
                         return _lookup_gates.size();
                     }
-
-                    // bool
-                    //     is_satisfied(plonk_variable_assignment<FieldType, witness_columns> full_variable_assignment)
-                    //     const {
-
-                    //     for (std::size_t c = 0; c < constraints.size(); ++c) {
-                    //         if (!constraints[c].a.evaluate(full_variable_assignment).is_zero()) {
-                    //             return false;
-                    //         }
-                    //     }
-
-                    //     return true;
-                    // }
 
                     const gates_container_type &gates() const {
                         return _gates;
@@ -228,7 +215,7 @@ namespace nil {
                     }
 
 
-                    bool operator==(const plonk_constraint_system<FieldType, ArithmetizationParams> &other) const {
+                    bool operator==(const plonk_constraint_system<FieldType> &other) const {
                         return (this->_gates == other._gates) && (this->_copy_constraints == other._copy_constraints) &&
                                (this->_lookup_gates == other._lookup_gates) && (this->_lookup_tables == other._lookup_tables);
                     }

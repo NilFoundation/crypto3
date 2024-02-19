@@ -28,6 +28,7 @@
 #ifndef CRYPTO3_PLONK_PLACEHOLDER_TRANSCRIPT_INITIALIZATION_CONTEXT_HPP
 #define CRYPTO3_PLONK_PLACEHOLDER_TRANSCRIPT_INITIALIZATION_CONTEXT_HPP
 
+#include <nil/crypto3/zk/snark/arithmetization/plonk/table_description.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/params.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
@@ -47,7 +48,6 @@ namespace nil {
                         typedef typename PlaceholderParamsType::field_type field_type;
                         typedef PlaceholderParamsType placeholder_params_type;
 
-                        using arithmetization_params = typename PlaceholderParamsType::arithmetization_params;
                         using commitment_scheme_type = typename PlaceholderParamsType::commitment_scheme_type;
                         using transcript_type = typename commitment_scheme_type::transcript_type;
                         using transcript_hash_type = typename commitment_scheme_type::transcript_hash_type;
@@ -57,9 +57,14 @@ namespace nil {
                                 std::size_t rows_amount,
                                 std::size_t usable_rows_amount,
                                 const typename commitment_scheme_type::params_type& commitment_params,
+                                const plonk_table_description<field_type>& table_description,
                                 const std::string& application_id,
                                 const typename field_type::value_type& delta)
-                            : rows_amount(rows_amount)
+                            : witness_columns(table_description.witness_columns)
+                            , public_input_columns(table_description.public_input_columns)
+                            , constant_columns(table_description.constant_columns)
+                            , selector_columns(table_description.selector_columns)
+                            , rows_amount(rows_amount)
                             , usable_rows_amount(usable_rows_amount)
                             , delta(delta)
                             , commitment_params(commitment_params)
@@ -68,11 +73,11 @@ namespace nil {
 
                         // All fields below this line must be included in the transcript initilization, including
                         // static const fields.
-                        constexpr static const std::size_t witness_columns = PlaceholderParamsType::witness_columns;
-                        constexpr static const std::size_t public_input_columns = PlaceholderParamsType::public_input_columns;
-                        constexpr static const std::size_t constant_columns = PlaceholderParamsType::constant_columns;
-                        constexpr static const std::size_t selector_columns = PlaceholderParamsType::selector_columns;
 
+                        std::size_t witness_columns;
+                        std::size_t public_input_columns;
+                        std::size_t constant_columns;
+                        std::size_t selector_columns;
 
                         std::size_t rows_amount;
                         std::size_t usable_rows_amount;
@@ -90,8 +95,10 @@ namespace nil {
 
                     template <typename PlaceholderParamsType, typename transcript_hash_type>
                     typename transcript_hash_type::digest_type compute_constraint_system_with_params_hash(
-                            const plonk_constraint_system<typename PlaceholderParamsType::field_type,
-                                typename PlaceholderParamsType::arithmetization_params> &constraint_system,
+                            const plonk_constraint_system<typename PlaceholderParamsType::field_type>
+                                &constraint_system,
+                            const plonk_table_description<typename PlaceholderParamsType::field_type>
+                                &table_description,
                             std::size_t rows_amount,
                             std::size_t usable_rows_amount,
                             const typename PlaceholderParamsType::commitment_scheme_type::params_type& commitment_params,
@@ -101,6 +108,7 @@ namespace nil {
                             rows_amount,
                             usable_rows_amount,
                             commitment_params,
+                            table_description,
                             application_id,
                             delta
                         );
@@ -117,7 +125,7 @@ namespace nil {
 
                         // Append constraint_system to the buffer "cv".
                         using FieldType = typename PlaceholderParamsType::field_type;
-                        using ConstraintSystem = plonk_constraint_system<FieldType, typename PlaceholderParamsType::arithmetization_params>;
+                        using ConstraintSystem = plonk_constraint_system<FieldType>;
 
                         auto filled_constraint_system = nil::crypto3::marshalling::types::fill_plonk_constraint_system<Endianness, ConstraintSystem>(constraint_system);
                         cv.resize(filled_context.length() + filled_constraint_system.length(), 0x00);

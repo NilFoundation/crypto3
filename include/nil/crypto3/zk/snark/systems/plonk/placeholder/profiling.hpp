@@ -45,10 +45,11 @@ namespace nil {
                 template<typename PlaceholderParams>
                 void print_placeholder_params(
                     const typename placeholder_public_preprocessor<
-                        typename PlaceholderParams::field_type, 
+                        typename PlaceholderParams::field_type,
                         PlaceholderParams
                     >::preprocessed_data_type &preprocessed_data,
                     const typename PlaceholderParams::commitment_scheme_type &commitment_scheme,
+                    const plonk_table_description<typename PlaceholderParams::field_type> &table_description,
                     std::string filename,
                     std::string circuit_name = "Sample proof"
                 ){
@@ -59,19 +60,19 @@ namespace nil {
                     root.put("usable_rows_amount", preprocessed_data.common_data.usable_rows_amount);
                     root.put("omega", preprocessed_data.common_data.basic_domain->get_domain_element(1));
                     root.put("verification_key", preprocessed_data.common_data.vk.to_string());
-                    
+
                     boost::property_tree::ptree ar_params_node;
                     boost::property_tree::ptree witness_node;
-                    witness_node.put("", PlaceholderParams::witness_columns);
+                    witness_node.put("", table_description.witness_columns);
                     ar_params_node.push_back(std::make_pair("", witness_node));
                     boost::property_tree::ptree public_input_node;
-                    public_input_node.put("", PlaceholderParams::public_input_columns);
+                    public_input_node.put("", table_description.public_input_columns);
                     ar_params_node.push_back(std::make_pair("", public_input_node));
                     boost::property_tree::ptree constant_node;
-                    constant_node.put("", PlaceholderParams::constant_columns);
+                    constant_node.put("", table_description.constant_columns);
                     ar_params_node.push_back(std::make_pair("", constant_node));
                     boost::property_tree::ptree selector_node;
-                    selector_node.put("", PlaceholderParams::selector_columns);
+                    selector_node.put("", table_description.selector_columns);
                     ar_params_node.push_back(std::make_pair("", witness_node));
                     root.add_child("ar_params", ar_params_node);
 

@@ -38,6 +38,7 @@
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/gates_argument.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/params.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/preprocessor.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/table_description.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -45,12 +46,6 @@ namespace nil {
             namespace snark {
                 template<typename FieldType, typename ParamsType>
                 class placeholder_verifier {
-
-                    constexpr static const std::size_t witness_columns = ParamsType::witness_columns;
-                    constexpr static const std::size_t public_input_columns = ParamsType::public_input_columns;
-                    constexpr static const std::size_t constant_columns = ParamsType::constant_columns;
-                    constexpr static const std::size_t selector_columns = ParamsType::selector_columns;
-
                     using transcript_hash_type = typename ParamsType::transcript_hash_type;
                     using policy_type = detail::placeholder_policy<FieldType, ParamsType>;
                     using public_preprocessor_type = placeholder_public_preprocessor<FieldType, ParamsType>;
@@ -67,11 +62,16 @@ namespace nil {
                     static void generate_evaluation_points(
                         commitment_scheme_type &_commitment_scheme,
                         const typename public_preprocessor_type::preprocessed_data_type &preprocessed_public_data,
-                        const plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params> &constraint_system,
+                        const plonk_constraint_system<FieldType> &constraint_system,
+                        const plonk_table_description<FieldType> &table_description,
                         typename FieldType::value_type challenge,
                         bool _is_lookup_enabled
                     ) {
                         PROFILE_PLACEHOLDER_SCOPE("evaluation_points_generated_time");
+
+                        const std::size_t witness_columns = table_description.witness_columns;
+                        const std::size_t public_input_columns = table_description.public_input_columns;
+                        const std::size_t constant_columns = table_description.constant_columns;
 
                         auto _omega = preprocessed_public_data.common_data.basic_domain->get_domain_element(1);
 
@@ -136,9 +136,10 @@ namespace nil {
                     static inline bool process(
                         const typename public_preprocessor_type::preprocessed_data_type &preprocessed_public_data,
                         const placeholder_proof<FieldType, ParamsType> &proof,
-                        const plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params> &constraint_system,
+                        const plonk_table_description<FieldType> &table_description,
+                        const plonk_constraint_system<FieldType> &constraint_system,
                         commitment_scheme_type commitment_scheme,
-                        const std::array<std::vector<typename FieldType::value_type>, ParamsType::arithmetization_params::public_input_columns> public_input
+                        const std::vector<std::vector<typename FieldType::value_type>> &public_input
                     ){
                         // TODO: process rotations for public input.
                         auto omega = preprocessed_public_data.common_data.basic_domain->get_domain_element(1);
@@ -146,7 +147,7 @@ namespace nil {
                         auto numerator = challenge.pow(preprocessed_public_data.common_data.rows_amount) - FieldType::value_type::one();
                         numerator /= typename FieldType::value_type(preprocessed_public_data.common_data.rows_amount);
 
-                        for( std::size_t i = 0; i < ParamsType::arithmetization_params::public_input_columns; ++i ){
+                        for( std::size_t i = 0; i < public_input.size(); ++i ){
                             typename FieldType::value_type value = FieldType::value_type::zero();
                             auto omega_pow = FieldType::value_type::one();
                             for( std::size_t j = 0; j < public_input[i].size(); ++j ){
@@ -154,20 +155,26 @@ namespace nil {
                                 omega_pow = omega_pow * omega;
                             }
                             value *= numerator;
-                            if( value != proof.eval_proof.eval_proof.z.get(VARIABLE_VALUES_BATCH, ParamsType::arithmetization_params::witness_columns + i, 0) )
-{
+                            if( value != proof.eval_proof.eval_proof.z.get(VARIABLE_VALUES_BATCH, table_description.witness_columns + i, 0) )
+                            {
                                 return false;
-}
+                            }
                         }
-                        return process(preprocessed_public_data, proof, constraint_system, commitment_scheme);
+                        return process(preprocessed_public_data, proof, table_description, constraint_system, commitment_scheme);
                     }
 
                     static inline bool process(
                         const typename public_preprocessor_type::preprocessed_data_type &preprocessed_public_data,
                         const placeholder_proof<FieldType, ParamsType> &proof,
-                        const plonk_constraint_system<FieldType, typename ParamsType::arithmetization_params> &constraint_system,
+                        const plonk_table_description<FieldType> &table_description,
+                        const plonk_constraint_system<FieldType> &constraint_system,
                         commitment_scheme_type commitment_scheme
                     ) {
+                        const std::size_t witness_columns = table_description.witness_columns;
+                        const std::size_t public_input_columns = table_description.public_input_columns;
+                        const std::size_t constant_columns = table_description.constant_columns;
+                        const std::size_t selector_columns = table_description.selector_columns;
+
                         transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(std::vector<std::uint8_t>({}));
 
                         transcript(preprocessed_public_data.common_data.vk.constraint_system_with_params_hash);
@@ -303,7 +310,8 @@ namespace nil {
                         commitment_scheme.set_batch_size(QUOTIENT_BATCH, proof.eval_proof.eval_proof.z.get_batch_size(QUOTIENT_BATCH));
                         if (is_lookup_enabled)
                             commitment_scheme.set_batch_size(LOOKUP_BATCH, proof.eval_proof.eval_proof.z.get_batch_size(LOOKUP_BATCH));
-                        generate_evaluation_points(commitment_scheme, preprocessed_public_data, constraint_system, challenge, is_lookup_enabled);
+                        generate_evaluation_points(commitment_scheme, preprocessed_public_data, constraint_system,
+                                                   table_description, challenge, is_lookup_enabled);
 
                         std::map<std::size_t, typename commitment_scheme_type::commitment_type> commitments = proof.commitments;
                         commitments[FIXED_VALUES_BATCH] = preprocessed_public_data.common_data.commitments.fixed_values;

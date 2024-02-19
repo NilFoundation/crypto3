@@ -75,7 +75,7 @@ namespace nil {
 
                     static inline void build_variable_value_map(
                         const math::expression<polynomial_dfs_variable_type>& expr,
-                        const plonk_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params> &assignments,
+                        const plonk_polynomial_dfs_table<FieldType> &assignments,
                         std::shared_ptr<math::evaluation_domain<FieldType>> domain,
                         std::size_t extended_domain_size,
                         std::unordered_map<polynomial_dfs_variable_type, polynomial_dfs_type>& variable_values_out) {
@@ -122,7 +122,7 @@ namespace nil {
                     static inline std::array<polynomial_dfs_type, argument_size>
                         prove_eval(
                             const typename policy_type::constraint_system_type &constraint_system,
-                            const plonk_polynomial_dfs_table<FieldType, typename ParamsType::arithmetization_params>
+                            const plonk_polynomial_dfs_table<FieldType>
                                 &column_polynomials,
                             std::shared_ptr<math::evaluation_domain<FieldType>> original_domain,
                             std::uint32_t max_gates_degree,
