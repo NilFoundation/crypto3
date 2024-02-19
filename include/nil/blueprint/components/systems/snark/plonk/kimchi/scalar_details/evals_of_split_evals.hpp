@@ -48,16 +48,16 @@ namespace nil {
                 template<typename ArithmetizationType, typename KimchiParamsType, std::size_t SplitSize, std::size_t... WireIndexes>
                 class evals_of_split_evals;
 
-                template<typename BlueprintFieldType, typename ArithmetizationParams, typename KimchiParamsType,
+                template<typename BlueprintFieldType, typename KimchiParamsType,
                          std::size_t SplitSize,
                          std::size_t W0, std::size_t W1, std::size_t W2, std::size_t W3, std::size_t W4, std::size_t W5,
                          std::size_t W6, std::size_t W7, std::size_t W8, std::size_t W9, std::size_t W10,
                          std::size_t W11, std::size_t W12, std::size_t W13, std::size_t W14>
-                class evals_of_split_evals<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                class evals_of_split_evals<snark::plonk_constraint_system<BlueprintFieldType>,
                                           KimchiParamsType, SplitSize, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13,
                                           W14> {
 
-                    typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
+                    typedef snark::plonk_constraint_system<BlueprintFieldType>
                         ArithmetizationType;
 
                     using var = snark::plonk_variable<typename BlueprintFieldType::value_type>;
@@ -101,7 +101,7 @@ namespace nil {
                         result_type(std::size_t component_start_row) {
                             std::size_t row = component_start_row;
 
-                            
+
                         }
                     };
 
@@ -123,7 +123,7 @@ namespace nil {
                             row += exponentiation_component::rows_amount;
 
                             kimchi_proof_evaluations<BlueprintFieldType, KimchiParamsType> evals_acc;
-                            
+
                             // init
                             for (std::size_t j = 0; j < evals_acc.w.size(); j++) {
                                 evals_acc.w[j] = params.split_evals[SplitSize - 1].w[j];
@@ -144,7 +144,7 @@ namespace nil {
                             // accumulation
                             for (std::size_t j = SplitSize - 2; j >= 0; j--) {
                                 evals_acc =
-                                    combined_proof_evals_component::generate_circuit(bp, 
+                                    combined_proof_evals_component::generate_circuit(bp,
                                         assignment, {evals_acc, point_exp},
                                         row)
                                         .output;
@@ -168,7 +168,7 @@ namespace nil {
                                         evals_acc.lookup.sorted[k] = zk::components::generate_circuit<add_component>(bp, assignment, {evals_acc.lookup.sorted[k], params.split_evals[j].lookup.sorted[k]}, row).output;
                                         row += add_component::rows_amount;
                                     }
-                                    
+
                                     evals_acc.lookup.aggreg = zk::components::generate_circuit<add_component>(bp, assignment, {evals_acc.lookup.aggreg, params.split_evals[j].lookup.aggreg}, row).output;
                                     row += add_component::rows_amount;
 
@@ -208,7 +208,7 @@ namespace nil {
                             row += exponentiation_component::rows_amount;
 
                             kimchi_proof_evaluations<BlueprintFieldType, KimchiParamsType> evals_acc;
-                            
+
                             // init
                             for (std::size_t j = 0; j < evals_acc.w.size(); j++) {
                                 evals_acc.w[j] = params.split_evals[SplitSize - 1].w[j];
@@ -253,7 +253,7 @@ namespace nil {
                                         evals_acc.lookup.sorted[k] = add_component::generate_assignments(assignment, {evals_acc.lookup.sorted[k], params.split_evals[j].lookup.sorted[k]}, row).output;
                                         row += add_component::rows_amount;
                                     }
-                                    
+
                                     evals_acc.lookup.aggreg = add_component::generate_assignments(assignment, {evals_acc.lookup.aggreg, params.split_evals[j].lookup.aggreg}, row).output;
                                     row += add_component::rows_amount;
 

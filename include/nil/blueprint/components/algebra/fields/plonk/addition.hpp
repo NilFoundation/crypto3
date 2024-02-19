@@ -50,13 +50,13 @@ namespace nil {
             template<typename ArithmetizationType, typename FieldType, typename NonNativePolicyType>
             class addition;
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams, typename NonNativePolicyType>
-            class addition<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+            template<typename BlueprintFieldType, typename NonNativePolicyType>
+            class addition<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>,
                            BlueprintFieldType, NonNativePolicyType>
-                : public plonk_component<BlueprintFieldType, ArithmetizationParams, 0, 0> {
+                : public plonk_component<BlueprintFieldType> {
 
             public:
-                using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 0, 0>;
+                using component_type = plonk_component<BlueprintFieldType>;
 
                 using var = typename component_type::var;
                 using manifest_type = plonk_component_manifest;
@@ -136,23 +136,23 @@ namespace nil {
                     component_type(witnesses, constants, public_inputs, get_manifest()) {};
 
                 static typename BlueprintFieldType::value_type calculate(typename BlueprintFieldType::value_type x,
-                                                                  typename BlueprintFieldType::value_type y) {
+                                                                         typename BlueprintFieldType::value_type y) {
                     return x + y;
                 }
             };
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
+            template<typename BlueprintFieldType>
             using plonk_native_addition =
-                addition<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                addition<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>,
                          BlueprintFieldType, basic_non_native_policy<BlueprintFieldType>>;
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
-            typename plonk_native_addition<BlueprintFieldType, ArithmetizationParams>::result_type
+            template<typename BlueprintFieldType>
+            typename plonk_native_addition<BlueprintFieldType>::result_type
                 generate_assignments(
-                    const plonk_native_addition<BlueprintFieldType, ArithmetizationParams> &component,
-                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                    const plonk_native_addition<BlueprintFieldType> &component,
+                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                         &assignment,
-                    const typename plonk_native_addition<BlueprintFieldType, ArithmetizationParams>::input_type
+                    const typename plonk_native_addition<BlueprintFieldType>::input_type
                         instance_input,
                     const std::uint32_t start_row_index) {
 
@@ -162,54 +162,53 @@ namespace nil {
                 assignment.witness(component.W(1), j) = var_value(assignment, instance_input.y);
                 assignment.witness(component.W(2), j) =
                     var_value(assignment, instance_input.x) + var_value(assignment, instance_input.y);
-                return typename plonk_native_addition<BlueprintFieldType, ArithmetizationParams>::result_type(
+                return typename plonk_native_addition<BlueprintFieldType>::result_type(
                     component, start_row_index);
             }
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
-            typename plonk_native_addition<BlueprintFieldType, ArithmetizationParams>::result_type
+            template<typename BlueprintFieldType>
+            typename plonk_native_addition<BlueprintFieldType>::result_type
                 generate_empty_assignments(
-                    const plonk_native_addition<BlueprintFieldType, ArithmetizationParams> &component,
-                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                    const plonk_native_addition<BlueprintFieldType> &component,
+                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                         &assignment,
-                    const typename plonk_native_addition<BlueprintFieldType, ArithmetizationParams>::input_type
+                    const typename plonk_native_addition<BlueprintFieldType>::input_type
                         instance_input,
                     const std::uint32_t start_row_index) {
 
-                using component_type = plonk_native_addition<BlueprintFieldType, ArithmetizationParams>;
+                using component_type = plonk_native_addition<BlueprintFieldType>;
                 assignment.witness(component.W(2), start_row_index) = component_type::calculate(
                     var_value(assignment, instance_input.x), var_value(assignment, instance_input.y));
-                return typename plonk_native_addition<BlueprintFieldType, ArithmetizationParams>::result_type(
+                return typename plonk_native_addition<BlueprintFieldType>::result_type(
                     component, start_row_index);
             }
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
+            template<typename BlueprintFieldType>
             std::size_t generate_gates(
-                const plonk_native_addition<BlueprintFieldType, ArithmetizationParams> &component,
-                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
-                    &assignment,
-                const typename plonk_native_addition<BlueprintFieldType, ArithmetizationParams>::input_type
+                const plonk_native_addition<BlueprintFieldType> &component,
+                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &assignment,
+                const typename plonk_native_addition<BlueprintFieldType>::input_type
                     &instance_input) {
 
-                using var = typename plonk_native_addition<BlueprintFieldType, ArithmetizationParams>::var;
+                using var = typename plonk_native_addition<BlueprintFieldType>::var;
 
                 auto constraint_1 = var(component.W(0), 0) + var(component.W(1), 0) - var(component.W(2), 0);
 
                 return bp.add_gate(constraint_1);
             }
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
+            template<typename BlueprintFieldType>
             void generate_copy_constraints(
-                const plonk_native_addition<BlueprintFieldType, ArithmetizationParams> &component,
-                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                const plonk_native_addition<BlueprintFieldType> &component,
+                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                     &assignment,
-                const typename plonk_native_addition<BlueprintFieldType, ArithmetizationParams>::input_type
+                const typename plonk_native_addition<BlueprintFieldType>::input_type
                     &instance_input,
                 const std::size_t start_row_index) {
 
-                using var = typename plonk_native_addition<BlueprintFieldType, ArithmetizationParams>::var;
+                using var = typename plonk_native_addition<BlueprintFieldType>::var;
 
                 const std::size_t j = start_row_index;
                 var component_x = var(component.W(0), static_cast<int>(j), false);
@@ -218,13 +217,12 @@ namespace nil {
                 bp.add_copy_constraint({component_y, instance_input.y});
             }
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
-            typename plonk_native_addition<BlueprintFieldType, ArithmetizationParams>::result_type generate_circuit(
-                const plonk_native_addition<BlueprintFieldType, ArithmetizationParams> &component,
-                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
-                    &assignment,
-                const typename plonk_native_addition<BlueprintFieldType, ArithmetizationParams>::input_type
+            template<typename BlueprintFieldType>
+            typename plonk_native_addition<BlueprintFieldType>::result_type generate_circuit(
+                const plonk_native_addition<BlueprintFieldType> &component,
+                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &assignment,
+                const typename plonk_native_addition<BlueprintFieldType>::input_type
                     &instance_input,
                 const std::size_t start_row_index) {
 
@@ -234,7 +232,7 @@ namespace nil {
 
                 generate_copy_constraints(component, bp, assignment, instance_input, start_row_index);
 
-                return typename plonk_native_addition<BlueprintFieldType, ArithmetizationParams>::result_type(
+                return typename plonk_native_addition<BlueprintFieldType>::result_type(
                     component, start_row_index);
             }
         }    // namespace components

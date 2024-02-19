@@ -55,7 +55,7 @@ namespace nil {
 
                 template<typename BlueprintFieldType,
                          size_t num_squeezes,
-                         typename ArithmetizationParams,
+
                          typename CurveType,
                          std::size_t W0,
                          std::size_t W1,
@@ -74,7 +74,7 @@ namespace nil {
                          std::size_t W14>
                 class aux_fr<
                     num_squeezes,
-                    snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                    snark::plonk_constraint_system<BlueprintFieldType>,
                     CurveType,
                     W0, W1, W2, W3,
                     W4, W5, W6, W7,
@@ -92,20 +92,20 @@ namespace nil {
                     constexpr static const std::size_t eval_rounds = 1;
                     constexpr static const std::size_t max_poly_size = 1;
                     constexpr static const std::size_t srs_len = 1;
-                    constexpr static const std::size_t prev_chal_size = 1; 
+                    constexpr static const std::size_t prev_chal_size = 1;
 
                     using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size,
                             srs_len>;
                     using index_terms_list = zk::components::index_terms_scalars_list_ec_test<ArithmetizationType>;
 
-                    using circuit_description = zk::components::kimchi_circuit_description<index_terms_list, 
+                    using circuit_description = zk::components::kimchi_circuit_description<index_terms_list,
                         witness_columns, perm_size>;
                     using kimchi_params = zk::components::kimchi_params_type<CurveType, commitment_params, circuit_description,
                         public_input_size, prev_chal_size>;
 
                     using var = snark::plonk_variable<typename BlueprintFieldType::value_type>;
                     using transcript_type =
-                        zk::components::kimchi_transcript_fr<ArithmetizationType, CurveType, kimchi_params, W0, W1, W2, W3, W4, W5, W6, 
+                        zk::components::kimchi_transcript_fr<ArithmetizationType, CurveType, kimchi_params, W0, W1, W2, W3, W4, W5, W6,
                                                                             W7, W8, W9, W10, W11, W12, W13, W14>;
 
                 public:
@@ -172,7 +172,7 @@ namespace nil {
 
                     static void generate_gates(
                         blueprint<ArithmetizationType> &bp,
-                        blueprint_public_assignment_table<ArithmetizationType> &assignment, 
+                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
                         const params_type &params,
                         const std::size_t first_selector_index) {}
 
@@ -181,7 +181,7 @@ namespace nil {
                             blueprint_public_assignment_table<ArithmetizationType> &assignment,
                             const params_type &params,
                             const std::size_t start_row_index) {
-                                
+
                             }
                 };
             }    // namespace components

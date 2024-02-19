@@ -137,12 +137,12 @@ BOOST_AUTO_TEST_CASE(blueprint_verifiers_kimchi_basic_verifier_test) {
     using ArithmetizationParamsScalar =
         zk::snark::plonk_arithmetization_params<WitnessColumnsScalar, PublicInputColumnsScalar, ConstantColumnsScalar,
                                                 SelectorColumnsScalar>;
-    using ArithmetizationTypeScalar = zk::snark::plonk_constraint_system<ScalarFieldType, ArithmetizationParamsScalar>;
+    using ArithmetizationTypeScalar = zk::snark::plonk_constraint_system<ScalarFieldTypeScalar>;
     using AssignmentTypeScalar = blueprint::assignment<ArithmetizationTypeScalar>;
 
     using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size, srs_len>;
     using index_terms_list = zk::components::index_terms_scalars_list_ec_test<AssignmentTypeScalar>;
-    using circuit_description = zk::components::kimchi_circuit_description<index_terms_list, 
+    using circuit_description = zk::components::kimchi_circuit_description<index_terms_list,
         witness_columns, perm_size>;
     using kimchi_params = zk::components::kimchi_params_type<curve_type, commitment_params, circuit_description,
         public_input_size, prev_chal_size>;
@@ -252,7 +252,7 @@ BOOST_AUTO_TEST_CASE(blueprint_verifiers_kimchi_basic_verifier_test) {
 
     auto result_check_scalar = [](AssignmentTypeScalar &assignment, verify_scalar_component::result_type &real_res) {};
 
-    test_component<verify_scalar_component, ScalarFieldType, ArithmetizationParamsScalar, hash_type, Lambda>(
+    test_component<verify_scalar_component, ScalarFieldTypeScalar, hash_type, Lambda>(
         params_scalar, public_input_scalar, result_check_scalar);
 
     //////////////////////////////////////////////////
@@ -265,7 +265,7 @@ BOOST_AUTO_TEST_CASE(blueprint_verifiers_kimchi_basic_verifier_test) {
 
     using ArithmetizationParams = zk::snark::plonk_arithmetization_params<WitnessColumnsBase, PublicInputColumnsBase,
                                                                           ConstantColumnsBase, SelectorColumnsBase>;
-    using ArithmetizationType = zk::snark::plonk_constraint_system<BaseFieldType, ArithmetizationParams>;
+    using ArithmetizationType = zk::snark::plonk_constraint_system<BaseFieldType>;
     using AssignmentType = blueprint::assignment<ArithmetizationType>;
 
     using var_ec_point = typename zk::components::var_ec_point<BaseFieldType>;
@@ -457,7 +457,7 @@ BOOST_AUTO_TEST_CASE(blueprint_verifiers_kimchi_basic_verifier_test) {
 
     auto result_check = [](AssignmentType &assignment, verify_base_component::result_type &real_res) {};
 
-    test_component<verify_base_component, BaseFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input,
+    test_component<verify_base_component, BaseFieldType, hash_type, Lambda>(params, public_input,
                                                                                                    result_check);
 }
 

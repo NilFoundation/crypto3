@@ -56,13 +56,13 @@ namespace nil {
             template<typename ArithmetizationType, typename BlueprintFieldType>
             class quadratic_inter_coefs;
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
-            class quadratic_inter_coefs<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+            template<typename BlueprintFieldType>
+            class quadratic_inter_coefs<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>,
                            BlueprintFieldType>
-                : public plonk_component<BlueprintFieldType, ArithmetizationParams, 0, 0> {
+                : public plonk_component<BlueprintFieldType> {
 
             public:
-                using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 0, 0>;
+                using component_type = plonk_component<BlueprintFieldType>;
 
                 using var = typename component_type::var;
                 using manifest_type = plonk_component_manifest;
@@ -137,18 +137,18 @@ namespace nil {
                     component_type(witnesses, constants, public_inputs, get_manifest()) {};
             };
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
+            template<typename BlueprintFieldType>
             using plonk_quadratic_inter_coefs =
                 quadratic_inter_coefs<
-                    crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                    crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>,
                     BlueprintFieldType>;
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
-            typename plonk_quadratic_inter_coefs<BlueprintFieldType, ArithmetizationParams>::result_type generate_assignments(
-                const plonk_quadratic_inter_coefs<BlueprintFieldType, ArithmetizationParams> &component,
-                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+            template<typename BlueprintFieldType>
+            typename plonk_quadratic_inter_coefs<BlueprintFieldType>::result_type generate_assignments(
+                const plonk_quadratic_inter_coefs<BlueprintFieldType> &component,
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                     &assignment,
-                const typename plonk_quadratic_inter_coefs<BlueprintFieldType, ArithmetizationParams>::input_type
+                const typename plonk_quadratic_inter_coefs<BlueprintFieldType>::input_type
                     &instance_input,
                 const std::uint32_t start_row_index) {
 
@@ -185,20 +185,20 @@ namespace nil {
                     assignment.witness(component.W(8), start_row_index) = 0;
                     assignment.witness(component.W(9), start_row_index) = 0;
                 }
-                return typename plonk_quadratic_inter_coefs<BlueprintFieldType, ArithmetizationParams>::result_type(
+                return typename plonk_quadratic_inter_coefs<BlueprintFieldType>::result_type(
                     component, start_row_index);
 	    }
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
+            template<typename BlueprintFieldType>
             std::size_t generate_gates(
-                const plonk_quadratic_inter_coefs<BlueprintFieldType, ArithmetizationParams> &component,
-                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                const plonk_quadratic_inter_coefs<BlueprintFieldType> &component,
+                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                     &assignment,
-                const typename plonk_quadratic_inter_coefs<BlueprintFieldType, ArithmetizationParams>::input_type
+                const typename plonk_quadratic_inter_coefs<BlueprintFieldType>::input_type
                     &instance_input) {
 
-                using var = typename plonk_quadratic_inter_coefs<BlueprintFieldType, ArithmetizationParams>::var;
+                using var = typename plonk_quadratic_inter_coefs<BlueprintFieldType>::var;
                 var X0 = var(component.W(0), 0, true),
                     Z0 = var(component.W(1), 0, true),
                     X1 = var(component.W(2), 0, true),
@@ -216,16 +216,16 @@ namespace nil {
                                    (X1 - X0)*(X2 - X0)*(X2 - X1)*I - 1});
             }
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
+            template<typename BlueprintFieldType>
             void generate_copy_constraints(
-                const plonk_quadratic_inter_coefs<BlueprintFieldType, ArithmetizationParams> &component,
-                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                const plonk_quadratic_inter_coefs<BlueprintFieldType> &component,
+                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                     &assignment,
-                const typename plonk_quadratic_inter_coefs<BlueprintFieldType, ArithmetizationParams>::input_type &instance_input,
+                const typename plonk_quadratic_inter_coefs<BlueprintFieldType>::input_type &instance_input,
                 const std::size_t start_row_index) {
 
-                using var = typename plonk_quadratic_inter_coefs<BlueprintFieldType, ArithmetizationParams>::var;
+                using var = typename plonk_quadratic_inter_coefs<BlueprintFieldType>::var;
 
                 bp.add_copy_constraint({var(component.W(0), start_row_index, false), instance_input.x0});
                 bp.add_copy_constraint({var(component.W(1), start_row_index, false), instance_input.z0});
@@ -235,20 +235,20 @@ namespace nil {
                 bp.add_copy_constraint({var(component.W(5), start_row_index, false), instance_input.z2});
             }
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
-            typename plonk_quadratic_inter_coefs<BlueprintFieldType, ArithmetizationParams>::result_type generate_circuit(
-                const plonk_quadratic_inter_coefs<BlueprintFieldType, ArithmetizationParams> &component,
-                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+            template<typename BlueprintFieldType>
+            typename plonk_quadratic_inter_coefs<BlueprintFieldType>::result_type generate_circuit(
+                const plonk_quadratic_inter_coefs<BlueprintFieldType> &component,
+                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                     &assignment,
-                const typename plonk_quadratic_inter_coefs<BlueprintFieldType, ArithmetizationParams>::input_type &instance_input,
+                const typename plonk_quadratic_inter_coefs<BlueprintFieldType>::input_type &instance_input,
                 const std::size_t start_row_index) {
 
                 std::size_t selector_index = generate_gates(component, bp, assignment, instance_input);
                 assignment.enable_selector(selector_index, start_row_index);
                 generate_copy_constraints(component, bp, assignment, instance_input, start_row_index);
 
-                return typename plonk_quadratic_inter_coefs<BlueprintFieldType, ArithmetizationParams>::result_type(
+                return typename plonk_quadratic_inter_coefs<BlueprintFieldType>::result_type(
                     component, start_row_index);
             }
 

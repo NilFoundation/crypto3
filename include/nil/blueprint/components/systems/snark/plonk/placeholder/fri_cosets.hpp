@@ -59,11 +59,10 @@ namespace nil {
             template<typename ArithmetizationType, typename FieldType>
             class fri_cosets;
 
-            template<typename BlueprintFieldType,
-                     typename ArithmetizationParams>
-            class fri_cosets<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+            template<typename BlueprintFieldType>
+            class fri_cosets<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>,
                 BlueprintFieldType>:
-                public plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0> {
+                public plonk_component<BlueprintFieldType> {
 
                 static std::size_t gates_amount_internal(std::size_t witness_amount, std::size_t n, std::size_t total_bits) {
                     const std::size_t l = witness_amount / 9; // number of 9-blocks per row
@@ -90,7 +89,7 @@ namespace nil {
                 }
 
             public:
-                using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0>;
+                using component_type = plonk_component<BlueprintFieldType>;
 
                 class gate_manifest_type : public component_gate_manifest {
 
@@ -227,18 +226,17 @@ namespace nil {
                 };
             };
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
+            template<typename BlueprintFieldType>
             using plonk_fri_cosets =
-                fri_cosets<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                fri_cosets<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>,
                 BlueprintFieldType>;
 
-            template<typename BlueprintFieldType,
-                     typename ArithmetizationParams>
-            typename plonk_fri_cosets<BlueprintFieldType, ArithmetizationParams>::result_type
+            template<typename BlueprintFieldType>
+            typename plonk_fri_cosets<BlueprintFieldType>::result_type
                 generate_assignments(
-                    const plonk_fri_cosets<BlueprintFieldType, ArithmetizationParams> &component,
-                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
-                    const typename plonk_fri_cosets<BlueprintFieldType, ArithmetizationParams>::input_type instance_input,
+                    const plonk_fri_cosets<BlueprintFieldType> &component,
+                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &assignment,
+                    const typename plonk_fri_cosets<BlueprintFieldType>::input_type instance_input,
                     const std::uint32_t start_row_index) {
 
                 using value_type = typename BlueprintFieldType::value_type;
@@ -309,19 +307,18 @@ namespace nil {
                     }
                 }
 
-                return typename plonk_fri_cosets<BlueprintFieldType, ArithmetizationParams>::result_type(component, start_row_index);
+                return typename plonk_fri_cosets<BlueprintFieldType>::result_type(component, start_row_index);
             }
 
-            template<typename BlueprintFieldType,
-                     typename ArithmetizationParams>
+            template<typename BlueprintFieldType>
             void generate_copy_constraints(
-                const plonk_fri_cosets<BlueprintFieldType, ArithmetizationParams> &component,
-                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
-                const typename plonk_fri_cosets<BlueprintFieldType, ArithmetizationParams>::input_type &instance_input,
+                const plonk_fri_cosets<BlueprintFieldType> &component,
+                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &assignment,
+                const typename plonk_fri_cosets<BlueprintFieldType>::input_type &instance_input,
                 const std::size_t start_row_index) {
 
-                using var = typename plonk_fri_cosets<BlueprintFieldType, ArithmetizationParams>::var;
+                using var = typename plonk_fri_cosets<BlueprintFieldType>::var;
 
                 // input
                 bp.add_copy_constraint({instance_input.x, var(component.W(0), start_row_index, false)});
@@ -352,17 +349,16 @@ namespace nil {
                                         var(component.W(2), start_row_index + component.rows_amount - 1, false)});
             }
 
-            template<typename BlueprintFieldType,
-                     typename ArithmetizationParams>
-            typename plonk_fri_cosets<BlueprintFieldType, ArithmetizationParams>::result_type
+            template<typename BlueprintFieldType>
+            typename plonk_fri_cosets<BlueprintFieldType>::result_type
                 generate_circuit(
-                    const plonk_fri_cosets<BlueprintFieldType, ArithmetizationParams> &component,
-                    circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
-                    const typename plonk_fri_cosets<BlueprintFieldType, ArithmetizationParams>::input_type &instance_input,
+                    const plonk_fri_cosets<BlueprintFieldType> &component,
+                    circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
+                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &assignment,
+                    const typename plonk_fri_cosets<BlueprintFieldType>::input_type &instance_input,
                     const std::size_t start_row_index) {
 
-                using var = typename plonk_fri_cosets<BlueprintFieldType, ArithmetizationParams>::var;
+                using var = typename plonk_fri_cosets<BlueprintFieldType>::var;
                 using constraint_type = crypto3::zk::snark::plonk_constraint<BlueprintFieldType>;
 
                 const std::size_t WA = component.WA;
@@ -508,14 +504,14 @@ namespace nil {
                 generate_copy_constraints(component, bp, assignment, instance_input, start_row_index);
                 generate_assignments_constant(component, assignment, instance_input, start_row_index);
 
-                return typename plonk_fri_cosets<BlueprintFieldType, ArithmetizationParams>::result_type(component, start_row_index);
+                return typename plonk_fri_cosets<BlueprintFieldType>::result_type(component, start_row_index);
             }
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
+            template<typename BlueprintFieldType>
             void generate_assignments_constant(
-                const plonk_fri_cosets<BlueprintFieldType, ArithmetizationParams> &component,
-                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
-                const typename plonk_fri_cosets<BlueprintFieldType, ArithmetizationParams>::input_type &instance_input,
+                const plonk_fri_cosets<BlueprintFieldType> &component,
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &assignment,
+                const typename plonk_fri_cosets<BlueprintFieldType>::input_type &instance_input,
                 const std::size_t start_row_index) {
 
                 assignment.constant(component.C(0), start_row_index) = component.omega;

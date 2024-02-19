@@ -63,7 +63,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_constraints_generic_scalars_g
     constexpr std::size_t SelectorColumns = 30;
     using ArithmetizationParams =
         zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType>;
     using AssignmentType = blueprint::assignment<ArithmetizationType>;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_constraints_generic_scalars_g
 
     using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size, srs_len>;
     using index_terms_list = zk::components::index_terms_scalars_list_ec_test<ArithmetizationType>;
-    using circuit_description = zk::components::kimchi_circuit_description<index_terms_list, 
+    using circuit_description = zk::components::kimchi_circuit_description<index_terms_list,
         witness_columns, perm_size>;
     using kimchi_params = zk::components::kimchi_params_type<curve_type, commitment_params, circuit_description,
         public_input_size, prev_chal_size>;
@@ -115,7 +115,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_constraints_generic_scalars_g
             0x14A2F13619031815C2F7875EF4B4326B1FB0811399B9E5101DB7F9FEE18A3BD6_cppui256,
             0x16D35E4D2D833F3D51BF75826118EF9640B7E81ECA37FC76C694F80C6D73382A_cppui256,
         };
-    
+
     typename BlueprintFieldType::value_type eval0_z = 0x38C5D08C61572A0F233A3732575F3A07AD484107EC7366FEB0903FCC30253C1A_cppui256;
 
     std::array<typename BlueprintFieldType::value_type, perm_size> eval0_s = {
@@ -147,7 +147,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_constraints_generic_scalars_g
             0x06BF9230E2E2424EF63FE51B0306D61BA478A06A226AEDA29DD12DA188D5F302_cppui256,
             0x29126D228A13DAF18CD96C487BF794569FB5A8BBDF14DDEC6CE22DAAED7DF34F_cppui256
         };
-    
+
     typename BlueprintFieldType::value_type eval1_z = 0x1635A182C3B5623D5E7CF31D244F389FB478B0612B27937A39D48B473DB68931_cppui256;
 
     std::array<typename BlueprintFieldType::value_type, perm_size> eval1_s = {
@@ -167,7 +167,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_constraints_generic_scalars_g
         0x220B73274823F8B0E46273FA8546B238F1E58529E061A811AB584A97C146AF87_cppui256;
 
     std::array<typename BlueprintFieldType::value_type, component_type::output_size>
-        expected_result ={ 0x3EA2D6B15BFDB5C984671ECF5BC14CB50F04F1DADECEA0CBD36C92B61F15312E_cppui256, 
+        expected_result ={ 0x3EA2D6B15BFDB5C984671ECF5BC14CB50F04F1DADECEA0CBD36C92B61F15312E_cppui256,
             0x35E37366760C3D2A9C95BFEE8BE746548D84ED80E7C88ED535B5BEF0518EC54B_cppui256,
             0x1A47E6230B00888729DEB23939B141C3A032851A8D06D8821CBA9388367D6577_cppui256,
             0x3D2FFD65B4D7E78F53072A50E814894D76580CF03F8DF994097C3FD3179D53FE_cppui256,
@@ -186,7 +186,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_constraints_generic_scalars_g
 
     using evaluations_type = typename zk::components::kimchi_proof_evaluations<
                         BlueprintFieldType, kimchi_params>;
-    std::array<evaluations_type, 2> evals; 
+    std::array<evaluations_type, 2> evals;
 
     for (std::size_t i = 0; i < 2; i++) {
         for (std::size_t j = 0; j < witness_columns; j++) {
@@ -216,7 +216,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_constraints_generic_scalars_g
         alpha_powers[i] = var(0, public_input.size() - 1, false, var::column_type::public_input);
     }
 
-    typename component_type::params_type params = { 
+    typename component_type::params_type params = {
         evals, alpha_powers, 0};
 
     auto result_check = [&expected_result](AssignmentType &assignment, component_type::result_type &real_res) {
@@ -225,7 +225,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_constraints_generic_scalars_g
         }
     };
 
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input,
+    test_component<component_type, BlueprintFieldType, hash_type, Lambda>(params, public_input,
                                                                                                  result_check);
 }
 

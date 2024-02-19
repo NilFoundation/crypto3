@@ -44,15 +44,15 @@ namespace nil {
             template<typename ArithmetizationType, typename CurveType>
             class unified_addition;
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType>
-            class unified_addition<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+            template<typename BlueprintFieldType, typename CurveType>
+            class unified_addition<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>,
                 CurveType>:
-                public plonk_component<BlueprintFieldType, ArithmetizationParams, 0, 0> {
+                public plonk_component<BlueprintFieldType> {
 
                 static_assert(std::is_same<typename CurveType::base_field_type, BlueprintFieldType>::value);
 
             public:
-                using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 0, 0>;
+                using component_type = plonk_component<BlueprintFieldType>;
 
                 using var = typename component_type::var;
                 using manifest_type = plonk_component_manifest;
@@ -136,19 +136,16 @@ namespace nil {
                     component_type(witnesses, constants, public_inputs, get_manifest()){};
             };
 
-            template<typename BlueprintFieldType,
-                     typename ArithmetizationParams,
-                     typename CurveType>
+            template<typename BlueprintFieldType, typename CurveType>
             using plonk_native_unified_addition =
-                unified_addition<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
-                CurveType>;
+                unified_addition<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>, CurveType>;
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType>
-            typename plonk_native_unified_addition<BlueprintFieldType, ArithmetizationParams, CurveType>::result_type
+            template<typename BlueprintFieldType, typename CurveType>
+            typename plonk_native_unified_addition<BlueprintFieldType, CurveType>::result_type
                 generate_assignments(
-                    const plonk_native_unified_addition<BlueprintFieldType, ArithmetizationParams, CurveType> &component,
-                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
-                    const typename plonk_native_unified_addition<BlueprintFieldType, ArithmetizationParams, CurveType>::input_type instance_input,
+                    const plonk_native_unified_addition<BlueprintFieldType, CurveType> &component,
+                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &assignment,
+                    const typename plonk_native_unified_addition<BlueprintFieldType, CurveType>::input_type instance_input,
                     const std::uint32_t start_row_index) {
 
                 const std::size_t j = start_row_index;
@@ -219,19 +216,19 @@ namespace nil {
                     assignment.witness(component.W(8), j) = 0;
                 }
 
-                return typename plonk_native_unified_addition<BlueprintFieldType, ArithmetizationParams, CurveType>::result_type(
+                return typename plonk_native_unified_addition<BlueprintFieldType, CurveType>::result_type(
                     component, start_row_index);
             }
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType>
+            template<typename BlueprintFieldType, typename CurveType>
             std::size_t generate_gates(
-                const plonk_native_unified_addition<BlueprintFieldType, ArithmetizationParams, CurveType> &component,
-                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
-                const typename plonk_native_unified_addition<BlueprintFieldType, ArithmetizationParams, CurveType>::input_type &instance_input) {
+                const plonk_native_unified_addition<BlueprintFieldType, CurveType> &component,
+                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &assignment,
+                const typename plonk_native_unified_addition<BlueprintFieldType, CurveType>::input_type &instance_input) {
 
                 using var =
-                    typename plonk_native_unified_addition<BlueprintFieldType, ArithmetizationParams, CurveType>::var;
+                    typename plonk_native_unified_addition<BlueprintFieldType, CurveType>::var;
 
                 auto constraint_1 =
                     (var(component.W(2), 0) - var(component.W(0), 0)) *
@@ -288,15 +285,15 @@ namespace nil {
                      constraint_7, constraint_8, constraint_9, constraint_10, constraint_11, constraint_12});
             }
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType>
+            template<typename BlueprintFieldType, typename CurveType>
             void generate_copy_constraints(
-                const plonk_native_unified_addition<BlueprintFieldType, ArithmetizationParams, CurveType> &component,
-                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
-                const typename plonk_native_unified_addition<BlueprintFieldType, ArithmetizationParams, CurveType>::input_type &instance_input,
+                const plonk_native_unified_addition<BlueprintFieldType, CurveType> &component,
+                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &assignment,
+                const typename plonk_native_unified_addition<BlueprintFieldType, CurveType>::input_type &instance_input,
                 const std::size_t start_row_index) {
 
-                using var = typename plonk_native_unified_addition<BlueprintFieldType, ArithmetizationParams, CurveType>::var;
+                using var = typename plonk_native_unified_addition<BlueprintFieldType, CurveType>::var;
 
                 bp.add_copy_constraint({instance_input.P.x, var(component.W(0), start_row_index, false)});
                 bp.add_copy_constraint({instance_input.P.y, var(component.W(1), start_row_index, false)});
@@ -304,13 +301,13 @@ namespace nil {
                 bp.add_copy_constraint({instance_input.Q.y, var(component.W(3), start_row_index, false)});
             }
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType>
-            typename plonk_native_unified_addition<BlueprintFieldType, ArithmetizationParams, CurveType>::result_type
+            template<typename BlueprintFieldType, typename CurveType>
+            typename plonk_native_unified_addition<BlueprintFieldType, CurveType>::result_type
                 generate_circuit(
-                    const plonk_native_unified_addition<BlueprintFieldType, ArithmetizationParams, CurveType> &component,
-                    circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
-                    const typename plonk_native_unified_addition<BlueprintFieldType, ArithmetizationParams, CurveType>::input_type &instance_input,
+                    const plonk_native_unified_addition<BlueprintFieldType, CurveType> &component,
+                    circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
+                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &assignment,
+                    const typename plonk_native_unified_addition<BlueprintFieldType, CurveType>::input_type &instance_input,
                     const std::size_t start_row_index){
 
                 std::size_t selector_index = generate_gates(component, bp, assignment, instance_input);
@@ -319,7 +316,7 @@ namespace nil {
 
                 generate_copy_constraints(component, bp, assignment, instance_input, start_row_index);
 
-                return typename plonk_native_unified_addition<BlueprintFieldType, ArithmetizationParams, CurveType>::result_type(
+                return typename plonk_native_unified_addition<BlueprintFieldType, CurveType>::result_type(
                     component, start_row_index);
             }
         }    // namespace components

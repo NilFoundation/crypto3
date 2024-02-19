@@ -53,15 +53,15 @@ namespace nil {
                 template<typename ArithmetizationType, typename KimchiParamsType, std::size_t... WireIndexes>
                 class derive_plonk;
 
-                template<typename BlueprintFieldType, typename ArithmetizationParams, typename KimchiParamsType,
+                template<typename BlueprintFieldType, typename KimchiParamsType,
                          std::size_t W0, std::size_t W1, std::size_t W2, std::size_t W3, std::size_t W4, std::size_t W5,
                          std::size_t W6, std::size_t W7, std::size_t W8, std::size_t W9, std::size_t W10,
                          std::size_t W11, std::size_t W12, std::size_t W13, std::size_t W14>
-                class derive_plonk<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                class derive_plonk<snark::plonk_constraint_system<BlueprintFieldType>,
                                           KimchiParamsType, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13,
                                           W14> {
 
-                    typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
+                    typedef snark::plonk_constraint_system<BlueprintFieldType>
                         ArithmetizationType;
 
                     using var = snark::plonk_variable<typename BlueprintFieldType::value_type>;
@@ -115,7 +115,7 @@ namespace nil {
                         var zeta;
                         var alpha;
                         var beta;
-                        var gamma; 
+                        var gamma;
                         var joint_combiner;
                         std::array<kimchi_proof_evaluations<BlueprintFieldType, KimchiParamsType>,
                             KimchiParamsType::eval_points_amount> combined_evals;
@@ -127,7 +127,7 @@ namespace nil {
                         result_type(std::size_t component_start_row) {
                             std::size_t row = component_start_row;
 
-                            
+
                         }
                     };
 
@@ -157,7 +157,7 @@ namespace nil {
 
 
                         auto index_scalars =
-                            index_terms_scalars_component::generate_circuit(bp, 
+                            index_terms_scalars_component::generate_circuit(bp,
                                 assignment,
                                 {params.zeta, params.alpha, params.beta,
                                  params.gamma, params.joint_combiner, params.combined_evals,
@@ -169,7 +169,7 @@ namespace nil {
                         std::pair<std::size_t, std::size_t> alpha_idxs =
                             index_terms_list::alpha_map(argument_type::Permutation);
                         var perm_scalar =
-                            perm_scalars_component::generate_circuit(bp, 
+                            perm_scalars_component::generate_circuit(bp,
                                 assignment,
                                 {params.combined_evals, alpha_powers, alpha_idxs.first,
                                  params.fq_output.beta, params.fq_output.gamma, zkp},
@@ -179,13 +179,13 @@ namespace nil {
 
                         alpha_idxs = index_terms_list::alpha_map(argument_type::Generic);
                         std::array<var, generic_scalars_component::output_size> generic_scalars =
-                            generic_scalars_component::generate_circuit(bp, 
+                            generic_scalars_component::generate_circuit(bp,
                                 assignment,
                                 {params.combined_evals, oracles_output.alpha_powers, alpha_idxs.first}, row)
                                 .output;
                         row += generic_scalars_component::rows_amount;
 
-                        var output = plonk_map_fields_component::generate_circuit(bp, 
+                        var output = plonk_map_fields_component::generate_circuit(bp,
                             assignment,
                             {params.alpha, params.beta, params.gamma, params.joint_combiner,
                              index_scalars, perm_scalar, generic_scalars},

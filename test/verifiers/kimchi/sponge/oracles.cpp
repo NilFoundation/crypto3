@@ -53,10 +53,10 @@ void test_from_limbs(std::vector<typename BlueprintFieldType::value_type> public
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 0;
     constexpr std::size_t SelectorColumns = 1;
-    using ArithmetizationParams = nil::crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns,
-        PublicInputColumns, ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
-    using AssignmentType = nil::blueprint::assignment<ArithmetizationType>;
+    zk::snark::plonk_table_description<BlueprintFieldType> desc(
+        WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns);
+    using ArithmetizationType = nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>;
+    using AssignmentType = nil::blueprint::assignment<nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>;
 	using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
 
@@ -81,7 +81,7 @@ void test_from_limbs(std::vector<typename BlueprintFieldType::value_type> public
     component_type component_instance({0, 1, 2}, {}, {});
 
 
-    nil::crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (component_instance, public_input, result_check, instance_input);
+    nil::crypto3::test_component<component_type, BlueprintFieldType, hash_type, Lambda> (component_instance, desc, public_input, result_check, instance_input);
 
 }
 
@@ -92,10 +92,10 @@ void test_to_limbs(const std::vector<typename BlueprintFieldType::value_type> &p
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 1;
     constexpr std::size_t SelectorColumns = 2;
-    using ArithmetizationParams = nil::crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns,
-        PublicInputColumns, ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
-    using AssignmentType = nil::blueprint::assignment<ArithmetizationType>;
+    zk::snark::plonk_table_description<BlueprintFieldType> desc(
+        WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns);
+    using ArithmetizationType = nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>;
+    using AssignmentType = nil::blueprint::assignment<nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>;
 	using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
 
@@ -124,19 +124,15 @@ void test_to_limbs(const std::vector<typename BlueprintFieldType::value_type> &p
 
     if constexpr (Stretched) {
         using stretched_component_type = nil::blueprint::components::component_stretcher<
-            BlueprintFieldType,
-            ArithmetizationParams,
-            component_type>;
+            BlueprintFieldType, component_type>;
 
         stretched_component_type stretched_instance(component_instance, WitnessColumns / 2, WitnessColumns);
 
-        nil::crypto3::test_component<stretched_component_type, BlueprintFieldType,
-                                     ArithmetizationParams, hash_type, Lambda>
-            (stretched_instance, public_input, result_check, instance_input);
+        nil::crypto3::test_component<stretched_component_type, BlueprintFieldType, hash_type, Lambda>
+            (stretched_instance, desc, public_input, result_check, instance_input);
     } else {
-        nil::crypto3::test_component<component_type, BlueprintFieldType,
-                                     ArithmetizationParams, hash_type, Lambda>
-            (component_instance, public_input, result_check, instance_input);
+        nil::crypto3::test_component<component_type, BlueprintFieldType, hash_type, Lambda>
+            (component_instance, desc, public_input, result_check, instance_input);
     }
 }
 

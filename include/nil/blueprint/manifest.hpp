@@ -44,8 +44,7 @@
 namespace nil {
     namespace blueprint {
         namespace components {
-            template<typename BlueprintFieldType, typename ArithmetizationParams,
-                     std::uint32_t ConstantAmount, std::uint32_t PublicInputAmount>
+            template<typename BlueprintFieldType>
             class plonk_component;
         }    // namespace components
 
@@ -964,14 +963,12 @@ namespace nil {
 
             // Checks if the manifest is satisfied for the component.
             // This is a runtime check in order to prevent bad intialization of components.
-            template<typename BlueprintFieldType, typename ArithmetizationParams,
-                        std::uint32_t ConstantAmount, std::uint32_t PublicInputAmount>
+            template<typename BlueprintFieldType>
             bool check_manifest(
-                const nil::blueprint::components::plonk_component<BlueprintFieldType, ArithmetizationParams,
-                                                                  ConstantAmount, PublicInputAmount>
+                const nil::blueprint::components::plonk_component<BlueprintFieldType>
                     &component) const {
                 // TODO: add lookups when they arrive.
-                return check_manifest(component.witness_amount(), ConstantAmount, 0, {});
+                return check_manifest(component.witness_amount(), component.constant_amount(), 0, {});
             }
 
             // merge_with is intended to be used to automatically calculate new manifest in case of one component

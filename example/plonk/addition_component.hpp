@@ -59,7 +59,6 @@ namespace nil {
                 /// Constraints:
                 /// x + y = sum <=> W0 + W1 = W2
                 template<typename BlueprintFieldType,
-                         typename ArithmetizationParams,
                          std::size_t W0,
                          std::size_t W1,
                          std::size_t W2>
@@ -151,7 +150,7 @@ namespace nil {
                     private:
                     static void generate_gates(
                         blueprint<ArithmetizationType> &bp,
-                        blueprint_assignment_table<ArithmetizationType> &assignment, 
+                        blueprint_assignment_table<ArithmetizationType> &assignment,
                         const params_type &params,
                         allocated_data_type &allocated_data,
                         const std::size_t start_row_index) {
@@ -163,7 +162,7 @@ namespace nil {
                             allocated_data.add_selector = selector_index;
                         } else {
                             selector_index = allocated_data.add_selector;
-                            assignment.enable_selector(selector_index, start_row_index); 
+                            assignment.enable_selector(selector_index, start_row_index);
                         }
 
                         // var(i, 0) defines cell at the column i with rotation 0 (we'll elaborate rotation in the next examples)
@@ -172,7 +171,7 @@ namespace nil {
 
                         if (!allocated_data.previously_allocated) {
                             // gate composes multiple constraints together
-                            bp.add_gate(selector_index, 
+                            bp.add_gate(selector_index,
                                 { constraint_1
                             });
                             allocated_data.previously_allocated = true;

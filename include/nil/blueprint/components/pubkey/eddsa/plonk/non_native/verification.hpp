@@ -46,7 +46,7 @@ namespace nil {
             class verification;
 
             template<typename BlueprintFieldType,
-                     typename ArithmetizationParams,
+
                      typename CurveType,
                      typename Ed25519Type,
                      std::size_t W0,
@@ -58,7 +58,7 @@ namespace nil {
                      std::size_t W6,
                      std::size_t W7,
                      std::size_t W8>
-            class verification<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+            class verification<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>,
                                CurveType,
                                Ed25519Type,
                                W0,
@@ -71,7 +71,7 @@ namespace nil {
                                W7,
                                W8> {
 
-                typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams> ArithmetizationType;
+                typedef snark::plonk_constraint_system<BlueprintFieldType> ArithmetizationType;
 
                 using check_ec_point_component =
                     ec_point<ArithmetizationType, CurveType, Ed25519Type, W0, W1, W2, W3, W4, W5, W6, W7, W8>;

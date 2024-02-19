@@ -62,29 +62,29 @@ namespace nil {
             //          verifier index (public data)
             // Output: batch evaluation proof, scalar field part
             //      (https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/kimchi/src/verifier.rs#L881-L888)
-            template<typename ArithmetizationType, typename CurveType, typename KimchiParamsType, 
+            template<typename ArithmetizationType, typename CurveType, typename KimchiParamsType,
                 typename KimchiCommitmentParamsType, std::size_t... WireIndexes>
             class prepare_batch_scalar;
 
-            template<typename ArithmetizationParams, typename CurveType, typename KimchiParamsType,  
+            template<typename CurveType, typename KimchiParamsType,
                      typename KimchiCommitmentParamsType, std::size_t W0, std::size_t W1,
                      std::size_t W2, std::size_t W3, std::size_t W4, std::size_t W5, std::size_t W6, std::size_t W7,
                      std::size_t W8, std::size_t W9, std::size_t W10, std::size_t W11, std::size_t W12,
                      std::size_t W13, std::size_t W14>
             class prepare_batch_scalar<
-                snark::plonk_constraint_system<typename CurveType::scalar_field_type, ArithmetizationParams>,
-                CurveType, KimchiParamsType, KimchiCommitmentParamsType, 
+                snark::plonk_constraint_system<typename CurveType::scalar_field_type>,
+                CurveType, KimchiParamsType, KimchiCommitmentParamsType,
                 W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> {
 
                 using BlueprintFieldType = typename CurveType::scalar_field_type;
 
-                typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
+                typedef snark::plonk_constraint_system<BlueprintFieldType>
                     ArithmetizationType;
 
                 using var = snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
                 using sub_component = zk::components::subtraction<ArithmetizationType, W0, W1, W2>;
-                
+
                 using oracles_component = oracles_scalar<ArithmetizationType, CurveType, KimchiParamsType,
                             KimchiCommitmentParamsType, W0, W1, W2, W3, W4, W5,
                             W6, W7, W8, W9, W10, W11, W12, W13, W14>;
@@ -108,7 +108,7 @@ namespace nil {
                 using proof_binding = typename zk::components::binding<ArithmetizationType,
                     BlueprintFieldType, KimchiParamsType>;
 
-                using batch_proof = batch_evaluation_proof_scalar<BlueprintFieldType, 
+                using batch_proof = batch_evaluation_proof_scalar<BlueprintFieldType,
                     ArithmetizationType, KimchiParamsType, KimchiCommitmentParamsType>;
 
                 using index_terms_list = typename KimchiParamsType::circuit_params::index_terms_list;
@@ -122,7 +122,7 @@ namespace nil {
                 constexpr static std::size_t rows() {
                     std::size_t row = 0;
 
-                    row += oracles_component::rows_amount; 
+                    row += oracles_component::rows_amount;
 
                     row += zkpm_evaluate_component::rows_amount;
 
@@ -141,7 +141,7 @@ namespace nil {
                 constexpr static const std::size_t rows_amount = rows();
                 constexpr static const std::size_t gates_amount = 0;
 
-                constexpr static const std::size_t f_comm_msm_size = 
+                constexpr static const std::size_t f_comm_msm_size =
                     kimchi_constants::f_comm_msm_size;
 
                 struct params_type {
@@ -176,7 +176,7 @@ namespace nil {
                     );
                     auto oracles_output = oracles_component::generate_circuit(bp, assignment,
                         oracles_params, row);
-                    row += oracles_component::rows_amount; 
+                    row += oracles_component::rows_amount;
 
                     std::array<var, f_comm_msm_size> f_comm_scalars;
                     std::size_t f_comm_idx = 0;
@@ -186,7 +186,7 @@ namespace nil {
                         oracles_output.oracles.zeta}, row).output;
                     row += zkpm_evaluate_component::rows_amount;
 
-                    std::pair<std::size_t, std::size_t> alpha_idxs = 
+                    std::pair<std::size_t, std::size_t> alpha_idxs =
                         index_terms_list::alpha_map(argument_type::Permutation);
                     f_comm_scalars[f_comm_idx] = perm_scalars_component::generate_circuit(bp,
                         assignment, {oracles_output.combined_evals, oracles_output.alpha_powers,
@@ -196,9 +196,9 @@ namespace nil {
                     f_comm_idx += 1;
                     row += perm_scalars_component::rows_amount;
 
-                    alpha_idxs = 
+                    alpha_idxs =
                         index_terms_list::alpha_map(argument_type::Generic);
-                    std::array<var, generic_scalars_component::output_size> generic_scalars = 
+                    std::array<var, generic_scalars_component::output_size> generic_scalars =
                         generic_scalars_component::generate_circuit(bp,
                             assignment, {oracles_output.combined_evals, oracles_output.alpha_powers,
                             alpha_idxs.first}, row).output;
@@ -264,7 +264,7 @@ namespace nil {
                     );
                     auto oracles_output = oracles_component::generate_assignments(assignment,
                         oracles_params, row);
-                    row += oracles_component::rows_amount; 
+                    row += oracles_component::rows_amount;
 
                     std::array<var, f_comm_msm_size> f_comm_scalars;
                     std::size_t f_comm_idx = 0;
@@ -273,7 +273,7 @@ namespace nil {
                         oracles_output.oracles.zeta}, row).output;
                     row += zkpm_evaluate_component::rows_amount;
 
-                    std::pair<std::size_t, std::size_t> alpha_idxs = 
+                    std::pair<std::size_t, std::size_t> alpha_idxs =
                         index_terms_list::alpha_map(argument_type::Permutation);
                     f_comm_scalars[f_comm_idx] = perm_scalars_component::generate_assignments(
                         assignment, {oracles_output.combined_evals, oracles_output.alpha_powers,
@@ -283,9 +283,9 @@ namespace nil {
                     f_comm_idx += 1;
                     row += perm_scalars_component::rows_amount;
 
-                    alpha_idxs = 
+                    alpha_idxs =
                         index_terms_list::alpha_map(argument_type::Generic);
-                    std::array<var, generic_scalars_component::output_size> generic_scalars = 
+                    std::array<var, generic_scalars_component::output_size> generic_scalars =
                         generic_scalars_component::generate_assignments(
                             assignment, {oracles_output.combined_evals, oracles_output.alpha_powers,
                             alpha_idxs.first}, row).output;
@@ -301,7 +301,7 @@ namespace nil {
                     row += sub_component::rows_amount;
 
                     auto index_scalars = index_terms_scalars_component::generate_assignments(
-                            assignment, {   
+                            assignment, {
                             oracles_output.oracles.zeta,
                             oracles_output.oracles.alpha,
                             params.fq_output.beta, params.fq_output.gamma,
@@ -346,7 +346,7 @@ namespace nil {
                                               blueprint_public_assignment_table<ArithmetizationType> &assignment,
                                               const params_type &params,
                                               std::size_t component_start_row = 0) {
-                    
+
                 }
 
                 static void

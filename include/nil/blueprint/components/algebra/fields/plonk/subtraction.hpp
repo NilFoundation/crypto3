@@ -50,13 +50,13 @@ namespace nil {
             template<typename ArithmetizationType, typename FieldType, typename NonNativePolicyType>
             class subtraction;
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams, typename NonNativePolicyType>
-            class subtraction<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+            template<typename BlueprintFieldType, typename NonNativePolicyType>
+            class subtraction<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>,
                               BlueprintFieldType, NonNativePolicyType>
-                : public plonk_component<BlueprintFieldType, ArithmetizationParams, 0, 0> {
+                : public plonk_component<BlueprintFieldType> {
 
             public:
-                using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 0, 0>;
+                using component_type = plonk_component<BlueprintFieldType>;
 
                 class gate_manifest_type : public component_gate_manifest {
                 public:
@@ -142,17 +142,17 @@ namespace nil {
                 }
             };
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
+            template<typename BlueprintFieldType>
             using plonk_subtraction =
-                subtraction<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                subtraction<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>,
                             BlueprintFieldType, basic_non_native_policy<BlueprintFieldType>>;
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
-            typename plonk_subtraction<BlueprintFieldType, ArithmetizationParams>::result_type generate_assignments(
-                const plonk_subtraction<BlueprintFieldType, ArithmetizationParams> &component,
-                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+            template<typename BlueprintFieldType>
+            typename plonk_subtraction<BlueprintFieldType>::result_type generate_assignments(
+                const plonk_subtraction<BlueprintFieldType> &component,
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                     &assignment,
-                const typename plonk_subtraction<BlueprintFieldType, ArithmetizationParams>::input_type
+                const typename plonk_subtraction<BlueprintFieldType>::input_type
                     instance_input,
                 const std::uint32_t start_row_index) {
 
@@ -162,54 +162,54 @@ namespace nil {
                 assignment.witness(component.W(1), j) = var_value(assignment, instance_input.y);
                 assignment.witness(component.W(2), j) =
                     var_value(assignment, instance_input.x) - var_value(assignment, instance_input.y);
-                return typename plonk_subtraction<BlueprintFieldType, ArithmetizationParams>::result_type(
+                return typename plonk_subtraction<BlueprintFieldType>::result_type(
                     component, start_row_index);
             }
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
-            typename plonk_subtraction<BlueprintFieldType, ArithmetizationParams>::result_type
+            template<typename BlueprintFieldType>
+            typename plonk_subtraction<BlueprintFieldType>::result_type
                     generate_empty_assignments(
-                const plonk_subtraction<BlueprintFieldType, ArithmetizationParams> &component,
-                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                const plonk_subtraction<BlueprintFieldType> &component,
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                     &assignment,
-                const typename plonk_subtraction<BlueprintFieldType, ArithmetizationParams>::input_type
+                const typename plonk_subtraction<BlueprintFieldType>::input_type
                     instance_input,
                 const std::uint32_t start_row_index) {
 
-                using component_type = plonk_subtraction<BlueprintFieldType, ArithmetizationParams>;
+                using component_type = plonk_subtraction<BlueprintFieldType>;
                 assignment.witness(component.W(2), start_row_index) = component_type::calculate(
                     var_value(assignment, instance_input.x), var_value(assignment, instance_input.y));
-                return typename plonk_subtraction<BlueprintFieldType, ArithmetizationParams>::result_type(
+                return typename plonk_subtraction<BlueprintFieldType>::result_type(
                     component, start_row_index);
             }
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
+            template<typename BlueprintFieldType>
             std::size_t generate_gates(
-                const plonk_subtraction<BlueprintFieldType, ArithmetizationParams> &component,
-                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                const plonk_subtraction<BlueprintFieldType> &component,
+                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                     &assignment,
-                const typename plonk_subtraction<BlueprintFieldType, ArithmetizationParams>::input_type
+                const typename plonk_subtraction<BlueprintFieldType>::input_type
                     &instance_input) {
 
-                using var = typename plonk_subtraction<BlueprintFieldType, ArithmetizationParams>::var;
+                using var = typename plonk_subtraction<BlueprintFieldType>::var;
 
                 auto constraint_1 = var(component.W(0), 0) - var(component.W(1), 0) - var(component.W(2), 0);
 
                 return bp.add_gate(constraint_1);
             }
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
+            template<typename BlueprintFieldType>
             void generate_copy_constraints(
-                const plonk_subtraction<BlueprintFieldType, ArithmetizationParams> &component,
-                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                const plonk_subtraction<BlueprintFieldType> &component,
+                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                     &assignment,
-                const typename plonk_subtraction<BlueprintFieldType, ArithmetizationParams>::input_type
+                const typename plonk_subtraction<BlueprintFieldType>::input_type
                     &instance_input,
                 const std::size_t start_row_index) {
 
-                using var = typename plonk_subtraction<BlueprintFieldType, ArithmetizationParams>::var;
+                using var = typename plonk_subtraction<BlueprintFieldType>::var;
 
                 const std::size_t j = start_row_index;
                 var component_x = var(component.W(0), static_cast<int>(j), false);
@@ -218,13 +218,13 @@ namespace nil {
                 bp.add_copy_constraint({component_y, instance_input.y});
             }
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
-            typename plonk_subtraction<BlueprintFieldType, ArithmetizationParams>::result_type generate_circuit(
-                const plonk_subtraction<BlueprintFieldType, ArithmetizationParams> &component,
-                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+            template<typename BlueprintFieldType>
+            typename plonk_subtraction<BlueprintFieldType>::result_type generate_circuit(
+                const plonk_subtraction<BlueprintFieldType> &component,
+                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                     &assignment,
-                const typename plonk_subtraction<BlueprintFieldType, ArithmetizationParams>::input_type
+                const typename plonk_subtraction<BlueprintFieldType>::input_type
                     &instance_input,
                 const std::size_t start_row_index) {
 
@@ -234,7 +234,7 @@ namespace nil {
 
                 generate_copy_constraints(component, bp, assignment, instance_input, start_row_index);
 
-                return typename plonk_subtraction<BlueprintFieldType, ArithmetizationParams>::result_type(
+                return typename plonk_subtraction<BlueprintFieldType>::result_type(
                     component, start_row_index);
             }
         }    // namespace components

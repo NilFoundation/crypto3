@@ -40,12 +40,12 @@ namespace nil {
                 template<typename ArithmetizationType>
                 class index_terms_scalars_list_chacha_test;
 
-                template<typename BlueprintFieldType, 
+                template<typename BlueprintFieldType,
                          typename ArithmetizationParams>
                 class index_terms_scalars_list_chacha_test<
-                    snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> {
+                    snark::plonk_constraint_system<BlueprintFieldType>> {
 
-                    typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
+                    typedef snark::plonk_constraint_system<BlueprintFieldType>
                         ArithmetizationType;
 
                     constexpr static const std::array<std::size_t, 4> argument_types = {
@@ -62,7 +62,7 @@ namespace nil {
                         std::make_pair(21, 3),
                     };
 
-                    public: 
+                    public:
 
                     static std::pair<std::size_t, std::size_t> alpha_map(argument_type arg) {
                         for (std::size_t i = 0; i < argument_types.size(); ++i) {
@@ -99,7 +99,7 @@ namespace nil {
                         "Cell(Variable { col: Index(Poseidon), row: Curr });Alpha;Pow(7);Literal 40000000000000000000000000000000224698FC094CF91B992D30ED00000000;Mul;Mul;\0",
                         "Cell(Variable { col: Index(Poseidon), row: Curr });Alpha;Pow(8);Literal 40000000000000000000000000000000224698FC094CF91B992D30ED00000000;Mul;Mul;\0",
                         "Cell(Variable { col: Index(Poseidon), row: Curr });Alpha;Pow(9);Literal 40000000000000000000000000000000224698FC094CF91B992D30ED00000000;Mul;Mul;\0",
-                        "Cell(Variable { col: Index(Poseidon), row: Curr });Alpha;Pow(10);Literal 40000000000000000000000000000000224698FC094CF91B992D30ED00000000;Mul;Mul;\0",                       
+                        "Cell(Variable { col: Index(Poseidon), row: Curr });Alpha;Pow(10);Literal 40000000000000000000000000000000224698FC094CF91B992D30ED00000000;Mul;Mul;\0",
                         "Cell(Variable { col: Index(Poseidon), row: Curr });Alpha;Pow(11);Literal 40000000000000000000000000000000224698FC094CF91B992D30ED00000000;Mul;Mul;\0",
                         "Cell(Variable { col: Index(Poseidon), row: Curr });Alpha;Pow(12);Literal 40000000000000000000000000000000224698FC094CF91B992D30ED00000000;Mul;Mul;\0",
                         "Cell(Variable { col: Index(Poseidon), row: Curr });Alpha;Pow(13);Literal 40000000000000000000000000000000224698FC094CF91B992D30ED00000000;Mul;Mul;\0",
@@ -118,7 +118,7 @@ namespace nil {
 
                 private:
 
-                    constexpr static const std::array<std::size_t, poseidon_gates_count> 
+                    constexpr static const std::array<std::size_t, poseidon_gates_count>
                         coefficient_array_size = {
                             count_delimiters(coefficient_str[0]), count_delimiters(coefficient_str[1]),
                             count_delimiters(coefficient_str[2]), count_delimiters(coefficient_str[3]),
@@ -140,7 +140,7 @@ namespace nil {
 
                     constexpr static const std::size_t constatnt_term_array_size = count_delimiters(constant_term_str);
 
-                    constexpr static const std::array<std::size_t, poseidon_gates_count> 
+                    constexpr static const std::array<std::size_t, poseidon_gates_count>
                         coefficient_rows = {
                             rpn_component_rows<coefficient_array_size[0], ArithmetizationType>(coefficient_str[0]),
                             rpn_component_rows<coefficient_array_size[1], ArithmetizationType>(coefficient_str[1]),
@@ -159,26 +159,26 @@ namespace nil {
                             rpn_component_rows<coefficient_array_size[14], ArithmetizationType>(coefficient_str[14])
                         };
 
-                    constexpr static const std::size_t var_base_mul_rows = 
+                    constexpr static const std::size_t var_base_mul_rows =
                         rpn_component_rows<var_base_mul_array_size, ArithmetizationType>(var_base_mul_str);
 
-                    constexpr static const std::size_t endo_mul_rows = 
+                    constexpr static const std::size_t endo_mul_rows =
                         rpn_component_rows<endo_mul_array_size, ArithmetizationType>(endo_mul_str);
 
-                    constexpr static const std::size_t complete_add_rows = 
+                    constexpr static const std::size_t complete_add_rows =
                         rpn_component_rows<complete_add_array_size, ArithmetizationType>(complete_add_str);
 
-                    constexpr static const std::size_t endo_mul_scalar_rows = 
+                    constexpr static const std::size_t endo_mul_scalar_rows =
                         rpn_component_rows<endo_mul_scalar_array_size, ArithmetizationType>(endo_mul_scalar_str);
 
-                    constexpr static const std::size_t constant_term_rows = 
+                    constexpr static const std::size_t constant_term_rows =
                         rpn_component_rows<constatnt_term_array_size, ArithmetizationType>(constant_term_str);
 
-                    constexpr static const std::size_t lookup_gate_rows = 
+                    constexpr static const std::size_t lookup_gate_rows =
                         rpn_component_rows<lookup_gate_array_size, ArithmetizationType>(lookup_gate_str);
 
-                    public: 
-                    
+                    public:
+
                     constexpr static const std::size_t size = 19;
                     constexpr static const std::array<index_term_type, size> terms = {{
                         {column_type::Coefficient, 0, coefficient_str[0], coefficient_rows[0]},

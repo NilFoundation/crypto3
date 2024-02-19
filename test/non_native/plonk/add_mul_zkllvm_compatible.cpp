@@ -59,9 +59,9 @@ void test_mul(typename CurveType::base_field_type::value_type b_val,
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 1;
     constexpr std::size_t SelectorColumns = 6;
-    using ArithmetizationParams =
-        crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+    zk::snark::plonk_table_description<BlueprintFieldType> desc(
+        WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns);
+    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>;
     using AssignmentType = blueprint::assignment<ArithmetizationType>;
     using hash_type = crypto3::hashes::keccak_1600<256>;
     using foreign_integral_type = typename Ed25519Type::base_field_type::integral_type;
@@ -124,18 +124,17 @@ void test_mul(typename CurveType::base_field_type::value_type b_val,
     if constexpr (Stretched) {
         using stretched_component_type = nil::blueprint::components::component_stretcher<
             BlueprintFieldType,
-            ArithmetizationParams,
             component_type>;
 
         stretched_component_type stretched_instance(component_instance, WitnessColumns / 2, WitnessColumns);
         // 253 is the default bits_amount
         crypto3::test_component<stretched_component_type, BlueprintFieldType,
-                                ArithmetizationParams, hash_type, Lambda>(
-            stretched_instance, public_input, result_check, instance_input,
+                                hash_type, Lambda>(
+            stretched_instance, desc, public_input, result_check, instance_input,
             nil::blueprint::connectedness_check_type::type::STRONG, 253, blueprint::components::bit_shift_mode::RIGHT);
     } else {
-        crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-            component_instance, public_input, result_check, instance_input,
+        crypto3::test_component<component_type, BlueprintFieldType, hash_type, Lambda>(
+            component_instance, desc, public_input, result_check, instance_input,
             nil::blueprint::connectedness_check_type::type::STRONG, 253, blueprint::components::bit_shift_mode::RIGHT);
     }
 }
@@ -148,9 +147,9 @@ void test_mul_per_bit(){
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 1;
     constexpr std::size_t SelectorColumns = 6;
-    using ArithmetizationParams =
-        crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+    zk::snark::plonk_table_description<BlueprintFieldType> desc(
+        WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns);
+    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>;
     using AssignmentType = blueprint::assignment<ArithmetizationType>;
     using hash_type = crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 1;
@@ -224,17 +223,16 @@ void test_mul_per_bit(){
     if constexpr (Stretched) {
         using stretched_component_type = nil::blueprint::components::component_stretcher<
             BlueprintFieldType,
-            ArithmetizationParams,
             component_type>;
 
         stretched_component_type stretched_instance(component_instance, WitnessColumns / 2, WitnessColumns);
 
         crypto3::test_component<stretched_component_type, BlueprintFieldType,
-                                ArithmetizationParams, hash_type, Lambda>(
-            stretched_instance, public_input, result_check, instance_input);
+                                hash_type, Lambda>(
+            stretched_instance, desc, public_input, result_check, instance_input);
     } else {
-        crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-            component_instance, public_input, result_check, instance_input);
+        crypto3::test_component<component_type, BlueprintFieldType, hash_type, Lambda>(
+            component_instance, desc, public_input, result_check, instance_input);
     }
 }
 
@@ -246,9 +244,9 @@ void test_doubling() {
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 1;
     constexpr std::size_t SelectorColumns = 6;
-    using ArithmetizationParams =
-        crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+    zk::snark::plonk_table_description<BlueprintFieldType> desc(
+        WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns);
+    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>;
     using AssignmentType = blueprint::assignment<ArithmetizationType>;
     using hash_type = crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 1;
@@ -298,17 +296,16 @@ void test_doubling() {
     if constexpr (Stretched) {
         using stretched_component_type = nil::blueprint::components::component_stretcher<
             BlueprintFieldType,
-            ArithmetizationParams,
             component_type>;
 
         stretched_component_type stretched_instance(component_instance, WitnessColumns / 2, WitnessColumns);
 
         crypto3::test_component<stretched_component_type, BlueprintFieldType,
-                                ArithmetizationParams, hash_type, Lambda>(
-            stretched_instance, public_input, result_check, instance_input);
+                                hash_type, Lambda>(
+            stretched_instance, desc, public_input, result_check, instance_input);
     } else {
-        crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-            component_instance, public_input, result_check, instance_input);
+        crypto3::test_component<component_type, BlueprintFieldType, hash_type, Lambda>(
+            component_instance, desc, public_input, result_check, instance_input);
     }
 }
 
@@ -320,9 +317,9 @@ void test_complete_addition(){
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 1;
     constexpr std::size_t SelectorColumns = 6;
-    using ArithmetizationParams =
-        crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+    zk::snark::plonk_table_description<BlueprintFieldType> desc(
+        WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns);
+    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>;
     using AssignmentType = blueprint::assignment<ArithmetizationType>;
     using hash_type = crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 1;
@@ -384,17 +381,16 @@ void test_complete_addition(){
     if constexpr (Stretched) {
         using stretched_component_type = nil::blueprint::components::component_stretcher<
             BlueprintFieldType,
-            ArithmetizationParams,
             component_type>;
 
         stretched_component_type stretched_instance(component_instance, WitnessColumns / 2, WitnessColumns);
 
         crypto3::test_component<stretched_component_type, BlueprintFieldType,
-                                ArithmetizationParams, hash_type, Lambda>(
-            stretched_instance, public_input, result_check, instance_input);
+                                hash_type, Lambda>(
+            stretched_instance, desc, public_input, result_check, instance_input);
     } else {
-        crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-            component_instance, public_input, result_check, instance_input);
+        crypto3::test_component<component_type, BlueprintFieldType, hash_type, Lambda>(
+            component_instance, desc, public_input, result_check, instance_input);
     }
 }
 

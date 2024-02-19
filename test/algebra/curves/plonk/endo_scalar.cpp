@@ -140,10 +140,10 @@ void test_endo_scalar(std::vector<typename CurveType::scalar_field_type::value_t
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 0;
     constexpr std::size_t SelectorColumns = 2;
-    using ArithmetizationParams = nil::crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns,
-        PublicInputColumns, ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
-    using AssignmentType = nil::blueprint::assignment<ArithmetizationType>;
+    zk::snark::plonk_table_description<BlueprintFieldType> desc(
+        WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns);
+    using ArithmetizationType = nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>;
+    using AssignmentType = nil::blueprint::assignment<nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>;
 	using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
 	constexpr static const std::size_t num_bits = 128;
@@ -168,7 +168,7 @@ void test_endo_scalar(std::vector<typename CurveType::scalar_field_type::value_t
 
     component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14},{},{},num_bits);
 
-    nil::crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (component_instance, public_input, result_check, instance_input);
+    nil::crypto3::test_component<component_type, BlueprintFieldType, hash_type, Lambda> (component_instance, desc, public_input, result_check, instance_input);
 }
 
 constexpr static const std::size_t random_tests_amount = 10;

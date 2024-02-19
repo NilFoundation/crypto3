@@ -55,16 +55,9 @@ BOOST_AUTO_TEST_CASE(gate_id_sanity_tests) {
     using var = typename nil::crypto3::zk::snark::plonk_variable<value_type>;
     using constraint_type = nil::crypto3::zk::snark::plonk_constraint<field_type>;
     using gate_type = nil::crypto3::zk::snark::plonk_gate<field_type, constraint_type>;
+    using gate_id_type = nil::blueprint::gate_id<field_type>;
 
-    constexpr std::size_t WitnessColumns = 11;
-    constexpr std::size_t PublicInputColumns = 1;
-    constexpr std::size_t ConstantColumns = 1;
-    constexpr std::size_t SelectorColumns = 2;
-    using ArithmetizationParams = zk::snark::plonk_arithmetization_params<
-        WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
-    using gate_id_type = nil::blueprint::gate_id<field_type, ArithmetizationParams>;
-
-    value_set<field_type, ArithmetizationParams> values = value_set<field_type, ArithmetizationParams>::get_value_set();
+    value_set<field_type> &values = value_set<field_type>::get_value_set();
     std::vector<constraint_type> constraints;
     constraints.reserve(3);
     constraints.emplace_back(
@@ -139,18 +132,9 @@ BOOST_AUTO_TEST_CASE(lookup_gate_id_sanity_tests) {
     using field_type = typename curve_type::scalar_field_type;
     using value_type = typename field_type::value_type;
     using var = typename nil::crypto3::zk::snark::plonk_variable<value_type>;
-    using constraint_type = nil::crypto3::zk::snark::plonk_constraint<field_type>;
-    using gate_type = nil::crypto3::zk::snark::plonk_gate<field_type, constraint_type>;
-
-    constexpr std::size_t WitnessColumns = 11;
-    constexpr std::size_t PublicInputColumns = 1;
-    constexpr std::size_t ConstantColumns = 1;
-    constexpr std::size_t SelectorColumns = 2;
-    using ArithmetizationParams = zk::snark::plonk_arithmetization_params<
-        WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
     using lookup_constraint_type = nil::crypto3::zk::snark::plonk_lookup_constraint<field_type>;
     using lookup_gate_type = nil::crypto3::zk::snark::plonk_lookup_gate<field_type, lookup_constraint_type>;
-    using lookup_gate_id_type = nil::blueprint::lookup_gate_id<field_type, ArithmetizationParams>;
+    using lookup_gate_id_type = nil::blueprint::lookup_gate_id<field_type>;
 
     std::vector<lookup_constraint_type> constraints_1, constraints_2;
 

@@ -56,17 +56,17 @@ namespace nil {
                          std::size_t... WireIndexes>
                 class batch_dlog_accumulator_check_scalar;
 
-                template<typename BlueprintFieldType, typename CurveType, typename ArithmetizationParams,
+                template<typename BlueprintFieldType, typename CurveType,
                          typename KimchiParamsType, std::size_t CommsLen, std::size_t Rounds,
                          std::size_t W0, std::size_t W1, std::size_t W2, std::size_t W3, std::size_t W4, std::size_t W5,
                          std::size_t W6, std::size_t W7, std::size_t W8, std::size_t W9, std::size_t W10,
                          std::size_t W11, std::size_t W12, std::size_t W13, std::size_t W14>
                 class batch_dlog_accumulator_check_scalar<
-                    snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, CurveType,
+                    snark::plonk_constraint_system<BlueprintFieldType>, CurveType,
                     KimchiParamsType, CommsLen, Rounds, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9,
                     W10, W11, W12, W13, W14> {
 
-                    typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
+                    typedef snark::plonk_constraint_system<BlueprintFieldType>
                         ArithmetizationType;
 
                     using var = snark::plonk_variable<typename BlueprintFieldType::value_type>;

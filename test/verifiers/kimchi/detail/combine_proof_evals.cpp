@@ -87,16 +87,16 @@ void prepare_proof(zk::snark::pickles_proof<CurveType> &original_proof,
             }
 
             public_input.push_back(original_proof.evals[point_idx].lookup.aggreg);
-            circuit_proof.proof_evals[point_idx].lookup.aggreg = 
+            circuit_proof.proof_evals[point_idx].lookup.aggreg =
                 var(0, public_input.size() - 1, false, var::column_type::public_input);
 
             public_input.push_back(original_proof.evals[point_idx].lookup.table);
-            circuit_proof.proof_evals[point_idx].lookup.table = 
+            circuit_proof.proof_evals[point_idx].lookup.table =
                 var(0, public_input.size() - 1, false, var::column_type::public_input);
 
             if (KimchiParamsType::circuit_params::lookup_runtime) {
                 public_input.push_back(original_proof.evals[point_idx].lookup.runtime);
-                circuit_proof.proof_evals[point_idx].lookup.runtime = 
+                circuit_proof.proof_evals[point_idx].lookup.runtime =
                     var(0, public_input.size() - 1, false, var::column_type::public_input);
             }
         }
@@ -121,7 +121,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_combine_proof_evals_test) {
     constexpr std::size_t SelectorColumns = 10;
     using ArithmetizationParams =
         zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType>;
     using AssignmentType = blueprint::assignment<ArithmetizationType>;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
@@ -139,7 +139,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_combine_proof_evals_test) {
 
     using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size, srs_len>;
     using index_terms_list = zk::components::index_terms_scalars_list_chacha_test<ArithmetizationType>;
-    using circuit_description = zk::components::kimchi_circuit_description<index_terms_list, 
+    using circuit_description = zk::components::kimchi_circuit_description<index_terms_list,
         witness_columns, perm_size>;
     using kimchi_params = zk::components::kimchi_params_type<curve_type, commitment_params, circuit_description,
         public_input_size, prev_chal_size>;
@@ -193,7 +193,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_combine_proof_evals_test) {
         assert(kimchi_proof.evals[0].poseidon_selector * zeta_value == assignment.var_value(real_res.output.poseidon_selector));
     };
 
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input,
+    test_component<component_type, BlueprintFieldType, hash_type, Lambda>(params, public_input,
                                                                                                  result_check);
 }
 

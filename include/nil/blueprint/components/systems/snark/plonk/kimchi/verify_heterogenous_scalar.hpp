@@ -58,17 +58,17 @@ namespace nil {
 
                 // scalar field part of verify_generogenous
                 // https://github.com/MinaProtocol/mina/blob/09348bccf281d54e6fa9dd2d8bbd42e3965e1ff5/src/lib/pickles/verify.ml#L30
-                template<typename ArithmetizationType, typename CurveType, typename KimchiParamsType, 
+                template<typename ArithmetizationType, typename CurveType, typename KimchiParamsType,
                     std::size_t BatchSize, std::size_t list_size, std::size_t evals_size, std::size_t... WireIndexes>
                 class verify_generogenous_scalar;
 
-                template<typename ArithmetizationParams, typename CurveType, typename KimchiParamsType,  
+                template<typename CurveType, typename KimchiParamsType,
                          std::size_t BatchSize, std::size_t list_size, std::size_t evals_size, std::size_t W0, std::size_t W1,
                          std::size_t W2, std::size_t W3, std::size_t W4, std::size_t W5, std::size_t W6, std::size_t W7,
                          std::size_t W8, std::size_t W9, std::size_t W10, std::size_t W11, std::size_t W12,
                          std::size_t W13, std::size_t W14>
                 class verify_generogenous_scalar<
-                    snark::plonk_constraint_system<typename CurveType::scalar_field_type, ArithmetizationParams>,
+                    snark::plonk_constraint_system<typename CurveType::scalar_field_type>,
                     CurveType, KimchiParamsType, BatchSize, list_size, evals_size,
                     W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> {
 
@@ -76,7 +76,7 @@ namespace nil {
 
                     constexpr static const std::size_t ScalarSize = 255;
 
-                    using ArithmetizationType = snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+                    using ArithmetizationType = snark::plonk_constraint_system<BlueprintFieldType>;
 
                     using var = snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
@@ -121,8 +121,8 @@ namespace nil {
 
                     using proof_binding =
                         typename zk::components::binding<ArithmetizationType, BlueprintFieldType, KimchiParamsType>;
-                    
-                    constexpr static const std::size_t poly_size = 4 + (KimchiParamsType::circuit_params::used_lookup ? 1 : 0); 
+
+                    constexpr static const std::size_t poly_size = 4 + (KimchiParamsType::circuit_params::used_lookup ? 1 : 0);
 
                     constexpr static std::size_t rows() {
                         std::size_t row = 0;
@@ -179,7 +179,7 @@ namespace nil {
 
                             row += prepare_scalars_inversion_component::rows_amount;
                         }
-                        
+
                         row += batch_dlog_accumulator_check_scalar::rows_amount;
 
                         row += kimchi_verify_component::rows_amount;
@@ -234,12 +234,12 @@ namespace nil {
                                 row += endo_scalar_component::rows_amount;
                             }
                             std::array<var, poly_size> min_poly = {alpha, params.def_values[i].plonk.beta, params.def_values[i].plonk.gamma, zeta, min_poly_joint_combiner};
-                            std::array<var, poly_size> plonk0_poly= {params.def_values[i].plonk.alpha, params.def_values[i].plonk.beta, params.def_values[i].plonk.gamma, params.def_values[i].plonk.zeta, 
+                            std::array<var, poly_size> plonk0_poly= {params.def_values[i].plonk.alpha, params.def_values[i].plonk.beta, params.def_values[i].plonk.gamma, params.def_values[i].plonk.zeta,
                                 params.def_values[i].plonk.joint_combiner};
                             auto tick_combined_evals = combined_evals_component::generate_circuit(bp, assignment, {params.evals[i], {zeta, zetaw}}, row).output;
                             row += combined_evals_component::rows_amount;
                             auto plonk = derive_plonk_component::generate_circuit(bp, assignment, {kimchi_verifier_index_scalar,
-                             params.def_values[i].plonk.alpha, params.def_values[i].plonk.beta, params.def_values[i].plonk.gamma, params.def_values[i].plonk.zeta, 
+                             params.def_values[i].plonk.alpha, params.def_values[i].plonk.beta, params.def_values[i].plonk.gamma, params.def_values[i].plonk.zeta,
                                 params.def_values[i].plonk.joint_combiner, tick_combined_evals}, row).output;
                             row += derive_plonk_component::rows_amount;
                             std::size_t bulletproofs_size = params.messages_for_next_step_proof[i].old_bulletproof_challenges.size();
@@ -359,12 +359,12 @@ s
                                 row += endo_scalar_component::rows_amount;
                             }
                             std::array<var, poly_size> min_poly = {alpha, params.def_values[i].plonk.beta, params.def_values[i].plonk.gamma, zeta, min_poly_joint_combiner};
-                            std::array<var, poly_size> plonk0_poly= {params.def_values[i].plonk.alpha, params.def_values[i].plonk.beta, params.def_values[i].plonk.gamma, params.def_values[i].plonk.zeta, 
+                            std::array<var, poly_size> plonk0_poly= {params.def_values[i].plonk.alpha, params.def_values[i].plonk.beta, params.def_values[i].plonk.gamma, params.def_values[i].plonk.zeta,
                                 params.def_values[i].plonk.joint_combiner};
                             auto tick_combined_evals = combined_evals_component::generate_assignments(assignment, {params.evals[i], {zeta, zetaw}}, row).output;
                             row += combined_evals_component::rows_amount;
                             auto plonk = derive_plonk_component::generate_assignments(assignment, {kimchi_verifier_index_scalar,
-                             params.def_values[i].plonk.alpha, params.def_values[i].plonk.beta, params.def_values[i].plonk.gamma, params.def_values[i].plonk.zeta, 
+                             params.def_values[i].plonk.alpha, params.def_values[i].plonk.beta, params.def_values[i].plonk.gamma, params.def_values[i].plonk.zeta,
                                 params.def_values[i].plonk.joint_combiner, tick_combined_evals}, row).output;
                             row += derive_plonk_component::rows_amount;
                             std::size_t bulletproofs_size = params.messages_for_next_step_proof[i].old_bulletproof_challenges.size();
@@ -443,7 +443,7 @@ s
                                 params.def_values[i].b}, row).output;
                             row += prepare_scalars_inversion_component::rows_amount;
                         }
-                        
+
                         batch_dlog_accumulator_check_scalar::generate_assignments(assignment,
                             {deferred_values.bulletproof_challenges}, row);
                         row += batch_dlog_accumulator_check_scalar::rows_amount;

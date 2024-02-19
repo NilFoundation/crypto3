@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_b_poly_coefficients) {
     constexpr std::size_t n = 3;
     using ArithmetizationParams =
         zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType>;
     using AssignmentType = blueprint::assignment<ArithmetizationType>;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 1;
@@ -83,7 +83,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_b_poly_coefficients) {
     typename component_type::params_type params = {challenges, one};
 
     constexpr std::size_t expected_result_size = 1 << n;
-    std::array<typename BlueprintFieldType::value_type, 
+    std::array<typename BlueprintFieldType::value_type,
         expected_result_size> expected_result = {
             1, 5, 2, 10, 1, 5, 2, 10
     };
@@ -94,7 +94,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_b_poly_coefficients) {
         }
     };
 
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input,
+    test_component<component_type, BlueprintFieldType, hash_type, Lambda>(params, public_input,
                                                                                                  result_check);
 
     auto duration =

@@ -50,13 +50,13 @@ namespace nil {
             template<typename ArithmetizationType, typename FieldType, typename NonNativePolicyType>
             class division;
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams, typename NonNativePolicyType>
-            class division<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+            template<typename BlueprintFieldType, typename NonNativePolicyType>
+            class division<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>,
                            BlueprintFieldType, NonNativePolicyType>
-                : public plonk_component<BlueprintFieldType, ArithmetizationParams, 0, 0> {
+                : public plonk_component<BlueprintFieldType> {
 
             public:
-                using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 0, 0>;
+                using component_type = plonk_component<BlueprintFieldType>;
 
                 using var = typename component_type::var;
                 using manifest_type = plonk_component_manifest;
@@ -140,17 +140,17 @@ namespace nil {
                 }
             };
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
+            template<typename BlueprintFieldType>
             using plonk_division =
-                division<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                division<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>,
                          BlueprintFieldType, basic_non_native_policy<BlueprintFieldType>>;
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
-            typename plonk_division<BlueprintFieldType, ArithmetizationParams>::result_type generate_assignments(
-                const plonk_division<BlueprintFieldType, ArithmetizationParams> &component,
-                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+            template<typename BlueprintFieldType>
+            typename plonk_division<BlueprintFieldType>::result_type generate_assignments(
+                const plonk_division<BlueprintFieldType> &component,
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                     &assignment,
-                const typename plonk_division<BlueprintFieldType, ArithmetizationParams>::input_type instance_input,
+                const typename plonk_division<BlueprintFieldType>::input_type instance_input,
                 const std::uint32_t start_row_index) {
 
                 const std::size_t j = start_row_index;
@@ -161,36 +161,36 @@ namespace nil {
                     var_value(assignment, instance_input.x) / var_value(assignment, instance_input.y);
                 assignment.witness(component.W(3), j) = var_value(assignment, instance_input.y).inversed();
 
-                return typename plonk_division<BlueprintFieldType, ArithmetizationParams>::result_type(
+                return typename plonk_division<BlueprintFieldType>::result_type(
                     component, start_row_index);
             }
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
-            typename plonk_division<BlueprintFieldType, ArithmetizationParams>::result_type generate_empty_assignments(
-                const plonk_division<BlueprintFieldType, ArithmetizationParams> &component,
-                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+            template<typename BlueprintFieldType>
+            typename plonk_division<BlueprintFieldType>::result_type generate_empty_assignments(
+                const plonk_division<BlueprintFieldType> &component,
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                     &assignment,
-                const typename plonk_division<BlueprintFieldType, ArithmetizationParams>::input_type instance_input,
+                const typename plonk_division<BlueprintFieldType>::input_type instance_input,
                 const std::uint32_t start_row_index) {
 
-                using component_type = plonk_division<BlueprintFieldType, ArithmetizationParams>;
+                using component_type = plonk_division<BlueprintFieldType>;
                 const std::size_t j = start_row_index;
                 assignment.witness(component.W(2), j) = component_type::calculate(
                     var_value(assignment, instance_input.x), var_value(assignment, instance_input.y));
 
-                return typename plonk_division<BlueprintFieldType, ArithmetizationParams>::result_type(
+                return typename plonk_division<BlueprintFieldType>::result_type(
                     component, start_row_index);
             }
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
+            template<typename BlueprintFieldType>
             std::size_t generate_gates(
-                const plonk_division<BlueprintFieldType, ArithmetizationParams> &component,
-                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                const plonk_division<BlueprintFieldType> &component,
+                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                     &assignment,
-                const typename plonk_division<BlueprintFieldType, ArithmetizationParams>::input_type &instance_input) {
+                const typename plonk_division<BlueprintFieldType>::input_type &instance_input) {
 
-                using var = typename plonk_division<BlueprintFieldType, ArithmetizationParams>::var;
+                using var = typename plonk_division<BlueprintFieldType>::var;
 
                 auto constraint_1 = var(component.W(1), 0) * var(component.W(2), 0) - var(component.W(0), 0);
                 auto constraint_2 = var(component.W(1), 0) * var(component.W(3), 0) - 1;
@@ -198,16 +198,16 @@ namespace nil {
                 return bp.add_gate({constraint_1, constraint_2});
             }
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
+            template<typename BlueprintFieldType>
             void generate_copy_constraints(
-                const plonk_division<BlueprintFieldType, ArithmetizationParams> &component,
-                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                const plonk_division<BlueprintFieldType> &component,
+                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                     &assignment,
-                const typename plonk_division<BlueprintFieldType, ArithmetizationParams>::input_type &instance_input,
+                const typename plonk_division<BlueprintFieldType>::input_type &instance_input,
                 const std::size_t start_row_index) {
 
-                using var = typename plonk_division<BlueprintFieldType, ArithmetizationParams>::var;
+                using var = typename plonk_division<BlueprintFieldType>::var;
 
                 const std::size_t j = start_row_index;
                 var component_x = var(component.W(0), static_cast<int>(j), false);
@@ -216,13 +216,13 @@ namespace nil {
                 bp.add_copy_constraint({component_y, instance_input.y});
             }
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
-            typename plonk_division<BlueprintFieldType, ArithmetizationParams>::result_type generate_circuit(
-                const plonk_division<BlueprintFieldType, ArithmetizationParams> &component,
-                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+            template<typename BlueprintFieldType>
+            typename plonk_division<BlueprintFieldType>::result_type generate_circuit(
+                const plonk_division<BlueprintFieldType> &component,
+                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                     &assignment,
-                const typename plonk_division<BlueprintFieldType, ArithmetizationParams>::input_type &instance_input,
+                const typename plonk_division<BlueprintFieldType>::input_type &instance_input,
                 const std::size_t start_row_index) {
 
                 std::size_t selector_index = generate_gates(component, bp, assignment, instance_input);
@@ -231,7 +231,7 @@ namespace nil {
 
                 generate_copy_constraints(component, bp, assignment, instance_input, start_row_index);
 
-                return typename plonk_division<BlueprintFieldType, ArithmetizationParams>::result_type(
+                return typename plonk_division<BlueprintFieldType>::result_type(
                     component, start_row_index);
             }
         }    // namespace components

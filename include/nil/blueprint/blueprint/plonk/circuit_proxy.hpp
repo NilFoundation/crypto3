@@ -30,23 +30,19 @@
 namespace nil {
     namespace blueprint {
 
-        template<typename ArithmetizationType, std::size_t... BlueprintParams>
+        template<typename ArithmetizationType>
         class circuit_proxy;
 
-        template<typename ArithmetizationType, std::size_t... BlueprintParams>
+        template<typename ArithmetizationType>
         class assignment;
 
-        template<typename BlueprintFieldType,
-                 typename ArithmetizationParams>
-        class circuit_proxy<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                                       ArithmetizationParams>>
-            : public circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                                       ArithmetizationParams>> {
-
-            typedef crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                                   ArithmetizationParams> ArithmetizationType;
+        template<typename BlueprintFieldType>
+        class circuit_proxy<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
+            : public circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> {
 
         private:
+
+            typedef crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType> ArithmetizationType;
             using constraint_type = crypto3::zk::snark::plonk_constraint<BlueprintFieldType>;
             using lookup_constraint_type = crypto3::zk::snark::plonk_lookup_constraint<BlueprintFieldType>;
             using lookup_table_definition = typename nil::crypto3::zk::snark::lookup_table_definition<BlueprintFieldType>;

@@ -42,13 +42,13 @@ namespace nil {
             class complete_addition;
 
             template<typename BlueprintFieldType,
-                     typename ArithmetizationParams, typename CurveType, typename Ed25519Type>
+                     typename CurveType, typename Ed25519Type>
             class complete_addition<
-                    crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                    crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>,
                     CurveType,
                     Ed25519Type,
                     basic_non_native_policy<BlueprintFieldType>>:
-                public plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0> {
+                public plonk_component<BlueprintFieldType> {
 
                 constexpr static std::size_t rows_amount_internal(std::size_t witness_amount) {
                     return
@@ -58,7 +58,7 @@ namespace nil {
                         subtraction_component::get_rows_amount(witness_amount, 0);
                 }
             public:
-                using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0>;
+                using component_type = plonk_component<BlueprintFieldType>;
 
                 using var = typename component_type::var;
                 using manifest_type = typename component_type::manifest_type;
@@ -100,7 +100,7 @@ namespace nil {
                     return rows_amount_internal(witness_amount);
                 }
 
-                typedef crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
+                typedef crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>
                     ArithmetizationType;
 
                 using non_native_range_component = components::range<
@@ -173,27 +173,27 @@ namespace nil {
                     component_type(witnesses, constants, public_inputs, get_manifest()) {};
             };
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType>
+            template<typename BlueprintFieldType, typename CurveType>
             using plonk_ed25519_complete_addition = complete_addition<
-                crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>,
                 CurveType,
                 typename crypto3::algebra::curves::ed25519,
                 basic_non_native_policy<BlueprintFieldType>>;
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType>
-            typename plonk_ed25519_complete_addition<BlueprintFieldType, ArithmetizationParams, CurveType>::result_type
+            template<typename BlueprintFieldType, typename CurveType>
+            typename plonk_ed25519_complete_addition<BlueprintFieldType, CurveType>::result_type
                 generate_assignments(
-                    const plonk_ed25519_complete_addition<BlueprintFieldType, ArithmetizationParams, CurveType> &component,
-                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
-                    const typename plonk_ed25519_complete_addition<BlueprintFieldType, ArithmetizationParams, CurveType>::input_type instance_input,
+                    const plonk_ed25519_complete_addition<BlueprintFieldType, CurveType> &component,
+                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &assignment,
+                    const typename plonk_ed25519_complete_addition<BlueprintFieldType, CurveType>::input_type instance_input,
                     const std::uint32_t start_row_index) {
 
                     using non_native_policy_type = basic_non_native_policy<BlueprintFieldType>;
 
-                    typedef crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
+                    typedef crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>
                         ArithmetizationType;
 
-                    using var = typename plonk_ed25519_complete_addition<BlueprintFieldType, ArithmetizationParams, CurveType>::var;
+                    using var = typename plonk_ed25519_complete_addition<BlueprintFieldType, CurveType>::var;
 
                     using Ed25519Type = typename crypto3::algebra::curves::ed25519;
 
@@ -380,24 +380,24 @@ namespace nil {
                         typename subtraction_component::input_type({P_y, k2.output}), row);
                     row += subtraction_instance.rows_amount;
 
-                    return typename plonk_ed25519_complete_addition<BlueprintFieldType, ArithmetizationParams, CurveType>::result_type(component, start_row_index);
+                    return typename plonk_ed25519_complete_addition<BlueprintFieldType, CurveType>::result_type(component, start_row_index);
                 }
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType>
-            typename plonk_ed25519_complete_addition<BlueprintFieldType, ArithmetizationParams, CurveType>::result_type
+            template<typename BlueprintFieldType, typename CurveType>
+            typename plonk_ed25519_complete_addition<BlueprintFieldType, CurveType>::result_type
                 generate_circuit(
-                    const plonk_ed25519_complete_addition<BlueprintFieldType, ArithmetizationParams, CurveType> &component,
-                    circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
-                    const typename plonk_ed25519_complete_addition<BlueprintFieldType, ArithmetizationParams, CurveType>::input_type instance_input,
+                    const plonk_ed25519_complete_addition<BlueprintFieldType, CurveType> &component,
+                    circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
+                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &assignment,
+                    const typename plonk_ed25519_complete_addition<BlueprintFieldType, CurveType>::input_type instance_input,
                     const std::uint32_t start_row_index) {
 
                     using non_native_policy_type = basic_non_native_policy<BlueprintFieldType>;
 
-                    typedef crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
+                    typedef crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>
                         ArithmetizationType;
 
-                    using var = typename plonk_ed25519_complete_addition<BlueprintFieldType, ArithmetizationParams, CurveType>::var;
+                    using var = typename plonk_ed25519_complete_addition<BlueprintFieldType, CurveType>::var;
 
                     using Ed25519Type = typename crypto3::algebra::curves::ed25519;
 
@@ -520,21 +520,21 @@ namespace nil {
                     generate_constants(component, bp, assignment, instance_input, start_row_index);
                     generate_copy_constraints(component, bp, assignment, instance_input, start_row_index);
 
-                    return typename plonk_ed25519_complete_addition<BlueprintFieldType, ArithmetizationParams, CurveType>::result_type(component, start_row_index);
+                    return typename plonk_ed25519_complete_addition<BlueprintFieldType, CurveType>::result_type(component, start_row_index);
                 }
 
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType>
+            template<typename BlueprintFieldType, typename CurveType>
             void generate_copy_constraints(
-                const plonk_ed25519_complete_addition<BlueprintFieldType, ArithmetizationParams, CurveType> &component,
-                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
-                const typename plonk_ed25519_complete_addition<BlueprintFieldType, ArithmetizationParams, CurveType>::input_type instance_input,
+                const plonk_ed25519_complete_addition<BlueprintFieldType, CurveType> &component,
+                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &assignment,
+                const typename plonk_ed25519_complete_addition<BlueprintFieldType, CurveType>::input_type instance_input,
                 const std::uint32_t start_row_index) {
 
                 std::size_t row = start_row_index;
 
-                using component_type = plonk_ed25519_complete_addition<BlueprintFieldType, ArithmetizationParams, CurveType>;
+                using component_type = plonk_ed25519_complete_addition<BlueprintFieldType, CurveType>;
 
                 row += component_type::non_native_range_component::get_rows_amount(component.witness_amount(), 0);
                 row += component_type::non_native_range_component::get_rows_amount(component.witness_amount(), 0);
@@ -559,18 +559,18 @@ namespace nil {
                 }
             }
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType>
+            template<typename BlueprintFieldType, typename CurveType>
             void generate_constants(
-                const plonk_ed25519_complete_addition<BlueprintFieldType, ArithmetizationParams, CurveType> &component,
-                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
-                const typename plonk_ed25519_complete_addition<BlueprintFieldType, ArithmetizationParams, CurveType>::input_type instance_input,
+                const plonk_ed25519_complete_addition<BlueprintFieldType, CurveType> &component,
+                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &assignment,
+                const typename plonk_ed25519_complete_addition<BlueprintFieldType, CurveType>::input_type instance_input,
                 const std::uint32_t start_row_index) {
 
                 std::size_t row = start_row_index;
                 using non_native_policy_type = basic_non_native_policy<BlueprintFieldType>;
 
-                typedef crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
+                typedef crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>
                     ArithmetizationType;
 
                 using Ed25519Type = typename crypto3::algebra::curves::ed25519;
@@ -610,22 +610,20 @@ namespace nil {
             template<typename ComponentType>
             class result_type_converter;
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType>
+            template<typename BlueprintFieldType, typename CurveType>
             class input_type_converter<
-                plonk_ed25519_complete_addition<BlueprintFieldType, ArithmetizationParams, CurveType>> {
+                plonk_ed25519_complete_addition<BlueprintFieldType, CurveType>> {
 
                 using component_type =
-                    plonk_ed25519_complete_addition<BlueprintFieldType, ArithmetizationParams, CurveType>;
+                    plonk_ed25519_complete_addition<BlueprintFieldType, CurveType>;
                 using input_type = typename component_type::input_type;
                 using var = typename nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
             public:
                 static input_type convert(
                     const input_type &input,
-                    nil::blueprint::assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                                                           ArithmetizationParams>>
+                    nil::blueprint::assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                         &assignment,
-                    nil::blueprint::assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                                                           ArithmetizationParams>>
+                    nil::blueprint::assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                         &tmp_assignment) {
 
                     input_type new_input;
@@ -668,15 +666,15 @@ namespace nil {
                 }
             };
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType>
+            template<typename BlueprintFieldType, typename CurveType>
             class result_type_converter<
-                plonk_ed25519_complete_addition<BlueprintFieldType, ArithmetizationParams, CurveType>> {
+                plonk_ed25519_complete_addition<BlueprintFieldType, CurveType>> {
 
                 using component_type =
-                    plonk_ed25519_complete_addition<BlueprintFieldType, ArithmetizationParams, CurveType>;
+                    plonk_ed25519_complete_addition<BlueprintFieldType, CurveType>;
                 using input_type = typename component_type::input_type;
                 using result_type = typename component_type::result_type;
-                using stretcher_type = component_stretcher<BlueprintFieldType, ArithmetizationParams, component_type>;
+                using stretcher_type = component_stretcher<BlueprintFieldType, component_type>;
             public:
                 static result_type convert(const stretcher_type &component, const result_type old_result,
                                            const input_type &instance_input, std::size_t start_row_index) {

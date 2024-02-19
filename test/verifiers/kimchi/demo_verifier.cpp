@@ -126,7 +126,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_demo_verifier_test) {
 
     using ArithmetizationParams =
         zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType>;
 
     nil::crypto3::zk::snark::pickles_proof<curve_type> kimchi_proof = test_proof();
 
@@ -141,7 +141,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_demo_verifier_test) {
     auto expected_result = P + Q;
     std::cout << "exprected result: (" << expected_result.X.data << ", " << expected_result.Y.data << ")" << std::endl;
 
-    zk::snark::plonk_table_description<BlueprintFieldType, ArithmetizationParams> desc;
+    zk::snark::plonk_table_description<BlueprintFieldType> desc;
 
     zk::blueprint<ArithmetizationType> bp(desc);
     zk::blueprint_private_assignment_table<ArithmetizationType> private_assignment(desc);
@@ -175,12 +175,12 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_demo_verifier_test) {
 
     assignment_bp.padding();
 
-    zk::snark::plonk_assignment_table<BlueprintFieldType, ArithmetizationParams> assignments(private_assignment,
+    zk::snark::plonk_assignment_table<BlueprintFieldType> assignments(private_assignment,
                                                                                              public_assignment);
 
     // profiling(assignments);
     using params =
-        zk::snark::placeholder_params<BlueprintFieldType, ArithmetizationParams, hash_type, hash_type, Lambda>;
+        zk::snark::placeholder_params<BlueprintFieldType, hash_type, hash_type, Lambda>;
 
     using fri_type = typename zk::commitments::fri<BlueprintFieldType, typename params::merkle_hash_type,
                                                    typename params::transcript_hash_type, 2, 1>;

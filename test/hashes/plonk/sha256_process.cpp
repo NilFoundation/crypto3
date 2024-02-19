@@ -55,10 +55,9 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sha256_process) {
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 1;
 
-    using ArithmetizationParams = crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns,
-        PublicInputColumns, ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                ArithmetizationParams>;
+    zk::snark::plonk_table_description<BlueprintFieldType> desc(
+        WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns);
+    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>;
     using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
     using AssignmentType = blueprint::assignment<ArithmetizationType>;
 
@@ -217,10 +216,10 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sha256_process) {
     }
 
     component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8},{0},{});
-    crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-        component_instance, public_input, result_check, instance_input);
-    crypto3::test_empty_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-        component_instance, public_input, result_check, instance_input);
+    crypto3::test_component<component_type, BlueprintFieldType, hash_type, Lambda>(
+        component_instance, desc, public_input, result_check, instance_input);
+    crypto3::test_empty_component<component_type, BlueprintFieldType, hash_type, Lambda>(
+        component_instance, desc, public_input, result_check, instance_input);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

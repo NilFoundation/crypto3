@@ -45,15 +45,15 @@ namespace nil {
 
                 // Compute Lookup Table commitment
                 // https://github.com/o1-labs/proof-systems/blob/1f8532ec1b8d43748a372632bd854be36b371afe/kimchi/src/verifier.rs#L830
-                // Input: 
-                // Output: 
-                template<typename ArithmetizationType, 
+                // Input:
+                // Output:
+                template<typename ArithmetizationType,
                     typename KimchiParamsType, typename CurveType,
                     std::size_t... WireIndexes>
                 class table_commitment;
 
                 template<typename BlueprintFieldType,
-                         typename ArithmetizationParams,
+
                          typename KimchiParamsType,
                          typename CurveType,
                          std::size_t W0,
@@ -72,7 +72,7 @@ namespace nil {
                          std::size_t W13,
                          std::size_t W14>
                 class table_commitment<
-                    snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                    snark::plonk_constraint_system<BlueprintFieldType>,
                     KimchiParamsType,
                     CurveType,
                     W0,
@@ -91,7 +91,7 @@ namespace nil {
                     W13,
                     W14> {
 
-                    typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
+                    typedef snark::plonk_constraint_system<BlueprintFieldType>
                         ArithmetizationType;
 
                     using var = snark::plonk_variable<typename BlueprintFieldType::value_type>;
@@ -99,15 +99,15 @@ namespace nil {
 
                     constexpr static const std::size_t lookup_columns = KimchiParamsType::circuit_params::lookup_columns;
 
-                    constexpr static const std::size_t use_lookup_runtime = KimchiParamsType::circuit_params::lookup_runtime ? 1 : 0; 
+                    constexpr static const std::size_t use_lookup_runtime = KimchiParamsType::circuit_params::lookup_runtime ? 1 : 0;
 
-                    constexpr static const std::size_t msm_size = (lookup_columns + use_lookup_runtime) 
-                    * KimchiParamsType::commitment_params_type::shifted_commitment_split; 
+                    constexpr static const std::size_t msm_size = (lookup_columns + use_lookup_runtime)
+                    * KimchiParamsType::commitment_params_type::shifted_commitment_split;
 
-                    using commitment_type = typename 
-                        zk::components::kimchi_commitment_type<BlueprintFieldType, 
+                    using commitment_type = typename
+                        zk::components::kimchi_commitment_type<BlueprintFieldType,
                             KimchiParamsType::commitment_params_type::shifted_commitment_split>;
-                    using msm_component = zk::components::element_g1_multi_scalar_mul<ArithmetizationType, CurveType,  
+                    using msm_component = zk::components::element_g1_multi_scalar_mul<ArithmetizationType, CurveType,
                         msm_size,
                         W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14>;
 
@@ -154,7 +154,7 @@ namespace nil {
                                 commitments[j] = params.runtime.parts[k];
                                 scalars[j] = params.joint_combiner[1];
                                 j++;
-                            }       
+                            }
                         }
                         msm_component::generate_circuit(bp, assignment, {scalars, commitments}, row);
                         return result_type(row);
@@ -183,7 +183,7 @@ namespace nil {
                                 commitments[j] = params.runtime.parts[k];
                                 scalars[j] = params.joint_combiner[1];
                                 j++;
-                            }       
+                            }
                         }
                         msm_component::generate_assignments(assignment, {scalars, commitments}, row);
                         return result_type(row);

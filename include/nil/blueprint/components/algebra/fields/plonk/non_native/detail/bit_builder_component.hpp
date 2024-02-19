@@ -91,10 +91,10 @@ namespace nil {
                 template<typename ArithmetizationType>
                 class bit_builder_component;
 
-                template<typename BlueprintFieldType, typename ArithmetizationParams>
+                template<typename BlueprintFieldType>
                 class bit_builder_component<
-                    crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
-                                    : public plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0> {
+                    crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
+                                    : public plonk_component<BlueprintFieldType> {
 
                     static std::size_t rows_amount_internal(std::size_t witness_amount,
                                                      std::size_t bits_amount, bool check_bits) {
@@ -159,7 +159,7 @@ namespace nil {
                     }
 
                 public:
-                    using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0>;
+                    using component_type = plonk_component<BlueprintFieldType>;
 
                     using var = typename component_type::var;
                     using manifest_type = nil::blueprint::plonk_component_manifest;
@@ -294,16 +294,15 @@ namespace nil {
                     }
                 };
 
-                template<typename BlueprintFieldType, typename ArithmetizationParams>
+                template<typename BlueprintFieldType>
                 using plonk_bit_builder = bit_builder_component<crypto3::zk::snark::plonk_constraint_system<
-                                                                                            BlueprintFieldType,
-                                                                                            ArithmetizationParams>>;
+                                                                                            BlueprintFieldType>>;
 
-                template<typename BlueprintFieldType, typename ArithmetizationParams>
+                template<typename BlueprintFieldType>
                 void generate_assignments(
-                        const plonk_bit_builder<BlueprintFieldType, ArithmetizationParams>
+                        const plonk_bit_builder<BlueprintFieldType>
                             &component,
-                        assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                        assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                             &assignment,
                         const std::vector<bool> &input_bits,
                         const std::uint32_t start_row_index) {
@@ -348,16 +347,16 @@ namespace nil {
                     we need to check that the output is actually bits.
                     It is optional for bit_composition: the input might have already been checked.
                 */
-                template<typename BlueprintFieldType, typename ArithmetizationParams>
+                template<typename BlueprintFieldType>
                 std::size_t generate_gates(
-                        const plonk_bit_builder<BlueprintFieldType, ArithmetizationParams>
+                        const plonk_bit_builder<BlueprintFieldType>
                             &component,
-                        circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                        circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                             &bp,
-                        assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                        assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                             &assignment) {
 
-                    using var = typename plonk_bit_builder<BlueprintFieldType, ArithmetizationParams>::var;
+                    using var = typename plonk_bit_builder<BlueprintFieldType>::var;
                     using constraint_type = crypto3::zk::snark::plonk_constraint<BlueprintFieldType>;
 
                     int row_idx = -1;
@@ -397,29 +396,29 @@ namespace nil {
                     return bp.add_gate(constraints);
                 }
 
-                template<typename BlueprintFieldType, typename ArithmetizationParams>
+                template<typename BlueprintFieldType>
                 void generate_assignments_constant(
-                        const plonk_bit_builder<BlueprintFieldType, ArithmetizationParams>
+                        const plonk_bit_builder<BlueprintFieldType>
                             &component,
-                        assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                        assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                             &assignment,
                         const std::size_t start_row_index) {
 
                     assignment.constant(component.C(0), start_row_index) = 0;
                 }
 
-                template<typename BlueprintFieldType, typename ArithmetizationParams>
+                template<typename BlueprintFieldType>
                 void generate_circuit(
-                        const plonk_bit_builder<BlueprintFieldType, ArithmetizationParams>
+                        const plonk_bit_builder<BlueprintFieldType>
                             &component,
-                        circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                        circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                             &bp,
-                        assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                        assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                             &assignment,
                         const std::size_t start_row_index) {
 
                     std::size_t selector_index =
-                        generate_gates<BlueprintFieldType, ArithmetizationParams>(component, bp, assignment);
+                        generate_gates<BlueprintFieldType>(component, bp, assignment);
 
                     std::size_t end_row_index = start_row_index + component.rows_amount - 2;
 
@@ -427,7 +426,7 @@ namespace nil {
 
                     // copy constraints are specific to either bit_composition or bit_decomposition
                     // they are created in generate_circuit for corresponding classes
-                    generate_assignments_constant<BlueprintFieldType, ArithmetizationParams>(
+                    generate_assignments_constant<BlueprintFieldType>(
                             component, assignment, start_row_index);
                 }
             }   // namespace detail

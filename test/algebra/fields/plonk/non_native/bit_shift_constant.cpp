@@ -55,9 +55,9 @@ void test_bit_shift(typename BlueprintFieldType::value_type input,
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 1;
     constexpr std::size_t SelectorColumns = 2;
-    using ArithmetizationParams =
-        crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+    zk::snark::plonk_table_description<BlueprintFieldType> desc(
+        WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns);
+    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>;
     using AssignmentType = blueprint::assignment<ArithmetizationType>;
     using hash_type = crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 1;
@@ -73,7 +73,7 @@ void test_bit_shift(typename BlueprintFieldType::value_type input,
 
     bool expected_to_pass = input < value_type(2).pow(BlueprintFieldType::modulus_bits - 1);
 
-    auto result_check = [&expected_res, &public_input, expected_to_pass]
+    auto result_check = [&expected_res, expected_to_pass]
                         (AssignmentType &assignment, typename component_type::result_type &real_res) {
         if (expected_to_pass) {
             assert(var_value(assignment, real_res.output) == expected_res);
@@ -89,12 +89,12 @@ void test_bit_shift(typename BlueprintFieldType::value_type input,
                                                        std::array<std::uint32_t, 1>{0}, BitsAmount, Shift, Mode);
 
     if (expected_to_pass) {
-        crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-            component_instance, public_input, result_check, instance_input,
+        crypto3::test_component<component_type, BlueprintFieldType, hash_type, Lambda>(
+            component_instance, desc, public_input, result_check, instance_input,
             nil::blueprint::connectedness_check_type::type::STRONG, BitsAmount, Shift, Mode);
     } else {
-        crypto3::test_component_to_fail<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-            component_instance, public_input, result_check, instance_input,
+        crypto3::test_component_to_fail<component_type, BlueprintFieldType, hash_type, Lambda>(
+            component_instance, desc, public_input, result_check, instance_input,
             nil::blueprint::connectedness_check_type::type::STRONG, BitsAmount, Shift, Mode);
     }
 }

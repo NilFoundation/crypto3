@@ -30,18 +30,18 @@
 
 namespace nil {
     namespace blueprint {
-        template<typename ArithmetizationType, std::size_t... BlueprintParams>
+
+        template<typename ArithmetizationType>
         class assignment_proxy;
 
-        template<typename BlueprintFieldType,
-                typename ArithmetizationParams>
-        class assignment_proxy<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                ArithmetizationParams>>
-        : public assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                ArithmetizationParams>> {
+        template<typename ArithmetizationType>
+        class circuit;
 
-            typedef crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                    ArithmetizationParams> ArithmetizationType;
+        template<typename BlueprintFieldType>
+        class assignment_proxy<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
+            : public assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> {
+
+            typedef crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType> ArithmetizationType;
 
             using value_type = typename BlueprintFieldType::value_type;
             using column_type = typename crypto3::zk::snark::plonk_column<BlueprintFieldType>;
@@ -53,9 +53,14 @@ namespace nil {
             std::set<std::uint32_t> used_rows;
             std::set<std::uint32_t> used_selector_rows;
         public:
-            assignment_proxy(std::shared_ptr<assignment<ArithmetizationType>> assignment,
+            assignment_proxy(std::shared_ptr<assignment<ArithmetizationType>> assignment_,
                              std::uint32_t _id) :
-                assignment_ptr(assignment),
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>(
+                    assignment_->witnesses_amount(),
+                    assignment_->public_inputs_amount(),
+                    assignment_->constants_amount(),
+                    assignment_->selectors_amount()),
+                assignment_ptr(assignment_),
                 id(_id),
                 check(false) {
                 assert(assignment_ptr);
@@ -265,6 +270,22 @@ namespace nil {
                 return assignment_ptr->get_lookup_constant_amount();
             }
 
+            void resize_witnesses(std::uint32_t new_size) override {
+                assignment_ptr->resize_witnesses(new_size);
+            }
+
+            void resize_public_inputs(std::uint32_t new_size) override {
+                assignment_ptr->resize_public_inputs(new_size);
+            }
+
+            void resize_constants(std::uint32_t new_size) override {
+                assignment_ptr->resize_constants(new_size);
+            }
+
+            void resize_selectors(std::uint32_t new_size) override {
+                assignment_ptr->resize_selectors(new_size);
+            }
+
             value_type private_storage(std::uint32_t storage_index) const override {
                 return assignment_ptr->private_storage(storage_index);
             }
@@ -398,11 +419,9 @@ namespace nil {
             }
         };
 
-        template<typename BlueprintFieldType,
-                typename ArithmetizationParams>
+        template<typename BlueprintFieldType>
         crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type> save_shared_var(
-                assignment_proxy<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                        ArithmetizationParams>> &input_assignment,
+                assignment_proxy<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &input_assignment,
                 const crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type> &input_var) {
             using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
             std::uint32_t row_index = input_assignment.shared_column_size(0);
@@ -411,11 +430,9 @@ namespace nil {
             return res;
         }
 
-        template<typename BlueprintFieldType,
-                typename ArithmetizationParams>
+        template<typename BlueprintFieldType>
         std::vector<crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>> save_shared_var(
-                assignment_proxy<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                        ArithmetizationParams>> &input_assignment,
+                assignment_proxy<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &input_assignment,
                 const std::vector<crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>> &input_vars) {
             std::vector<crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>> res;
             for (const auto &it : input_vars) {
@@ -424,12 +441,11 @@ namespace nil {
             return res;
         }
 
-        template<typename BlueprintFieldType,
-                 typename ArithmetizationParams>
-        bool is_satisfied(const circuit_proxy<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                                                                          ArithmetizationParams>> &bp,
-                          const assignment_proxy<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                                                                             ArithmetizationParams>> &assignments){
+        template<typename BlueprintFieldType>
+        bool is_satisfied(const circuit_proxy<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
+                            &bp,
+                          const assignment_proxy<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
+                            &assignments) {
 
             const auto& used_gates = bp.get_used_gates();
 

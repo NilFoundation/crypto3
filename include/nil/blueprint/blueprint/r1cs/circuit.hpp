@@ -49,7 +49,7 @@ namespace nil {
             class blueprint<crypto3::zk::snark::r1cs_constraint_system<BlueprintFieldType>> {
                 typedef zk::snark::r1cs_constraint_system<BlueprintFieldType> ArithmetizationType;
 
-                zk::snark::r1cs_variable_assignment<BlueprintFieldType>
+                zk::snark::r1cs_variable_assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                     values; /* values[0] will hold the value of the first
                allocated variable of the blueprint, *NOT* constant 1 */
                 typename BlueprintFieldType::value_type constant_term;
@@ -131,7 +131,7 @@ namespace nil {
                     constraint_system.auxiliary_input_size = num_variables() - primary_input_size;
                 }
 
-                zk::snark::r1cs_variable_assignment<BlueprintFieldType> full_variable_assignment() const {
+                zk::snark::r1cs_variable_assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> full_variable_assignment() const {
                     return values;
                 }
 

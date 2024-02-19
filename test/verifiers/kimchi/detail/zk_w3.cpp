@@ -63,7 +63,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_zk_w3_test_suite) {
     constexpr std::size_t SelectorColumns = 30;
     using ArithmetizationParams =
         zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType>;
     using AssignmentType = blueprint::assignment<ArithmetizationType>;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_zk_w3_test_suite) {
 
     using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size, srs_len>;
     using index_terms_list = zk::components::index_terms_scalars_list_ec_test<ArithmetizationType>;
-    using circuit_description = zk::components::kimchi_circuit_description<index_terms_list, 
+    using circuit_description = zk::components::kimchi_circuit_description<index_terms_list,
         witness_columns, perm_size>;
     using kimchi_params = zk::components::kimchi_params_type<curve_type, commitment_params, circuit_description,
         public_input_size, prev_chal_size>;
@@ -105,14 +105,14 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_zk_w3_test_suite) {
     verifier_index.omega = omega;
     verifier_index.domain_size = domain_size;
 
-    typename component_type::params_type params = { 
+    typename component_type::params_type params = {
         verifier_index};
 
     auto result_check = [&expected_result](AssignmentType &assignment, component_type::result_type &real_res) {
         assert(expected_result == assignment.var_value(real_res.output));
     };
 
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input,
+    test_component<component_type, BlueprintFieldType, hash_type, Lambda>(params, public_input,
                                                                                                  result_check);
 }
 

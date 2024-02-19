@@ -39,10 +39,10 @@ namespace nil {
             template<typename ArithmetizationType>
             class permutation_verifier;
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
+            template<typename BlueprintFieldType>
             class permutation_verifier<
-                crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
-                : public plonk_component<BlueprintFieldType, ArithmetizationParams, 0, 0> {
+                crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
+                : public plonk_component<BlueprintFieldType> {
 
                 constexpr static const std::uint32_t ConstantsAmount = 0;
 
@@ -51,7 +51,7 @@ namespace nil {
                 }
 
             public:
-                using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, ConstantsAmount, 0>;
+                using component_type = plonk_component<BlueprintFieldType>;
 
                 using var = typename component_type::var;
                 using manifest_type = nil::blueprint::plonk_component_manifest;
@@ -150,17 +150,17 @@ namespace nil {
                     m(m_) {};
             };
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
+            template<typename BlueprintFieldType>
             using plonk_permutation_verifier = permutation_verifier<
-                crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>;
+                crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>;
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
-            typename plonk_permutation_verifier<BlueprintFieldType, ArithmetizationParams>::result_type
+            template<typename BlueprintFieldType>
+            typename plonk_permutation_verifier<BlueprintFieldType>::result_type
                 generate_assignments(
-                    const plonk_permutation_verifier<BlueprintFieldType, ArithmetizationParams> &component,
-                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                    const plonk_permutation_verifier<BlueprintFieldType> &component,
+                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                         &assignment,
-                    const typename plonk_permutation_verifier<BlueprintFieldType, ArithmetizationParams>::input_type
+                    const typename plonk_permutation_verifier<BlueprintFieldType>::input_type
                         instance_input,
                     const std::uint32_t start_row_index) {
 
@@ -220,20 +220,20 @@ namespace nil {
                 assignment.witness(component.W(2), row) = Vsigma_y * Vsigma_y;
                 assignment.witness(component.W(3), row) = Vsigma_zetay;
 
-                return typename plonk_permutation_verifier<BlueprintFieldType, ArithmetizationParams>::result_type(
+                return typename plonk_permutation_verifier<BlueprintFieldType>::result_type(
                     component, start_row_index);
             }
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
+            template<typename BlueprintFieldType>
             std::vector<std::size_t> generate_gates(
-                const plonk_permutation_verifier<BlueprintFieldType, ArithmetizationParams> &component,
-                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                const plonk_permutation_verifier<BlueprintFieldType> &component,
+                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                     &assignment,
-                const typename plonk_permutation_verifier<BlueprintFieldType, ArithmetizationParams>::input_type
+                const typename plonk_permutation_verifier<BlueprintFieldType>::input_type
                     instance_input) {
 
-                using var = typename plonk_permutation_verifier<BlueprintFieldType, ArithmetizationParams>::var;
+                using var = typename plonk_permutation_verifier<BlueprintFieldType>::var;
 
                 auto constraint_1 = var(component.W(0), 0) - var(component.W(1), 0) -
                                     var(component.W(2), 0) * var(component.W(3), 0) - var(component.W(3), +1);
@@ -289,20 +289,20 @@ namespace nil {
                 return {first_selector_index, second_selector_index, third_selector_index, fourth_selector_index};
             }
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
+            template<typename BlueprintFieldType>
             void generate_copy_constraints(
-                const plonk_permutation_verifier<BlueprintFieldType, ArithmetizationParams> &component,
-                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                const plonk_permutation_verifier<BlueprintFieldType> &component,
+                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                     &assignment,
-                const typename plonk_permutation_verifier<BlueprintFieldType, ArithmetizationParams>::input_type
+                const typename plonk_permutation_verifier<BlueprintFieldType>::input_type
                     instance_input,
                 const std::uint32_t start_row_index) {
 
                 std::size_t row = start_row_index;
                 std::size_t m = component.m;
 
-                using var = typename plonk_permutation_verifier<BlueprintFieldType, ArithmetizationParams>::var;
+                using var = typename plonk_permutation_verifier<BlueprintFieldType>::var;
 
                 for (std::size_t i = 0; i < m; i++) {
                     bp.add_copy_constraint({var(component.W(1), row, false), instance_input.f[i]});
@@ -319,14 +319,14 @@ namespace nil {
                 bp.add_copy_constraint({var(component.W(3), row, false), instance_input.V_zeta});
             }
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
-            typename plonk_permutation_verifier<BlueprintFieldType, ArithmetizationParams>::result_type
+            template<typename BlueprintFieldType>
+            typename plonk_permutation_verifier<BlueprintFieldType>::result_type
                 generate_circuit(
-                    const plonk_permutation_verifier<BlueprintFieldType, ArithmetizationParams> &component,
-                    circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                    const plonk_permutation_verifier<BlueprintFieldType> &component,
+                    circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
+                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                         &assignment,
-                    const typename plonk_permutation_verifier<BlueprintFieldType, ArithmetizationParams>::input_type
+                    const typename plonk_permutation_verifier<BlueprintFieldType>::input_type
                         instance_input,
                     const std::uint32_t start_row_index) {
 
@@ -348,7 +348,7 @@ namespace nil {
 
                 generate_copy_constraints(component, bp, assignment, instance_input, start_row_index);
 
-                return typename plonk_permutation_verifier<BlueprintFieldType, ArithmetizationParams>::result_type(
+                return typename plonk_permutation_verifier<BlueprintFieldType>::result_type(
                     component, start_row_index);
             }
         }    // namespace components

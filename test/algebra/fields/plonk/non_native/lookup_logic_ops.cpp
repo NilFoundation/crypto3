@@ -43,28 +43,21 @@ using namespace nil;
 
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 
-#define boilerplate(ComponentType) \
-    using field_type = typename crypto3::algebra::curves::pallas::base_field_type; \
-    constexpr std::size_t WitnessColumns = 3; \
-    constexpr std::size_t PublicInputColumns = 1; \
-    constexpr std::size_t ConstantColumns = 4; \
-    constexpr std::size_t SelectorColumns = 4; \
-    using ArithmetizationParams = \
-        crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, \
-                                                         SelectorColumns>; \
-    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<field_type, ArithmetizationParams>; \
-    using AssignmentType = blueprint::assignment<ArithmetizationType>; \
-    using hash_type = crypto3::hashes::keccak_1600<256>; \
-    using component_type = ComponentType<ArithmetizationType>; \
-    constexpr std::size_t Lambda = 1;
-
-
-template <typename BlueprintFieldType, typename ArithmetizationParams, typename AssignmentType,
-          typename HashType, std::size_t Lambda,
-          typename ComponentType>
+template <typename BlueprintFieldType, typename ComponentType>
 void test_logic_component(std::map<std::array<bool, 2>, bool> expected_mapping) {
     using field_value_type = typename BlueprintFieldType::value_type;
     using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
+    using field_type = typename crypto3::algebra::curves::pallas::base_field_type;
+    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<field_type>;
+    std::size_t WitnessColumns = 3;
+    std::size_t PublicInputColumns = 1;
+    std::size_t ConstantColumns = 4;
+    std::size_t SelectorColumns = 4;
+    zk::snark::plonk_table_description<BlueprintFieldType> desc(
+        WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns);
+    using AssignmentType = blueprint::assignment<ArithmetizationType>;
+    using hash_type = crypto3::hashes::keccak_1600<256>;
+    constexpr std::size_t lambda = 1;
 
     std::array<std::uint32_t, 2 + 1> witnesses;
     for (std::uint32_t i = 0; i < 2 + 1; i++) {
@@ -92,61 +85,32 @@ void test_logic_component(std::map<std::array<bool, 2>, bool> expected_mapping) 
             public_input[i] = item.first[i] ? 1 : 0;
         }
 
-        crypto3::test_component<ComponentType, BlueprintFieldType, ArithmetizationParams, HashType, Lambda>(
-            component_instance, public_input, result_check(item.second ? 1 : 0), instance_input);
+        crypto3::test_component<ComponentType, BlueprintFieldType, hash_type, lambda>(
+            component_instance, desc, public_input, result_check(item.second ? 1 : 0), instance_input);
     }
 }
 
 
 BOOST_AUTO_TEST_CASE(blueprint_non_native_lookup_logic_and_test) {
-    boilerplate(blueprint::components::lookup_logic_and);
+    using field_type = typename crypto3::algebra::curves::pallas::base_field_type;
+    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<field_type>;
+    using component_type = blueprint::components::lookup_logic_and<ArithmetizationType>;
 
     std::map<std::array<bool, 2>, bool> expected_mapping = {
         {{false, false}, false}, {{false, true}, false}, {{true, false}, false}, {{true, true}, true},
     };
-    test_logic_component<field_type, ArithmetizationParams, AssignmentType,
-                         hash_type, Lambda, component_type>(expected_mapping);
+    test_logic_component<field_type, component_type>(expected_mapping);
 }
 
-/*
-BOOST_AUTO_TEST_CASE(blueprint_non_native_logic_or_test) {
-    boilerplate(blueprint::components::logic_or);
-
-    std::map<std::array<bool, 2>, bool> expected_mapping = {
-        {{false, false}, false}, {{false, true}, true}, {{true, false}, true}, {{true, true}, true},
-    };
-    test_logic_component<field_type, ArithmetizationParams, AssignmentType,
-                         hash_type, Lambda, component_type>(expected_mapping);
-}
-*/
 BOOST_AUTO_TEST_CASE(blueprint_non_native_lookup_logic_xor_test) {
-    boilerplate(blueprint::components::lookup_logic_xor);
+    using field_type = typename crypto3::algebra::curves::pallas::base_field_type;
+    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<field_type>;
+    using component_type = blueprint::components::lookup_logic_xor<ArithmetizationType>;
 
     std::map<std::array<bool, 2>, bool> expected_mapping = {
         {{false, false}, false}, {{false, true}, true}, {{true, false}, true}, {{true, true}, false},
     };
-    test_logic_component<field_type, ArithmetizationParams, AssignmentType,
-                         hash_type, Lambda, component_type>(expected_mapping);
-}
-/*
-BOOST_AUTO_TEST_CASE(blueprint_non_native_logic_nand_test) {
-    boilerplate(blueprint::components::logic_nand);
-
-    std::map<std::array<bool, 2>, bool> expected_mapping = {
-        {{false, false}, true}, {{false, true}, true}, {{true, false}, true}, {{true, true}, false},
-    };
-    test_logic_component<field_type, ArithmetizationParams, AssignmentType,
-                         hash_type, Lambda, component_type>(expected_mapping);
+    test_logic_component<field_type, component_type>(expected_mapping);
 }
 
-BOOST_AUTO_TEST_CASE(blueprint_non_native_logic_nor_test) {
-    boilerplate(blueprint::components::logic_nor);
-
-    std::map<std::array<bool, 2>, bool> expected_mapping = {
-        {{false, false}, true}, {{false, true}, false}, {{true, false}, false}, {{true, true}, false},
-    };
-    test_logic_component<field_type, ArithmetizationParams, AssignmentType,
-                         hash_type, Lambda, component_type>(expected_mapping);
-}
-*/
 BOOST_AUTO_TEST_SUITE_END()

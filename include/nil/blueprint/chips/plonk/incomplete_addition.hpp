@@ -43,7 +43,7 @@ namespace nil {
                 class incomplete_addition;
 
                 template<typename BlueprintFieldType,
-                         typename ArithmetizationParams,
+
                          typename CurveType>
                 class incomplete_addition<
                     snark::plonk_constraint_system<BlueprintFieldType,
@@ -59,7 +59,7 @@ namespace nil {
 
                     static snark::plonk_constraint<BlueprintFieldType> generate(
                         blueprint<ArithmetizationType> &bp,
-                        blueprint_public_assignment_table<ArithmetizationType> &public_assignment, 
+                        blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
                         const var& X1, const var& Y1, const var& X2, const var& Y2,
                         const var& X3, const var& Y3) {
 

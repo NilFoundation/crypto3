@@ -51,7 +51,7 @@ namespace nil {
 
                 template<typename BlueprintFieldType,
                          size_t num_squeezes,
-                         typename ArithmetizationParams,
+
                          typename CurveType,
                          std::size_t W0,
                          std::size_t W1,
@@ -70,7 +70,7 @@ namespace nil {
                          std::size_t W14>
                 class aux<
                     num_squeezes,
-                    snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                    snark::plonk_constraint_system<BlueprintFieldType>,
                     CurveType,
                     W0, W1, W2, W3,
                     W4, W5, W6, W7,
@@ -82,7 +82,7 @@ namespace nil {
 
                     using var = snark::plonk_variable<typename BlueprintFieldType::value_type>;
                     using sponge_type =
-                        zk::components::kimchi_sponge<ArithmetizationType, CurveType, W0, W1, W2, W3, W4, W5, W6, 
+                        zk::components::kimchi_sponge<ArithmetizationType, CurveType, W0, W1, W2, W3, W4, W5, W6,
                                                                             W7, W8, W9, W10, W11, W12, W13, W14>;
                     sponge_type sponge;
 
@@ -149,7 +149,7 @@ namespace nil {
 
                     static void generate_gates(
                         blueprint<ArithmetizationType> &bp,
-                        blueprint_public_assignment_table<ArithmetizationType> &assignment, 
+                        blueprint_public_assignment_table<ArithmetizationType> &assignment,
                         const params_type &params,
                         const std::size_t first_selector_index) {}
 

@@ -55,15 +55,15 @@ namespace nil {
                 template<typename ArithmetizationType, typename CurveType, std::size_t... WireIndexes>
                 class compare_with_const;
 
-                template<typename BlueprintFieldType, typename ArithmetizationParams,
+                template<typename BlueprintFieldType,
                          typename CurveType, std::size_t W0,  std::size_t W1, std::size_t W2>
-                class compare_with_const<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                class compare_with_const<snark::plonk_constraint_system<BlueprintFieldType>,
                                          CurveType,
                                          W0,
                                          W1,
                                          W2> {
 
-                    typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
+                    typedef snark::plonk_constraint_system<BlueprintFieldType>
                         ArithmetizationType;
 
                     using sub_component = zk::components::subtraction<ArithmetizationType, W0, W1, W2>;

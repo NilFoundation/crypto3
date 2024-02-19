@@ -48,13 +48,13 @@ namespace nil {
             template<typename ArithmetizationType, typename FieldType>
             class fri_array_swap;
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
-            class fri_array_swap<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+            template<typename BlueprintFieldType>
+            class fri_array_swap<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>,
                            BlueprintFieldType>
-                : public plonk_component<BlueprintFieldType, ArithmetizationParams, 0, 0> {
+                : public plonk_component<BlueprintFieldType> {
 
             public:
-                using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 0, 0>;
+                using component_type = plonk_component<BlueprintFieldType>;
 
                 using var = typename component_type::var;
                 using manifest_type = plonk_component_manifest;
@@ -168,21 +168,21 @@ namespace nil {
                     half_array_size(half_array_size_) {};
             };
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
+            template<typename BlueprintFieldType>
             using plonk_fri_array_swap =
-                fri_array_swap<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                fri_array_swap<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>,
                                BlueprintFieldType>;
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
-            typename plonk_fri_array_swap<BlueprintFieldType, ArithmetizationParams>::result_type generate_assignments(
-                const plonk_fri_array_swap<BlueprintFieldType, ArithmetizationParams> &component,
-                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+            template<typename BlueprintFieldType>
+            typename plonk_fri_array_swap<BlueprintFieldType>::result_type generate_assignments(
+                const plonk_fri_array_swap<BlueprintFieldType> &component,
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                     &assignment,
-                const typename plonk_fri_array_swap<BlueprintFieldType, ArithmetizationParams>::input_type
+                const typename plonk_fri_array_swap<BlueprintFieldType>::input_type
                     &instance_input,
                 const std::uint32_t start_row_index) {
 
-                using component_type = plonk_fri_array_swap<BlueprintFieldType, ArithmetizationParams>;
+                using component_type = plonk_fri_array_swap<BlueprintFieldType>;
                 using value_type = typename BlueprintFieldType::value_type;
 
                 BOOST_ASSERT(2 * component.half_array_size == instance_input.arr.size());
@@ -219,16 +219,16 @@ namespace nil {
                 return typename component_type::result_type(component, start_row_index);
 	        }
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
+            template<typename BlueprintFieldType>
             std::size_t generate_gates(
-                const plonk_fri_array_swap<BlueprintFieldType, ArithmetizationParams> &component,
-                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                const plonk_fri_array_swap<BlueprintFieldType> &component,
+                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                     &assignment,
-                const typename plonk_fri_array_swap<BlueprintFieldType, ArithmetizationParams>::input_type
+                const typename plonk_fri_array_swap<BlueprintFieldType>::input_type
                     &instance_input) {
 
-                using component_type = plonk_fri_array_swap<BlueprintFieldType, ArithmetizationParams>;
+                using component_type = plonk_fri_array_swap<BlueprintFieldType>;
                 using var = typename component_type::var;
                 using constraint_type = crypto3::zk::snark::plonk_constraint<BlueprintFieldType>;
 
@@ -251,17 +251,17 @@ namespace nil {
                 return bp.add_gate(constraints);
             }
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
+            template<typename BlueprintFieldType>
             void generate_copy_constraints(
-                const plonk_fri_array_swap<BlueprintFieldType, ArithmetizationParams> &component,
-                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                const plonk_fri_array_swap<BlueprintFieldType> &component,
+                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                     &assignment,
-                const typename plonk_fri_array_swap<BlueprintFieldType, ArithmetizationParams>::input_type
+                const typename plonk_fri_array_swap<BlueprintFieldType>::input_type
                     &instance_input,
                 const std::size_t start_row_index) {
 
-                using component_type = plonk_fri_array_swap<BlueprintFieldType, ArithmetizationParams>;
+                using component_type = plonk_fri_array_swap<BlueprintFieldType>;
                 using var = typename component_type::var;
 
                 BOOST_ASSERT(2 * component.half_array_size == instance_input.arr.size());
@@ -284,17 +284,17 @@ namespace nil {
                 }
             }
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
-            typename plonk_fri_array_swap<BlueprintFieldType, ArithmetizationParams>::result_type generate_circuit(
-                const plonk_fri_array_swap<BlueprintFieldType, ArithmetizationParams> &component,
-                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+            template<typename BlueprintFieldType>
+            typename plonk_fri_array_swap<BlueprintFieldType>::result_type generate_circuit(
+                const plonk_fri_array_swap<BlueprintFieldType> &component,
+                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                     &assignment,
-                const typename plonk_fri_array_swap<BlueprintFieldType, ArithmetizationParams>::input_type
+                const typename plonk_fri_array_swap<BlueprintFieldType>::input_type
                     &instance_input,
                 const std::size_t start_row_index) {
 
-                using component_type = plonk_fri_array_swap<BlueprintFieldType, ArithmetizationParams>;
+                using component_type = plonk_fri_array_swap<BlueprintFieldType>;
 
                 std::size_t selector_index = generate_gates(component, bp, assignment, instance_input);
                 assignment.enable_selector(

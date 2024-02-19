@@ -40,7 +40,7 @@ namespace nil {
             class batched_verification;
 
             template<typename BlueprintFieldType,
-                     typename ArithmetizationParams,
+
                      typename CurveType,
                      typename Ed25519Type,
                      std::size_t k,
@@ -53,7 +53,7 @@ namespace nil {
                      std::size_t W6,
                      std::size_t W7,
                      std::size_t W8>
-            class batched_verification<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+            class batched_verification<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>,
                                                    CurveType,
                                                    Ed25519Type,
                                                    k,
@@ -72,7 +72,7 @@ namespace nil {
 
                 using ed25519_component = eddsa25519<ArithmetizationType, CurveType, Ed25519Type,
                 W0, W1, W2, W3, W4, W5, W6, W7, W8>;
-                
+
                 using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
                 using var_ec_point = typename ed25519_component::params_type::var_ec_point;
                 using signature = typename ed25519_component::params_type::signature;
@@ -124,7 +124,7 @@ namespace nil {
                     blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
                     const params_type &params,
                     const std::size_t first_selector_index) {
-                    
+
                 }
 
                 static void generate_copy_constraints(blueprint<ArithmetizationType> &bp,
@@ -136,7 +136,7 @@ namespace nil {
                 static void generate_lookup_table(blueprint_assignment_table<ArithmetizationType> &assignment,
                                                         const params_type &params,
                                                         std::size_t component_start_row) {
-                
+
                     std::size_t row = component_start_row;
                     std::size_t n = (1 << 16);
                     for(std::size_t i = 0; i < 2; i++) {

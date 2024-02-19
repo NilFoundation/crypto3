@@ -64,7 +64,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_base_field_test_suite) {
     constexpr std::size_t SelectorColumns = 25;
     using ArithmetizationParams =
         zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType>;
     using AssignmentType = blueprint::assignment<ArithmetizationType>;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     using var_ec_point = typename zk::components::var_ec_point<BlueprintFieldType>;
@@ -87,7 +87,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_base_field_test_suite) {
 
     using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size, srs_len>;
     using index_terms_list = zk::components::index_terms_scalars_list_ec_test<ArithmetizationType>;
-    using circuit_description = zk::components::kimchi_circuit_description<index_terms_list, 
+    using circuit_description = zk::components::kimchi_circuit_description<index_terms_list,
         witness_columns, perm_size>;
     using kimchi_params = zk::components::kimchi_params_type<curve_type, commitment_params, circuit_description,
         public_input_size, prev_chal_size>;
@@ -162,7 +162,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_base_field_test_suite) {
     for (std::size_t i = 0; i < perm_size; i++) {
         witness_comm[i] = {{unshifted_var[1]}};
     }
-    std::array<commitment_type, kimchi_params::witness_columns> 
+    std::array<commitment_type, kimchi_params::witness_columns>
         coefficient_comm;
     for (std::size_t i = 0; i < coefficient_comm.size(); i++) {
         coefficient_comm[i] = {{unshifted_var[2]}};
@@ -297,7 +297,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_base_field_test_suite) {
         {PI_G_var},
         {lagrange_bases_var},
         {{sigma_comm}, {coefficient_comm}, generic_comm, psm_comm, {selectors_comm}, {lookup_selectors_comm},
-        psm_comm, // runtime_tables_selector 
+        psm_comm, // runtime_tables_selector
         {psm_comm}, // table
         psm_comm, // complete_add
         psm_comm, // var_base_mmul
@@ -313,7 +313,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_base_field_test_suite) {
 
     auto result_check = [](AssignmentType &assignment, component_type::result_type &real_res) {};
 
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
+    test_component<component_type, BlueprintFieldType, hash_type, Lambda>(
         params, public_input, result_check);
 }
 

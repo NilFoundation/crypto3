@@ -54,14 +54,14 @@ namespace nil {
                          std::size_t... WireIndexes>
                 class ft_eval;
 
-                template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType,
+                template<typename BlueprintFieldType, typename CurveType,
                          typename KimchiParamsType, std::size_t W0, std::size_t W1, std::size_t W2, std::size_t W3,
                          std::size_t W4, std::size_t W5, std::size_t W6, std::size_t W7, std::size_t W8, std::size_t W9,
                          std::size_t W10, std::size_t W11, std::size_t W12, std::size_t W13, std::size_t W14>
-                class ft_eval<snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, CurveType,
+                class ft_eval<snark::plonk_constraint_system<BlueprintFieldType>, CurveType,
                               KimchiParamsType, W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14> {
 
-                    typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
+                    typedef snark::plonk_constraint_system<BlueprintFieldType>
                         ArithmetizationType;
 
                     using var = snark::plonk_variable<typename BlueprintFieldType::value_type>;
@@ -183,7 +183,7 @@ namespace nil {
                         row += zkpm_eval_component::rows_amount;
 
                         // zeta1m1 = zeta_pow_n - ScalarField::<G>::one();
-                        var zeta1m1 = zk::components::generate_circuit<sub_component>(bp, 
+                        var zeta1m1 = zk::components::generate_circuit<sub_component>(bp,
                             assignment, {params.zeta_pow_n, one}, row).output;
                         row += sub_component::rows_amount;
 
@@ -202,7 +202,7 @@ namespace nil {
                                 {params.combined_evals[0].w[KimchiParamsType::permut_size - 1], params.gamma}, row)
                                 .output;
                         row += add_component::rows_amount;
-                        init  = zk::components::generate_circuit<mul_component>(bp, 
+                        init  = zk::components::generate_circuit<mul_component>(bp,
                             assignment, {init, params.combined_evals[1].z}, row).output;
                         row += mul_component::rows_amount;
                         init =
@@ -241,7 +241,7 @@ namespace nil {
 
                         // ft_eval0 - p_eval[0]
                         if (KimchiParamsType::public_input_size > 0) {
-                            var ft_eval0 = zk::components::generate_circuit<sub_component>(bp, 
+                            var ft_eval0 = zk::components::generate_circuit<sub_component>(bp,
                                 assignment, {ft_eval0, params.public_eval[0]}, row).output;
                             row += sub_component::rows_amount;
                         }

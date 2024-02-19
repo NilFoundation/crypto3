@@ -61,9 +61,9 @@ void test_sha512(std::vector<typename BlueprintFieldType::value_type> public_inp
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 1;
 
-    using ArithmetizationParams =
-        crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+    zk::snark::plonk_table_description<BlueprintFieldType> desc(
+        WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns);
+    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>;
     using AssignmentType = blueprint::assignment<ArithmetizationType>;
 
     using component_type = blueprint::components::sha512<ArithmetizationType>;
@@ -97,16 +97,15 @@ void test_sha512(std::vector<typename BlueprintFieldType::value_type> public_inp
     if constexpr (Stretched) {
         using stretched_component_type = blueprint::components::component_stretcher<
             BlueprintFieldType,
-            ArithmetizationParams,
             component_type>;
 
         stretched_component_type stretched_instance(component_instance, WitnessColumns / 2, WitnessColumns);
 
-        crypto3::test_component<stretched_component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-            stretched_instance, public_input, result_check, instance_input);
+        crypto3::test_component<stretched_component_type, BlueprintFieldType, hash_type, Lambda>(
+            stretched_instance, desc, public_input, result_check, instance_input);
     } else {
-        crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-            component_instance, public_input, result_check, instance_input);
+        crypto3::test_component<component_type, BlueprintFieldType, hash_type, Lambda>(
+            component_instance, desc, public_input, result_check, instance_input);
     }
 }
 

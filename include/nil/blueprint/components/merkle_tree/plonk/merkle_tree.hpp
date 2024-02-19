@@ -40,13 +40,13 @@ namespace nil {
             template<typename ArithmetizationType, typename CurveType, std::size_t... WireIndexes>
             class merkle_tree;
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType,
+            template<typename BlueprintFieldType, typename CurveType,
                      std::size_t W0, std::size_t W1, std::size_t W2, std::size_t W3, std::size_t W4, std::size_t W5,
                      std::size_t W6, std::size_t W7, std::size_t W8>
-            class merkle_tree<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, CurveType,
+            class merkle_tree<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>, CurveType,
                               W0, W1, W2, W3, W4, W5, W6, W7, W8> {
 
-                typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
+                typedef snark::plonk_constraint_system<BlueprintFieldType>
                     ArithmetizationType;
 
                 using var = snark::plonk_variable<typename BlueprintFieldType::value_type>;

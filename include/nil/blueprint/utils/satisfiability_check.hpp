@@ -40,13 +40,10 @@
 namespace nil {
     namespace blueprint {
 
-        template<typename BlueprintFieldType,
-                 typename ArithmetizationParams>
+        template<typename BlueprintFieldType>
         bool is_satisfied(
-            const circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                                                      ArithmetizationParams>> &bp,
-            const assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                                                         ArithmetizationParams>> &assignments) {
+            const circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
+            const assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &assignments) {
             std::set<uint32_t> used_gates;
             for (std::uint32_t i = 0; i < bp.gates().size(); i++) {
                 used_gates.insert(i);
@@ -70,13 +67,10 @@ namespace nil {
             return is_satisfied(bp, assignments, used_gates, used_lookup_gates, used_copy_constraints, selector_rows);
         }
 
-        template<typename BlueprintFieldType,
-                 typename ArithmetizationParams>
+        template<typename BlueprintFieldType>
         bool is_satisfied(
-            const circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                                                      ArithmetizationParams>> &bp,
-            const assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                                                         ArithmetizationParams>> &assignments,
+            const circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
+            const assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &assignments,
             const std::set<std::uint32_t> &used_gates,
             const std::set<std::uint32_t> &used_lookup_gates,
             const std::set<std::uint32_t> &used_copy_constraints,
@@ -91,7 +85,7 @@ namespace nil {
             for (const auto& i : used_gates) {
                 crypto3::zk::snark::plonk_column<BlueprintFieldType> selector =
                     assignments.crypto3::zk::snark::
-                        template plonk_assignment_table<BlueprintFieldType, ArithmetizationParams>::selector(
+                        template plonk_assignment_table<BlueprintFieldType>::selector(
                             gates[i].selector_index);
 
                 for (const auto& selector_row : selector_rows) {
@@ -119,7 +113,7 @@ namespace nil {
             for (const auto& i : used_lookup_gates) {
                 crypto3::zk::snark::plonk_column<BlueprintFieldType> selector =
                     assignments.crypto3::zk::snark::
-                        template plonk_assignment_table<BlueprintFieldType, ArithmetizationParams>::selector(
+                        template plonk_assignment_table<BlueprintFieldType>::selector(
                             lookup_gates[i].tag_index);
 
                 for (const auto& selector_row : selector_rows) {

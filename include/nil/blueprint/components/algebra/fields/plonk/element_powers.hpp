@@ -47,7 +47,7 @@ namespace nil {
                 template<typename ArithmetizationType, typename CurveType, std::size_t n, std::size_t... WireIndexes>
                 class element_powers;
 
-                template<typename ArithmetizationParams,
+                template<
                          typename CurveType,
                          std::size_t n,
                          std::size_t W0,
@@ -66,7 +66,7 @@ namespace nil {
                          std::size_t W13,
                          std::size_t W14>
                 class element_powers<
-                    snark::plonk_constraint_system<typename CurveType::scalar_field_type, ArithmetizationParams>,
+                    snark::plonk_constraint_system<typename CurveType::scalar_field_type>,
                     CurveType,
                     n,
                     W0,
@@ -87,7 +87,7 @@ namespace nil {
 
                     using BlueprintFieldType = typename CurveType::scalar_field_type;
 
-                    typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
+                    typedef snark::plonk_constraint_system<BlueprintFieldType>
                         ArithmetizationType;
 
                     using var = snark::plonk_variable<typename BlueprintFieldType::value_type>;

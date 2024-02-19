@@ -36,38 +36,35 @@
 #include <nil/crypto3/zk/snark/arithmetization/plonk/copy_constraint.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/lookup_constraint.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/variable.hpp>
-#include <nil/blueprint/blueprint/plonk/assignment.hpp>
 
+#include <nil/blueprint/blueprint/plonk/assignment.hpp>
+#include <nil/blueprint/gate_id.hpp>
 #include <nil/blueprint/lookup_library.hpp>
 
 namespace nil {
     namespace blueprint {
 
-        template<typename ArithmetizationType, std::size_t... BlueprintParams>
+        template<typename ArithmetizationType>
         class circuit;
 
-        template<typename ArithmetizationType, std::size_t... BlueprintParams>
+        template<typename ArithmetizationType>
         class assignment;
 
-        template<typename BlueprintFieldType,
-                 typename ArithmetizationParams>
-        class circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                                       ArithmetizationParams>>
-            : public crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                                    ArithmetizationParams> {
+        template<typename BlueprintFieldType>
+        class circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
+            : public crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType> {
 
-            typedef crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                                   ArithmetizationParams> ArithmetizationType;
+            typedef crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType> ArithmetizationType;
 
         private:
-            using gate_id_type = gate_id<BlueprintFieldType, ArithmetizationParams>;
+            using gate_id_type = gate_id<BlueprintFieldType>;
             using constraint_type = crypto3::zk::snark::plonk_constraint<BlueprintFieldType>;
             using gate_selector_map = std::map<gate_id_type, std::size_t>;
             using gate_type = crypto3::zk::snark::plonk_gate<BlueprintFieldType, constraint_type>;
 
             using lookup_constraint_type = crypto3::zk::snark::plonk_lookup_constraint<BlueprintFieldType>;
             using lookup_gate_type = crypto3::zk::snark::plonk_lookup_gate<BlueprintFieldType, lookup_constraint_type>;
-            using lookup_gate_id_type = lookup_gate_id<BlueprintFieldType, ArithmetizationParams>;
+            using lookup_gate_id_type = lookup_gate_id<BlueprintFieldType>;
             using lookup_gate_selector_map = std::map<lookup_gate_id_type, std::size_t>;
 
             using lookup_table_definition = typename nil::crypto3::zk::snark::lookup_table_definition<BlueprintFieldType>;
@@ -80,8 +77,7 @@ namespace nil {
         public:
             typedef BlueprintFieldType blueprint_field_type;
 
-            circuit(crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                    ArithmetizationParams> constraint_system) :
+            circuit(ArithmetizationType constraint_system) :
                     ArithmetizationType(constraint_system) { }
 
             circuit() : ArithmetizationType() {}
@@ -191,8 +187,7 @@ namespace nil {
 
             virtual void add_copy_constraint(const crypto3::zk::snark::plonk_copy_constraint<BlueprintFieldType> &copy_constraint) {
                 static const std::size_t private_storage_index =
-                    assignment<crypto3::zk::snark::plonk_constraint_system<
-                        BlueprintFieldType, ArithmetizationParams>>::private_storage_index;
+                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>::private_storage_index;
                 if (copy_constraint.first == copy_constraint.second) {
                     return;
                 }

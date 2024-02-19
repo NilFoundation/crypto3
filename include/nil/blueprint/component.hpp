@@ -44,25 +44,18 @@ namespace nil {
             template<typename ArithmetizationType>
             class component{};
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams,
-                     std::uint32_t ConstantAmount, std::uint32_t PublicInputAmount>
+            template<typename BlueprintFieldType>
             class plonk_component:
-                public component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> {
-            protected:
-
-                using witness_container_type = std::vector<std::uint32_t>;
-                using manifest_type = nil::blueprint::plonk_component_manifest;
+                public component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> {
             public:
-                static constexpr std::size_t constants_amount = ConstantAmount;
-                static constexpr std::size_t public_inputs_amount = PublicInputAmount;
-
-                using constant_container_type = std::array<std::uint32_t, ConstantAmount>;
-                using public_input_container_type = std::array<std::uint32_t, PublicInputAmount>;
+                using manifest_type = nil::blueprint::plonk_component_manifest;
+                using witness_container_type = std::vector<std::uint32_t>;
+                using constant_container_type = std::vector<std::uint32_t>;
+                using public_input_container_type = std::vector<std::uint32_t>;
 
                 witness_container_type _W;
                 constant_container_type _C;
                 public_input_container_type _PI;
-                // underlying_components_container_type _underlying_components;
 
                 using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
@@ -81,7 +74,7 @@ namespace nil {
                  * @param[in] internal constant signed index. For -1, last constant assumed.
                  */
                 typename constant_container_type::value_type C(std::int32_t index) const {
-                    return _C[(ConstantAmount + index)%ConstantAmount];
+                    return _C[(_C.size() + index) % _C.size()];
                 }
 
                 /**
@@ -90,11 +83,8 @@ namespace nil {
                  * @param[in] internal public input signed index. For -1, last public input assumed.
                  */
                 typename public_input_container_type::value_type PI(std::int32_t index) const {
-                    return _PI[(PublicInputAmount + index)%PublicInputAmount];
+                    return _PI[(_PI.size() + index) % _PI.size()];
                 }
-
-                typedef crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
-                    ArithmetizationType;
 
                 /**
                  * Constructor from arbitrary container types.
@@ -111,9 +101,11 @@ namespace nil {
                 plonk_component(WitnessContainerType witness, ConstantContainerType constant,
                         PublicInputContainerType public_input, const manifest_type &manifest) {
                     _W.resize(witness.size());
+                    _C.resize(constant.size());
+                    _PI.resize(public_input.size());
                     std::copy_n(std::make_move_iterator(witness.begin()), witness.size(), _W.begin());
-                    std::copy_n(std::make_move_iterator(constant.begin()), ConstantAmount, _C.begin());
-                    std::copy_n(std::make_move_iterator(public_input.begin()), PublicInputAmount, _PI.begin());
+                    std::copy_n(std::make_move_iterator(constant.begin()), constant.size(), _C.begin());
+                    std::copy_n(std::make_move_iterator(public_input.begin()), public_input.size(), _PI.begin());
 
                     BLUEPRINT_RELEASE_ASSERT(manifest.check_manifest(*this));
                 }
@@ -131,27 +123,10 @@ namespace nil {
                 }
             };
 
-            // namespace detail {
-            //     /**
-            //      * The specialized hash function for `unordered_map` PLONK component keys
-            //      */
-            //     struct component_hash {
-            //         template<typename BlueprintFieldType, typename ArithmetizationParams, std::uint32_t WitnessAmount,
-            //             ConstantAmount, PublicInputAmount>
-            //         std::size_t operator() (const component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, WitnessAmount,
-            //                 ConstantAmount, PublicInputAmount> &node) const {
-
-            //         }
-            //     };
-
-            // } // namespace detail
-
-
             template<typename BlueprintFieldType>
             class r1cs_component:
                 public component<crypto3::zk::snark::r1cs_constraint_system<BlueprintFieldType>> {
             protected:
-
                 typedef crypto3::zk::snark::r1cs_constraint_system<BlueprintFieldType>
                     ArithmetizationType;
 

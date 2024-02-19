@@ -80,7 +80,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_base_endo_scalar_mul) {
     var scalar_var = {0, 3, false, var::column_type::public_input};
 
     typename component_type::params_type assignment_params = {{T_X_var, T_Y_var},scalar_var};
-    std::cout<<"random point: " << T.X.data << " " << T.Y.data <<std::endl; 
+    std::cout<<"random point: " << T.X.data << " " << T.Y.data <<std::endl;
     std::vector<typename BlueprintFieldType::value_type> public_input = {T.X, T.Y, b_scalar};
 
     constexpr static const typename BlueprintFieldType::value_type endo  = component_type::endo;
@@ -113,10 +113,10 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_base_endo_scalar_mul) {
     }
     std::cout<<"Expected result: "<<acc.X.data<<" "<< acc.Y.data<<std::endl;
 
-    auto result_check = [](AssignmentType &assignment, 
+    auto result_check = [](AssignmentType &assignment,
         component_type::result_type &real_res) {
     };
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (assignment_params, public_input, result_check);
+    test_component<component_type, BlueprintFieldType, hash_type, Lambda> (assignment_params, public_input, result_check);
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
     std::cout << "base_endo_scalar_mul: " << duration.count() << "ms" << std::endl;
 }

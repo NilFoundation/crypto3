@@ -46,13 +46,17 @@ namespace nil {
     namespace blueprint {
         // Helper class for gate_id
         // Encapsulates storing values at random points for gate comparison
-        template<typename BlueprintFieldType, typename ArithmetizationParams>
+        template<typename BlueprintFieldType>
         class value_set {
         private:
             using value_type = typename BlueprintFieldType::value_type;
             using var = nil::crypto3::zk::snark::plonk_variable<value_type>;
 
             static constexpr std::size_t starting_constraint_mults_size = 20;
+
+            boost::random::random_device dev;
+            nil::crypto3::random::algebraic_engine<BlueprintFieldType> random_engine =
+                nil::crypto3::random::algebraic_engine<BlueprintFieldType>(dev);
 
             std::array<std::array<std::vector<value_type>, 3>, 2> witnesses;
             std::array<std::array<std::vector<value_type>, 3>, 2> constants;
@@ -63,111 +67,76 @@ namespace nil {
             // Used to separate lookup constraints by table id.
             std::vector<value_type> lookup_table_mults;
 
-            value_type generate_constraint_mult(
-                    nil::crypto3::random::algebraic_engine<BlueprintFieldType> &engine) const {
-                value_type val = engine();
+            value_type generate_constraint_mult() {
+                value_type val = random_engine();
                 // Here it's critical that the values are non-zero
                 // Otherwise some of the constraints would never actually matter
                 // The probability for that is extremely low, but checking for this
                 // might still be worthwhile
                 while (val == value_type::zero()) {
-                    val = engine();
+                    val = random_engine();
                 }
                 return val;
             }
 
             value_set() {
-                boost::random::random_device dev;
-                nil::crypto3::random::algebraic_engine<BlueprintFieldType> random_engine(dev);
-
-                for (std::size_t p = 0; p < 2; p++) {
-                    for (std::size_t i = 0; i < 3; i++) {
-                        witnesses[p][i].reserve(ArithmetizationParams::witness_columns);
-                    }
-                }
-
-                for (std::size_t p = 0; p < 2; p++) {
-                    for (std::size_t i = 0; i < 3; i++) {
-                        constants[p][i].reserve(ArithmetizationParams::constant_columns);
-                    }
-                }
-
-                for (std::size_t p = 0; p < 2; p++) {
-                    for (std::size_t i = 0; i < 3; i++) {
-                        for (std::size_t j = 0; j < ArithmetizationParams::witness_columns; j++) {
-                            witnesses[p][i].emplace_back(random_engine());
-                        }
-                    }
-                }
-
-                for (std::size_t p = 0; p < 2; p++) {
-                    for (std::size_t i = 0; i < 3; i++) {
-                        for (std::size_t j = 0; j < ArithmetizationParams::constant_columns; j++) {
-                            constants[p][i].emplace_back(random_engine());
-                        }
-                    }
-                }
 
                 constraint_mults.reserve(starting_constraint_mults_size);
                 for (std::size_t i = 0; i < starting_constraint_mults_size; i++) {
-                    constraint_mults.emplace_back(generate_constraint_mult(random_engine));
+                    constraint_mults.emplace_back(generate_constraint_mult());
                 }
                 lookup_constraint_mults.reserve(starting_constraint_mults_size);
                 for (std::size_t i = 0; i < starting_constraint_mults_size; i++) {
-                    lookup_constraint_mults.emplace_back(generate_constraint_mult(random_engine));
+                    lookup_constraint_mults.emplace_back(generate_constraint_mult());
                 }
                 lookup_table_mults.reserve(starting_constraint_mults_size);
                 for (std::size_t i = 0; i < starting_constraint_mults_size; i++) {
-                    lookup_table_mults.emplace_back(generate_constraint_mult(random_engine));
+                    lookup_table_mults.emplace_back(generate_constraint_mult());
                 }
             }
-        public:
-            static constexpr std::size_t witness_columns = ArithmetizationParams::witness_columns;
-            static constexpr std::size_t constant_columns = ArithmetizationParams::constant_columns;
 
+            inline value_type get_power_helper(std::vector<value_type> &container, std::size_t index) {
+                while (index >= container.size()) {
+                    container.push_back(generate_constraint_mult());
+                }
+                return container[index];
+            }
+
+            inline value_type get_value_helper(
+                    std::array<std::array<std::vector<value_type>, 3>, 2> &container,
+                    std::size_t point, std::size_t index, std::size_t rotation) {
+                BOOST_ASSERT_MSG(point == 0 || point == 1, "Point must be either 0 or 1.");
+                return get_power_helper(container[point][rotation + 1], index);
+            }
+
+        public:
             // Singleton
             static value_set& get_value_set() {
                 static value_set instance;
                 return instance;
             }
 
-            value_type get_witness(std::size_t point, std::size_t index, std::size_t rotation) const {
-                BOOST_ASSERT_MSG(point == 0 || point == 1, "Point must be either 0 or 1.");
-                BOOST_ASSERT_MSG(index < witness_columns, "Index must be less than witness_columns.");
-                return witnesses[point][rotation + 1][index];
+            value_type get_witness(std::size_t point, std::size_t index, std::size_t rotation) {
+                return get_value_helper(witnesses, point, index, rotation);
             }
 
-            value_type get_constant(std::size_t point, std::size_t index, std::size_t rotation) const {
-                BOOST_ASSERT_MSG(point == 0 || point == 1, "Point must be either 0 or 1.");
-                BOOST_ASSERT_MSG(index < constant_columns, "Index must be less than constant_columns.");
-                return constants[point][rotation + 1][index];
+            value_type get_constant(std::size_t point, std::size_t index, std::size_t rotation) {
+                return get_value_helper(constants, point, index, rotation);
             }
-
-            #define GET_POWER_MACRO(power_container) \
-                if (index >= power_container.size()) { \
-                    static boost::random::random_device dev;  \
-                    static nil::crypto3::random::algebraic_engine<BlueprintFieldType> random_engine(dev); \
-                    while (index >= power_container.size()) { \
-                        power_container.push_back(generate_constraint_mult(random_engine)); \
-                    } \
-                } \
-                return power_container[index];
 
             value_type get_power(std::size_t index) {
-                GET_POWER_MACRO(constraint_mults);
+                return get_power_helper(constraint_mults, index);
             }
 
             value_type get_lookup_power(std::size_t index) {
-                GET_POWER_MACRO(lookup_constraint_mults);
+                return get_power_helper(lookup_constraint_mults, index);
             }
 
             value_type get_table_power(std::size_t index) {
-                GET_POWER_MACRO(lookup_table_mults);
+                return get_power_helper(lookup_table_mults, index);
             }
 
-            #undef GET_POWER_MACRO
-
-            value_type get_var_value(std::size_t point, const var &var) const {
+            value_type get_var_value(std::size_t point, const var &var) {
                 BOOST_ASSERT_MSG(point == 0 || point == 1, "Index must be either 0 or 1.");
                 BOOST_ASSERT_MSG(var.relative == true, "Absolute variables should not belong to a gate.");
                 switch (var.type) {
@@ -182,11 +151,11 @@ namespace nil {
                 __builtin_unreachable();
             };
 
-            value_type get_first_value(const var &var) const {
+            value_type get_first_value(const var &var) {
                 return get_var_value(0, var);
             };
 
-            value_type get_second_value(const var &var) const {
+            value_type get_second_value(const var &var) {
                 return get_var_value(1, var);
             };
         };
@@ -196,13 +165,13 @@ namespace nil {
         // This uses [Schwartz–Zippel lemma](https://en.wikipedia.org/wiki/Schwartz%E2%80%93Zippel_lemma)
         // to guarantee a really small probability of collision : degree/field_size
         // We do that at two random points, because I am paranoid.
-        template<typename BlueprintFieldType, typename ArithmetizationParams>
+        template<typename BlueprintFieldType>
         class gate_id {
         private:
             using value_type = typename BlueprintFieldType::value_type;
             using var = nil::crypto3::zk::snark::plonk_variable<value_type>;
             using expression_type = nil::crypto3::math::expression<var>;
-            using value_set_type = value_set<BlueprintFieldType, ArithmetizationParams>;
+            using value_set_type = value_set<BlueprintFieldType>;
             using constraint_type = nil::crypto3::zk::snark::plonk_constraint<BlueprintFieldType>;
             using gate_type = crypto3::zk::snark::plonk_gate<BlueprintFieldType, constraint_type>;
 
@@ -293,13 +262,13 @@ namespace nil {
         };
 
         // Similar idea to gate_id, but implemented for lookup gates
-        template<typename BlueprintFieldType, typename ArithmetizationParams>
+        template<typename BlueprintFieldType>
         class lookup_gate_id {
         private:
             using value_type = typename BlueprintFieldType::value_type;
             using var = nil::crypto3::zk::snark::plonk_variable<value_type>;
             using expression_type = nil::crypto3::math::expression<var>;
-            using value_set_type = value_set<BlueprintFieldType, ArithmetizationParams>;
+            using value_set_type = value_set<BlueprintFieldType>;
             using constraint_type = nil::crypto3::zk::snark::plonk_lookup_constraint<BlueprintFieldType>;
             using gate_type = crypto3::zk::snark::plonk_lookup_gate<BlueprintFieldType, constraint_type>;
 

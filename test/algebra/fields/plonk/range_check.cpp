@@ -68,11 +68,10 @@ auto test_range_check(typename BlueprintFieldType::value_type input,
     // Since we need to know SelectorColumns amount before the component is actually intialized,
     // we use two.
     constexpr std::size_t SelectorColumns = 2;
-    using ArithmetizationParams = nil::crypto3::zk::snark::plonk_arithmetization_params<
-        WitnessesAmount, PublicInputColumns, ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                                                                 ArithmetizationParams>;
-    using AssignmentType = nil::blueprint::assignment<ArithmetizationType>;
+    zk::snark::plonk_table_description<BlueprintFieldType> desc(
+        WitnessesAmount, PublicInputColumns, ConstantColumns, SelectorColumns);
+    using ArithmetizationType = nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>;
+    using AssignmentType = nil::blueprint::assignment<nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>;
 	using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 1;
 
@@ -103,29 +102,29 @@ auto test_range_check(typename BlueprintFieldType::value_type input,
 
     if (!CustomAssignments) {
         if (expected_to_pass) {
-            nil::crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-                component_instance, public_input, result_check, instance_input,
+            nil::crypto3::test_component<component_type, BlueprintFieldType, hash_type, Lambda>(
+                component_instance, desc, public_input, result_check, instance_input,
                 nil::blueprint::connectedness_check_type::type::STRONG, R);
         } else {
-            nil::crypto3::test_component_to_fail<component_type, BlueprintFieldType, ArithmetizationParams,
+            nil::crypto3::test_component_to_fail<component_type, BlueprintFieldType,
                                                  hash_type, Lambda>(
-                                                    component_instance, public_input, result_check, instance_input,
+                                                    component_instance, desc, public_input, result_check, instance_input,
                                                     nil::blueprint::connectedness_check_type::type::STRONG, R);
         }
     } else {
         auto custom_assignment = nil::crypto3::generate_patched_assignments<
-             BlueprintFieldType, ArithmetizationParams, component_type>(patches);
+             BlueprintFieldType, component_type>(patches);
 
         if (expected_to_pass) {
-            nil::crypto3::test_component_custom_assignments<component_type, BlueprintFieldType, ArithmetizationParams,
+            nil::crypto3::test_component_custom_assignments<component_type, BlueprintFieldType,
                     hash_type, Lambda>(
-                        component_instance, public_input,
+                        component_instance, desc, public_input,
                         result_check, custom_assignment, instance_input,
                         nil::blueprint::connectedness_check_type::type::STRONG, R);
         } else {
             nil::crypto3::test_component_to_fail_custom_assignments<component_type, BlueprintFieldType,
-                    ArithmetizationParams, hash_type, Lambda>(
-                            component_instance, public_input, result_check,
+                    hash_type, Lambda>(
+                            component_instance, desc, public_input, result_check,
                             custom_assignment, instance_input,
                             nil::blueprint::connectedness_check_type::type::STRONG, R);
         }

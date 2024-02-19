@@ -47,17 +47,17 @@ namespace nil {
             template<typename ArithmetizationType, typename FieldType, typename NonNativePolicyType>
             class reduction;
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
-            class reduction<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+            template<typename BlueprintFieldType>
+            class reduction<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>,
                             BlueprintFieldType,
                             basic_non_native_policy<BlueprintFieldType>>
-                : public plonk_component<BlueprintFieldType, ArithmetizationParams, 0, 0> {
+                : public plonk_component<BlueprintFieldType> {
 
                 using operating_field_type = crypto3::algebra::fields::curve25519_scalar_field;
                 using non_native_policy_type = basic_non_native_policy<BlueprintFieldType>;
 
             public:
-                using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 0, 0>;
+                using component_type = plonk_component<BlueprintFieldType>;
 
                 using var = typename component_type::var;using manifest_type = nil::blueprint::plonk_component_manifest;
 
@@ -128,22 +128,22 @@ namespace nil {
                     component_type(witnesses, constants, public_inputs, get_manifest()) {};
             };
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
+            template<typename BlueprintFieldType>
             using plonk_reduction =
-                reduction<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                reduction<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>,
                           BlueprintFieldType,
                           basic_non_native_policy<BlueprintFieldType>>;
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
-            typename plonk_reduction<BlueprintFieldType, ArithmetizationParams>::result_type generate_assignments(
-                const plonk_reduction<BlueprintFieldType, ArithmetizationParams> &component,
-                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+            template<typename BlueprintFieldType>
+            typename plonk_reduction<BlueprintFieldType>::result_type generate_assignments(
+                const plonk_reduction<BlueprintFieldType> &component,
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                     &assignment,
-                const typename plonk_reduction<BlueprintFieldType, ArithmetizationParams>::input_type instance_input,
+                const typename plonk_reduction<BlueprintFieldType>::input_type instance_input,
                 const std::uint32_t start_row_index) {
 
                 using ArithmetizationType =
-                    crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+                    crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>;
 
                 std::size_t row = start_row_index;
                 std::array<typename ArithmetizationType::field_type::integral_type, 8> data = {
@@ -241,20 +241,20 @@ namespace nil {
                 assignment.witness(component.W(6), row + 2) = (v >> 12) & ((1 << (22)) - 1);
                 assignment.witness(component.W(7), row + 2) = v & 4095;
 
-                return typename plonk_reduction<BlueprintFieldType, ArithmetizationParams>::result_type(
+                return typename plonk_reduction<BlueprintFieldType>::result_type(
                     component, start_row_index);
             }
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
+            template<typename BlueprintFieldType>
             std::array<std::size_t, 2> generate_gates(
-                const plonk_reduction<BlueprintFieldType, ArithmetizationParams> &component,
-                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                const plonk_reduction<BlueprintFieldType> &component,
+                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                     &assignment,
-                const typename plonk_reduction<BlueprintFieldType, ArithmetizationParams>::input_type
+                const typename plonk_reduction<BlueprintFieldType>::input_type
                     &instance_input) {
 
-                using var = typename plonk_reduction<BlueprintFieldType, ArithmetizationParams>::var;
+                using var = typename plonk_reduction<BlueprintFieldType>::var;
 
                 auto L = 0x1000000000000000000000000000000014def9dea2f79cd65812631a5cf5d3ed_cppui512;
 
@@ -330,17 +330,17 @@ namespace nil {
                 return {selector_index_1, selector_index_2};
             }
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
+            template<typename BlueprintFieldType>
             void generate_copy_constraints(
-                const plonk_reduction<BlueprintFieldType, ArithmetizationParams> &component,
-                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                const plonk_reduction<BlueprintFieldType> &component,
+                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                     &assignment,
-                const typename plonk_reduction<BlueprintFieldType, ArithmetizationParams>::input_type
+                const typename plonk_reduction<BlueprintFieldType>::input_type
                     &instance_input,
                 const std::size_t start_row_index) {
 
-                using var = typename plonk_reduction<BlueprintFieldType, ArithmetizationParams>::var;
+                using var = typename plonk_reduction<BlueprintFieldType>::var;
 
                 std::size_t row = start_row_index;
 
@@ -354,13 +354,13 @@ namespace nil {
                 bp.add_copy_constraint({var(component.W(7), row + 3, false), instance_input.k[7]});
             }
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
-            typename plonk_reduction<BlueprintFieldType, ArithmetizationParams>::result_type generate_circuit(
-                const plonk_reduction<BlueprintFieldType, ArithmetizationParams> &component,
-                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+            template<typename BlueprintFieldType>
+            typename plonk_reduction<BlueprintFieldType>::result_type generate_circuit(
+                const plonk_reduction<BlueprintFieldType> &component,
+                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                     &assignment,
-                const typename plonk_reduction<BlueprintFieldType, ArithmetizationParams>::input_type
+                const typename plonk_reduction<BlueprintFieldType>::input_type
                     &instance_input,
                 const std::size_t start_row_index) {
 
@@ -371,7 +371,7 @@ namespace nil {
 
                 generate_copy_constraints(component, bp, assignment, instance_input, start_row_index);
 
-                return typename plonk_reduction<BlueprintFieldType, ArithmetizationParams>::result_type(
+                return typename plonk_reduction<BlueprintFieldType>::result_type(
                     component, start_row_index);
             }
 

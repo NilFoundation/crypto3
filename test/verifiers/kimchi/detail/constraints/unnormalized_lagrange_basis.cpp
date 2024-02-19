@@ -60,7 +60,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_unnormalized_lagrange_basis_positive_power)
     constexpr std::size_t SelectorColumns = 4;
     using ArithmetizationParams =
         zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType>;
     using AssignmentType = blueprint::assignment<ArithmetizationType>;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
@@ -87,7 +87,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_unnormalized_lagrange_basis_positive_power)
         assert(expected_res == assignment.var_value(real_res.output));
     };
 
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input, result_check);
+    test_component<component_type, BlueprintFieldType, hash_type, Lambda>(params, public_input, result_check);
 
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
     std::cout << "vanishes_on_last_4_rows: " << duration.count() << "ms" << std::endl;
@@ -104,7 +104,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_unnormalized_lagrange_basis_negative_power)
     constexpr std::size_t SelectorColumns = 4;
     using ArithmetizationParams =
         zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType>;
     using AssignmentType = blueprint::assignment<ArithmetizationType>;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
@@ -131,7 +131,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_unnormalized_lagrange_basis_negative_power)
         assert(expected_res == assignment.var_value(real_res.output));
     };
 
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input, result_check);
+    test_component<component_type, BlueprintFieldType, hash_type, Lambda>(params, public_input, result_check);
 
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
     std::cout << "vanishes_on_last_4_rows: " << duration.count() << "ms" << std::endl;

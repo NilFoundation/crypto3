@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_index_terms_scalar_ec_test_su
     constexpr std::size_t SelectorColumns = 30;
     using ArithmetizationParams =
         zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType>;
     using AssignmentType = blueprint::assignment<ArithmetizationType>;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
@@ -89,7 +89,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_index_terms_scalar_ec_test_su
 
     using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size, srs_len>;
     using index_terms_list = zk::components::index_terms_scalars_list_ec_test<ArithmetizationType>;
-    using circuit_description = zk::components::kimchi_circuit_description<index_terms_list, 
+    using circuit_description = zk::components::kimchi_circuit_description<index_terms_list,
         witness_columns, perm_size>;
     using kimchi_params = zk::components::kimchi_params_type<curve_type, commitment_params, circuit_description,
         public_input_size, prev_chal_size>;
@@ -116,7 +116,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_index_terms_scalar_ec_test_su
             0x08066B51E8C7F77F825F541E02C51A608FD217435FDF7E75AD5BBE36CB826443_cppui256,
             0x1AA8ADB147AA57E6AA5DBAF2C238352D8C6AA301ECD497BBC775E2A2804E3363_cppui256
         };
-    
+
     typename BlueprintFieldType::value_type eval0_z = 0x1480D3E4FD095CEC3688F88B105EE6F2365DCFAAA28CCB6B87DAB7E71E58010B_cppui256;
 
     std::array<typename BlueprintFieldType::value_type, perm_size> eval0_s = {
@@ -146,7 +146,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_index_terms_scalar_ec_test_su
             0x06BF9230E2E2424EF63FE51B0306D61BA478A06A226AEDA29DD12DA188D5F302_cppui256,
             0x29126D228A13DAF18CD96C487BF794569FB5A8BBDF14DDEC6CE22DAAED7DF34F_cppui256
         };
-    
+
     typename BlueprintFieldType::value_type eval1_z = 0x1635A182C3B5623D5E7CF31D244F389FB478B0612B27937A39D48B473DB68931_cppui256;
 
     std::array<typename BlueprintFieldType::value_type, perm_size> eval1_s = {
@@ -171,7 +171,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_index_terms_scalar_ec_test_su
     typename BlueprintFieldType::value_type zeta_val =
         0x03D8C35D2E1466E8514E20A8E658F4E2B1116AB123F7BF53F9A1C7376F788EB1_cppui256;
 
-    typename BlueprintFieldType::value_type omega_val = 
+    typename BlueprintFieldType::value_type omega_val =
         0x0CB8102D0128EBB25343154773101EAF1A9DAEF679667EB4BD1E06B973E985E4_cppui256;
     std::size_t domain_size = 512;
 
@@ -192,7 +192,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_index_terms_scalar_ec_test_su
         0x0000000000000000000000000000000000000000000000000000000000000000_cppui256,
         0x0000000000000000000000000000000000000000000000000000000000000000_cppui256,
         0x0000000000000000000000000000000000000000000000000000000000000000_cppui256,
-        0x017EEEF7695889AFB5311D7B36B31455AFF02B103BDA9BABF5BC29107B8F3AB7_cppui256, // varBaseMul 
+        0x017EEEF7695889AFB5311D7B36B31455AFF02B103BDA9BABF5BC29107B8F3AB7_cppui256, // varBaseMul
         0x259D030170979C4754D0CEBF9E6AE529563BEB3A27C7003F57CCD4F80F875E4B_cppui256, // endoMul
         0x0F297E2FA4E61DD377911C6B14C03F5CABC1114813C5D5C4CDCBDFBE84C526DB_cppui256, // endoMulScalar
         0x0EF5278F0AD55CDE149D4E396A01E9B72A0D73FB4CF033C570B1B7E0C24C5FCE_cppui256, // completeAdd
@@ -205,7 +205,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_index_terms_scalar_ec_test_su
 
     using evaluations_type = typename zk::components::kimchi_proof_evaluations<
                         BlueprintFieldType, kimchi_params>;
-    std::array<evaluations_type, 2> evals; 
+    std::array<evaluations_type, 2> evals;
 
     for (std::size_t i = 0; i < 2; i++) {
         for (std::size_t j = 0; j < witness_columns; j++) {
@@ -244,7 +244,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_index_terms_scalar_ec_test_su
     public_input.push_back(omega_val);
     var omega = var(0, public_input.size() - 1, false, var::column_type::public_input);
 
-    typename component_type::params_type params = { 
+    typename component_type::params_type params = {
         zeta, alpha, beta, gamma, joint_combiner,
         evals, omega, domain_size};
 
@@ -254,7 +254,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_index_terms_scalar_ec_test_su
         }
     };
 
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input,
+    test_component<component_type, BlueprintFieldType, hash_type, Lambda>(params, public_input,
                                                                                                  result_check);
 }
 
@@ -268,7 +268,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_index_terms_scalar_lookup_tes
     constexpr std::size_t SelectorColumns = 30;
     using ArithmetizationParams =
         zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType>;
     using AssignmentType = blueprint::assignment<ArithmetizationType>;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
@@ -287,7 +287,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_index_terms_scalar_lookup_tes
 
     using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size, srs_len>;
     using index_terms_list = zk::components::index_terms_scalars_list_lookup_test<ArithmetizationType>;
-    using circuit_description = zk::components::kimchi_circuit_description<index_terms_list, 
+    using circuit_description = zk::components::kimchi_circuit_description<index_terms_list,
         witness_columns, perm_size>;
     using kimchi_params = zk::components::kimchi_params_type<curve_type, commitment_params, circuit_description,
         public_input_size, prev_chal_size>;
@@ -314,7 +314,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_index_terms_scalar_lookup_tes
             0x057447F937138B38EE2983C5224B3A80753EFB1A4269B28E394029D89BD20891_cppui256,
             0x0BC7766F2D4C24402C35C11D5451F9DB42940DAC964AE5DEA26B973AE0716433_cppui256,
         };
-    
+
     typename BlueprintFieldType::value_type eval0_z = 0x134EBAD0F9C35BE923C101FBDDE3E6223FE9688D939FD620137F2BA1473CEE2E_cppui256;
 
     std::array<typename BlueprintFieldType::value_type, perm_size> eval0_s = {
@@ -334,10 +334,10 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_index_terms_scalar_lookup_tes
         0x2101DB892E0BFF916221891846B5208F85DC8AFADF3CEF66EC40AA026D7E2616_cppui256,
     };
 
-    typename BlueprintFieldType::value_type eval0_lookup_aggregated = 
-        0x2491DCAD05BC2541E67009FD6430FD3E3F761F6777745636741FBE38BF40178A_cppui256;;    
+    typename BlueprintFieldType::value_type eval0_lookup_aggregated =
+        0x2491DCAD05BC2541E67009FD6430FD3E3F761F6777745636741FBE38BF40178A_cppui256;;
 
-    typename BlueprintFieldType::value_type eval0_lookup_table = 
+    typename BlueprintFieldType::value_type eval0_lookup_table =
         0x3061EA493FBB49E185D2C7B05A5F918B243FC5FF0BF157EE88C117C1C5FF250F_cppui256;
 
     std::array<typename BlueprintFieldType::value_type, witness_columns>
@@ -358,7 +358,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_index_terms_scalar_lookup_tes
             0x03C1F49FFCF5D4109ED32482643C80CC8DB1E13D257E006D2A78670102D010BB_cppui256,
             0x32F0A76D76BF32308CD3228547147B0B353AD81EA3C5207256CE943DC38706B2_cppui256,
         };
-    
+
     typename BlueprintFieldType::value_type eval1_z = 0x3C6E48DF402AA8AD73AEE593E6A45E617A6FA5F0FD6537195830BDFAD5007FB2_cppui256;
 
     std::array<typename BlueprintFieldType::value_type, perm_size> eval1_s = {
@@ -377,10 +377,10 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_index_terms_scalar_lookup_tes
         0x08DF00E4FA6F4A9261CCF816AF7792D42CEF4E7E6942C8DC3171A0002538DEB5_cppui256,
     };
 
-    typename BlueprintFieldType::value_type eval1_lookup_aggregated = 
-        0x297BAEF6E597DAB1C9D2694509368B8D3A5FE32AE7B2AF577633806DB48952A3_cppui256;    
+    typename BlueprintFieldType::value_type eval1_lookup_aggregated =
+        0x297BAEF6E597DAB1C9D2694509368B8D3A5FE32AE7B2AF577633806DB48952A3_cppui256;
 
-    typename BlueprintFieldType::value_type eval1_lookup_table = 
+    typename BlueprintFieldType::value_type eval1_lookup_table =
         0x12A589E01D18A29D5D176B45C9EF899EF6ADDF3A6594EAD2461666E05876B2E9_cppui256;
 
     std::array<std::array<typename BlueprintFieldType::value_type, witness_columns>, 2> eval_w = {eval0_w, eval1_w};
@@ -402,7 +402,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_index_terms_scalar_lookup_tes
     typename BlueprintFieldType::value_type joint_combiner_val =
         0x38C743A28755C1E00F0771302FE6A07A2130C21884C1A7AF1800DD8FD9FC6547_cppui256;
 
-    typename BlueprintFieldType::value_type omega_val = 
+    typename BlueprintFieldType::value_type omega_val =
         0x0CB8102D0128EBB25343154773101EAF1A9DAEF679667EB4BD1E06B973E985E4_cppui256;
     std::size_t domain_size = 512;
 
@@ -423,7 +423,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_index_terms_scalar_lookup_tes
         0x0000000000000000000000000000000000000000000000000000000000000000_cppui256,
         0x0000000000000000000000000000000000000000000000000000000000000000_cppui256,
         0x0000000000000000000000000000000000000000000000000000000000000000_cppui256,
-        0x3C298FAAF54E18672778EBEBAC6157CEE2D95F16122B92D0BAAD88BB8C2E0E1C_cppui256, // varBaseMul 
+        0x3C298FAAF54E18672778EBEBAC6157CEE2D95F16122B92D0BAAD88BB8C2E0E1C_cppui256, // varBaseMul
         0x2C4C103BC45214A6E78FB9CF5E6F7B8980C36AE4A2455988028C3C907D8C7F08_cppui256, // endoMul
         0x18BDD6D3E3CFAEC53B93C6AD4B9B167FB44B5DFD1A92D34C93BBD1C9F713978D_cppui256, // endoMulScalar
         0x2B2CCD26ACF301C648598FDF4FE0DF29BBD189A233E5BFDEC169B4545F151046_cppui256, // completeAdd
@@ -437,7 +437,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_index_terms_scalar_lookup_tes
 
     using evaluations_type = typename zk::components::kimchi_proof_evaluations<
                         BlueprintFieldType, kimchi_params>;
-    std::array<evaluations_type, 2> evals; 
+    std::array<evaluations_type, 2> evals;
 
     for (std::size_t i = 0; i < 2; i++) {
         for (std::size_t j = 0; j < witness_columns; j++) {
@@ -491,7 +491,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_index_terms_scalar_lookup_tes
     public_input.push_back(omega_val);
     var omega = var(0, public_input.size() - 1, false, var::column_type::public_input);
 
-    typename component_type::params_type params = { 
+    typename component_type::params_type params = {
         zeta, alpha, beta, gamma, joint_combiner,
         evals, omega, domain_size};
 
@@ -501,7 +501,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_index_terms_scalar_lookup_tes
         }
     };
 
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input,
+    test_component<component_type, BlueprintFieldType, hash_type, Lambda>(params, public_input,
                                                                                                  result_check);
 }
 

@@ -60,7 +60,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_pickles_heterogenous_verify_scalar_field_te
     constexpr std::size_t SelectorColumns = 30;
     using ArithmetizationParams =
         zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType>;
     using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
@@ -96,7 +96,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_pickles_heterogenous_verify_scalar_field_te
 
     auto result_check = [](AssignmentType &assignment, component_type::result_type &real_res) {};
 
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input,
+    test_component<component_type, BlueprintFieldType, hash_type, Lambda>(params, public_input,
                                                                                                  result_check);
 }
 

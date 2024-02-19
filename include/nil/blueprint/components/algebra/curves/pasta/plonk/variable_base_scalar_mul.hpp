@@ -103,19 +103,19 @@ namespace nil {
             template<typename ArithmetizationType, typename CurveType>
             class curve_element_variable_base_scalar_mul;
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType>
+            template<typename BlueprintFieldType, typename CurveType>
             class curve_element_variable_base_scalar_mul<
-                crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>,
                 CurveType
-            >: public plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0> {
+            >: public plonk_component<BlueprintFieldType> {
 
             public:
-                using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0>;
+                using component_type = plonk_component<BlueprintFieldType>;
 
                 using var = typename component_type::var;
                 using manifest_type = plonk_component_manifest;
                 using add_component =
-                    nil::blueprint::components::unified_addition<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, CurveType>;
+                    nil::blueprint::components::unified_addition<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>, CurveType>;
 
                 class gate_manifest_type : public component_gate_manifest {
                 public:
@@ -215,23 +215,23 @@ namespace nil {
                     component_type(witnesses, constants, public_inputs, get_manifest()){};
             };
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType>
+            template<typename BlueprintFieldType, typename CurveType>
             using plonk_curve_element_variable_base_scalar_mul =
                 curve_element_variable_base_scalar_mul<
-                    crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                    crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>,
                     CurveType
                 >;
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType>
-            typename plonk_curve_element_variable_base_scalar_mul<BlueprintFieldType, ArithmetizationParams, CurveType>::result_type
+            template<typename BlueprintFieldType, typename CurveType>
+            typename plonk_curve_element_variable_base_scalar_mul<BlueprintFieldType, CurveType>::result_type
                 generate_assignments(
-                    const plonk_curve_element_variable_base_scalar_mul<BlueprintFieldType, ArithmetizationParams, CurveType> &component,
-                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
-                    const typename plonk_curve_element_variable_base_scalar_mul<BlueprintFieldType, ArithmetizationParams, CurveType>::input_type instance_input,
+                    const plonk_curve_element_variable_base_scalar_mul<BlueprintFieldType, CurveType> &component,
+                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &assignment,
+                    const typename plonk_curve_element_variable_base_scalar_mul<BlueprintFieldType, CurveType>::input_type instance_input,
                     const std::uint32_t start_row_index) {
 
                 using add_component = typename plonk_curve_element_variable_base_scalar_mul<
-                    BlueprintFieldType, ArithmetizationParams, CurveType>::add_component;
+                    BlueprintFieldType, CurveType>::add_component;
 
                 typename BlueprintFieldType::value_type b = var_value(assignment, instance_input.b);
                 typename BlueprintFieldType::value_type b_high;
@@ -413,20 +413,20 @@ namespace nil {
                 assignment.witness(component.W(0), start_row_index + component.rows_amount - 1) = x;
                 assignment.witness(component.W(1), start_row_index + component.rows_amount - 1) = y;
 
-                return typename plonk_curve_element_variable_base_scalar_mul<BlueprintFieldType, ArithmetizationParams, CurveType>::result_type(component, start_row_index);
+                return typename plonk_curve_element_variable_base_scalar_mul<BlueprintFieldType, CurveType>::result_type(component, start_row_index);
             }
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType>
-            typename plonk_curve_element_variable_base_scalar_mul<BlueprintFieldType, ArithmetizationParams, CurveType>::result_type
+            template<typename BlueprintFieldType, typename CurveType>
+            typename plonk_curve_element_variable_base_scalar_mul<BlueprintFieldType, CurveType>::result_type
                 generate_circuit(
-                    const plonk_curve_element_variable_base_scalar_mul<BlueprintFieldType, ArithmetizationParams, CurveType> &component,
-                    circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
-                    const typename plonk_curve_element_variable_base_scalar_mul<BlueprintFieldType, ArithmetizationParams, CurveType>::input_type &instance_input,
+                    const plonk_curve_element_variable_base_scalar_mul<BlueprintFieldType, CurveType> &component,
+                    circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
+                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &assignment,
+                    const typename plonk_curve_element_variable_base_scalar_mul<BlueprintFieldType, CurveType>::input_type &instance_input,
                     const std::uint32_t start_row_index) {
 
                 using add_component = typename plonk_curve_element_variable_base_scalar_mul<
-                    BlueprintFieldType, ArithmetizationParams, CurveType>::add_component;
+                    BlueprintFieldType, CurveType>::add_component;
 
                 generate_assignments_constants(component, bp, assignment, instance_input, start_row_index);
 
@@ -449,17 +449,17 @@ namespace nil {
                 generate_circuit(unified_addition_instance, bp, assignment, addition_input, start_row_index);
 
                 generate_copy_constraints(component, bp, assignment, instance_input, start_row_index);
-                return typename plonk_curve_element_variable_base_scalar_mul<BlueprintFieldType, ArithmetizationParams, CurveType>::result_type(component, start_row_index);
+                return typename plonk_curve_element_variable_base_scalar_mul<BlueprintFieldType, CurveType>::result_type(component, start_row_index);
             }
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType>
+            template<typename BlueprintFieldType, typename CurveType>
                 std::array<std::size_t, 3> generate_gates(
-                    const plonk_curve_element_variable_base_scalar_mul<BlueprintFieldType, ArithmetizationParams, CurveType> &component,
-                    circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
-                    const typename plonk_curve_element_variable_base_scalar_mul<BlueprintFieldType, ArithmetizationParams, CurveType>::input_type instance_input) {
+                    const plonk_curve_element_variable_base_scalar_mul<BlueprintFieldType, CurveType> &component,
+                    circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
+                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &assignment,
+                    const typename plonk_curve_element_variable_base_scalar_mul<BlueprintFieldType, CurveType>::input_type instance_input) {
 
-                using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+                using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>;
                 using var = typename curve_element_variable_base_scalar_mul<ArithmetizationType, CurveType>::var;
 
                 auto bit_check_1 = var(component.W(2), +1) * (1 - var(component.W(2), +1));
@@ -747,18 +747,18 @@ namespace nil {
                 return {selector_index_1, selector_index_2, selector_index_3};
             }
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType>
+            template<typename BlueprintFieldType, typename CurveType>
                 void generate_copy_constraints(
-                    const plonk_curve_element_variable_base_scalar_mul<BlueprintFieldType, ArithmetizationParams, CurveType> &component,
-                    circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
-                    const typename plonk_curve_element_variable_base_scalar_mul<BlueprintFieldType, ArithmetizationParams, CurveType>::input_type instance_input,
+                    const plonk_curve_element_variable_base_scalar_mul<BlueprintFieldType, CurveType> &component,
+                    circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
+                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &assignment,
+                    const typename plonk_curve_element_variable_base_scalar_mul<BlueprintFieldType, CurveType>::input_type instance_input,
                     const std::uint32_t start_row_index) {
 
                 std::size_t j = start_row_index + component.add_component_rows_amount;
-                using var = typename plonk_curve_element_variable_base_scalar_mul<BlueprintFieldType, ArithmetizationParams, CurveType>::var;
+                using var = typename plonk_curve_element_variable_base_scalar_mul<BlueprintFieldType, CurveType>::var;
                 using add_component = typename plonk_curve_element_variable_base_scalar_mul<
-                    BlueprintFieldType, ArithmetizationParams, CurveType>::add_component;
+                    BlueprintFieldType, CurveType>::add_component;
 
                 add_component unified_addition_instance(
                         {component.W(0), component.W(1), component.W(2), component.W(3), component.W(4),
@@ -826,12 +826,12 @@ namespace nil {
 
             }
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType>
+            template<typename BlueprintFieldType, typename CurveType>
                     void generate_assignments_constants(
-                        const plonk_curve_element_variable_base_scalar_mul<BlueprintFieldType, ArithmetizationParams, CurveType> &component,
-                        circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                        assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
-                        const typename plonk_curve_element_variable_base_scalar_mul<BlueprintFieldType, ArithmetizationParams, CurveType>::input_type instance_input,
+                        const plonk_curve_element_variable_base_scalar_mul<BlueprintFieldType, CurveType> &component,
+                        circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
+                        assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &assignment,
+                        const typename plonk_curve_element_variable_base_scalar_mul<BlueprintFieldType, CurveType>::input_type instance_input,
                         const std::uint32_t start_row_index) {
                 std::size_t row = start_row_index + component.add_component_rows_amount;
 
@@ -844,22 +844,20 @@ namespace nil {
             template<typename ComponentType>
             class result_type_converter;
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType>
+            template<typename BlueprintFieldType, typename CurveType>
             class input_type_converter<
-                plonk_curve_element_variable_base_scalar_mul<BlueprintFieldType, ArithmetizationParams, CurveType>> {
+                plonk_curve_element_variable_base_scalar_mul<BlueprintFieldType, CurveType>> {
 
                 using component_type =
-                    plonk_curve_element_variable_base_scalar_mul<BlueprintFieldType, ArithmetizationParams, CurveType>;
+                    plonk_curve_element_variable_base_scalar_mul<BlueprintFieldType, CurveType>;
                 using input_type = typename component_type::input_type;
                 using var = typename nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
             public:
                 static input_type convert(
                     const input_type &input,
-                    nil::blueprint::assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                                                           ArithmetizationParams>>
+                    nil::blueprint::assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                         &assignment,
-                    nil::blueprint::assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                                                           ArithmetizationParams>>
+                    nil::blueprint::assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                         &tmp_assignment) {
 
                     tmp_assignment.public_input(0, 0) = var_value(assignment, input.T.x);
@@ -911,15 +909,15 @@ namespace nil {
                 }
             };
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType>
+            template<typename BlueprintFieldType, typename CurveType>
             class result_type_converter<
-                plonk_curve_element_variable_base_scalar_mul<BlueprintFieldType, ArithmetizationParams, CurveType>> {
+                plonk_curve_element_variable_base_scalar_mul<BlueprintFieldType, CurveType>> {
 
                 using component_type =
-                    plonk_curve_element_variable_base_scalar_mul<BlueprintFieldType, ArithmetizationParams, CurveType>;
+                    plonk_curve_element_variable_base_scalar_mul<BlueprintFieldType, CurveType>;
                 using input_type = typename component_type::input_type;
                 using result_type = typename component_type::result_type;
-                using stretcher_type = component_stretcher<BlueprintFieldType, ArithmetizationParams, component_type>;
+                using stretcher_type = component_stretcher<BlueprintFieldType, component_type>;
             public:
                 static result_type convert(const stretcher_type &component, const result_type old_result,
                                            const input_type &instance_input, std::size_t start_row_index) {

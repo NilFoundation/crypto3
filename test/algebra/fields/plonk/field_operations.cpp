@@ -56,12 +56,12 @@ void test_add(std::vector<typename FieldType::value_type> public_input){
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 0;
     constexpr std::size_t SelectorColumns = 1;
-    using ArithmetizationParams =
-        crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
-    using AssignmentType = nil::blueprint::assignment<ArithmetizationType>;
+    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>;
+    using AssignmentType = nil::blueprint::assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>;
+    zk::snark::plonk_table_description<BlueprintFieldType> desc(
+        WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns);
 
     using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
@@ -85,8 +85,10 @@ void test_add(std::vector<typename FieldType::value_type> public_input){
 
     component_type component_instance({0, 1, 2},{},{});
 
-    nil::crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (component_instance, public_input, result_check, instance_input);
-    nil::crypto3::test_empty_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (component_instance, public_input, result_check, instance_input);
+    nil::crypto3::test_component<component_type, BlueprintFieldType, hash_type, Lambda> (
+        component_instance, desc, public_input, result_check, instance_input);
+    nil::crypto3::test_empty_component<component_type, BlueprintFieldType, hash_type, Lambda> (
+        component_instance, desc, public_input, result_check, instance_input);
 }
 
 template <typename FieldType>
@@ -96,12 +98,12 @@ void test_sub(std::vector<typename FieldType::value_type> public_input){
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 0;
     constexpr std::size_t SelectorColumns = 1;
-    using ArithmetizationParams =
-        crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
-    using AssignmentType = nil::blueprint::assignment<ArithmetizationType>;
+    using AssignmentType = nil::blueprint::assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>;
+    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>;
+    zk::snark::plonk_table_description<BlueprintFieldType> desc(
+        WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns);
 
     using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
@@ -125,8 +127,10 @@ void test_sub(std::vector<typename FieldType::value_type> public_input){
 
     component_type component_instance({0, 1, 2},{},{});
 
-    nil::crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (component_instance, public_input, result_check, instance_input);
-    nil::crypto3::test_empty_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (component_instance, public_input, result_check, instance_input);
+    nil::crypto3::test_component<component_type, BlueprintFieldType, hash_type, Lambda> (
+        component_instance, desc, public_input, result_check, instance_input);
+    nil::crypto3::test_empty_component<component_type, BlueprintFieldType, hash_type, Lambda> (
+        component_instance, desc, public_input, result_check, instance_input);
 }
 
 template <typename FieldType>
@@ -136,12 +140,12 @@ void test_mul(std::vector<typename FieldType::value_type> public_input){
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 0;
     constexpr std::size_t SelectorColumns = 1;
-    using ArithmetizationParams =
-        crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
-    using AssignmentType = nil::blueprint::assignment<ArithmetizationType>;
+    using AssignmentType = nil::blueprint::assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>;
+    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>;
+    zk::snark::plonk_table_description<BlueprintFieldType> desc(
+        WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns);
 
     using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
@@ -165,8 +169,10 @@ void test_mul(std::vector<typename FieldType::value_type> public_input){
 
     component_type component_instance({0, 1, 2},{},{});
 
-    nil::crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (component_instance, public_input, result_check, instance_input);
-    nil::crypto3::test_empty_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (component_instance, public_input, result_check, instance_input);
+    nil::crypto3::test_component<component_type, BlueprintFieldType, hash_type, Lambda> (
+        component_instance, desc, public_input, result_check, instance_input);
+    nil::crypto3::test_empty_component<component_type, BlueprintFieldType, hash_type, Lambda> (
+        component_instance, desc, public_input, result_check, instance_input);
 }
 
 template <typename FieldType>
@@ -177,13 +183,13 @@ void test_mul_by_const(std::vector<typename FieldType::value_type> public_input,
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 1;
     constexpr std::size_t SelectorColumns = 1;
-    using ArithmetizationParams =
-        crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+    zk::snark::plonk_table_description<BlueprintFieldType> desc(
+        WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns);
+    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
-    using AssignmentType = nil::blueprint::assignment<ArithmetizationType>;
-
+    using AssignmentType = nil::blueprint::assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>;
+    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>;
     using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
     using component_type = blueprint::components::mul_by_constant<ArithmetizationType, BlueprintFieldType>;
@@ -206,8 +212,10 @@ void test_mul_by_const(std::vector<typename FieldType::value_type> public_input,
 
     component_type component_instance({0, 1},{0},{},y);
 
-    nil::crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (component_instance, public_input, result_check, instance_input);
-    nil::crypto3::test_empty_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (component_instance, public_input, result_check, instance_input);
+    nil::crypto3::test_component<component_type, BlueprintFieldType, hash_type, Lambda> (
+        component_instance, desc, public_input, result_check, instance_input);
+    nil::crypto3::test_empty_component<component_type, BlueprintFieldType, hash_type, Lambda> (
+        component_instance, desc, public_input, result_check, instance_input);
 }
 
 template <typename FieldType>
@@ -218,13 +226,12 @@ void test_div(std::vector<typename FieldType::value_type> public_input,
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 0;
     constexpr std::size_t SelectorColumns = 1;
-    using ArithmetizationParams =
-        crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
-    using AssignmentType = nil::blueprint::assignment<ArithmetizationType>;
-
+    using AssignmentType = nil::blueprint::assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>;
+    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>;
+    zk::snark::plonk_table_description<BlueprintFieldType> desc(
+        WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns);
     using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
     using component_type = blueprint::components::division<ArithmetizationType, BlueprintFieldType, nil::blueprint::basic_non_native_policy<BlueprintFieldType>>;
@@ -239,8 +246,10 @@ void test_div(std::vector<typename FieldType::value_type> public_input,
 
     component_type component_instance({0, 1, 2, 3},{},{});
 
-    nil::crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (component_instance, public_input, result_check, instance_input);
-    nil::crypto3::test_empty_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (component_instance, public_input, result_check, instance_input);
+    nil::crypto3::test_component<component_type, BlueprintFieldType, hash_type, Lambda> (
+        component_instance, desc, public_input, result_check, instance_input);
+    nil::crypto3::test_empty_component<component_type, BlueprintFieldType, hash_type, Lambda> (
+        component_instance, desc, public_input, result_check, instance_input);
 }
 
 template <typename FieldType>
@@ -250,12 +259,12 @@ void test_div_or_zero(std::vector<typename FieldType::value_type> public_input){
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 0;
     constexpr std::size_t SelectorColumns = 1;
-    using ArithmetizationParams =
-        crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
-    using AssignmentType = nil::blueprint::assignment<ArithmetizationType>;
+    using AssignmentType = nil::blueprint::assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>;
+    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>;
+    zk::snark::plonk_table_description<BlueprintFieldType> desc(
+        WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns);
 
     using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
@@ -284,8 +293,10 @@ void test_div_or_zero(std::vector<typename FieldType::value_type> public_input){
 
     component_type component_instance({0, 1, 2, 3, 4},{},{});
 
-    nil::crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (component_instance, public_input, result_check, instance_input);
-    nil::crypto3::test_empty_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (component_instance, public_input, result_check, instance_input);
+    nil::crypto3::test_component<component_type, BlueprintFieldType, hash_type, Lambda> (
+        component_instance, desc, public_input, result_check, instance_input);
+    nil::crypto3::test_empty_component<component_type, BlueprintFieldType, hash_type, Lambda> (
+        component_instance, desc, public_input, result_check, instance_input);
 }
 
 template <typename FieldType>

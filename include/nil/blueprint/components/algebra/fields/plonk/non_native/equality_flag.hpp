@@ -43,13 +43,13 @@ namespace nil {
             template<typename ArithmetizationType, typename BlueprintFieldType>
             class equality_flag;
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
-            class equality_flag<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+            template<typename BlueprintFieldType>
+            class equality_flag<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>,
                 BlueprintFieldType>:
-                public plonk_component<BlueprintFieldType, ArithmetizationParams, 0, 0> {
+                public plonk_component<BlueprintFieldType> {
 
             public:
-                using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 0, 0>;
+                using component_type = plonk_component<BlueprintFieldType>;
 
                 class gate_manifest_type : public component_gate_manifest {
                 public:
@@ -146,18 +146,17 @@ namespace nil {
                     {};
             };
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
+            template<typename BlueprintFieldType>
             using plonk_equality_flag =
-                equality_flag<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                equality_flag<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>,
                 BlueprintFieldType>;
 
-            template<typename BlueprintFieldType,
-                     typename ArithmetizationParams>
-            typename plonk_equality_flag<BlueprintFieldType, ArithmetizationParams>::result_type
+            template<typename BlueprintFieldType>
+            typename plonk_equality_flag<BlueprintFieldType>::result_type
                 generate_assignments(
-                    const plonk_equality_flag<BlueprintFieldType, ArithmetizationParams> &component,
-                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
-                    const typename plonk_equality_flag<BlueprintFieldType, ArithmetizationParams>::input_type instance_input,
+                    const plonk_equality_flag<BlueprintFieldType> &component,
+                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &assignment,
+                    const typename plonk_equality_flag<BlueprintFieldType>::input_type instance_input,
                     const std::uint32_t start_row_index) {
 
                 const std::size_t j = start_row_index;
@@ -173,19 +172,18 @@ namespace nil {
                 }
                 assignment.witness(component.W(3), j) = x_val == y_val ? !component.inequality : component.inequality;
 
-                return typename plonk_equality_flag<BlueprintFieldType, ArithmetizationParams>::result_type(
+                return typename plonk_equality_flag<BlueprintFieldType>::result_type(
                         component, start_row_index);
             }
 
-            template<typename BlueprintFieldType,
-                     typename ArithmetizationParams>
+            template<typename BlueprintFieldType>
             std::size_t generate_gates(
-                const plonk_equality_flag<BlueprintFieldType, ArithmetizationParams> &component,
-                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
-                const typename plonk_equality_flag<BlueprintFieldType, ArithmetizationParams>::input_type &instance_input) {
+                const plonk_equality_flag<BlueprintFieldType> &component,
+                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &assignment,
+                const typename plonk_equality_flag<BlueprintFieldType>::input_type &instance_input) {
 
-                using var = typename plonk_equality_flag<BlueprintFieldType, ArithmetizationParams>::var;
+                using var = typename plonk_equality_flag<BlueprintFieldType>::var;
                 using constraint_type = crypto3::zk::snark::plonk_constraint<BlueprintFieldType>;
 
                 var x_var = var(component.W(0), 0),
@@ -202,16 +200,15 @@ namespace nil {
                 return bp.add_gate({constraint_1, constraint_2, constraint_3});
             }
 
-            template<typename BlueprintFieldType,
-                     typename ArithmetizationParams>
+            template<typename BlueprintFieldType>
             void generate_copy_constraints(
-                const plonk_equality_flag<BlueprintFieldType, ArithmetizationParams> &component,
-                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
-                const typename plonk_equality_flag<BlueprintFieldType, ArithmetizationParams>::input_type &instance_input,
+                const plonk_equality_flag<BlueprintFieldType> &component,
+                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &assignment,
+                const typename plonk_equality_flag<BlueprintFieldType>::input_type &instance_input,
                 const std::size_t start_row_index) {
 
-                using var = typename plonk_equality_flag<BlueprintFieldType, ArithmetizationParams>::var;
+                using var = typename plonk_equality_flag<BlueprintFieldType>::var;
 
                 const std::size_t j = start_row_index;
                 var component_x = var(component.W(0), static_cast<int>(j), false);
@@ -220,14 +217,13 @@ namespace nil {
                 bp.add_copy_constraint({instance_input.y, component_y});
             }
 
-            template<typename BlueprintFieldType,
-                     typename ArithmetizationParams>
-            typename plonk_equality_flag<BlueprintFieldType, ArithmetizationParams>::result_type
+            template<typename BlueprintFieldType>
+            typename plonk_equality_flag<BlueprintFieldType>::result_type
                 generate_circuit(
-                    const plonk_equality_flag<BlueprintFieldType, ArithmetizationParams> &component,
-                    circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
-                    const typename plonk_equality_flag<BlueprintFieldType, ArithmetizationParams>::input_type &instance_input,
+                    const plonk_equality_flag<BlueprintFieldType> &component,
+                    circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
+                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &assignment,
+                    const typename plonk_equality_flag<BlueprintFieldType>::input_type &instance_input,
                     const std::size_t start_row_index){
 
                 std::size_t selector_index = generate_gates(component, bp, assignment, instance_input);
@@ -236,7 +232,7 @@ namespace nil {
 
                 generate_copy_constraints(component, bp, assignment, instance_input, start_row_index);
 
-                return typename plonk_equality_flag<BlueprintFieldType, ArithmetizationParams>::result_type(
+                return typename plonk_equality_flag<BlueprintFieldType>::result_type(
                         component, start_row_index);
             }
         }    // namespace components

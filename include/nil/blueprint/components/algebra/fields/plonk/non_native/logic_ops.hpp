@@ -47,19 +47,17 @@ namespace nil {
             template<typename ArithmetizationType>
             class logic_not;
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
-            class logic_not<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+            template<typename BlueprintFieldType>
+            class logic_not<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                              : public boolean_op_component<crypto3::zk::snark::plonk_constraint_system<
-                                                                                                BlueprintFieldType,
-                                                                                                ArithmetizationParams>,
+                                                                                                BlueprintFieldType>,
                                                            1> {
 
                 using value_type = typename BlueprintFieldType::value_type;
 
             public:
                 using component_type =
-                    boolean_op_component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                            ArithmetizationParams>, 1>;
+                    boolean_op_component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>, 1>;
 
                 using var = typename component_type::var;
                 using manifest_type = nil::blueprint::plonk_component_manifest;
@@ -119,19 +117,17 @@ namespace nil {
             template<typename ArithmetizationType>
             class logic_and;
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
-            class logic_and<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+            template<typename BlueprintFieldType>
+            class logic_and<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                              : public boolean_op_component<crypto3::zk::snark::plonk_constraint_system<
-                                                                                                BlueprintFieldType,
-                                                                                                ArithmetizationParams>,
+                                                                                                BlueprintFieldType>,
                                                            2> {
 
                 using value_type = typename BlueprintFieldType::value_type;
 
             public:
                 using component_type =
-                    boolean_op_component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                    ArithmetizationParams>, 2>;
+                    boolean_op_component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>, 2>;
 
                 using var = typename component_type::var;
                 using manifest_type = nil::blueprint::plonk_component_manifest;
@@ -191,19 +187,17 @@ namespace nil {
             template<typename ArithmetizationType>
             class logic_or;
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
-            class logic_or<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+            template<typename BlueprintFieldType>
+            class logic_or<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                             : public boolean_op_component<crypto3::zk::snark::plonk_constraint_system<
-                                                                                                BlueprintFieldType,
-                                                                                                ArithmetizationParams>,
-                                                           2> {
+                                                                                                BlueprintFieldType>, 2>
+            {
 
                 using value_type = typename BlueprintFieldType::value_type;
 
             public:
                 using component_type =
-                    boolean_op_component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                    ArithmetizationParams>, 2>;
+                    boolean_op_component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>, 2>;
 
                 using var = typename component_type::var;
                 using manifest_type = nil::blueprint::plonk_component_manifest;
@@ -263,19 +257,17 @@ namespace nil {
             template<typename ArithmetizationType>
             class logic_xor;
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
-            class logic_xor<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+            template<typename BlueprintFieldType>
+            class logic_xor<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                              : public boolean_op_component<crypto3::zk::snark::plonk_constraint_system<
-                                                                                                BlueprintFieldType,
-                                                                                                ArithmetizationParams>,
-                                                           2> {
+                                                                                                BlueprintFieldType>, 2>
+            {
 
                 using value_type = typename BlueprintFieldType::value_type;
 
             public:
                 using component_type =
-                    boolean_op_component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                    ArithmetizationParams>, 2>;
+                    boolean_op_component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>, 2>;
 
                 using var = typename component_type::var;
                 using manifest_type = nil::blueprint::plonk_component_manifest;
@@ -335,12 +327,11 @@ namespace nil {
             template<typename ArithmetizationType>
             class logic_nand;
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
-            class logic_nand<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+            template<typename BlueprintFieldType>
+            class logic_nand<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                              : public boolean_op_component<crypto3::zk::snark::plonk_constraint_system<
-                                                                                                BlueprintFieldType,
-                                                                                                ArithmetizationParams>,
-                                                           2> {
+                                                                                                BlueprintFieldType>, 2>
+            {
 
                 constexpr static const std::uint32_t WitnessesAmount = 3;
 
@@ -348,8 +339,7 @@ namespace nil {
 
             public:
                 using component_type =
-                    boolean_op_component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                    ArithmetizationParams>, 2>;
+                    boolean_op_component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>, 2>;
 
                 using var = typename component_type::var;
                 using manifest_type = nil::blueprint::plonk_component_manifest;
@@ -408,19 +398,17 @@ namespace nil {
             template<typename ArithmetizationType>
             class logic_nor;
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
-            class logic_nor<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+            template<typename BlueprintFieldType>
+            class logic_nor<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                              : public boolean_op_component<crypto3::zk::snark::plonk_constraint_system<
-                                                                                                BlueprintFieldType,
-                                                                                                ArithmetizationParams>,
-                                                           2> {
+                                                                                                BlueprintFieldType>, 2>
+            {
 
                 using value_type = typename BlueprintFieldType::value_type;
 
             public:
                 using component_type =
-                    boolean_op_component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                    ArithmetizationParams>, 2>;
+                    boolean_op_component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>, 2>;
 
                 using var = typename component_type::var;
                 using manifest_type = nil::blueprint::plonk_component_manifest;

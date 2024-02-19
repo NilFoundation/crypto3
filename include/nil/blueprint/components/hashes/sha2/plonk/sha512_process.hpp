@@ -47,13 +47,12 @@ namespace nil {
             template<typename ArithmetizationType>
             class sha512_process;
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
-            class sha512_process<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                                                             ArithmetizationParams>>:
-                public plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0> {
+            template<typename BlueprintFieldType>
+            class sha512_process<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>:
+                public plonk_component<BlueprintFieldType> {
 
             public:
-                using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0>;
+                using component_type = plonk_component<BlueprintFieldType>;
 
                 using var = typename component_type::var;
                 using manifest_type = nil::blueprint::plonk_component_manifest;
@@ -132,7 +131,7 @@ namespace nil {
                 struct result_type {
                     std::array<var, 8> output_state;
 
-                    result_type(const sha512_process<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &component, std::uint32_t start_row_index) {
+                    result_type(const sha512_process<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &component, std::uint32_t start_row_index) {
                         output_state = {var(component.W(0), start_row_index + component.rows_amount - 3, false),
                                         var(component.W(1), start_row_index + component.rows_amount - 3, false),
                                         var(component.W(2), start_row_index + component.rows_amount - 3, false),
@@ -167,35 +166,34 @@ namespace nil {
 
             };
 
-            template<typename BlueprintFieldType,
-                     typename ArithmetizationParams>
+            template<typename BlueprintFieldType>
             using plonk_sha512_process =
-                sha512_process<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>;
+                sha512_process<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>;
 
             namespace detail {
 
-                template<typename BlueprintFieldType, typename ArithmetizationParams>
+                template<typename BlueprintFieldType>
                 void generate_assignments_constant(
-                        const plonk_sha512_process<BlueprintFieldType, ArithmetizationParams> &component,
-                        circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                        assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
-                        const typename plonk_sha512_process<BlueprintFieldType, ArithmetizationParams>::input_type &instance_input,
+                        const plonk_sha512_process<BlueprintFieldType> &component,
+                        circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
+                        assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &assignment,
+                        const typename plonk_sha512_process<BlueprintFieldType>::input_type &instance_input,
                         const std::size_t start_row_index) {
 
                         std::size_t row = start_row_index + 386 + 3;
                         for (std::size_t i = 0; i < 80; i ++){
                             assignment.constant(component.C(0), row + i*9) =
-                                plonk_sha512_process<BlueprintFieldType, ArithmetizationParams>::round_constant[i];
+                                plonk_sha512_process<BlueprintFieldType>::round_constant[i];
                         }
                 }
 
-                template<typename BlueprintFieldType, typename ArithmetizationParams>
+                template<typename BlueprintFieldType>
                 std::size_t generate_sigma0_gates(
-                    const plonk_sha512_process<BlueprintFieldType, ArithmetizationParams> &component,
-                    circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment) {
+                    const plonk_sha512_process<BlueprintFieldType> &component,
+                    circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
+                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &assignment) {
 
-                    using var = typename plonk_sha512_process<BlueprintFieldType, ArithmetizationParams>::var;
+                    using var = typename plonk_sha512_process<BlueprintFieldType>::var;
 
                     typename BlueprintFieldType::integral_type one = 1;
                     auto constraint_1 =
@@ -218,13 +216,13 @@ namespace nil {
                     return bp.add_gate({constraint_1, constraint_2, constraint_3, constraint_4});
                 }
 
-                template<typename BlueprintFieldType, typename ArithmetizationParams>
+                template<typename BlueprintFieldType>
                 std::size_t generate_sigma1_gates(
-                    const plonk_sha512_process<BlueprintFieldType, ArithmetizationParams> &component,
-                    circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment) {
+                    const plonk_sha512_process<BlueprintFieldType> &component,
+                    circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
+                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &assignment) {
 
-                    using var = typename plonk_sha512_process<BlueprintFieldType, ArithmetizationParams>::var;
+                    using var = typename plonk_sha512_process<BlueprintFieldType>::var;
                     typename BlueprintFieldType::integral_type one = 1;
                     auto constraint_1 =
                         var(component.W(0), +1) - (var(component.W(1), 1) + var(component.W(2), 1) * (one << 6) + var(component.W(3), 1) * (one << 19) +
@@ -245,13 +243,13 @@ namespace nil {
                     return bp.add_gate({constraint_1, constraint_2, constraint_3});
                 }
 
-                template<typename BlueprintFieldType, typename ArithmetizationParams>
+                template<typename BlueprintFieldType>
                 std::array<std::size_t, 3> generate_message_scheduling_gates(
-                    const plonk_sha512_process<BlueprintFieldType, ArithmetizationParams> &component,
-                    circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment) {
+                    const plonk_sha512_process<BlueprintFieldType> &component,
+                    circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
+                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &assignment) {
 
-                    using var = typename plonk_sha512_process<BlueprintFieldType, ArithmetizationParams>::var;
+                    using var = typename plonk_sha512_process<BlueprintFieldType>::var;
 
                     std::size_t sigma0_selector = generate_sigma0_gates(component, bp, assignment);
                     typename BlueprintFieldType::integral_type one = 1;
@@ -268,18 +266,18 @@ namespace nil {
                     return {sigma0_selector, sigma1_selector, selector_2};
                 }
 
-                template<typename BlueprintFieldType, typename ArithmetizationParams>
+                template<typename BlueprintFieldType>
                 std::size_t generate_Sigma0_gates(
-                    const plonk_sha512_process<BlueprintFieldType, ArithmetizationParams> &component,
-                    circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment) {
+                    const plonk_sha512_process<BlueprintFieldType> &component,
+                    circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
+                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &assignment) {
 
-                    using var = typename plonk_sha512_process<BlueprintFieldType, ArithmetizationParams>::var;
+                    using var = typename plonk_sha512_process<BlueprintFieldType>::var;
 
                     typename BlueprintFieldType::integral_type one = 1;
                     std::vector<std::size_t> a_sizes = {14, 14, 6, 5, 14, 11};
                     typename BlueprintFieldType::value_type base4_value =
-                        plonk_sha512_process<BlueprintFieldType, ArithmetizationParams>::base4;
+                        plonk_sha512_process<BlueprintFieldType>::base4;
                     auto constraint_1 =
                         var(component.W(0), +1) - (var(component.W(1), +1) + var(component.W(2), 1) * (one << 14) + var(component.W(3), +1) * (one << 28) +
                                        var(component.W(4), +1) * (one << 34) + var(component.W(5), 1) * (one << 39) + var(component.W(6), 1) * (one << 53));
@@ -302,18 +300,18 @@ namespace nil {
                     return bp.add_gate({constraint_1, constraint_2});
                 }
 
-                template<typename BlueprintFieldType, typename ArithmetizationParams>
+                template<typename BlueprintFieldType>
                 std::size_t generate_Sigma1_gates(
-                    const plonk_sha512_process<BlueprintFieldType, ArithmetizationParams> &component,
-                    circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                    const plonk_sha512_process<BlueprintFieldType> &component,
+                    circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
+                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                         &assignment) {
 
-                    using var = typename plonk_sha512_process<BlueprintFieldType, ArithmetizationParams>::var;
+                    using var = typename plonk_sha512_process<BlueprintFieldType>::var;
 
                     typename BlueprintFieldType::integral_type one = 1;
                     typename BlueprintFieldType::value_type base7_value =
-                        plonk_sha512_process<BlueprintFieldType, ArithmetizationParams>::base7;
+                        plonk_sha512_process<BlueprintFieldType>::base7;
                     auto constraint_1 =
                         var(component.W(0), -1) - (var(component.W(1), -1) + var(component.W(2), -1) * (one << 14) +
                                                          var(component.W(3), -1) * (one << 18) + var(component.W(4), -1) * (one << 32) +
@@ -337,13 +335,13 @@ namespace nil {
                     return bp.add_gate({constraint_1, constraint_2, constraint_3});
                 }
 
-                template<typename BlueprintFieldType, typename ArithmetizationParams>
+                template<typename BlueprintFieldType>
                 std::size_t generate_Maj_gates(
-                    const plonk_sha512_process<BlueprintFieldType, ArithmetizationParams> &component,
-                    circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment) {
+                    const plonk_sha512_process<BlueprintFieldType> &component,
+                    circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
+                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &assignment) {
 
-                    using var = typename plonk_sha512_process<BlueprintFieldType, ArithmetizationParams>::var;
+                    using var = typename plonk_sha512_process<BlueprintFieldType>::var;
 
                     typename BlueprintFieldType::integral_type one = 1;
                     auto constraint_1 =
@@ -355,16 +353,16 @@ namespace nil {
                     return bp.add_gate({constraint_1});
                 }
 
-                template<typename BlueprintFieldType, typename ArithmetizationParams>
+                template<typename BlueprintFieldType>
                 std::size_t generate_Ch_gates(
-                    const plonk_sha512_process<BlueprintFieldType, ArithmetizationParams> &component,
-                    circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment) {
+                    const plonk_sha512_process<BlueprintFieldType> &component,
+                    circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
+                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &assignment) {
 
-                    using var = typename plonk_sha512_process<BlueprintFieldType, ArithmetizationParams>::var;
+                    using var = typename plonk_sha512_process<BlueprintFieldType>::var;
 
                     typename BlueprintFieldType::value_type base7_value =
-                        plonk_sha512_process<BlueprintFieldType, ArithmetizationParams>::base7;
+                        plonk_sha512_process<BlueprintFieldType>::base7;
                     auto constraint_1 =
                         var(component.W(7), 0) + var(component.W(8), 0) * base7_value.pow(16) + var(component.W(0), +1) * base7_value.pow(32) +
                         var(component.W(1), +1) * base7_value.pow(48) - (var(component.W(5), 0) + 2 * var(component.W(6), 0) + 3 * var(component.W(6), +1));
@@ -372,13 +370,13 @@ namespace nil {
                     return bp.add_gate({constraint_1});
                 }
 
-                template<typename BlueprintFieldType, typename ArithmetizationParams>
+                template<typename BlueprintFieldType>
                 std::array<std::size_t, 7> generate_compression_gates(
-                    const plonk_sha512_process<BlueprintFieldType, ArithmetizationParams> &component,
-                    circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment) {
+                    const plonk_sha512_process<BlueprintFieldType> &component,
+                    circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
+                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &assignment) {
 
-                    using var = typename plonk_sha512_process<BlueprintFieldType, ArithmetizationParams>::var;
+                    using var = typename plonk_sha512_process<BlueprintFieldType>::var;
 
                     std::vector<std::size_t> sigma_sizes = {14, 14, 14, 14, 8};
                     typename BlueprintFieldType::integral_type one = 1;
@@ -430,13 +428,12 @@ namespace nil {
                 }
             }   // namespace detail
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
-            typename plonk_sha512_process<BlueprintFieldType, ArithmetizationParams>::result_type
+            template<typename BlueprintFieldType>
+            typename plonk_sha512_process<BlueprintFieldType>::result_type
                 generate_assignments(
-                    const plonk_sha512_process<BlueprintFieldType, ArithmetizationParams> &component,
-                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
-                    const typename plonk_sha512_process<BlueprintFieldType,
-                        ArithmetizationParams>::input_type instance_input,
+                    const plonk_sha512_process<BlueprintFieldType> &component,
+                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &assignment,
+                    const typename plonk_sha512_process<BlueprintFieldType>::input_type &instance_input,
                     const std::uint32_t start_row_index) {
 
                 std::size_t row = start_row_index;
@@ -475,7 +472,7 @@ namespace nil {
                     std::vector<std::size_t> input_state_sparse_sizes = {64};
                     std::array<std::vector<typename BlueprintFieldType::integral_type>, 2> input_state_sparse_chunks =
                         detail::split_and_sparse<BlueprintFieldType>(input_state_sparse, input_state_sparse_sizes,
-                            plonk_sha512_process<BlueprintFieldType, ArithmetizationParams>::base4);
+                            plonk_sha512_process<BlueprintFieldType>::base4);
                     assignment.witness(component.W(i), row + 1) = input_state_sparse_chunks[1][0];
                     sparse_values[i] = input_state_sparse_chunks[1][0];
                 }
@@ -493,7 +490,7 @@ namespace nil {
                     std::vector<std::size_t> input_state_sparse_sizes = {64};
                     std::array<std::vector<typename BlueprintFieldType::integral_type>, 2> input_state_sparse_chunks =
                         detail::split_and_sparse<BlueprintFieldType>(input_state_sparse, input_state_sparse_sizes,
-                            plonk_sha512_process<BlueprintFieldType, ArithmetizationParams>::base7);
+                            plonk_sha512_process<BlueprintFieldType>::base7);
                     assignment.witness(component.W(i), row + 1) = input_state_sparse_chunks[1][0];
                     sparse_values[i] = input_state_sparse_chunks[1][0];
                 }
@@ -501,9 +498,9 @@ namespace nil {
                 std::vector<std::size_t> sigma_sizes = {14, 14, 14, 14, 8};
                 std::vector<std::size_t> ch_and_maj_sizes = {16, 16, 16, 16};
                 typename BlueprintFieldType::value_type base4_value =
-                    plonk_sha512_process<BlueprintFieldType, ArithmetizationParams>::base4;
+                    plonk_sha512_process<BlueprintFieldType>::base4;
                 typename BlueprintFieldType::value_type base7_value =
-                    plonk_sha512_process<BlueprintFieldType, ArithmetizationParams>::base7;
+                    plonk_sha512_process<BlueprintFieldType>::base7;
                 for (std::size_t i = row; i < row + 379; i = i + 6) {
                     typename BlueprintFieldType::integral_type integral_a =
                         typename BlueprintFieldType::integral_type(
@@ -519,7 +516,7 @@ namespace nil {
                     std::vector<std::size_t> a_sizes = {1, 6, 1, 14, 14, 14, 14};
                     std::array<std::vector<typename BlueprintFieldType::integral_type>, 2> a_chunks =
                         detail::split_and_sparse<BlueprintFieldType>(a, a_sizes,
-                            plonk_sha512_process<BlueprintFieldType, ArithmetizationParams>::base4);
+                            plonk_sha512_process<BlueprintFieldType>::base4);
                     assignment.witness(component.W(1), i) = a_chunks[0][0];
                     assignment.witness(component.W(2), i) = a_chunks[0][1];
                     assignment.witness(component.W(3), i) = a_chunks[0][2];
@@ -545,7 +542,7 @@ namespace nil {
                     std::array<std::vector<typename BlueprintFieldType::integral_type>, 2>
                         sigma0_chunks =
                             detail::reversed_sparse_and_split<BlueprintFieldType>(sparse_sigma0, sigma_sizes,
-                            plonk_sha512_process<BlueprintFieldType, ArithmetizationParams>::base4);
+                            plonk_sha512_process<BlueprintFieldType>::base4);
                     assignment.witness(component.W(6), i + 1) = sigma0_chunks[1][0];
                     assignment.witness(component.W(7), i + 1) = sigma0_chunks[1][1];
                     assignment.witness(component.W(8), i + 1) = sigma0_chunks[1][2];
@@ -573,7 +570,7 @@ namespace nil {
                     std::vector<std::size_t> b_sizes = {6, 13, 14, 14, 14, 3};
                     std::array<std::vector<typename BlueprintFieldType::integral_type>, 2> b_chunks =
                         detail::split_and_sparse<BlueprintFieldType>(b, b_sizes,
-                        plonk_sha512_process<BlueprintFieldType, ArithmetizationParams>::base4);
+                        plonk_sha512_process<BlueprintFieldType>::base4);
                     assignment.witness(component.W(0), i + 5) = message_scheduling_words[(i - row) / 6 + 14];
                     assignment.witness(component.W(1), i + 5) = b_chunks[0][0];
                     assignment.witness(component.W(2), i + 5) = b_chunks[0][1];
@@ -600,7 +597,7 @@ namespace nil {
                     std::array<std::vector<typename BlueprintFieldType::integral_type>, 2>
                         sigma1_chunks =
                             detail::reversed_sparse_and_split<BlueprintFieldType>(sparse_sigma1, sigma_sizes,
-                            plonk_sha512_process<BlueprintFieldType, ArithmetizationParams>::base4);
+                            plonk_sha512_process<BlueprintFieldType>::base4);
                     assignment.witness(component.W(4), i + 4) = sigma1_chunks[1][0];
                     assignment.witness(component.W(5), i + 4) = sigma1_chunks[1][1];
                     assignment.witness(component.W(6), i + 4) = sigma1_chunks[1][2];
@@ -640,7 +637,7 @@ namespace nil {
                     std::vector<std::size_t> e_sizes = {14, 4, 14, 9, 14, 9};
                     std::array<std::vector<typename BlueprintFieldType::integral_type>, 2> e_chunks =
                         detail::split_and_sparse<BlueprintFieldType>(e_bits, e_sizes,
-                            plonk_sha512_process<BlueprintFieldType, ArithmetizationParams>::base7);
+                            plonk_sha512_process<BlueprintFieldType>::base7);
                     assignment.witness(component.W(1), i) = e_chunks[0][0];
                     assignment.witness(component.W(2), i) = e_chunks[0][1];
                     assignment.witness(component.W(3), i) = e_chunks[0][2];
@@ -667,7 +664,7 @@ namespace nil {
                     std::array<std::vector<typename BlueprintFieldType::integral_type>, 2>
                         Sigma1_chunks =
                             detail::reversed_sparse_and_split<BlueprintFieldType>(sparse_Sigma1, sigma_sizes,
-                            plonk_sha512_process<BlueprintFieldType, ArithmetizationParams>::base7);
+                            plonk_sha512_process<BlueprintFieldType>::base7);
                     assignment.witness(component.W(4), i + 1) = Sigma1_chunks[1][0];
                     assignment.witness(component.W(5), i + 1) = Sigma1_chunks[1][1];
                     assignment.witness(component.W(6), i + 1) = Sigma1_chunks[1][2];
@@ -701,7 +698,7 @@ namespace nil {
                     std::array<std::vector<typename BlueprintFieldType::integral_type>, 2>
                         ch_chunks =
                             detail::reversed_sparse_and_split_ch<BlueprintFieldType>(sparse_ch, ch_and_maj_sizes,
-                            plonk_sha512_process<BlueprintFieldType, ArithmetizationParams>::base7);
+                            plonk_sha512_process<BlueprintFieldType>::base7);
                     assignment.witness(component.W(7), i + 2) = ch_chunks[1][0];
                     assignment.witness(component.W(8), i + 2) = ch_chunks[1][1];
                     assignment.witness(component.W(0), i + 3) = ch_chunks[1][2];
@@ -721,7 +718,7 @@ namespace nil {
                         ch_chunks[0][3] * (one << 48);
 
                     typename BlueprintFieldType::value_type tmp1 = h + Sigma1 + ch +
-                        plonk_sha512_process<BlueprintFieldType, ArithmetizationParams>::round_constant[(i - row) / 9] +
+                        plonk_sha512_process<BlueprintFieldType>::round_constant[(i - row) / 9] +
                         message_scheduling_words[(i - row) / 9];
                     typename BlueprintFieldType::value_type sum = tmp1 + d;
                     typename BlueprintFieldType::value_type e_new = typename BlueprintFieldType::integral_type(sum.data) %
@@ -743,7 +740,7 @@ namespace nil {
                     std::vector<std::size_t> a_sizes = {14, 14, 6, 5, 14, 11};
                     std::array<std::vector<typename BlueprintFieldType::integral_type>, 2> a_chunks =
                         detail::split_and_sparse<BlueprintFieldType>(a_bits, a_sizes,
-                            plonk_sha512_process<BlueprintFieldType, ArithmetizationParams>::base4);
+                            plonk_sha512_process<BlueprintFieldType>::base4);
                     assignment.witness(component.W(1), i + 8) = a_chunks[0][0];
                     assignment.witness(component.W(2), i + 8) = a_chunks[0][1];
                     assignment.witness(component.W(3), i + 8) = a_chunks[0][2];
@@ -768,7 +765,7 @@ namespace nil {
                     std::array<std::vector<typename BlueprintFieldType::integral_type>, 2>
                         Sigma0_chunks =
                             detail::reversed_sparse_and_split<BlueprintFieldType>(sparse_Sigma0, sigma_sizes,
-                            plonk_sha512_process<BlueprintFieldType, ArithmetizationParams>::base4);
+                            plonk_sha512_process<BlueprintFieldType>::base4);
                     assignment.witness(component.W(4), i + 7) = Sigma0_chunks[1][0];
                     assignment.witness(component.W(5), i + 7) = Sigma0_chunks[1][1];
                     assignment.witness(component.W(6), i + 7) = Sigma0_chunks[1][2];
@@ -802,7 +799,7 @@ namespace nil {
                         maj_chunks =
                             detail::reversed_sparse_and_split_maj<BlueprintFieldType>(
                                 sparse_maj, ch_and_maj_sizes,
-                                plonk_sha512_process<BlueprintFieldType, ArithmetizationParams>::base4);
+                                plonk_sha512_process<BlueprintFieldType>::base4);
                     assignment.witness(component.W(7), i + 6) = maj_chunks[1][0];
                     assignment.witness(component.W(8), i + 6) = maj_chunks[1][1];
                     assignment.witness(component.W(0), i + 5) = maj_chunks[1][2];
@@ -859,16 +856,16 @@ namespace nil {
                     typename BlueprintFieldType::integral_type(typename BlueprintFieldType::value_type(2).pow(64).data))/
                     typename BlueprintFieldType::integral_type(typename BlueprintFieldType::value_type(2).pow(64).data);
                 }
-                return typename plonk_sha512_process<BlueprintFieldType, ArithmetizationParams>::result_type(
+                return typename plonk_sha512_process<BlueprintFieldType>::result_type(
                     component, start_row_index);
             }
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
+            template<typename BlueprintFieldType>
             std::array<std::size_t, 10> generate_gates(
-                const plonk_sha512_process<BlueprintFieldType, ArithmetizationParams> &component,
-                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
-                const typename plonk_sha512_process<BlueprintFieldType, ArithmetizationParams>::input_type &instance_input) {
+                const plonk_sha512_process<BlueprintFieldType> &component,
+                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &assignment,
+                const typename plonk_sha512_process<BlueprintFieldType>::input_type &instance_input) {
 
                 auto message_selectors = detail::generate_message_scheduling_gates(component, bp, assignment);
                 auto compression_selectors = detail::generate_compression_gates(component, bp, assignment);
@@ -881,15 +878,15 @@ namespace nil {
                 };
             }
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
+            template<typename BlueprintFieldType>
             void generate_copy_constraints(
-                const plonk_sha512_process<BlueprintFieldType, ArithmetizationParams> &component,
-                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
-                const typename plonk_sha512_process<BlueprintFieldType, ArithmetizationParams>::input_type &instance_input,
+                const plonk_sha512_process<BlueprintFieldType> &component,
+                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &assignment,
+                const typename plonk_sha512_process<BlueprintFieldType>::input_type &instance_input,
                 const std::size_t start_row_index) {
 
-                using var = typename plonk_sha512_process<BlueprintFieldType, ArithmetizationParams>::var;
+                using var = typename plonk_sha512_process<BlueprintFieldType>::var;
 
                 std::size_t row = start_row_index + 2;
 
@@ -941,13 +938,13 @@ namespace nil {
                 bp.add_copy_constraint({var(component.W(3), row + 2, false), instance_input.input_state[7]});
             }
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
-            typename plonk_sha512_process<BlueprintFieldType, ArithmetizationParams>::result_type
+            template<typename BlueprintFieldType>
+            typename plonk_sha512_process<BlueprintFieldType>::result_type
                 generate_circuit(
-                    const plonk_sha512_process<BlueprintFieldType, ArithmetizationParams> &component,
-                    circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &bp,
-                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>> &assignment,
-                    const typename plonk_sha512_process<BlueprintFieldType, ArithmetizationParams>::input_type &instance_input,
+                    const plonk_sha512_process<BlueprintFieldType> &component,
+                    circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
+                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &assignment,
+                    const typename plonk_sha512_process<BlueprintFieldType>::input_type &instance_input,
                     const std::size_t start_row_index){
 
                     std::size_t j = start_row_index;
@@ -969,7 +966,7 @@ namespace nil {
                     j = j + 720;
                     assignment.enable_selector(selector_indices[9], j, j + 2, 2);
                     generate_copy_constraints(component, bp, assignment, instance_input, start_row_index);
-                    return typename plonk_sha512_process<BlueprintFieldType, ArithmetizationParams>::result_type(
+                    return typename plonk_sha512_process<BlueprintFieldType>::result_type(
                         component, start_row_index);
                 }
 

@@ -52,12 +52,12 @@ void test_array_swap(
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 0;
     constexpr std::size_t SelectorColumns = 1;
-    using ArithmetizationParams =
-        crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+    zk::snark::plonk_table_description<BlueprintFieldType> desc(
+        WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns);
+    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
-    using AssignmentType = nil::blueprint::assignment<ArithmetizationType>;
+    using AssignmentType = nil::blueprint::assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>;
 
     using value_type = typename BlueprintFieldType::value_type;
     using var = crypto3::zk::snark::plonk_variable<value_type>;
@@ -96,8 +96,8 @@ void test_array_swap(
                                                        std::array<std::uint32_t, 1>{0}, ArraySize);
     // I thought this component would be an example of where the ::WEAK connectedness check is required
     // I was wrong
-    nil::crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>
-        (component_instance, public_input, result_check, instance_input,
+    nil::crypto3::test_component<component_type, BlueprintFieldType, hash_type, Lambda>
+        (component_instance, desc, public_input, result_check, instance_input,
          nil::blueprint::connectedness_check_type::type::STRONG, ArraySize);
 }
 

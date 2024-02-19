@@ -52,12 +52,12 @@ void test_equality_flag(const std::vector<typename BlueprintFieldType::value_typ
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 0;
     constexpr std::size_t SelectorColumns = 1;
-    using ArithmetizationParams =
-        crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+    zk::snark::plonk_table_description<BlueprintFieldType> desc(
+        WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns);
+    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
-    using AssignmentType = nil::blueprint::assignment<ArithmetizationType>;
+    using AssignmentType = nil::blueprint::assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>;
 
     using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
@@ -71,7 +71,7 @@ void test_equality_flag(const std::vector<typename BlueprintFieldType::value_typ
             BlueprintFieldType::value_type::one()
           : BlueprintFieldType::value_type::zero();
 
-    auto result_check = [&expected_res, &public_input, inequality](AssignmentType &assignment,
+    auto result_check = [&expected_res, inequality](AssignmentType &assignment,
 	    typename component_type::result_type &real_res) {
             if (inequality) {
                 assert(expected_res != var_value(assignment, real_res.output));
@@ -82,8 +82,8 @@ void test_equality_flag(const std::vector<typename BlueprintFieldType::value_typ
 
     component_type component_instance({0, 1, 2, 3, 4}, {}, {}, inequality);
 
-    nil::crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>
-        (component_instance, public_input, result_check, instance_input,
+    nil::crypto3::test_component<component_type, BlueprintFieldType, hash_type, Lambda>
+        (component_instance, desc, public_input, result_check, instance_input,
          nil::blueprint::connectedness_check_type::type::STRONG, inequality);
 }
 

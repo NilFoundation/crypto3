@@ -48,16 +48,15 @@ namespace nil {
                 template<typename ArithmetizationType, std::uint32_t ArgNum>
                 class boolean_op_component;
 
-                template<typename BlueprintFieldType, typename ArithmetizationParams, std::uint32_t ArgNum>
-                class boolean_op_component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                                                                    ArithmetizationParams>,
+                template<typename BlueprintFieldType, std::uint32_t ArgNum>
+                class boolean_op_component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>,
                                            ArgNum>
-                                : public plonk_component<BlueprintFieldType, ArithmetizationParams, 0, 0> {
+                                : public plonk_component<BlueprintFieldType> {
 
                     using value_type = typename BlueprintFieldType::value_type;
 
                 public:
-                    using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 0, 0>;
+                    using component_type = plonk_component<BlueprintFieldType>;
 
                     using var = typename component_type::var;
                     using manifest_type = nil::blueprint::plonk_component_manifest;
@@ -102,8 +101,7 @@ namespace nil {
                         var output;
 
                         result_type(const boolean_op_component<crypto3::zk::snark::plonk_constraint_system<
-                                                                                                BlueprintFieldType,
-                                                                                                ArithmetizationParams>,
+                                                                                                BlueprintFieldType>,
                                                                ArgNum> &component,
                                     const std::uint32_t start_row_index) {
                             output = var(component.W(ArgNum), start_row_index, false);
@@ -139,25 +137,23 @@ namespace nil {
 
             using detail::boolean_op_component;
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams, std::uint32_t ArgNum>
+            template<typename BlueprintFieldType, std::uint32_t ArgNum>
             using plonk_boolean_op_component =
-                boolean_op_component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                                                                 ArithmetizationParams>,
-                                     ArgNum>;
+                boolean_op_component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>, ArgNum>;
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams, std::uint32_t ArgNum>
-            typename plonk_boolean_op_component<BlueprintFieldType, ArithmetizationParams, ArgNum>::result_type
+            template<typename BlueprintFieldType, std::uint32_t ArgNum>
+            typename plonk_boolean_op_component<BlueprintFieldType, ArgNum>::result_type
                 generate_assignments(
-                    const plonk_boolean_op_component<BlueprintFieldType, ArithmetizationParams, ArgNum>
+                    const plonk_boolean_op_component<BlueprintFieldType, ArgNum>
                         &component,
-                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                         &assignment,
-                    const typename plonk_boolean_op_component<BlueprintFieldType, ArithmetizationParams,
+                    const typename plonk_boolean_op_component<BlueprintFieldType,
                                                               ArgNum>::input_type
                         instance_input,
                     const std::uint32_t start_row_index) {
 
-                using component_type = plonk_boolean_op_component<BlueprintFieldType, ArithmetizationParams,
+                using component_type = plonk_boolean_op_component<BlueprintFieldType,
                                                                   ArgNum>;
                 using value_type = typename BlueprintFieldType::value_type;
 
@@ -172,19 +168,19 @@ namespace nil {
                 return typename component_type::result_type(component, start_row_index);
             }
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams, std::uint32_t ArgNum>
+            template<typename BlueprintFieldType, std::uint32_t ArgNum>
             std::size_t generate_gates(
-                const plonk_boolean_op_component<BlueprintFieldType, ArithmetizationParams, ArgNum>
+                const plonk_boolean_op_component<BlueprintFieldType, ArgNum>
                     &component,
-                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                     &bp,
-                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                     &assignment,
-                const typename plonk_boolean_op_component<BlueprintFieldType, ArithmetizationParams,
+                const typename plonk_boolean_op_component<BlueprintFieldType,
                                                           ArgNum>::input_type
                     &instance_input) {
 
-                using var = typename plonk_boolean_op_component<BlueprintFieldType, ArithmetizationParams,
+                using var = typename plonk_boolean_op_component<BlueprintFieldType,
                                                                 ArgNum>::var;
 
                 std::array<var, ArgNum + 1> witnesses;
@@ -195,21 +191,21 @@ namespace nil {
                 return bp.add_gate({constraint});
             }
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams, std::uint32_t ArgNum>
+            template<typename BlueprintFieldType, std::uint32_t ArgNum>
             void generate_copy_constraints(
-                const plonk_boolean_op_component<BlueprintFieldType, ArithmetizationParams, ArgNum>
+                const plonk_boolean_op_component<BlueprintFieldType, ArgNum>
                     &component,
-                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                     &bp,
-                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                     &assignment,
-                const typename plonk_boolean_op_component<BlueprintFieldType, ArithmetizationParams,
+                const typename plonk_boolean_op_component<BlueprintFieldType,
                                                           ArgNum>::input_type
                     &instance_input,
                 const std::size_t start_row_index) {
 
                 using var =
-                    typename plonk_boolean_op_component<BlueprintFieldType, ArithmetizationParams, ArgNum>::var;
+                    typename plonk_boolean_op_component<BlueprintFieldType, ArgNum>::var;
 
                 std::size_t row = start_row_index;
 
@@ -219,21 +215,21 @@ namespace nil {
                 }
             }
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams, std::uint32_t ArgNum>
-            typename plonk_boolean_op_component<BlueprintFieldType, ArithmetizationParams, ArgNum>::result_type
+            template<typename BlueprintFieldType, std::uint32_t ArgNum>
+            typename plonk_boolean_op_component<BlueprintFieldType, ArgNum>::result_type
                 generate_circuit(
-                    const plonk_boolean_op_component<BlueprintFieldType, ArithmetizationParams,ArgNum>
+                    const plonk_boolean_op_component<BlueprintFieldType,ArgNum>
                         &component,
-                    circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                    circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                         &bp,
-                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                         &assignment,
-                    const typename plonk_boolean_op_component<BlueprintFieldType, ArithmetizationParams,
+                    const typename plonk_boolean_op_component<BlueprintFieldType,
                                                               ArgNum>::input_type
                         &instance_input,
                     const std::size_t start_row_index) {
 
-                using component_type = plonk_boolean_op_component<BlueprintFieldType, ArithmetizationParams,
+                using component_type = plonk_boolean_op_component<BlueprintFieldType,
                                                                   ArgNum>;
 
                 std::size_t selector_index = generate_gates(component, bp, assignment, instance_input);

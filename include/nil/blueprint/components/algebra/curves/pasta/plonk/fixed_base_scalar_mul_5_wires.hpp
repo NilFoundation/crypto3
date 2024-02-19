@@ -43,13 +43,13 @@ namespace nil {
                 template<typename ArithmetizationType, typename CurveType, std::size_t... WireIndexes>
                 class element_g1_fixed_base_scalar_mul;
 
-                template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType,
+                template<typename BlueprintFieldType, typename CurveType,
                          std::size_t W0, std::size_t W1, std::size_t W2, std::size_t W3, std::size_t W4>
                 class element_g1_fixed_base_scalar_mul<
-                    snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, CurveType, W0, W1, W2,
+                    snark::plonk_constraint_system<BlueprintFieldType>, CurveType, W0, W1, W2,
                     W3, W4> {
 
-                    typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
+                    typedef snark::plonk_constraint_system<BlueprintFieldType>
                         ArithmetizationType;
 
                 public:

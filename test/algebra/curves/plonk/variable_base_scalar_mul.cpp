@@ -57,10 +57,10 @@ void test_variable_base_scalar_mul (
     constexpr std::size_t ConstantColumns = 1;
     constexpr std::size_t SelectorColumns = 4;
 	using BlueprintFieldType = typename CurveType::base_field_type;
-    using ArithmetizationParams = nil::crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns,
-        PublicInputColumns, ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
-    using AssignmentType = nil::blueprint::assignment<ArithmetizationType>;
+    zk::snark::plonk_table_description<BlueprintFieldType> desc(
+        WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns);
+    using ArithmetizationType = nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>;
+    using AssignmentType = nil::blueprint::assignment<nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>;
 	using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 1;
 	using component_type = nil::blueprint::components::curve_element_variable_base_scalar_mul<ArithmetizationType, CurveType>;
@@ -86,7 +86,6 @@ void test_variable_base_scalar_mul (
 	if constexpr (Stretched) {
         using stretched_component_type = nil::blueprint::components::component_stretcher<
             BlueprintFieldType,
-            ArithmetizationParams,
             component_type>;
 
         stretched_component_type stretched_instance(component_instance, WitnessColumns / 2, WitnessColumns);
@@ -95,26 +94,26 @@ void test_variable_base_scalar_mul (
 			var high_bit = {0, 3, false, var::column_type::public_input};
 			typename component_type::input_type instance_input = {{T_X_var, T_Y_var},scalar_var, high_bit};
 			nil::crypto3::test_component<stretched_component_type, BlueprintFieldType,
-										 ArithmetizationParams, hash_type, Lambda>
-			 	(stretched_instance, public_input, result_check, instance_input);
+										 hash_type, Lambda>
+			 	(stretched_instance, desc, public_input, result_check, instance_input);
 		} else {
 			typename component_type::input_type instance_input = {{T_X_var, T_Y_var},scalar_var};
 			nil::crypto3::test_component<stretched_component_type, BlueprintFieldType,
-										 ArithmetizationParams, hash_type, Lambda>
-				(stretched_instance, public_input, result_check, instance_input);
+										 hash_type, Lambda>
+				(stretched_instance, desc, public_input, result_check, instance_input);
 		}
 	} else {
 		if constexpr (std::is_same<CurveType,nil::crypto3::algebra::curves::pallas>::value) {
 			var high_bit = {0, 3, false, var::column_type::public_input};
 			typename component_type::input_type instance_input = {{T_X_var, T_Y_var},scalar_var, high_bit};
 			nil::crypto3::test_component<component_type, BlueprintFieldType,
-										 ArithmetizationParams, hash_type, Lambda>
-			 	(component_instance, public_input, result_check, instance_input);
+										 hash_type, Lambda>
+			 	(component_instance, desc, public_input, result_check, instance_input);
 		} else {
 			typename component_type::input_type instance_input = {{T_X_var, T_Y_var},scalar_var};
 			nil::crypto3::test_component<component_type, BlueprintFieldType,
-										 ArithmetizationParams, hash_type, Lambda>
-				(component_instance, public_input, result_check, instance_input);
+										 hash_type, Lambda>
+				(component_instance, desc, public_input, result_check, instance_input);
 		}
 	}
 }

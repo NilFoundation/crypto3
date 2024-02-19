@@ -58,7 +58,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_combined_inner_product) {
     constexpr std::size_t k = 11;
     using ArithmetizationParams =
         zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType>;
     using AssignmentType = blueprint::assignment<ArithmetizationType>;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 1;
@@ -86,11 +86,11 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_combined_inner_product) {
     typename component_type::params_type params = {input_var_zeta1, input_var_zeta2, xi, r};
 
 
-    auto result_check = [](AssignmentType &assignment, 
-        component_type::result_type &real_res) { 
+    auto result_check = [](AssignmentType &assignment,
+        component_type::result_type &real_res) {
     };
 
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(params, public_input, result_check);
+    test_component<component_type, BlueprintFieldType, hash_type, Lambda>(params, public_input, result_check);
 
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
     std::cout << "combined_inner_product_component: " << duration.count() << "ms" << std::endl;

@@ -53,9 +53,9 @@ void test(std::vector<typename BlueprintFieldType::value_type> &public_input,
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 1;
 
-    using ArithmetizationParams = crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns,
-                                                                                   ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+    zk::snark::plonk_table_description<BlueprintFieldType> desc(
+        WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns);
+    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>;
     using AssignmentType = blueprint::assignment<ArithmetizationType>;
     using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
@@ -88,12 +88,12 @@ void test(std::vector<typename BlueprintFieldType::value_type> &public_input,
         // std::cout << "expected F: " << expected_res.data << std::endl;
     };
     if (signature.size() == 1 && signature[0] == 1) {
-        crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-            component_instance, public_input, result_check, instance_input,
+        crypto3::test_component<component_type, BlueprintFieldType, hash_type, Lambda>(
+            component_instance, desc, public_input, result_check, instance_input,
             nil::blueprint::connectedness_check_type::type::NONE, signature);
     } else {
-        crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-            component_instance, public_input, result_check, instance_input,
+        crypto3::test_component<component_type, BlueprintFieldType, hash_type, Lambda>(
+            component_instance, desc, public_input, result_check, instance_input,
             nil::blueprint::connectedness_check_type::type::STRONG, signature);
     }
 }

@@ -39,14 +39,14 @@ namespace nil {
             template<typename ArithmetizationType, typename CurveType, typename Ed25519Type, std::size_t... WireIndexes>
             class fixed_base_multiplication;
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams, typename CurveType,
+            template<typename BlueprintFieldType, typename CurveType,
                      typename Ed25519Type, std::size_t W0, std::size_t W1, std::size_t W2, std::size_t W3,
                      std::size_t W4, std::size_t W5, std::size_t W6, std::size_t W7, std::size_t W8>
             class fixed_base_multiplication<
-                crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>, CurveType,
+                crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>, CurveType,
                 Ed25519Type, W0, W1, W2, W3, W4, W5, W6, W7, W8> {
 
-                typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams> ArithmetizationType;
+                typedef snark::plonk_constraint_system<BlueprintFieldType> ArithmetizationType;
 
                 using non_native_range_component =
                     components::non_native_range<ArithmetizationType, CurveType, 0, 1, 2, 3, 4, 5, 6, 7, 8>;

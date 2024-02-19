@@ -62,10 +62,9 @@ namespace nil {
 
                 See comparison_flag if you want to access the result of the comparison instead.
             */
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
-            class comparison_unchecked<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                                                                   ArithmetizationParams>> :
-                public plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0> {
+            template<typename BlueprintFieldType>
+            class comparison_unchecked<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> :
+                public plonk_component<BlueprintFieldType> {
 
                 using value_type = typename BlueprintFieldType::value_type;
 
@@ -89,13 +88,12 @@ namespace nil {
                                              mode == comparison_mode::GREATER_EQUAL);
                 }
             public:
-                using component_type = plonk_component<BlueprintFieldType, ArithmetizationParams, 1, 0>;
+                using component_type = plonk_component<BlueprintFieldType>;
 
                 using var = typename component_type::var;
 
                 using range_check_component_type =
-                    range_check<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                                                            ArithmetizationParams>>;
+                    range_check<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>;
                 using manifest_type = nil::blueprint::plonk_component_manifest;
 
                 class gate_manifest_type : public component_gate_manifest {
@@ -206,25 +204,22 @@ namespace nil {
                     };
             };
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
+            template<typename BlueprintFieldType>
             using plonk_comparison_unchecked =
-                comparison_unchecked<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                                                       ArithmetizationParams>>;
+                comparison_unchecked<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>;
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
+            template<typename BlueprintFieldType>
             std::size_t generate_gates(
-                const plonk_comparison_unchecked<BlueprintFieldType, ArithmetizationParams>
+                const plonk_comparison_unchecked<BlueprintFieldType>
                     &component,
-                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                                                    ArithmetizationParams>>
+                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                     &bp,
-                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                                                       ArithmetizationParams>>
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                     &assignment,
-                const typename plonk_comparison_unchecked<BlueprintFieldType, ArithmetizationParams>::input_type
+                const typename plonk_comparison_unchecked<BlueprintFieldType>::input_type
                     &instance_input) {
 
-                using var = typename plonk_comparison_unchecked<BlueprintFieldType, ArithmetizationParams>::var;
+                using var = typename plonk_comparison_unchecked<BlueprintFieldType>::var;
                 using constraint_type = crypto3::zk::snark::plonk_constraint<BlueprintFieldType>;
 
                 std::vector<constraint_type> correctness_constraints;
@@ -252,21 +247,19 @@ namespace nil {
                 return bp.add_gate(correctness_constraints);
             }
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
+            template<typename BlueprintFieldType>
             void generate_copy_constraints(
-                const plonk_comparison_unchecked<BlueprintFieldType, ArithmetizationParams>
+                const plonk_comparison_unchecked<BlueprintFieldType>
                     &component,
-                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                                                    ArithmetizationParams>>
+                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                     &bp,
-                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                                                       ArithmetizationParams>>
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                     &assignment,
-                const typename plonk_comparison_unchecked<BlueprintFieldType, ArithmetizationParams>::input_type
+                const typename plonk_comparison_unchecked<BlueprintFieldType>::input_type
                     &instance_input,
                 const std::uint32_t start_row_index) {
 
-                using var = typename plonk_comparison_unchecked<BlueprintFieldType, ArithmetizationParams>::var;
+                using var = typename plonk_comparison_unchecked<BlueprintFieldType>::var;
                 std::uint32_t row = start_row_index;
 
                 row += component.rows_amount - 1 - component.needs_bonus_row;
@@ -287,20 +280,20 @@ namespace nil {
                 bp.add_copy_constraint({instance_input.y, y_var});
             }
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
-            typename plonk_comparison_unchecked<BlueprintFieldType, ArithmetizationParams>::result_type
+            template<typename BlueprintFieldType>
+            typename plonk_comparison_unchecked<BlueprintFieldType>::result_type
             generate_circuit(
-                const plonk_comparison_unchecked<BlueprintFieldType, ArithmetizationParams>
+                const plonk_comparison_unchecked<BlueprintFieldType>
                     &component,
-                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                     &bp,
-                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                     &assignment,
-                const typename plonk_comparison_unchecked<BlueprintFieldType, ArithmetizationParams>::input_type
+                const typename plonk_comparison_unchecked<BlueprintFieldType>::input_type
                     &instance_input,
                 const std::uint32_t start_row_index) {
 
-                using var = typename plonk_comparison_unchecked<BlueprintFieldType, ArithmetizationParams>::var;
+                using var = typename plonk_comparison_unchecked<BlueprintFieldType>::var;
                 generate_circuit(component.range_check_subcomponent, bp, assignment,
                                  {var(component.W(2), start_row_index + component.range_check_subcomponent.rows_amount)},
                                  start_row_index);
@@ -313,25 +306,24 @@ namespace nil {
 
                 generate_copy_constraints(component, bp, assignment, instance_input, start_row_index);
 
-                return typename plonk_comparison_unchecked<BlueprintFieldType, ArithmetizationParams>::result_type(
+                return typename plonk_comparison_unchecked<BlueprintFieldType>::result_type(
                         component, start_row_index);
             }
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
-            typename plonk_comparison_unchecked<BlueprintFieldType, ArithmetizationParams>::result_type
+            template<typename BlueprintFieldType>
+            typename plonk_comparison_unchecked<BlueprintFieldType>::result_type
             generate_assignments(
-                const plonk_comparison_unchecked<BlueprintFieldType, ArithmetizationParams>
+                const plonk_comparison_unchecked<BlueprintFieldType>
                     &component,
-                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                                                       ArithmetizationParams>>
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                     &assignment,
-                const typename plonk_comparison_unchecked<BlueprintFieldType, ArithmetizationParams>::input_type
+                const typename plonk_comparison_unchecked<BlueprintFieldType>::input_type
                     &instance_input,
                 const std::uint32_t start_row_index) {
 
                 std::size_t row = start_row_index;
 
-                using component_type = plonk_comparison_unchecked<BlueprintFieldType, ArithmetizationParams>;
+                using component_type = plonk_comparison_unchecked<BlueprintFieldType>;
                 using value_type = typename BlueprintFieldType::value_type;
                 using var = typename component_type::var;
 

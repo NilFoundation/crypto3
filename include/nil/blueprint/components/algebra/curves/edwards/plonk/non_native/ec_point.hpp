@@ -44,7 +44,7 @@ namespace nil {
             class ec_point;
 
             template<typename BlueprintFieldType,
-                     typename ArithmetizationParams,
+
                      typename CurveType,
                       typename Ed25519Type,
                      std::size_t W0,
@@ -56,7 +56,7 @@ namespace nil {
                      std::size_t W6,
                      std::size_t W7,
                      std::size_t W8>
-            class ec_point<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+            class ec_point<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>,
                                                    CurveType,
                                                     Ed25519Type,
                                                    W0,
@@ -71,7 +71,7 @@ namespace nil {
 
                 typedef snark::plonk_constraint_system<BlueprintFieldType,
                     ArithmetizationParams> ArithmetizationType;
-                
+
                 using variable_base_mult_component = variable_base_multiplication<ArithmetizationType, CurveType, Ed25519Type,
                 W0, W1, W2, W3, W4, W5, W6, W7, W8>;
                 using mult_component = non_native_field_element_multiplication<ArithmetizationType, CurveType, Ed25519Type,
@@ -87,8 +87,8 @@ namespace nil {
                 constexpr static const std::size_t selector_seed = 0xfcd1;
 
             public:
-                constexpr static const std::size_t rows_amount = 2 * non_native_range_component::rows_amount 
-                                                                + 5 * mult_component::rows_amount 
+                constexpr static const std::size_t rows_amount = 2 * non_native_range_component::rows_amount
+                                                                + 5 * mult_component::rows_amount
                                                                 + 2 * add_component::rows_amount;
 
                 constexpr static const std::size_t gates_amount = 0;
@@ -218,7 +218,7 @@ namespace nil {
                     blueprint_public_assignment_table<ArithmetizationType> &public_assignment,
                     const params_type &params,
                     const std::size_t first_selector_index) {
-                    
+
                 }
 
                 static void generate_copy_constraints(blueprint<ArithmetizationType> &bp,
@@ -229,7 +229,7 @@ namespace nil {
                     auto left = (typename add_component::result_type(component_start_row + 25)).output;
                     row += 2 * mult_component::rows_amount + add_component::rows_amount;
                     auto right = (typename add_component::result_type(component_start_row + 43)).output;
-                    
+
                     bp.add_copy_constraint({left[0], right[0]});
                     bp.add_copy_constraint({left[1], right[1]});
                     bp.add_copy_constraint({left[2], right[2]});

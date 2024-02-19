@@ -46,12 +46,12 @@ void test_add(const typename FieldType::value_type &a, const typename FieldType:
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 0;
     constexpr std::size_t SelectorColumns = 1;
-    using ArithmetizationParams =
-        crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
-    using AssignmentType = nil::blueprint::assignment<ArithmetizationType>;
+    using AssignmentType = nil::blueprint::assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>;
+    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>;
+    zk::snark::plonk_table_description<BlueprintFieldType> desc(
+        WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns);
 
     using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
@@ -82,8 +82,8 @@ void test_add(const typename FieldType::value_type &a, const typename FieldType:
     component_type component_instance({0, 1, 2}, {}, {});
 
     nil::crypto3::test_component_private_input<
-        component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>
-            (component_instance, public_input, result_check, instance_input);
+        component_type, BlueprintFieldType, hash_type, Lambda>
+            (component_instance, desc, public_input, result_check, instance_input);
 }
 
 constexpr static const std::size_t random_tests_amount = 10;
@@ -105,20 +105,12 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_private_input_test) {
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_private_input_copy_constraints) {
     using field_type = typename crypto3::algebra::curves::pallas::base_field_type;
-
-    constexpr std::size_t WitnessColumns = 3;
-    constexpr std::size_t PublicInputColumns = 1;
-    constexpr std::size_t ConstantColumns = 0;
-    constexpr std::size_t SelectorColumns = 1;
-    using ArithmetizationParams =
-        crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<field_type, ArithmetizationParams>;
-    using AssignmentType = nil::blueprint::assignment<ArithmetizationType>;
+    using AssignmentType = nil::blueprint::assignment<nil::crypto3::zk::snark::plonk_constraint_system<field_type>>;
 
     using var = crypto3::zk::snark::plonk_variable<typename field_type::value_type>;
 
     const std::size_t private_index = AssignmentType::private_storage_index;
-    blueprint::circuit<ArithmetizationType> bp;
+    blueprint::circuit<crypto3::zk::snark::plonk_constraint_system<field_type>> bp;
 
     auto private_1 = var(private_index, 0, false, var::column_type::public_input),
         private_2 = var(private_index, 1, false, var::column_type::public_input),

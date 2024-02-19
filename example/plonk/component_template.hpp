@@ -50,7 +50,7 @@ namespace nil {
                 class component_template;
 
                 template<typename BlueprintFieldType,
-                         typename ArithmetizationParams,
+
                          typename CurveType,
                          std::size_t W0,
                          std::size_t W1,
@@ -129,13 +129,13 @@ namespace nil {
                     private:
                     static void generate_gates(
                         blueprint<ArithmetizationType> &bp,
-                        blueprint_assignment_table<ArithmetizationType> &assignment, 
+                        blueprint_assignment_table<ArithmetizationType> &assignment,
                         const params_type &params,
                         allocated_data_type &allocated_data,
                         const std::size_t start_row_index) {
 
                         if (!allocated_data.previously_allocated) {
-                        } else { 
+                        } else {
                         }
 
                     }

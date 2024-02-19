@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_compare_0) {
     using var = zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
     using component_type = zk::components::compare_with_const<ArithmetizationType, curve_type, 0, 1, 2>;
-    
+
     typename component_type::params_type params = {var(0, 0, false, var::column_type::public_input)};
     typename BlueprintFieldType::value_type value = 0x40000000000000000000000000000000224698fc094cf91b992d30ed00000002_cppui255;
     std::vector<typename BlueprintFieldType::value_type> public_input = {value};
@@ -75,11 +75,11 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_compare_0) {
         result = 1;
     }
 
-    auto result_check = [&result](AssignmentType &assignment, 
+    auto result_check = [&result](AssignmentType &assignment,
         component_type::result_type &real_res) {
         assert(result == assignment.var_value(real_res.output));
     };
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (params, public_input, result_check);
+    test_component<component_type, BlueprintFieldType, hash_type, Lambda> (params, public_input, result_check);
 
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
     std::cout << "compare with constant: " << duration.count() << "ms" << std::endl;
@@ -105,16 +105,16 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_compare_1) {
     using var = zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
     using component_type = zk::components::compare_with_const<ArithmetizationType, curve_type, 0, 1, 2>;
-    
+
     typename component_type::params_type params = {var(0, 0, false, var::column_type::public_input)};
     std::vector<typename BlueprintFieldType::value_type> public_input = {0x40000000000000000000000000000000224698fc094cf91b992d30ed00000000_cppui255};
     typename BlueprintFieldType::value_type result = 1;
-    
-    auto result_check = [&result](AssignmentType &assignment, 
+
+    auto result_check = [&result](AssignmentType &assignment,
         component_type::result_type &real_res) {
         assert(result == assignment.var_value(real_res.output));
     };
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda> (params, public_input, result_check);
+    test_component<component_type, BlueprintFieldType, hash_type, Lambda> (params, public_input, result_check);
 
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
     std::cout << "compare with constant: " << duration.count() << "ms" << std::endl;

@@ -49,7 +49,7 @@ namespace nil {
                 class curve_element_variable_base_endo_scalar_mul;
 
                 template<typename BlueprintFieldType,
-                         typename ArithmetizationParams,
+
                          typename CurveType,
                          std::size_t W0,
                          std::size_t W1,
@@ -67,7 +67,7 @@ namespace nil {
                          std::size_t W13,
                          std::size_t W14>
                 class curve_element_variable_base_endo_scalar_mul<
-                    snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>,
+                    snark::plonk_constraint_system<BlueprintFieldType>,
                     CurveType,
                     W0,
                     W1,
@@ -84,7 +84,7 @@ namespace nil {
                     W12,
                     W13,
                     W14> {
-                    typedef snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>
+                    typedef snark::plonk_constraint_system<BlueprintFieldType>
                         ArithmetizationType;
 
                     using var = snark::plonk_variable<typename BlueprintFieldType::value_type>;

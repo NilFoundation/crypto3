@@ -57,9 +57,9 @@ void test_bit_decomposition(typename BlueprintFieldType::value_type input,
     constexpr std::size_t PublicInputColumns = 1;
     constexpr std::size_t ConstantColumns = 1;
     constexpr std::size_t SelectorColumns = 1;
-    using ArithmetizationParams =
-        crypto3::zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+    zk::snark::plonk_table_description<BlueprintFieldType> desc(
+        WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns);
+    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>;
     using AssignmentType = blueprint::assignment<ArithmetizationType>;
     using hash_type = crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 1;
@@ -109,23 +109,23 @@ void test_bit_decomposition(typename BlueprintFieldType::value_type input,
 
     if (!CustomAssignments) {
         if (expected_to_pass) {
-            crypto3::test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-                component_instance, public_input, result_check, instance_input,
+            crypto3::test_component<component_type, BlueprintFieldType, hash_type, Lambda>(
+                component_instance, desc, public_input, result_check, instance_input,
                 nil::blueprint::connectedness_check_type::type::STRONG, BitsAmount);
-            crypto3::test_empty_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-                component_instance, public_input, result_check, instance_input,
+            crypto3::test_empty_component<component_type, BlueprintFieldType, hash_type, Lambda>(
+                component_instance, desc, public_input, result_check, instance_input,
                 nil::blueprint::connectedness_check_type::type::STRONG, BitsAmount);
         } else {
-            crypto3::test_component_to_fail<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
-                component_instance, public_input, result_check, instance_input,
+            crypto3::test_component_to_fail<component_type, BlueprintFieldType, hash_type, Lambda>(
+                component_instance, desc, public_input, result_check, instance_input,
                 nil::blueprint::connectedness_check_type::type::STRONG, BitsAmount);
         }
     } else {
         auto custom_assignments = crypto3::generate_patched_assignments<BlueprintFieldType,
-            ArithmetizationParams, component_type>(patches);
+            component_type>(patches);
         crypto3::test_component_to_fail_custom_assignments<
-            component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>
-                (component_instance, public_input, result_check, custom_assignments, instance_input,
+            component_type, BlueprintFieldType, hash_type, Lambda>
+                (component_instance, desc, public_input, result_check, custom_assignments, instance_input,
                  nil::blueprint::connectedness_check_type::type::STRONG, BitsAmount);
     }
 }

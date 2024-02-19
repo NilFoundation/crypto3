@@ -64,7 +64,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_ft_eval_test) {
     constexpr std::size_t SelectorColumns = 10;
     using ArithmetizationParams =
         zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType>;
     using AssignmentType = blueprint::assignment<ArithmetizationType>;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
@@ -81,7 +81,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_ft_eval_test) {
 
     using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size, srs_len>;
     using index_terms_list = zk::components::index_terms_scalars_list_ec_test<ArithmetizationType>;
-    using circuit_description = zk::components::kimchi_circuit_description<index_terms_list, 
+    using circuit_description = zk::components::kimchi_circuit_description<index_terms_list,
         witness_columns, perm_size>;
     using kimchi_params = zk::components::kimchi_params_type<curve_type, commitment_params, circuit_description,
         public_input_size, prev_chal_size>;
@@ -156,7 +156,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_ft_eval_test) {
         0x11347E33DF1631D59D66F6149D99DD22FD23B185D7D89CFE0909877C494D7916_cppui256,
         0x0E1372B72364C37883171F80BC89F2AC7043464C8C30E1D2B5D94105035A6C6E_cppui256,
         0x336A5683971A09A68D33D77B41947F8CAFFE3923190B51D443E515761A32889B_cppui256,}},
-        
+
         {{0x069DE7D0EBB1985B05DAB9E13348C12530D374BAD474C76C4AB9FAC8EB557332_cppui256,
         0x177B2B5F39976BE667F5D6768480F1555F52395613AF100529C99844DA28DCC9_cppui256,
         0x2941C2A82AC0067D3DD6A2C47EDD675D5B7BA071414A8324BA4CFAA1816B163F_cppui256,
@@ -237,7 +237,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_ft_eval_test) {
         assert(expected_result == assignment.var_value(real_res.output));
     };
 
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
+    test_component<component_type, BlueprintFieldType, hash_type, Lambda>(
         params, public_input, result_check);
 }
 

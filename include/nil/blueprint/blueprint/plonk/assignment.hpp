@@ -42,24 +42,19 @@
 namespace nil {
     namespace blueprint {
 
-        template<typename ArithmetizationType, std::size_t... BlueprintParams>
+        template<typename ArithmetizationType>
         class assignment;
 
-        template<typename ArithmetizationType, std::size_t... BlueprintParams>
+        template<typename ArithmetizationType>
         class circuit;
 
-        template<typename BlueprintFieldType,
-                typename ArithmetizationParams>
-        class assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                ArithmetizationParams>>
-                : public crypto3::zk::snark::plonk_assignment_table<BlueprintFieldType,
-                        ArithmetizationParams> {
+        template<typename BlueprintFieldType>
+        class assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
+                : public crypto3::zk::snark::plonk_assignment_table<BlueprintFieldType> {
 
-            using zk_type = crypto3::zk::snark::plonk_assignment_table<BlueprintFieldType,
-                    ArithmetizationParams>;
+            using zk_type = crypto3::zk::snark::plonk_assignment_table<BlueprintFieldType>;
 
-            typedef crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                    ArithmetizationParams> ArithmetizationType;
+            typedef crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType> ArithmetizationType;
 
             using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
             using value_type = typename BlueprintFieldType::value_type;
@@ -75,9 +70,14 @@ namespace nil {
         public:
             static constexpr const std::size_t private_storage_index = std::numeric_limits<std::size_t>::max();
 
-            assignment() :
-                    crypto3::zk::snark::plonk_assignment_table<BlueprintFieldType,
-                            ArithmetizationParams>() {
+            assignment(std::size_t witness_amount, std::size_t public_input_amount,
+                       std::size_t constant_amount, std::size_t selector_amount)
+                : zk_type(witness_amount, public_input_amount, constant_amount, selector_amount) {
+            }
+
+            assignment(const crypto3::zk::snark::plonk_table_description<BlueprintFieldType> &desc)
+                : zk_type(desc.witness_columns, desc.public_input_columns,
+                          desc.constant_columns, desc.selector_columns) {
             }
 
             virtual value_type &selector(std::size_t selector_index, std::uint32_t row_index) {
@@ -172,7 +172,7 @@ namespace nil {
             }
 
             virtual value_type &witness(std::uint32_t witness_index, std::uint32_t row_index) {
-                BLUEPRINT_ASSERT(witness_index < ArithmetizationParams::WitnessColumns);
+                BLUEPRINT_ASSERT(witness_index < this->_private_table._witnesses.size());
 
                 if (this->_private_table._witnesses[witness_index].size() <= row_index)
                     this->_private_table._witnesses[witness_index].resize(row_index + 1);
@@ -182,7 +182,7 @@ namespace nil {
             }
 
             virtual value_type witness(std::uint32_t witness_index, std::uint32_t row_index) const {
-                BLUEPRINT_ASSERT(witness_index < ArithmetizationParams::WitnessColumns);
+                BLUEPRINT_ASSERT(witness_index < this->_private_table._witnesses.size());
                 BLUEPRINT_ASSERT(row_index < this->_private_table._witnesses[witness_index].size());
 
                 return this->_private_table._witnesses[witness_index][row_index];
@@ -235,7 +235,7 @@ namespace nil {
             virtual value_type &constant(
                 std::uint32_t constant_index, std::uint32_t row_index) {
 
-                assert(constant_index < zk_type::constants_amount());
+                BLUEPRINT_ASSERT(constant_index < zk_type::constants_amount());
 
                 if (zk_type::constant_column_size(constant_index) <= row_index)
                     this->_public_table._constants[constant_index].resize(row_index + 1);
@@ -374,17 +374,15 @@ namespace nil {
             }
         };
 
-        template<typename BlueprintFieldType,
-                typename ArithmetizationParams>
+        template<typename BlueprintFieldType>
         typename BlueprintFieldType::value_type var_value(
-                const assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                ArithmetizationParams>> &input_assignment,
+                const assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &input_assignment,
                 const crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type> &input_var) {
             using var_column_type =
                 typename crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>::column_type;
-            using assignment_type =
-                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>>;
+            using assignment_type = assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>;
             // This SHOULD be handled by a separate variable type
+            // (Or even better: properly extracted from the component)
             // But adding a new variable type breaks assigner
             // So we add a type without actually adding a type
             if (input_var.index == assignment_type::private_storage_index) {

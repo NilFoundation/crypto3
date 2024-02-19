@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_table_commitment_test) {
     constexpr std::size_t SelectorColumns = 25;
     using ArithmetizationParams =
         zk::snark::plonk_arithmetization_params<WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns>;
-    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType, ArithmetizationParams>;
+    using ArithmetizationType = zk::snark::plonk_constraint_system<BlueprintFieldType>;
     using AssignmentType = zk::blueprint_assignment_table<ArithmetizationType>;
     using hash_type = nil::crypto3::hashes::keccak_1600<256>;
     constexpr std::size_t Lambda = 40;
@@ -86,13 +86,13 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_table_commitment_test) {
 
     using commitment_params = zk::components::kimchi_commitment_params_type<eval_rounds, max_poly_size, srs_len>;
     using index_terms_list = zk::components::index_terms_scalars_list_lookup_test<ArithmetizationType>;
-    using circuit_description = zk::components::kimchi_circuit_description<index_terms_list, 
+    using circuit_description = zk::components::kimchi_circuit_description<index_terms_list,
         witness_columns, perm_size>;
     using KimchiParamsType = zk::components::kimchi_params_type<curve_type, commitment_params, circuit_description,
         public_input_size, prev_chal_size>;
 
-    using commitment_type = typename 
-                        zk::components::kimchi_commitment_type<BlueprintFieldType, 
+    using commitment_type = typename
+                        zk::components::kimchi_commitment_type<BlueprintFieldType,
                             KimchiParamsType::commitment_params_type::shifted_commitment_split>;
     using kimchi_constants = zk::components::kimchi_inner_constants<KimchiParamsType>;
 
@@ -119,7 +119,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_table_commitment_test) {
 
     constexpr static const std::size_t lookup_columns = KimchiParamsType::circuit_params::lookup_columns;
 
-    constexpr std::size_t use_lookup_runtime = KimchiParamsType::circuit_params::lookup_runtime ? 1 : 0; 
+    constexpr std::size_t use_lookup_runtime = KimchiParamsType::circuit_params::lookup_runtime ? 1 : 0;
 
     // zk::snark::pickles_proof<curve_type> kimchi_proof = test_proof();
 
@@ -163,7 +163,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_table_commitment_test) {
 
     auto result_check = [](AssignmentType &assignment, component_type::result_type &real_res) {};
 
-    test_component<component_type, BlueprintFieldType, ArithmetizationParams, hash_type, Lambda>(
+    test_component<component_type, BlueprintFieldType, hash_type, Lambda>(
         params, public_input, result_check);
 };
 BOOST_AUTO_TEST_SUITE_END()

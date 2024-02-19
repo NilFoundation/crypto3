@@ -94,14 +94,10 @@ namespace nil {
             // And which can be rearranged with relative impunity
             // Additionally, we want to separate the zones by gate types inside the zones
             // Otherwise this would result in gate duplication, which is worse than doing nothing to the component
-            template<typename BlueprintFieldType, typename ArithmetizationParams>
+            template<typename BlueprintFieldType>
             zoning_info<BlueprintFieldType> generate_zones(
-                const circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                                                            ArithmetizationParams>>
-                    &bp,
-                const assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                                                                ArithmetizationParams>>
-                    &assignment,
+                const circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
+                const assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &assignment,
                 std::size_t start_row_index,
                 std::size_t rows_amount) {
                 using var = typename nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
@@ -173,7 +169,7 @@ namespace nil {
             template<typename ComponentType>
             class result_type_converter;
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams, typename ComponentType>
+            template<typename BlueprintFieldType, typename ComponentType>
             class component_stretcher {
             public:
                 typedef typename ComponentType::input_type input_type;
@@ -256,15 +252,14 @@ namespace nil {
                 mutable bool remapping_computed = false;
 
                 void compute_remapping(
-                        assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                                                               ArithmetizationParams>>
-                            &assignment,
+                        assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &assignment,
                         std::size_t old_witness_amount,
                         const input_type &instance_input) const {
-                    circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                                                        ArithmetizationParams>> tmp_circuit;
-                    nil::blueprint::assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                                                        ArithmetizationParams>> tmp_assignment;
+                    circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> tmp_circuit;
+                    nil::blueprint::assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> tmp_assignment(
+                        assignment.witnesses_amount(), assignment.public_inputs_amount(),
+                        assignment.constants_amount(), assignment.selectors_amount()
+                    );
                     auto converted_input = input_type_converter<ComponentType>::convert(instance_input, assignment,
                                                                                         tmp_assignment);
                     generate_circuit(this->component, tmp_circuit, tmp_assignment, converted_input, 0);
@@ -392,17 +387,13 @@ namespace nil {
                 }
 
                 void move_circuit(
-                    const circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                                                              ArithmetizationParams>>
+                    const circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                         &tmp_circuit,
-                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                                                           ArithmetizationParams>>
+                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                         &tmp_assignment,
-                    circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                                                        ArithmetizationParams>>
+                    circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                         &bp,
-                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                                                           ArithmetizationParams>>
+                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                         &assignment,
                     const input_type &instance_input,
                     std::size_t start_row_index) const {
@@ -472,13 +463,11 @@ namespace nil {
                 }
 
                 void move_assignment(
-                    const component_stretcher<BlueprintFieldType, ArithmetizationParams, ComponentType>
+                    const component_stretcher<BlueprintFieldType, ComponentType>
                         &component,
-                    const assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                                                                 ArithmetizationParams>>
+                    const assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                         &tmp_assignment,
-                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                                                            ArithmetizationParams>>
+                    assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                         &assignment,
                     std::size_t start_row_index) const {
 
@@ -504,17 +493,15 @@ namespace nil {
                       stretch_coeff(stretched_witness_amount_ / old_witness_amount_) {}
             };
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams, typename ComponentType>
+            template<typename BlueprintFieldType, typename ComponentType>
             typename ComponentType::result_type generate_circuit(
-                const component_stretcher<BlueprintFieldType, ArithmetizationParams, ComponentType>
+                const component_stretcher<BlueprintFieldType, ComponentType>
                     &component,
-                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                                                    ArithmetizationParams>>
+                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                     &bp,
-                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                                                       ArithmetizationParams>>
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                     &assignment,
-                const typename component_stretcher<BlueprintFieldType, ArithmetizationParams,
+                const typename component_stretcher<BlueprintFieldType,
                                                          ComponentType>::input_type
                     &instance_input,
                 const std::uint32_t start_row_index) {
@@ -522,11 +509,11 @@ namespace nil {
                 if (!component.remapping_computed) {
                     component.compute_remapping(assignment, component.witness_amount(), instance_input);
                 }
-                nil::blueprint::assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                                                                       ArithmetizationParams>>
-                    tmp_assignment;
+                nil::blueprint::assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
+                    tmp_assignment(assignment.witnesses_amount(), assignment.public_inputs_amount(),
+                                   assignment.constants_amount(), assignment.selectors_amount());
                 circuit<crypto3::zk::snark::plonk_constraint_system<
-                    BlueprintFieldType, ArithmetizationParams>> tmp_circuit;
+                    BlueprintFieldType>> tmp_circuit;
 
                 auto result = generate_circuit(
                     component.component, tmp_circuit, tmp_assignment, instance_input, 0);
@@ -536,15 +523,13 @@ namespace nil {
                                                                      start_row_index);
             }
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams, typename ComponentType>
+            template<typename BlueprintFieldType, typename ComponentType>
             typename ComponentType::result_type generate_assignments(
-                const component_stretcher<BlueprintFieldType, ArithmetizationParams, ComponentType>
+                const component_stretcher<BlueprintFieldType, ComponentType>
                     &component,
-                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType,
-                                                                       ArithmetizationParams>>
+                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                     &assignment,
-                const typename component_stretcher<BlueprintFieldType, ArithmetizationParams,
-                                                         ComponentType>::input_type
+                const typename component_stretcher<BlueprintFieldType, ComponentType>::input_type
                     &instance_input,
                 const std::uint32_t start_row_index) {
 
@@ -553,9 +538,11 @@ namespace nil {
                 }
 
                 nil::blueprint::assignment<crypto3::zk::snark::plonk_constraint_system<
-                    BlueprintFieldType, ArithmetizationParams>> tmp_assignment;
+                    BlueprintFieldType>> tmp_assignment(
+                        assignment.witnesses_amount(), assignment.public_inputs_amount(),
+                        assignment.constants_amount(), assignment.selectors_amount());
                 circuit<crypto3::zk::snark::plonk_constraint_system<
-                    BlueprintFieldType, ArithmetizationParams>> tmp_circuit;
+                    BlueprintFieldType>> tmp_circuit;
 
                 auto converted_input = input_type_converter<ComponentType>::convert(instance_input, assignment,
                                                                                     tmp_assignment);
@@ -571,13 +558,13 @@ namespace nil {
                                                                      start_row_index);
             }
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams, typename ComponentType>
+            template<typename BlueprintFieldType, typename ComponentType>
             struct is_component_stretcher : std::false_type {};
 
-            template<typename BlueprintFieldType, typename ArithmetizationParams, typename ComponentType>
+            template<typename BlueprintFieldType, typename ComponentType>
             struct is_component_stretcher<
-                BlueprintFieldType, ArithmetizationParams,
-                component_stretcher<BlueprintFieldType, ArithmetizationParams, ComponentType>>
+                BlueprintFieldType,
+                component_stretcher<BlueprintFieldType, ComponentType>>
                     : std::true_type {};
 
         } // namespace components
