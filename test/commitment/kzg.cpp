@@ -29,7 +29,7 @@
 
 #include <string>
 
-#include <boost/test/unit_test.hpp>
+#include <boost/test/included/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
@@ -44,9 +44,14 @@
 #include <nil/crypto3/math/algorithms/unity_root.hpp>
 #include <nil/crypto3/math/domains/evaluation_domain.hpp>
 #include <nil/crypto3/math/algorithms/make_evaluation_domain.hpp>
-#include <nil/crypto3/zk/commitments/polynomial/kzg.hpp>
 #include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
 #include <nil/crypto3/algebra/curves/detail/marshalling.hpp>
+
+#include <nil/crypto3/algebra/curves/mnt6.hpp>
+#include <nil/crypto3/algebra/pairing/mnt6.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/mnt6.hpp>
+
+#include <nil/crypto3/zk/commitments/polynomial/kzg.hpp>
 
 using namespace nil::crypto3;
 using namespace nil::crypto3::math;
@@ -80,6 +85,35 @@ BOOST_AUTO_TEST_CASE(kzg_basic_test) {
 
     BOOST_CHECK(zk::algorithms::verify_eval<kzg_type>(params, proof, pk));
 }
+
+BOOST_AUTO_TEST_CASE(kzg_basic_test_mnt6) {
+
+    typedef algebra::curves::mnt6_298 curve_type;
+    typedef typename curve_type::scalar_field_type::value_type scalar_value_type;
+
+    typedef zk::commitments::kzg<curve_type> kzg_type;
+
+    scalar_value_type alpha = 10;
+    std::size_t n = 16;
+    scalar_value_type z = 2;
+    const polynomial<scalar_value_type> f = {-1, 1, 2, 3};
+
+    auto params = typename kzg_type::params_type(n, alpha);
+    BOOST_CHECK(curve_type::template g1_type<>::value_type::one() == params.commitment_key[0]);
+    BOOST_CHECK(alpha * curve_type::template g1_type<>::value_type::one() == params.commitment_key[1]);
+    BOOST_CHECK(alpha * alpha * curve_type::template g1_type<>::value_type::one() == params.commitment_key[2]);
+    BOOST_CHECK(alpha * alpha * alpha * curve_type::template g1_type<>::value_type::one() == params.commitment_key[3]);
+    BOOST_CHECK(alpha * curve_type::template g2_type<>::value_type::one() == params.verification_key);
+
+    auto commit = zk::algorithms::commit<kzg_type>(params, f);
+    BOOST_CHECK(3209 * curve_type::template g1_type<>::value_type::one() == commit);
+
+    typename kzg_type::public_key_type pk = {commit, z, f.evaluate(z)};
+    auto proof = zk::algorithms::proof_eval<kzg_type>(params, f, pk);
+
+    BOOST_CHECK(zk::algorithms::verify_eval<kzg_type>(params, proof, pk));
+}
+
 
 BOOST_AUTO_TEST_CASE(kzg_random_test) {
 
@@ -485,5 +519,47 @@ BOOST_AUTO_TEST_CASE(batched_kzg_bigger_basic_test) {
     transcript_type transcript_verification;
     BOOST_CHECK(zk::algorithms::verify_eval<kzg_type>(params, proof, pk, transcript_verification));
 }
+/*
+BOOST_AUTO_TEST_CASE(batched_kzg_bigger_basic_test_mnt6) {
+    typedef algebra::curves::mnt6_298 curve_type;
+    typedef typename curve_type::scalar_field_type::value_type scalar_value_type;
+
+    typedef hashes::sha2<256> transcript_hash_type;
+    typedef zk::commitments::batched_kzg<curve_type, transcript_hash_type, math::polynomial<scalar_value_type>> kzg_type;
+    typedef typename kzg_type::transcript_type transcript_type;
+
+    scalar_value_type alpha = 7;
+    typename kzg_type::batch_of_polynomials_type polys = {{{{1, 2, 3, 4, 5, 6, 7, 8}},
+                                                        {{11, 12, 13, 14, 15, 16, 17, 18}},
+                                                        {{21, 22, 23, 24, 25, 26, 27, 28}},
+                                                        {{31, 32, 33, 34, 35, 36, 37, 38}}}};
+
+    auto params = typename kzg_type::params_type(8, 8, alpha);
+
+    std::vector<std::vector<scalar_value_type>> S = {{{101, 2, 3}, {102, 2, 3}, {1, 3}, {101, 4}}};
+    std::vector<scalar_value_type> T = zk::algorithms::merge_eval_points<kzg_type>(S);
+    {
+        std::vector<scalar_value_type> T_check = {1, 2, 3, 4, 101, 102};
+        std::sort(T.begin(), T.end());
+        BOOST_CHECK(T == T_check);
+    }
+    auto rs = zk::algorithms::create_evals_polys<kzg_type>(polys, S);
+    BOOST_CHECK(rs.size() == polys.size());
+    for (std::size_t i = 0; i < polys.size(); ++i) {
+        BOOST_CHECK(rs[i].degree() < polys[i].degree());
+        for (auto s : S[i]) {
+            BOOST_CHECK(polys[i].evaluate(s) == rs[i].evaluate(s));
+        }
+    }
+    auto commits = zk::algorithms::commit<kzg_type>(params, polys);
+    auto pk = typename kzg_type::public_key_type(commits, T, S, rs);
+
+    transcript_type transcript;
+    auto proof = zk::algorithms::proof_eval<kzg_type>(params, polys, pk, transcript);
+
+    transcript_type transcript_verification;
+    BOOST_CHECK(zk::algorithms::verify_eval<kzg_type>(params, proof, pk, transcript_verification));
+}
+*/
 
 BOOST_AUTO_TEST_SUITE_END()

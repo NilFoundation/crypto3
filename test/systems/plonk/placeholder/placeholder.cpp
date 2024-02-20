@@ -33,7 +33,7 @@
 #include <random>
 #include <regex>
 
-#include <boost/test/unit_test.hpp>
+#include <boost/test/included/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
@@ -45,6 +45,14 @@
 #include <nil/crypto3/algebra/curves/vesta.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/vesta.hpp>
 #include <nil/crypto3/algebra/random_element.hpp>
+
+#include <nil/crypto3/algebra/curves/mnt4.hpp>
+#include <nil/crypto3/algebra/pairing/mnt4.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/mnt4.hpp>
+
+#include <nil/crypto3/algebra/curves/mnt6.hpp>
+#include <nil/crypto3/algebra/pairing/mnt6.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/mnt6.hpp>
 
 #include <nil/crypto3/math/algorithms/unity_root.hpp>
 #include <nil/crypto3/math/polynomial/lagrange_interpolation.hpp>
@@ -1191,5 +1199,139 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(prover_test, F, TestFixtures) {
     F fixture(circuit, circuit.usable_rows, circuit.table_rows);
     BOOST_CHECK(fixture.run_test());
 }
+BOOST_AUTO_TEST_SUITE_END()
+
+
+
+template<
+    typename curve_type,
+    typename merkle_hash_type,
+    typename transcript_hash_type,
+    std::size_t WitnessColumns,
+    std::size_t PublicInputColumns,
+    std::size_t ConstantColumns,
+    std::size_t SelectorColumns,
+    std::size_t usable_rows_amount,
+    std::size_t permutation, bool UseGrinding = false>
+struct placeholder_kzg_test_fixture : public test_initializer {
+    using field_type = typename curve_type::scalar_field_type;
+
+    struct placeholder_test_params {
+        constexpr static const std::size_t usable_rows = 13;
+
+        constexpr static const std::size_t witness_columns = WitnessColumns;
+        constexpr static const std::size_t public_input_columns = PublicInputColumns;
+        constexpr static const std::size_t constant_columns = ConstantColumns;
+        constexpr static const std::size_t selector_columns = SelectorColumns;
+
+        constexpr static const std::size_t lambda = 40;
+        constexpr static const std::size_t m = 2;
+    };
+
+    using transcript_type = typename transcript::fiat_shamir_heuristic_sequential<transcript_hash_type>;
+
+    using circuit_params = placeholder_circuit_params<field_type>;
+
+    using kzg_type = commitments::batched_kzg<curve_type, transcript_hash_type>;
+    using kzg_scheme_type = typename commitments::kzg_commitment_scheme<kzg_type>;
+    using kzg_placeholder_params_type = nil::crypto3::zk::snark::placeholder_params<circuit_params, kzg_scheme_type>;
+
+    using policy_type = zk::snark::detail::placeholder_policy<field_type, kzg_placeholder_params_type>;
+
+    using circuit_type = 
+        circuit_description<field_type,
+        placeholder_circuit_params<field_type>,
+        usable_rows_amount, permutation>;
+
+    placeholder_kzg_test_fixture(
+            const circuit_type& circuit_in,
+            std::size_t usable_rows, std::size_t table_rows)
+        : circuit(circuit_in)
+        , desc(WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns)
+        , constraint_system(circuit.gates, circuit.copy_constraints, circuit.lookup_gates, circuit.lookup_tables)
+        , assignments(circuit.table)
+        , table_rows_log(std::log2(table_rows))
+    {
+        desc.rows_amount = table_rows;
+        desc.usable_rows_amount = usable_rows;
+    }
+
+    bool run_test() {
+        test_initializer::setup();
+        typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints, circuit.lookup_gates);
+        typename policy_type::variable_assignment_type assignments = circuit.table;
+
+        std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
+
+        bool verifier_res;
+
+        // KZG commitment scheme
+        auto kzg_params = create_kzg_params<kzg_type>(table_rows_log);
+        kzg_scheme_type kzg_scheme(kzg_params);
+
+        typename placeholder_public_preprocessor<field_type, kzg_placeholder_params_type>::preprocessed_data_type
+            kzg_preprocessed_public_data =
+            placeholder_public_preprocessor<field_type, kzg_placeholder_params_type>::process(
+                    constraint_system, assignments.public_table(), desc, kzg_scheme, columns_with_copy_constraints.size()
+                    );
+
+        typename placeholder_private_preprocessor<field_type, kzg_placeholder_params_type>::preprocessed_data_type
+            kzg_preprocessed_private_data = placeholder_private_preprocessor<field_type, kzg_placeholder_params_type>::process(
+                    constraint_system, assignments.private_table(), desc
+                    );
+
+        auto kzg_proof = placeholder_prover<field_type, kzg_placeholder_params_type>::process(
+                kzg_preprocessed_public_data, std::move(kzg_preprocessed_private_data), desc, constraint_system, kzg_scheme
+                );
+
+        verifier_res = placeholder_verifier<field_type, kzg_placeholder_params_type>::process(
+                kzg_preprocessed_public_data, kzg_proof, desc, constraint_system, kzg_scheme
+                );
+        test_initializer::teardown();
+        return verifier_res;
+    }
+
+    circuit_type circuit;
+    plonk_table_description<field_type> desc;
+    typename policy_type::constraint_system_type constraint_system;
+    typename policy_type::variable_assignment_type assignments;
+    std::size_t table_rows_log;
+};
+
+
+BOOST_AUTO_TEST_SUITE(placeholder_circuit2_kzg)
+
+    using TestFixtures = boost::mpl::list<
+    placeholder_kzg_test_fixture<
+        algebra::curves::bls12<381>,
+        hashes::keccak_1600<256>,
+        hashes::keccak_1600<256>,
+        witness_columns_t,
+        public_columns_t,
+        constant_columns_t,
+        selector_columns_t,
+        usable_rows_t,
+        4, true>/*, -- Not yet implemented
+    placeholder_kzg_test_fixture<
+        algebra::curves::mnt6_298,
+        hashes::poseidon<nil::crypto3::hashes::detail::mina_poseidon_policy<algebra::curves::bls12<381>>>,
+        hashes::poseidon<nil::crypto3::hashes::detail::mina_poseidon_policy<algebra::curves::bls12<381>>>,
+        witness_columns_t,
+        public_columns_t,
+        constant_columns_t,
+        selector_columns_t,
+        usable_rows_t,
+        4,
+        true>
+        */
+    >;
+
+BOOST_AUTO_TEST_CASE_TEMPLATE(prover_test, F, TestFixtures) {
+    typename F::field_type::value_type pi0 = test_global_alg_rnd_engine<typename F::field_type>();
+    auto circuit = circuit_test_t<typename F::field_type>(pi0, test_global_alg_rnd_engine<typename F::field_type>);
+    F fixture(circuit, circuit.usable_rows, circuit.table_rows);
+    BOOST_CHECK(fixture.run_test());
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
