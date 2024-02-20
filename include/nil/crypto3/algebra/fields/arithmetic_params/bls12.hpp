@@ -70,7 +70,7 @@ namespace nil {
                         0xAA6346091755D4D2512D4356572472834C04E5E921E17619A53352A615E29DD315F831E03A7ADF8ED48AC6BD94CA1E0_cppui380;
 
                     constexpr static const integral_type modulus = policy_type::modulus;
-                    constexpr static const integral_type group_order =
+                    constexpr static const integral_type group_order_minus_one_half =
                         0xD0088F51CBFF34D258DD3DB21A5D66BB23BA5C279C2895FB39869507B587B120F55FFFF58A9FFFFDCFF7FFFFFFFD555_cppui380;
                 };
 
@@ -96,7 +96,7 @@ namespace nil {
                         0x135203E60180A68EE2E9C448D77A2CD91C3DEDD930B1CF60EF396489F61EB45E304466CF3E67FA0AF1EE7B04121BDEA2_cppui381};
 
                     constexpr static const integral_type modulus = policy_type::modulus;
-                    constexpr static const extended_integral_type group_order =
+                    constexpr static const extended_integral_type group_order_minus_one_half =
                         0x1521BD25C61AFE3A5E93C75511792F4F16E48728738235A3372CF249A4F45E82853167E8B6EE5377A98A49984BC77808EB430CE430C2E3D949742D43848D024B35FC8F69F38DBA18B1619C1B1089E7EBE76B58EBB1C1755935500000E38C71C_cppui761;
                 };
 
@@ -129,7 +129,7 @@ namespace nil {
                         0x6E2A5BB9C8DB33E973D13C71C7B5F4181B3E0D188CF06990C62C1807439B73AF_cppui255;
 
                     constexpr static const integral_type modulus = policy_type::modulus;
-                    constexpr static const integral_type group_order =
+                    constexpr static const integral_type group_order_minus_one_half =
                         0x39F6D3A994CEBEA4199CEC0404D0EC02A9DED2017FFF2DFF7FFFFFFF80000000_cppui254;
                 };
 
@@ -164,7 +164,7 @@ namespace nil {
                         0x1065AB4C0E7DDA53F72540713590CB96A2A9516C804A20E2BE8B1180449F513E50F4148BE329585581F532F8815DE20_cppui377;
 
                     constexpr static const integral_type modulus = policy_type::modulus;
-                    constexpr static const integral_type group_order =
+                    constexpr static const integral_type group_order_minus_one_half =
                         0xD71D230BE28875631D82E03650A49D8D116CF9807A89C78F79B117DD04A4000B85AEA2180000004284600000000000_cppui376;
                 };
 
@@ -190,7 +190,7 @@ namespace nil {
                         0x1ABEF7237D62007BB9B2EDA5AFCB52F9D179F23DBD49B8D1B24CF7C1BF8066791317689172D0F4CB90CF47182B7D7B2_cppui377};
 
                     constexpr static const integral_type modulus = policy_type::modulus;
-                    constexpr static const extended_integral_type group_order =
+                    constexpr static const extended_integral_type group_order_minus_one_half =
                         0x16983E85DD7FD912B489DD9B0931E25DC5C3ED257749F8FAF38A09EED26AE04E80C57DC833066E00A7389281526B62305555545DB857018C1925CAC31C64EB5E5FDE91AF8E04D256D1347970DEC00399C692A780000008508C00000000000_cppui753;
                 };
 
@@ -223,7 +223,7 @@ namespace nil {
                         0x601DFA555C48DDAB1E55EF6F1C9D713624D23FFAE2716996A4295C90F65454C_cppui251;
 
                     constexpr static const integral_type modulus = policy_type::modulus;
-                    constexpr static const integral_type group_order =
+                    constexpr static const integral_type group_order_minus_one_half =
                         0x955B2AF4D1652AB305A268F2E1BD800ACD53B7F680000008508C00000000000_cppui252;
                 };
 
@@ -299,11 +299,11 @@ namespace nil {
                     arithmetic_params<bls12_scalar_field<381>>::modulus;
 
                 constexpr typename arithmetic_params<bls12_base_field<381>>::integral_type const
-                    arithmetic_params<bls12_base_field<381>>::group_order;
+                    arithmetic_params<bls12_base_field<381>>::group_order_minus_one_half;
                 constexpr typename arithmetic_params<fp2<bls12_base_field<381>>>::extended_integral_type const
-                    arithmetic_params<fp2<bls12_base_field<381>>>::group_order;
+                    arithmetic_params<fp2<bls12_base_field<381>>>::group_order_minus_one_half;
                 constexpr typename arithmetic_params<bls12_scalar_field<381>>::integral_type const
-                    arithmetic_params<bls12_scalar_field<381>>::group_order;
+                    arithmetic_params<bls12_scalar_field<381>>::group_order_minus_one_half;
 
                 /************************* BLS12-377 definitions ***********************************/
 
@@ -377,11 +377,11 @@ namespace nil {
                     arithmetic_params<bls12_scalar_field<377>>::modulus;
 
                 constexpr typename arithmetic_params<bls12_base_field<377>>::integral_type const
-                    arithmetic_params<bls12_base_field<377>>::group_order;
+                    arithmetic_params<bls12_base_field<377>>::group_order_minus_one_half;
                 constexpr typename arithmetic_params<fp2<bls12_base_field<377>>>::extended_integral_type const
-                    arithmetic_params<fp2<bls12_base_field<377>>>::group_order;
+                    arithmetic_params<fp2<bls12_base_field<377>>>::group_order_minus_one_half;
                 constexpr typename arithmetic_params<bls12_scalar_field<377>>::integral_type const
-                    arithmetic_params<bls12_scalar_field<377>>::group_order;
+                    arithmetic_params<bls12_scalar_field<377>>::group_order_minus_one_half;
 
             }    // namespace fields
         }        // namespace algebra

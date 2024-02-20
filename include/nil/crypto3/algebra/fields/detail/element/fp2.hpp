@@ -256,7 +256,7 @@ namespace nil {
                         }
 
                         constexpr bool is_square() const {
-                            element_fp2 tmp = this->pow(policy_type::group_order);
+                            element_fp2 tmp = this->pow(policy_type::group_order_minus_one_half);
                             return (tmp.is_one() || tmp.is_zero());    // maybe can be done more effective
                         }
 

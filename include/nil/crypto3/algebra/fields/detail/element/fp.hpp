@@ -26,6 +26,8 @@
 #ifndef CRYPTO3_ALGEBRA_FIELDS_ELEMENT_FP_HPP
 #define CRYPTO3_ALGEBRA_FIELDS_ELEMENT_FP_HPP
 
+#include <iostream>
+
 #include <nil/crypto3/algebra/fields/detail/exponentiation.hpp>
 #include <nil/crypto3/algebra/fields/detail/element/operations.hpp>
 
@@ -215,9 +217,9 @@ namespace nil {
                             return element_fp(data * data);    // maybe can be done more effective
                         }
 
-                        // TODO: maybe error here
                         constexpr bool is_square() const {
-                            return (this->sqrt() != -1);    // maybe can be done more effective
+                            element_fp tmp = this->pow(policy_type::group_order_minus_one_half);
+                            return (tmp.is_one() || tmp.is_zero());
                         }
 
                         template<typename PowerType,

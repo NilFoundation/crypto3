@@ -73,7 +73,7 @@ namespace nil {
                             0x1366271F76AB41CEEEE8C1E5E972F3CEC14A25F18B3F4B93642FAD4972356D977470E0FA674_cppui297,
                             0x00, 0x00};
 
-                        constexpr static const extended_integral_type group_order =
+                        constexpr static const extended_integral_type group_order_minus_one_half =
                             0x1A1E3D618BA643D0F7F10B59BD7DB6981AD661CC756DCF7EC82F4F320CF354C814FAB1F72198E11AAE5A65BFAC8866CDA5F25E91FE3405FB619822AE7756E3F1CBC0B60FBD44114FC23E7CC3932D198CBE6F3DF9DF28E58FF8DBDC80329943BF3F003B81A48CADD598E4CEF600000000_cppui893;
 
                         /*constexpr static const std::array<non_residue_type, 3> Frobenius_coeffs_c1 =
@@ -123,7 +123,7 @@ namespace nil {
 
                     template<std::size_t Version>
                     constexpr typename fp3_extension_params<mnt6_base_field<Version>>::extended_integral_type const
-                        fp3_extension_params<mnt6_base_field<Version>>::group_order;
+                        fp3_extension_params<mnt6_base_field<Version>>::group_order_minus_one_half;
 
                     template<std::size_t Version>
                     constexpr typename fp3_extension_params<mnt6_base_field<Version>>::integral_type const

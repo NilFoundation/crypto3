@@ -30,7 +30,7 @@
 #include <cstdint>
 #include <string>
 
-#include <boost/test/unit_test.hpp>
+#include <boost/test/included/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
@@ -451,6 +451,17 @@ void field_not_square_test(const std::vector<std::array<const char *, 2>> &test_
     }
 }
 
+template<typename FieldType>
+void field_not_square_test(const std::vector<std::array<const char *, 3>> &test_set) {
+    typedef typename FieldType::value_type value_type;
+    typedef typename value_type::underlying_type::integral_type integral_type;
+
+    for (auto &not_square : test_set) {
+        BOOST_CHECK_EQUAL(value_type(integral_type(not_square[0]), integral_type(not_square[1]), integral_type(not_square[2])).is_square(), false);
+        BOOST_CHECK_EQUAL(value_type(integral_type(not_square[0]), integral_type(not_square[1]), integral_type(not_square[2])).pow(2).is_square(),
+                          true);
+    }
+}
 
 BOOST_AUTO_TEST_SUITE(fields_manual_tests)
 
@@ -616,6 +627,22 @@ BOOST_DATA_TEST_CASE(field_operation_test_secp256r1_fq, string_data("field_opera
     using policy_type = fields::secp_r1_fq<256>;
 
     field_operation_test<policy_type>(data_set);
+}
+
+BOOST_AUTO_TEST_CASE(field_not_square_manual_test_mnt6_298_fq3) {
+    using policy_type = fields::fp3<fields::mnt6_fq<298> >;
+    typedef typename policy_type::value_type value_type;
+    typedef typename value_type::underlying_type::integral_type integral_type;
+
+    std::vector<std::array<const char *, 3>> not_squares = {
+        {
+            "357507749117090458521032584112160943872175572350005643576228811373296461079103885151642520",
+            "136750387754396923590287206986786570171136748402425635594999628594733886068542303669195863",
+            "416393324960275802403945643875465406802576411988843831727119597727966701953485191636182242"
+        }
+    };
+
+    field_not_square_test<policy_type>(not_squares);
 }
 
 BOOST_AUTO_TEST_CASE(field_not_square_manual_test_bls12_381_fq) {

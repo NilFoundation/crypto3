@@ -63,6 +63,9 @@ namespace nil {
                     constexpr static const integral_type modulus =
                         0x1A0111EA397FE69A4B1BA7B6434BACD764774B84F38512BF6730D2A0F6B0F6241EABFFFEB153FFFFB9FEFFFFFFFFAAAB_cppui381;
 
+                    constexpr static const integral_type group_order_minus_one_half =
+                        0xD0088F51CBFF34D258DD3DB21A5D66BB23BA5C279C2895FB39869507B587B120F55FFFF58A9FFFFDCFF7FFFFFFFD555_cppui381;
+
                     typedef typename policy_type::modular_backend modular_backend;
                     constexpr static const modular_params_type modulus_params = modulus;
                     typedef nil::crypto3::multiprecision::number<
@@ -93,6 +96,9 @@ namespace nil {
                     constexpr static const integral_type modulus =
                         0x1AE3A4617C510EAC63B05C06CA1493B1A22D9F300F5138F1EF3622FBA094800170B5D44300000008508C00000000001_cppui377;
 
+                    constexpr static const integral_type group_order_minus_one_half =
+                        0xD71D230BE28875631D82E03650A49D8D116CF9807A89C78F79B117DD04A4000B85AEA2180000004284600000000000_cppui377;
+
                     typedef typename policy_type::modular_backend modular_backend;
                     typedef nil::crypto3::multiprecision::modular_params<modular_backend> modular_params_type;
                     constexpr static const modular_params_type modulus_params = modulus;
@@ -119,6 +125,9 @@ namespace nil {
 #else
                 constexpr typename bls12_base_field<381>::integral_type const bls12_base_field<381>::modulus;
                 constexpr typename bls12_base_field<377>::integral_type const bls12_base_field<377>::modulus;
+
+                constexpr typename bls12_base_field<381>::integral_type const bls12_base_field<381>::group_order_minus_one_half;
+                constexpr typename bls12_base_field<377>::integral_type const bls12_base_field<377>::group_order_minus_one_half;
 
                 constexpr
                     typename bls12_base_field<381>::modular_params_type const bls12_base_field<381>::modulus_params;

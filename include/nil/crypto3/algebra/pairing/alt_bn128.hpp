@@ -28,7 +28,7 @@
 
 #include <nil/crypto3/algebra/curves/babyjubjub.hpp>
 #include <nil/crypto3/algebra/curves/alt_bn128.hpp>
-#include <nil/crypto3/algebra/pairing/detail/alt_bn128/254/params.hpp>
+#include <nil/crypto3/algebra/pairing/detail/alt_bn128/params.hpp>
 #include <nil/crypto3/algebra/pairing/forms/short_weierstrass/jacobian_with_a4_0/ate_double_miller_loop.hpp>
 #include <nil/crypto3/algebra/pairing/forms/short_weierstrass/jacobian_with_a4_0/ate_miller_loop.hpp>
 #include <nil/crypto3/algebra/pairing/forms/short_weierstrass/jacobian_with_a4_0/ate_precompute_g1.hpp>

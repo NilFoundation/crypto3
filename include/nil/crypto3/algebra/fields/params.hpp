@@ -26,6 +26,8 @@
 #ifndef CRYPTO3_ALGEBRA_FIELDS_PARAMS_HPP
 #define CRYPTO3_ALGEBRA_FIELDS_PARAMS_HPP
 
+#include <cstddef>
+
 namespace nil {
     namespace crypto3 {
         namespace algebra {
@@ -44,6 +46,7 @@ namespace nil {
                     typedef typename field_type::extended_integral_type extended_integral_type;
 
                     constexpr static const integral_type modulus = field_type::modulus;
+                    constexpr static const integral_type group_order_minus_one_half = field_type::group_order_minus_one_half;
 
                     constexpr static const modular_params_type modulus_params = field_type::modulus_params;
                 };
