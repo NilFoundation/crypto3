@@ -61,6 +61,7 @@
 // #include <nil/crypto3/algebra/fields/dsa_jce.hpp>
 #include <nil/crypto3/algebra/fields/curve25519/base_field.hpp>
 #include <nil/crypto3/algebra/fields/curve25519/scalar_field.hpp>
+#include <nil/crypto3/algebra/fields/goldilocks64/base_field.hpp>
 // #include <nil/crypto3/algebra/fields/ffdhe_ietf.hpp>
 // #include <nil/crypto3/algebra/fields/field.hpp>
 // #include <nil/crypto3/algebra/fields/modp_ietf.hpp>
@@ -450,6 +451,7 @@ void field_not_square_test(const std::vector<std::array<const char *, 2>> &test_
     }
 }
 
+
 BOOST_AUTO_TEST_SUITE(fields_manual_tests)
 
 BOOST_AUTO_TEST_CASE(field_operation_perf_test_pallas, *boost::unit_test::disabled()) {
@@ -511,6 +513,12 @@ BOOST_AUTO_TEST_CASE(field_operation_perf_test_pallas, *boost::unit_test::disabl
         std::chrono::high_resolution_clock::now() - start);
     std::cout << "Inversion time: " << std::fixed << std::setprecision(3)
         << elapsed.count() / (SAMPLES / 1000) << " ns" << std::endl;
+}
+
+BOOST_DATA_TEST_CASE(field_operation_test_goldilocks64_fq, string_data("field_operation_test_goldilocks64_fq"), data_set) {
+    using policy_type = fields::goldilocks64_fq;
+
+    field_operation_test<policy_type>(data_set);
 }
 
 BOOST_DATA_TEST_CASE(field_operation_test_bls12_381_fr, string_data("field_operation_test_bls12_381_fr"), data_set) {
