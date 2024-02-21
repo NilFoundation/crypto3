@@ -51,17 +51,16 @@ namespace nil {
                     return 2;
                 }
 
-                number<Backend, ExpressionTemplates> divisor;
                 boost::random::independent_bits_engine<std::mt19937, 256, number<Backend, ExpressionTemplates>> rng;
-                number<modular_adaptor<Backend, backends::modular_params_rt<Backend>>, ExpressionTemplates>
-                        c(rng(), n), x(rng(), n), xx = x;
+                number<modular_adaptor<Backend, backends::modular_params_rt<Backend>>, ExpressionTemplates> divisor,
+                        c(rng(), n), x(rng(), n), nn(n, n), xx = x;
                 do {
                     x = x * x + c;
                     xx = xx * xx + c;
                     xx = xx * xx + c;
-                    divisor = multiprecision::gcd((x > xx) ? x - xx : xx - x, n);
-                } while (divisor == 1);
-                return divisor;
+                    divisor = multiprecision::gcd((x > xx) ? x - xx : xx - x, nn);
+                } while (static_cast<int>(divisor) == 1);
+                return static_cast<multiprecision::number<Backend, ExpressionTemplates>>(divisor);
             }
 
             /*
@@ -71,7 +70,7 @@ namespace nil {
              */
             template<typename IntegerType>
             void prime_factorize(IntegerType n, std::set<IntegerType> &prime_factors) {
-                if (n == IntegerType(0) || n == IntegerType(1))
+                if (n == 0 || n == 1)
                     return;
                 if (multiprecision::miller_rabin_test(n, 100)) {
                     prime_factors.insert(n);
@@ -92,7 +91,7 @@ namespace nil {
                 IntegerType mi(m);
                 IntegerType qNew(IntegerType(1) << nBits);
                 IntegerType r(qNew % mi);
-                IntegerType qNew2(qNew + IntegerType(1));
+                IntegerType qNew2(qNew + 1);
                 if (r > IntegerType(0))
                     qNew2 += (mi - r);
                 BOOST_ASSERT_MSG(qNew2 >= qNew, "FirstPrime parameters overflow this integer implementation");
