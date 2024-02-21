@@ -19,6 +19,14 @@ namespace nil {
     namespace crypto3 {
         namespace multiprecision {
             namespace backends {
+
+                using default_ops::eval_is_zero;
+                using default_ops::eval_bit_test;
+                using default_ops::eval_modulus;
+                using default_ops::eval_subtract;
+                using default_ops::eval_add;
+                using default_ops::eval_bit_set;
+
                 template<typename Backend>
                 constexpr Backend eval_extended_euclidean_algorithm(Backend &num1, Backend& num2, Backend &bezout_x, Backend &bezout_y) {
                     Backend x, y, tmp_num1 = num1, tmp_num2 = num2;

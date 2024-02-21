@@ -22,6 +22,8 @@ namespace nil {
             typedef modular_params<cpp_int_backend<>> cpp_mod_params;
 
             // Fixed precision unsigned types:
+            typedef modular_params<cpp_int_backend<64, 64, unsigned_magnitude, unchecked, void>>
+                umod_params_params64_t;
             typedef modular_params<cpp_int_backend<128, 128, unsigned_magnitude, unchecked, void>>
                 umod_params_params128_t;
             typedef modular_params<cpp_int_backend<256, 256, unsigned_magnitude, unchecked, void>> umod_params256_t;
