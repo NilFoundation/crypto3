@@ -43,7 +43,7 @@ namespace nil {
                     using field_type = FieldType;
                     using value_type = typename field_type::value_type;
                     using public_input_type = std::vector<std::vector<value_type>>;
-                    using constraint_system_type = plonk_constraint_system<value_type>;
+                    using constraint_system_type = plonk_constraint_system<field_type>;
                     using assignment_table_type = plonk_table<field_type, plonk_column<field_type>>;
                 };
 
