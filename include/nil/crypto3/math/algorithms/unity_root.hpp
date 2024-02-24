@@ -46,27 +46,27 @@ namespace nil {
             template<typename IntegerType>
             static typename std::enable_if<!algebra::is_field_element<IntegerType>::value, IntegerType>::type
             find_generator(const IntegerType &q) {
-                std::set<IntegerType> primeFactors;
+                std::set < IntegerType > prime_factors;
 
                 IntegerType qm1 = q - IntegerType(1);
                 IntegerType qm2 = q - IntegerType(2);
-                algebra::prime_factorize<IntegerType>(qm1, primeFactors);
-                bool generatorFound = false;
+                algebra::prime_factorize<IntegerType>(qm1, prime_factors);
+                bool generator_found = false;
                 IntegerType gen;
-                while (!generatorFound) {
+                while (!generator_found) {
                     uint32_t count = 0;
 
                     // gen = RNG(qm2).ModAdd(IntegerType::ONE, q); //modadd note needed
                     gen = RNG(qm2) + IntegerType(1);
 
-                    for (auto it = primeFactors.begin(); it != primeFactors.end(); ++it) {
+                    for (auto it = prime_factors.begin(); it != prime_factors.end(); ++it) {
                         if (gen.ModExp(qm1 / (*it), q) == IntegerType(1))
                             break;
                         else
                             count++;
                     }
-                    if (count == primeFactors.size())
-                        generatorFound = true;
+                    if (count == prime_factors.size())
+                        generator_found = true;
                 }
                 return gen;
             }
@@ -87,18 +87,20 @@ namespace nil {
              *
              * @return a root of unity.
              */
-            template<typename IntegerType>
-            typename std::enable_if<!algebra::is_field_element<IntegerType>::value, IntegerType>::type
-            unity_root(uint32_t m, const IntegerType &modulo) {
-                IntegerType M(m);
+            template<typename Backend,
+                    multiprecision::expression_template_option ExpressionTemplates>
+            multiprecision::number<Backend, ExpressionTemplates>
+            unity_root(uint32_t m, const multiprecision::number<Backend, ExpressionTemplates> &modulo) {
+                using namespace multiprecision;
 
-                if ((modulo - IntegerType(1)).Mod(M) != IntegerType(0)) {
+                number<Backend, ExpressionTemplates> M(m);
+
+                if ((modulo - number<Backend, ExpressionTemplates>(1) % M) % M != 0) {
                     return {};
                 }
 
-                IntegerType result;
-                IntegerType gen = find_generator(modulo);
-                result = gen.ModExp((modulo - IntegerType(1)).DividedBy(M), modulo);
+                number<modular_adaptor<Backend, backends::modular_params_rt<Backend>>, ExpressionTemplates>
+                        gen(find_generator(modulo), modulo), result = multiprecision::pow(gen, (modulo - 1) / M);
                 if (result == 1) {
                     result = unity_root(m, modulo);
                 }

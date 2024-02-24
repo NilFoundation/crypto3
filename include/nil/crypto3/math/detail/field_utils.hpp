@@ -30,6 +30,7 @@
 #include <complex>
 
 #include <boost/math/constants/constants.hpp>
+
 #include <nil/crypto3/algebra/fields/params.hpp>
 
 namespace nil {
@@ -48,6 +49,16 @@ namespace nil {
                     return r;
                 }
 
+                /**
+                 * Determines if a number is a power of 2.
+                 *
+                 * @param n to test if it is a power of 2.
+                 * @return is true if the unsigned int is a power of 2.
+                 */
+                inline bool is_power_of_two(uint32_t n) {
+                    return n && !(n & (n - 1));
+                }
+
                 constexpr std::size_t power_of_two(std::size_t n) {
                     n--;
                     n |= n >> 1;
@@ -63,8 +74,9 @@ namespace nil {
                 template<typename FieldType>
                 typename FieldType::value_type coset_shift() {
                     return
-                        typename FieldType::value_type(fields::arithmetic_params<FieldType>::multiplicative_generator)
-                            .squared();
+                            typename FieldType::value_type(
+                                    fields::arithmetic_params<FieldType>::multiplicative_generator)
+                                    .squared();
                 }
 
             }    // namespace detail
