@@ -27,6 +27,7 @@
 #define BOOST_TEST_MODULE algebra_fields_test
 
 #include <iostream>
+#include <chrono>
 #include <cstdint>
 #include <string>
 
@@ -57,15 +58,9 @@
 #include <nil/crypto3/algebra/fields/secp/secp_r1/scalar_field.hpp>
 #include <nil/crypto3/algebra/random_element.hpp>
 
-// #include <nil/crypto3/algebra/fields/dsa_botan.hpp>
-// #include <nil/crypto3/algebra/fields/dsa_jce.hpp>
 #include <nil/crypto3/algebra/fields/curve25519/base_field.hpp>
 #include <nil/crypto3/algebra/fields/curve25519/scalar_field.hpp>
 #include <nil/crypto3/algebra/fields/goldilocks64/base_field.hpp>
-// #include <nil/crypto3/algebra/fields/ffdhe_ietf.hpp>
-// #include <nil/crypto3/algebra/fields/field.hpp>
-// #include <nil/crypto3/algebra/fields/modp_ietf.hpp>
-// #include <nil/crypto3/algebra/fields/modp_srp.hpp>
 #include <nil/crypto3/algebra/fields/maxprime.hpp>
 
 #include <nil/crypto3/algebra/fields/detail/element/fp.hpp>
@@ -480,7 +475,7 @@ BOOST_AUTO_TEST_CASE(field_operation_perf_test_pallas, *boost::unit_test::disabl
 
     std::chrono::time_point<std::chrono::high_resolution_clock> start(std::chrono::high_resolution_clock::now());
 
-    size_t SAMPLES = 1000000;
+    size_t SAMPLES = 10000000;
     for (int i = 0; i < SAMPLES; ++i) {
         int index = i % points1.size();
         points2[index] *= points1[index];

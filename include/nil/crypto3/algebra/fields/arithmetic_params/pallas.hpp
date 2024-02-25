@@ -32,7 +32,7 @@
 #include <nil/crypto3/algebra/fields/pallas/base_field.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/vesta.hpp>
 
-#include <nil/crypto3/detail/literals.hpp>
+
 
 namespace nil {
     namespace crypto3 {
