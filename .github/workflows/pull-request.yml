@@ -60,6 +60,8 @@ jobs:
         hash_static_digest_test
         hash_tiger_test
         hash_poseidon_test
+        pubkey_ecdsa_test
+        pubkey_bls_test
 
       test-paths: |
         libs/zk/test
