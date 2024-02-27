@@ -10,33 +10,8 @@
 
 #include "test.hpp"
 
-#if !defined(TEST_GMP) && !defined(TEST_TOMMATH) && !defined(TEST_CPP_INT)
-#define TEST_TOMMATH
-#define TEST_GMP
-#define TEST_CPP_INT
-
-#ifdef _MSC_VER
-#pragma message("CAUTION!!: No backend type specified so testing everything.... this will take some time!!")
-#endif
-#ifdef __GNUC__
-#pragma warning "CAUTION!!: No backend type specified so testing everything.... this will take some time!!"
-#endif
-
-#endif
-
-#if defined(TEST_GMP)
-#include <nil/crypto3/multiprecision/gmp.hpp>
-#endif
-#if defined(TEST_TOMMATH)
-#include <nil/crypto3/multiprecision/tommath.hpp>
-#endif
-#if defined(TEST_CPP_INT)
 #include <nil/crypto3/multiprecision/cpp_int.hpp>
 #include <nil/crypto3/multiprecision/cpp_int/literals.hpp>
-
-BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(256);
-
-#endif
 
 #include <nil/crypto3/multiprecision/jacobi.hpp>
 
@@ -71,19 +46,11 @@ void test() {
 int main() {
     using namespace nil::crypto3::multiprecision;
 
-#if defined(TEST_CPP_INT)
     test<cpp_int>();
 
     constexpr auto a = 0x4931a5f_cppui256;
     constexpr auto b = 0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000001_cppui256;
     static_assert(jacobi(a, b) == -1, "jacobi error");
-#endif
-#if defined(TEST_GMP)
-    test<mpz_int>();
-#endif
-#if defined(TEST_TOMMATH)
-    test<tom_int>();
-#endif
 
     return boost::report_errors();
 }

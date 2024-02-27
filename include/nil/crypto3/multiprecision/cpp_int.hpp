@@ -21,7 +21,6 @@
 #include <nil/crypto3/multiprecision/detail/rebind.hpp>
 #include <boost/core/empty_value.hpp>
 #include <nil/crypto3/multiprecision/cpp_int/cpp_int_config.hpp>
-#include <nil/crypto3/multiprecision/rational_adaptor.hpp>
 #include <nil/crypto3/multiprecision/traits/is_byte_container.hpp>
 #include <boost/integer/static_min_max.hpp>
 #include <nil/crypto3/multiprecision/cpp_int/checked.hpp>
@@ -2717,8 +2716,6 @@ namespace nil {
                 : public std::integral_constant<int, number_kind_integer> { };
 
             using cpp_int = number<cpp_int_backend<>>;
-            using cpp_rational_backend = rational_adaptor<cpp_int_backend<>>;
-            using cpp_rational = number<cpp_rational_backend>;
 
             // Fixed precision unsigned types:
             using uint128_t = number<cpp_int_backend<128, 128, unsigned_magnitude, unchecked, void>>;
@@ -2734,8 +2731,6 @@ namespace nil {
 
             // Over again, but with checking enabled this time:
             using checked_cpp_int = number<cpp_int_backend<0, 0, signed_magnitude, checked>>;
-            using checked_cpp_rational_backend = rational_adaptor<cpp_int_backend<0, 0, signed_magnitude, checked>>;
-            using checked_cpp_rational = number<checked_cpp_rational_backend>;
             // Fixed precision unsigned types:
             using checked_uint128_t = number<cpp_int_backend<128, 128, unsigned_magnitude, checked, void>>;
             using checked_uint256_t = number<cpp_int_backend<256, 256, unsigned_magnitude, checked, void>>;

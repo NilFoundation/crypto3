@@ -24,30 +24,12 @@
 #include <nil/crypto3/multiprecision/cpp_modular.hpp>
 #endif
 
-#ifdef TEST_GMP
-#include <nil/crypto3/multiprecision/gmp.hpp>
-#include <nil/crypto3/multiprecision/gmp_modular.hpp>
-#endif
-
-#ifdef TEST_TOMMATH
-#include <nil/crypto3/multiprecision/tommath.hpp>
-#include <nil/crypto3/multiprecision/modular/modular_params_tommath.hpp>
-#endif
-
 #include "test.hpp"
 
 using namespace nil::crypto3::multiprecision;
 
 #ifdef TEST_CPP_INT
         using Backend = cpp_int_backend<>;
-#endif
-
-#ifdef TEST_GMP
-        using Backend = gmp_int;
-#endif
-
-#ifdef TEST_TOMMATH
-        using Backend = tommath_int;
 #endif
 
 static const std::string even_mod[] = {
