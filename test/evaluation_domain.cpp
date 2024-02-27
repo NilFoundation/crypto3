@@ -45,6 +45,9 @@
 #include <nil/crypto3/algebra/fields/mnt6/base_field.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/mnt6.hpp>
 
+#include <nil/crypto3/algebra/fields/goldilocks64/base_field.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/goldilocks64.hpp>
+
 #include <nil/crypto3/algebra/random_element.hpp>
 
 #include <nil/crypto3/math/coset.hpp>
@@ -382,6 +385,7 @@ BOOST_AUTO_TEST_SUITE(fft_evaluation_domain_test_suite)
 BOOST_AUTO_TEST_CASE(fft) {
     test_fft<fields::bls12<381>>();
     test_fft<fields::mnt4<298>>();
+    test_fft<fields::goldilocks64>();
 }
 
 BOOST_AUTO_TEST_CASE(fft_perf_test, *boost::unit_test::disabled()) {
@@ -393,21 +397,25 @@ BOOST_AUTO_TEST_CASE(fft_perf_test, *boost::unit_test::disabled()) {
 BOOST_AUTO_TEST_CASE(inverse_fft_to_fft) {
     test_inverse_fft_of_fft<fields::bls12<381>>();
     test_inverse_fft_of_fft<fields::mnt4<298>>();
+    test_inverse_fft_of_fft<fields::goldilocks64>();
 }
 
 BOOST_AUTO_TEST_CASE(inverse_coset_ftt_to_coset_fft) {
     test_inverse_coset_ftt_of_coset_fft<fields::bls12<381>>();
     test_inverse_coset_ftt_of_coset_fft<fields::mnt4<298>>();
+    test_inverse_coset_ftt_of_coset_fft<fields::goldilocks64>();
 }
 
 BOOST_AUTO_TEST_CASE(lagrange_coefficients) {
     test_lagrange_coefficients<fields::bls12<381>>();
     test_lagrange_coefficients<fields::mnt4<298>>();
+    test_lagrange_coefficients<fields::goldilocks64>();
 }
 
 BOOST_AUTO_TEST_CASE(compute_z) {
     test_compute_z<fields::bls12<381>>();
     test_compute_z<fields::mnt4<298>>();
+    test_compute_z<fields::goldilocks64>();
 }
 
 BOOST_AUTO_TEST_CASE(curve_elements_fft) {
