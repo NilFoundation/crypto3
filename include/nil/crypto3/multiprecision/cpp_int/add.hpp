@@ -427,10 +427,8 @@ namespace nil {
                                                                                            SignType1,
                                                                                            Checked1,
                                                                                            Allocator1>>::value)) {
-                    // Martun: this is called from fp.hpp
                     eval_subtract(result, result, o);
                 }
-
                 template<unsigned MinBits1,
                          unsigned MaxBits1,
                          cpp_integer_type SignType1,
@@ -453,17 +451,16 @@ namespace nil {
                     type
                     eval_subtract(cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
                                   const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& a,
-                                  const cpp_int_backend<MinBits3, MaxBits3, SignType3, Checked3, Allocator3>& b
-                                ) noexcept((is_non_throwing_cpp_int<cpp_int_backend<MinBits1,
-                                                                                    MaxBits1,
-                                                                                    SignType1,
-                                                                                    Checked1,
-                                                                                    Allocator1>>::value)) {
+                                  const cpp_int_backend<MinBits3, MaxBits3, SignType3, Checked3, Allocator3>&
+                                      b) noexcept((is_non_throwing_cpp_int<cpp_int_backend<MinBits1,
+                                                                                           MaxBits1,
+                                                                                           SignType1,
+                                                                                           Checked1,
+                                                                                           Allocator1>>::value)) {
                     if (a.sign() != b.sign()) {
                         add_unsigned(result, a, b);
                         return;
                     }
-                    // Martun: this is called from fp.hpp
                     subtract_unsigned(result, a, b);
                 }
 

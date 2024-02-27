@@ -11,6 +11,24 @@
 #include <boost/random/mersenne_twister.hpp>
 #include "test.hpp"
 
+#if defined(HAS_GMP)
+#include <nil/crypto3/multiprecision/gmp.hpp>
+#endif
+#if defined(HAS_MPFR)
+#include <nil/crypto3/multiprecision/mpfr.hpp>
+#endif
+#if defined(HAS_MPFI)
+#include <nil/crypto3/multiprecision/mpfi.hpp>
+#endif
+#ifdef HAS_TOMMATH
+#include <nil/crypto3/multiprecision/tommath.hpp>
+#endif
+#ifdef HAS_FLOAT128
+#include <nil/crypto3/multiprecision/float128.hpp>
+#endif
+#include <nil/crypto3/multiprecision/cpp_bin_float.hpp>
+#include <nil/crypto3/multiprecision/cpp_dec_float.hpp>
+
 using namespace nil::crypto3::multiprecision;
 
 #ifdef BOOST_MSVC
@@ -140,5 +158,54 @@ int main() {
     test_convert<cpp_int, int128_t>();
     test_convert<int128_t, cpp_int>();
 
+    test_convert<cpp_int, cpp_rational>();
+    test_convert<int128_t, cpp_rational>();
+    test_convert<uint128_t, cpp_rational>();
+
+    test_convert<cpp_int, cpp_bin_float_50>();
+    test_convert<int128_t, cpp_bin_float_50>();
+    test_convert<uint128_t, cpp_bin_float_50>();
+
+    test_convert<cpp_int, cpp_dec_float_50>();
+    test_convert<int128_t, cpp_dec_float_50>();
+    test_convert<uint128_t, cpp_dec_float_50>();
+
+#if defined(HAS_GMP)
+    test_convert<cpp_int, mpz_int>();
+    test_convert<int128_t, mpz_int>();
+    test_convert<uint128_t, mpz_int>();
+
+    test_convert<cpp_int, mpq_rational>();
+    test_convert<int128_t, mpq_rational>();
+    test_convert<uint128_t, mpq_rational>();
+
+    test_convert<cpp_int, mpf_float_50>();
+    test_convert<int128_t, mpf_float_50>();
+    test_convert<uint128_t, mpf_float_50>();
+#endif
+#if defined(HAS_MPFR)
+    test_convert<cpp_int, mpfr_float_50>();
+    test_convert<int128_t, mpfr_float_50>();
+    test_convert<uint128_t, mpfr_float_50>();
+#endif
+#if defined(HAS_MPFI)
+    test_convert<cpp_int, mpfi_float_50>();
+    test_convert<int128_t, mpfi_float_50>();
+    test_convert<uint128_t, mpfi_float_50>();
+#endif
+#ifdef HAS_TOMMATH
+    test_convert<cpp_int, tom_int>();
+    test_convert<int128_t, tom_int>();
+    test_convert<uint128_t, tom_int>();
+
+    test_convert<cpp_int, tom_rational>();
+    test_convert<int128_t, tom_rational>();
+    test_convert<uint128_t, tom_rational>();
+#endif
+#ifdef HAS_FLOAT128
+    test_convert<cpp_int, float128>();
+    test_convert<int128_t, float128>();
+    test_convert<uint128_t, float128>();
+#endif
     return boost::report_errors();
 }

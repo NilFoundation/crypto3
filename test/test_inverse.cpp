@@ -20,7 +20,17 @@
 
 #include "test.hpp"
 
+#if !defined(TEST_CPP_INT)
+#define TEST_CPP_INT
+#endif
+
+#ifdef TEST_CPP_INT
 #include <nil/crypto3/multiprecision/cpp_int.hpp>
+#endif
+
+#if defined(TEST_GMP)
+#include <nil/crypto3/multiprecision/gmp.hpp>
+#endif
 
 #include <nil/crypto3/multiprecision/inverse.hpp>
 #include <nil/crypto3/multiprecision/modular/modular_adaptor.hpp>
@@ -29,6 +39,8 @@
 #include <nil/crypto3/multiprecision/cpp_modular.hpp>
 
 #include <nil/crypto3/multiprecision/cpp_int/literals.hpp>
+
+BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(585);
 
 using namespace nil::crypto3::multiprecision;
 
@@ -291,10 +303,17 @@ void test_cpp_int_backend() {
 BOOST_AUTO_TEST_SUITE(runtime_tests)
 
 BOOST_AUTO_TEST_CASE(inverse_tests) {
+#ifdef TEST_GMP
+    test_monty_inverse<nil::crypto3::multiprecision::mpz_int>();
+    test_inverse_mod<nil::crypto3::multiprecision::mpz_int>();
+    test_inverse_extended_euclidean_algorithm<nil::crypto3::multiprecision::mpz_int>();
+#endif
+#ifdef TEST_CPP_INT
     test_monty_inverse<nil::crypto3::multiprecision::cpp_int>();
     test_inverse_mod<nil::crypto3::multiprecision::cpp_int>();
     test_inverse_extended_euclidean_algorithm<nil::crypto3::multiprecision::cpp_int>();
     test_cpp_int_backend<nil::crypto3::multiprecision::cpp_int_backend<>>();
+#endif
 }
 
 BOOST_AUTO_TEST_SUITE_END()

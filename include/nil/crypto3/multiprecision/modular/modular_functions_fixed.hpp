@@ -529,16 +529,11 @@ namespace nil {
                         //
                         // recover correct size of backend content
                         //
-
-                        // Martun: about 19 ns 
                         adjust_backend_size(A, mod_size);
 
-                        // Martun: about 24 ns
                         if (!eval_lt(A, m_mod.backend())) {
                             eval_subtract(A, m_mod.backend());
                         }
-
-                        // Martun: this is 0 ns
                         result = A;
                     }
 

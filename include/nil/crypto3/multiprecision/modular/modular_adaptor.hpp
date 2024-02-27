@@ -309,9 +309,7 @@ namespace nil {
                         0, typename cpp_int_backend<MinBits, MaxBits, SignType, Checked>::unsigned_types>::type;
                     using default_ops::eval_lt;
 
-                    // Martun: This is the main operation for substraction when called from fp.hpp. 
                     eval_subtract(result.base_data(), o.base_data());
-
                     if (eval_lt(result.base_data(), ui_type(0u))) {
                         eval_add(result.base_data(), result.mod_data().get_mod().backend());
                     }

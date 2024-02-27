@@ -14,11 +14,37 @@
 
 #include "test.hpp"
 
+#if !defined(TEST_GMP) && !defined(TEST_TOMMATH) && !defined(TEST_CPP_INT)
+#define TEST_TOMMATH
+#define TEST_GMP
+#define TEST_CPP_INT
+
+#ifdef _MSC_VER
+#pragma message("CAUTION!!: No backend type specified so testing everything.... this will take some time!!")
+#endif
+#ifdef __GNUC__
+#pragma warning "CAUTION!!: No backend type specified so testing everything.... this will take some time!!"
+#endif
+
+#endif
+
+#if defined(TEST_GMP)
+#include <nil/crypto3/multiprecision/gmp.hpp>
+#include <nil/crypto3/multiprecision/gmp_modular.hpp>
+#endif
+#if defined(TEST_TOMMATH)
+#include <nil/crypto3/multiprecision/tommath.hpp>
+#include <nil/crypto3/multiprecision/tommath_modular.hpp>
+#endif
+#if defined(TEST_CPP_INT)
 #include <nil/crypto3/multiprecision/cpp_int.hpp>
 #include <nil/crypto3/multiprecision/cpp_modular.hpp>
+#endif
 
 #include <nil/crypto3/multiprecision/ressol.hpp>
 #include <nil/crypto3/multiprecision/cpp_int/literals.hpp>
+
+#if defined(TEST_CPP_INT)
 
 BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(4);
 BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(7);
@@ -331,10 +357,22 @@ constexpr bool test_backend_static() {
     return true;
 }
 
+#endif
+
 int main() {
+#if defined(TEST_CPP_INT)
     test<nil::crypto3::multiprecision::cpp_int>();
     test_backend<nil::crypto3::multiprecision::cpp_int_backend<>>();
     constexpr bool res1 = test_static();
     constexpr bool res2 = test_backend_static();
+#endif
+#if defined(TEST_GMP)
+    test<nil::crypto3::multiprecision::mpz_int>();
+    test_backend<gmp_int>();
+#endif
+#if defined(TEST_TOMMATH)
+    test<nil::crypto3::multiprecision::tom_int>();
+#endif
+
     return boost::report_errors();
 }

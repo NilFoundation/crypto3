@@ -509,9 +509,8 @@ namespace nil {
                     return *this;
                 }
 
-                // Martun: When calling from fp.hpp, call ends here.
                 BOOST_MP_CXX14_CONSTEXPR number& operator-=(const self_type& val) {
-                    //detail::scoped_default_precision<number<Backend, ExpressionTemplates>> precision_guard(*this, val);
+                    detail::scoped_default_precision<number<Backend, ExpressionTemplates>> precision_guard(*this, val);
                     //
                     // If the current precision of *this differs from that of expression e, then we
                     // create a temporary (which will have the correct precision thanks to precision_guard)
@@ -521,12 +520,12 @@ namespace nil {
                     // optimised away, but we can't prevent instantiation of the dead code leading
                     // to longer build and possibly link times.
                     //
-                    //BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(number)
-                    //if (precision_guard.precision() !=
-                    //    nil::crypto3::multiprecision::detail::current_precision_of(*this)) {
-                    //    number t(*this - val);
-                    //    return *this = std::move(t);
-                    //}
+                    BOOST_MP_CONSTEXPR_IF_VARIABLE_PRECISION(number)
+                    if (precision_guard.precision() !=
+                        nil::crypto3::multiprecision::detail::current_precision_of(*this)) {
+                        number t(*this - val);
+                        return *this = std::move(t);
+                    }
                     do_subtract(detail::expression<detail::terminal, self_type>(val), detail::terminal());
                     return *this;
                 }
@@ -1720,8 +1719,6 @@ namespace nil {
                     eval_add(m_backend, canonical_value(e.left().value()));
                     eval_subtract(m_backend, canonical_value(e.right().value()));
                 }
-
-                // Martun: When called from fp.hpp, this is called.
                 template<class Exp>
                 BOOST_MP_CXX14_CONSTEXPR void do_subtract(const Exp& e, const detail::terminal&) {
                     using default_ops::eval_subtract;
@@ -2115,7 +2112,6 @@ namespace nil {
                 // the non-member operators way easier if they are:
                 //
                 static BOOST_MP_FORCEINLINE constexpr const Backend& canonical_value(const self_type& v) noexcept {
-                    // Martun: when called from fp.hpp this is being called.
                     return v.m_backend;
                 }
                 template<class B2, expression_template_option ET>
@@ -2138,7 +2134,6 @@ namespace nil {
                     typename std::enable_if<std::is_same<typename detail::canonical<V, Backend>::type, V>::value,
                                             const V&>::type
                     canonical_value(const V& v) noexcept {
-// Martun:
                     return v;
                 }
                 static BOOST_MP_FORCEINLINE typename detail::canonical<std::string, Backend>::type
@@ -2367,5 +2362,7 @@ struct std::hash<boost::rational<nil::crypto3::multiprecision::number<Backend, E
         return result;
     }
     };
+
+#include <nil/crypto3/multiprecision/detail/ublas_interop.hpp>
 
 #endif

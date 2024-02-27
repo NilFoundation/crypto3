@@ -1,0 +1,63 @@
+[/
+  Copyright 2020 Ilia Shirobokov.
+  Copyright 2020 Alisa Cherniaeva.
+
+  Distributed under the Boost Software License, Version 1.0.
+  (See accompanying file LICENSE_1_0.txt or copy at
+  http://www.boost.org/LICENSE_1_0.txt).
+]
+
+[section:inverse Modular Inverse]
+
+[pre
+[*Table of Contents]
+ [link boost_multiprecision.tut.inverse.api Modular Inverse API]
+     [link inverse_extended_euclidean_algorithm `inverse_extended_euclidean_algorithm(const number<Backend, ExpressionTemplates>& n, const number<Backend, ExpressionTemplates>& mod)`]
+     [link inverse_extended_euclidean_algorithm_2 `inverse_extended_euclidean_algorithm(const number<modular_adaptor<Backend>, ExpressionTemplates>& modular`]
+     [link monty_inverse `monty_inverse(const number<Backend, ExpressionTemplates>& a, const number<Backend, ExpressionTemplates>& p, const number<Backend, ExpressionTemplates>& k)`]
+]
+
+[h2:api Modular Inversion API]
+
+[#inverse_extended_euclidean_algorithm] [role blue `inverse_extended_euclidean_algorithm(const number<Backend, ExpressionTemplates>& n, const number<Backend, ExpressionTemplates>& mod)`]
+
+``
+template <typename Backend, expression_template_option ExpressionTemplates>
+    number<Backend, ExpressionTemplates> inverse_extended_euclidean_algorithm(
+        const number<Backend, ExpressionTemplates>& n, const number<Backend, ExpressionTemplates>& mod)
+``
+
+Calculates modular inverse of `n` by modulo `mod`, i.e. calculates `n ^ (-1)` mod `mod` using [@https://en.wikipedia.org/wiki/Extended_Euclidean_algorithm Extended Euclidian Algorithm]. 
+
+Notice that `n` and `mod` have to be [@https://mathworld.wolfram.com/RelativelyPrime.html relatively prime].
+
+[#inverse_extended_euclidean_algorithm_2] [role blue `inverse_extended_euclidean_algorithm(const number<modular_adaptor<Backend>, ExpressionTemplates>& modular`]
+
+``
+template <typename Backend, expression_template_option ExpressionTemplates>
+    number<modular_adaptor<Backend>, ExpressionTemplates> inverse_extended_euclidean_algorithm(
+        const number<modular_adaptor<Backend>, ExpressionTemplates>& modular)
+``
+
+Calculates modular inverse of the modular number, i.e. calculates `n ^ (-1)` mod `m` using [@https://en.wikipedia.org/wiki/Extended_Euclidean_algorithm Extended Euclidian Algorithm]. 
+
+Here `n` is a base value of `modular` and `m` ia a modular value.
+
+Notice that `n` and `mod` have to be [@https://mathworld.wolfram.com/RelativelyPrime.html relatively prime].
+
+[#monty_inverse] [role blue `monty_inverse(const number<Backend, ExpressionTemplates>& a, const number<Backend, ExpressionTemplates>& p, const number<Backend, ExpressionTemplates>& k)`]
+
+``
+template <typename Backend, expression_template_option ExpressionTemplates>
+    number<Backend, ExpressionTemplates> monty_inverse(const number<Backend, ExpressionTemplates>& a,
+                                                   const number<Backend, ExpressionTemplates>& p,
+                                                   const number<Backend, ExpressionTemplates>& k)
+``
+
+Calculates modular inverse of the form `a ^ (-1) mod (p^k)`. 
+
+The implementation is based on the algorithm proposed by [@https://eprint.iacr.org/2017/411.pdf Çetin Kaya Koç]. 
+
+Notice that `a` and `p` have to be [@https://mathworld.wolfram.com/RelativelyPrime.html relatively prime].
+
+[endsect] [/section:inverse] 
