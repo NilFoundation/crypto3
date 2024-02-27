@@ -209,6 +209,11 @@ void check_curve_operations(const std::vector<typename CurveGroup::value_type> &
                             const std::vector<std::size_t> &constants) {
     using nil::crypto3::multiprecision::cpp_int;
 
+    BOOST_CHECK_EQUAL(points[p1] + CurveGroup::value_type::zero(), points[p1]);
+    BOOST_CHECK_EQUAL(points[p1] - CurveGroup::value_type::zero(), points[p1]);
+    BOOST_CHECK_EQUAL(points[p1] - points[p1], CurveGroup::value_type::zero());
+    BOOST_CHECK_EQUAL(points[p1] * static_cast<cpp_int>(0), CurveGroup::value_type::zero());
+
     BOOST_CHECK_EQUAL(points[p1] + points[p2], points[p1_plus_p2]);
     BOOST_CHECK_EQUAL(points[p1] - points[p2], points[p1_minus_p2]);
     BOOST_CHECK_EQUAL(points[p1].doubled(), points[p1_dbl]);

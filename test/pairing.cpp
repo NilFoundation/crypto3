@@ -448,6 +448,10 @@ void check_pairing_operations(std::vector<Fr_value_type> &Fr_elements,
     BOOST_CHECK_EQUAL((Fr_elements[A2_poly] * Fr_elements[B2_poly] - Fr_elements[VKx_poly] * Fr_elements[VKy_poly]) *
                           Fr_elements[VKz_poly].inversed(),
                       Fr_elements[C2_poly]);
+    
+    BOOST_CHECK_EQUAL(Fr_elements[A1_poly] * G1_value_type::zero(), G1_value_type::zero());
+    BOOST_CHECK_EQUAL(Fr_elements[B1_poly] * G2_value_type::zero(), G2_value_type::zero());
+    
     BOOST_CHECK_EQUAL(Fr_elements[VKx_poly] * G1_value_type::one(), G1_elements[VKx]);
     BOOST_CHECK_EQUAL(Fr_elements[VKy_poly] * G2_value_type::one(), G2_elements[VKy]);
     BOOST_CHECK_EQUAL(Fr_elements[VKz_poly] * G2_value_type::one(), G2_elements[VKz]);
@@ -458,6 +462,15 @@ void check_pairing_operations(std::vector<Fr_value_type> &Fr_elements,
     BOOST_CHECK_EQUAL(Fr_elements[B1_poly] * G2_value_type::one(), G2_elements[B1]);
     BOOST_CHECK_EQUAL(Fr_elements[B2_poly] * G2_value_type::one(), G2_elements[B2]);
     std::cout << " * Basic fields and groups tests finished." << std::endl << std::endl;
+
+    std::cout << " * Pairing with infinity tests started..." << std::endl;
+    BOOST_CHECK_EQUAL(final_exponentiation<CurveType>(pair<CurveType>(G1_value_type::zero(), G2_elements[B1])), GT_value_type::one());
+    std::cout << " * Pairing with infinity tests finished." << std::endl << std::endl;
+
+    std::cout << " * Reduced pairing with infinity tests started..." << std::endl;
+    BOOST_CHECK_EQUAL(pair_reduced<CurveType>(G1_value_type::zero(), G2_elements[B1]), GT_value_type::one());
+    std::cout << " * Reduced pairing with infinity tests finished." << std::endl << std::endl;
+
 
     std::cout << " * Precomputing and pairing tests started..." << std::endl;
     BOOST_CHECK_EQUAL(precompute_g1<CurveType>(G1_elements[A1]), G1_prec_elements[prec_A1]);

@@ -61,7 +61,8 @@ namespace nil {
                                                                 const policy_type::ate_g2_precomputed_type &prec_Q) {
 
                         g2_field_type_value L1_coeff =
-                            g2_field_type_value(prec_P.PX, g1_field_type_value::zero()) - prec_Q.QX_over_twist;
+                            g2_field_type_value(prec_P.PX, g1_field_type_value::zero()) -
+                            prec_Q.QX_over_twist;
 
                         typename gt_type::value_type f = gt_type::value_type::one();
 

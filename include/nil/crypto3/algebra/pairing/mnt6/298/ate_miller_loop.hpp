@@ -57,8 +57,17 @@ namespace nil {
                     using g2_field_type_value = typename g2_type::field_type::value_type;
 
                 public:
-                    static typename gt_type::value_type process(const policy_type::ate_g1_precomputed_type &prec_P,
-                                                                const policy_type::ate_g2_precomputed_type &prec_Q) {
+
+                    /*
+                     * This code is close replica of arkworks implementation
+                     * https://github.com/arkworks-rs/algebra/blob/30ad93b079d345bef03f53d92b1ef7017936af85/ec/src/models/mnt6/mod.rs#L140
+                     *
+                     * The difference is that arkworks are using signed bit representation (-1, 0, 1) of
+                     * ate_loop_count constant, but here is unsigned variant (0, 1).
+                     */
+                    static typename gt_type::value_type process(
+                            const policy_type::ate_g1_precomputed_type &prec_P,
+                            const policy_type::ate_g2_precomputed_type &prec_Q) {
 
                         g2_field_type_value L1_coeff =
                             g2_field_type_value(prec_P.PX, g1_field_type_value::zero(), g1_field_type_value::zero()) -
@@ -71,7 +80,7 @@ namespace nil {
                         std::size_t add_idx = 0;
 
                         for (long i = params_type::integral_type_max_bits - 1; i >= 0; --i) {
-                            const bool bit = nil::crypto3::multiprecision::bit_test(params_type::ate_loop_count, i);
+                            const bool bit = multiprecision::bit_test(params_type::ate_loop_count, i);
 
                             if (!found_one) {
                                 /* this skips the MSB itself */
@@ -85,13 +94,15 @@ namespace nil {
                             typename policy_type::ate_dbl_coeffs dc = prec_Q.dbl_coeffs[dbl_idx++];
 
                             typename gt_type::value_type g_RR_at_P = typename gt_type::value_type(
-                                -dc.c_4C - dc.c_J * prec_P.PX_twist + dc.c_L, dc.c_H * prec_P.PY_twist);
+                                dc.c_L - dc.c_4C - dc.c_J * prec_P.PX_twist,
+                                dc.c_H * prec_P.PY_twist);
                             f = f.squared() * g_RR_at_P;
 
                             if (bit) {
                                 typename policy_type::ate_add_coeffs ac = prec_Q.add_coeffs[add_idx++];
                                 typename gt_type::value_type g_RQ_at_P = typename gt_type::value_type(
-                                    ac.c_RZ * prec_P.PY_twist, -(prec_Q.QY_over_twist * ac.c_RZ + L1_coeff * ac.c_L1));
+                                    ac.c_RZ * prec_P.PY_twist,
+                                    -(prec_Q.QY_over_twist * ac.c_RZ + L1_coeff * ac.c_L1) );
                                 f = f * g_RQ_at_P;
                             }
                         }
@@ -99,7 +110,8 @@ namespace nil {
                         if (params_type::ate_is_loop_count_neg) {
                             typename policy_type::ate_add_coeffs ac = prec_Q.add_coeffs[add_idx++];
                             typename gt_type::value_type g_RnegR_at_P = typename gt_type::value_type(
-                                ac.c_RZ * prec_P.PY_twist, -(prec_Q.QY_over_twist * ac.c_RZ + L1_coeff * ac.c_L1));
+                                    ac.c_RZ * prec_P.PY_twist,
+                                    -(prec_Q.QY_over_twist * ac.c_RZ + L1_coeff * ac.c_L1) );
                             f = (f * g_RnegR_at_P).inversed();
                         }
 

@@ -63,6 +63,9 @@ namespace nil {
                     constexpr static const integral_type modulus =
                         0x73EDA753299D7D483339D80809A1D80553BDA402FFFE5BFEFFFFFFFF00000001_cppui255;
 
+                    constexpr static const integral_type group_order_minus_one_half =
+                        0x39F6D3A994CEBEA4199CEC0404D0EC02A9DED2017FFF2DFF7FFFFFFF80000000_cppui255;
+
                     typedef typename policy_type::modular_backend modular_backend;
                     constexpr static const modular_params_type modulus_params = modulus;
                     typedef nil::crypto3::multiprecision::number<
@@ -92,6 +95,8 @@ namespace nil {
 
                     constexpr static const integral_type modulus =
                         0x12AB655E9A2CA55660B44D1E5C37B00159AA76FED00000010A11800000000001_cppui253;
+                    constexpr static const integral_type group_order_minus_one_half =
+                        0x0955B2AF4D1652AB305A268F2E1BD800ACD53B7F680000008508C00000000000_cppui253;
 
                     typedef typename policy_type::modular_backend modular_backend;
                     constexpr static const modular_params_type modulus_params = modulus;
@@ -118,6 +123,8 @@ namespace nil {
 #else
                 constexpr typename bls12_scalar_field<381>::integral_type const bls12_scalar_field<381>::modulus;
                 constexpr typename bls12_scalar_field<377>::integral_type const bls12_scalar_field<377>::modulus;
+                constexpr typename bls12_scalar_field<381>::integral_type const bls12_scalar_field<381>::group_order_minus_one_half;
+                constexpr typename bls12_scalar_field<377>::integral_type const bls12_scalar_field<377>::group_order_minus_one_half;
 
                 constexpr
                     typename bls12_scalar_field<381>::modular_params_type const bls12_scalar_field<381>::modulus_params;

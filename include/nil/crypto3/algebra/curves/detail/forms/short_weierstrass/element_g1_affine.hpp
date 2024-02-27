@@ -156,6 +156,10 @@ namespace nil {
                             using result_type =
                                 curve_element<params_type, form, typename curves::coordinates::projective>;
 
+                            if (is_zero()) {
+                                return result_type::zero();
+                            }
+
                             return result_type(X, Y,
                                                result_type::field_type::value_type::one());    // X = x, Y = y, Z = 1
                         }

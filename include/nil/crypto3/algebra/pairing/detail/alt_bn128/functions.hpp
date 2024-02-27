@@ -271,6 +271,11 @@ namespace nil {
 
                             g1 Pcopy = P.to_affine();
 
+                            if (P.is_zero()) {
+                                Pcopy.X = g1_type::field_type::value_type::zero();
+                                Pcopy.Y = g1_type::field_type::value_type::zero();
+                            }
+
                             ate_g1_precomputed_type result;
                             result.PX = Pcopy.X;
                             result.PY = Pcopy.Y;

@@ -47,6 +47,11 @@ namespace nil {
 
                         typename g1_affine_type::value_type Pcopy = P.to_affine();
 
+                        if (P.is_zero()) {
+                            Pcopy.X = g1_type::field_type::value_type::zero();
+                            Pcopy.Y = g1_type::field_type::value_type::zero();
+                        }
+
                         g1_precomputed_type result;
                         result.PX = Pcopy.X;
                         result.PY = Pcopy.Y;

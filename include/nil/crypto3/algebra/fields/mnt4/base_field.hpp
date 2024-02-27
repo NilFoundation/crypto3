@@ -59,6 +59,9 @@ namespace nil {
                     constexpr static const integral_type modulus =
                         0x3BCF7BCD473A266249DA7B0548ECAEEC9635D1330EA41A9E35E51200E12C90CD65A71660001_cppui298;
 
+                    constexpr static const integral_type group_order_minus_one_half =
+                        0x1DE7BDE6A39D133124ED3D82A47657764B1AE89987520D4F1AF2890070964866B2D38B30000_cppui298;
+
                     typedef typename policy_type::modular_backend modular_backend;
                     constexpr static const modular_params_type modulus_params = modulus;
                     typedef nil::crypto3::multiprecision::number<
@@ -80,6 +83,8 @@ namespace nil {
                 constexpr typename std::size_t const mnt4_base_field<298>::value_bits;
 
                 constexpr typename mnt4_base_field<298>::integral_type const mnt4_base_field<298>::modulus;
+
+                constexpr typename mnt4_base_field<298>::integral_type const mnt4_base_field<298>::group_order_minus_one_half;
 
                 constexpr typename mnt4_base_field<298>::modular_params_type const mnt4_base_field<298>::modulus_params;
 

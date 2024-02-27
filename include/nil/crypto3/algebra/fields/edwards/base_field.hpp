@@ -58,6 +58,8 @@ namespace nil {
 
                     constexpr static const integral_type modulus =
                         0x40D5FC9D2A395B138B924ED6342D41B6EB690B80000001_cppui183;
+                    constexpr static const integral_type group_order_minus_one_half =
+                        0x206AFE4E951CAD89C5C9276B1A16A0DB75B485C0000000_cppui183;
 
                     typedef typename policy_type::modular_backend modular_backend;
                     constexpr static const modular_params_type modulus_params = modulus;
@@ -78,6 +80,7 @@ namespace nil {
                 constexpr typename std::size_t const edwards_base_field<183>::value_bits;
 
                 constexpr typename edwards_base_field<183>::integral_type const edwards_base_field<183>::modulus;
+                constexpr typename edwards_base_field<183>::integral_type const edwards_base_field<183>::group_order_minus_one_half;
 
                 constexpr typename edwards_base_field<183>::modular_params_type const edwards_base_field<183>::modulus_params;
 

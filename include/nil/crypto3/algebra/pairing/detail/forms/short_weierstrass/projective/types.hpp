@@ -26,6 +26,8 @@
 #ifndef CRYPTO3_ALGEBRA_PAIRING_SHORT_WEIERSTRASS_PROJECTIVE_TYPES_POLICY_HPP
 #define CRYPTO3_ALGEBRA_PAIRING_SHORT_WEIERSTRASS_PROJECTIVE_TYPES_POLICY_HPP
 
+#include <vector>
+
 namespace nil {
     namespace crypto3 {
         namespace algebra {
