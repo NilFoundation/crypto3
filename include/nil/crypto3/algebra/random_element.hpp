@@ -29,6 +29,7 @@
 #include <nil/crypto3/algebra/type_traits.hpp>
 
 #include <nil/crypto3/multiprecision/debug_adaptor.hpp>
+#include <nil/crypto3/multiprecision/cpp_bin_float.hpp>
 #include <nil/crypto3/multiprecision/cpp_int.hpp>
 
 #include <boost/core/ignore_unused.hpp>

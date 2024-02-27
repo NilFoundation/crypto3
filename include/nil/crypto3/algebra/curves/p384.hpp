@@ -29,7 +29,7 @@
 #include <nil/crypto3/algebra/curves/curve_nist.hpp>
 #include <nil/crypto3/algebra/curves/detail/element/p384.hpp>
 
-
+#include <nil/crypto3/detail/literals.hpp>
 
 namespace nil {
     namespace crypto3 {

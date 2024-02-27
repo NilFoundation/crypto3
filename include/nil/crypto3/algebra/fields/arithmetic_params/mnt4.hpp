@@ -33,7 +33,7 @@
 #include <nil/crypto3/algebra/fields/mnt4/base_field.hpp>
 #include <nil/crypto3/algebra/fields/mnt4/scalar_field.hpp>
 
-
+#include <nil/crypto3/detail/literals.hpp>
 
 namespace nil {
     namespace crypto3 {

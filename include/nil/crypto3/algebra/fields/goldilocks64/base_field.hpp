@@ -30,6 +30,8 @@
 #include <nil/crypto3/algebra/fields/params.hpp>
 #include <nil/crypto3/algebra/fields/field.hpp>
 
+#include <nil/crypto3/detail/literals.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace algebra {
