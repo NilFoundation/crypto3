@@ -63,37 +63,37 @@ namespace nil {
             using gate_type = nil::crypto3::zk::snark::plonk_gate<typename PlaceholderParams::field_type, constraint_type>;
             using lookup_gate_type = nil::crypto3::zk::snark::plonk_lookup_gate<typename PlaceholderParams::field_type, lookup_constraint_type>;
             using variable_indices_type = std::map<nil::crypto3::zk::snark::plonk_variable<typename PlaceholderParams::field_type::value_type>, std::size_t>;
-            using columns_rotations_type = std::array<std::set<int>, PlaceholderParams::total_columns>;
+            using columns_rotations_type = std::vector<std::set<int>>;
 
             variable_indices_type get_plonk_variable_indices(const columns_rotations_type &col_rotations){
                 using variable_type = nil::crypto3::zk::snark::plonk_variable<typename PlaceholderParams::field_type::value_type>;
                 std::map<variable_type, std::size_t> result;
                 std::size_t j = 0;
-                for(std::size_t i = 0; i < PlaceholderParams::constant_columns; i++){
-                    for(auto& rot: col_rotations[i + PlaceholderParams::witness_columns + PlaceholderParams::public_input_columns]){
+                for(std::size_t i = 0; i < _desc.constant_columns; i++){
+                    for(auto& rot: col_rotations[i + _desc.witness_columns + _desc.public_input_columns]){
                         variable_type v(i, rot, true, variable_type::column_type::constant);
                         result[v] = j;
                         j++;
                     }
                     j++;
                 }
-                for(std::size_t i = 0; i < PlaceholderParams::selector_columns; i++){
-                    for(auto& rot: col_rotations[i + PlaceholderParams::witness_columns + PlaceholderParams::public_input_columns + PlaceholderParams::constant_columns]){
+                for(std::size_t i = 0; i < _desc.selector_columns; i++){
+                    for(auto& rot: col_rotations[i + _desc.witness_columns + _desc.public_input_columns + _desc.constant_columns]){
                         variable_type v(i, rot, true, variable_type::column_type::selector);
                         result[v] = j;
                         j++;
                     }
                     j++;
                 }
-                for(std::size_t i = 0; i < PlaceholderParams::witness_columns; i++){
+                for(std::size_t i = 0; i < _desc.witness_columns; i++){
                     for(auto& rot: col_rotations[i]){
                         variable_type v(i, rot, true, variable_type::column_type::witness);
                         result[v] = j;
                         j++;
                     }
                 }
-                for(std::size_t i = 0; i < PlaceholderParams::public_input_columns; i++){
-                    for(auto& rot: col_rotations[i + PlaceholderParams::witness_columns]){
+                for(std::size_t i = 0; i < _desc.public_input_columns; i++){
+                    for(auto& rot: col_rotations[i + _desc.witness_columns]){
                         variable_type v(i, rot, true, variable_type::column_type::public_input);
                         result[v] = j;
                         j++;
@@ -107,11 +107,11 @@ namespace nil {
                 std::uint16_t fixed_values_points = 0;
                 std::stringstream result;
 
-                for(std::size_t i= 0; i < PlaceholderParams::constant_columns + PlaceholderParams::selector_columns; i++){
-                    fixed_values_points += col_rotations[i + PlaceholderParams::witness_columns + PlaceholderParams::public_input_columns].size() + 1;
+                for(std::size_t i= 0; i < _desc.constant_columns + _desc.selector_columns; i++){
+                    fixed_values_points += col_rotations[i + _desc.witness_columns + _desc.public_input_columns].size() + 1;
                 }
 
-                for(std::size_t i= 0; i < PlaceholderParams::total_columns; i++){
+                for(std::size_t i= 0; i < _desc.table_width(); i++){
                     std::size_t j = 0;
                     for(auto& rot: col_rotations[i]){
                         if(rot == 0){
@@ -124,14 +124,14 @@ namespace nil {
 
                 std::uint16_t sum = fixed_values_points;
                 std::size_t i = 0;
-                for(; i < PlaceholderParams::witness_columns + PlaceholderParams::public_input_columns; i++){
+                for(; i < _desc.witness_columns + _desc.public_input_columns; i++){
                     zero_indices[i] = (sum + zero_indices[i]) * 0x20;
                     sum += col_rotations[i].size();
                     result << std::hex << std::setfill('0') << std::setw(4) << zero_indices[i];
                 }
 
                 sum = 0;
-                for(; i < PlaceholderParams::total_columns; i++){
+                for(; i < _desc.table_width(); i++){
                     zero_indices[i] = (sum + zero_indices[i]) * 0x20;
                     sum += col_rotations[i].size() + 1;
                     result << std::hex << std::setfill('0') << std::setw(4) << zero_indices[i];
@@ -282,6 +282,7 @@ namespace nil {
             }
         public:
             evm_verifier_printer(
+                zk::snark::plonk_table_description<typename PlaceholderParams::field_type> desc,
                 const typename PlaceholderParams::constraint_system_type &constraint_system,
                 const common_data_type &common_data,
                 const typename PlaceholderParams::commitment_scheme_type &lpc_scheme,
@@ -293,6 +294,7 @@ namespace nil {
                 bool deduce_horner = true,
                 bool optimize_powers = true
             ) :
+            _desc(desc),
             _constraint_system(constraint_system),
             _common_data(common_data),
             _lpc_scheme(lpc_scheme),
@@ -317,14 +319,14 @@ namespace nil {
                 _table_z_offset = _special_selectors_offset + 0xc0;
                 _variable_values_offset = 0;
 
-                for( std::size_t i = 0; i < PlaceholderParams::arithmetization_params::constant_columns + PlaceholderParams::arithmetization_params::selector_columns; i++){
-                    _variable_values_offset += 0x20 * (_common_data.columns_rotations[i + PlaceholderParams::arithmetization_params::witness_columns + PlaceholderParams::arithmetization_params::public_input_columns].size()+1);
+                for( std::size_t i = 0; i < _desc.constant_columns + _desc.selector_columns; i++){
+                    _variable_values_offset += 0x20 * (_common_data.columns_rotations[i + _desc.witness_columns + _desc.public_input_columns].size()+1);
                 }
 
                 _permutation_offset = _variable_values_offset;
                 _public_input_offset = _variable_values_offset;
-                for( std::size_t i = 0; i < PlaceholderParams::arithmetization_params::witness_columns + PlaceholderParams::arithmetization_params::public_input_columns; i++){
-                    if(i == PlaceholderParams::arithmetization_params::witness_columns){
+                for( std::size_t i = 0; i < _desc.witness_columns + _desc.public_input_columns; i++){
+                    if(i == _desc.witness_columns){
                         _public_input_offset = _permutation_offset;
                     }
                     _permutation_offset += 0x20 * (_common_data.columns_rotations[i].size());
@@ -800,8 +802,8 @@ namespace nil {
                 std::size_t poly_points = 2*_permutation_size;
                 /* special_selectors */
                 poly_points += 2;
-                poly_points += PlaceholderParams::arithmetization_params::constant_columns;
-                poly_points += PlaceholderParams::arithmetization_params::selector_columns;
+                poly_points += _desc.constant_columns;
+                poly_points += _desc.selector_columns;
                 eta_buf.resize( 32*poly_points );
 
                 std::array<std::uint8_t, 0> empty;
@@ -841,9 +843,9 @@ namespace nil {
                     ++j;
                 }
 
-                std::size_t column_rotation_offset = PlaceholderParams::witness_columns + PlaceholderParams::public_input_columns;
+                std::size_t column_rotation_offset = _desc.witness_columns + _desc.public_input_columns;
                 j = 0;
-                while (j < PlaceholderParams::arithmetization_params::constant_columns) {
+                while (j < _desc.constant_columns) {
                     poly_points = _common_data.columns_rotations[column_rotation_offset + j].size()+1;
                     result << "\t\t\tpoints[" << i << "] = basic_marshalling.get_uint256_be(blob,";
                     result << point_offset + (poly_points-1)*32 << ");" << std::endl;
@@ -854,9 +856,9 @@ namespace nil {
                     ++j;
                 }
 
-                column_rotation_offset += PlaceholderParams::constant_columns;
+                column_rotation_offset += _desc.constant_columns;
                 j = 0;
-                while (j < PlaceholderParams::arithmetization_params::selector_columns) {
+                while (j < _desc.selector_columns) {
                     poly_points = _common_data.columns_rotations[column_rotation_offset + j].size()+1;
                     result << "\t\t\tpoints[" << i << "] = basic_marshalling.get_uint256_be(blob,";
                     result << point_offset + (poly_points-1)*32 << ");" << std::endl;
@@ -923,6 +925,7 @@ namespace nil {
                 std::size_t _quotient_polys = (_quotient_degree % _rows_amount != 0)? (_quotient_degree / _rows_amount + 1): (_quotient_degree / _rows_amount);
 
                 commitment_scheme_replaces<PlaceholderParams>(
+                    _desc,
                     reps, _common_data, _lpc_scheme, _permutation_size, _quotient_polys,
                     _use_lookups?_constraint_system.sorted_lookup_columns_number():0, _use_lookups);
 
@@ -937,6 +940,7 @@ namespace nil {
             }
 
         private:
+            const zk::snark::plonk_table_description<typename PlaceholderParams::field_type> _desc;
             const typename PlaceholderParams::constraint_system_type &_constraint_system;
             const common_data_type &_common_data;
             const typename PlaceholderParams::commitment_scheme_type &_lpc_scheme;

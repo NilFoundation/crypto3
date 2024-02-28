@@ -46,6 +46,7 @@ namespace nil {
 
         template<typename PlaceholderParams>
         void commitment_scheme_replaces(
+            zk::snark::plonk_table_description<typename PlaceholderParams::field_type> desc,
             transpiler_replacements& replacements,
             const common_data_type<PlaceholderParams> &common_data,
             const typename PlaceholderParams::commitment_scheme_type& lpc_scheme,
@@ -58,6 +59,7 @@ namespace nil {
             std::vector<std::string> points;
 
             auto [z_points_indices, singles_strs, singles_map, poly_ids] = calculate_unique_points<PlaceholderParams, common_data_type<PlaceholderParams>>(
+                desc,
                 common_data, permutation_size, use_lookups, quotient_polys, lookup_polys,
                 "evm" // Generator mode
             );

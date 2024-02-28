@@ -235,6 +235,7 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
         );
 
     auto printer = nil::blueprint::evm_verifier_printer<lpc_placeholder_params_type>(
+        desc,
         constraint_system,
         lpc_preprocessed_public_data.common_data,
         lpc_scheme,
@@ -325,6 +326,7 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
             constraint_system, assignments.public_table(), desc, lpc_scheme, columns_with_copy_constraints.size()
         );
     auto printer = nil::blueprint::evm_verifier_printer<lpc_placeholder_params_type>(
+        desc,
         constraint_system,
         lpc_preprocessed_public_data.common_data,
         lpc_scheme,
@@ -406,6 +408,7 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
         preprocessed_public_data = placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::process(
             constraint_system, assignments.public_table(), desc, lpc_scheme, columns_with_copy_constraints.size());
     auto printer = nil::blueprint::evm_verifier_printer<lpc_placeholder_params_type>(
+        desc,
         constraint_system,
         preprocessed_public_data.common_data,
         lpc_scheme,
@@ -485,6 +488,7 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
         preprocessed_public_data = placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::process(
             constraint_system, assignments.public_table(), desc, lpc_scheme, columns_with_copy_constraints.size());
     auto printer = nil::blueprint::evm_verifier_printer<lpc_placeholder_params_type>(
+        desc,
         constraint_system,
         preprocessed_public_data.common_data,
         lpc_scheme,
@@ -567,6 +571,7 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
             constraint_system, assignments.public_table(), desc, lpc_scheme, columns_with_copy_constraints.size());
 
     auto printer = nil::blueprint::evm_verifier_printer<lpc_placeholder_params_type>(
+        desc,
         constraint_system,
         preprocessed_public_data.common_data,
         lpc_scheme,
@@ -652,6 +657,7 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
 
 
     auto printer = nil::blueprint::evm_verifier_printer<lpc_placeholder_params_type>(
+        desc,
         constraint_system,
         preprocessed_public_data.common_data,
         lpc_scheme,

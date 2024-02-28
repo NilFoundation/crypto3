@@ -71,8 +71,8 @@ namespace nil {
                 std::uint16_t fixed_values_points = 0;
                 std::stringstream result;
 
-                for(std::size_t i= 0; i < PlaceholderParams::constant_columns + PlaceholderParams::selector_columns; i++){
-                    fixed_values_points += col_rotations[i + PlaceholderParams::witness_columns + PlaceholderParams::public_input_columns].size() + 1;
+                for(std::size_t i= 0; i < desc.constant_columns + desc.selector_columns; i++){
+                    fixed_values_points += col_rotations[i + desc.witness_columns + desc.public_input_columns].size() + 1;
                 }
 
                 for(std::size_t i= 0; i < PlaceholderParams::total_columns; i++){
@@ -88,7 +88,7 @@ namespace nil {
 
                 std::uint16_t sum = fixed_values_points;
                 std::size_t i = 0;
-                for(; i < PlaceholderParams::witness_columns + PlaceholderParams::public_input_columns; i++){
+                for(; i < desc.witness_columns + desc.public_input_columns; i++){
                     zero_indices[i] = sum + zero_indices[i];
                     sum += col_rotations[i].size();
                 }
@@ -431,31 +431,31 @@ namespace nil {
             static inline variable_indices_type get_plonk_variable_indices(const columns_rotations_type &col_rotations, std::size_t start_index){
                 std::map<variable_type, std::size_t> result;
                 std::size_t j = 0;
-                for(std::size_t i = 0; i < PlaceholderParams::constant_columns; i++){
-                    for(auto& rot: col_rotations[i + PlaceholderParams::witness_columns + PlaceholderParams::public_input_columns]){
+                for(std::size_t i = 0; i < desc.constant_columns; i++){
+                    for(auto& rot: col_rotations[i + desc.witness_columns + desc.public_input_columns]){
                         variable_type v(i, rot, true, variable_type::column_type::constant);
                         result[v] = j + start_index;
                         j++;
                     }
                     j++;
                 }
-                for(std::size_t i = 0; i < PlaceholderParams::selector_columns; i++){
-                    for(auto& rot: col_rotations[i + PlaceholderParams::witness_columns + PlaceholderParams::public_input_columns + PlaceholderParams::constant_columns]){
+                for(std::size_t i = 0; i < desc.selector_columns; i++){
+                    for(auto& rot: col_rotations[i + desc.witness_columns + desc.public_input_columns + desc.constant_columns]){
                         variable_type v(i, rot, true, variable_type::column_type::selector);
                         result[v] = j + start_index;
                         j++;
                     }
                     j++;
                 }
-                for(std::size_t i = 0; i < PlaceholderParams::witness_columns; i++){
+                for(std::size_t i = 0; i < desc.witness_columns; i++){
                     for(auto& rot: col_rotations[i]){
                         variable_type v(i, rot, true, variable_type::column_type::witness);
                         result[v] = j + start_index;
                         j++;
                     }
                 }
-                for(std::size_t i = 0; i < PlaceholderParams::public_input_columns; i++){
-                    for(auto& rot: col_rotations[i + PlaceholderParams::witness_columns]){
+                for(std::size_t i = 0; i < desc.public_input_columns; i++){
+                    for(auto& rot: col_rotations[i + desc.witness_columns]){
                         variable_type v(i, rot, true, variable_type::column_type::public_input);
                         result[v] = j + start_index;
                         j++;
@@ -560,9 +560,9 @@ namespace nil {
                 points.push_back(rot_string(0) + "& "+ rot_string(1) + "& eta& ");
                 unique_points.insert(rot_string(0) + "& "+ rot_string(1) + "& eta& ");
 
-                for(std::size_t i = 0; i < PlaceholderParams::constant_columns; i++){
+                for(std::size_t i = 0; i < desc.constant_columns; i++){
                     std::stringstream str;
-                    for(auto j:common_data.columns_rotations[i + PlaceholderParams::witness_columns + PlaceholderParams::public_input_columns]){
+                    for(auto j:common_data.columns_rotations[i + desc.witness_columns + desc.public_input_columns]){
                         if(singles.find(rot_string(j)) == singles.end())
                             singles[rot_string(j)] = singles.size();
                         str << rot_string(j) << "& ";
@@ -572,9 +572,9 @@ namespace nil {
                     points.push_back(str.str());
                 }
 
-                for(std::size_t i = 0; i < PlaceholderParams::selector_columns; i++){
+                for(std::size_t i = 0; i < desc.selector_columns; i++){
                     std::stringstream str;
-                    for(auto j:common_data.columns_rotations[i + PlaceholderParams::witness_columns + PlaceholderParams::public_input_columns + PlaceholderParams::constant_columns]){
+                    for(auto j:common_data.columns_rotations[i + desc.witness_columns + desc.public_input_columns + desc.constant_columns]){
                         if(singles.find(rot_string(j)) == singles.end())
                             singles[rot_string(j)] = singles.size();
                         str << rot_string(j) << "& ";
@@ -584,7 +584,7 @@ namespace nil {
                     points.push_back(str.str());
                 }
 
-                for(std::size_t i = 0; i < PlaceholderParams::witness_columns; i++){
+                for(std::size_t i = 0; i < desc.witness_columns; i++){
                     std::stringstream str;
                     for(auto j:common_data.columns_rotations[i]){
                         if(singles.find(rot_string(j)) == singles.end())
@@ -595,9 +595,9 @@ namespace nil {
                     points.push_back(str.str());
                 }
 
-                for(std::size_t i = 0; i < PlaceholderParams::public_input_columns; i++){
+                for(std::size_t i = 0; i < desc.public_input_columns; i++){
                     std::stringstream str;
-                    for(auto j:common_data.columns_rotations[i + PlaceholderParams::witness_columns]){
+                    for(auto j:common_data.columns_rotations[i + desc.witness_columns]){
                         if(singles.find(rot_string(j)) == singles.end())
                             singles[rot_string(j)] = singles.size();
                         str << rot_string(j) << "& ";
@@ -781,6 +781,7 @@ namespace nil {
                 }
 
                 auto [z_points_indices, singles_strs, singles_map, poly_ids] = calculate_unique_points<PlaceholderParams, common_data_type>(
+                    desc,
                     common_data, permutation_size, use_lookups, quotient_polys,
                     use_lookups?constraint_system.sorted_lookup_columns_number():0,
                     "recursive" // Generator mode

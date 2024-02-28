@@ -99,6 +99,7 @@ namespace nil {
         template<typename PlaceholderParams, typename CommonDataType>
         static std::tuple<std::vector<std::size_t>, std::vector<std::string>, std::map<std::string, std::size_t>, std::vector<std::vector<std::size_t>>>
         calculate_unique_points(
+            zk::snark::plonk_table_description<typename PlaceholderParams::field_type> desc,
             const CommonDataType &common_data,
             std::size_t permutation_size,
             bool use_lookups,
@@ -153,9 +154,9 @@ namespace nil {
             z_points_indices.push_back(singles_map["eta"]);
             count++;
 
-            for(std::size_t i = 0; i < PlaceholderParams::constant_columns; i++){
+            for(std::size_t i = 0; i < desc.constant_columns; i++){
                 std::stringstream str;
-                for(auto j:common_data.columns_rotations[i + PlaceholderParams::witness_columns + PlaceholderParams::public_input_columns]){
+                for(auto j:common_data.columns_rotations[i + desc.witness_columns + desc.public_input_columns]){
                     if(singles_map.find(rot_string(j, rows_amount, mode)) == singles_map.end()){
                         singles_map[rot_string(j, rows_amount, mode)] = singles_map.size();
                         singles.push_back(rot_string(j, rows_amount, mode));
@@ -169,9 +170,9 @@ namespace nil {
                 count++;
             }
 
-            for(std::size_t i = 0; i < PlaceholderParams::selector_columns; i++){
+            for(std::size_t i = 0; i < desc.selector_columns; i++){
                 std::stringstream str;
-                for(auto j:common_data.columns_rotations[i + PlaceholderParams::witness_columns + PlaceholderParams::public_input_columns + PlaceholderParams::constant_columns]){
+                for(auto j:common_data.columns_rotations[i + desc.witness_columns + desc.public_input_columns + desc.constant_columns]){
                     if(singles_map.find(rot_string(j, rows_amount, mode)) == singles_map.end()){
                         singles_map[rot_string(j, rows_amount, mode)] = singles_map.size();
                         singles.push_back(rot_string(j, rows_amount, mode));
@@ -185,7 +186,7 @@ namespace nil {
                 count++;
             }
 
-            for(std::size_t i = 0; i < PlaceholderParams::witness_columns; i++){
+            for(std::size_t i = 0; i < desc.witness_columns; i++){
                 std::stringstream str;
                 for(auto j:common_data.columns_rotations[i]){
                     if(singles_map.find(rot_string(j, rows_amount, mode)) == singles_map.end()){
@@ -199,9 +200,9 @@ namespace nil {
                 count++;
             }
 
-            for(std::size_t i = 0; i < PlaceholderParams::public_input_columns; i++){
+            for(std::size_t i = 0; i < desc.public_input_columns; i++){
                 std::stringstream str;
-                for(auto j:common_data.columns_rotations[i + PlaceholderParams::witness_columns]){
+                for(auto j:common_data.columns_rotations[i + desc.witness_columns]){
                     if(singles_map.find(rot_string(j, rows_amount, mode)) == singles_map.end()){
                         singles_map[rot_string(j, rows_amount, mode)] = singles_map.size();
                         singles.push_back(rot_string(j, rows_amount, mode));

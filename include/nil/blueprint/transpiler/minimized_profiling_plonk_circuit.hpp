@@ -49,15 +49,19 @@
 
 namespace nil {
     namespace blueprint {
-        template<typename FieldType, typename ArithmetizationParams>
+        template<typename FieldType>
         struct minimized_profiling_plonk_circuit {
             static const std::size_t MAX_LINES = 1200;
             static const std::size_t ONE_FILE_GATES_MAX_LINES = 1000;
 
-            using columns_rotations_type = std::array<std::set<int>, ArithmetizationParams::total_columns>;
-            using ArithmetizationType = nil::crypto3::zk::snark::plonk_constraint_system<FieldType, ArithmetizationParams>;
-            using TableDescriptionType = nil::crypto3::zk::snark::plonk_table_description<FieldType, ArithmetizationParams>;
+            const zk::snark::plonk_table_description<FieldType> desc;
+
+            using columns_rotations_type = std::vector<std::set<int>>;
+            using ArithmetizationType = nil::crypto3::zk::snark::plonk_constraint_system<FieldType>;
+            using TableDescriptionType = nil::crypto3::zk::snark::plonk_table_description<FieldType>;
             using GateType = nil::crypto3::zk::snark::plonk_gate<FieldType, nil::crypto3::zk::snark::plonk_constraint<FieldType>>;
+
+
 
             struct profiling_params_type {
                 bool optimize_gates;
@@ -266,7 +270,7 @@ namespace nil {
                 }
             };
 
-            static inline columns_rotations_type columns_rotations(
+            columns_rotations_type columns_rotations(
                 ArithmetizationType &constraint_system,  const TableDescriptionType &table_description
             ) {
                 using variable_type = nil::crypto3::zk::snark::plonk_variable<typename FieldType::value_type>;
@@ -297,7 +301,7 @@ namespace nil {
                     }
                 }
 */
-                for (std::size_t i = 0; i < ArithmetizationParams::total_columns; i++) {
+                for (std::size_t i = 0; i < desc.witness_columns + desc.public_input_columns + desc.constant_columns + desc.selector_columns; i++) {
                     result[i].insert(0);
                 }
 
@@ -309,7 +313,7 @@ namespace nil {
                 return it == (std::cend(c) - 1);
             }
 
-            static std::string generate_variable(
+            std::string generate_variable(
                 const profiling_params_type &profiling_params,
                 const nil::crypto3::zk::snark::plonk_variable<typename FieldType::value_type> &var,
                 columns_rotations_type &columns_rotations
@@ -325,16 +329,18 @@ namespace nil {
                     global_index = var.index;
                 }
                 if (var.type == variable_type::public_input) {
-                    global_index = var.index + ArithmetizationParams::witness_columns;
+                    global_index = var.index + desc.witness_columns;
                 }
                 if (var.type == variable_type::constant) {
-                    global_index = var.index + ArithmetizationParams::witness_columns +
-                                   ArithmetizationParams::public_input_columns;
+                    global_index = var.index +
+                    desc.witness_columns +
+                    desc.public_input_columns;
                 }
                 if (var.type == variable_type::selector) {
-                    global_index = var.index + ArithmetizationParams::witness_columns +
-                                   ArithmetizationParams::public_input_columns +
-                                   ArithmetizationParams::constant_columns;
+                    global_index = var.index +
+                    desc.witness_columns +
+                    desc.public_input_columns +
+                    desc.constant_columns;
                 }
 
                 // Find out rotation_idx
@@ -371,7 +377,7 @@ namespace nil {
             }
 
             template<typename Vars>
-            static std::string generate_term(
+            std::string generate_term(
                 const profiling_params_type &profiling_params,
                 const Vars &vars,
                 columns_rotations_type &columns_rotations,
@@ -396,7 +402,7 @@ namespace nil {
             }
 
             template<typename Terms>
-            static std::string generate_terms(
+            std::string generate_terms(
                     const profiling_params_type &profiling_params,
                     const Terms &terms,
                     columns_rotations_type &columns_rotations
@@ -420,7 +426,7 @@ namespace nil {
             }
 
 
-            static std::string generate_constraint(
+            std::string generate_constraint(
                 const profiling_params_type &profiling_params,
                 const typename nil::crypto3::zk::snark::plonk_constraint<FieldType> &constraint,
                 columns_rotations_type &columns_rotations
@@ -486,7 +492,7 @@ namespace nil {
                     ")\n";
             }
 
-            static std::string generate_gate_assembly_code(
+            std::string generate_gate_assembly_code(
                 const profiling_params_type &profiling_params,
                 int gate_ind, const GateType &gate,
                 columns_rotations_type &columns_rotations
@@ -504,7 +510,7 @@ namespace nil {
                 return res.str();
             }
 
-            static void print_gate_file(
+            void print_gate_file(
                 int gate_ind, std::ostream &gate_out,
                 std::string id,
                 const profiling_params_type &profiling_params,
@@ -522,7 +528,7 @@ namespace nil {
                 gate_out << result;
             }
 
-            static void print_multiple_gates_file(
+            void print_multiple_gates_file(
                 int file_ind, std::ostream &gate_out,
                 std::string id,
                 const profiling_params_type &profiling_params,
@@ -568,7 +574,7 @@ namespace nil {
                 out << result;
             }
 
-            static void print_single_sol_file(
+            void print_single_sol_file(
                 std::ostream &out,
                 std::string id,
                 profiling_params_type &profiling_params,
@@ -628,7 +634,7 @@ namespace nil {
             }
 
 
-            static void process_split(
+            void process_split(
                 std::string main_file_template,
                 std::string gate_file_template,
                 ArithmetizationType &bp,
@@ -703,6 +709,9 @@ namespace nil {
                     gate_argument_out.close();
                 }
             }
+
+            minimized_profiling_plonk_circuit(crypto3::zk::snark::plonk_table_description<FieldType> desc) : desc(desc) {}
+
         };
     }    // namespace blueprint
 }    // namespace nil
