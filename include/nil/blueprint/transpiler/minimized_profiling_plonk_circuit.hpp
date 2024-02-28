@@ -45,7 +45,7 @@
 #include <nil/blueprint/transpiler/gate_argument_template.hpp>
 
 #include <boost/assert.hpp>
-#include <boost/algorithm/string.hpp> 
+#include <boost/algorithm/string.hpp>
 
 namespace nil {
     namespace blueprint {
@@ -200,7 +200,7 @@ namespace nil {
                     std::stringstream get_evals_functions_str;
 
                     if( this->need_witness ){
-                        evals_offsets_str << "\tuint256 constant WITNESS_EVALUATIONS_OFFSET = 0x" << std::hex 
+                        evals_offsets_str << "\tuint256 constant WITNESS_EVALUATIONS_OFFSET = 0x" << std::hex
                             << this->offset_witness << std::dec << ";" << std::endl;
                         evaluation_fields_str << "\t\t//0x"  << std::hex << this->offset_witness << std::dec << std::endl;
                         if(this->rotated_witness){
@@ -216,7 +216,7 @@ namespace nil {
 
                     if( this->need_public_input ){
                         evaluation_fields_str << "\t\t//0x"  << std::hex << this->offset_public_input << std::dec << std::endl;
-                        evals_offsets_str << "\tuint256 constant PUBLIC_INPUT_EVALUATIONS_OFFSET = 0x" << std::hex 
+                        evals_offsets_str << "\tuint256 constant PUBLIC_INPUT_EVALUATIONS_OFFSET = 0x" << std::hex
                             << this->offset_public_input << std::dec << ";" << std::endl;
                         if(this->rotated_public_input){
                             get_evals_functions_str << get_rotated_public_input;
@@ -231,7 +231,7 @@ namespace nil {
 
                     if( this->need_constant ){
                         evaluation_fields_str << "\t\t//"  << std::hex << this->offset_constant << std::dec << std::endl;
-                        evals_offsets_str << "\tuint256 constant CONSTANT_EVALUATIONS_OFFSET = 0x" << std::hex 
+                        evals_offsets_str << "\tuint256 constant CONSTANT_EVALUATIONS_OFFSET = 0x" << std::hex
                             << this->offset_constant << std::dec << ";" << std::endl;
                         if(this->rotated_constant){
                             evaluation_fields_str << field_rotated_constant_evaluations;
@@ -246,7 +246,7 @@ namespace nil {
 
                     if( this->need_selector ){
                         evaluation_fields_str << "\t\t//"  << std::hex << this->offset_selector << std::dec << std::endl;
-                        evals_offsets_str << "\tuint256 constant SELECTOR_EVALUATIONS_OFFSET = 0x" << std::hex 
+                        evals_offsets_str << "\tuint256 constant SELECTOR_EVALUATIONS_OFFSET = 0x" << std::hex
                             << this->offset_selector << std::dec << ";" << std::endl;
                         if(this->rotated_selector){
                             evaluation_fields_str << field_rotated_selector_evaluations;
@@ -320,7 +320,7 @@ namespace nil {
                 std::size_t index = var.index;
                 std::size_t global_index;
 
-                // Define global index in columns_rotations 
+                // Define global index in columns_rotations
                 if (var.type == variable_type::witness) {
                     global_index = var.index;
                 }
@@ -352,19 +352,19 @@ namespace nil {
                 if (var.type == variable_type::public_input) {
                     if( profiling_params.rotated_public_input )
                         res << get_rotated_public_input_call << "("<< index << ","<< rotation_idx << ", local_vars)";
-                    else 
+                    else
                         res << get_public_input_call << "("<< index << ", local_vars)";
                 }
                 if (var.type == variable_type::constant) {
                     if( profiling_params.rotated_public_input )
                         res << get_rotated_constant_call << "("<< index << ","<< rotation_idx << ", local_vars)";
-                    else 
+                    else
                         res << get_constant_call << "("<< index << ", local_vars)";
                 }
                 if (var.type == variable_type::selector) {
                     if( profiling_params.rotated_selector )
                         res << get_rotated_selector_call << "("<< index << ","<< rotation_idx << ", local_vars)";
-                    else 
+                    else
                         res << get_selector_call << "("<< index << ", local_vars)";
                 }
                 return res.str();
@@ -373,7 +373,7 @@ namespace nil {
             template<typename Vars>
             static std::string generate_term(
                 const profiling_params_type &profiling_params,
-                const Vars &vars, 
+                const Vars &vars,
                 columns_rotations_type &columns_rotations,
                 bool coeff_one = false
             ) {
@@ -460,7 +460,7 @@ namespace nil {
                 const nil::crypto3::zk::snark::plonk_gate<
                 FieldType, nil::crypto3::zk::snark::plonk_constraint<FieldType>> &gate
             ) {
-                std::stringstream res; 
+                std::stringstream res;
 
                 res << "\t\t\tmstore("
                       "add(local_vars, GATE_EVAL_OFFSET),"
@@ -487,8 +487,8 @@ namespace nil {
             }
 
             static std::string generate_gate_assembly_code(
-                const profiling_params_type &profiling_params, 
-                int gate_ind, const GateType &gate, 
+                const profiling_params_type &profiling_params,
+                int gate_ind, const GateType &gate,
                 columns_rotations_type &columns_rotations
             ) {
                 std::stringstream res;
@@ -505,10 +505,10 @@ namespace nil {
             }
 
             static void print_gate_file(
-                int gate_ind, std::ostream &gate_out, 
+                int gate_ind, std::ostream &gate_out,
                 std::string id,
                 const profiling_params_type &profiling_params,
-                std::string gate_sol_file_template, 
+                std::string gate_sol_file_template,
                 const GateType &gate,
                 columns_rotations_type &columns_rotations
             ) {
@@ -523,15 +523,15 @@ namespace nil {
             }
 
             static void print_multiple_gates_file(
-                int file_ind, std::ostream &gate_out, 
+                int file_ind, std::ostream &gate_out,
                 std::string id,
                 const profiling_params_type &profiling_params,
-                std::string gate_sol_file_template, 
+                std::string gate_sol_file_template,
                 const ArithmetizationType &bp,
                 columns_rotations_type &columns_rotations
             ) {
                 std::string assembly_code;
-                for(std::size_t i = profiling_params.gates_first[file_ind]; 
+                for(std::size_t i = profiling_params.gates_first[file_ind];
                     i < profiling_params.gates_first[file_ind] + profiling_params.gates_num[file_ind];
                     i++
                 ){
@@ -550,10 +550,10 @@ namespace nil {
             }
 
             static void print_main_file(
-                std::ostream &out, 
+                std::ostream &out,
                 std::string id,
                 profiling_params_type &profiling_params,
-                std::string main_file_template, 
+                std::string main_file_template,
                 std::string includes,
                 std::size_t gates_number,
                 std::string executions
@@ -569,11 +569,11 @@ namespace nil {
             }
 
             static void print_single_sol_file(
-                std::ostream &out, 
+                std::ostream &out,
                 std::string id,
                 profiling_params_type &profiling_params,
                 columns_rotations_type columns_rotations,
-                std::string single_file_template, 
+                std::string single_file_template,
                 ArithmetizationType &bp
             ) {
                 std::stringstream gates_execution_str;
@@ -650,7 +650,7 @@ namespace nil {
                     gate_argument_out.open(out_folder_path + "/gate_argument.sol");
                     print_single_sol_file(
                         gate_argument_out,
-                        id, 
+                        id,
                         profiling_params,
                         columns_rotations,
                         single_sol_file_template,
@@ -688,11 +688,11 @@ namespace nil {
                             gate_out.close();
                         }
                     }
-                    
+
                     std::ofstream gate_argument_out;
                     gate_argument_out.open(out_folder_path + "/gate_argument.sol");
                     print_main_file(
-                        gate_argument_out, 
+                        gate_argument_out,
                         id,
                         profiling_params,
                         main_file_template,
