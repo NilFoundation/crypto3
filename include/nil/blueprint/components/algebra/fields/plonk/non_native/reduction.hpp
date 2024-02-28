@@ -106,7 +106,7 @@ namespace nil {
                         output = var(component.W(4), start_row_index + component.rows_amount - 3, false);
                     }
 
-                    std::vector<var> all_vars() const {
+                    std::vector<std::reference_wrapper<var>> all_vars() {
                         return {output};
                     }
                 };

@@ -110,9 +110,7 @@ namespace nil {
                     std::array<var, state_size> input_state;
 
                     std::vector<std::reference_wrapper<var>> all_vars() {
-                        std::vector<std::reference_wrapper<var>> result;
-                        result.insert(result.end(), input_state.begin(), input_state.end());
-                        return result;
+                        return {input_state[0], input_state[1], input_state[2]};
                     }
                 };
 
@@ -128,10 +126,8 @@ namespace nil {
                                         var(component.W(2), start_row_index + component.rows_amount - 1, false)};
                     }
 
-                    std::vector<var> all_vars() const {
-                        std::vector<var> result;
-                        result.insert(result.end(), output_state.begin(), output_state.end());
-                        return result;
+                    std::vector<std::reference_wrapper<var>> all_vars() {
+                        return {output_state[0], output_state[1], output_state[2]};
                     }
                 };
 

@@ -57,6 +57,7 @@ set(COMMON_TEST_FILES
     "utils/connectedness_check"
     "private_input"
     "proxy"
+    "mock/mocked_components"
     )
 
 set(NON_NATIVE_TESTS_FILES

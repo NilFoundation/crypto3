@@ -113,7 +113,7 @@ namespace nil {
                                    var(component.W(8), start_row_index, false, var::column_type::witness) };
                     }
 
-                    std::vector<var> all_vars() const {
+                    std::vector<std::reference_wrapper<var>> all_vars() {
                         return {output[0], output[1], output[2]};
                     }
                 };

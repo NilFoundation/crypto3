@@ -260,6 +260,150 @@ namespace nil {
 
                 typedef crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type> value_type;
             };
+
+            /*
+             * Big unsigned numbers
+            */
+            template<typename BlueprintFieldType>
+            struct basic_non_native_policy_field_type<BlueprintFieldType,
+                    nil::crypto3::multiprecision::number<
+                        nil::crypto3::multiprecision::cpp_int_backend<256, 256,
+                        nil::crypto3::multiprecision::unsigned_magnitude,
+                        nil::crypto3::multiprecision::unchecked, void>>> {
+
+                constexpr static const std::uint32_t ratio = 2; // 128, 128 bits
+                // not actually a field, but we preserve the interface
+                using non_native_field_type = typename nil::crypto3::multiprecision::number<
+                        nil::crypto3::multiprecision::cpp_int_backend<256, 256,
+                        nil::crypto3::multiprecision::unsigned_magnitude,
+                        nil::crypto3::multiprecision::unchecked, void>>;
+                using native_field_type = typename crypto3::algebra::curves::pallas::base_field_type;
+                using var = crypto3::zk::snark::plonk_variable<typename native_field_type::value_type>;
+
+                typedef std::array<var, ratio> non_native_var_type;
+                typedef std::array<native_field_type::value_type, ratio> chopped_value_type;
+
+                constexpr static const std::array<std::size_t, ratio> chunk_sizes = {128, 128};
+
+
+                static native_field_type::value_type get_i_th_chunk(non_native_field_type::value_type input,
+                                        std::size_t i_th) {
+                    assert(i_th < ratio && "non-native type does not have that much chunks!");
+                    native_field_type::extended_integral_type result = native_field_type::extended_integral_type(input);
+                    native_field_type::integral_type base = 1;
+                    native_field_type::integral_type mask = (base << chunk_sizes[i_th]) - 1;
+                    std::size_t shift = 0;
+                    for (std::size_t i = 1; i <= i_th; i++) {
+                        shift += chunk_sizes[i - 1];
+                    }
+
+                    return (result >> shift) & mask;
+                }
+
+
+                static chopped_value_type chop_non_native(non_native_field_type::value_type input) {
+                    chopped_value_type result;
+                    for (std::size_t i = 0; i < ratio; i++) {
+                        result[i] = get_i_th_chunk(input, i);
+                    }
+                    return result;
+                }
+
+                static non_native_field_type::value_type glue_non_native(chopped_value_type input) {
+                    non_native_field_type::value_type result;
+                    result = non_native_field_type::value_type(native_field_type::integral_type(input[0].data));
+                    for (std::size_t i = 1; i < ratio; i++) {
+                        std::size_t shift = 0;
+                        for (std::size_t j = 0; j < i; j++) {
+                            shift += chunk_sizes[j];
+                        }
+                        result += non_native_field_type::value_type(native_field_type::integral_type(input[i].data) << shift);
+                    }
+                    return result;
+                }
+            };
+
+            /*
+             * Small and big signed numbers
+            */
+            template<typename BlueprintFieldType, std::size_t BitsAmount>
+            struct basic_non_native_policy_field_type<BlueprintFieldType,
+                    nil::crypto3::multiprecision::number<
+                        nil::crypto3::multiprecision::cpp_int_backend<BitsAmount, BitsAmount,
+                        nil::crypto3::multiprecision::signed_magnitude,
+                        nil::crypto3::multiprecision::unchecked, void>>> {
+
+                constexpr static const std::uint32_t ratio = BitsAmount < 256 ? 2 : 3; // sign and all other bits
+                static constexpr std::array<std::size_t, ratio> chunk_sizes_init() {
+                    if constexpr (BitsAmount < 256) {
+                        return {1, BitsAmount - 1};
+                    } else {
+                        return {1, 127, 128};
+                    }
+                }
+
+                // not actually a field, but we preserve the interface
+                using non_native_field_type = typename nil::crypto3::multiprecision::number<
+                        nil::crypto3::multiprecision::cpp_int_backend<BitsAmount, BitsAmount,
+                        nil::crypto3::multiprecision::signed_magnitude,
+                        nil::crypto3::multiprecision::unchecked, void>>;
+                using native_field_type = typename crypto3::algebra::curves::pallas::base_field_type;
+                using var = crypto3::zk::snark::plonk_variable<typename native_field_type::value_type>;
+
+                typedef std::array<var, ratio> non_native_var_type;
+                typedef std::array<native_field_type::value_type, ratio> chopped_value_type;
+
+                constexpr static const std::array<std::size_t, ratio> chunk_sizes = chunk_sizes_init();
+
+                static native_field_type::value_type get_i_th_chunk(typename non_native_field_type::value_type input,
+                                        std::size_t i_th) {
+                    assert(i_th < ratio && "non-native type does not have that much chunks!");
+
+                    if constexpr (BitsAmount < 256) {
+                        if (i_th == 0) {
+                            return input.sign() == 0 ? 1 : -1;
+                        } else {
+                            return native_field_type::value_type(input.sign() * native_field_type::integral_type(input.data));
+                        }
+                    } else {
+                        static const non_native_field_type top_mask = ((non_native_field_type(1) << 128) - 1) << 128;
+                        static const non_native_field_type bottom_mask = (non_native_field_type(1) << 128) - 1;
+
+                        if (i_th == 0) {
+                            return input.sign() == 0 ? 1 : -1;
+                        } else if (i_th == 1) {
+                            return top_mask & input;
+                        } else {
+                            return bottom_mask & input;
+                        }
+                    }
+                }
+
+
+                static chopped_value_type chop_non_native(typename non_native_field_type::value_type input) {
+                    chopped_value_type result;
+                    for (std::size_t i = 0; i < ratio; i++) {
+                        result[i] = get_i_th_chunk(input, i);
+                    }
+                    return result;
+                }
+
+                static typename non_native_field_type::value_type glue_non_native(chopped_value_type input) {
+                    typename non_native_field_type::value_type result;
+                    if constexpr (BitsAmount < 256) {
+                        result =
+                            (non_native_field_type::value_type(native_field_type::integral_type(input[0].data)) == 0 ? 1 : -1) * non_native_field_type::value_type(native_field_type::integral_type(input[1].data));
+                    } else {
+                        static const non_native_field_type two_128 =
+                        nil::crypto3::multiprecision::pow(non_native_field_type(2), 128);
+                        result =
+                            (non_native_field_type::value_type(native_field_type::integral_type(input[0].data)) == 0 ? 1 : -1) *
+                            (non_native_field_type::value_type(native_field_type::integral_type(input[1].data) * two_128 +
+                            non_native_field_type::value_type(input[2].data)));
+                    }
+                    return result;
+                }
+            };
         }    // namespace detail
 
         template<typename BlueprintFieldType>

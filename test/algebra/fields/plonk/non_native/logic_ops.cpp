@@ -48,8 +48,8 @@ void test_logic_component(std::map<std::array<bool, ArgsNum>, bool> expected_map
     using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>;
     using AssignmentType = blueprint::assignment<ArithmetizationType>;
     using hash_type = crypto3::hashes::keccak_1600<256>;
-    using field_value_type = typename BlueprintFieldType::value_type;
-    using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
+    using value_type = typename BlueprintFieldType::value_type;
+    using var = crypto3::zk::snark::plonk_variable<value_type>;
     std::size_t WitnessColumns = (ArgsNum) + 1;
     std::size_t PublicInputColumns = 1;
     std::size_t ConstantColumns = 0;
@@ -69,14 +69,14 @@ void test_logic_component(std::map<std::array<bool, ArgsNum>, bool> expected_map
         instance_input.input[i] = var(0, i, false, var::column_type::public_input);
     }
 
-    auto result_check = [](field_value_type expected_result) {
+    auto result_check = [](value_type expected_result) {
         return [expected_result](AssignmentType &assignment,
             typename ComponentType::result_type &real_res) {
                 assert(var_value(assignment, real_res.output) == expected_result);
             };
     };
 
-    std::vector<field_value_type> public_input;
+    std::vector<value_type> public_input;
     public_input.resize(ArgsNum);
 
     for (auto item : expected_mapping) {
@@ -153,6 +153,63 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_logic_nor_test) {
         {{false, false}, true}, {{false, true}, false}, {{true, false}, false}, {{true, true}, false},
     };
     test_logic_component<field_type, component_type, 2>(expected_mapping);
+}
+
+template<typename BlueprintFieldType>
+void test_select(typename BlueprintFieldType::value_type &cond,
+                 typename BlueprintFieldType::value_type &true_branch,
+                 typename BlueprintFieldType::value_type &false_branch) {
+    constexpr std::size_t WitnessColumns = 4;
+    constexpr std::size_t PublicInputColumns = 1;
+    constexpr std::size_t ConstantColumns = 0;
+    constexpr std::size_t SelectorColumns = 1;
+    zk::snark::plonk_table_description<BlueprintFieldType> desc(
+        WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns);
+    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>;
+    using AssignmentType = blueprint::assignment<ArithmetizationType>;
+    using hash_type = crypto3::hashes::keccak_1600<256>;
+    using component_type = blueprint::components::select<ArithmetizationType>;
+    constexpr std::size_t Lambda = 1;
+
+    using value_type = typename BlueprintFieldType::value_type;
+    using var = crypto3::zk::snark::plonk_variable<value_type>;
+
+    typename component_type::input_type instance_input;
+    for (std::size_t i = 0; i < 3; i++) {
+        instance_input.input[i] = var(0, i, false, var::column_type::public_input);
+    }
+    const value_type expected_result = cond == 1 ? true_branch : false_branch;
+
+    component_type component_instance(std::array<std::uint32_t, 4>({0, 1, 2, 3}));
+
+    auto result_check = [&expected_result](AssignmentType &assignment,
+            typename component_type::result_type &real_res) {
+        assert(var_value(assignment, real_res.output) == expected_result);
+    };
+
+    std::vector<value_type> public_input = {cond, true_branch, false_branch};
+
+    crypto3::test_component<component_type, BlueprintFieldType, hash_type, Lambda>(
+        component_instance, desc, public_input, result_check, instance_input);
+}
+
+constexpr static const int random_tests_amount = 10;
+
+BOOST_AUTO_TEST_CASE(blueprint_non_native_select_test) {
+    using field_type = typename crypto3::algebra::curves::pallas::base_field_type;
+    using value_type = typename field_type::value_type;
+    // generate random test data for select component
+    nil::crypto3::random::algebraic_engine<field_type> rand;
+    boost::random::mt19937 seed_seq;
+    rand.seed(seed_seq);
+
+    for (std::size_t j = 0; j < random_tests_amount; j++) {
+        value_type cond = rand().data & value_type(1).data,
+                   true_branch = rand(),
+                   false_branch = rand();
+
+        test_select<field_type>(cond, true_branch, false_branch);
+    }
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -140,8 +140,11 @@ namespace nil {
                         }
                     }
 
-                    std::vector<var> all_vars() {
-                        return output;
+                    std::vector<std::reference_wrapper<var>> all_vars() {
+                        std::vector<std::reference_wrapper<var>> result;
+                        result.reserve(output.size());
+                        result.insert(result.end(), output.begin(), output.end());
+                        return result;
                     }
                 };
 

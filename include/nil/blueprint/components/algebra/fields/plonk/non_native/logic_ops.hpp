@@ -463,6 +463,75 @@ namespace nil {
                                 public_inputs) :
                     component_type(witnesses, constants, public_inputs, get_manifest()) {};
             };
+
+            // if (cond) then (a) else (b)
+            // expects cond to be a boolean
+            template<typename ArithmetizationType>
+            class select;
+
+            template<typename BlueprintFieldType>
+            class select<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
+                             : public boolean_op_component<crypto3::zk::snark::plonk_constraint_system<
+                                                                                                BlueprintFieldType>,
+                                                           3> {
+
+                using value_type = typename BlueprintFieldType::value_type;
+
+            public:
+                using component_type =
+                    boolean_op_component<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>, 3>;
+
+                using var = typename component_type::var;
+                using manifest_type = nil::blueprint::plonk_component_manifest;
+
+                class gate_manifest_type : public component_gate_manifest {
+                public:
+                    std::uint32_t gates_amount() const override {
+                        return select::gates_amount;
+                    }
+                };
+
+                static gate_manifest get_gate_manifest(std::size_t witness_amount,
+                                                       std::size_t lookup_column_amount) {
+                    static gate_manifest manifest = gate_manifest(gate_manifest_type());
+                    return manifest;
+                }
+
+                static manifest_type get_manifest() {
+                    return component_type::get_manifest();
+                }
+
+                constexpr static std::size_t get_rows_amount(std::size_t witness_amount,
+                                                             std::size_t lookup_column_amount) {
+                    return component_type::get_rows_amount(witness_amount, lookup_column_amount);
+                }
+
+                virtual crypto3::zk::snark::plonk_constraint<BlueprintFieldType>
+                        op_constraint(const std::array<var, 4> &witnesses) const {
+                    return witnesses[3] - (witnesses[0] * witnesses[1] + (1 - witnesses[0]) * witnesses[2]);
+                }
+
+                virtual value_type result_assignment(const std::array<value_type, 3> &input_values) const {
+                    return input_values[0] == 0 ? input_values[2] : input_values[1];
+                }
+
+                template<typename ContainerType>
+                explicit select(ContainerType witness) : component_type(witness, get_manifest()) {};
+
+                template<typename WitnessContainerType, typename ConstantContainerType,
+                         typename PublicInputContainerType>
+                select(WitnessContainerType witness, ConstantContainerType constant,
+                               PublicInputContainerType public_input) :
+                    component_type(witness, constant, public_input, get_manifest()) {};
+
+                select(std::initializer_list<typename component_type::witness_container_type::value_type>
+                                witnesses,
+                          std::initializer_list<typename component_type::constant_container_type::value_type>
+                                constants,
+                          std::initializer_list<typename component_type::public_input_container_type::value_type>
+                                public_inputs) :
+                    component_type(witnesses, constants, public_inputs, get_manifest()) {};
+            };
         }    // namespace components
     }        // namespace blueprint
 }    // namespace nil

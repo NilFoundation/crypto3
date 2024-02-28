@@ -134,7 +134,7 @@ namespace nil {
                             output = var(component.W(l - 1), start_row_index + component.rows_amount - 1, false);
                         }
 
-                        std::vector<var> all_vars() {
+                        std::vector<std::reference_wrapper<var>> all_vars() {
                             return {output};
                         }
                     };

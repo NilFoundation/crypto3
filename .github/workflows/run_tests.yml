@@ -79,6 +79,7 @@ jobs:
             blueprint_verifiers_placeholder_f3_loop_test,
             blueprint_verifiers_placeholder_gate_component_test,
             blueprint_proxy_test
+            blueprint_mock_mocked_components_test
           ]  # Tests to execute
         include: # Abused to enable proof generation for some tests; add more as needed
           - target: blueprint_algebra_fields_plonk_non_native_logic_ops_test

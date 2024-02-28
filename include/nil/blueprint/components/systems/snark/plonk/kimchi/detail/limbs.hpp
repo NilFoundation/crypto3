@@ -115,7 +115,7 @@ namespace nil {
                         result = var(component.W(2), static_cast<int>(start_row_index), false, var::column_type::witness);
                     }
 
-                    std::vector<var> all_vars() const {
+                    std::vector<std::reference_wrapper<var>> all_vars() {
                         return {result};
                     }
                 };
@@ -295,7 +295,7 @@ namespace nil {
                                     var(component.W(4), static_cast<int>(start_row_index), false, var::column_type::witness)};
                     }
 
-                    std::vector<var> all_vars() const {
+                    std::vector<std::reference_wrapper<var>> all_vars() {
                         return {result[0], result[1], result[2], result[3]};
                     }
                 };

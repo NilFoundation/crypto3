@@ -196,7 +196,7 @@ namespace nil {
                         Y = var(component.W(1), start_row_index + component.rows_amount - 1, false, var::column_type::witness);
                     }
 
-                    std::vector<var> all_vars() const {
+                    std::vector<std::reference_wrapper<var>> all_vars() {
                         return {X, Y};
                     }
                 };

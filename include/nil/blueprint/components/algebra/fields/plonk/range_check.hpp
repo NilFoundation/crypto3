@@ -180,7 +180,7 @@ namespace nil {
                 struct result_type {
                     result_type(const range_check &component, std::size_t start_row_index) {}
 
-                    std::vector<var> all_vars() const {
+                    std::vector<std::reference_wrapper<var>> all_vars() {
                         return {};
                     }
                 };

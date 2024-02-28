@@ -283,7 +283,8 @@ namespace nil {
             const std::vector<std::reference_wrapper<
                               nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>>>
                 &input_variables,
-            const std::vector<nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>>
+            const std::vector<std::reference_wrapper<
+                              nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>>>
                 &output_variables,
             std::size_t start_row_index, std::size_t rows_amount) {
 
@@ -366,7 +367,7 @@ namespace nil {
             const std::vector<std::reference_wrapper<
                               nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>>>
                 &input_variables,
-            const std::vector<nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>>
+            const std::vector<std::reference_wrapper<nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>>>
                 &output_variables,
             std::size_t row_size, std::size_t start_row_index, std::size_t rows_amount) {
 
@@ -400,7 +401,8 @@ namespace nil {
             const std::vector<std::reference_wrapper<
                               nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>>>
                 &input_variables,
-            const std::vector<nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>>
+            const std::vector<std::reference_wrapper<
+                              nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>>>
                 &output_variables,
             std::size_t row_size, std::size_t start_row_index, std::size_t rows_amount) {
 
@@ -446,7 +448,8 @@ namespace nil {
             const std::vector<std::reference_wrapper<
                               nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>>>
                 &input_variables,
-            const std::vector<nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>>
+            const std::vector<std::reference_wrapper<
+                              nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>>>
                 &output_variables,
             std::size_t start_row_index, std::size_t rows_amount,
             connectedness_check_type type) {

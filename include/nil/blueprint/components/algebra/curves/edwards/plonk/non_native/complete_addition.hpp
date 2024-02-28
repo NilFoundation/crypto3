@@ -153,7 +153,7 @@ namespace nil {
                             var(component.W(3), start_row_index + non_native_range_component_rows_amount, false)};
                     }
 
-                    std::vector<var> all_vars() const {
+                    std::vector<std::reference_wrapper<var>> all_vars() {
                         return {output.x[0], output.x[1], output.x[2], output.x[3],
                                 output.y[0], output.y[1], output.y[2], output.y[3]};
                     }

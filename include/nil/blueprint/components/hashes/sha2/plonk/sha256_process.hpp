@@ -151,8 +151,8 @@ namespace nil {
                                         var(component.W(7), start_row_index, false)};
                     }
 
-                    std::vector<var> all_vars() const {
-                        std::vector<var> result;
+                    std::vector<std::reference_wrapper<var>> all_vars() {
+                        std::vector<std::reference_wrapper<var>> result;
                         result.reserve(8);
                         result.insert(result.end(), output_state.begin(), output_state.end());
                         return result;
