@@ -54,6 +54,8 @@
 #include <nil/crypto3/algebra/pairing/mnt6.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/mnt6.hpp>
 
+#include <nil/crypto3/algebra/fields/arithmetic_params/goldilocks64.hpp>
+
 #include <nil/crypto3/math/algorithms/unity_root.hpp>
 #include <nil/crypto3/math/polynomial/lagrange_interpolation.hpp>
 #include <nil/crypto3/math/algorithms/calculate_domain_set.hpp>
@@ -235,12 +237,11 @@ struct test_initializer {
     }
 };
 
-template<typename CurveType, typename merkle_hash_type, typename transcript_hash_type,
+template<typename FieldType, typename merkle_hash_type, typename transcript_hash_type,
     std::size_t WitnessColumns, std::size_t PublicInputColumns, std::size_t ConstantColumns, std::size_t SelectorColumns,
     std::size_t usable_rows_amount, std::size_t permutation, bool UseGrinding = false>
 struct placeholder_test_fixture : public test_initializer {
-    using curve_type = CurveType;
-    using field_type = typename curve_type::base_field_type;
+    using field_type = FieldType;
 
     struct placeholder_test_params {
         constexpr static const std::size_t usable_rows = 13;
@@ -1119,8 +1120,23 @@ using field_type = typename curve_type::base_field_type;
 using poseidon_type = hashes::poseidon<nil::crypto3::hashes::detail::mina_poseidon_policy<field_type>>;
 
 using TestFixtures = boost::mpl::list<
-    placeholder_test_fixture<algebra::curves::pallas, poseidon_type, poseidon_type, witness_columns_1, public_columns_1, constant_columns_1, selector_columns_1, rows_amount_1, 4>,
-    placeholder_test_fixture<algebra::curves::pallas, hashes::keccak_1600<512>, hashes::keccak_1600<512>, witness_columns_1, public_columns_1, constant_columns_1, selector_columns_1, rows_amount_1, 4>
+    placeholder_test_fixture<algebra::curves::pallas::base_field_type, poseidon_type, poseidon_type, witness_columns_1, public_columns_1, constant_columns_1, selector_columns_1, rows_amount_1, 4>,
+    placeholder_test_fixture<algebra::curves::pallas::base_field_type, hashes::keccak_1600<512>, hashes::keccak_1600<512>, witness_columns_1, public_columns_1, constant_columns_1, selector_columns_1, rows_amount_1, 4>
+    >;
+BOOST_AUTO_TEST_CASE_TEMPLATE(prover_test, F, TestFixtures) {
+    auto circuit = circuit_test_1<field_type>(test_global_alg_rnd_engine<field_type>);
+    F fixture(circuit, circuit.usable_rows, circuit.table_rows);
+    BOOST_CHECK(fixture.run_test());
+}
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(placeholder_circuit1_goldilocks)
+
+using field_type = typename algebra::fields::goldilocks64;
+using poseidon_type = hashes::poseidon<nil::crypto3::hashes::detail::mina_poseidon_policy<field_type>>;
+
+using TestFixtures = boost::mpl::list<
+    placeholder_test_fixture<field_type, hashes::keccak_1600<512>, hashes::keccak_1600<512>, witness_columns_1, public_columns_1, constant_columns_1, selector_columns_1, rows_amount_1, 4>
     >;
 BOOST_AUTO_TEST_CASE_TEMPLATE(prover_test, F, TestFixtures) {
     auto circuit = circuit_test_1<field_type>(test_global_alg_rnd_engine<field_type>);
@@ -1138,8 +1154,8 @@ const size_t usable_rows_3 = 4;
 const size_t permutation_size = 3;
 
 using TestFixtures = boost::mpl::list<
-    placeholder_test_fixture<algebra::curves::pallas, poseidon_type, poseidon_type, witness_columns_3, public_columns_3, constant_columns_3, selector_columns_3, usable_rows_3, permutation_size>,
-    placeholder_test_fixture<algebra::curves::pallas, hashes::keccak_1600<512>, hashes::keccak_1600<512>, witness_columns_3, public_columns_3, constant_columns_3, selector_columns_3, usable_rows_3, permutation_size>
+    placeholder_test_fixture<algebra::curves::pallas::base_field_type, poseidon_type, poseidon_type, witness_columns_3, public_columns_3, constant_columns_3, selector_columns_3, usable_rows_3, permutation_size>,
+    placeholder_test_fixture<algebra::curves::pallas::base_field_type, hashes::keccak_1600<512>, hashes::keccak_1600<512>, witness_columns_3, public_columns_3, constant_columns_3, selector_columns_3, usable_rows_3, permutation_size>
     >;
 BOOST_AUTO_TEST_CASE_TEMPLATE(prover_test, F, TestFixtures) {
     auto circuit = circuit_test_3<field_type>(test_global_alg_rnd_engine<field_type>);
@@ -1157,8 +1173,8 @@ const size_t usable_rows_4 = 5;
 const size_t permutation_size = 3;
 
 using TestFixtures = boost::mpl::list<
-    placeholder_test_fixture<algebra::curves::pallas, poseidon_type, poseidon_type, witness_columns_4, public_columns_4, constant_columns_4, selector_columns_4, usable_rows_4, permutation_size>,
-    placeholder_test_fixture<algebra::curves::pallas, hashes::keccak_1600<512>, hashes::keccak_1600<512>, witness_columns_4, public_columns_4, constant_columns_4, selector_columns_4, usable_rows_4, permutation_size>
+    placeholder_test_fixture<algebra::curves::pallas::base_field_type, poseidon_type, poseidon_type, witness_columns_4, public_columns_4, constant_columns_4, selector_columns_4, usable_rows_4, permutation_size>,
+    placeholder_test_fixture<algebra::curves::pallas::base_field_type, hashes::keccak_1600<512>, hashes::keccak_1600<512>, witness_columns_4, public_columns_4, constant_columns_4, selector_columns_4, usable_rows_4, permutation_size>
     >;
 BOOST_AUTO_TEST_CASE_TEMPLATE(prover_test, F, TestFixtures) {
     auto circuit = circuit_test_4<field_type>(test_global_alg_rnd_engine<field_type>);
@@ -1174,8 +1190,8 @@ using field_type = typename curve_type::base_field_type;
 using poseidon_type = hashes::poseidon<nil::crypto3::hashes::detail::mina_poseidon_policy<field_type>>;
 
 using TestFixtures = boost::mpl::list<
-    placeholder_test_fixture<algebra::curves::pallas, poseidon_type, poseidon_type, witness_columns_6, public_columns_6, constant_columns_6, selector_columns_6, usable_rows_6, 3, true>,
-    placeholder_test_fixture<algebra::curves::pallas, hashes::keccak_1600<512>, hashes::keccak_1600<512>, witness_columns_6, public_columns_6, constant_columns_6, selector_columns_6, usable_rows_6, 3, true>
+    placeholder_test_fixture<algebra::curves::pallas::base_field_type, poseidon_type, poseidon_type, witness_columns_6, public_columns_6, constant_columns_6, selector_columns_6, usable_rows_6, 3, true>,
+    placeholder_test_fixture<algebra::curves::pallas::base_field_type, hashes::keccak_1600<512>, hashes::keccak_1600<512>, witness_columns_6, public_columns_6, constant_columns_6, selector_columns_6, usable_rows_6, 3, true>
     >;
 BOOST_AUTO_TEST_CASE_TEMPLATE(prover_test, F, TestFixtures) {
     auto circuit = circuit_test_6<field_type>(test_global_alg_rnd_engine<field_type>);
@@ -1191,8 +1207,8 @@ using field_type = typename curve_type::base_field_type;
 using poseidon_type = hashes::poseidon<nil::crypto3::hashes::detail::mina_poseidon_policy<field_type>>;
 
 using TestFixtures = boost::mpl::list<
-    placeholder_test_fixture<algebra::curves::pallas, poseidon_type, poseidon_type, witness_columns_7, public_columns_7, constant_columns_7, selector_columns_7, usable_rows_7, 3, true>,
-    placeholder_test_fixture<algebra::curves::pallas, hashes::keccak_1600<512>, hashes::keccak_1600<512>, witness_columns_7, public_columns_7, constant_columns_7, selector_columns_7, usable_rows_7, 3, true>
+    placeholder_test_fixture<algebra::curves::pallas::base_field_type, poseidon_type, poseidon_type, witness_columns_7, public_columns_7, constant_columns_7, selector_columns_7, usable_rows_7, 3, true>,
+    placeholder_test_fixture<algebra::curves::pallas::base_field_type, hashes::keccak_1600<512>, hashes::keccak_1600<512>, witness_columns_7, public_columns_7, constant_columns_7, selector_columns_7, usable_rows_7, 3, true>
     >;
 BOOST_AUTO_TEST_CASE_TEMPLATE(prover_test, F, TestFixtures) {
     auto circuit = circuit_test_7<field_type>(test_global_alg_rnd_engine<field_type>);
@@ -1238,7 +1254,7 @@ struct placeholder_kzg_test_fixture : public test_initializer {
 
     using policy_type = zk::snark::detail::placeholder_policy<field_type, kzg_placeholder_params_type>;
 
-    using circuit_type = 
+    using circuit_type =
         circuit_description<field_type,
         placeholder_circuit_params<field_type>,
         usable_rows_amount, permutation>;
