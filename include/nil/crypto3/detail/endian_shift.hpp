@@ -102,8 +102,8 @@ namespace nil {
 
                     std::size_t sz[2] = {UnitBits - shift_rem, shift_rem};
                     word_type masks[2] = {
-                        unbounded_shr(high_bits<word_bits>(~word_type(), sz[0]), shift_unit_bits),
-                        unbounded_shr(high_bits<word_bits>(~word_type(), sz[1]), shift_unit_bits + UnitBits + sz[0])};
+                        unbounded_shr(high_bits<word_bits, word_type>(~word_type(), sz[0]), shift_unit_bits),
+                        unbounded_shr(high_bits<word_bits, word_type>(~word_type(), sz[1]), shift_unit_bits + UnitBits + sz[0])};
 
                     std::size_t bits_left = word_bits - shift;
                     word_type w_combined = 0;

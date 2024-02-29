@@ -40,11 +40,12 @@ macro(define_block_cipher_test name)
 endmacro()
 
 set(TESTS_NAMES
-    "pack"
-    "rijndael"
+    "injector"
     "kasumi"
     "md4"
     "md5"
+    "pack"
+    "rijndael"
     "shacal"
     "shacal2")
 

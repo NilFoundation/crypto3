@@ -66,7 +66,7 @@ namespace nil {
                 b = unbounded_shr<16>(((b * 0x0802LU & 0x22110LU) | (b * 0x8020LU & 0x88440LU)) * 0x10101LU);
 #elif (BOOST_ARCH_CURRENT_WORD_BITS == 64)
                 b = (b * 0x0202020202ULL & 0x010884422010ULL) % 1023;
-#else                
+#else
 #error "BOOST_ARCH_CURRENT_WORD_BITS not set"
 #endif
             }
@@ -156,7 +156,7 @@ namespace nil {
 
             /*!
              * @brief bit_in_unit_reverser transforms the sequence of bits in each unit of
-             * the input value into reversed sequence of bytes in each unit of the output value.
+             * the input value into reversed sequence of bits in each unit of the output value.
              * The function reverse is recursively invoked and the parameter k is used to track
              * the number of already processed input units. The recursion ends, when all input
              * units have been processed, i.e. when k == InputBits.
@@ -510,6 +510,38 @@ namespace nil {
                     return out;
                 }
             };
+
+            /*!
+             * @brief reverser reverses both the sequence of units in the given value and with within a unit, if InputEndianness
+             * and OutputEndianness endiannesses have different unit orders, and the sequence of bits in each unit of the given value,
+             * if InputEndianness and OutputEndianness endiannesses have different bit orders.
+             *
+             * @ingroup reverser
+             *
+             * @tparam InputEndianness
+             * @tparam OutputEndianness
+             * @tparam UnitBits
+             */
+            template<typename InputEndianness, typename OutputEndianness, int UnitBits>
+            class reverser {
+            private:
+                using unit_reverser_specified = unit_reverser<InputEndianness, OutputEndianness, UnitBits>;
+                using bit_reverser_specified = bit_reverser<InputEndianness, OutputEndianness, UnitBits>;
+            public:
+                template<typename ValueType, int ValueBits = sizeof(ValueType) * CHAR_BIT>
+                inline static void reverse(ValueType &val) {
+                    unit_reverser_specified::reverse(val);
+                    bit_reverser_specified::reverse(val);
+                }
+
+                template<typename ValueType, int ValueBits = sizeof(ValueType) * CHAR_BIT>
+                inline static ValueType reverse(ValueType const &val) {
+                    ValueType out = unit_reverser_specified::reverse(val);
+                    bit_reverser_specified::reverse(out);
+                    return out;
+                }
+            };
+
         }    // namespace detail
     }        // namespace crypto3
 }    // namespace nil

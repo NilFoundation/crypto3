@@ -70,7 +70,7 @@ namespace nil {
                     constexpr static const std::size_t value_bits = sizeof(typename block_type::value_type) * CHAR_BIT;
                     constexpr static const std::size_t block_values = block_bits / value_bits;
 
-                    typedef ::nil::crypto3::detail::injector<endian_type, value_bits, block_values, block_bits>
+                    typedef ::nil::crypto3::detail::injector<endian_type, endian_type, value_bits, block_values>
                         injector_type;
 
                 public:
