@@ -291,12 +291,12 @@ namespace nil {
                         std::vector<single_commitment_type> commits;
                         std::vector<scalar_value_type> T;  // merged eval points
                         std::vector<std::vector<scalar_value_type>> S; // eval points
-                        std::vector<math::polynomial<scalar_value_type>> r; // U polynomials
+                        std::vector<poly_type> r; // U polynomials
                         public_key_type() {};
                         public_key_type(std::vector<single_commitment_type> commits,
                                                 std::vector<scalar_value_type> T,
                                                 std::vector<std::vector<scalar_value_type>> S,
-                                                std::vector<math::polynomial<scalar_value_type>> r) :
+                                                std::vector<poly_type> r) :
                                                 commits(commits), T(T), S(S), r(r) {};
                         public_key_type operator=(const public_key_type &other) {
                             commits = other.commits;
@@ -355,12 +355,12 @@ namespace nil {
                         bool
                     >::type = true
                 >
-                static std::vector<math::polynomial<typename KZG::scalar_value_type>> create_evals_polys(
+                static std::vector<typename KZG::poly_type> create_evals_polys(
                     const typename KZG::batch_of_polynomials_type &polys,
                     const std::vector<std::vector<typename KZG::scalar_value_type>> S
                 ) {
                     BOOST_ASSERT(polys.size() == S.size());
-                    std::vector<math::polynomial<typename KZG::scalar_value_type>> rs(polys.size());
+                    std::vector<typename KZG::poly_type> rs(polys.size());
                     for (std::size_t i = 0; i < polys.size(); ++i) {
                         typename std::vector<std::pair<typename KZG::scalar_value_type, typename KZG::scalar_value_type>> evals;
                         for (auto s : S[i]) {
@@ -537,7 +537,7 @@ namespace nil {
 
                     auto gamma = transcript.template challenge<typename KZG::curve_type::scalar_field_type>();
                     auto factor = KZG::scalar_value_type::one();
-                    typename math::polynomial<typename KZG::scalar_value_type> accum;
+                    typename KZG::poly_type accum;
 
                     for (std::size_t i = 0; i < polys.size(); ++i) {
                         auto spare_poly = polys[i] - public_key.r[i];
@@ -553,6 +553,7 @@ namespace nil {
                     }
 
                     //verify without pairing
+                    /*
                     {
                         typename math::polynomial<typename KZG::scalar_value_type> right_side({{0}});
                         factor = KZG::scalar_value_type::one();
@@ -561,7 +562,7 @@ namespace nil {
                             factor = factor * gamma;
                         }
                         assert(accum * create_polynom_by_zeros<KZG>(public_key.T) == right_side);
-                    }
+                    }*/
 
                     return commit_one<KZG>(params, accum);
                 }
@@ -710,12 +711,9 @@ namespace nil {
                             std::vector<uint8_t> single_commitment_bytes =
                                 nil::marshalling::pack<endianness>(single_commitment, status);
                             BOOST_ASSERT(status == nil::marshalling::status_type::success);
-
                             result.insert(result.end(), single_commitment_bytes.begin(), single_commitment_bytes.end());
                         }
                         _commitments[index] = result;
-
-
                         return result;
                     }
 
@@ -729,7 +727,6 @@ namespace nil {
                     }
 
                     proof_type proof_eval(transcript_type &transcript){
-
                         this->eval_polys();
                         this->merge_eval_points();
 
@@ -745,14 +742,15 @@ namespace nil {
                         for( auto const &it: this->_polys ){
                             auto k = it.first;
                             for (std::size_t i = 0; i < this->_z.get_batch_size(k); ++i) {
-                                accum += factor * (math::polynomial<typename KZGScheme::scalar_value_type>(this->_polys[k][i].coefficients()) - this->get_U(k, i))/this->get_V(this->_points[k][i]);
+                                accum += factor * ( math::polynomial<typename KZGScheme::scalar_value_type>( this->_polys[k][i].coefficients()) - this->get_U(k, i)) / this->get_V(this->_points[k][i]);
                                 factor *= gamma;
                             }
                         }
 
                         //verify without pairing. It's only for debug
                         //if something goes wrong, it may be useful to place here verification with pairings
-                        /*{
+                        /*
+                        {
                             typename math::polynomial<typename KZGScheme::scalar_value_type> right_side({{0}});
                             factor = KZGScheme::scalar_value_type::one();
                             for( auto const &it: this->_polys ){
@@ -801,12 +799,13 @@ namespace nil {
                                 BOOST_ASSERT(status == nil::marshalling::status_type::success);
                                 auto U_commit = nil::crypto3::zk::algorithms::commit_one<KZGScheme>(_params, this->get_U(k,i));
 
-                                auto left_side_pairing = nil::crypto3::algebra::pair_reduced<curve_type>(
-                                    factor*(i_th_commitment - U_commit),
-                                    commit_g2(set_difference_polynom(_merged_points, this->_points.at(k)[i]))
-                                );
+                                auto diffpoly = set_difference_polynom(_merged_points, this->_points.at(k)[i]);
+                                auto diffpoly_commitment = commit_g2(diffpoly);
 
-                                left_side_accum *= left_side_pairing;
+                                auto left_side_pairing = nil::crypto3::algebra::pair_reduced<curve_type>(
+                                    factor*(i_th_commitment - U_commit), diffpoly_commitment);
+
+                                left_side_accum = left_side_accum * left_side_pairing;
                                 factor *= gamma;
                             }
                         }

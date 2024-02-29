@@ -127,6 +127,7 @@ namespace nil {
                     }
                 };
 
+
                 template<typename Hash, typename Enable = void>
                 struct fiat_shamir_heuristic_sequential
                 {
@@ -166,7 +167,6 @@ namespace nil {
                         state = hash<hash_type>(state);
                         nil::marshalling::status_type status;
                         nil::crypto3::multiprecision::cpp_int raw_result = nil::marshalling::pack(state, status);
-
                         return raw_result;
                     }
 
@@ -176,7 +176,6 @@ namespace nil {
                         state = hash<hash_type>(state);
                         nil::marshalling::status_type status;
                         Integral raw_result = nil::marshalling::pack(state, status);
-
                         return raw_result;
                     }
 
