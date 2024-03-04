@@ -55,51 +55,37 @@ namespace nil {
 
                         data_type data;
 
-                        constexpr element_fp3() {
-                            data =
-                                data_type({underlying_type::zero(), underlying_type::zero(), underlying_type::zero()});
-                        }
+                        constexpr element_fp3() = default;
 
                         template<typename Number1, typename Number2, typename Number3>
                         constexpr element_fp3(const Number1 &in_data0,
                                               const Number2 &in_data1,
-                                              const Number3 &in_data2) {
-                            data = data_type(
-                                {underlying_type(in_data0), underlying_type(in_data1), underlying_type(in_data2)});
-                        }
+                                              const Number3 &in_data2)
+                            : data({underlying_type(in_data0), underlying_type(in_data1), underlying_type(in_data2)})
+                        {}
 
-                        constexpr element_fp3(const data_type &in_data) {
-                            data = data_type({in_data[0], in_data[1], in_data[2]});
-                        };
+                        constexpr element_fp3(const data_type &in_data)
+                            : data({in_data[0], in_data[1], in_data[2]}) {}
 
                         constexpr element_fp3(const underlying_type &in_data0,
                                               const underlying_type &in_data1,
                                               const underlying_type &in_data2)
-                            : data({in_data0, in_data1, in_data2})
-                        {
-                        }
+                            : data({in_data0, in_data1, in_data2}) {}
 
                         constexpr element_fp3(const element_fp3 &B) : data(B.data) {};
                         constexpr element_fp3(const element_fp3 &&B) BOOST_NOEXCEPT : data(std::move(B.data)) {};
 
-                        constexpr inline static element_fp3 zero() {
-                            return element_fp3(
-                                underlying_type::zero(), underlying_type::zero(), underlying_type::zero());
-                        }
-
-                        constexpr inline static element_fp3 one() {
-                            return element_fp3(
-                                underlying_type::one(), underlying_type::zero(), underlying_type::zero());
-                        }
+                        // Creating a zero is a fairly slow operation and is called very often, so we must return a
+                        // reference to the same static object every time.
+                        constexpr static const element_fp3& zero();
+                        constexpr static const element_fp3& one();
 
                         constexpr bool is_zero() const {
-                            return (data[0] == underlying_type::zero()) && (data[1] == underlying_type::zero()) &&
-                                   (data[2] == underlying_type::zero());
+                            return *this == zero();
                         }
 
                         constexpr bool is_one() const {
-                            return (data[0] == underlying_type::one()) && (data[1] == underlying_type::zero()) &&
-                                   (data[2] == underlying_type::zero());
+                            return *this == one();
                         }
 
                         constexpr bool operator==(const element_fp3 &B) const {
@@ -159,9 +145,6 @@ namespace nil {
                         }
 
                         constexpr element_fp3 sqrt() const {
-
-                            element_fp3 one = this->one();
-
                             std::size_t v = policy_type::s;
                             element_fp3 z(policy_type::nqr_to_t[0], policy_type::nqr_to_t[1], policy_type::nqr_to_t[2]);
                             element_fp3 w = this->pow(policy_type::t_minus_1_over_2);
@@ -171,10 +154,10 @@ namespace nil {
                             // compute square root with Tonelli--Shanks
                             // (does not terminate if not a square!)
 
-                            while (b != one) {
+                            while (!b.is_one()) {
                                 std::size_t m = 0;
                                 element_fp3 b2m = b;
-                                while (b2m != one) {
+                                while (!b2m.is_one()) {
                                     /* invariant: b2m = b^(2^m) after entering this loop */
                                     b2m = b2m.squared();
                                     m += 1;
@@ -261,6 +244,31 @@ namespace nil {
                     constexpr const typename element_fp3<FieldParams>::non_residue_type
                         element_fp3<FieldParams>::non_residue;
 
+                    namespace element_fp3_details {
+                        // These constexpr static variables can not be members of element_fp2, because 
+                        // element_fp2 is incomplete type until the end of its declaration.
+                        template<typename FieldParams>
+                        constexpr static element_fp3<FieldParams> zero_instance(
+                            FieldParams::underlying_type::zero(),
+                            FieldParams::underlying_type::zero(),
+                            FieldParams::underlying_type::zero());
+
+                        template<typename FieldParams>
+                        constexpr static element_fp3<FieldParams> one_instance(
+                            FieldParams::underlying_type::one(),
+                            FieldParams::underlying_type::zero(),
+                            FieldParams::underlying_type::zero());
+                    }
+
+                    template<typename FieldParams>
+                    constexpr const element_fp3<FieldParams>& element_fp3<FieldParams>::zero() {
+                        return element_fp3_details::zero_instance<FieldParams>;
+                    }
+
+                    template<typename FieldParams>
+                    constexpr const element_fp3<FieldParams>& element_fp3<FieldParams>::one() {
+                        return element_fp3_details::one_instance<FieldParams>;
+                    }
                 }    // namespace detail
             }        // namespace fields
         }            // namespace algebra

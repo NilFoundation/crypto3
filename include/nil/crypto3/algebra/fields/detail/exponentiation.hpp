@@ -53,6 +53,7 @@ namespace nil {
 
                             if (nil::crypto3::multiprecision::bit_test(exponent, i)) {
                                 found_one = true;
+                                // TODO(martun): create an operator *= for this.
                                 result = result * base;
                             }
                         }

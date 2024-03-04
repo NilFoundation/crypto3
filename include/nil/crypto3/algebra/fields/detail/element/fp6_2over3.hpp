@@ -52,30 +52,30 @@ namespace nil {
 
                         data_type data;
 
-                        constexpr element_fp6_2over3() {
-                            data = data_type({underlying_type::zero(), underlying_type::zero()});
-                        }
+                        constexpr element_fp6_2over3() = default;
 
-                        constexpr element_fp6_2over3(underlying_type in_data0, underlying_type in_data1) {
-                            data = data_type({in_data0, in_data1});
-                        }
+                        constexpr element_fp6_2over3(const underlying_type& in_data0, const underlying_type& in_data1)
+                            : data({in_data0, in_data1}) {}
 
-                        constexpr element_fp6_2over3(const data_type &in_data) {
-                            data = data_type({in_data[0], in_data[1]});
-                        };
+                        constexpr element_fp6_2over3(const data_type &in_data)
+                            : data({in_data[0], in_data[1]}) {}
 
-                        constexpr element_fp6_2over3(const element_fp6_2over3 &B) : data {B.data} {};
+                        constexpr element_fp6_2over3(const element_fp6_2over3 &B) : data {B.data} {}
+
                         constexpr element_fp6_2over3(const element_fp6_2over3 &&B) BOOST_NOEXCEPT 
-                            : data(std::move(B.data)) {};
+                            : data(std::move(B.data)) {}
 
+                        // Creating a zero is a fairly slow operation and is called very often, so we must return a
+                        // reference to the same static object every time.
+                        constexpr static const element_fp6_2over3& zero();
+                        constexpr static const element_fp6_2over3& one();
 
-
-                        constexpr inline static element_fp6_2over3 zero() {
-                            return element_fp6_2over3(underlying_type::zero(), underlying_type::zero());
+                        constexpr bool is_zero() const {
+                            return *this == zero();
                         }
 
-                        constexpr inline static element_fp6_2over3 one() {
-                            return element_fp6_2over3(underlying_type::one(), underlying_type::zero());
+                        constexpr bool is_one() const {
+                            return *this == one();
                         }
 
                         constexpr bool operator==(const element_fp6_2over3 &B) const {
@@ -306,6 +306,29 @@ namespace nil {
                     constexpr const typename element_fp6_2over3<FieldParams>::non_residue_type
                         element_fp6_2over3<FieldParams>::non_residue;
 
+                    namespace element_fp6_2over3_details {
+                        // These constexpr static variables can not be members of element_fp2, because 
+                        // element_fp2 is incomplete type until the end of its declaration.
+                        template<typename FieldParams>
+                        constexpr static element_fp6_2over3<FieldParams> zero_instance(
+                            FieldParams::underlying_type::zero(),
+                            FieldParams::underlying_type::zero());
+
+                        template<typename FieldParams>
+                        constexpr static element_fp6_2over3<FieldParams> one_instance(
+                            FieldParams::underlying_type::one(),
+                            FieldParams::underlying_type::zero());
+                    }
+
+                    template<typename FieldParams>
+                    constexpr const element_fp6_2over3<FieldParams>& element_fp6_2over3<FieldParams>::zero() {
+                        return element_fp6_2over3_details::zero_instance<FieldParams>;
+                    }
+
+                    template<typename FieldParams>
+                    constexpr const element_fp6_2over3<FieldParams>& element_fp6_2over3<FieldParams>::one() {
+                        return element_fp6_2over3_details::one_instance<FieldParams>;
+                    }
                 }    // namespace detail
             }        // namespace fields
         }            // namespace algebra

@@ -39,39 +39,14 @@
 
 #include <nil/crypto3/algebra/curves/alt_bn128.hpp>
 #include <nil/crypto3/algebra/curves/bls12.hpp>
-//#include <nil/crypto3/algebra/curves/bn128.hpp>
-// #include <nil/crypto3/algebra/curves/brainpool_r1.hpp>
 #include <nil/crypto3/algebra/curves/edwards.hpp>
-// #include <nil/crypto3/algebra/curves/frp_v1.hpp>
-// #include <nil/crypto3/algebra/curves/gost_A.hpp>
 #include <nil/crypto3/algebra/curves/mnt4.hpp>
 #include <nil/crypto3/algebra/curves/mnt6.hpp>
-// #include <nil/crypto3/algebra/curves/p192.hpp>
-// #include <nil/crypto3/algebra/curves/p224.hpp>
-// #include <nil/crypto3/algebra/curves/p256.hpp>
-// #include <nil/crypto3/algebra/curves/p384.hpp>
-// #include <nil/crypto3/algebra/curves/p521.hpp>
-// #include <nil/crypto3/algebra/curves/secp.hpp>
-// #include <nil/crypto3/algebra/curves/sm2p_v1.hpp>
-// #include <nil/crypto3/algebra/curves/x962_p.hpp>
-
 #include <nil/crypto3/algebra/curves/params/multiexp/alt_bn128.hpp>
 #include <nil/crypto3/algebra/curves/params/multiexp/bls12.hpp>
-//#include <nil/crypto3/algebra/curves/params/multiexp/bn128.hpp>
-// #include <nil/crypto3/algebra/curves/params/multiexp/brainpool_r1.hpp>
 #include <nil/crypto3/algebra/curves/params/multiexp/edwards.hpp>
-// #include <nil/crypto3/algebra/curves/params/multiexp/frp_v1.hpp>
-// #include <nil/crypto3/algebra/curves/params/multiexp/gost_A.hpp>
 #include <nil/crypto3/algebra/curves/params/multiexp/mnt4.hpp>
 #include <nil/crypto3/algebra/curves/params/multiexp/mnt6.hpp>
-// #include <nil/crypto3/algebra/curves/params/multiexp/p192.hpp>
-// #include <nil/crypto3/algebra/curves/params/multiexp/p224.hpp>
-// #include <nil/crypto3/algebra/curves/params/multiexp/p256.hpp>
-// #include <nil/crypto3/algebra/curves/params/multiexp/p384.hpp>
-// #include <nil/crypto3/algebra/curves/params/multiexp/p521.hpp>
-// #include <nil/crypto3/algebra/curves/params/multiexp/secp.hpp>
-// #include <nil/crypto3/algebra/curves/params/multiexp/sm2p_v1.hpp>
-// #include <nil/crypto3/algebra/curves/params/multiexp/x962_p.hpp>
 #include <nil/crypto3/algebra/curves/params/wnaf/bls12.hpp>
 
 #include <nil/crypto3/algebra/random_element.hpp>

@@ -52,28 +52,30 @@ namespace nil {
 
                         data_type data;
 
-                        constexpr element_fp4() {
-                            data = data_type({underlying_type::zero(), underlying_type::zero()});
-                        }
+                        constexpr element_fp4() = default;
 
-                        constexpr element_fp4(underlying_type in_data0, underlying_type in_data1) {
-                            data = data_type({in_data0, in_data1});
-                        }
+                        constexpr element_fp4(underlying_type in_data0, underlying_type in_data1)
+                            : data({in_data0, in_data1}) {}
 
-                        constexpr element_fp4(const data_type &in_data) {
-                            data = data_type({in_data[0], in_data[1]});
-                        };
+                        constexpr element_fp4(const data_type &in_data)
+                            : data({in_data[0], in_data[1]}) {}
 
-                        constexpr element_fp4(const element_fp4 &B) : data {B.data} {};
+                        constexpr element_fp4(const element_fp4 &B) : data {B.data} {}
+
                         constexpr element_fp4(const element_fp4 &&B) BOOST_NOEXCEPT 
-                            : data(std::move(B.data)) {};
+                            : data(std::move(B.data)) {}
 
-                        constexpr inline static element_fp4 zero() {
-                            return element_fp4(underlying_type::zero(), underlying_type::zero());
+                        // Creating a zero is a fairly slow operation and is called very often, so we must return a
+                        // reference to the same static object every time.
+                        constexpr static const element_fp4& zero();
+                        constexpr static const element_fp4& one();
+
+                        constexpr bool is_zero() const {
+                            return *this == zero();
                         }
 
-                        constexpr inline static element_fp4 one() {
-                            return element_fp4(underlying_type::one(), underlying_type::zero());
+                        constexpr bool is_one() const {
+                            return *this == one();
                         }
 
                         constexpr bool operator==(const element_fp4 &B) const {
@@ -237,6 +239,30 @@ namespace nil {
                     template<typename FieldParams>
                     constexpr const typename element_fp4<FieldParams>::non_residue_type
                         element_fp4<FieldParams>::non_residue;
+
+                    namespace element_fp4_details {
+                        // These constexpr static variables can not be members of element_fp2, because 
+                        // element_fp2 is incomplete type until the end of its declaration.
+                        template<typename FieldParams>
+                        constexpr static element_fp4<FieldParams> zero_instance(
+                            FieldParams::underlying_type::zero(),
+                            FieldParams::underlying_type::zero());
+
+                        template<typename FieldParams>
+                        constexpr static element_fp4<FieldParams> one_instance(
+                            FieldParams::underlying_type::one(),
+                            FieldParams::underlying_type::zero());
+                    }
+
+                    template<typename FieldParams>
+                    constexpr const element_fp4<FieldParams>& element_fp4<FieldParams>::zero() {
+                        return element_fp4_details::zero_instance<FieldParams>;
+                    }
+
+                    template<typename FieldParams>
+                    constexpr const element_fp4<FieldParams>& element_fp4<FieldParams>::one() {
+                        return element_fp4_details::one_instance<FieldParams>;
+                    }
 
                 }    // namespace detail
             }        // namespace fields

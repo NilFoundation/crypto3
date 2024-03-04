@@ -64,39 +64,34 @@ namespace nil {
                         using data_type = modular_type;
                         data_type data;
 
-                        constexpr element_fp() : data(data_type(0, modulus_params)) {};
+                        constexpr element_fp() = default;
 
-                        constexpr element_fp(const data_type &data) : data(data) {};
+                        constexpr element_fp(const data_type &data) : data(data) {}
 
                         template<typename Number,
                                  typename std::enable_if<(multiprecision::is_number<Number>::value &&
                                                           !multiprecision::is_modular_number<Number>::value) ||
                                                              std::is_integral<Number>::value,
                                                          bool>::type = true>
-                        constexpr element_fp(const Number &data) : data(data, modulus_params) {};
+                        constexpr element_fp(const Number &data) : data(data, modulus_params) {}
 
                         constexpr element_fp(const element_fp &B)
-                            : data(B.data) {
-                        };
+                            : data(B.data) {}
 
                         constexpr element_fp(const element_fp &&B) BOOST_NOEXCEPT
-                            : data(std::move(B.data)) {
-                        };
+                            : data(std::move(B.data)) {}
 
-                        constexpr inline static element_fp zero() {
-                            return element_fp(0);
-                        }
-
-                        constexpr inline static element_fp one() {
-                            return element_fp(1);
-                        }
+                        // Creating a zero is a fairly slow operation and is called very often, so we must return a
+                        // reference to the same static object every time.
+                        constexpr static const element_fp& zero();
+                        constexpr static const element_fp& one();
 
                         constexpr bool is_zero() const {
-                            return data == data_type(0, modulus_params);
+                            return *this == zero();
                         }
 
                         constexpr bool is_one() const {
-                            return data == data_type(1, modulus_params);
+                            return *this == one();
                         }
 
                         constexpr bool operator==(const element_fp &B) const {
@@ -240,6 +235,26 @@ namespace nil {
 
                     template<typename FieldParams>
                     constexpr typename element_fp<FieldParams>::modular_params_type const element_fp<FieldParams>::modulus_params;
+
+                    namespace element_fp_details {
+                        // These constexpr static variables can not be members of element_fp, because 
+                        // element_fp is incomplete type until the end of its declaration.
+                        template<typename FieldParams>
+                        constexpr static element_fp<FieldParams> zero_instance = 0;
+
+                        template<typename FieldParams>
+                        constexpr static element_fp<FieldParams> one_instance = 1;
+                    }
+
+                    template<typename FieldParams>
+                    constexpr const element_fp<FieldParams>& element_fp<FieldParams>::zero() {
+                        return element_fp_details::zero_instance<FieldParams>;
+                    }
+
+                    template<typename FieldParams>
+                    constexpr const element_fp<FieldParams>& element_fp<FieldParams>::one() {
+                        return element_fp_details::one_instance<FieldParams>;
+                    }
 
                     template<typename FieldParams>
                     std::ostream& operator<<(std::ostream& os, const element_fp<FieldParams>& elem) {
