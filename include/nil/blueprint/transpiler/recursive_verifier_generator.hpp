@@ -49,13 +49,12 @@ namespace nil {
         template<typename PlaceholderParams, typename ProofType, typename CommonDataType>
         struct recursive_verifier_generator{
             using field_type = typename PlaceholderParams::field_type;
-            using arithmetization_params = typename PlaceholderParams::arithmetization_params;
             using proof_type = ProofType;
             using common_data_type = CommonDataType;
             using verification_key_type = typename common_data_type::verification_key_type;
             using commitment_scheme_type = typename PlaceholderParams::commitment_scheme_type;
             using constraint_system_type = typename PlaceholderParams::constraint_system_type;
-            using columns_rotations_type = std::array<std::set<int>, PlaceholderParams::total_columns>;
+            using columns_rotations_type = std::vector<std::set<int>>;
             using variable_type = typename constraint_system_type::variable_type;
             using variable_indices_type = std::map<variable_type, std::size_t>;
             using degree_visitor_type = typename constraint_system_type::degree_visitor_type;
@@ -66,7 +65,7 @@ namespace nil {
             using assignment_table_type = typename PlaceholderParams::assignment_table_type;
 
             // TODO: Move logic to utils.hpp. It's similar to EVM verifier generator
-            static std::string zero_indices(columns_rotations_type col_rotations, std::size_t permutation_size){
+            std::string zero_indices(columns_rotations_type col_rotations, std::size_t permutation_size){
                 std::vector<std::size_t> zero_indices;
                 std::uint16_t fixed_values_points = 0;
                 std::stringstream result;
@@ -75,7 +74,7 @@ namespace nil {
                     fixed_values_points += col_rotations[i + desc.witness_columns + desc.public_input_columns].size() + 1;
                 }
 
-                for(std::size_t i= 0; i < PlaceholderParams::total_columns; i++){
+                for(std::size_t i= 0; i < desc.table_width(); i++){
                     std::size_t j = 0;
                     for(auto& rot: col_rotations[i]){
                         if(rot == 0){
@@ -94,12 +93,12 @@ namespace nil {
                 }
 
                 sum = 0;
-                for(; i < PlaceholderParams::total_columns; i++){
+                for(; i < desc.table_width(); i++){
                     zero_indices[i] = sum + zero_indices[i];
                     sum += col_rotations[i].size() + 1;
                 }
 
-                for( i = 0; i < PlaceholderParams::total_columns; i++){
+                for( i = 0; i < desc.table_width(); i++){
                     if( i != 0 ) result << ", ";
                     result << zero_indices[i] + 4 * permutation_size + 6;
                 }
@@ -355,19 +354,20 @@ namespace nil {
                 return "unsupported commitment scheme type";
             }
 
-            static inline std::string generate_input(
+            inline std::string generate_input(
                 const verification_key_type &vk,
                 const typename assignment_table_type::public_input_container_type &public_inputs,
                 const proof_type &proof,
-                const std::array<std::size_t, arithmetization_params::public_input_columns> public_input_sizes
+                const std::vector<std::size_t> public_input_sizes
             ){
+                BOOST_ASSERT(public_input_sizes.size() == desc.public_input_columns);
                 std::stringstream out;
                 out << "[" << std::endl;
 
-                if(arithmetization_params::public_input_columns != 0){
+                if(desc.public_input_columns != 0){
                     out << "\t{\"array\":[" << std::endl;
                     std::size_t cur = 0;
-                    for(std::size_t i = 0; i < arithmetization_params::public_input_columns; i++){
+                    for(std::size_t i = 0; i < desc.public_input_columns; i++){
                         std::size_t max_non_zero = 0;
                         for(std::size_t j = 0; j < public_inputs[i].size(); j++){
                             if( public_inputs[i][j] != 0 ) max_non_zero = j;
@@ -428,7 +428,7 @@ namespace nil {
             }
 
             // TODO move logic to utils.hpp to prevent code duplication
-            static inline variable_indices_type get_plonk_variable_indices(const columns_rotations_type &col_rotations, std::size_t start_index){
+            inline variable_indices_type get_plonk_variable_indices(const columns_rotations_type &col_rotations, std::size_t start_index){
                 std::map<variable_type, std::size_t> result;
                 std::size_t j = 0;
                 for(std::size_t i = 0; i < desc.constant_columns; i++){
@@ -533,7 +533,7 @@ namespace nil {
                 return result;
             }
 
-            static inline std::tuple<
+            inline std::tuple<
                 std::vector<std::vector<std::string>>, std::vector<std::size_t>, std::map<std::string, std::size_t>
             > calculate_unique_point_sets(
                 const common_data_type &common_data,
@@ -644,13 +644,14 @@ namespace nil {
                 return std::make_tuple(result, points_ids, singles);
             }
 
-            static inline std::string generate_recursive_verifier(
+            std::string generate_recursive_verifier(
                 const constraint_system_type &constraint_system,
                 const common_data_type &common_data,
                 const commitment_scheme_type &commitment_scheme,
                 std::size_t permutation_size,
-                const std::array<std::size_t, arithmetization_params::public_input_columns> public_input_sizes
+                const std::vector<std::size_t> public_input_sizes
             ){
+                BOOST_ASSERT(desc.public_input_columns == public_input_sizes.size());
                 std::string result = nil::blueprint::recursive_verifier_template;
                 bool use_lookups = constraint_system.lookup_gates().size() > 0;
                 transpiler_replacements lookup_reps;
@@ -676,16 +677,16 @@ namespace nil {
                 std::size_t quotient_polys = (quotient_degree % rows_amount != 0)? (quotient_degree / rows_amount + 1): (quotient_degree / rows_amount);
 
                 std::size_t poly_num = 2 * permutation_size + 2 + (use_lookups?2:1)
-                    + arithmetization_params::total_columns
+                    + desc.table_width()
                     + constraint_system.sorted_lookup_columns_number() + quotient_polys;
 
                 std::size_t points_num = 4 * permutation_size + 6;
                 std::size_t table_values_num = 0;
-                for(std::size_t i = 0; i < arithmetization_params::constant_columns + arithmetization_params::selector_columns; i++){
-                    points_num += common_data.columns_rotations[i + arithmetization_params::witness_columns + arithmetization_params::public_input_columns].size() + 1;
-                    table_values_num += common_data.columns_rotations[i + arithmetization_params::witness_columns + arithmetization_params::public_input_columns].size() + 1;
+                for(std::size_t i = 0; i < desc.constant_columns + desc.selector_columns; i++){
+                    points_num += common_data.columns_rotations[i + desc.witness_columns + desc.public_input_columns].size() + 1;
+                    table_values_num += common_data.columns_rotations[i + desc.witness_columns + desc.public_input_columns].size() + 1;
                 }
-                for(std::size_t i = 0; i < arithmetization_params::witness_columns + arithmetization_params::public_input_columns; i++){
+                for(std::size_t i = 0; i < desc.witness_columns + desc.public_input_columns; i++){
                     points_num += common_data.columns_rotations[i].size();
                     table_values_num += common_data.columns_rotations[i].size();
                 }
@@ -842,7 +843,7 @@ namespace nil {
                 std::string full_public_input_check_str = "";
                 full_public_input_check_str += "\tstd::array<pallas::base_field_type::value_type, "+ to_string(full_public_input_size) + "> Omegas = {1};\n";
                 full_public_input_check_str += "\tpallas::base_field_type::value_type result(0);\n";
-                for (std::size_t i = 0; i < arithmetization_params::public_input_columns; i++){
+                for (std::size_t i = 0; i < desc.public_input_columns; i++){
                     full_public_input_check_str += "\t{\n";
                     for( std::size_t j = 0; j < public_input_sizes[i]; j++){
                         full_public_input_check_str += "\tresult = pallas::base_field_type::value_type(0);\n";
@@ -855,8 +856,8 @@ namespace nil {
                     full_public_input_check_str += "\t}\n";
                 }
 
-                std::size_t fixed_values_size = permutation_size * 2 + 2 + arithmetization_params::constant_columns + arithmetization_params::selector_columns;
-                std::size_t variable_values_size = arithmetization_params::witness_columns + arithmetization_params::public_input_columns;
+                std::size_t fixed_values_size = permutation_size * 2 + 2 + desc.constant_columns + desc.selector_columns;
+                std::size_t variable_values_size = desc.witness_columns + desc.public_input_columns;
 
                 std::string initial_proof_check_str = "";
                 std::vector<std::size_t> batches_sizes;
@@ -972,7 +973,7 @@ namespace nil {
                 reps["$LAMBDA$"] = to_string(lambda);
                 reps["$PERMUTATION_SIZE$"] = to_string(permutation_size);
                 reps["$ZERO_INDICES$"] = zero_indices(common_data.columns_rotations, permutation_size);
-                reps["$TOTAL_COLUMNS$"] = to_string(arithmetization_params::total_columns);
+                reps["$TOTAL_COLUMNS$"] = to_string(desc.table_width());
                 reps["$ROWS_LOG$"] = to_string(log2(rows_amount));
                 reps["$ROWS_AMOUNT$"] = to_string(rows_amount);
                 reps["$TABLE_VALUES_NUM$"] = to_string(table_values_num);
@@ -981,10 +982,10 @@ namespace nil {
                 reps["$GATES_SIZES$"] = gates_sizes;
                 reps["$GATES_SELECTOR_INDICES$"] = gates_selectors_indices.str();
                 reps["$CONSTRAINTS_BODY$"] = constraints_body.str();
-                reps["$WITNESS_COLUMNS_AMOUNT$"] = to_string(arithmetization_params::witness_columns);
-                reps["$PUBLIC_INPUT_COLUMNS_AMOUNT$"] = to_string(arithmetization_params::public_input_columns);
-                reps["$CONSTANT_COLUMNS_AMOUNT$"] = to_string(arithmetization_params::constant_columns);
-                reps["$SELECTOR_COLUMNS_AMOUNT$"] = to_string(arithmetization_params::selector_columns);
+                reps["$WITNESS_COLUMNS_AMOUNT$"] = to_string(desc.witness_columns);
+                reps["$PUBLIC_INPUT_COLUMNS_AMOUNT$"] = to_string(desc.public_input_columns);
+                reps["$CONSTANT_COLUMNS_AMOUNT$"] = to_string(desc.constant_columns);
+                reps["$SELECTOR_COLUMNS_AMOUNT$"] = to_string(desc.selector_columns);
                 reps["$QUOTIENT_POLYS_START$"] = to_string(4*permutation_size + 6 + table_values_num + (use_lookups?4:2));
                 reps["$QUOTIENT_POLYS_AMOUNT$"] = to_string(quotient_polys);
                 reps["$D0_SIZE$"] = to_string(fri_params.D[0]->m);
@@ -1021,12 +1022,20 @@ namespace nil {
                 reps["$FULL_PUBLIC_INPUT_SIZE$"] = to_string(full_public_input_size);
                 reps["$LPC_POLY_IDS_CONSTANT_ARRAYS$"] = lpc_poly_ids_const_arrays;
                 reps["$LPC_Y_COMPUTATION$"] = lpc_y_computation.str();
-                reps["$PUBLIC_INPUT_CHECK$"] = arithmetization_params::public_input_columns == 0 ? "" :full_public_input_check_str;
-                reps["$PUBLIC_INPUT_INPUT$"] = arithmetization_params::public_input_columns == 0 ? "" : public_input_input_str;
+                reps["$PUBLIC_INPUT_CHECK$"] = desc.public_input_columns == 0 ? "" :full_public_input_check_str;
+                reps["$PUBLIC_INPUT_INPUT$"] = desc.public_input_columns == 0 ? "" : public_input_input_str;
 
                 result = replace_all(result, reps);
                 return result;
             }
+
+        public:
+            recursive_verifier_generator(
+                zk::snark::plonk_table_description<typename PlaceholderParams::field_type> _desc) :
+            desc(_desc) {}
+
+        private:
+            const zk::snark::plonk_table_description<typename PlaceholderParams::field_type> desc;
         };
     }
 }
