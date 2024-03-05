@@ -30,7 +30,7 @@ namespace nil {
             public:
                 typedef typename modular_logic::policy_type policy_type;
 
-            protected:
+            public:
                 typedef typename policy_type::internal_limb_type internal_limb_type;
                 typedef typename policy_type::Backend_doubled_limbs Backend_doubled_limbs;
                 typedef typename policy_type::number_type number_type;

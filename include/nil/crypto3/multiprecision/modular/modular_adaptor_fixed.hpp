@@ -61,6 +61,7 @@ namespace nil {
                     }
 #endif
 
+                    // Martun: here adjust_modular is called in all the constructors, which takes time. 
                     template<typename Backend1, typename Backend2>
                     constexpr modular_adaptor(const Backend1 &b, const Backend2 &m) {
                         this->mod_data().adjust_modular(m_base, b);
@@ -196,6 +197,8 @@ namespace nil {
                     const Backend1 &a, const Backend2 &b) {
                     // BOOST_ASSERT_MSG(MinBits == eval_msb(b) + 1, "modulus precision should match used backend");
                     result.set_modular_params(b);
+
+                    // Martun: every time a number is assigned ajust_modular is called.
                     result.mod_data().adjust_modular(result.base_data(), a);
                 }
 
