@@ -27,6 +27,7 @@
 #define BOOST_TEST_MODULE algebra_curves_test
 
 #include <iostream>
+#include <chrono>
 #include <type_traits>
 
 #include <boost/test/included/unit_test.hpp>
@@ -38,23 +39,13 @@
 
 #include <nil/crypto3/algebra/curves/alt_bn128.hpp>
 #include <nil/crypto3/algebra/curves/bls12.hpp>
-// #include <nil/crypto3/algebra/curves/brainpool_r1.hpp>
 #include <nil/crypto3/algebra/curves/edwards.hpp>
 #include <nil/crypto3/algebra/curves/jubjub.hpp>
 #include <nil/crypto3/algebra/curves/babyjubjub.hpp>
-// #include <nil/crypto3/algebra/curves/frp_v1.hpp>
-// #include <nil/crypto3/algebra/curves/gost_A.hpp>
 #include <nil/crypto3/algebra/curves/mnt4.hpp>
 #include <nil/crypto3/algebra/curves/mnt6.hpp>
-// #include <nil/crypto3/algebra/curves/p192.hpp>
-// #include <nil/crypto3/algebra/curves/p224.hpp>
-// #include <nil/crypto3/algebra/curves/p256.hpp>
-// #include <nil/crypto3/algebra/curves/p384.hpp>
-// #include <nil/crypto3/algebra/curves/p521.hpp>
 #include <nil/crypto3/algebra/curves/secp_k1.hpp>
 #include <nil/crypto3/algebra/curves/secp_r1.hpp>
-// #include <nil/crypto3/algebra/curves/sm2p_v1.hpp>
-// #include <nil/crypto3/algebra/curves/x962_p.hpp>
 #include <nil/crypto3/algebra/curves/ed25519.hpp>
 #include <nil/crypto3/algebra/curves/curve25519.hpp>
 
