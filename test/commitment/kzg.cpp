@@ -932,3 +932,67 @@ BOOST_AUTO_TEST_CASE(batched_kzg_placeholder_repr) {
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+
+
+template<
+    typename curve_type,
+    typename transcript_hash_type
+    >
+struct placeholder_class_test_initializer {
+    bool run_test() {
+        typedef typename curve_type::scalar_field_type::value_type scalar_value_type;
+
+        using kzg_type = zk::commitments::batched_kzg<curve_type, transcript_hash_type>;
+        typedef typename kzg_type::transcript_type transcript_type;
+        using kzg_scheme_type = typename zk::commitments::kzg_commitment_scheme_v2<kzg_type>;
+
+        scalar_value_type alpha = 7;
+        auto params = typename kzg_type::params_type(8, 8, alpha);
+        kzg_scheme_type kzg(params);
+
+        typename kzg_type::batch_of_polynomials_type polys(4);
+
+        polys[0].template from_coefficients<std::vector<scalar_value_type>>({{ 1,  2,  3,  4,  5,  6,  7,  8}});
+        polys[1].template from_coefficients<std::vector<scalar_value_type>>({{11, 12, 13, 14, 15, 16, 17, 18}});
+        polys[2].template from_coefficients<std::vector<scalar_value_type>>({{21, 22, 23, 24, 25, 26, 27, 28}});
+        polys[3].template from_coefficients<std::vector<scalar_value_type>>({{31, 32, 33, 34, 35, 36, 37, 38}});
+
+
+        std::size_t batch_id = 0;
+
+        kzg.append_to_batch(batch_id, polys);
+        std::map<std::size_t, typename kzg_scheme_type::commitment_type> commitments;
+        commitments[batch_id] = kzg.commit(batch_id);
+
+        std::set<scalar_value_type> points_0 = {101, 2, 3};
+        std::set<scalar_value_type> points_1 = {102, 2, 3};
+        std::set<scalar_value_type> points_2 = {  1, 2, 3};
+        std::set<scalar_value_type> points_3 = {104, 2, 3};
+        kzg.append_eval_points(batch_id, 0, points_0);
+        kzg.append_eval_points(batch_id, 1, points_1);
+        kzg.append_eval_points(batch_id, 2, points_2);
+        kzg.append_eval_points(batch_id, 3, points_3);
+
+        transcript_type transcript;
+        auto proof = kzg.proof_eval(transcript);
+
+        transcript_type transcript_verification;
+        bool result = kzg.verify_eval(proof, commitments, transcript_verification);
+        return result;
+
+    }
+};
+
+BOOST_AUTO_TEST_SUITE(placeholder_class)
+    using TestFixtures = boost::mpl::list<
+        placeholder_class_test_initializer< algebra::curves::bls12_381, hashes::keccak_1600<256> >,
+        placeholder_class_test_initializer< algebra::curves::mnt4_298, hashes::keccak_1600<256> >,
+        placeholder_class_test_initializer< algebra::curves::mnt6_298, hashes::keccak_1600<256> >
+        >;
+
+BOOST_AUTO_TEST_CASE_TEMPLATE(placeholder_class_test, F, TestFixtures) {
+    F fixture;
+    BOOST_CHECK(fixture.run_test());
+}
+
+BOOST_AUTO_TEST_SUITE_END()

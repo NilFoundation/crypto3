@@ -35,6 +35,7 @@
 #include <boost/property_tree/json_parser.hpp>
 
 #include <nil/crypto3/math/polynomial/polynomial_dfs.hpp>
+#include <nil/crypto3/math/polynomial/lagrange_interpolation.hpp>
 
 #include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
 #include <nil/crypto3/zk/commitments/type_traits.hpp>
@@ -223,14 +224,14 @@ namespace nil {
                     void append_eval_points(std::size_t batch_id, std::set<typename field_type::value_type> points){
                         BOOST_ASSERT(_locked[batch_id]); // We can add points only after polynomails are commited.
                         for(std::size_t i = 0; i < _points[batch_id].size(); i++){
-                            _points[batch_id][i].insert(points.first(), points.last());
+                            _points[batch_id][i].insert(_points[batch_id][i].end(), points.begin(), points.end());
                         }
                     }
 
                     // This function don't check evaluation points repeats
                     void append_eval_points(std::size_t batch_id, std::size_t poly_id, std::set<typename field_type::value_type> points){
                         BOOST_ASSERT(_locked[batch_id]); // We can add points only after polynomails are commited.
-                        _points[batch_id][poly_id].insert(points.first(), points.last());
+                        _points[batch_id][poly_id].insert(_points[batch_id][poly_id].end(), points.begin(), points.end());
                     }
 
                     void set_batch_size(std::size_t batch_id, std::size_t batch_size){
