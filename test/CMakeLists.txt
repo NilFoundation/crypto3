@@ -26,6 +26,7 @@ cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
                        marshalling::crypto3_zk
                       ${Boost_LIBRARIES})
 
+add_custom_target(compile_and_run_transpiler_tests)
 
 macro(define_transpiler_test name)
     cm_test(NAME transpiler_${name}_test SOURCES ${name}.cpp)
@@ -44,6 +45,12 @@ macro(define_transpiler_test name)
     elseif(target_type STREQUAL "STATIC_LIB")
 
     endif()
+    add_custom_target(transpiler_${name}_test_run
+        COMMAND $<TARGET_FILE:transpiler_${name}_test>
+        DEPENDS transpiler_${name}_test $<TARGET_FILE:transpiler_${name}_test>
+    )
+    add_dependencies(compile_and_run_transpiler_tests transpiler_${name}_test_run)
+
 endmacro()
 
 set(TESTS_NAMES
