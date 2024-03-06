@@ -77,7 +77,15 @@ namespace nil {
                         nil::marshalling::types::array_list <TTypeBase,
                             nil::marshalling::types::integral<TTypeBase, octet_type>,
                             nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, std::size_t>>
-                        >
+                        >,
+//                      std::size_t witness_columns;
+                        nil::marshalling::types::integral<TTypeBase, std::size_t>,
+//                      std::size_t public_input_columns;
+                        nil::marshalling::types::integral<TTypeBase, std::size_t>,
+//                      std::size_t constant_columns;
+                        nil::marshalling::types::integral<TTypeBase, std::size_t>,
+//                      std::size_t selector_columns;
+                        nil::marshalling::types::integral<TTypeBase, std::size_t>
                     >
                 >;
 
@@ -117,10 +125,21 @@ namespace nil {
                         nil::marshalling::types::integral<TTypeBase, octet_type>,
                         nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, std::size_t>>
                     > filled_constraint_system_with_params_hash;
-                    for( std::size_t i = 0; i < common_data.vk.constraint_system_with_params_hash.size(); i++){
-                        filled_constraint_system_with_params_hash.value().push_back(
-                            nil::marshalling::types::integral<TTypeBase, octet_type>(common_data.vk.constraint_system_with_params_hash[i])
-                        );
+                    if constexpr(nil::crypto3::hashes::is_poseidon<typename CommonDataType::transcript_hash_type>::value){
+                        auto integral = typename CommonDataType::field_type::integral_type(common_data.vk.constraint_system_with_params_hash.data);
+                        std::vector<unsigned char> blob;
+                        export_bits(integral, std::back_inserter(blob), 8);
+                        for( std::size_t i = blob.size(); i > 0; i--){
+                            filled_constraint_system_with_params_hash.value().push_back(
+                                nil::marshalling::types::integral<TTypeBase, octet_type>(blob[i-1])
+                            );
+                        }
+                    } else {
+                        for( std::size_t i = 0; i < common_data.vk.constraint_system_with_params_hash.size(); i++){
+                            filled_constraint_system_with_params_hash.value().push_back(
+                                nil::marshalling::types::integral<TTypeBase, octet_type>(common_data.vk.constraint_system_with_params_hash[i])
+                            );
+                        }
                     }
 
                     return result_type(std::make_tuple(
@@ -129,12 +148,16 @@ namespace nil {
                         nil::marshalling::types::integral<TTypeBase, std::size_t>(common_data.rows_amount),
                         nil::marshalling::types::integral<TTypeBase, std::size_t>(common_data.usable_rows_amount),
                         nil::marshalling::types::integral<TTypeBase, std::size_t>(common_data.max_gates_degree),
-                        filled_constraint_system_with_params_hash
+                        filled_constraint_system_with_params_hash,
+                        nil::marshalling::types::integral<TTypeBase, std::size_t>(common_data.witness_columns),
+                        nil::marshalling::types::integral<TTypeBase, std::size_t>(common_data.public_input_columns),
+                        nil::marshalling::types::integral<TTypeBase, std::size_t>(common_data.constant_columns),
+                        nil::marshalling::types::integral<TTypeBase, std::size_t>(common_data.selector_columns)
                     ));
                 }
 
                 template<typename Endianness, typename CommonDataType>
-                CommonDataType
+                std::tuple <CommonDataType, typename CommonDataType::table_description_type>
                 make_placeholder_common_data(const
                     placeholder_common_data<nil::marshalling::field_type<Endianness>, CommonDataType> &filled_common_data
                 ){
@@ -153,17 +176,42 @@ namespace nil {
                     auto rows_amount = std::get<2>(filled_common_data.value()).value();
                     auto usable_rows_amount = std::get<3>(filled_common_data.value()).value();
                     auto max_gates_degree = std::get<4>(filled_common_data.value()).value();
+                    auto witness_columns = std::get<6>(filled_common_data.value()).value();
+                    auto public_input_columns = std::get<7>(filled_common_data.value()).value();
+                    auto constant_columns = std::get<8>(filled_common_data.value()).value();
+                    auto selector_columns = std::get<9>(filled_common_data.value()).value();
 
                     typename CommonDataType::commitments_type commitments;
                     commitments.fixed_values = fixed_values;
 
                     typename CommonDataType::verification_key_type vk;
                     vk.fixed_values_commitment = fixed_values;
-                    for( std::size_t i = 0; i < std::get<5>(filled_common_data.value()).value().size(); i++){
-                        vk.constraint_system_with_params_hash[i] = (std::get<5>(filled_common_data.value()).value()[i].value());
+                    if constexpr(nil::crypto3::hashes::is_poseidon<typename CommonDataType::transcript_hash_type>::value){
+                        std::vector<std::uint8_t> blob;
+                        for( std::size_t i = 0; i < std::get<5>(filled_common_data.value()).value().size(); i++){
+                            blob.push_back(std::uint8_t(std::get<5>(filled_common_data.value()).value()[i].value()));
+                        }
+                        typename CommonDataType::field_type::integral_type newval;
+                        import_bits(newval, blob.begin(), blob.end(), 8, false);
+                        vk.constraint_system_with_params_hash = typename CommonDataType::field_type::value_type(newval);
+                    } else {
+                        for( std::size_t i = 0; i < std::get<5>(filled_common_data.value()).value().size(); i++){
+                            vk.constraint_system_with_params_hash[i] = (std::get<5>(filled_common_data.value()).value()[i].value());
+                        }
                     }
 
-                    return CommonDataType(commitments, columns_rotations, rows_amount, usable_rows_amount, max_gates_degree, vk);
+                    typename CommonDataType::table_description_type table_description(
+                        witness_columns, public_input_columns, constant_columns, selector_columns,
+                        usable_rows_amount, rows_amount
+                    );
+
+                    return std::make_tuple(CommonDataType(
+                        commitments, columns_rotations,
+                        rows_amount, usable_rows_amount,
+                        witness_columns, public_input_columns,
+                        constant_columns, selector_columns,
+                        max_gates_degree, vk
+                    ), table_description);
                 }
             }    // namespace types
         }        // namespace marshalling

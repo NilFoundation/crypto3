@@ -67,8 +67,8 @@ namespace nil {
                     std::vector<plonk_gate<FieldType, plonk_constraint<FieldType>>> gates;
                     std::vector<plonk_copy_constraint<FieldType>> copy_constraints;
                     std::vector<plonk_lookup_gate<FieldType, plonk_lookup_constraint<FieldType>>> lookup_gates;
-
                     std::vector<plonk_lookup_table<FieldType>> lookup_tables;
+                    std::vector<std::size_t> public_input_sizes;
 
                     circuit_description() : table_rows(0){
                     }
@@ -249,6 +249,7 @@ namespace nil {
                     typedef placeholder_circuit_params<FieldType> circuit_params;
 
                     circuit_description<FieldType, circuit_params, 5, permutation> test_circuit;
+                    test_circuit.public_input_sizes = {3};
 
                     std::array<std::vector<typename FieldType::value_type>, table_columns> table;
 
