@@ -383,7 +383,11 @@ BOOST_FIXTURE_TEST_CASE(prover_test, test_initializer){
     desc.usable_rows_amount = circuit.usable_rows;
     std::size_t table_rows_log = std::log2(desc.rows_amount);
 
-    typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints, circuit.lookup_gates);
+    typename policy_type::constraint_system_type constraint_system(
+        circuit.gates, circuit.copy_constraints,
+        circuit.lookup_gates, circuit.lookup_tables,
+        circuit.public_input_sizes
+    );
     typename policy_type::variable_assignment_type assignments = circuit.table;
 
     std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};

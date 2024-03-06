@@ -147,10 +147,18 @@ namespace nil {
                         auto numerator = challenge.pow(preprocessed_public_data.common_data.rows_amount) - FieldType::value_type::one();
                         numerator /= typename FieldType::value_type(preprocessed_public_data.common_data.rows_amount);
 
+                        // If public input sizes are set, all of them should be set.
+                        if(constraint_system.public_input_sizes_num() != 0 && constraint_system.public_input_sizes_num() != table_description.public_input_columns){
+                            return false;
+                        }
+
                         for( std::size_t i = 0; i < public_input.size(); ++i ){
                             typename FieldType::value_type value = FieldType::value_type::zero();
+                            std::size_t max_size = public_input[i].size();
+                            if (constraint_system.public_input_sizes_num() != 0)
+                                max_size = std::min(max_size, constraint_system.public_input_size(i));
                             auto omega_pow = FieldType::value_type::one();
-                            for( std::size_t j = 0; j < public_input[i].size(); ++j ){
+                            for( std::size_t j = 0; j < max_size; ++j ){
                                 value += (public_input[i][j] * omega_pow) / (challenge - omega_pow);
                                 omega_pow = omega_pow * omega;
                             }
