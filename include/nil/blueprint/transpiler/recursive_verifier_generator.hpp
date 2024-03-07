@@ -845,8 +845,8 @@ namespace nil {
                 full_public_input_check_str += "\tpallas::base_field_type::value_type result(0);\n";
                 for (std::size_t i = 0; i < desc.public_input_columns; i++){
                     full_public_input_check_str += "\t{\n";
+                    full_public_input_check_str += "\tresult = pallas::base_field_type::value_type(0);\n";
                     for( std::size_t j = 0; j < public_input_sizes[i]; j++){
-                        full_public_input_check_str += "\tresult = pallas::base_field_type::value_type(0);\n";
                         full_public_input_check_str += "\t\tresult += public_input[" + to_string(cur) + "] * Omegas["+to_string(j)+"] / (challenges.xi - Omegas["+to_string(j)+"]);";
                         if( j != public_input_sizes[i] - 1)
                             full_public_input_check_str += "  Omegas["+to_string(j+1)+"] = Omegas["+to_string(j)+"] * omega;\n";
