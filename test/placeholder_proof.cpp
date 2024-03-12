@@ -244,6 +244,22 @@ typename fri_type::params_type create_fri_params(std::size_t degree_log, const i
     return params;
 }
 
+template<typename ColumnType>
+void print_public_input(ColumnType &public_input, std::string filename){
+    std::size_t max_non_zero = 0;
+    for(std::size_t i = 0; i < public_input.size(); i++){
+        if( public_input[i] != 0 ){
+            max_non_zero = i + 1;
+        }
+    }
+    std::ofstream pi_stream;
+    pi_stream.open(filename);
+    for(std::size_t i = 0; i < std::min(public_input.size(), max_non_zero); i++ ){
+        pi_stream <<  public_input[i] << "\n";
+    }
+    pi_stream.close();
+}
+
 // *******************************************************************************
 // * Randomness setup
 // *******************************************************************************/
@@ -479,6 +495,7 @@ BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_initializer) {
             lpc_preprocessed_public_data,
             lpc_proof, lpc_scheme, desc, "circuit1"
         );
+        print_public_input(desc.public_input_columns == 0? std::vector<typename field_type::value_type>({}):assignments.public_input(0), "circuit1/public_input.inp");
     } else {
         test_placeholder_proof<Endianness, placeholder_proof<field_type, lpc_placeholder_params_type>>(lpc_proof, fri_params);
     }
@@ -576,26 +593,10 @@ BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_initializer){
             lpc_preprocessed_public_data,
             lpc_proof, lpc_scheme, desc, "circuit2"
         );
+        print_public_input(desc.public_input_columns == 0? std::vector<typename field_type::value_type>({}):assignments.public_input(0), "circuit2/public_input.inp");
     }else {
         test_placeholder_proof<Endianness, placeholder_proof<field_type, lpc_placeholder_params_type>>(lpc_proof, fri_params);
     }
-
-    std::size_t max_non_zero = 0;
-    for(std::size_t i = 0; i < assignments.public_input(0).size(); i++){
-        if( assignments.public_input(0)[i] != 0 ){
-            max_non_zero = i;
-        }
-    }
-
-    std::ofstream pi_stream;
-    pi_stream.open("circuit2/public_input.json");
-    pi_stream << "[" << std::endl;
-    for(std::size_t i = 0; i <= max_non_zero; i++ ){
-        if( i != 0 ) pi_stream << "," << std::endl;
-        pi_stream <<  "\t{\"field\": "<< assignments.public_input(0)[i] << " }";
-    }
-    pi_stream << std::endl << "]";
-    pi_stream.close();
 
     verifier_res = placeholder_verifier<field_type, lpc_placeholder_params_type>::process(
         lpc_preprocessed_public_data, lpc_proof, desc, constraint_system, lpc_scheme
@@ -683,6 +684,7 @@ BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_initializer) {
             preprocessed_public_data,
             proof, lpc_scheme, desc, "circuit3"
         );
+        print_public_input(desc.public_input_columns == 0? std::vector<typename field_type::value_type>({}):assignments.public_input(0), "circuit3/public_input.inp");
     } else {
         test_placeholder_proof<Endianness, placeholder_proof<field_type, lpc_placeholder_params_type>>(proof, fri_params);
     }
@@ -774,6 +776,7 @@ BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_initializer) {
             preprocessed_public_data,
             proof, lpc_scheme, desc, "circuit4"
         );
+        print_public_input(desc.public_input_columns == 0? std::vector<typename field_type::value_type>({}):assignments.public_input(0), "circuit4/public_input.inp");
     }else {
         test_placeholder_proof<Endianness, placeholder_proof<field_type, lpc_placeholder_params_type>>(proof, fri_params);
     }
@@ -864,6 +867,7 @@ BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_initializer) {
             preprocessed_public_data,
             proof, lpc_scheme, desc, "circuit6"
         );
+        print_public_input(desc.public_input_columns == 0? std::vector<typename field_type::value_type>({}):assignments.public_input(0), "circuit6/public_input.inp");
     }else {
         test_placeholder_proof<Endianness, placeholder_proof<field_type, lpc_placeholder_params_type>>(proof, fri_params);
     }
@@ -948,6 +952,7 @@ BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_initializer) {
             preprocessed_public_data,
             proof, lpc_scheme, desc, "circuit7"
         );
+        print_public_input(desc.public_input_columns == 0? std::vector<typename field_type::value_type>({}):assignments.public_input(0), "circuit7/public_input.inp");
     }else {
         test_placeholder_proof<Endianness, placeholder_proof<field_type, lpc_placeholder_params_type>>(proof, fri_params);
     }
