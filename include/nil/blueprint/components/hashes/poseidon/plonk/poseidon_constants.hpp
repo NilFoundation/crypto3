@@ -27,7 +27,6 @@
 #ifndef CRYPTO3_BLUEPRINT_PLONK_DETAIL_POSEIDON_CONSTANTS_HPP
 #define CRYPTO3_BLUEPRINT_PLONK_DETAIL_POSEIDON_CONSTANTS_HPP
 
-#include <nil/crypto3/detail/literals.hpp>
 #include <nil/crypto3/algebra/matrix/matrix.hpp>
 
 #include <nil/crypto3/algebra/fields/pallas/base_field.hpp>
@@ -37,7 +36,7 @@ namespace nil {
     namespace blueprint {
         namespace components {
             namespace detail {
-                
+
                 template<typename ConstFieldType, std::size_t state_size, std::size_t rounds_amount>
                 struct poseidon_constants;
 
