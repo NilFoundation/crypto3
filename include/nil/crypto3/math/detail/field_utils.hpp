@@ -39,7 +39,7 @@ namespace nil {
 
                 using namespace nil::crypto3::algebra;
 
-                std::size_t bitreverse(std::size_t n, const std::size_t l) {
+                inline std::size_t bitreverse(std::size_t n, const std::size_t l) {
                     std::size_t r = 0;
                     for (std::size_t k = 0; k < l; ++k) {
                         r = (r << 1) | (n & 1);
