@@ -30,7 +30,8 @@
 #include <nil/blueprint/detail/lookup_table_precomputes.hpp>
 
 #include <boost/spirit/include/qi.hpp>
-#include <boost/phoenix.hpp>
+#include <boost/phoenix/operator.hpp>
+#include <boost/phoenix/object.hpp>
 
 namespace nil {
     namespace blueprint {

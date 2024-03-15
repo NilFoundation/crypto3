@@ -116,7 +116,7 @@ namespace nil {
             }
         };
 
-        std::ostream& operator<<(std::ostream &os, const manifest_lookup_type& t) {
+        inline std::ostream& operator<<(std::ostream &os, const manifest_lookup_type& t) {
             switch (t.t) {
                 case manifest_lookup_type::type::NONE:
                     os << "NONE";
@@ -172,7 +172,7 @@ namespace nil {
             }
         };
 
-        std::ostream& operator<<(std::ostream &os, const manifest_constant_type& t) {
+        inline std::ostream& operator<<(std::ostream &os, const manifest_constant_type& t) {
             switch (t.t) {
                 case manifest_constant_type::type::NONE:
                     os << "NONE";
@@ -217,7 +217,7 @@ namespace nil {
             };
         };
 
-        std::ostream& operator<<(std::ostream &os, const manifest_param& p) {
+        inline std::ostream& operator<<(std::ostream &os, const manifest_param& p) {
             return p.operator<<(os);
         }
 
@@ -516,7 +516,7 @@ namespace nil {
             }
         };
 
-        manifest_param::type get_manifest_param_type(manifest_param* a) {
+        inline manifest_param::type get_manifest_param_type(manifest_param* a) {
             using type = manifest_param::type;
              if (dynamic_cast<manifest_unsat_param*>(a)) {
                 return type::UNSAT;
@@ -532,11 +532,11 @@ namespace nil {
             }
         }
 
-        manifest_param::type get_manifest_param_type(std::shared_ptr<manifest_param> a) {
+        inline manifest_param::type get_manifest_param_type(std::shared_ptr<manifest_param> a) {
             return get_manifest_param_type(a.get());
         }
 
-        std::shared_ptr<manifest_param> manifest_single_value_param::merge_with(
+        inline std::shared_ptr<manifest_param> manifest_single_value_param::merge_with(
                                 std::shared_ptr<manifest_param> other) {
             using type = manifest_param::type;
             type other_type = get_manifest_param_type(other);
@@ -575,7 +575,7 @@ namespace nil {
             return std::shared_ptr<manifest_param>(new manifest_unsat_param());
         }
 
-        std::shared_ptr<manifest_param> manifest_set_param::merge_with(std::shared_ptr<manifest_param> other) {
+        inline std::shared_ptr<manifest_param> manifest_set_param::merge_with(std::shared_ptr<manifest_param> other) {
             using type = manifest_param::type;
             type other_type = get_manifest_param_type(other);
             if (other_type == type::UNSAT) {
@@ -632,7 +632,7 @@ namespace nil {
             return std::shared_ptr<manifest_param>(new manifest_unsat_param());
         }
 
-        std::shared_ptr<manifest_param> manifest_range_param::merge_with(std::shared_ptr<manifest_param> other) {
+        inline std::shared_ptr<manifest_param> manifest_range_param::merge_with(std::shared_ptr<manifest_param> other) {
             using type = manifest_param::type;
             type other_type = get_manifest_param_type(other);
             if (other_type == type::UNSAT) {
@@ -705,7 +705,7 @@ namespace nil {
             return std::shared_ptr<manifest_param>(new manifest_unsat_param());
         }
 
-        std::shared_ptr<manifest_param> manifest_range_param::intersect(
+        inline std::shared_ptr<manifest_param> manifest_range_param::intersect(
                             std::shared_ptr<manifest_param> other) {
             using type = manifest_param::type;
             type other_type = get_manifest_param_type(other);
@@ -766,7 +766,7 @@ namespace nil {
             return std::shared_ptr<manifest_param>(new manifest_unsat_param());
         }
 
-        std::shared_ptr<manifest_param> manifest_range_param::subtract(std::set<std::uint32_t> values) {
+        inline std::shared_ptr<manifest_param> manifest_range_param::subtract(std::set<std::uint32_t> values) {
             std::set<std::uint32_t> filtered_set;
             for (std::uint32_t value : values) {
                 if (check_manifest_param(value)) {
@@ -839,7 +839,7 @@ namespace nil {
             }
         }
 
-        std::shared_ptr<manifest_param> manifest_set_param::intersect(
+        inline std::shared_ptr<manifest_param> manifest_set_param::intersect(
                             std::shared_ptr<manifest_param> other) {
             using type = manifest_param::type;
             type other_type = get_manifest_param_type(other);
@@ -1018,7 +1018,7 @@ namespace nil {
             }
         };
 
-        std::ostream& operator<<(std::ostream& os, const plonk_component_manifest &manifest) {
+        inline std::ostream& operator<<(std::ostream& os, const plonk_component_manifest &manifest) {
             os << "witness_amount: " << (*manifest.witness_amount) << " "
                 << "constant_required: " << manifest.constant_required << " "
                 << "lookup_usage: " << manifest.lookup_usage << " "
@@ -1134,7 +1134,7 @@ namespace nil {
             }
         };
 
-        manifest_constant_type manifest_constant_type::intersect(
+        inline manifest_constant_type manifest_constant_type::intersect(
                 const compiler_manifest &manifest) const {
             if (t == manifest_constant_type::type::UNSAT ||
                (t == manifest_constant_type::type::REQUIRED && manifest.has_constant == false)) {
