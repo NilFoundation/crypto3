@@ -130,6 +130,7 @@
             containers = "crypto3_containers_.*_test";
             hash = "hash_.*_test";
             math = "math_.*_test";
+            block = "block_.*_test";
           };
           makeTestDerivation = { name, compiler, targets ? [ ], buildTargets ? targets, testTargets ? targets }:
             (makeCrypto3Derivation { inherit system; }).overrideAttrs (oldAttrs: {
@@ -145,7 +146,7 @@
                 "-DBUILD_TESTS=TRUE"
                 "-DCMAKE_BUILD_TYPE=Release" # TODO: change to Debug after build fix
                 "-DBUILD_SHARED_LIBS=FALSE"
-                "-DCMAKE_ENABLE_TESTS=TRUE"
+                "-DCMAKE_ENABLE_TESTS=1" # For some reason TRUE does not work here
               ];
 
               dontBuild = false;
