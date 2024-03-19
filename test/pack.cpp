@@ -25,16 +25,15 @@
 
 #define BOOST_TEST_MODULE block_pack_test
 
-#include <boost/array.hpp>
-#include <boost/cstdint.hpp>
-
-#include <nil/crypto3/detail/pack.hpp>
+#include <array>
+#include <cstdint>
+#include <cstdio>
 
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
-#include <cstdio>
+#include <nil/crypto3/detail/pack.hpp>
 
 using namespace nil::crypto3;
 using namespace nil::crypto3::detail;
@@ -66,7 +65,7 @@ BOOST_AUTO_TEST_CASE(bubb_to_bubb_2) {
 BOOST_AUTO_TEST_CASE(bubb_to_bulb_1) {
     std::array<uint8_t, 4> in = {{0x12, 0x34, 0x56, 0x78}};
     std::array<uint32_t, 1> out {};
-    std::array<uint32_t, 1> res = {{0x482c6a1e}}; 
+    std::array<uint32_t, 1> res = {{0x482c6a1e}};
 
     pack<big_octet_big_bit, big_octet_little_bit, 8, 32>(in.begin(), in.end(), out.begin());
 
@@ -90,7 +89,7 @@ BOOST_AUTO_TEST_CASE(bubb_to_lubb_1) {
 
     pack<big_octet_big_bit, little_octet_big_bit, 8, 64>(in.begin(), in.end(), out.begin());
 
-    BOOST_CHECK(out == res);    
+    BOOST_CHECK(out == res);
 }
 
 BOOST_AUTO_TEST_CASE(bubb_to_lubb_2) {
@@ -204,7 +203,7 @@ BOOST_AUTO_TEST_CASE(lubb_to_lulb_2) {
 }
 
 BOOST_AUTO_TEST_CASE(bulb_to_bubb_1) {
-    std::array<uint8_t, 16> in = {{0x12, 0x34, 0x56, 0x78, 0x90, 0xab, 0xcd, 0xef, 
+    std::array<uint8_t, 16> in = {{0x12, 0x34, 0x56, 0x78, 0x90, 0xab, 0xcd, 0xef,
                                    0x48, 0x2c, 0x6a, 0x1e, 0x09, 0xd5, 0xb3, 0xf7}};
     std::array<uint64_t, 2> out {};
     std::array<uint64_t, 2> res = {{0x482c6a1e09d5b3f7, 0x1234567890abcdef}};
@@ -392,7 +391,7 @@ BOOST_AUTO_TEST_CASE(bubb_to_bubb_2) {
 BOOST_AUTO_TEST_CASE(bubb_to_bulb_1) {
     std::array<uint32_t, 1> in = {{0x482c6a1e}};
     std::array<uint8_t, 4> out {};
-    std::array<uint8_t, 4> res = {{0x12, 0x34, 0x56, 0x78}}; 
+    std::array<uint8_t, 4> res = {{0x12, 0x34, 0x56, 0x78}};
 
     pack<big_octet_big_bit, big_octet_little_bit, 32, 8>(in.begin(), in.end(), out.begin());
 
@@ -416,7 +415,7 @@ BOOST_AUTO_TEST_CASE(bubb_to_lubb_1) {
 
     pack<big_octet_big_bit, little_octet_big_bit, 64, 8>(in.begin(), in.end(), out.begin());
 
-    BOOST_CHECK(out == res);    
+    BOOST_CHECK(out == res);
 }
 
 BOOST_AUTO_TEST_CASE(bubb_to_lubb_2) {
@@ -530,9 +529,9 @@ BOOST_AUTO_TEST_CASE(lubb_to_lulb_2) {
 }
 
 BOOST_AUTO_TEST_CASE(bulb_to_bubb_1) {
-    std::array<uint64_t, 2> in = {{0x482c6a1e09d5b3f7, 0x1234567890abcdef}}; 
+    std::array<uint64_t, 2> in = {{0x482c6a1e09d5b3f7, 0x1234567890abcdef}};
     std::array<uint8_t, 16> out {};
-    std::array<uint8_t, 16> res = {{0x12, 0x34, 0x56, 0x78, 0x90, 0xab, 0xcd, 0xef, 
+    std::array<uint8_t, 16> res = {{0x12, 0x34, 0x56, 0x78, 0x90, 0xab, 0xcd, 0xef,
                                     0x48, 0x2c, 0x6a, 0x1e, 0x09, 0xd5, 0xb3, 0xf7}};
 
     pack<big_octet_little_bit, big_octet_big_bit, 64, 8>(in.begin(), in.end(), out.begin());
