@@ -30,8 +30,11 @@ jobs:
         if: inputs.submodules-refs != ''
         uses: NilFoundation/ci-cd/actions/recursive-checkout@v1.2.1
         with:
-          paths: ${{ github.workspace }}/**
           refs: ${{ inputs.submodules-refs }}
+          paths: |
+            ${{ github.workspace }}/**
+            !${{ github.workspace }}/
+            !${{ github.workspace }}/**/.git/**
 
       - name: Run checks
         run: nix flake -L check .?submodules=1#

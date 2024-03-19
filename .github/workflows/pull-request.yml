@@ -46,37 +46,9 @@ jobs:
   #     (needs.handle-syncwith.result == 'success' || needs.handle-syncwith.result == 'skipped')
   #   secrets: inherit
 
-  publish-result:
-    name: Publish Junit tests result
-    runs-on: ubuntu-22.04
+  publish-results:
+    name: Publish JUnit results
     needs:
       - test-linux
       # - test-mac
-    permissions:
-      checks: write
-
-    steps:
-      # - name: Download Artifacts
-      #   uses: actions/download-artifact@v4
-      #   with:
-      #     pattern: test-results-*
-      #     path: test-results
-      #     merge-multiple: true
-
-      - name: Download Linux artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: test-results-linux
-          path: test-results-linux
-
-      # - name: Download macOS artifact
-      #   uses: actions/download-artifact@v3
-      #   with:
-      #     name: test-results-mac
-      #     path: test-results-mac
-
-      - name: Publish Test Results
-        uses: EnricoMi/publish-unit-test-result-action/linux@v2
-        with:
-          files: "test-results-*/**/*.xml"
-          comment_mode: "off" # PRs from forks will not fail with insufficient permission
+    uses: ./.github/workflows/reusable-publish-result.yml

@@ -26,8 +26,11 @@ jobs:
         if: inputs.submodules-refs != ''
         uses: NilFoundation/ci-cd/actions/recursive-checkout@v1.2.1
         with:
-          paths: ${{ github.workspace }}/**
           refs: ${{ inputs.submodules-refs }}
+          paths: |
+            ${{ github.workspace }}/**
+            !${{ github.workspace }}/
+            !${{ github.workspace }}/**/.git/**
 
       # From https://github.com/DeterminateSystems/magic-nix-cache-action
       - uses: DeterminateSystems/nix-installer-action@main
