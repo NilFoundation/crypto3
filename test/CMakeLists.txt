@@ -6,8 +6,6 @@
 # http://www.boost.org/LICENSE_1_0.txt
 #---------------------------------------------------------------------------#
 
-include(CMTest)
-
 if(NOT Boost_UNIT_TEST_FRAMEWORK_FOUND)
     cm_find_package(Boost REQUIRED COMPONENTS unit_test_framework)
 endif()
@@ -16,27 +14,29 @@ cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
                        ${Boost_LIBRARIES})
 
 macro(define_block_cipher_test name)
-    cm_test(NAME block_${name}_test SOURCES ${name}.cpp)
+    set(test_name "block_${name}_test")
 
-    target_include_directories(block_${name}_test PRIVATE
+    cm_test(NAME ${test_name} SOURCES ${name}.cpp)
+
+    target_include_directories(${test_name} PRIVATE
                                "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
                                "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>"
 
                                ${Boost_INCLUDE_DIRS})
 
     if(NOT CMAKE_CXX_STANDARD)
-        set_target_properties(block_${name}_test PROPERTIES CXX_STANDARD 14)
+        set_target_properties(${test_name} PROPERTIES CXX_STANDARD 14)
     endif()
 
     get_target_property(target_type Boost::unit_test_framework TYPE)
     if(target_type STREQUAL "SHARED_LIB")
-        target_compile_definitions(block_${name}_test PRIVATE BOOST_TEST_DYN_LINK)
+        target_compile_definitions(${test_name} PRIVATE BOOST_TEST_DYN_LINK)
     elseif(target_type STREQUAL "STATIC_LIB")
 
     endif()
 
     string(CONCAT TEST_DATA ${CMAKE_CURRENT_SOURCE_DIR} "/data/" "${name}" ".json")
-    target_compile_definitions(block_${name}_test PRIVATE TEST_DATA="${TEST_DATA}")
+    target_compile_definitions(${test_name} PRIVATE TEST_DATA="${TEST_DATA}")
 endmacro()
 
 set(TESTS_NAMES
