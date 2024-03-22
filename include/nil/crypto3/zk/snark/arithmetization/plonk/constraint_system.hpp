@@ -110,6 +110,10 @@ namespace nil {
                         return _public_input_sizes.size();
                     }
 
+                    const std::vector<std::size_t> &public_input_sizes() const{
+                        return _public_input_sizes;
+                    }
+
                     std::size_t num_gates() const {
                         return _gates.size();
                     }
