@@ -30,6 +30,9 @@
 #include <sstream>
 #include <map>
 
+#include <boost/algorithm/string/replace.hpp>
+#include <nil/blueprint/transpiler/util.hpp>
+
 #include <nil/crypto3/hash/algorithm/hash.hpp>
 #include<nil/crypto3/hash/keccak.hpp>
 #include<nil/crypto3/hash/sha2.hpp>
