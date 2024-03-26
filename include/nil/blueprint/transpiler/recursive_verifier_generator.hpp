@@ -64,8 +64,44 @@ namespace nil {
             using pow_operation_type = typename constraint_system_type::pow_operation_type;
             using assignment_table_type = typename PlaceholderParams::assignment_table_type;
 
+            std::vector<std::size_t> zero_indices(columns_rotations_type col_rotations, std::size_t permutation_size){
+                std::vector<std::size_t> zero_indices;
+                std::uint16_t fixed_values_points = 0;
+                std::stringstream result;
+
+                for(std::size_t i= 0; i < desc.constant_columns + desc.selector_columns; i++){
+                    fixed_values_points += col_rotations[i + desc.witness_columns + desc.public_input_columns].size() + 1;
+                }
+
+                for(std::size_t i= 0; i < desc.table_width(); i++){
+                    std::size_t j = 0;
+                    for(auto& rot: col_rotations[i]){
+                        if(rot == 0){
+                            zero_indices.push_back(j);
+                            break;
+                        }
+                        j++;
+                    }
+                }
+
+                std::uint16_t sum = fixed_values_points;
+                std::size_t i = 0;
+                for(; i < desc.witness_columns + desc.public_input_columns; i++){
+                    zero_indices[i] = sum + zero_indices[i] + 4 * permutation_size + 6;
+                    sum += col_rotations[i].size();
+                }
+
+                sum = 0;
+                for(; i < desc.table_width(); i++){
+                    zero_indices[i] = sum + zero_indices[i] + 4 * permutation_size + 6;
+                    sum += col_rotations[i].size() + 1;
+                }
+
+                return zero_indices;
+            }
+
             // TODO: Move logic to utils.hpp. It's similar to EVM verifier generator
-            std::string zero_indices(columns_rotations_type col_rotations, std::size_t permutation_size){
+            std::string zero_indices_str(columns_rotations_type col_rotations, std::size_t permutation_size){
                 std::vector<std::size_t> zero_indices;
                 std::uint16_t fixed_values_points = 0;
                 std::stringstream result;
@@ -119,7 +155,9 @@ namespace nil {
                     out << hashed_data;
                     return generate_field_array2_from_64_hex_string(out.str());
                 } else if constexpr(std::is_same<HashType, nil::crypto3::hashes::keccak_1600<256>>::value){
-                    return "{\"field\": \"" <<  hashed_data <<  "\"}";
+                    std::stringstream out;
+                    out << hashed_data;
+                    return generate_field_array2_from_64_hex_string(out.str());
                 } else {
                     std::stringstream out;
                     out << "{\"field\": \"" <<  hashed_data <<  "\"}";
@@ -355,7 +393,6 @@ namespace nil {
             }
 
             inline std::string generate_input(
-                const verification_key_type &vk,
                 const typename assignment_table_type::public_input_container_type &public_inputs,
                 const proof_type &proof,
                 const std::vector<std::size_t> public_input_sizes
@@ -388,15 +425,6 @@ namespace nil {
                     }
                     out << std::endl << "\t]}," << std::endl;
                 }
-
-                out << "\t{\"array\":[" << std::endl;
-                out << "\t\t" << generate_hash<typename PlaceholderParams::transcript_hash_type>(
-                    vk.constraint_system_with_params_hash
-                ) << "," << std::endl;
-                out << "\t\t" << generate_hash<typename PlaceholderParams::transcript_hash_type>(
-                    vk.fixed_values_commitment
-                ) << std::endl;
-                out << "\t]}," << std::endl;
 
                 out << "\t{\"struct\":[" << std::endl;
                 out << "\t\t{\"array\":[" << std::endl;
@@ -806,6 +834,7 @@ namespace nil {
                 std::stringstream prepare_U_V_str;
                 prepare_U_V_str << "\tpallas::base_field_type::value_type theta_acc = pallas::base_field_type::value_type(1);\n\n";
                 for(std::size_t i = 0; i < singles_strs.size();i++){
+                    prepare_U_V_str << "\tU[" + to_string(i) << "] = pallas::base_field_type::value_type(0);\n";
                     for(std::size_t j = 0; j <z_points_indices.size(); j++){
                         if( z_points_indices[j] == i)
                             prepare_U_V_str << "\tU[" + to_string(i) << "] += theta_acc * proof.z[" << j << "]; theta_acc *= challenges.lpc_theta;\n";
@@ -834,14 +863,15 @@ namespace nil {
                     lpc_y_computation << "\t\tQ1 -= U["<< i << "];" << std::endl;
                     lpc_y_computation << "\t\tQ0 /= (res[0][0] - singles[" << i << "]);" << std::endl;
                     lpc_y_computation << "\t\tQ1 /= (res[0][1] - singles[" << i << "]);" << std::endl;
-                    lpc_y_computation << "\t\ty[0] += Q0;" << std::endl;
-                    lpc_y_computation << "\t\ty[1] += Q1;" << std::endl;
+                    lpc_y_computation << "\t\ty0 += Q0;" << std::endl;
+                    lpc_y_computation << "\t\ty1 += Q1;" << std::endl;
                 }
 
                 // We need remove loop there because we can't use for loops in for loops
                 cur = 0;
                 std::string full_public_input_check_str = "";
-                full_public_input_check_str += "\tstd::array<pallas::base_field_type::value_type, "+ to_string(full_public_input_size) + "> Omegas = {1};\n";
+                full_public_input_check_str += "\tstd::array<pallas::base_field_type::value_type, "+ to_string(full_public_input_size) + "> Omegas ;\n";
+                full_public_input_check_str += "\tOmegas[0] = pallas::base_field_type::value_type(1);\n";
                 full_public_input_check_str += "\tpallas::base_field_type::value_type result(0);\n";
                 for (std::size_t i = 0; i < desc.public_input_columns; i++){
                     full_public_input_check_str += "\t{\n";
@@ -885,7 +915,7 @@ namespace nil {
                     }
                     start_position += batches_sizes[i];
                     if( i == 0 )
-                        initial_proof_check_str += "\t\t__builtin_assigner_exit_check(hash_state == vk[1]);\n\n";
+                        initial_proof_check_str += "\t\t__builtin_assigner_exit_check(hash_state == pallas::base_field_type::value_type(0x$VK1$_cppui255));\n\n";
                     else
                         initial_proof_check_str += "\t\t__builtin_assigner_exit_check(hash_state == proof.commitments[" + to_string(i-1) + "]);\n\n";
                 }
@@ -899,7 +929,7 @@ namespace nil {
                 for( std::size_t i = 0; i < fri_params.r; i++){
                     round_proof_check_str += "\t\tpos = res[" + to_string(i) + "][2]; npos = pallas::base_field_type::value_type(1) - pos;\n";
                     if(i == 0)
-                        round_proof_check_str += "\t\trhash = __builtin_assigner_poseidon_pallas_base({0, npos * y[0] + pos * y[1], pos * y[0] + npos * y[1]})[2];\n";
+                        round_proof_check_str += "\t\trhash = __builtin_assigner_poseidon_pallas_base({0, npos * y0 + pos * y1, pos * y0 + npos * y1})[2];\n";
                     else
                         round_proof_check_str += "\t\trhash = __builtin_assigner_poseidon_pallas_base({0, npos * proof.round_proof_values[i]["+to_string(i*2-2)+"] + pos * proof.round_proof_values[i]["+to_string(i*2-1)+"], npos * proof.round_proof_values[i]["+to_string(i*2-1)+"] + pos * proof.round_proof_values[i]["+to_string(i*2-2)+"]})[2];\n";
                     for ( std::size_t j = 0; j < log2(fri_params.D[0]->m) - i - 1; j++){
@@ -908,6 +938,35 @@ namespace nil {
                         cur++;
                     }
                     round_proof_check_str += "\t\t__builtin_assigner_exit_check(rhash == proof.fri_roots["+to_string(i)+"]);\n\n";
+                }
+
+                for(std::size_t i = 0; i < fri_params.r; i++){
+                    round_proof_check_str += "\t\tinterpolant = __builtin_assigner_fri_lin_inter(res["+to_string(i)+"][0], y0, y1, challenges.fri_alphas["+to_string(i)+"]);\n";
+                    round_proof_check_str += "\t\t__builtin_assigner_exit_check(interpolant == proof.round_proof_values[i]["+to_string(2*i)+"]);\n";
+                    round_proof_check_str += "\t\ty0 = proof.round_proof_values[i]["+to_string(2*i)+"];\n";
+                    round_proof_check_str += "\t\ty1 = proof.round_proof_values[i]["+to_string(2*i+1)+"];\n";
+                }
+
+                std::vector<std::size_t> selectors_indices;
+                for(const auto &gate: constraint_system.gates()){
+                    selectors_indices.push_back(gate.selector_index);
+                }
+
+                auto zeroes = zero_indices(common_data.columns_rotations, permutation_size);
+                std::string perm_arg_prepare_str = "";
+                for( std::size_t i = 0; i < permutation_size; i++ ){
+                    perm_arg_prepare_str += "\tperm_arg_input.xi_values["+to_string(i)+"] = proof.z["+to_string(zeroes[i])+"];\n";
+                    perm_arg_prepare_str += "\tperm_arg_input.id_perm["+to_string(i)+"] = proof.z["+to_string(2*i)+"];\n";
+                    perm_arg_prepare_str += "\tperm_arg_input.sigma_perm["+to_string(i)+"] = proof.z["+to_string(2*permutation_size + 2*i)+"];\n";
+                }
+
+                std::string gate_arg_prepare_str = "\t\tpallas::base_field_type::value_type theta_acc(1);\n";
+                cur = 0;
+                for( std::size_t i = 0; i < constraint_system.gates().size(); i++ ){
+                    for( std::size_t j = 0; j < constraint_system.gates()[i].constraints.size(); j++, cur++){
+                        gate_arg_prepare_str += "\t\tF[7] += proof.z["+to_string(zeroes[desc.witness_columns + desc.public_input_columns + desc.constant_columns + selectors_indices[i]]) + "] * constraints["+to_string(cur)+"] * theta_acc; theta_acc *= challenges.gate_theta;\n";
+                    }
+                    gate_arg_prepare_str += "\n";
                 }
 
                 std::string lookup_input_loop = "";
@@ -972,7 +1031,7 @@ namespace nil {
                 reps["$FINAL_POLYNOMIAL_SIZE$"] = to_string(std::pow(2, std::log2(fri_params.max_degree + 1) - fri_params.r + 1) - 2);
                 reps["$LAMBDA$"] = to_string(lambda);
                 reps["$PERMUTATION_SIZE$"] = to_string(permutation_size);
-                reps["$ZERO_INDICES$"] = zero_indices(common_data.columns_rotations, permutation_size);
+                reps["$ZERO_INDICES$"] = zero_indices_str(common_data.columns_rotations, permutation_size);
                 reps["$TOTAL_COLUMNS$"] = to_string(desc.table_width());
                 reps["$ROWS_LOG$"] = to_string(log2(rows_amount));
                 reps["$ROWS_AMOUNT$"] = to_string(rows_amount);
@@ -1024,6 +1083,10 @@ namespace nil {
                 reps["$LPC_Y_COMPUTATION$"] = lpc_y_computation.str();
                 reps["$PUBLIC_INPUT_CHECK$"] = desc.public_input_columns == 0 ? "" :full_public_input_check_str;
                 reps["$PUBLIC_INPUT_INPUT$"] = desc.public_input_columns == 0 ? "" : public_input_input_str;
+                reps["$VK0$"] = to_hex_string(common_data.vk.constraint_system_with_params_hash);
+                reps["$VK1$"] = to_hex_string(common_data.vk.fixed_values_commitment);
+                reps["$PERM_ARG_PREPARE$"] = perm_arg_prepare_str;
+                reps["$GATE_ARG_PREPARE$"] = gate_arg_prepare_str;
 
                 result = replace_all(result, reps);
                 return result;

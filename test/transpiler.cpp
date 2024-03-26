@@ -790,7 +790,7 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
         std::ofstream output_file;
         output_file.open(inp_path);
         output_file << nil::blueprint::recursive_verifier_generator<lpc_placeholder_params_type, proof_type, common_data_type>(desc).generate_input(
-            preprocessed_public_data.common_data.vk, assignments.public_inputs(), proof,  {preprocessed_public_data.common_data.usable_rows_amount + 1}
+            assignments.public_inputs(), proof,  {preprocessed_public_data.common_data.usable_rows_amount + 1}
         );
         output_file.close();
     }
@@ -899,7 +899,7 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
     std::ofstream output_file;
     output_file.open(inp_path);
     output_file << nil::blueprint::recursive_verifier_generator<lpc_placeholder_params_type, proof_type, common_data_type>(desc).generate_input(
-        preprocessed_public_data.common_data.vk, assignments.public_inputs(), proof,  {3}
+        assignments.public_inputs(), proof,  {3}
     );
     output_file.close();
 }
@@ -1006,7 +1006,7 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
         std::ofstream output_file;
         output_file.open(inp_path);
         output_file << nil::blueprint::recursive_verifier_generator<lpc_placeholder_params_type, proof_type, common_data_type>(desc).generate_input(
-            preprocessed_public_data.common_data.vk, assignments.public_inputs(), proof, std::vector<std::size_t>()
+            assignments.public_inputs(), proof, std::vector<std::size_t>()
         );
         output_file.close();
     }
@@ -1111,7 +1111,7 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
         std::ofstream output_file;
         output_file.open(inp_path);
         output_file << nil::blueprint::recursive_verifier_generator<lpc_placeholder_params_type, proof_type, common_data_type>(desc).generate_input(
-            preprocessed_public_data.common_data.vk, assignments.public_inputs(), proof, std::vector<std::size_t>()
+            assignments.public_inputs(), proof, std::vector<std::size_t>()
         );
         output_file.close();
     }
@@ -1218,7 +1218,7 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
         std::ofstream output_file;
         output_file.open(inp_path);
         output_file << nil::blueprint::recursive_verifier_generator<lpc_placeholder_params_type, proof_type, common_data_type>(desc).generate_input(
-            preprocessed_public_data.common_data.vk, assignments.public_inputs(), proof, std::vector<std::size_t>()
+            assignments.public_inputs(), proof, std::vector<std::size_t>()
         );
         output_file.close();
     }
@@ -1327,7 +1327,7 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
         std::ofstream output_file;
         output_file.open(inp_path);
         output_file << nil::blueprint::recursive_verifier_generator<lpc_placeholder_params_type, proof_type, common_data_type>(desc).generate_input(
-            preprocessed_public_data.common_data.vk, assignments.public_inputs(), proof, std::vector<std::size_t>()
+            assignments.public_inputs(), proof, std::vector<std::size_t>()
         );
         output_file.close();
     }

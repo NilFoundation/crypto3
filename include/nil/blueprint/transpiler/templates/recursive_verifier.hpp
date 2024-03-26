@@ -136,14 +136,14 @@ $LOOKUP_TABLE_LOOP$
 using namespace nil::crypto3;
 using namespace nil::crypto3::algebra::curves;
 
+namespace placeholder_verifier{
+
 const size_t witness_amount = $WITNESS_COLUMNS_AMOUNT$;
 const size_t public_input_amount = $PUBLIC_INPUT_COLUMNS_AMOUNT$;
 const size_t constant_amount = $CONSTANT_COLUMNS_AMOUNT$;
 const size_t selector_amount = $SELECTOR_COLUMNS_AMOUNT$;
 const std::array<std::size_t, public_input_amount> public_input_sizes = {$PUBLIC_INPUT_SIZES$};
 const std::size_t full_public_input_size = $FULL_PUBLIC_INPUT_SIZE$;
-
-namespace placeholder_verifier{
 
 const bool use_lookups = $USE_LOOKUPS$;
 const size_t batches_num = $BATCHES_NUM$;
@@ -182,6 +182,9 @@ const std::array<int, gates_amount> gates_sizes = {$GATES_SIZES$};
 const size_t unique_points = $UNIQUE_POINTS$;
 const size_t singles_amount = $SINGLES_AMOUNT$;
 const std::array<std::size_t, batches_num> batches_amount_list = {$BATCHES_AMOUNT_LIST$};
+pallas::base_field_type::value_type vk0 = pallas::base_field_type::value_type(0x$VK0$_cppui255);
+pallas::base_field_type::value_type vk1 = pallas::base_field_type::value_type(0x$VK1$_cppui255);
+
 
 $LOOKUP_VARS$
 
@@ -324,7 +327,6 @@ $SINGLES_COMPUTATION$;
 }
 
 placeholder_challenges_type generate_challenges(
-    const std::array<pallas::base_field_type::value_type, 2> &vk,
     const placeholder_proof_type &proof
 ){
     placeholder_challenges_type challenges;
@@ -335,8 +337,8 @@ placeholder_challenges_type generate_challenges(
     tr_state.state[2] = pallas::base_field_type::value_type(0);
     tr_state.cur = 1;
 
-    transcript(tr_state, vk[0]);
-    transcript(tr_state, vk[1]);
+    transcript(tr_state, vk0);
+    transcript(tr_state, vk1);
 
     // LPC additional point
     challenges.eta = transcript_challenge(tr_state);
@@ -368,7 +370,7 @@ placeholder_challenges_type generate_challenges(
 
     challenges.xi = transcript_challenge(tr_state);
 
-    transcript(tr_state, vk[1]);
+    transcript(tr_state, vk1);
     for(std::size_t i = 0; i < commitments_num; i++){
         transcript(tr_state, proof.commitments[i]);
     }
@@ -404,7 +406,7 @@ $CONSTRAINTS_BODY$
 }
 
 $LOOKUP_EXPRESSIONS$
-
+/*
 typename pallas::base_field_type::value_type
     gate_argument_verifier(
         std::array<typename pallas::base_field_type::value_type, gates_amount> selectors,
@@ -421,6 +423,7 @@ typename pallas::base_field_type::value_type
         theta
     );
 }
+*/
 
 template<std::size_t start_index, std::size_t leaf_size>
 pallas::base_field_type::value_type calculate_leaf_hash(
@@ -460,10 +463,9 @@ typedef __attribute__((ext_vector_type(2)))
 
 [[circuit]] bool placeholder_verifier(
     $PUBLIC_INPUT_INPUT$
-    std::array<pallas::base_field_type::value_type, 2> vk,
     placeholder_proof_type proof
 ) {
-    placeholder_challenges_type challenges = generate_challenges(vk, proof);
+    placeholder_challenges_type challenges = generate_challenges(proof);
     __builtin_assigner_exit_check(challenges.xi == proof.challenge);
 
     precomputed_values_type precomputed_values;
@@ -472,18 +474,22 @@ typedef __attribute__((ext_vector_type(2)))
     // For loop in for loop removed
 $PUBLIC_INPUT_CHECK$
 
-    std::array<pallas::base_field_type::value_type, 8> F;// = {0,0,0,0,0,0,0,0};
+    std::array<pallas::base_field_type::value_type, 8> F;
+    F[0] = pallas::base_field_type::value_type(0);
+    F[1] = pallas::base_field_type::value_type(0);
+    F[2] = pallas::base_field_type::value_type(0);
+    F[3] = pallas::base_field_type::value_type(0);
+    F[4] = pallas::base_field_type::value_type(0);
+    F[5] = pallas::base_field_type::value_type(0);
+    F[6] = pallas::base_field_type::value_type(0);
+    F[7] = pallas::base_field_type::value_type(0);
 
     // Call permutation argument
     placeholder_permutation_argument_input_type perm_arg_input;
     perm_arg_input.thetas[0] = challenges.perm_beta;
     perm_arg_input.thetas[1] = challenges.perm_gamma;
 
-    for( std::size_t i = 0; i < permutation_size; i++ ){
-        perm_arg_input.xi_values[i] = proof.z[zero_indices[i]];
-        perm_arg_input.id_perm[i] = proof.z[2*i];
-        perm_arg_input.sigma_perm[i] = proof.z[2*permutation_size + 2*i];
-    }
+$PERM_ARG_PREPARE$
 
     permutation_argument_output_type permutation_argument = __builtin_assigner_permutation_arg_verifier(
         perm_arg_input.xi_values.data(),
@@ -502,22 +508,14 @@ $PUBLIC_INPUT_CHECK$
     F[1] = permutation_argument[1];
     F[2] = permutation_argument[2];
 
-    $LOOKUP_CODE$
+$LOOKUP_CODE$
 
     if constexpr( gates_amount > 0) {
         std::array<pallas::base_field_type::value_type, constraints_amount> constraints;
         std::array<pallas::base_field_type::value_type, gates_amount> selectors;
         constraints = calculate_constraints(proof.z);
 
-        for( std::size_t i = 0; i < gates_amount; i++ ){
-            selectors[i] = proof.z[zero_indices[witness_amount + public_input_amount + constant_amount + gates_selector_indices[i]]];
-        }
-
-        F[7] = gate_argument_verifier(
-            selectors,
-            constraints,
-            challenges.gate_theta
-        );
+$GATE_ARG_PREPARE$
         F[7] *= (pallas::base_field_type::value_type(1) - proof.z[4*permutation_size] - proof.z[4*permutation_size + 3]);
     }
 
@@ -557,7 +555,10 @@ $PREPARE_U_AND_V$
         pallas::base_field_type::value_type pos;
         pallas::base_field_type::value_type npos;
 $INITIAL_PROOF_CHECK$
-        std::array<pallas::base_field_type::value_type, 2> y = {0,0};
+        pallas::base_field_type::value_type y0;
+        pallas::base_field_type::value_type y1;
+        y0 = pallas::base_field_type::value_type(0);
+        y1 = pallas::base_field_type::value_type(0);
         theta_acc = pallas::base_field_type::value_type(1);
         pallas::base_field_type::value_type Q0;
         pallas::base_field_type::value_type Q1;
@@ -565,20 +566,6 @@ $LPC_Y_COMPUTATION$
         std::size_t D = D0_log - 1;
         pallas::base_field_type::value_type rhash;
 $ROUND_PROOF_CHECK$
-        for(std::size_t j = 0; j < fri_rounds; j++){
-            interpolant = __builtin_assigner_fri_lin_inter(
-                res[j][0],
-                y[0],
-                y[1],
-                challenges.fri_alphas[j]
-            );
-            __builtin_assigner_exit_check(interpolant == proof.round_proof_values[i][2*j]);
-            y[0] = proof.round_proof_values[i][2*j];
-            y[1] = proof.round_proof_values[i][2*j + 1];
-
-            pallas::base_field_type::value_type rhash;
-        }
-
         interpolant = pallas::base_field_type::value_type(0);
         pallas::base_field_type::value_type x = res[fri_rounds][0];
         pallas::base_field_type::value_type factor = pallas::base_field_type::value_type(1);
@@ -586,7 +573,7 @@ $ROUND_PROOF_CHECK$
             interpolant = interpolant + proof.final_polynomial[j] * factor;
             factor = factor * x;
         }
-        __builtin_assigner_exit_check(interpolant == y[0]);
+        __builtin_assigner_exit_check(interpolant == y0);
 
         interpolant = pallas::base_field_type::value_type(0);
         x = res[fri_rounds][1];
@@ -595,7 +582,7 @@ $ROUND_PROOF_CHECK$
             interpolant = interpolant + proof.final_polynomial[j] * factor;
             factor = factor * x;
         }
-        __builtin_assigner_exit_check(interpolant == y[1]);
+        __builtin_assigner_exit_check(interpolant == y1);
 	}
     return true;
 }
