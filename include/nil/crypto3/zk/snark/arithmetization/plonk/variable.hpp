@@ -69,7 +69,7 @@ namespace nil {
                     using assignment_type = AssignmentType;
 
                     enum column_type : std::uint8_t {
-                        witness, public_input, constant, selector
+                        witness, public_input, constant, selector, uninitialized
                     };
 
                     /**
@@ -80,7 +80,7 @@ namespace nil {
                     bool relative;
                     column_type type;
 
-                    constexpr plonk_variable() : index(0), rotation(0), relative(false), type(column_type::witness) {};
+                    constexpr plonk_variable() : index(0), rotation(0), relative(false), type(column_type::uninitialized) {};
 
                     constexpr plonk_variable(const std::size_t index,
                                              std::int32_t rotation,
@@ -176,7 +176,8 @@ namespace nil {
                             {plonk_variable<AssignmentType>::column_type::witness,      "w"},
                             {plonk_variable<AssignmentType>::column_type::public_input, "pub"},
                             {plonk_variable<AssignmentType>::column_type::constant,     "c"},
-                            {plonk_variable<AssignmentType>::column_type::selector,     "sel"}
+                            {plonk_variable<AssignmentType>::column_type::selector,     "sel"},
+                            {plonk_variable<AssignmentType>::column_type::uninitialized,"NaN"}
                     };
                     os << type_map[var.type] << "_" << var.index;
                     if (!var.relative) {
