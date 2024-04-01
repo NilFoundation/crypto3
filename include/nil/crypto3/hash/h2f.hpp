@@ -29,9 +29,10 @@
 #include <string>
 #include <vector>
 
-#include <nil/crypto3/hash/detail/raw_stream_processor.hpp>
+#include <nil/crypto3/hash/accumulators/hash.hpp>
 #include <nil/crypto3/hash/detail/h2f/h2f_suites.hpp>
 #include <nil/crypto3/hash/detail/h2f/h2f_functions.hpp>
+#include <nil/crypto3/hash/detail/stream_processors/stream_processors_enum.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -101,14 +102,9 @@ namespace nil {
                     };
                     typedef void type;
                 };
-                template<typename StateAccumulator, std::size_t ValueBits>
-                struct stream_processor {
-                    struct params_type {
-                        typedef typename construction::params_type::digest_endian digest_endian;
-                        constexpr static const std::size_t value_bits = ValueBits;
-                    };
-                    typedef raw_stream_processor<construction, StateAccumulator, params_type> type;
-                };
+
+                constexpr static detail::stream_processor_type stream_processor = detail::stream_processor_type::RawDelegating;
+                using accumulator_tag = accumulators::tag::forwarding_hash<h2f<Field, Hash, Params>>;
 
                 static inline void init_accumulator(internal_accumulator_type &acc) {
                     expand_message_type::init_accumulator(acc);

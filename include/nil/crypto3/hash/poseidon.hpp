@@ -13,9 +13,10 @@
 #ifdef __ZKLLVM__
 #include <nil/crypto3/algebra/curves/pallas.hpp>
 #else
+#include <nil/crypto3/hash/accumulators/hash.hpp>
 #include <nil/crypto3/hash/detail/poseidon/poseidon_permutation.hpp>
 #include <nil/crypto3/hash/detail/poseidon/poseidon_sponge.hpp>
-#include <nil/crypto3/hash/detail/block_stream_processor.hpp>
+#include <nil/crypto3/hash/detail/stream_processors_enum.hpp>
 #endif
 
 namespace nil {
@@ -93,16 +94,8 @@ namespace nil {
                     typedef detail::poseidon_sponge_construction<policy_type> type;
                 };
 
-                template<typename StateAccumulator, std::size_t ValueBits>
-                struct stream_processor {
-                    struct params_type {
-                        typedef typename policy_type::digest_endian digest_endian;
-
-                        constexpr static const std::size_t value_bits = ValueBits;
-                    };
-
-                    typedef block_stream_processor<construction, StateAccumulator, params_type> type;
-                };
+                constexpr static detail::stream_processor_type stream_processor = detail::stream_processor_type::RawDelegating;
+                using accumulator_tag = accumulators::tag::forwarding_hash<poseidon<PolicyType>>;
             };
 #endif
         }    // namespace hashes

@@ -26,8 +26,9 @@
 #ifndef CRYPTO3_HASH_KECCAK_HPP
 #define CRYPTO3_HASH_KECCAK_HPP
 
+#include <nil/crypto3/hash/accumulators/hash.hpp>
 #include <nil/crypto3/hash/detail/sponge_construction.hpp>
-#include <nil/crypto3/hash/detail/block_stream_processor.hpp>
+#include <nil/crypto3/hash/detail/stream_processors/stream_processors_enum.hpp>
 
 #include <nil/crypto3/hash/detail/keccak/keccak_functions.hpp>
 #include <nil/crypto3/hash/detail/keccak/keccak_policy.hpp>
@@ -84,9 +85,9 @@ namespace nil {
              */
             template<std::size_t DigestBits = 512>
             class keccak_1600 {
+            public:
                 typedef detail::keccak_1600_policy<DigestBits> policy_type;
 
-            public:
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
                 typedef typename policy_type::word_type word_type;
 
@@ -111,16 +112,8 @@ namespace nil {
                         type;
                 };
 
-                template<typename StateAccumulator, std::size_t ValueBits>
-                struct stream_processor {
-                    struct params_type {
-                        typedef typename policy_type::digest_endian digest_endian;
-
-                        constexpr static const std::size_t value_bits = ValueBits;
-                    };
-
-                    typedef block_stream_processor<construction, StateAccumulator, params_type> type;
-                };
+                constexpr static detail::stream_processor_type stream_processor = detail::stream_processor_type::Block;
+                using accumulator_tag = accumulators::tag::hash<keccak_1600<DigestBits>>;
             };
         }    // namespace hashes
     }        // namespace crypto3

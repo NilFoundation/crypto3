@@ -95,7 +95,7 @@ namespace nil {
 
             public:
                 template<typename Integer = std::size_t>
-                inline haifa_construction &process_block(const block_type &block, Integer seen,
+                inline haifa_construction &process_block(const block_type &block, Integer seen = Integer(),
                                                          Integer finalization = 0) {
                     compressor_functor::process_block(state_, block, seen, finalization);
                     return *this;

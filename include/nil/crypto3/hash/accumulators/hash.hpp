@@ -27,39 +27,33 @@
 #ifndef CRYPTO3_ACCUMULATORS_HASH_HPP
 #define CRYPTO3_ACCUMULATORS_HASH_HPP
 
-#include <boost/parameter/value_type.hpp>
-
 #include <boost/accumulators/framework/accumulator_base.hpp>
 #include <boost/accumulators/framework/extractor.hpp>
 #include <boost/accumulators/framework/depends_on.hpp>
 #include <boost/accumulators/framework/parameters/sample.hpp>
-
+#include <boost/accumulators/statistics/count.hpp>
+#include <boost/assert.hpp>
 #include <boost/container/static_vector.hpp>
+#include <boost/parameter/value_type.hpp>
 
+#include <nil/crypto3/detail/endian_shift.hpp>
 #include <nil/crypto3/detail/make_array.hpp>
 #include <nil/crypto3/detail/static_digest.hpp>
-#include <nil/crypto3/detail/endian_shift.hpp>
-#include <nil/crypto3/detail/inject.hpp>
 
 #include <nil/crypto3/hash/accumulators/bits_count.hpp>
-
-#include <nil/crypto3/hash/accumulators/parameters/bits.hpp>
 #include <nil/crypto3/hash/accumulators/parameters/iterator_last.hpp>
-
+#include <nil/crypto3/hash/accumulators/parameters/words_to_consume.hpp>
+#include <nil/crypto3/hash/detail/block_cache.hpp>
 #include <nil/crypto3/hash/type_traits.hpp>
-
-#include <boost/accumulators/statistics/count.hpp>
 
 namespace nil {
     namespace crypto3 {
-        namespace hashes {
-            template<typename Params, typename BasePointGeneratorHash, typename Group>
-            struct pedersen;
-        }
+
         namespace accumulators {
             namespace impl {
-                template<typename Hash, typename = void>
-                struct hash_impl : boost::accumulators::accumulator_base {
+
+                template<typename Hash>
+                class block_acc_impl : public boost::accumulators::accumulator_base {
                 protected:
                     typedef Hash hash_type;
                     typedef typename hash_type::construction::type construction_type;
@@ -83,14 +77,11 @@ namespace nil {
                     constexpr static const std::size_t length_words = length_bits / word_bits;
                     BOOST_STATIC_ASSERT(!length_bits || length_bits % word_bits == 0);
 
-                    typedef ::nil::crypto3::detail::injector<endian_type, word_bits, block_words, block_bits>
-                        injector_type;
-
                 public:
                     typedef typename hash_type::digest_type result_type;
 
                     // The constructor takes an argument pack.
-                    hash_impl(boost::accumulators::dont_care) : filled(false), total_seen(0) {
+                    block_acc_impl(boost::accumulators::dont_care) {
                     }
 
                     template<typename ArgumentPack>
@@ -100,141 +91,81 @@ namespace nil {
                     }
 
                     inline result_type result(boost::accumulators::dont_care) const {
-                        construction_type res = construction;
-                        return res.digest(cache, total_seen);
+                        construction_type res = construction; // Make a copy, so we can append more to existing state afterwards
+                        return res.digest(cache_.get_block(), total_seen_);
                     }
 
                 protected:
                     inline void resolve_type(const block_type &value, std::size_t bits) {
-                        // total_seen += bits == 0 ? block_bits : bits;
                         process(value, bits == 0 ? block_bits : bits);
                     }
 
                     inline void resolve_type(const word_type &value, std::size_t bits) {
-                        // total_seen += bits == 0 ? word_bits : bits;
                         process(value, bits == 0 ? word_bits : bits);
                     }
 
-                    inline void process(const block_type &value, std::size_t value_seen) {
-                        using namespace ::nil::crypto3::detail;
+                    inline void process(const block_type &value, std::size_t bits_seen) {
+                        std::size_t processed_bits = 0;
 
-                        if (filled) {
-                            construction.process_block(cache, total_seen);
-                            filled = false;
-                        }
+                        while (processed_bits < bits_seen) {
+                            std::size_t unused_bits_in_cache = cache_.capacity() - cache_.bits_used();
+                            std::size_t remaining_bits = bits_seen - processed_bits;
+                            std::size_t bits_to_append = std::min(unused_bits_in_cache, remaining_bits);
 
-                        std::size_t cached_bits = total_seen % block_bits;
+                            cache_.append(value, bits_to_append, processed_bits);
+                            processed_bits += bits_to_append;
 
-                        if (cached_bits != 0) {
-                            // If there are already any bits in the cache
-
-                            std::size_t needed_to_fill_bits = block_bits - cached_bits;
-                            std::size_t new_bits_to_append =
-                                (needed_to_fill_bits > value_seen) ? value_seen : needed_to_fill_bits;
-
-                            injector_type::inject(value, new_bits_to_append, cache, cached_bits);
-                            total_seen += new_bits_to_append;
-
-                            if (cached_bits == block_bits) {
-                                // If there are enough bits in the incoming value to fill the block
-                                filled = true;
-
-                                if (value_seen > new_bits_to_append) {
-
-                                    construction.process_block(cache, total_seen);
-                                    filled = false;
-
-                                    // If there are some remaining bits in the incoming value - put them into the cache,
-                                    // which is now empty
-
-                                    cached_bits = 0;
-
-                                    injector_type::inject(
-                                        value, value_seen - new_bits_to_append, cache, cached_bits, new_bits_to_append);
-
-                                    total_seen += value_seen - new_bits_to_append;
-                                }
-                            }
-
-                        } else {
-
-                            total_seen += value_seen;
-
-                            // If there are no bits in the cache
-                            if (value_seen == block_bits) {
-                                // The incoming value is a full block
-                                filled = true;
-
-                                std::move(value.begin(), value.end(), cache.begin());
-
-                            } else {
-                                // The incoming value is not a full block
-                                std::move(value.begin(),
-                                          value.begin() + value_seen / word_bits + (value_seen % word_bits ? 1 : 0),
-                                          cache.begin());
+                            if (cache_.is_full()) {
+                                flush_cache_to_construction();
                             }
                         }
+
+                        total_seen_ += bits_seen;
+                        // TODO: remove this, since we have bits_count acc, and could use its result
+                        // Example:
+                        // typedef typename boost::accumulators::detail::extractor_result<accumulator_set<>, tag::bits_count>::type bits_count_result_type;
+
+                        // template<typename Args>
+                        // void operator()(Args const &args) {
+                        //     // Accessing the accumulator
+                        //     accumulator_set<> &acc = args[accumulator];
+
+                        //     // Now, accessing the bits_count result from the accumulator
+                        //     bits_count_result_type bitsCount = acc[tag::bits_count];
                     }
 
-                    inline void process(const word_type &value, std::size_t value_seen) {
-                        using namespace ::nil::crypto3::detail;
+                    inline void process(const word_type value, std::size_t bits_seen) {
+                        std::size_t processed_bits = 0;
 
-                        if (filled) {
-                            construction.process_block(cache, total_seen);
-                            filled = false;
-                        }
+                        while (processed_bits < bits_seen) {
+                            std::size_t unused_bits_in_cache = cache_.capacity() - cache_.bits_used();
+                            std::size_t remaining_bits = bits_seen - processed_bits;
+                            std::size_t bits_to_append = std::min(unused_bits_in_cache, remaining_bits);
 
-                        std::size_t cached_bits = total_seen % block_bits;
+                            cache_.append(value, bits_to_append, processed_bits);
+                            processed_bits += bits_to_append;
 
-                        if (cached_bits % word_bits != 0) {
-                            std::size_t needed_to_fill_bits = block_bits - cached_bits;
-                            std::size_t new_bits_to_append =
-                                (needed_to_fill_bits > value_seen) ? value_seen : needed_to_fill_bits;
-
-                            injector_type::inject(value, new_bits_to_append, cache, cached_bits);
-                            total_seen += new_bits_to_append;
-
-                            if (cached_bits == block_bits) {
-                                // If there are enough bits in the incoming value to fill the block
-
-                                filled = true;
-
-                                if (value_seen > new_bits_to_append) {
-
-                                    construction.process_block(cache, total_seen);
-                                    filled = false;
-
-                                    // If there are some remaining bits in the incoming value - put them into the cache,
-                                    // which is now empty
-                                    cached_bits = 0;
-
-                                    injector_type::inject(
-                                        value, value_seen - new_bits_to_append, cache, cached_bits, new_bits_to_append);
-
-                                    total_seen += value_seen - new_bits_to_append;
-                                }
+                            if (cache_.is_full()) {
+                                flush_cache_to_construction();
                             }
-
-                        } else {
-                            cache[cached_bits / word_bits] = value;
-
-                            total_seen += value_seen;
                         }
+
+                        total_seen_ += bits_seen;
                     }
 
-                    bool filled;
-                    std::size_t total_seen;
-                    block_type cache;
+                private:
+                    void flush_cache_to_construction() {
+                        construction.process_block(std::move(cache_.get_block()));
+                        cache_.clean();
+                    }
+
+                    std::size_t total_seen_ = 0;
+                    nil::crypto3::hashes::block_cache<block_type, word_type, word_bits, block_words, endian_type> cache_;
                     construction_type construction;
                 };
 
                 template<typename Hash>
-                struct hash_impl<Hash,
-                                 typename std::enable_if<nil::crypto3::hashes::is_find_group_hash<Hash>::value ||
-                                                         nil::crypto3::hashes::is_pedersen<Hash>::value ||
-                                                         nil::crypto3::hashes::is_h2f<Hash>::value ||
-                                                         nil::crypto3::hashes::is_h2c<Hash>::value>::type>
-                    : boost::accumulators::accumulator_base {
+                struct forwarding_acc_impl : boost::accumulators::accumulator_base {
                 protected:
                     typedef Hash hash_type;
                     typedef typename hash_type::internal_accumulator_type internal_accumulator_type;
@@ -243,7 +174,7 @@ namespace nil {
                     typedef typename hash_type::result_type result_type;
 
                     template<typename Args>
-                    hash_impl(const Args &args) {
+                    forwarding_acc_impl(const Args &args) {
                         hash_type::init_accumulator(acc);
                     }
 
@@ -280,7 +211,17 @@ namespace nil {
                     /// INTERNAL ONLY
                     ///
 
-                    typedef boost::mpl::always<accumulators::impl::hash_impl<Hash>> impl;
+                    typedef boost::mpl::always<accumulators::impl::block_acc_impl<Hash>> impl;
+                };
+
+                template<typename Hash>
+                struct forwarding_hash : boost::accumulators::depends_on<> {
+                    typedef Hash hash_type;
+
+                    /// INTERNAL ONLY
+                    ///
+
+                    typedef boost::mpl::always<accumulators::impl::forwarding_acc_impl<Hash>> impl;
                 };
             }    // namespace tag
 
@@ -290,6 +231,20 @@ namespace nil {
                     hash(const AccumulatorSet &acc) {
                     return boost::accumulators::extract_result<tag::hash<Hash>>(acc);
                 }
+
+                template<typename Hash, typename AccumulatorSet>
+                typename boost::mpl::apply<AccumulatorSet, tag::forwarding_hash<Hash>>::type::result_type
+                    hash(const AccumulatorSet &acc) {
+                    return boost::accumulators::extract_result<tag::forwarding_hash<Hash>>(acc);
+                }
+
+                // TODO: try to unify as:
+                //   template<typename Hash, typename AccumulatorSet, typename Tag>
+                //   typename boost::mpl::apply<AccumulatorSet, Tag>::type::result_type
+                //       hash(const AccumulatorSet &acc) {
+                //       return boost::accumulators::extract_result<Tag>(acc);
+                //   }
+
             }    // namespace extract
         }        // namespace accumulators
     }            // namespace crypto3

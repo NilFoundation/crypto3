@@ -61,7 +61,7 @@ namespace nil {
                     constexpr static const std::size_t capacity = Capacity;
                     constexpr static const std::size_t sbox_power = SBoxPower;
 
-                    constexpr static const bool mina_version = MinaVersion; 
+                    constexpr static const bool mina_version = MinaVersion;
 
                     struct iv_generator {
                         // TODO: maybe it would be done in constexpr way
@@ -80,7 +80,7 @@ namespace nil {
                  * @brief Policy class for the original implementation.
                  * @tparam FieldType Type of the field.
                  * @tparam Security The bit strength of hash, one of [80, 128, 256].
-                 * @tparam Rate Rate of input block for Poseidon permutation in field elements. Values of 2 or 4 are used with Merkle Trees. 
+                 * @tparam Rate Rate of input block for Poseidon permutation in field elements. Values of 2 or 4 are used with Merkle Trees.
                  * @tparam Capacity Capacity or inner part of Poseidon permutation in field elements.
                  */
                 template<typename FieldType, std::size_t Security, std::size_t Rate, typename Enable = void>

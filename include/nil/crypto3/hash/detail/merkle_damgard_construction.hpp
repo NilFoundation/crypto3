@@ -100,9 +100,6 @@ namespace nil {
 
                     block_type b = block;
                     std::size_t block_seen = total_seen % block_bits;
-                    // Process block if block is full
-                    if (total_seen && !block_seen)
-                        process_block(b);
 
                     // Pad last message block
                     padding_functor padding;

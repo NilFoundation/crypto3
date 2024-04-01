@@ -43,30 +43,27 @@ namespace nil {
         namespace hashes {
 
             /*!
-             * @brief This will do the usual Merkle-Damgård-style strengthening,
-             * padding with a 1 bit, then 0 bits as needed, then, if requested,
-             * the length.
+             * @brief This will convert input data stream (bytes, uint64, etc. — everything convertable
+             * to block_type via pack function) into blocks and feed these blocks to StateAccumulator.
              *
-             * @tparam Hash
+             * @tparam Construction
              * @tparam StateAccumulator
              * @tparam Params
              */
-            template<typename Construction, typename StateAccumulator, typename Params>
+            template<typename Policy, typename StateAccumulator, std::size_t ValueBits>
             class block_stream_processor {
             protected:
-                typedef typename Construction::type construction_type;
                 typedef StateAccumulator accumulator_type;
-                typedef Params params_type;
 
-                constexpr static const std::size_t word_bits = construction_type::word_bits;
+                constexpr static const std::size_t word_bits = Policy::word_bits;
 
-                constexpr static const std::size_t block_bits = construction_type::block_bits;
-                typedef typename construction_type::block_type block_type;
+                constexpr static const std::size_t block_bits = Policy::block_bits;
+                typedef typename Policy::block_type block_type;
 
             public:
-                typedef typename params_type::digest_endian endian_type;
+                typedef typename Policy::digest_endian endian_type;
 
-                constexpr static const std::size_t value_bits = params_type::value_bits;
+                constexpr static const std::size_t value_bits = ValueBits;
                 typedef typename boost::uint_t<value_bits>::least value_type;
                 BOOST_STATIC_ASSERT(word_bits % value_bits == 0);
                 constexpr static const std::size_t block_values = block_bits / value_bits;
@@ -76,9 +73,10 @@ namespace nil {
                 BOOST_STATIC_ASSERT(block_bits % value_bits == 0);
 
                 inline void process_block(std::size_t block_seen = block_bits) {
+                    using namespace nil::crypto3::detail;
                     // Convert the input into words
                     block_type block;
-                    nil::crypto3::detail::pack_to<endian_type, value_bits, word_bits>(cache.begin(), cache.end(), block.begin());
+                    pack_to<endian_type, value_bits, word_bits>(cache.begin(), cache.end(), block.begin());
                     // Process the block
                     acc(block, ::nil::crypto3::accumulators::bits = block_seen);
                 }
@@ -102,28 +100,10 @@ namespace nil {
                 }
 
                 template<typename InputIterator>
-                inline void update_n(InputIterator first, InputIterator last) {
-                    std::size_t n = std::distance(first, last);
-                    update_n(first, n);
-                }
-
-                template<typename InputIterator>
-                inline void operator()(InputIterator b, InputIterator e, std::random_access_iterator_tag) {
-                    update_n(b, e);
-                }
-
-                template<typename InputIterator, typename Category>
-                inline void operator()(InputIterator b, InputIterator e, Category) {
+                inline void operator()(InputIterator b, InputIterator e) {
                     while (b != e) {
                         update_one(*b++);
                     }
-                }
-
-                template<typename InputIterator>
-                inline void operator()(InputIterator b, InputIterator e) {
-                    typedef typename std::iterator_traits<InputIterator>::iterator_category cat;
-
-                    operator()(b, e, cat());
                 }
 
                 template<typename ContainerT>

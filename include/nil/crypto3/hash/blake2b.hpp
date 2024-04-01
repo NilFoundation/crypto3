@@ -27,11 +27,12 @@
 #ifndef CRYPTO3_HASH_BLAKE2B_HPP
 #define CRYPTO3_HASH_BLAKE2B_HPP
 
+#include <nil/crypto3/hash/accumulators/hash.hpp>
 #include <nil/crypto3/hash/detail/blake2b/blake2b_functions.hpp>
 #include <nil/crypto3/hash/detail/blake2b/blake2b_padding.hpp>
 
 #include <nil/crypto3/hash/detail/haifa_construction.hpp>
-#include <nil/crypto3/hash/detail/block_stream_processor.hpp>
+#include <nil/crypto3/hash/detail/stream_processors/stream_processors_enum.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -110,9 +111,8 @@ namespace nil {
              */
             template<std::size_t DigestBits>
             class blake2b {
-                typedef detail::blake2b_policy<DigestBits> policy_type;
-
             public:
+                typedef detail::blake2b_policy<DigestBits> policy_type;
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
                 typedef typename policy_type::word_type word_type;
 
@@ -136,16 +136,8 @@ namespace nil {
                         type;
                 };
 
-                template<typename StateAccumulator, std::size_t ValueBits>
-                struct stream_processor {
-                    struct params_type {
-                        typedef typename policy_type::digest_endian digest_endian;
-
-                        constexpr static const std::size_t value_bits = ValueBits;
-                    };
-
-                    typedef block_stream_processor<construction, StateAccumulator, params_type> type;
-                };
+                constexpr static detail::stream_processor_type stream_processor = detail::stream_processor_type::Block;
+                using accumulator_tag = accumulators::tag::hash<blake2b<DigestBits>>;
             };
 
         }    // namespace hashes

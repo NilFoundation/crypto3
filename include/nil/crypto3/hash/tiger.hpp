@@ -26,11 +26,12 @@
 #ifndef CRYPTO3_HASH_TIGER_HPP
 #define CRYPTO3_HASH_TIGER_HPP
 
+#include <nil/crypto3/hash/accumulators/hash.hpp>
 #include <nil/crypto3/hash/detail/tiger/tiger_policy.hpp>
 
 #include <nil/crypto3/hash/detail/merkle_damgard_construction.hpp>
 #include <nil/crypto3/hash/detail/tiger/tiger_padding.hpp>
-#include <nil/crypto3/hash/detail/block_stream_processor.hpp>
+#include <nil/crypto3/hash/detail/stream_processors/stream_processors_enum.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -85,9 +86,9 @@ namespace nil {
              */
             template<std::size_t DigestBits = 192, std::size_t Passes = 3>
             class tiger {
+            public:
                 typedef detail::tiger_policy<DigestBits, Passes> policy_type;
 
-            public:
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
                 typedef typename policy_type::word_type word_type;
 
@@ -118,16 +119,8 @@ namespace nil {
                         type;
                 };
 
-                template<typename StateAccumulator, std::size_t ValueBits>
-                struct stream_processor {
-                    struct params_type {
-                        typedef typename policy_type::digest_endian digest_endian;
-
-                        constexpr static const std::size_t value_bits = ValueBits;
-                    };
-
-                    typedef block_stream_processor<construction, StateAccumulator, params_type> type;
-                };
+                constexpr static detail::stream_processor_type stream_processor = detail::stream_processor_type::Block;
+                using accumulator_tag = accumulators::tag::hash<tiger<DigestBits, Passes>>;
             };
         }    // namespace hashes
     }        // namespace crypto3

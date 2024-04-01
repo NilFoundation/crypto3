@@ -90,9 +90,6 @@ namespace nil {
 
                     block_type b = block;
                     std::size_t block_seen = total_seen % block_bits;
-                    // Process block if it is full
-                    if (total_seen && !block_seen)
-                        process_block(b);
 
                     std::size_t copy_seen = block_seen;
                     // Pad last message block

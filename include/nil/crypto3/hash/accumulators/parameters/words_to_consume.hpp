@@ -22,33 +22,22 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_HASH_STATE_HPP
-#define CRYPTO3_HASH_STATE_HPP
+#ifndef CRYPTO3_ACCUMULATORS_PARAMETERS_WORDS_TO_CONSUME_HPP
+#define CRYPTO3_ACCUMULATORS_PARAMETERS_WORDS_TO_CONSUME_HPP
 
-#include <boost/accumulators/framework/accumulator_set.hpp>
-#include <boost/accumulators/framework/features.hpp>
+#include <boost/parameter/keyword.hpp>
 
-#include <nil/crypto3/detail/type_traits.hpp>
+#include <boost/accumulators/accumulators_fwd.hpp>
 
-#include <nil/crypto3/hash/accumulators/hash.hpp>
-
-#include <nil/crypto3/detail/static_digest.hpp>
-
-// TODO: rename this file
 namespace nil {
     namespace crypto3 {
-        template<typename Hash, typename = typename std::enable_if<detail::is_hash<Hash>::value>::type>
-        struct accumulator_set
-            : public boost::accumulators::accumulator_set<
-                typename Hash::digest_type,
-                boost::accumulators::features<
-                    typename Hash::accumulator_tag
-                >,
-                std::size_t
-            > {
-            typedef Hash hash_type;
-        };
+        namespace accumulators {
+
+            // used inside algebraic hash
+            BOOST_PARAMETER_KEYWORD(tag, words_n_to_consume)
+
+        }    // namespace accumulators
     }    // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_BLOCK_STREAM_PREPROCESSOR_HPP
+#endif    // CRYPTO3_ACCUMULATORS_PARAMETERS_WORDS_TO_CONSUME_HPP

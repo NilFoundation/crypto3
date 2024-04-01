@@ -28,13 +28,14 @@
 
 #include <tuple>
 
+#include <nil/crypto3/hash/accumulators/hash.hpp>
 #include <nil/crypto3/hash/algorithm/hash.hpp>
 #include <nil/crypto3/hash/hash_state.hpp>
 #include <nil/crypto3/hash/find_group_hash.hpp>
 
-#include <nil/crypto3/hash/detail/raw_stream_processor.hpp>
 #include <nil/crypto3/hash/detail/pedersen/basic_functions.hpp>
 #include <nil/crypto3/hash/detail/pedersen/lookup.hpp>
+#include <nil/crypto3/hash/detail/stream_processors/stream_processors_enum.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -54,6 +55,7 @@ namespace nil {
             struct pedersen_to_point {
                 using params = Params;
                 using group_type = Group;
+                using word_type = bool;
 
                 using base_point_generator_hash = BasePointGeneratorHash;
                 using base_point_generator = find_group_hash<params, base_point_generator_hash, group_type>;
@@ -72,16 +74,8 @@ namespace nil {
                     typedef void type;
                 };
 
-                template<typename StateAccumulator, std::size_t ValueBits>
-                struct stream_processor {
-                    struct params_type {
-                        typedef typename construction::params_type::digest_endian digest_endian;
-
-                        constexpr static const std::size_t value_bits = ValueBits;
-                    };
-
-                    typedef raw_stream_processor<construction, StateAccumulator, params_type> type;
-                };
+                constexpr static detail::stream_processor_type stream_processor = detail::stream_processor_type::RawDelegating;
+                using accumulator_tag = accumulators::tag::forwarding_hash<pedersen_to_point<Params, BasePointGeneratorHash, Group>>;
 
                 // TODO: sync definition of the chunk_bits with circuit
                 static constexpr std::size_t chunk_bits = 3;
@@ -208,6 +202,8 @@ namespace nil {
 
                 using base_hash_type = pedersen_to_point<params, base_point_generator_hash, group_type>;
 
+                using word_type = typename base_hash_type::word_type;
+
                 using curve_type = typename base_hash_type::curve_type;
                 using group_value_type = typename base_hash_type::group_value_type;
 
@@ -217,22 +213,14 @@ namespace nil {
                 using digest_type = std::vector<bool>;
                 using result_type = digest_type;
 
+                constexpr static detail::stream_processor_type stream_processor = detail::stream_processor_type::RawDelegating;
+                using accumulator_tag = accumulators::tag::forwarding_hash<pedersen<Params, BasePointGeneratorHash, Group>>;
+
                 struct construction {
                     struct params_type {
                         typedef nil::marshalling::option::little_endian digest_endian;
                     };
                     typedef void type;
-                };
-
-                template<typename StateAccumulator, std::size_t ValueBits>
-                struct stream_processor {
-                    struct params_type {
-                        typedef typename construction::params_type::digest_endian digest_endian;
-
-                        constexpr static const std::size_t value_bits = ValueBits;
-                    };
-
-                    typedef raw_stream_processor<construction, StateAccumulator, params_type> type;
                 };
 
                 using internal_accumulator_type = nil::crypto3::accumulator_set<base_hash_type>;

@@ -53,7 +53,7 @@ namespace nil {
                     constexpr static const std::size_t digest_bits = policy_type::digest_bits;
                     typedef typename policy_type::digest_type digest_type;
 
-                    typedef ::nil::crypto3::detail::injector<endian_type, word_bits, block_words, block_bits>
+                    typedef ::nil::crypto3::detail::injector<endian_type, endian_type, word_bits, block_words>
                         injector_type;
 
                 public:

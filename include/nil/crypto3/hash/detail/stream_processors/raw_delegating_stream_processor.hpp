@@ -23,8 +23,8 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_HASH_RAW_STREAM_PROCESSOR_HPP
-#define CRYPTO3_HASH_RAW_STREAM_PROCESSOR_HPP
+#ifndef CRYPTO3_HASH_PEDERSEN_STREAM_PROCESSOR_HPP
+#define CRYPTO3_HASH_PEDERSEN_STREAM_PROCESSOR_HPP
 
 #include <array>
 #include <iterator>
@@ -36,23 +36,21 @@ namespace nil {
     namespace crypto3 {
         namespace hashes {
 
-            /*!
-             * @brief
+            /**
+             * @class raw_delegating_stream_processor
+             * @brief Stream processor class, that, unlike other processors, doesn't even feed values
+             * from iterators/container to accumulator.
              *
-             * @tparam Hash
+             * It passes iterators/container to accumulator as is (delegates feeding job to accumulator).
+             *
              * @tparam StateAccumulator
-             * @tparam Params
              */
-            template<typename Construction, typename StateAccumulator, typename Params>
-            class raw_stream_processor {
+            template<typename StateAccumulator>
+            class raw_delegating_stream_processor {
             protected:
-                typedef typename Construction::type construction_type;
                 typedef StateAccumulator accumulator_type;
-                typedef Params params_type;
 
             public:
-                typedef typename params_type::digest_endian endian_type;
-
                 template<typename InputIterator>
                 inline void operator()(InputIterator b, InputIterator e) {
                     acc(b, nil::crypto3::accumulators::iterator_last = e);
@@ -64,7 +62,7 @@ namespace nil {
                 }
 
             public:
-                raw_stream_processor(accumulator_type &acc) : acc(acc) {
+                raw_delegating_stream_processor(accumulator_type &acc) : acc(acc) {
                 }
 
             private:
@@ -74,4 +72,4 @@ namespace nil {
     }        // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_HASH_RAW_STREAM_PROCESSOR_HPP
+#endif    // CRYPTO3_HASH_PEDERSEN_STREAM_PROCESSOR_HPP

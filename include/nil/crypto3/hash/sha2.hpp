@@ -30,12 +30,13 @@
 #ifdef __ZKLLVM__
 #include <nil/crypto3/algebra/curves/pallas.hpp>
 #else
+#include <nil/crypto3/hash/accumulators/hash.hpp>
 #include <nil/crypto3/hash/detail/sha2/sha2_policy.hpp>
 #include <nil/crypto3/hash/detail/state_adder.hpp>
 #include <nil/crypto3/hash/detail/davies_meyer_compressor.hpp>
 #include <nil/crypto3/hash/detail/merkle_damgard_construction.hpp>
-#include <nil/crypto3/hash/detail/block_stream_processor.hpp>
 #include <nil/crypto3/hash/detail/merkle_damgard_padding.hpp>
+#include <nil/crypto3/hash/detail/stream_processors/stream_processors_enum.hpp>
 #endif
 
 namespace nil {
@@ -62,10 +63,10 @@ namespace nil {
 #else
             template<std::size_t Version>
             class sha2 {
-                typedef detail::sha2_policy<Version> policy_type;
-                typedef typename policy_type::block_cipher_type block_cipher_type;
-
             public:
+                typedef detail::sha2_policy<Version> policy_type;
+
+                typedef typename policy_type::block_cipher_type block_cipher_type;
                 constexpr static const std::size_t version = Version;
 
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
@@ -98,16 +99,8 @@ namespace nil {
                         type;
                 };
 
-                template<typename StateAccumulator, std::size_t ValueBits>
-                struct stream_processor {
-                    struct params_type {
-                        typedef typename policy_type::digest_endian digest_endian;
-
-                        constexpr static const std::size_t value_bits = ValueBits;
-                    };
-
-                    typedef block_stream_processor<construction, StateAccumulator, params_type> type;
-                };
+                constexpr static detail::stream_processor_type stream_processor = detail::stream_processor_type::Block;
+                using accumulator_tag = accumulators::tag::hash<sha2<Version>>;
             };
 #endif
         }    // namespace hashes

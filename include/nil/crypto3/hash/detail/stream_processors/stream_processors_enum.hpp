@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2024 Iosif (x-mass) <x-mass@nil.foundation>
 //
 // MIT License
 //
@@ -22,33 +22,22 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_HASH_STATE_HPP
-#define CRYPTO3_HASH_STATE_HPP
+#ifndef CRYPTO3_HASH_DETAIL_STREAM_PROCESSORS_ENUM
+#define CRYPTO3_HASH_DETAIL_STREAM_PROCESSORS_ENUM
 
-#include <boost/accumulators/framework/accumulator_set.hpp>
-#include <boost/accumulators/framework/features.hpp>
-
-#include <nil/crypto3/detail/type_traits.hpp>
-
-#include <nil/crypto3/hash/accumulators/hash.hpp>
-
-#include <nil/crypto3/detail/static_digest.hpp>
-
-// TODO: rename this file
 namespace nil {
     namespace crypto3 {
-        template<typename Hash, typename = typename std::enable_if<detail::is_hash<Hash>::value>::type>
-        struct accumulator_set
-            : public boost::accumulators::accumulator_set<
-                typename Hash::digest_type,
-                boost::accumulators::features<
-                    typename Hash::accumulator_tag
-                >,
-                std::size_t
-            > {
-            typedef Hash hash_type;
-        };
+        namespace hashes {
+            namespace detail {
+
+                enum class stream_processor_type {
+                    Block,
+                    RawDelegating
+                };
+
+            }    // namespace detail
+        }    // namespace hashes
     }    // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_BLOCK_STREAM_PREPROCESSOR_HPP
+#endif // CRYPTO3_HASH_DETAIL_STREAM_PROCESSORS_ENUM

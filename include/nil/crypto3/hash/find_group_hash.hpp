@@ -38,7 +38,7 @@
 #include <nil/marshalling/algorithms/pack.hpp>
 #include <nil/crypto3/marshalling/algebra/types/curve_element.hpp>
 
-#include <nil/crypto3/hash/detail/raw_stream_processor.hpp>
+#include <nil/crypto3/hash/detail/stream_processors/stream_processors_enum.hpp>
 #include <nil/crypto3/hash/algorithm/hash.hpp>
 #include <nil/crypto3/hash/sha2.hpp>
 
@@ -89,16 +89,8 @@ namespace nil {
                     typedef void type;
                 };
 
-                template<typename StateAccumulator, std::size_t ValueBits>
-                struct stream_processor {
-                    struct params_type {
-                        typedef typename construction::params_type::digest_endian digest_endian;
-
-                        constexpr static const std::size_t value_bits = ValueBits;
-                    };
-
-                    typedef raw_stream_processor<construction, StateAccumulator, params_type> type;
-                };
+                constexpr static detail::stream_processor_type stream_processor = detail::stream_processor_type::RawDelegating;
+                using accumulator_tag = accumulators::tag::forwarding_hash<find_group_hash<Params, Hash, Group>>;
 
                 static inline std::vector<std::uint8_t> urs = {
                     0x30, 0x39, 0x36, 0x62, 0x33, 0x36, 0x61, 0x35, 0x38, 0x30, 0x34, 0x62, 0x66, 0x61, 0x63, 0x65,
