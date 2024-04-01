@@ -36,6 +36,7 @@
 #include <nil/crypto3/detail/pack.hpp>
 #include <nil/crypto3/hash/accumulators/hash.hpp>
 #include <nil/crypto3/hash/detail/stream_processors/block_stream_processor.hpp>
+#include <nil/crypto3/hash/detail/stream_processors/raw_stream_processor.hpp>
 #include <nil/crypto3/hash/detail/stream_processors/raw_delegating_stream_processor.hpp>
 #include <nil/crypto3/hash/detail/stream_processors/stream_processors_enum.hpp>
 
@@ -139,12 +140,14 @@ namespace nil {
                                 std::numeric_limits<value_type>::digits + std::numeric_limits<value_type>::is_signed>;
 
                             StreamProcessor(this->accumulator_set)(first, last);
+                        } else if constexpr (hash_type::stream_processor == detail::stream_processor_type::Raw) {
+                            using StreamProcessor = typename nil::crypto3::hashes::raw_stream_processor<accumulator_set_type>;
+
+                            StreamProcessor(this->accumulator_set)(first, last);
                         } else if constexpr (hash_type::stream_processor == detail::stream_processor_type::RawDelegating) {
                             using StreamProcessor = typename nil::crypto3::hashes::raw_delegating_stream_processor<accumulator_set_type>;
 
                             StreamProcessor(this->accumulator_set)(first, last);
-                        } else {
-                            BOOST_ASSERT_MSG(false, "Can't determine a type of StreamProcessor");
                         }
                     }
 

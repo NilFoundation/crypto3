@@ -26,31 +26,21 @@ namespace nil {
                  * @tparam Capacity Capacity or inner part of Poseidon permutation in field elements
                  * @tparam Security mode of Poseidon permutation
                  */
+                // base_poseidon_policy<FieldType, 128, 4, 1, 5, 8, 60, false> {};
                 template<typename FieldType, std::size_t Security, std::size_t Rate, std::size_t Capacity, std::size_t SBoxPower, std::size_t FullRounds, std::size_t PartRounds, bool MinaVersion>
                 struct base_poseidon_policy {
-                    typedef FieldType field_type;
-                    typedef typename field_type::value_type element_type;
+                    using field_type = FieldType;
 
-                    constexpr static const std::size_t word_bits = field_type::modulus_bits;
-                    typedef element_type word_type;
-
-                    constexpr static const std::size_t digest_bits = field_type::modulus_bits;
-                    typedef element_type digest_type;
-
-                    // TODO: Not sure what is best to use here.
-                    typedef typename stream_endian::big_octet_big_bit digest_endian;
-
-                    constexpr static const std::size_t state_bits = (Rate + Capacity) * field_type::modulus_bits;
-                    constexpr static const std::size_t state_words = (Rate + Capacity);
-                    typedef std::array<element_type, Rate + Capacity> state_type;
-
-                    constexpr static const std::size_t block_bits = Rate * field_type::modulus_bits;
-
-                    // TODO: Check if this value is correct.
-                    constexpr static const std::size_t length_bits = word_bits;
+                    using word_type = typename field_type::value_type;
 
                     constexpr static const std::size_t block_words = Rate;
-                    typedef std::array<element_type, Rate> block_type;
+
+                    using block_type = std::array<word_type, block_words>;
+
+                    constexpr static const std::size_t state_words = Rate + Capacity;
+                    using state_type = std::array<word_type, state_words>;
+
+                    using digest_type = word_type;
 
                     constexpr static const std::size_t full_rounds = FullRounds;
                     constexpr static const std::size_t half_full_rounds = FullRounds >> 1;
@@ -65,10 +55,10 @@ namespace nil {
 
                     struct iv_generator {
                         // TODO: maybe it would be done in constexpr way
-                        const state_type &operator()() const {
+                        static state_type generate() {
                             static const state_type H0 = []() {
                                 state_type H;
-                                H.fill(element_type(0));
+                                H.fill(word_type(0));
                                 return H;
                             }();
                             return H0;

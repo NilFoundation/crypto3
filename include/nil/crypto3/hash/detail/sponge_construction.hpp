@@ -166,26 +166,14 @@ namespace nil {
                 constexpr static const std::size_t block_words = Policy::block_words;
                 using block_type = std::array<word_type, block_words>;
 
-                constexpr static const std::size_t digest_words = Policy::digest_words;
-                using digest_type = std::array<word_type, digest_words>;
+                using digest_type = typename Policy::digest_type;
 
                 algebraic_sponge_construction() {
                     reset();
                 }
 
                 digest_type digest() {
-                    digest_type squeezed_words_holder;
-                    constexpr static std::size_t blocks_needed_for_digest =  digest_words / block_words + (digest_words % block_words == 0 ? 0 : 1);
-                    for (std::size_t i = 0; i < blocks_needed_for_digest; ++i) {
-                        block_type squeezed = squeeze();
-                        std::move(
-                            squeezed.begin(),
-                            squeezed.begin() + std::min(block_words, digest_words - i * block_words),
-                            squeezed_words_holder.begin() + i * block_words
-                        );
-                    }
-
-                    return squeezed_words_holder;
+                    return squeeze()[0];
                 }
 
                 void absorb(const block_type &block) {

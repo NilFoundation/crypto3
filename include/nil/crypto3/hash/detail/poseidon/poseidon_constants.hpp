@@ -33,8 +33,7 @@ namespace nil {
                 class poseidon_constants {
                 public:
                     typedef poseidon_policy_type policy_type;
-                    typedef typename policy_type::field_type field_type;
-                    typedef typename field_type::value_type element_type;
+                    typedef typename policy_type::word_type element_type;
                     constexpr static const std::size_t state_words = policy_type::state_words;
 
                     typedef algebra::vector<element_type, state_words> state_vector_type;
@@ -48,7 +47,7 @@ namespace nil {
                     // Choose which constants we want, original or kimchi. We may later add
                     // other sets of constants here.
                     typedef typename std::conditional<poseidon_policy_type::mina_version, poseidon_kimchi_constants_data<policy_type>, poseidon_original_constants_data<policy_type>>::type constants_data_type;
- 
+
                     poseidon_constants() {
                         // Transpose the matrix.
                         for (std::size_t i = 0; i < state_words; i++) {
@@ -57,7 +56,7 @@ namespace nil {
                             }
                         }
                     }
-                    
+
                     inline const element_type &get_round_constant(
                             std::size_t round, std::size_t i) const {
                         return constants_data_type::round_constants[round][i];

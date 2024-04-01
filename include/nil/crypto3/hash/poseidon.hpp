@@ -14,9 +14,11 @@
 #include <nil/crypto3/algebra/curves/pallas.hpp>
 #else
 #include <nil/crypto3/hash/accumulators/hash.hpp>
+#include <nil/crypto3/hash/detail/poseidon/nil_poseidon_sponge.hpp>
+#include <nil/crypto3/hash/detail/poseidon/poseidon_functions.hpp>
 #include <nil/crypto3/hash/detail/poseidon/poseidon_permutation.hpp>
-#include <nil/crypto3/hash/detail/poseidon/poseidon_sponge.hpp>
-#include <nil/crypto3/hash/detail/stream_processors_enum.hpp>
+#include <nil/crypto3/hash/detail/sponge_construction.hpp>
+#include <nil/crypto3/hash/detail/stream_processors/stream_processors_enum.hpp>
 #endif
 
 namespace nil {
@@ -35,67 +37,62 @@ namespace nil {
                 };
             };
 #else
-            template<typename policy_type>
-            class poseidon_compressor {
-            protected:
-                typedef detail::poseidon_permutation<policy_type> poseidon_permutation;
-
-            public:
-                typedef typename policy_type::word_type word_type;
-                typedef typename policy_type::block_type block_type;
-                typedef typename policy_type::state_type state_type;
-
-                constexpr static const std::size_t word_bits = policy_type::word_bits;
-                constexpr static const std::size_t state_bits = policy_type::state_bits;
-                constexpr static const std::size_t state_words = policy_type::state_words;
-                constexpr static const std::size_t block_bits = policy_type::block_bits;
-                constexpr static const std::size_t block_words = policy_type::block_words;
-                constexpr static const std::size_t length_bits = policy_type::length_bits;
-
-                static void process_block(state_type &state, const block_type &block) {
-
-                    for (std::size_t i = 0; i < state_words; ++i)
-                        state[i] ^= block[i];
-
-                    // for (std::size_t i = 0; i != state_words; ++i)
-                    //     boost::endian::endian_reverse_inplace(state[i]);
-
-                    poseidon_permutation::permute(state);
-
-                    // for (std::size_t i = 0; i != state_words; ++i)
-                    //     boost::endian::endian_reverse_inplace(state[i]);
-                }
-            };
-
             template<typename PolicyType>
             struct poseidon {
             public:
                 typedef PolicyType policy_type;
-                constexpr static const std::size_t word_bits = policy_type::word_bits;
                 typedef typename policy_type::word_type word_type;
 
-                constexpr static const std::size_t block_bits = policy_type::block_bits;
                 constexpr static const std::size_t block_words = policy_type::block_words;
                 typedef typename policy_type::block_type block_type;
 
-                constexpr static const std::size_t digest_bits = policy_type::digest_bits;
-                typedef typename policy_type::digest_type digest_type;
-                typedef digest_type value_type;
-
                 // This is required by 'is_hash' concept.
+                constexpr static const std::size_t digest_bits = 0;
+                using digest_type = typename policy_type::digest_type;
+
                 struct construction {
                     struct params_type {
-                        typedef typename policy_type::digest_endian digest_endian;
-
-                        constexpr static const std::size_t digest_bits = policy_type::digest_bits;
-                        constexpr static const std::size_t length_bits = policy_type::length_bits;
+                        // This is required by 'is_hash' concept.
                     };
 
-                    typedef detail::poseidon_sponge_construction<policy_type> type;
+                    using type = detail::nil_poseidon_sponge_construction<
+                        policy_type
+                    >;
                 };
 
-                constexpr static detail::stream_processor_type stream_processor = detail::stream_processor_type::RawDelegating;
-                using accumulator_tag = accumulators::tag::forwarding_hash<poseidon<PolicyType>>;
+                constexpr static detail::stream_processor_type stream_processor = detail::stream_processor_type::Raw;
+                using accumulator_tag = accumulators::tag::algebraic_hash<poseidon<PolicyType>>;
+            };
+
+            template<typename PolicyType>
+            struct original_poseidon {
+            public:
+                typedef PolicyType policy_type;
+                typedef typename policy_type::word_type word_type;
+
+                constexpr static const std::size_t block_words = policy_type::block_words;
+                typedef typename policy_type::block_type block_type;
+
+                // This is required by 'is_hash' concept.
+                constexpr static const std::size_t digest_bits = 0;
+                using digest_type = typename policy_type::digest_type;
+
+                struct construction {
+                    struct params_type {
+                        // This is required by 'is_hash' concept.
+                    };
+
+                    using type = algebraic_sponge_construction<
+                        policy_type,
+                        typename policy_type::iv_generator,
+                        detail::poseidon_functions<policy_type>,
+                        detail::poseidon_functions<policy_type>,
+                        detail::poseidon_functions<policy_type>
+                    >;
+                };
+
+                constexpr static detail::stream_processor_type stream_processor = detail::stream_processor_type::Raw;
+                using accumulator_tag = accumulators::tag::algebraic_hash<original_poseidon<PolicyType>>;
             };
 #endif
         }    // namespace hashes

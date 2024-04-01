@@ -27,16 +27,15 @@ namespace nil {
 
                 /// Round for the original version, ARC-SBOX-MDS order.
                 template<typename poseidon_policy_type>
-                class poseidon_round_operator<poseidon_policy_type, 
+                class poseidon_round_operator<poseidon_policy_type,
                                               std::enable_if_t<!poseidon_policy_type::mina_version>> {
                 public:
                     typedef poseidon_policy_type policy_type;
-                    typedef typename policy_type::field_type field_type;
 
                     typedef poseidon_constants<policy_type> poseidon_constants_type;
                     typedef typename poseidon_constants_type::round_constants_type round_constants_type;
 
-                    typedef typename field_type::value_type element_type;
+                    typedef typename policy_type::word_type element_type;
                     typedef typename poseidon_constants_type::state_vector_type state_vector_type;
 
                     constexpr static const std::size_t state_words = policy_type::state_words;
@@ -80,7 +79,7 @@ namespace nil {
 
                 /// Rounds for Mina version have SBOX-MDS-ARC order.
                 template<typename poseidon_policy_type>
-                class poseidon_round_operator<poseidon_policy_type, 
+                class poseidon_round_operator<poseidon_policy_type,
                                               std::enable_if_t<poseidon_policy_type::mina_version>> {
                 public:
                     typedef poseidon_policy_type policy_type;

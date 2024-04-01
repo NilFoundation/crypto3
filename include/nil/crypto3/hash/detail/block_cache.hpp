@@ -113,6 +113,67 @@ namespace nil {
                     std::size_t filled_bits_n_ = 0;
             };
 
+            template <typename BlockType, typename WordType, std::size_t BlockWords>
+            class algebra_block_cache {
+                public:
+                    void append(WordType word) {
+                        if (is_full()) {
+                            return;
+                        }
+                        storage_[filled_words_n_++] = word;
+                    }
+
+                    void append(const BlockType& block, const std::size_t words_n_to_append, const std::size_t block_offset_words = 0) {
+                        if (words_n_to_append > BlockWords - filled_words_n_) {
+                            return;
+                        }
+
+                        if (is_empty() && block_offset_words == 0) {
+                            storage_ = block;
+                        } else {
+                            std::copy(
+                                block.begin() + block_offset_words,
+                                block.begin() + block_offset_words + words_n_to_append,
+                                storage_.begin() + filled_words_n_
+                            );
+
+                        }
+                        filled_words_n_ += words_n_to_append;
+                    }
+
+                    const BlockType& get_block() const {
+                        return storage_;
+                    }
+
+                    BlockType& get_block() {
+                        return storage_;
+                    }
+
+                    void clean() {
+                        filled_words_n_ = 0;
+                    }
+
+                    bool is_full() const {
+                        return filled_words_n_ == BlockWords;
+                    }
+
+                    bool is_empty() const {
+                        return filled_words_n_ == 0;
+                    }
+
+                    std::size_t words_used() const {
+                        return filled_words_n_;
+                    }
+
+                    std::size_t capacity() const {
+                        return filled_words_n_;
+                    }
+
+                private:
+                    BlockType storage_ = BlockType();
+                    std::size_t filled_words_n_ = 0;
+                };
+
         }    // hashes
     }    // crypto3
 }    // nil

@@ -20,18 +20,15 @@ namespace nil {
                 template<typename poseidon_policy_type>
                 struct poseidon_permutation {
                     typedef poseidon_policy_type policy_type;
-                    typedef typename policy_type::field_type field_type;
 
                     typedef poseidon_round_operator<policy_type> round_operator_type;
 
-                    typedef typename field_type::value_type element_type;
+                    typedef typename policy_type::word_type element_type;
                     typedef typename round_operator_type::state_vector_type state_vector_type;
 
-                    constexpr static const std::size_t state_bits = policy_type::state_bits;
                     constexpr static const std::size_t state_words = policy_type::state_words;
                     typedef typename policy_type::state_type state_type;
 
-                    constexpr static const std::size_t block_bits = policy_type::block_bits;
                     constexpr static const std::size_t block_words = policy_type::block_words;
                     typedef typename policy_type::block_type block_type;
 
@@ -65,7 +62,7 @@ namespace nil {
                         for (std::size_t i = half_full_rounds; i < full_rounds; i++) {
                             round_operator_type::full_round(A_vector, round_number++);
                         }
-                        
+
                         for (std::size_t i = 0; i < state_words; i++) {
                             A[i] = A_vector[i];
                         }

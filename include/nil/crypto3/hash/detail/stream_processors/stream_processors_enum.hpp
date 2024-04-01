@@ -32,6 +32,7 @@ namespace nil {
 
                 enum class stream_processor_type {
                     Block,
+                    Raw,
                     RawDelegating
                 };
 
