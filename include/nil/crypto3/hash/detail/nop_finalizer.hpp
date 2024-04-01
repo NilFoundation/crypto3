@@ -33,6 +33,11 @@ namespace nil {
                     template<typename T>
                     void operator()(T &) {
                     }
+
+                    template<typename T>
+                    static void finalize(T &) {
+                        // sponge construction uses finalizer::finalize(state) instead of () operator
+                    }
                 };
             }    // namespace detail
         }        // namespace hashes

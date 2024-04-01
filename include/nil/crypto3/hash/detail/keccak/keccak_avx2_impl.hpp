@@ -56,6 +56,9 @@ namespace nil {
                         UINT64_C(0x000000000000800a), UINT64_C(0x800000008000000a), UINT64_C(0x8000000080008081),
                         UINT64_C(0x8000000000008080), UINT64_C(0x0000000080000001), UINT64_C(0x8000000080008008)};
 
+// To suppress `warning: ignoring attributes on template argument ‘__m256i’`.
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wignored-attributes"
                     constexpr static const std::array<__m256i, round_constants_size> round_constants_v = {
                         {{static_cast<long long>(round_constants[0]), static_cast<long long>(round_constants[0]),
                           static_cast<long long>(round_constants[0]), static_cast<long long>(round_constants[0])},
@@ -120,6 +123,7 @@ namespace nil {
                          {word_bits - 10, word_bits - 61, word_bits - 55, word_bits - 8},
                          {word_bits - 2, word_bits - 15, word_bits - 25, word_bits - 20},
                          {word_bits - 44, word_bits - 43, word_bits - 21, word_bits - 14}}};
+#pragma GCC diagnostic pop
 
                     static inline void permute(state_type &A) {
 

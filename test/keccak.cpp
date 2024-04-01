@@ -291,7 +291,7 @@ BOOST_FIXTURE_TEST_CASE(keccak_224_accumulator, fixture<224>) {
     // "abc"
     hash_t::construction::type::block_type m = {{}};
 
-    m[0] = UINT64_C(0x6162630000000000);
+    m[0] = UINT64_C(0x0000000000636261);
     acc(m, accumulators::bits = 24);
 
     hash_t::digest_type s = extract::hash<hash_t>(acc);
@@ -307,7 +307,7 @@ BOOST_FIXTURE_TEST_CASE(keccak_256_accumulator, fixture<256>) {
     // "abc"
     hash_t::construction::type::block_type m = {{}};
 
-    m[0] = UINT64_C(0x6162630000000000);
+    m[0] = UINT64_C(0x0000000000636261);
     acc(m, accumulators::bits = 24);
 
     hash_t::digest_type s = extract::hash<hash_t>(acc);
@@ -323,7 +323,7 @@ BOOST_FIXTURE_TEST_CASE(keccak_384_accumulator, fixture<384>) {
     // "abc"
     hash_t::construction::type::block_type m = {{}};
 
-    m[0] = UINT64_C(0x6162630000000000);
+    m[0] = UINT64_C(0x0000000000636261);
     acc(m, accumulators::bits = 24);
 
     hash_t::digest_type s = extract::hash<hash_t>(acc);
@@ -342,7 +342,7 @@ BOOST_FIXTURE_TEST_CASE(keccak_512_accumulator, fixture<512>) {
     // "abc"
     hash_t::construction::type::block_type m = {{}};
 
-    m[0] = UINT64_C(0x6162630000000000);
+    m[0] = UINT64_C(0x0000000000636261);
     acc(m, accumulators::bits = 24);
 
     hash_t::digest_type s = extract::hash<hash_t>(acc);
@@ -375,9 +375,9 @@ BOOST_AUTO_TEST_CASE(keccak_224_preprocessor1) {
 BOOST_AUTO_TEST_CASE(keccak_224_preprocessor2) {
     accumulator_set<hashes::keccak_1600<224>> acc;
 
-    acc(UINT64_C(0x6100000000000000), accumulators::bits = 8);
-    acc(UINT64_C(0x6200000000000000), accumulators::bits = 8);
-    acc(UINT64_C(0x6300000000000000), accumulators::bits = 8);
+    acc(UINT64_C(0x0000000000000061), accumulators::bits = 8);
+    acc(UINT64_C(0x0000000000000062), accumulators::bits = 8);
+    acc(UINT64_C(0x0000000000000063), accumulators::bits = 8);
 
     hashes::keccak_1600<224>::digest_type s = extract::hash<hashes::keccak_1600<224>>(acc);
 
@@ -402,9 +402,9 @@ BOOST_AUTO_TEST_CASE(keccak_256_preprocessor1) {
 BOOST_AUTO_TEST_CASE(keccak_256_preprocessor2) {
     accumulator_set<hashes::keccak_1600<256>> acc;
 
-    acc(UINT64_C(0x6100000000000000), accumulators::bits = 8);
-    acc(UINT64_C(0x6200000000000000), accumulators::bits = 8);
-    acc(UINT64_C(0x6300000000000000), accumulators::bits = 8);
+    acc(UINT64_C(0x0000000000000061), accumulators::bits = 8);
+    acc(UINT64_C(0x0000000000000062), accumulators::bits = 8);
+    acc(UINT64_C(0x0000000000000063), accumulators::bits = 8);
 
     hashes::keccak_1600<256>::digest_type s = extract::hash<hashes::keccak_1600<256>>(acc);
 
@@ -432,9 +432,9 @@ BOOST_AUTO_TEST_CASE(keccak_384_preprocessor1) {
 BOOST_AUTO_TEST_CASE(keccak_384_preprocessor2) {
     accumulator_set<hashes::keccak_1600<384>> acc;
 
-    acc(UINT64_C(0x6100000000000000), accumulators::bits = 8);
-    acc(UINT64_C(0x6200000000000000), accumulators::bits = 8);
-    acc(UINT64_C(0x6300000000000000), accumulators::bits = 8);
+    acc(UINT64_C(0x0000000000000061), accumulators::bits = 8);
+    acc(UINT64_C(0x0000000000000062), accumulators::bits = 8);
+    acc(UINT64_C(0x0000000000000063), accumulators::bits = 8);
 
     hashes::keccak_1600<384>::digest_type s = extract::hash<hashes::keccak_1600<384>>(acc);
 
@@ -465,9 +465,9 @@ BOOST_AUTO_TEST_CASE(keccak_512_preprocessor1) {
 BOOST_AUTO_TEST_CASE(keccak_512_preprocessor2) {
     accumulator_set<hashes::keccak_1600<512>> acc;
 
-    acc(UINT64_C(0x6100000000000000), accumulators::bits = 8);
-    acc(UINT64_C(0x6200000000000000), accumulators::bits = 8);
-    acc(UINT64_C(0x6300000000000000), accumulators::bits = 8);
+    acc(UINT64_C(0x0000000000000061), accumulators::bits = 8);
+    acc(UINT64_C(0x0000000000000062), accumulators::bits = 8);
+    acc(UINT64_C(0x0000000000000063), accumulators::bits = 8);
 
     hashes::keccak_1600<512>::digest_type s = extract::hash<hashes::keccak_1600<512>>(acc);
 

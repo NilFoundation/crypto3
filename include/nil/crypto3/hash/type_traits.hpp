@@ -98,6 +98,8 @@
 
 #include <type_traits>
 
+#include <nil/crypto3/hash/detail/sponge_construction.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace hashes {
@@ -159,6 +161,29 @@ namespace nil {
             template<typename HashType>
             struct is_poseidon<HashType, typename std::enable_if_t<std::is_same<nil::crypto3::hashes::poseidon<typename HashType::policy_type>, HashType>::value>> {
             public:
+                static const bool value = true;
+                typedef HashType type;
+            };
+
+            template <template <typename...> class PrimaryTemplate, typename T>
+            struct is_specialization_of : std::false_type {};
+
+            template <template <typename...> class PrimaryTemplate, typename... Args>
+            struct is_specialization_of<PrimaryTemplate, PrimaryTemplate<Args...>> : std::true_type {};
+
+            template<typename HashType, typename = void>
+            struct uses_sponge_construction {
+                static const bool value = false;
+            };
+
+            template<typename HashType>
+            struct uses_sponge_construction<
+                HashType,
+                std::enable_if_t<
+                    is_specialization_of<sponge_construction, typename HashType::construction::type>::value ||
+                    is_specialization_of<algebraic_sponge_construction, typename HashType::construction::type>::value
+                >
+            > {
                 static const bool value = true;
                 typedef HashType type;
             };

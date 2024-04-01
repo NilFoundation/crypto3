@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020 Alexander Sokolov <asokolov@nil.foundation>
+// Copyright (c) 2024 Iosif (x-mass) <x-mass@nil.foundation>
 //
 // MIT License
 //
@@ -38,9 +39,6 @@ namespace nil {
              * @brief
              * @tparam DigestEndian
              * @tparam DigestBits
-             * @tparam IV
-             * @tparam Compressor
-             * @tparam Finalizer
              *
              * The Sponge construction builds a block hashes from a
              * one-way compressor.  As this version operated on the block
@@ -49,67 +47,52 @@ namespace nil {
              * truncate the internal state.
              */
             template<typename Params,
-                     typename IV,
-                     typename Compressor,
-                     typename Padding,
-                     typename Finalizer = detail::nop_finalizer>
+                     typename Policy,
+                     typename IVGenerator, // Class produsing IV
+                     typename Absorber,    // Must provide void absorb(block, state)
+                     typename Permutator,  // Must provide void permute(state)
+                     typename Padder       // Must provide std::vector<block_type> get_padded_blocks(block)
+                     >
             class sponge_construction {
+            // This implementation corresponds to hash accumulator, it consumes full block rather than words.
             public:
-                typedef IV iv_generator;
-                typedef Compressor compressor_functor;
-                typedef Padding padding_functor;
-                typedef Finalizer finalizer_functor;
+                using endian_type = typename Params::digest_endian;
 
-                typedef typename Params::digest_endian endian_type;
+                constexpr static const std::size_t word_bits = Policy::word_bits;
+                using word_type = typename Policy::word_type;
 
-                constexpr static const std::size_t word_bits = compressor_functor::word_bits;
-                typedef typename compressor_functor::word_type word_type;
+                // S = R || C (state)
+                constexpr static const std::size_t state_bits = Policy::state_bits;
+                constexpr static const std::size_t state_words = Policy::state_words;
+                using state_type = typename Policy::state_type;
 
-                constexpr static const std::size_t state_bits = compressor_functor::state_bits;
-                constexpr static const std::size_t state_words = compressor_functor::state_words;
-                typedef typename compressor_functor::state_type state_type;
-
-                constexpr static const std::size_t block_bits = compressor_functor::block_bits;
-                constexpr static const std::size_t block_words = compressor_functor::block_words;
-                typedef typename compressor_functor::block_type block_type;
+                // R (bitrate). `block` is used to fit other code (e.g. accumulator)
+                constexpr static const std::size_t block_bits = Policy::block_bits;
+                constexpr static const std::size_t block_words = Policy::block_words;
+                using block_type = typename Policy::block_type;
 
                 constexpr static const std::size_t digest_bits = Params::digest_bits;
                 constexpr static const std::size_t digest_bytes = digest_bits / octet_bits;
-                constexpr static const std::size_t digest_words = digest_bits / word_bits;
-                typedef static_digest<digest_bits> digest_type;
+                constexpr static const std::size_t digest_words = digest_bits / word_bits + (digest_bits % word_bits == 0 ? 0 : 1);
+                using digest_type = static_digest<digest_bits>;
 
-                template<typename Integer = std::size_t>
-                inline sponge_construction &process_block(const block_type &block, Integer seen = Integer()) {
-                    compressor_functor::process_block(state_, block);
-                    return *this;
+                sponge_construction() {
+                    reset();
                 }
 
-                inline digest_type digest(const block_type &block = block_type(),
-                                          std::size_t total_seen = std::size_t()) {
+                digest_type digest() {
                     using namespace nil::crypto3::detail;
 
-                    block_type b = block;
-                    std::size_t block_seen = total_seen % block_bits;
-
-                    std::size_t copy_seen = block_seen;
-                    // Pad last message block
-                    padding_functor padding;
-                    padding(b, block_seen);
-                    process_block(b);
-
-                    // Process additional block if not all bits were padded
-                    if (!padding.is_last_block()) {
-                        std::fill(b.begin(), b.end(), 0);
-                        padding.process_last(b, copy_seen);
-                        process_block(b);
+                    std::array<word_type, digest_words> squeezed_blocks_holder;
+                    constexpr static std::size_t blocks_needed_for_digest =  digest_bits / block_bits + (digest_bits % block_bits == 0 ? 0 : 1);
+                    for (std::size_t i = 0; i < blocks_needed_for_digest; ++i) {
+                        block_type squeezed = squeeze();
+                        // TODO: check if this will break in case >1. sinse there could be not enough squeezed_blocks_holder
+                        pack_from<endian_type, word_bits, word_bits>(squeezed.begin(), squeezed.end(), squeezed_blocks_holder.begin() + i * block_words);
                     }
 
-                    // Apply finalizer
-                    finalizer_functor()(state_);
-
-                    // Convert digest to byte representation
-                    std::array<octet_type, state_bits / octet_bits> d_full;
-                    pack_from<endian_type, word_bits, octet_bits>(state_.begin(), state_.end(), d_full.begin());
+                    std::array<octet_type, digest_bits / octet_bits> d_full;
+                    pack_from<endian_type, word_bits, octet_bits>(squeezed_blocks_holder.begin(), squeezed_blocks_holder.end(), d_full.begin());
 
                     digest_type d;
                     std::copy(d_full.begin(), d_full.begin() + digest_bytes, d.begin());
@@ -117,17 +100,42 @@ namespace nil {
                     return d;
                 }
 
-                sponge_construction() {
-                    reset();
+                void absorb(const block_type &block) {
+                    Absorber::absorb(block, state_);
+                    Permutator::permute(state_);
+                    permutation_was_made_ = true;
                 }
+
+                void absorb_with_padding(const block_type &block = block_type(),
+                                          const std::size_t last_block_bits_filled = 0) {
+                    // Mb create padding somewhere else and only keep absorb(...) method?
+                    auto padded_blocks = Padder::get_padded_blocks(block, last_block_bits_filled);
+                    for (auto& block : padded_blocks) {
+                        absorb(std::move(block));
+                    }
+                }
+
+                block_type squeeze() {
+                    if (!permutation_was_made_) {
+                        // In hypothetical case when we don't have padding and did not absorb values before.
+                        // Thus, not to return initial state, we do this permutation.
+                        Permutator::permute(state_);
+                        permutation_was_made_ = true;
+                    }
+                    block_type block;
+                    std::copy(state_.begin(), state_.begin() + block_words, block.begin());
+                    Permutator::permute(state_);
+                    return block;
+                }
+
 
                 void reset(state_type const &s) {
                     state_ = s;
+                    permutation_was_made_ = false;
                 }
 
                 void reset() {
-                    iv_generator iv;
-                    reset(iv());
+                    reset(IVGenerator::generate());
                 }
 
                 state_type const &state() const {
@@ -136,6 +144,94 @@ namespace nil {
 
             private:
                 state_type state_;
+                bool permutation_was_made_;
+            };
+
+            template<typename Policy,
+                     typename IVGenerator, // Class produsing IV
+                     typename Absorber,    // Must provide void absorb(block, state)
+                     typename Permutator,  // Must provide void permute(state)
+                     typename Padder       // Must provide std::vector<block_type> get_padded_blocks(block)
+                     >
+            class algebraic_sponge_construction {
+            // This implementation corresponds to hash accumulator, it consumes full block rather than words.
+            public:
+                using word_type = typename Policy::word_type;
+
+                // S = R || C (state)
+                constexpr static const std::size_t state_words = Policy::state_words;
+                using state_type = std::array<word_type, state_words>;
+
+                // R (bitrate). `block` is used to fit other code (e.g. accumulator)
+                constexpr static const std::size_t block_words = Policy::block_words;
+                using block_type = std::array<word_type, block_words>;
+
+                constexpr static const std::size_t digest_words = Policy::digest_words;
+                using digest_type = std::array<word_type, digest_words>;
+
+                algebraic_sponge_construction() {
+                    reset();
+                }
+
+                digest_type digest() {
+                    digest_type squeezed_words_holder;
+                    constexpr static std::size_t blocks_needed_for_digest =  digest_words / block_words + (digest_words % block_words == 0 ? 0 : 1);
+                    for (std::size_t i = 0; i < blocks_needed_for_digest; ++i) {
+                        block_type squeezed = squeeze();
+                        std::move(
+                            squeezed.begin(),
+                            squeezed.begin() + std::min(block_words, digest_words - i * block_words),
+                            squeezed_words_holder.begin() + i * block_words
+                        );
+                    }
+
+                    return squeezed_words_holder;
+                }
+
+                void absorb(const block_type &block) {
+                    Absorber::absorb(block, state_);
+                    Permutator::permute(state_);
+                    permutation_was_made_ = true;
+                }
+
+                void absorb_with_padding(const block_type &block,
+                                          const std::size_t last_block_words_filled = block_words) {
+                    auto padded_blocks = Padder::get_padded_blocks(block, last_block_words_filled);
+                    for (auto& block : padded_blocks) {
+                        absorb(std::move(block));
+                    }
+                }
+
+                block_type squeeze() {
+                    if (!permutation_was_made_) {
+                        // In case when we don't have padding and did not absorb values before.
+                        // Thus, not to return initial state, we do this permutation. E.g. Poseidon,
+                        // which does not use any padding.
+                        Permutator::permute(state_);
+                        permutation_was_made_ = true;
+                    }
+                    block_type block;
+                    std::copy(state_.begin(), state_.begin() + block_words, block.begin());
+                    Permutator::permute(state_);
+                    return block;
+                }
+
+                void reset(state_type const& s) {
+                    state_ = s;
+                    permutation_was_made_ = false;
+                }
+
+                void reset() {
+                    reset(IVGenerator::generate());
+                }
+
+                const state_type& state() const {
+                    return state_;
+                }
+
+            private:
+                state_type state_;
+                bool permutation_was_made_;
             };
 
         }    // namespace hashes

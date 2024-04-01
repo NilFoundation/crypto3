@@ -144,26 +144,13 @@ namespace nil {
 
                     constexpr static const std::size_t length_bits = 0;
 
-                    typedef typename stream_endian::big_octet_big_bit digest_endian;
+                    typedef typename stream_endian::little_octet_big_bit digest_endian;
 
                     constexpr static const std::size_t rounds = 24;
 
                     struct iv_generator {
-                        state_type const &operator()() const {
-                            static state_type const H0 = {UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000),
-                                                          UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000),
-                                                          UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000),
-                                                          UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000),
-                                                          UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000),
-                                                          UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000),
-                                                          UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000),
-                                                          UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000),
-                                                          UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000),
-                                                          UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000),
-                                                          UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000),
-                                                          UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000),
-                                                          UINT64_C(0x0000000000000000)};
-                            return H0;
+                        static state_type generate() {
+                            return keccak_1600_policy<DigestBits>::iv_generator::generate();
                         }
                     };
                 };

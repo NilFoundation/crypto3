@@ -55,6 +55,8 @@ namespace nil {
                     constexpr static const std::size_t word_bits = policy_type::word_bits;
                     typedef typename policy_type::word_type word_type;
 
+                    typedef typename policy_type::block_type block_type;
+
                     typedef typename policy_type::state_type state_type;
 
                     typedef typename std::conditional<word_bits == 64,
@@ -79,6 +81,13 @@ namespace nil {
 
                     typedef typename impl_type::round_constants_type round_constants_type;
                     constexpr static const round_constants_type round_constants = impl_type::round_constants;
+
+                    static void absorb(const block_type& block, state_type& state) {
+                        for (std::size_t i = 0; i < block.size(); ++i) {
+                            // XOR
+                            state[i] ^= block[i];
+                        }
+                    }
                 };
 
                 template<std::size_t DigestBits>

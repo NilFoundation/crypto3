@@ -33,9 +33,10 @@ namespace nil {
     namespace crypto3 {
         namespace hashes {
             namespace detail {
-                template<typename Hash>
-                class keccak_1600_padding {
-                    typedef Hash policy_type;
+                // pad10*1 scheme
+                template<typename Policy>
+                class keccak_1600_padder {
+                    typedef Policy policy_type;
 
                     constexpr static const std::size_t word_bits = policy_type::word_bits;
                     typedef typename policy_type::word_type word_type;
@@ -51,57 +52,55 @@ namespace nil {
                     constexpr static const std::size_t digest_bits = policy_type::digest_bits;
                     typedef typename policy_type::digest_type digest_type;
 
-                    typedef ::nil::crypto3::detail::injector<stream_endian::big_octet_little_bit,
-                                                             stream_endian::big_octet_little_bit, word_bits, block_words>
+                    typedef ::nil::crypto3::detail::injector<stream_endian::big_octet_big_bit, stream_endian::little_octet_little_bit, word_bits,
+                                                             block_words>
                         injector_type;
 
                     bool is_last;
 
                 public:
-                    keccak_1600_padding() : is_last(true) {
+                    keccak_1600_padder() : is_last(true) {
                     }
 
-                    bool is_last_block() const {
-                        return is_last;
-                    }
-
-                    void operator()(block_type &block, std::size_t &block_seen) {
+                    static std::vector<block_type> get_padded_blocks(const block_type& block, std::size_t block_seen) {
                         using namespace nil::crypto3::detail;
 
-                        if ((block_bits - block_seen) > 1) {
-                            // try to handle bit NIST tests
-                            /*if (block_seen % octet_bits) {
-                                pack<stream_endian::big_octet_big_bit, stream_endian::big_octet_little_bit,
-                                word_bits, word_bits>(block.begin(), block.end(), block.begin());
-                            }*/
-                            // pad 1
-                            injector_type::inject(unbounded_shr(high_bits<word_bits>(~word_type(), 1), 7), 1, block,
-                                                  block_seen);
-                            // pad 0*
-                            block_type zeros;
-                            std::fill(zeros.begin(), zeros.end(), 0);
-                            injector_type::inject(zeros, block_bits - 1 - block_seen, block, block_seen);
-                            // pad 1
-                            injector_type::inject(unbounded_shr(high_bits<word_bits>(~word_type(), 1), 7), 1, block,
-                                                  block_seen);
+                        std::vector<block_type> padded_blocks;
+                        block_type new_block = block;
+                        // set variable to 10
+                        word_type padding_start = high_bits<word_bits>(~word_type(), 1);
+                        // get how many bits from it could fit into current block
+                        const std::size_t padding_start_bits_for_first_block = std::min(block_bits - block_seen, std::size_t{2});
+                        // inject this amount of bits
+                        injector_type::inject(padding_start, padding_start_bits_for_first_block, new_block, block_seen);
+
+                        if (block_seen == block_bits) {
+                            // if current block is full, copy it to result vector, reset counter. Since we need
+                            // to add, at least, the last 1 bit (and mb the rest of padding_start)
+                            padded_blocks.push_back(new_block);
+                            block_seen = 0;
                         }
 
-                        else {
-                            is_last = false;
-                            block[block_words - 1] &= ~high_bits<word_bits>(~word_type(), 1);
+                        if (padding_start_bits_for_first_block < 2) {
+                            // if not all padding_start was injected, we inject the rest of the padding_start to the next block
+                            injector_type::inject(padding_start, 2 - padding_start_bits_for_first_block, new_block,
+                                                    block_seen, padding_start_bits_for_first_block);
                         }
-                    }
 
-                    void process_last(block_type &block, std::size_t &block_seen) {
-                        using namespace nil::crypto3::detail;
-
-                        // pad 0*
+                        // fill the rest of the block with zeros
                         block_type zeros;
                         std::fill(zeros.begin(), zeros.end(), 0);
-                        injector_type::inject(zeros, block_bits - 1, block, block_seen);
-                        // pad 1
-                        injector_type::inject(unbounded_shr(high_bits<word_bits>(~word_type(), 1), 7), 1, block,
-                                              block_seen);
+                        injector_type::inject(zeros, block_bits - 1 - block_seen, new_block, block_seen);
+
+                        // add the last 1
+                        injector_type::inject(high_bits<word_bits>(~word_type(), 1), 1, new_block,
+                                                block_seen);
+
+                        padded_blocks.push_back(new_block);
+
+                        BOOST_ASSERT(block_seen == block_bits);
+
+                        return padded_blocks;
                     }
                 };
             }    // namespace detail

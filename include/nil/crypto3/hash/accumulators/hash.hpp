@@ -92,7 +92,14 @@ namespace nil {
 
                     inline result_type result(boost::accumulators::dont_care) const {
                         construction_type res = construction; // Make a copy, so we can append more to existing state afterwards
-                        return res.digest(cache_.get_block(), total_seen_);
+                        if constexpr (nil::crypto3::hashes::uses_sponge_construction<hash_type>::value) {
+                            // Sponge hash behavior
+                            res.absorb_with_padding(cache_.get_block(), cache_.bits_used());
+                            return res.digest();
+                        } else {
+                            // Non-sponge hash behavior
+                            return res.digest(cache_.get_block(), total_seen_);
+                        }
                     }
 
                 protected:
@@ -155,7 +162,11 @@ namespace nil {
 
                 private:
                     void flush_cache_to_construction() {
-                        construction.process_block(std::move(cache_.get_block()));
+                        if constexpr (nil::crypto3::hashes::uses_sponge_construction<hash_type>::value) {
+                            construction.absorb(std::move(cache_.get_block()));
+                        } else {
+                            construction.process_block(std::move(cache_.get_block()));
+                        }
                         cache_.clean();
                     }
 
