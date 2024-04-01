@@ -6,8 +6,6 @@
 # http://www.boost.org/LICENSE_1_0.txt
 #---------------------------------------------------------------------------#
 
-include(CMTest)
-
 cm_find_package(${CMAKE_WORKSPACE_NAME}_block)
 
 if(NOT Boost_UNIT_TEST_FRAMEWORK_FOUND)
@@ -34,7 +32,7 @@ macro(define_hash_test name)
                             "--log_sink=${TEST_LOGS_DIR}/${test_name}.xml")
     endif()
 
-    cm_test(NAME ${test_name} SOURCES ${name}.cpp)
+    cm_test(NAME ${test_name} SOURCES ${name}.cpp ARGS ${additional_args})
 
     target_include_directories(${test_name} PRIVATE
                                "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"

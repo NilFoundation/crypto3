@@ -280,6 +280,5 @@ elseif(${CMAKE_TARGET_ARCHITECTURE} STREQUAL "ppc64")
             "${CMAKE_UPPER_WORKSPACE_NAME}_HAS_POWER8")
 endif()
 
-if(BUILD_TESTS)
-    add_subdirectory(test)
-endif()
+include(CMTest)
+cm_add_test_subdirectory(test)
