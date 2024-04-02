@@ -74,6 +74,10 @@ namespace nil {
                                 return witness_columns + public_input_columns + a.index;
                             case plonk_variable<typename FieldType::value_type>::column_type::selector:
                                 return witness_columns + public_input_columns + constant_columns + a.index;
+                            default:
+                                std::cerr << "Invalid column type";
+                                std::abort();
+                                break;
                         }
                         /* unreachable*/
                         return std::numeric_limits<size_t>::max();

@@ -131,6 +131,8 @@ namespace nil {
                                     case VariableType::column_type::selector:
                                         assignment = assignments.selector(var.index);
                                         break;
+                                    default:
+                                        BOOST_ASSERT_MSG(false, "Invalid column type");
                                 }
 
                                 if (var.rotation != 0) {
@@ -169,6 +171,8 @@ namespace nil {
                                     case VariableType::column_type::selector:
                                         assignment = assignments.selector(var.index);
                                         break;
+                                    default:
+                                        BOOST_ASSERT_MSG(false, "Invalid column type");
                                 }
 
                                 if (var.rotation != 0) {

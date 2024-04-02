@@ -107,6 +107,10 @@ namespace nil {
                                 case polynomial_dfs_variable_type::column_type::selector:
                                     assignment = assignments.selector(var.index);
                                     break;
+                                default:
+                                    std::cerr << "Invalid column type";
+                                    std::abort();
+                                    break;
                             }
 
                             if (var.rotation != 0) {
