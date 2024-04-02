@@ -123,8 +123,9 @@ namespace nil {
                         precommit(const std::vector <math::polynomial<typename FieldType::value_type>> &poly,
                                   const std::shared_ptr <math::evaluation_domain<FieldType>> &D) {
 
+                            using namespace algorithms;
                             std::size_t leaf_size = poly.size();
-                            std::vector <std::vector<std::uint8_t>> y_data;
+                            std::vector <std::vector<detail::leaf_data_type<FRI>>> y_data;
                             y_data.resize(D->m);
                             std::vector <std::vector<typename FieldType::value_type>> poly_dfs(leaf_size);
                             for (std::size_t i = 0; i < leaf_size; i++) {
@@ -135,11 +136,10 @@ namespace nil {
 
                             for (std::size_t i = 0; i < D->m; i++) {
                                 for (std::size_t j = 0; j < leaf_size; j++) {
-                                    y_data[i].resize(field_element_type::length() * leaf_size);
+                                    y_data[i].resize(detail::leaf_data_size_multiplier<FRI> * leaf_size);
 
-                                    field_element_type y_val(poly_dfs[j][i]);
-                                    auto write_iter = y_data[i].begin() + field_element_type::length() * j;
-                                    y_val.write(write_iter, field_element_type::length());
+                                    auto write_iter = y_data[i].begin() + detail::leaf_data_size_multiplier<FRI> * j;
+                                    detail::write_field_element_to_iter<FRI>(write_iter, poly_dfs[j][i]);
                                 }
                             }
 
@@ -284,6 +284,7 @@ namespace nil {
                             std::size_t r = fri_params.r;
 
                             for (std::size_t i = 0; i < r; i++) {
+                                using namespace algorithms;
                                 typename FieldType::value_type alpha = transcript.template challenge<FieldType>();
 
                                 typename FieldType::value_type x_next = fri_params.q.evaluate(x);
@@ -299,17 +300,16 @@ namespace nil {
                                 }
 
                                 for (std::size_t j = 0; j < m; j++) {
-                                    std::vector <std::uint8_t> leaf_data(field_element_type::length() * leaf_size);
+                                    std::vector <detail::leaf_data_type<FRI>> leaf_data(detail::leaf_data_size_multiplier<FRI> * leaf_size);
 
                                     for (std::size_t polynom_index = 0; polynom_index < leaf_size;
                                          polynom_index++) {
 
                                         typename FieldType::value_type leaf = proof.round_proofs[i].y[polynom_index][j];
 
-                                        field_element_type leaf_val(leaf);
                                         auto write_iter = leaf_data.begin() +
-                                                          field_element_type::length() * polynom_index;
-                                        leaf_val.write(write_iter, field_element_type::length());
+                                                          detail::leaf_data_size_multiplier<FRI> * polynom_index;
+                                        detail::write_field_element_to_iter<FRI>(write_iter, leaf);
                                     }
 
                                     if (!proof.round_proofs[i].p[j].validate(leaf_data)) {
@@ -317,7 +317,7 @@ namespace nil {
                                     }
                                 }
 
-                                std::vector <std::uint8_t> leaf_data(field_element_type::length() * leaf_size);
+                                std::vector <detail::leaf_data_type<FRI>> leaf_data(detail::leaf_data_size_multiplier<FRI> * leaf_size);
 
                                 for (std::size_t polynom_index = 0; polynom_index < leaf_size;
                                      polynom_index++) {
@@ -346,10 +346,8 @@ namespace nil {
 
                                     typename FieldType::value_type leaf = proof.round_proofs[i].colinear_value[polynom_index];
 
-
-                                    field_element_type leaf_val(leaf);
-                                    auto write_iter = leaf_data.begin() + field_element_type::length() * polynom_index;
-                                    leaf_val.write(write_iter, field_element_type::length());
+                                    auto write_iter = leaf_data.begin() + detail::leaf_data_size_multiplier<FRI> * polynom_index;
+                                    detail::write_field_element_to_iter<FRI>(write_iter, leaf);
 
                                     if (interpolant.evaluate(alpha) !=
                                         proof.round_proofs[i].colinear_value[polynom_index]) {
@@ -398,6 +396,7 @@ namespace nil {
                             std::size_t r = fri_params.r;
 
                             for (std::size_t i = 0; i < r; i++) {
+                                using namespace algorithms;
                                 typename FieldType::value_type alpha = transcript.template challenge<FieldType>();
 
                                 typename FieldType::value_type x_next = fri_params.q.evaluate(x);
@@ -413,17 +412,16 @@ namespace nil {
                                 }
 
                                 for (std::size_t j = 0; j < m; j++) {
-                                    std::vector <std::uint8_t> leaf_data(field_element_type::length() * leaf_size);
+                                    std::vector <detail::leaf_data_type<FRI>> leaf_data(detail::leaf_data_size_multiplier<FRI> * leaf_size);
 
                                     for (std::size_t polynom_index = 0; polynom_index < leaf_size;
                                          polynom_index++) {
 
                                         typename FieldType::value_type leaf = proof.round_proofs[i].y[polynom_index][j];
 
-                                        field_element_type leaf_val(leaf);
                                         auto write_iter = leaf_data.begin() +
-                                                          field_element_type::length() * polynom_index;
-                                        leaf_val.write(write_iter, field_element_type::length());
+                                                          detail::leaf_data_size_multiplier<FRI> * polynom_index;
+                                        detail::write_field_element_to_iter<FRI>(write_iter, leaf);
                                     }
 
                                     if (!proof.round_proofs[i].p[j].validate(leaf_data)) {
@@ -431,7 +429,7 @@ namespace nil {
                                     }
                                 }
 
-                                std::vector <std::uint8_t> leaf_data(field_element_type::length() * leaf_size);
+                                std::vector <detail::leaf_data_type<FRI>> leaf_data(detail::leaf_data_size_multiplier<FRI> * leaf_size);
 
                                 for (std::size_t polynom_index = 0; polynom_index < leaf_size;
                                      polynom_index++) {
@@ -460,10 +458,8 @@ namespace nil {
 
                                     typename FieldType::value_type leaf = proof.round_proofs[i].colinear_value[polynom_index];
 
-
-                                    field_element_type leaf_val(leaf);
-                                    auto write_iter = leaf_data.begin() + field_element_type::length() * polynom_index;
-                                    leaf_val.write(write_iter, field_element_type::length());
+                                    auto write_iter = leaf_data.begin() + detail::leaf_data_size_multiplier<FRI> * polynom_index;
+                                    detail::write_field_element_to_iter<FRI>(write_iter, leaf);
 
                                     if (interpolant.evaluate(alpha) !=
                                         proof.round_proofs[i].colinear_value[polynom_index]) {

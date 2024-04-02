@@ -28,6 +28,9 @@
 #ifndef CRYPTO3_PLONK_PLACEHOLDER_TRANSCRIPT_INITIALIZATION_CONTEXT_HPP
 #define CRYPTO3_PLONK_PLACEHOLDER_TRANSCRIPT_INITIALIZATION_CONTEXT_HPP
 
+#include <nil/crypto3/algebra/type_traits.hpp>
+#include <nil/crypto3/hash/block_to_field_elements_wrapper.hpp>
+
 #include <nil/crypto3/zk/snark/arithmetization/plonk/table_description.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/params.hpp>
@@ -135,7 +138,12 @@ namespace nil {
                         filled_constraint_system.write(write_iter, filled_constraint_system.length());
 
                         // Return hash of "cv", which contains concatenated constraint system and other initialization parameters.
-                        return hash<transcript_hash_type>(cv);
+                        return hash<transcript_hash_type>(
+                            hashes::conditional_block_to_field_elements_wrapper<
+                                typename transcript_hash_type::word_type,
+                                decltype(cv)
+                            >(cv)
+                        );
                     }
                 }    // namespace detail
             }        // namespace snark

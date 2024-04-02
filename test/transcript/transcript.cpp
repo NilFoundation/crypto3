@@ -36,6 +36,7 @@
 #include <nil/crypto3/algebra/curves/alt_bn128.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/alt_bn128.hpp>
 
+#include <nil/crypto3/hash/block_to_field_elements_wrapper.hpp>
 #include <nil/crypto3/hash/poseidon.hpp>
 #include <nil/crypto3/hash/keccak.hpp>
 
@@ -74,7 +75,9 @@ BOOST_AUTO_TEST_CASE(zk_poseidon_transcript_init_test) {
     using poseidon_type = hashes::poseidon<nil::crypto3::hashes::detail::mina_poseidon_policy<field_type>>;
 
     std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-    transcript::fiat_shamir_heuristic_sequential<poseidon_type> tr(init_blob);
+    transcript::fiat_shamir_heuristic_sequential<poseidon_type> tr{
+        hashes::block_to_field_elements_wrapper<field_type, std::vector<std::uint8_t>>(init_blob)
+    };
     auto ch1 = tr.challenge<field_type>();
     auto ch2 = tr.challenge<field_type>();
     int ch_int = tr.int_challenge<int>();

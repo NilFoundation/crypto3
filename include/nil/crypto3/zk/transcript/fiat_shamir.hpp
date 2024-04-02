@@ -30,23 +30,20 @@
 #include <nil/marshalling/algorithms/pack.hpp>
 #include <nil/crypto3/marshalling/algebra/types/field_element.hpp>
 
-#include <nil/crypto3/hash/type_traits.hpp>
 #include <nil/crypto3/hash/algorithm/hash.hpp>
-#include <nil/crypto3/hash/sha2.hpp>
 #include <nil/crypto3/hash/keccak.hpp>
+#include <nil/crypto3/hash/poseidon.hpp>
+#include <nil/crypto3/hash/sha2.hpp>
+#include <nil/crypto3/hash/type_traits.hpp>
+#include <nil/crypto3/hash/type_traits.hpp>
+#include <nil/crypto3/hash/detail/poseidon/nil_poseidon_sponge.hpp>
 
 #include <nil/crypto3/algebra/curves/pallas.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/pallas.hpp>
-#include <nil/crypto3/hash/poseidon.hpp>
-
-#include <nil/crypto3/hash/detail/poseidon/kimchi_constants.hpp>
-#include <nil/crypto3/hash/detail/poseidon/original_constants.hpp>
-#include <nil/crypto3/hash/detail/poseidon/poseidon_policy.hpp>
-#include <nil/crypto3/hash/detail/poseidon/poseidon_permutation.hpp>
-#include <nil/crypto3/hash/detail/poseidon/poseidon_sponge.hpp>
-#include <nil/crypto3/hash/detail/block_stream_processor.hpp>
+#include <nil/crypto3/algebra/type_traits.hpp>
 
 #include <nil/crypto3/multiprecision/cpp_int.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace zk {
@@ -88,10 +85,18 @@ namespace nil {
 
                     template<typename TAny>
                     void operator()(TAny data) {
-                        nil::marshalling::status_type status;
-                        typename hash_type::construction::type::block_type byte_data =
-                            nil::marshalling::pack(data, status);
-                        acc(byte_data);
+                        if constexpr (algebra::is_field_element<typename hash_type::word_type>::value) {
+                            BOOST_STATIC_ASSERT_MSG(
+                                algebra::is_field_element<TAny>::value,
+                                "Hash type consumes field elements, but provided value is not a field element"
+                            );
+                            acc(data);
+                        } else {
+                            nil::marshalling::status_type status;
+                            typename hash_type::construction::type::block_type byte_data =
+                                nil::marshalling::pack(data, status);
+                            acc(byte_data);
+                        }
                     }
 
                     template<typename ChallengesType::challenges_ids ChallengeId, typename FieldType>
@@ -126,7 +131,6 @@ namespace nil {
                         return result;
                     }
                 };
-
 
                 template<typename Hash, typename Enable = void>
                 struct fiat_shamir_heuristic_sequential
@@ -196,11 +200,26 @@ namespace nil {
                     typename hash_type::digest_type state;
                 };
 
-                // Specialize for posseidon.
+                // Specialize for Nil Posseidon.
                 template<typename Hash>
                 struct fiat_shamir_heuristic_sequential<
-                        Hash,
-                        typename std::enable_if_t<crypto3::hashes::is_poseidon<Hash>::value>> {
+                    Hash,
+                    typename std::enable_if_t<
+                        nil::crypto3::hashes::is_specialization_of<
+                            nil::crypto3::hashes::poseidon,
+                            Hash
+                        >::value
+                    >
+                > {
+                    //   After refactoring an attempt to remove this Nil Poseidon specialization was made.
+                    // The difference between challenge() for other hashes and for Nil Poseidon is
+                    // how the second challenge is produced. For the first call things are the same:
+                    // we feed the result A (aka state in current code) of hash from operator() to hash, it
+                    // puts A to sponge_state[1] (read about nil_poseidon_sponge, if you're wondered why not
+                    // sponge_state[0]), then calls squeeze(). But for the second challenge thigs are
+                    // different: other hashes feed state B to hash again (in case of Nil Poseidon state will
+                    // be put to sponge_state[1]), but here we just run squeeze() (B is located in sponge_state[0]).
+                    // Not to replace current hacks with new bigger ones, we'll just keep it.
 
                     typedef Hash hash_type;
                     using field_type = nil::crypto3::algebra::curves::pallas::base_field_type;
@@ -214,7 +233,7 @@ namespace nil {
                     template<typename InputRange>
                     fiat_shamir_heuristic_sequential(const InputRange &r) {
                         if(r.size() != 0) {
-                            sponge.absorb(hash<hash_type>(r));
+                            sponge.absorb(static_cast<typename hash_type::digest_type>(hash<hash_type>(r)));
                         }
                     }
 
@@ -229,7 +248,7 @@ namespace nil {
 
                     template<typename InputRange>
                     void operator()(const InputRange &r) {
-                        sponge.absorb(hash<hash_type>(r));
+                        sponge.absorb(static_cast<typename hash_type::digest_type>(hash<hash_type>(r)));
                     }
 
                     template<typename InputIterator>
@@ -271,8 +290,8 @@ namespace nil {
                         return result;
                     }
 
-                private:
-                    hashes::detail::poseidon_sponge_construction<typename Hash::policy_type> sponge;
+                public:
+                    hashes::detail::nil_poseidon_sponge_construction<typename Hash::policy_type> sponge;
                 };
 
             }    // namespace transcript

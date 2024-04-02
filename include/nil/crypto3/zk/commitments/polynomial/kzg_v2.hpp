@@ -54,6 +54,7 @@
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
 
 #include <nil/crypto3/zk/commitments/batched_commitment.hpp>
+#include <nil/crypto3/zk/detail/field_element_consumer.hpp>
 
 using namespace nil::crypto3::math;
 
@@ -105,6 +106,10 @@ namespace nil {
                         }
                     };
                     using endianness = nil::marshalling::option::big_endian;
+                    using field_element_type = nil::crypto3::marshalling::types::field_element<
+                            nil::marshalling::field_type<endianness>,
+                            commitment_type
+                    >;
                 private:
                     params_type _params;
                     std::map<std::size_t, commitment_type> _commitments;
@@ -145,7 +150,12 @@ namespace nil {
                          * #295 */
 
                         // Push commitments to transcript
-                        transcript(_commitments[batch_ind]);
+                        transcript(
+                            ::nil::crypto3::hashes::conditional_block_to_field_elements_wrapper<
+                                typename KZGScheme::transcript_hash_type::word_type,
+                                decltype(_commitments[batch_ind])
+                            >(_commitments[batch_ind])
+                        );
 
                         // Push evaluation points to transcript
                         for( std::size_t i = 0; i < this->_z.get_batch_size(batch_ind); i++){
@@ -154,7 +164,12 @@ namespace nil {
                                 std::vector<uint8_t> byteblob =
                                     nil::marshalling::pack<endianness>(this->_z.get(batch_ind, i, j), status);
                                 BOOST_ASSERT(status == nil::marshalling::status_type::success);
-                                transcript(byteblob);
+                                transcript(
+                                    ::nil::crypto3::hashes::conditional_block_to_field_elements_wrapper<
+                                        typename KZGScheme::transcript_hash_type::word_type,
+                                        decltype(byteblob)
+                                    >(byteblob)
+                                );
                             }
                         }
 
@@ -166,7 +181,12 @@ namespace nil {
                                 std::vector<uint8_t> byteblob =
                                     nil::marshalling::pack<endianness>(poly[j], status);
                                 BOOST_ASSERT(status == nil::marshalling::status_type::success);
-                                transcript(byteblob);
+                                transcript(
+                                    ::nil::crypto3::hashes::conditional_block_to_field_elements_wrapper<
+                                        typename KZGScheme::transcript_hash_type::word_type,
+                                        decltype(byteblob)
+                                    >(byteblob)
+                                );
                             }
                         }
                     }
@@ -244,7 +264,12 @@ namespace nil {
                         std::vector<std::uint8_t> pi1_byteblob = nil::marshalling::pack<endianness>(pi_1, status);
                         BOOST_ASSERT(status == nil::marshalling::status_type::success);
 
-                        transcript(pi1_byteblob);
+                        transcript(
+                            ::nil::crypto3::hashes::conditional_block_to_field_elements_wrapper<
+                                typename KZGScheme::transcript_hash_type::word_type,
+                                decltype(pi1_byteblob)
+                            >(pi1_byteblob)
+                        );
 
                         auto theta_2 = transcript.template challenge<typename curve_type::scalar_field_type>();
                         math::polynomial<typename KZGScheme::scalar_value_type> theta_2_vanish = { -theta_2, 1 };
@@ -273,7 +298,12 @@ namespace nil {
                         /* TODO: Review the necessity of sending pi_2 to transcript */
                         std::vector<uint8_t> pi2_byteblob = nil::marshalling::pack<endianness>(pi_2, status);
                         BOOST_ASSERT(status == nil::marshalling::status_type::success);
-                        transcript(pi2_byteblob);
+                        transcript(
+                            ::nil::crypto3::hashes::conditional_block_to_field_elements_wrapper<
+                                typename KZGScheme::transcript_hash_type::word_type,
+                                decltype(pi2_byteblob)
+                            >(pi2_byteblob)
+                        );
 
                         return {this->_z, pi_1, pi_2};
                     }
@@ -296,7 +326,12 @@ namespace nil {
                         nil::marshalling::status_type status;
                         std::vector<std::uint8_t> byteblob = nil::marshalling::pack<endianness>(proof.pi_1, status);
                         BOOST_ASSERT(status == nil::marshalling::status_type::success);
-                        transcript(byteblob);
+                        transcript(
+                            ::nil::crypto3::hashes::conditional_block_to_field_elements_wrapper<
+                                typename KZGScheme::transcript_hash_type::word_type,
+                                decltype(byteblob)
+                            >(byteblob)
+                        );
                         auto theta_2 = transcript.template challenge<typename KZGScheme::curve_type::scalar_field_type>();
                         auto theta_i = KZGScheme::scalar_value_type::one();
 

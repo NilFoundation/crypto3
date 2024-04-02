@@ -47,6 +47,7 @@
 #include <nil/crypto3/algebra/curves/detail/marshalling.hpp>
 #include <nil/crypto3/algebra/marshalling.hpp>
 #include <nil/crypto3/algebra/random_element.hpp>
+#include <nil/crypto3/hash/block_to_field_elements_wrapper.hpp>
 
 #include <nil/crypto3/marshalling/algebra/types/curve_element.hpp>
 
@@ -335,14 +336,24 @@ namespace nil {
                         std::vector<uint8_t> byteblob =
                             nil::marshalling::pack<nil::marshalling::option::big_endian>(commit, status);
                         BOOST_ASSERT(status == nil::marshalling::status_type::success);
-                        transcript(byteblob);
+                        transcript(
+                            ::nil::crypto3::hashes::conditional_block_to_field_elements_wrapper<
+                                typename KZG::transcript_hash_type::word_type,
+                                decltype(byteblob)
+                            >(byteblob)
+                        );
                     }
                     for (const auto &S : public_key.S) {
                         for (const auto &s : S) {
                             std::vector<uint8_t> byteblob =
                                 nil::marshalling::pack<nil::marshalling::option::big_endian>(s, status);
                             BOOST_ASSERT(status == nil::marshalling::status_type::success);
-                            transcript(byteblob);
+                            transcript(
+                                ::nil::crypto3::hashes::conditional_block_to_field_elements_wrapper<
+                                    typename KZG::transcript_hash_type::word_type,
+                                    decltype(byteblob)
+                                >(byteblob)
+                            );
                         }
                     }
                     for (const auto &r : public_key.r) {
@@ -350,7 +361,12 @@ namespace nil {
                             std::vector<uint8_t> byteblob =
                                 nil::marshalling::pack<nil::marshalling::option::big_endian>(r[i], status);
                             BOOST_ASSERT(status == nil::marshalling::status_type::success);
-                            transcript(byteblob);
+                            transcript(
+                                ::nil::crypto3::hashes::conditional_block_to_field_elements_wrapper<
+                                    typename KZG::transcript_hash_type::word_type,
+                                    decltype(byteblob)
+                                >(byteblob)
+                            );
                         }
                     }
                 }
@@ -676,7 +692,12 @@ namespace nil {
                          * #295 */
 
                         // Push commitments to transcript
-                        transcript(_commitments[batch_ind]);
+                        transcript(
+                            ::nil::crypto3::hashes::conditional_block_to_field_elements_wrapper<
+                                typename KZGScheme::transcript_hash_type::word_type,
+                                decltype(_commitments[batch_ind])
+                            >(_commitments[batch_ind])
+                        );
 
                         // Push evaluation points to transcript
                         for( std::size_t i = 0; i < this->_z.get_batch_size(batch_ind); i++){
@@ -685,7 +706,12 @@ namespace nil {
                                 std::vector<uint8_t> byteblob =
                                     nil::marshalling::pack<endianness>(this->_z.get(batch_ind, i, j), status);
                                 BOOST_ASSERT(status == nil::marshalling::status_type::success);
-                                transcript(byteblob);
+                                transcript(
+                                    ::nil::crypto3::hashes::conditional_block_to_field_elements_wrapper<
+                                        typename KZGScheme::transcript_hash_type::word_type,
+                                        decltype(byteblob)
+                                    >(byteblob)
+                                );
                             }
                         }
 
@@ -697,7 +723,12 @@ namespace nil {
                                 std::vector<uint8_t> byteblob =
                                     nil::marshalling::pack<endianness>(poly[j], status);
                                 BOOST_ASSERT(status == nil::marshalling::status_type::success);
-                                transcript(byteblob);
+                                transcript(
+                                    ::nil::crypto3::hashes::conditional_block_to_field_elements_wrapper<
+                                        typename KZGScheme::transcript_hash_type::word_type,
+                                        decltype(byteblob)
+                                    >(byteblob)
+                                );
                             }
                         }
                     }

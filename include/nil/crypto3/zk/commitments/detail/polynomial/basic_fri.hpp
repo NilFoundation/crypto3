@@ -35,8 +35,6 @@
 #include <map>
 #include <random>
 
-#include <nil/crypto3/marshalling/algebra/types/field_element.hpp>
-
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
 #include <nil/crypto3/math/polynomial/polynomial_dfs.hpp>
 #include <nil/crypto3/math/polynomial/lagrange_interpolation.hpp>
@@ -52,6 +50,7 @@
 #include <nil/crypto3/zk/commitments/type_traits.hpp>
 #include <nil/crypto3/zk/commitments/detail/polynomial/fold_polynomial.hpp>
 #include <nil/crypto3/zk/commitments/detail/polynomial/proof_of_work.hpp>
+#include <nil/crypto3/zk/detail/field_element_consumer.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/detail/placeholder_scoped_profiler.hpp>
 
 namespace nil {
@@ -301,6 +300,15 @@ namespace nil {
             }        // namespace commitments
 
             namespace algorithms {
+                namespace detail {
+                    template <typename FRI>
+                    using fri_field_element_consumer = ::nil::crypto3::zk::detail::field_element_consumer<
+                        typename FRI::field_type,
+                        typename FRI::merkle_tree_hash_type::word_type,
+                        typename FRI::field_element_type
+                    >;
+                }    // namespace detail
+
                 template<typename FRI,
                     typename std::enable_if<
                         std::is_base_of<
@@ -364,19 +372,19 @@ namespace nil {
                     std::size_t domain_size = D->size();
                     std::size_t coset_size = 1 << fri_step;
                     std::size_t leafs_number = domain_size / coset_size;
-                    std::size_t leaf_bytes = coset_size * FRI::field_element_type::length();
-                    std::vector<std::vector<std::uint8_t>> y_data(leafs_number, std::vector<std::uint8_t>(leaf_bytes));
+                    std::vector<detail::fri_field_element_consumer<FRI>> y_data(
+                        leafs_number,
+                        detail::fri_field_element_consumer<FRI>(coset_size)
+                    );
 
                     for (std::size_t x_index = 0; x_index < leafs_number; x_index++) {
                         std::vector<std::array<std::size_t, FRI::m>> s_indices(coset_size / FRI::m);
                         s_indices[0][0] = x_index;
                         s_indices[0][1] = get_paired_index<FRI>(x_index, domain_size);
 
-                        auto write_iter = y_data[x_index].begin();
-                        typename FRI::field_element_type y_val0(f[s_indices[0][0]]);
-                        y_val0.write(write_iter, FRI::field_element_type::length());
-                        typename FRI::field_element_type y_val1(f[s_indices[0][1]]);
-                        y_val1.write(write_iter, FRI::field_element_type::length());
+                        auto& element_consumer = y_data[x_index].reset_cursor();
+                        element_consumer.consume(f[s_indices[0][0]]);
+                        element_consumer.consume(f[s_indices[0][1]]);
 
                         std::size_t base_index = domain_size / (FRI::m * FRI::m);
                         std::size_t prev_half_size = 1;
@@ -386,10 +394,8 @@ namespace nil {
                                 s_indices[i][0] = (base_index + s_indices[j][0]) % domain_size;
                                 s_indices[i][1] = get_paired_index<FRI>(s_indices[i][0], domain_size);
 
-                                typename FRI::field_element_type y_val0(f[s_indices[i][0]]);
-                                y_val0.write(write_iter, FRI::field_element_type::length());
-                                typename FRI::field_element_type y_val1(f[s_indices[i][1]]);
-                                y_val1.write(write_iter, FRI::field_element_type::length());
+                                element_consumer.consume(f[s_indices[i][0]]);
+                                element_consumer.consume(f[s_indices[i][1]]);
 
                                 i++;
                             }
@@ -452,21 +458,20 @@ namespace nil {
                     std::size_t list_size = poly.size();
                     std::size_t coset_size = 1 << fri_step;
                     std::size_t leafs_number = domain_size / coset_size;
-                    std::vector<std::vector<std::uint8_t>> y_data(
-                            leafs_number,
-                            std::vector<std::uint8_t>(coset_size * FRI::field_element_type::length() * list_size));
+                    std::vector<detail::fri_field_element_consumer<FRI>> y_data(
+                        leafs_number,
+                        detail::fri_field_element_consumer<FRI>(coset_size * list_size)
+                    );
 
                     for (std::size_t x_index = 0; x_index < leafs_number; x_index++) {
-                        auto write_iter = y_data[x_index].begin();
+                        auto& element_consumer = y_data[x_index].reset_cursor();
                         for (std::size_t polynom_index = 0; polynom_index < list_size; polynom_index++) {
                             std::vector<std::array<std::size_t, FRI::m>> s_indices(coset_size / FRI::m);
                             s_indices[0][0] = x_index;
                             s_indices[0][1] = get_paired_index<FRI>(x_index, domain_size);
 
-                            typename FRI::field_element_type y_val0(poly[polynom_index][s_indices[0][0]]);
-                            y_val0.write(write_iter, FRI::field_element_type::length());
-                            typename FRI::field_element_type y_val1(poly[polynom_index][s_indices[0][1]]);
-                            y_val1.write(write_iter, FRI::field_element_type::length());
+                            element_consumer.consume(poly[polynom_index][s_indices[0][0]]);
+                            element_consumer.consume(poly[polynom_index][s_indices[0][1]]);
 
                             std::size_t base_index = domain_size / (FRI::m * FRI::m);
                             std::size_t prev_half_size = 1;
@@ -475,10 +480,8 @@ namespace nil {
                                 for (std::size_t j = 0; j < prev_half_size; j++) {
                                     s_indices[i][0] = (base_index + s_indices[j][0]) % domain_size;
                                     s_indices[i][1] = get_paired_index<FRI>(s_indices[i][0], domain_size);
-                                    typename FRI::field_element_type y_val0(poly[polynom_index][s_indices[i][0]]);
-                                    y_val0.write(write_iter, FRI::field_element_type::length());
-                                    typename FRI::field_element_type y_val1(poly[polynom_index][s_indices[i][1]]);
-                                    y_val1.write(write_iter, FRI::field_element_type::length());
+                                    element_consumer.consume(poly[polynom_index][s_indices[i][0]]);
+                                    element_consumer.consume(poly[polynom_index][s_indices[i][1]]);
 
                                     i++;
                                 }
@@ -988,19 +991,12 @@ namespace nil {
                                 return false;
                             }
 
-                            std::vector<std::uint8_t> leaf_data(coset_size * FRI::field_element_type::length() * query_proof.initial_proof.at(k).values.size());
-                            auto write_iter = leaf_data.begin();
+                            detail::fri_field_element_consumer<FRI> leaf_data(coset_size * query_proof.initial_proof.at(k).values.size());
 
                             for (std::size_t i = 0; i < query_proof.initial_proof.at(k).values.size(); i++) {
                                 for (auto [idx, pair_idx] : correct_order_idx) {
-                                    typename FRI::field_element_type leaf_val0(
-                                        query_proof.initial_proof.at(k).values[i][idx][0]
-                                    );
-                                    leaf_val0.write(write_iter, FRI::field_element_type::length());
-                                    typename FRI::field_element_type leaf_val1(
-                                        query_proof.initial_proof.at(k).values[i][idx][1]
-                                    );
-                                    leaf_val1.write(write_iter, FRI::field_element_type::length());
+                                    leaf_data.consume(query_proof.initial_proof.at(k).values[i][idx][0]);
+                                    leaf_data.consume(query_proof.initial_proof.at(k).values[i][idx][1]);
                                 }
                             }
                             if (!query_proof.initial_proof.at(k).p.validate(leaf_data)) {
@@ -1049,15 +1045,12 @@ namespace nil {
 
                             std::tie(s, s_indices) = calculate_s<FRI>(x, x_index, fri_params.step_list[i],
                                                                       fri_params.D[t]);
-                            std::vector<std::uint8_t> leaf_data(coset_size * FRI::field_element_type::length());
-                            auto write_iter = leaf_data.begin();
+                            detail::fri_field_element_consumer<FRI> leaf_data(coset_size);
                             auto correct_order_idx =
                                     get_correct_order<FRI>(x_index, domain_size, fri_params.step_list[i], s_indices);
                             for (auto [idx, pair_idx]: correct_order_idx) {
-                                typename FRI::field_element_type leaf_val0(y[idx][0]);
-                                leaf_val0.write(write_iter, FRI::field_element_type::length());
-                                typename FRI::field_element_type leaf_val1(y[idx][1]);
-                                leaf_val1.write(write_iter, FRI::field_element_type::length());
+                                leaf_data.consume(y[idx][0]);
+                                leaf_data.consume(y[idx][1]);
                             }
                             if (!query_proof.round_proofs[i].p.validate(leaf_data)) {
                                 std::cout << "Wrong round merkle proof on " << i << "-th round" << std::endl;
