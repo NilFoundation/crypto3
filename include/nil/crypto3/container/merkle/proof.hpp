@@ -53,7 +53,7 @@ namespace nil {
         }    // namespace marshalling
         namespace containers {
             namespace detail {
-                template<typename NodeType, std::size_t Arity = 2, typename Enable = void>
+                template<typename NodeType, std::size_t Arity = 2>
                 class merkle_proof_impl {
                 public:
                     typedef NodeType node_type;
@@ -127,52 +127,21 @@ namespace nil {
                         }
                     }
 
-                    // Specilized implementaions below.
                     template<typename Hashable, typename HashType = typename NodeType::hash_type>
-                    typename std::enable_if_t<!crypto3::hashes::is_poseidon<HashType>::value,
-                    bool> validate(const Hashable &a) const {
+                    bool validate(const Hashable &a) const {
                         using hash_type = typename NodeType::hash_type;
                         value_type d = crypto3::hash<hash_type>(a);
                         for (auto &it : _path) {
                             accumulator_set<hash_type> acc;
                             size_t i = 0;
                             for (; (i < arity - 1) && i == it[i]._position; ++i) {
-                                crypto3::hash<hash_type>(it[i]._hash.begin(), it[i]._hash.end(), acc);
+                                crypto3::hash<hash_type>(it[i]._hash, acc);
                             }
-                            crypto3::hash<hash_type>(d.begin(), d.end(), acc);
+                            crypto3::hash<hash_type>(d, acc);
                             for (; i < arity - 1; ++i) {
-                                crypto3::hash<hash_type>(it[i]._hash.begin(), it[i]._hash.end(), acc);
+                                crypto3::hash<hash_type>(it[i]._hash, acc);
                             }
                             d = accumulators::extract::hash<hash_type>(acc);
-                        }
-                        return (d == _root);
-                    }
-
-                    // Specialize for poseidon.
-                    template<typename Hashable, typename HashType = typename NodeType::hash_type>
-                    typename std::enable_if_t<crypto3::hashes::is_poseidon<HashType>::value, bool>
-                        validate(const Hashable &a) const {
-                        BOOST_ASSERT_MSG(Arity == 2, "Poseidon is only supported for arity 2");
-
-                        typedef NodeType node_type;
-                        typedef typename node_type::hash_type hash_type;
-
-                        constexpr static const std::size_t arity = Arity;
-
-                        typedef typename node_type::value_type value_type;
-
-                        value_type d = generate_poseidon_leaf_hash<hash_type>(a);// crypto3::hash<hash_type>(a);
-                        for (auto &it : _path) {
-                            std::vector<typename hash_type::digest_type> values;
-                            size_t i = 0;
-                            for (; (i < arity - 1) && i == it[i]._position; ++i) {
-                                values.push_back(it[i]._hash);
-                            }
-                            values.push_back(d);
-                            for (; i < arity - 1; ++i) {
-                                values.push_back(it[i]._hash);
-                            }
-                            d = generate_poseidon_hash<hash_type>(values[0], values[1]);
                         }
                         return (d == _root);
                     }
@@ -260,11 +229,11 @@ namespace nil {
                                 accumulator_set<hash_type> acc;
                                 std::size_t i = 0;
                                 for (; (i < Arity - 1) && i == it[i].position(); ++i) {
-                                    crypto3::hash<hash_type>(it[i].hash().begin(), it[i].hash().end(), acc);
+                                    crypto3::hash<hash_type>(it[i].hash(), acc);
                                 }
                                 crypto3::hash<hash_type>(d.begin(), d.end(), acc);
                                 for (; i < Arity - 1; ++i) {
-                                    crypto3::hash<hash_type>(it[i].hash().begin(), it[i].hash().end(), acc);
+                                    crypto3::hash<hash_type>(it[i].hash(), acc);
                                 }
                                 d = accumulators::extract::hash<hash_type>(acc);
                                 hashes.push_back(d);

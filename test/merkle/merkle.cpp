@@ -26,6 +26,9 @@
 
 #define BOOST_TEST_MODULE containter_merkletree_test
 
+#include <nil/crypto3/algebra/random_element.hpp>
+#include <nil/crypto3/algebra/type_traits.hpp>
+#include <nil/crypto3/hash/block_to_field_elements_wrapper.hpp>
 #include <nil/crypto3/hash/sha2.hpp>
 #include <nil/crypto3/hash/md5.hpp>
 #include <nil/crypto3/hash/blake2b.hpp>
@@ -57,6 +60,19 @@ typename std::enable_if<std::is_unsigned<ValueType>::value, std::vector<std::arr
         std::array<ValueType, N> leaf {};
         std::generate(std::begin(leaf), std::end(leaf),
                       [&]() { return std::rand() % (std::numeric_limits<ValueType>::max() + 1); });
+        v.emplace_back(leaf);
+    }
+    return v;
+}
+
+template<typename ValueType, std::size_t N>
+typename std::enable_if<algebra::is_field_element<ValueType>::value, std::vector<std::array<ValueType, N>>>::type
+    generate_random_data(std::size_t leaf_number) {
+    std::vector<std::array<ValueType, N>> v;
+    for (std::size_t i = 0; i < leaf_number; ++i) {
+        std::array<ValueType, N> leaf {};
+        std::generate(std::begin(leaf), std::end(leaf),
+                      [&]() { return algebra::random_element<typename ValueType::field_type>(); });
         v.emplace_back(leaf);
     }
     return v;
@@ -242,6 +258,7 @@ BOOST_AUTO_TEST_SUITE(containers_merkltree_test)
 using curve_type = algebra::curves::pallas;
 using field_type = typename curve_type::base_field_type;
 using poseidon_type = hashes::poseidon<nil::crypto3::hashes::detail::mina_poseidon_policy<field_type>>;
+using original_poseidon_type = hashes::original_poseidon<nil::crypto3::hashes::detail::mina_poseidon_policy<field_type>>;
 
 BOOST_AUTO_TEST_CASE(merkletree_construct_test_1) {
     std::vector<std::array<char, 1>> v = {{'0'}, {'1'}, {'2'}, {'3'}, {'4'}, {'5'}, {'6'}, {'7'}};
@@ -267,13 +284,39 @@ BOOST_AUTO_TEST_CASE(merkletree_validate_test_1) {
     testing_validate_template<hashes::sha2<256>, 2>(v);
     testing_validate_template<hashes::md5, 2>(v);
     testing_validate_template<hashes::blake2b<224>, 2>(v);
-    testing_validate_template<poseidon_type, 2>(v);
+
+    BOOST_STATIC_ASSERT_MSG(algebra::is_field_element<original_poseidon_type::word_type>::value, "Expecting Poseidon to consume field elements");
+    std::vector<std::array<original_poseidon_type::word_type, 1>> v_field = {
+        {0x0_cppui255},
+        {0x1_cppui255},
+        {0x2_cppui255},
+        {0x3_cppui255},
+        {0x4_cppui255},
+        {0x5_cppui255},
+        {0x6_cppui255},
+        {0x7_cppui255}
+    };
+    testing_validate_template<original_poseidon_type, 2>(v_field);
+    testing_validate_template<poseidon_type, 2>(v_field);
+    // When you have bytes input, use wrapper to lazy convert it to field elements:
+    std::vector<
+        nil::crypto3::hashes::block_to_field_elements_wrapper<
+            typename poseidon_type::word_type::field_type,
+            std::array<char, 1>
+        >
+    > wrappers;
+    for (const auto& inner_containers : v) {
+        wrappers.emplace_back(inner_containers);
+    }
+    testing_validate_template<original_poseidon_type, 2>(wrappers);
+    testing_validate_template<poseidon_type, 2>(wrappers);
 
     std::size_t leaf_number = 8;
     testing_validate_template_random_data<hashes::sha2<256>, 2, std::uint8_t, 1>(leaf_number);
     testing_validate_template_random_data<hashes::md5, 2, std::uint8_t, 1>(leaf_number);
     testing_validate_template_random_data<hashes::blake2b<224>, 2, std::uint8_t, 1>(leaf_number);
-    testing_validate_template_random_data<poseidon_type, 2, std::uint8_t, 1>(leaf_number);
+    testing_validate_template_random_data<original_poseidon_type, 2, original_poseidon_type::word_type, 1>(leaf_number);
+    testing_validate_template_random_data<poseidon_type, 2, poseidon_type::word_type, 1>(leaf_number);
 }
 
 BOOST_AUTO_TEST_CASE(merkletree_validate_test_2) {
@@ -333,7 +376,17 @@ BOOST_AUTO_TEST_CASE(merkletree_hash_test_1) {
         "0123456789012345678901234567890123456789012345678901234567890123",
         "0123456789012345678901234567890123456789012345678901234567890123"
     };
-    merkle_tree<poseidon_type, 2> tree = make_merkle_tree<poseidon_type, 2>(v_64.begin(), v_64.end());
+    std::vector<
+        nil::crypto3::hashes::block_to_field_elements_wrapper<
+            typename poseidon_type::word_type::field_type,
+            std::string,
+            /*OverflowOnPurpose=*/ true
+        >
+    > wrappers;
+    for (const auto& inner_containers : v_64) {
+        wrappers.emplace_back(inner_containers);
+    }
+    merkle_tree<poseidon_type, 2> tree = make_merkle_tree<poseidon_type, 2>(wrappers.begin(), wrappers.end());
     BOOST_CHECK(tree.root() == 0x6E7641F1EAE17C0DA8227840EFEA6E1D17FB5EBA600D9DC34F314D5400E5BF3_cppui255);
 }
 
