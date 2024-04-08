@@ -58,7 +58,7 @@ jobs:
 
           for check_name in "${check_names[@]}"; do
             # This completes immediately since results are in cache
-            nix build .?submodules=1#checks.x86_64-linux.$check_name
+            nix build -L .?submodules=1#checks.x86_64-linux.$check_name
             cp -r ./result/* "$results_dir/$check_name"
             rm result
           done
