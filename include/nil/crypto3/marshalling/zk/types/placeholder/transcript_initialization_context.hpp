@@ -66,8 +66,8 @@ namespace nil {
 //                      std::size_t usable_rows_amount;
                         nil::marshalling::types::integral<TTypeBase, std::size_t>,
 //                      typename commitment_type::params_type commitment_params;
-                        typename commitment_params<nil::marshalling::option::endian<typename TTypeBase::endian_type>,
-                            typename TranscriptInitializationContextType::commitment_scheme_type::params_type>::type,
+                        typename commitment_params<TTypeBase,
+                            typename TranscriptInitializationContextType::commitment_scheme_type>::type,
 //                      constexpr static const typename field_type::value_type modulus = field_type::modulus;
                         field_element<TTypeBase, typename TranscriptInitializationContextType::field_type::value_type>,
 //                      std::string application_id;
@@ -85,7 +85,7 @@ namespace nil {
                     result_type result;
 
                     auto filled_commitment_params =
-                        fill_commitment_params<Endianness, typename TranscriptInitializationContextType::commitment_scheme_type::params_type>(
+                        fill_commitment_params<Endianness, typename TranscriptInitializationContextType::commitment_scheme_type>(
                             init_context.commitment_params
                     );
 

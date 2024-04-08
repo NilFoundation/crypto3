@@ -152,14 +152,8 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit1)
     using field_type = typename curve_type::base_field_type;
     using merkle_hash_type = hashes::keccak_1600<512>;
     using transcript_hash_type = hashes::keccak_1600<512>;
-    constexpr static const std::size_t table_rows_log = 4;
 
     struct placeholder_test_params {
-        constexpr static const std::size_t table_rows = 1 << table_rows_log;
-        constexpr static const std::size_t permutation_size = 4;
-        constexpr static const std::size_t usable_rows = (1 << table_rows_log) - 3;
-
-
         constexpr static const std::size_t witness_columns = witness_columns_1;
         constexpr static const std::size_t public_input_columns = public_columns_1;
         constexpr static const std::size_t constant_columns = constant_columns_1;
@@ -174,9 +168,7 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit1)
     using lpc_params_type = commitments::list_polynomial_commitment_params<
         merkle_hash_type,
         transcript_hash_type,
-        placeholder_test_params::lambda,
-        placeholder_test_params::m,
-        true
+        placeholder_test_params::m
     >;
 
     using lpc_type = commitments::list_polynomial_commitment<field_type, lpc_params_type>;
@@ -194,8 +186,8 @@ BOOST_FIXTURE_TEST_CASE(constraint_system_marshalling_test, test_initializer) {
         placeholder_test_params::selector_columns
     );
 
-    desc.rows_amount = placeholder_test_params::table_rows;
-    desc.usable_rows_amount = placeholder_test_params::usable_rows;
+    desc.rows_amount = circuit.table_rows;
+    desc.usable_rows_amount = circuit.usable_rows;
 
     typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints, circuit.lookup_gates);
     typename policy_type::variable_assignment_type assignments = circuit.table;
@@ -214,18 +206,15 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit2)
     using curve_type = algebra::curves::bls12<381>;
     using field_type = typename curve_type::scalar_field_type;
 
-    constexpr static const std::size_t table_rows_log = 4;
-    constexpr static const std::size_t table_rows = 1 << table_rows_log;
-    constexpr static const std::size_t usable_rows = (1 << table_rows_log) - 3;
-
     struct placeholder_test_params {
         using merkle_hash_type = hashes::keccak_1600<512>;
         using transcript_hash_type = hashes::keccak_1600<512>;
 
-        constexpr static const std::size_t witness_columns = 3;
-        constexpr static const std::size_t public_input_columns = 1;
-        constexpr static const std::size_t constant_columns = 0;
-        constexpr static const std::size_t selector_columns = 2;
+        constexpr static const std::size_t witness_columns = witness_columns_t;
+        constexpr static const std::size_t public_input_columns = public_columns_t;
+        constexpr static const std::size_t constant_columns = constant_columns_t;
+        constexpr static const std::size_t selector_columns = selector_columns_t;
+        constexpr static const std::size_t usable_rows = usable_rows_t;
 
         constexpr static const std::size_t lambda = 1;
         constexpr static const std::size_t m = 2;
@@ -237,7 +226,6 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit2)
     using lpc_params_type = commitments::list_polynomial_commitment_params<
         typename placeholder_test_params::merkle_hash_type,
         typename placeholder_test_params::transcript_hash_type,
-        placeholder_test_params::lambda,
         placeholder_test_params::m
     >;
 
@@ -257,8 +245,9 @@ BOOST_FIXTURE_TEST_CASE(constraint_system_marshalling_test, test_initializer) {
         placeholder_test_params::constant_columns,
         placeholder_test_params::selector_columns
     );
-    desc.rows_amount = table_rows;
-    desc.usable_rows_amount = usable_rows;
+    desc.rows_amount = circuit.table_rows;
+    desc.usable_rows_amount = circuit.usable_rows;
+    std::size_t table_rows_log = std::ceil(std::log2(circuit.table_rows));
 
     typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints, circuit.lookup_gates);
     typename policy_type::variable_assignment_type assignments = circuit.table;
@@ -275,10 +264,6 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit3)
     using TTypeBase = nil::marshalling::field_type<Endianness>;
     using curve_type = algebra::curves::pallas;
     using field_type = typename curve_type::base_field_type;
-
-    constexpr static const std::size_t table_rows_log = 3;
-    constexpr static const std::size_t table_rows = 1 << table_rows_log;
-    constexpr static const std::size_t usable_rows = 4;
 
     struct placeholder_test_params {
         using merkle_hash_type = hashes::keccak_1600<512>;
@@ -298,9 +283,7 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit3)
     using lpc_params_type = commitments::list_polynomial_commitment_params<
         typename placeholder_test_params::merkle_hash_type,
         typename placeholder_test_params::transcript_hash_type,
-        placeholder_test_params::lambda,
-        placeholder_test_params::m,
-        true
+        placeholder_test_params::m
     >;
 
     using lpc_type = commitments::list_polynomial_commitment<field_type, lpc_params_type>;
@@ -318,8 +301,8 @@ BOOST_FIXTURE_TEST_CASE(constraint_system_marshalling_test, test_initializer) {
         placeholder_test_params::selector_columns
     );
 
-    desc.rows_amount = table_rows;
-    desc.usable_rows_amount = usable_rows;
+    desc.rows_amount = circuit.table_rows;
+    desc.usable_rows_amount = circuit.usable_rows;
 
     typename policy_type::constraint_system_type constraint_system(
         circuit.gates,
@@ -343,10 +326,6 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit4)
     using curve_type = algebra::curves::pallas;
     using field_type = typename curve_type::base_field_type;
 
-    constexpr static const std::size_t table_rows_log = 3;
-    constexpr static const std::size_t table_rows = 1 << table_rows_log;
-    constexpr static const std::size_t usable_rows = 5;
-
     struct placeholder_test_params {
         using merkle_hash_type = hashes::keccak_1600<512>;
         using transcript_hash_type = hashes::keccak_1600<512>;
@@ -365,9 +344,7 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit4)
     using lpc_params_type = commitments::list_polynomial_commitment_params<
         typename placeholder_test_params::merkle_hash_type,
         typename placeholder_test_params::transcript_hash_type,
-        placeholder_test_params::lambda,
-        placeholder_test_params::m,
-        true
+        placeholder_test_params::m
     >;
 
     using lpc_type = commitments::list_polynomial_commitment<field_type, lpc_params_type>;
@@ -385,8 +362,8 @@ BOOST_FIXTURE_TEST_CASE(constraint_system_marshalling_test, test_initializer) {
         placeholder_test_params::selector_columns
     );
 
-    desc.rows_amount = table_rows;
-    desc.usable_rows_amount = usable_rows;
+    desc.rows_amount = circuit.table_rows;
+    desc.usable_rows_amount = circuit.usable_rows;
 
     typename policy_type::constraint_system_type constraint_system(
         circuit.gates,
@@ -403,7 +380,6 @@ BOOST_FIXTURE_TEST_CASE(constraint_system_marshalling_test, test_initializer) {
 }
 BOOST_AUTO_TEST_SUITE_END()
 
-#if 0
 BOOST_AUTO_TEST_SUITE(placeholder_circuit5)
     using Endianness = nil::marshalling::option::big_endian;
     using TTypeBase = nil::marshalling::field_type<Endianness>;
@@ -411,19 +387,14 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit5)
     using curve_type = algebra::curves::bls12<381>;
     using field_type = typename curve_type::scalar_field_type;
 
-    constexpr static const std::size_t table_rows_log = 4;
-    constexpr static const std::size_t table_rows = 1 << table_rows_log;
-    constexpr static const std::size_t permutation_size = 4;
-    constexpr static const std::size_t usable_rows = (1 << table_rows_log) - 3;
-
     struct placeholder_test_params {
         using merkle_hash_type = hashes::keccak_1600<512>;
         using transcript_hash_type = hashes::keccak_1600<512>;
 
-        constexpr static const std::size_t witness_columns = 3;
-        constexpr static const std::size_t public_input_columns = 2;
-        constexpr static const std::size_t constant_columns = 0;
-        constexpr static const std::size_t selector_columns = 2;
+        constexpr static const std::size_t witness_columns = witness_columns_5;
+        constexpr static const std::size_t public_input_columns = public_columns_5;
+        constexpr static const std::size_t constant_columns = constant_columns_5;
+        constexpr static const std::size_t selector_columns = selector_columns_5;
 
         constexpr static const std::size_t lambda = 1;
         constexpr static const std::size_t m = 2;
@@ -435,7 +406,6 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit5)
     using lpc_params_type = commitments::list_polynomial_commitment_params<
         typename placeholder_test_params::merkle_hash_type,
         typename placeholder_test_params::transcript_hash_type,
-        placeholder_test_params::lambda,
         placeholder_test_params::m
     >;
 
@@ -447,8 +417,7 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit5)
 
 BOOST_FIXTURE_TEST_CASE(constraint_system_marshalling_test, test_initializer) {
     auto pi0 = nil::crypto3::algebra::random_element<field_type>();
-    auto pi1 = nil::crypto3::algebra::random_element<field_type>();
-    auto circuit = circuit_test_t<field_type>(pi0, pi1);
+    auto circuit = circuit_test_t<field_type>(pi0);
 
     plonk_table_description<field_type> desc(
         placeholder_test_params::witness_columns,
@@ -456,8 +425,8 @@ BOOST_FIXTURE_TEST_CASE(constraint_system_marshalling_test, test_initializer) {
         placeholder_test_params::constant_columns,
         placeholder_test_params::selector_columns
     );
-    desc.rows_amount = table_rows;
-    desc.usable_rows_amount = usable_rows;
+    desc.rows_amount = circuit.table_rows;
+    desc.usable_rows_amount = circuit.usable_rows;
 
     typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints, circuit.lookup_gates);
     typename policy_type::variable_assignment_type assignments = circuit.table;
@@ -468,17 +437,12 @@ BOOST_FIXTURE_TEST_CASE(constraint_system_marshalling_test, test_initializer) {
         test_constraint_system<Endianness, typename policy_type::constraint_system_type>(constraint_system);
 }
 BOOST_AUTO_TEST_SUITE_END()
-#endif
 
 BOOST_AUTO_TEST_SUITE(placeholder_circuit6)
     using Endianness = nil::marshalling::option::big_endian;
     using TTypeBase = nil::marshalling::field_type<Endianness>;
     using curve_type = algebra::curves::pallas;
     using field_type = typename curve_type::base_field_type;
-
-    constexpr static const std::size_t table_rows_log = 3;
-    constexpr static const std::size_t table_rows = 1 << table_rows_log;
-    constexpr static const std::size_t usable_rows = 6;
 
     struct placeholder_test_params {
         using merkle_hash_type = hashes::keccak_1600<512>;
@@ -498,9 +462,7 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit6)
     using lpc_params_type = commitments::list_polynomial_commitment_params<
         typename placeholder_test_params::merkle_hash_type,
         typename placeholder_test_params::transcript_hash_type,
-        placeholder_test_params::lambda,
-        placeholder_test_params::m,
-        true
+        placeholder_test_params::m
     >;
 
     using lpc_type = commitments::list_polynomial_commitment<field_type, lpc_params_type>;
@@ -518,8 +480,8 @@ BOOST_FIXTURE_TEST_CASE(constraint_system_marshalling_test, test_initializer) {
         placeholder_test_params::selector_columns
     );
 
-    desc.rows_amount = table_rows;
-    desc.usable_rows_amount = usable_rows;
+    desc.rows_amount = circuit.table_rows;
+    desc.usable_rows_amount = circuit.usable_rows;
 
     typename policy_type::constraint_system_type constraint_system(
         circuit.gates,
@@ -563,9 +525,7 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit7)
     using lpc_params_type = commitments::list_polynomial_commitment_params<
         typename placeholder_test_params::merkle_hash_type,
         typename placeholder_test_params::transcript_hash_type,
-        placeholder_test_params::lambda,
-        placeholder_test_params::m,
-        true
+        placeholder_test_params::m
     >;
 
     using lpc_type = commitments::list_polynomial_commitment<field_type, lpc_params_type>;
@@ -582,8 +542,8 @@ BOOST_FIXTURE_TEST_CASE(constraint_system_marshalling_test, test_initializer) {
         placeholder_test_params::selector_columns
     );
 
-    desc.rows_amount = table_rows;
-    desc.usable_rows_amount = usable_rows;
+    desc.rows_amount = circuit.table_rows;
+    desc.usable_rows_amount = circuit.usable_rows;
 
     typename policy_type::constraint_system_type constraint_system(
         circuit.gates,

@@ -41,7 +41,7 @@
 #include <nil/marshalling/options.hpp>
 
 #include <nil/crypto3/marshalling/algebra/types/field_element.hpp>
-#include <nil/crypto3/marshalling/zk/types/commitments/lpc.hpp>
+#include <nil/crypto3/marshalling/zk/types/commitments/eval_storage.hpp>
 
 namespace nil {
     namespace crypto3 {

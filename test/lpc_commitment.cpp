@@ -27,7 +27,7 @@
 
 #define BOOST_TEST_MODULE crypto3_marshalling_lpc_commitment_test
 
-#include <boost/test/unit_test.hpp>
+#include <boost/test/included/unit_test.hpp>
 #include <boost/algorithm/string/case_conv.hpp>
 
 #include <boost/random/mersenne_twister.hpp>
@@ -264,12 +264,15 @@ typename FRI::proof_type generate_random_fri_proof(
     std::size_t d,              //final polynomial degree
     std::size_t max_batch_size,
     std::vector<std::size_t> step_list,
+    std::size_t lambda,
+    bool use_grinding,
     nil::crypto3::marshalling::types::batch_info_type batch_info,
     nil::crypto3::random::algebraic_engine<typename FRI::field_type> &alg_rnd,
     boost::random::mt11213b &rnd
 ) {
     typename FRI::proof_type res;
-    for (std::size_t k = 0; k < FRI::lambda; k++) {
+    res.query_proofs.resize(lambda);
+    for (std::size_t k = 0; k < lambda; k++) {
         res.query_proofs[k] = generate_random_fri_query_proof<FRI>(max_batch_size, step_list, batch_info, alg_rnd, rnd);
     }
     res.fri_roots.resize(step_list.size());
@@ -278,18 +281,21 @@ typename FRI::proof_type generate_random_fri_proof(
                 generate_random_data<std::uint8_t, 32>(1, rnd).at(0)
         );
     }
-    if constexpr(FRI::use_grinding){
+    if (use_grinding){
         res.proof_of_work = rnd();
     }
     res.final_polynomial = generate_random_polynomial<typename FRI::field_type>(d, alg_rnd);
     return res;
 }
 
+
 template<typename LPC>
 typename LPC::proof_type generate_random_lpc_proof(
     std::size_t d,              //final polynomial degree
     std::size_t max_batch_size,
     std::vector<std::size_t> step_list,
+    std::size_t lambda,
+    std::size_t use_grinding,
     nil::crypto3::random::algebraic_engine<typename LPC::basic_fri::field_type> &alg_rnd,
     boost::random::mt11213b &rnd
 ) {
@@ -308,7 +314,7 @@ typename LPC::proof_type generate_random_lpc_proof(
             }
         }
     }
-    res.fri_proof = generate_random_fri_proof<typename LPC::basic_fri>(d, max_batch_size, step_list, batch_info, alg_rnd, rnd);
+    res.fri_proof = generate_random_fri_proof<typename LPC::basic_fri>(d, max_batch_size, step_list, lambda, use_grinding, batch_info, alg_rnd, rnd);
     return res;
 }
 
@@ -365,7 +371,7 @@ void test_lpc_proof(typename LPC::proof_type &proof, typename LPC::fri_type::par
     auto filled_proof = nil::crypto3::marshalling::types::fill_eval_proof<Endianness, LPC>(proof, fri_params);
     auto _proof = nil::crypto3::marshalling::types::make_eval_proof<Endianness, LPC>(filled_proof);
     BOOST_CHECK(proof == _proof);
-
+/*
     std::vector<std::uint8_t> cv;
     cv.resize(filled_proof.length(), 0x00);
     auto write_iter = cv.begin();
@@ -382,7 +388,7 @@ void test_lpc_proof(typename LPC::proof_type &proof, typename LPC::fri_type::par
 
     if (filename != "") {
         print_hex_byteblob_to_file(cv.begin(), cv.end(), false, filename + ".data");
-    }
+    }*/
 }
 
 // *******************************************************************************
@@ -432,19 +438,6 @@ struct test_initializer {
     }
 };
 
-template<typename fri_type, typename FieldType>
-typename fri_type::params_type create_fri_params(
-        std::size_t degree_log, const int max_step = 1, std::size_t expand_factor = 4) {
-    std::size_t r = degree_log - 1;
-
-    return typename fri_type::params_type(
-        (1 << degree_log) - 1, // max_degree
-        math::calculate_domain_set<FieldType>(degree_log + expand_factor, r),
-        generate_random_step_list(r, max_step, test_global_rnd_engine),
-        expand_factor
-    );
-}
-
 BOOST_AUTO_TEST_SUITE(marshalling_random)
     // setup
     static constexpr std::size_t lambda = 40;
@@ -461,23 +454,26 @@ BOOST_AUTO_TEST_SUITE(marshalling_random)
 
     using Endianness = nil::marshalling::option::big_endian;
     using TTypeBase = nil::marshalling::field_type<Endianness>;
-    using FRI = typename nil::crypto3::zk::commitments::detail::basic_batched_fri<field_type, hash_type, hash_type, lambda, m>;
+    using FRI = typename nil::crypto3::zk::commitments::detail::basic_batched_fri<field_type, hash_type, hash_type, m>;
     using lpc_params_type = typename nil::crypto3::zk::commitments::list_polynomial_commitment_params<
-            hash_type, hash_type, lambda, m
+            hash_type, hash_type, m
     >;
     using LPC = typename nil::crypto3::zk::commitments::batched_list_polynomial_commitment<field_type, lpc_params_type>;
+    using lpc_scheme_type = nil::crypto3::zk::commitments::lpc_commitment_scheme<LPC, math::polynomial<typename field_type::value_type>>;
 
 BOOST_FIXTURE_TEST_CASE(lpc_proof_test, test_initializer) {
 
-    typename FRI::params_type fri_params = create_fri_params<FRI, field_type>(r + 1, 4);
+    typename FRI::params_type fri_params(1, r + 1, lambda, 4);
 
     auto proof = generate_random_lpc_proof<LPC>(
             final_polynomial_degree, 5,
             fri_params.step_list,
+            lambda,
+            false,
             test_global_alg_rnd_engine<typename LPC::basic_fri::field_type>,
             test_global_rnd_engine
     );
-    test_lpc_proof<Endianness, LPC>(proof, fri_params);
+    test_lpc_proof<Endianness, lpc_scheme_type>(proof, fri_params);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -501,10 +497,10 @@ BOOST_FIXTURE_TEST_CASE(batches_num_3_test, test_initializer){
     constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
     constexpr static const std::size_t m = 2;
 
-    typedef zk::commitments::fri<field_type, merkle_hash_type, transcript_hash_type, lambda, m> fri_type;
+    typedef zk::commitments::fri<field_type, merkle_hash_type, transcript_hash_type, m> fri_type;
 
     typedef zk::commitments::
-        list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, m>
+        list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, m>
             lpc_params_type;
     typedef zk::commitments::list_polynomial_commitment<field_type, lpc_params_type> lpc_type;
 
@@ -524,7 +520,8 @@ BOOST_FIXTURE_TEST_CASE(batches_num_3_test, test_initializer){
         d - 1, // max_degree
         D,
         generate_random_step_list(r, 1, test_global_rnd_engine),
-        2 //expand_factor
+        2, //expand_factor
+        lambda
     );
 
     using lpc_scheme_type = nil::crypto3::zk::commitments::lpc_commitment_scheme<lpc_type, math::polynomial<typename field_type::value_type>>;
@@ -544,6 +541,10 @@ BOOST_FIXTURE_TEST_CASE(batches_num_3_test, test_initializer){
     commitments[2] = lpc_scheme_prover.commit(2);
     commitments[3] = lpc_scheme_prover.commit(3);
 
+    auto filled_commitment = nil::crypto3::marshalling::types::fill_commitment<Endianness, lpc_scheme_type>(commitments[0]);
+    auto _commitment = nil::crypto3::marshalling::types::make_commitment<Endianness, lpc_scheme_type>(filled_commitment);
+
+
     // Generate evaluation points. Generate points outside of the basic domain
     // Generate evaluation points. Choose poin1ts outside the domain
     auto point = algebra::fields::arithmetic_params<field_type>::multiplicative_generator;
@@ -557,7 +558,7 @@ BOOST_FIXTURE_TEST_CASE(batches_num_3_test, test_initializer){
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(x_data);
     auto proof = lpc_scheme_prover.proof_eval(transcript);
 
-    test_lpc_proof<Endianness, lpc_type>(proof, fri_params);
+    test_lpc_proof<Endianness, lpc_scheme_type>(proof, fri_params);
 
     // Verify
 /*  zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);

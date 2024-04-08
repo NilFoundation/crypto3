@@ -74,6 +74,7 @@ set(TESTS_NAMES
         "r1cs_gg_ppzksnark_proof"
         "r1cs_gg_ppzksnark_verification_key"
         "r1cs_gg_ppzksnark"
+        "kzg_commitment"
         "fri_commitment"
         "lpc_commitment"
         "placeholder_proof"
