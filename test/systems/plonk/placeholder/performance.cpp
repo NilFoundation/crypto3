@@ -112,20 +112,6 @@ class placeholder_performance_test_base {
         }
         return step_list;
     }
-
-    template<typename fri_type, typename FieldType>
-    typename fri_type::params_type create_fri_params(
-        std::size_t degree_log, const int max_step = 1, std::size_t expand_factor = 7) {
-    std::size_t r = degree_log - 1;
-
-    return typename fri_type::params_type(
-        (1 << degree_log) - 1, // max_degree
-        math::calculate_domain_set<FieldType>(degree_log + expand_factor, r),
-        generate_random_step_list(r, max_step),
-        expand_factor
-    );
-}
-
 };
 
 template<std::size_t lambda>
@@ -147,7 +133,7 @@ public:
     static constexpr std::size_t TotalColumns = WitnessColumns + PublicInputColumns + ConstantColumns + SelectorColumns;
 
     using lpc_params_type = commitments::list_polynomial_commitment_params<
-        hash_type, hash_type, lambda, m, true /* use grinding */>;
+        hash_type, hash_type, m>;
 
     using lpc_type = commitments::list_polynomial_commitment<field_type, lpc_params_type>;
     using lpc_scheme_type = typename commitments::lpc_commitment_scheme<lpc_type>;
@@ -182,8 +168,9 @@ public:
         std::cout << "rows_amount = " << table_description.rows_amount << std::endl;
 
         std::size_t table_rows_log = std::ceil(std::log2(table_description.rows_amount));
-        typename lpc_type::fri_type::params_type fri_params =
-            create_fri_params<typename lpc_type::fri_type, field_type>(table_rows_log);
+        typename lpc_type::fri_type::params_type fri_params(
+            1, table_rows_log, lambda, 7, true
+        );
 
         std::size_t permutation_size = table_description.witness_columns +
             table_description.public_input_columns + table_description.constant_columns;
@@ -372,7 +359,6 @@ using transcript_type = typename transcript::fiat_shamir_heuristic_sequential<ty
 using lpc_params_type = commitments::list_polynomial_commitment_params<
     typename placeholder_fibonacci_params::merkle_hash_type,
     typename placeholder_fibonacci_params::transcript_hash_type,
-    placeholder_fibonacci_params::lambda,
     placeholder_fibonacci_params::m
 >;
 
@@ -397,8 +383,9 @@ BOOST_FIXTURE_TEST_CASE(placeholder_large_fibonacci_test, placeholder_performanc
     desc.usable_rows_amount = circuit.usable_rows;
     std::size_t table_rows_log = std::log2(desc.rows_amount);
 
-    typename lpc_type::fri_type::params_type fri_params =
-        create_fri_params<typename lpc_type::fri_type, field_type>(table_rows_log);
+    typename lpc_type::fri_type::params_type fri_params(
+        1, table_rows_log, placeholder_fibonacci_params::lambda, 7, true
+    );
 
     typename policy_type::constraint_system_type constraint_system(
         circuit.gates, circuit.copy_constraints, circuit.lookup_gates);

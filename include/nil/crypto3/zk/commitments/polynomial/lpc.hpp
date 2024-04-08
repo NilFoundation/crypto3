@@ -36,7 +36,6 @@
 #include <nil/crypto3/container/merkle/tree.hpp>
 #include <nil/crypto3/container/merkle/proof.hpp>
 
-#include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
 #include <nil/crypto3/zk/commitments/batched_commitment.hpp>
 #include <nil/crypto3/zk/commitments/detail/polynomial/basic_fri.hpp>
 
@@ -50,8 +49,9 @@ namespace nil {
                     typename LPCScheme::params_type::field_type::value_type>>
                 class lpc_commitment_scheme : public polys_evaluator<typename LPCScheme::params_type,
                     typename LPCScheme::commitment_type, PolynomialType>{
-
                 public:
+                    static constexpr bool is_lpc(){return true;}
+
                     using field_type = typename LPCScheme::field_type;
                     using value_type = typename field_type::value_type;
                     using params_type = typename LPCScheme::params_type;
@@ -111,11 +111,6 @@ namespace nil {
                     }
 
                     proof_type proof_eval(transcript_type &transcript) {
-                        for (auto const& it: _batch_fixed) {
-                            if (it.second) {
-                                this->append_eval_point(it.first, _etha);
-                            }
-                        }
 
                         this->eval_polys();
 
@@ -158,6 +153,27 @@ namespace nil {
                             combined_Q_normal += Q_normal;
                         }
 
+                        for(std::size_t i: this->_z.get_batches()){
+                            if( !_batch_fixed[i] )continue;
+                            math::polynomial<value_type> Q_normal;
+                            auto point = _etha;
+                            V = {-point, 1};
+                            for(std::size_t j = 0; j < this->_z.get_batch_size(i); j++){
+                                math::polynomial<value_type> g_normal;
+                                if constexpr(std::is_same<math::polynomial_dfs<value_type>, PolynomialType>::value ) {
+                                    g_normal = math::polynomial<value_type>(this->_polys[i][j].coefficients());
+                                } else {
+                                    g_normal = this->_polys[i][j];
+                                }
+                                g_normal *= theta_acc;
+                                Q_normal += g_normal;
+                                Q_normal -= _fixed_polys_values[i][j] * theta_acc;
+                                theta_acc *= theta;
+                            }
+                            Q_normal = Q_normal / V;
+                            combined_Q_normal += Q_normal;
+                        }
+
                         if constexpr (std::is_same<math::polynomial_dfs<value_type>, PolynomialType>::value ) {
                             combined_Q.from_coefficients(combined_Q_normal);
                         } else {
@@ -188,28 +204,22 @@ namespace nil {
                         const std::map<std::size_t, commitment_type> &commitments,
                         transcript_type &transcript
                     ) {
-                        for (auto const&[b_ind, fixed]: _batch_fixed) {
-                            if(!fixed) continue;
-                            this->append_eval_point(b_ind, _etha);
-                            for( std::size_t i = 0; i < proof.z.get_batch_size(b_ind); i++) {
-                                if(this->_fixed_polys_values[b_ind][i] != proof.z.get(b_ind, i, proof.z.get_poly_points_number(b_ind, i) - 1)) {
-                                    return false;
-                                }
-                            }
-                        }
-
                         this->_z = proof.z;
                         for (auto const &it: commitments) {
                             transcript(commitments.at(it.first));
                         }
 
                         auto points = this->get_unique_points();
+
                         // List of unique eval points set. [id=>points]
-                        typename std::vector<typename field_type::value_type> U(points.size());
+                        std::size_t total_points = points.size();
+                        if (std::any_of(_batch_fixed.begin(), _batch_fixed.end(), [](auto i){return i.second != false;})) total_points++;
+
+                        typename std::vector<typename field_type::value_type> U(total_points);
                         // V is product of (x - eval_point) polynomial for each eval_point
-                        typename std::vector<math::polynomial<value_type>> V(points.size());
+                        typename std::vector<math::polynomial<value_type>> V(total_points);
                         // List of involved polynomials for each eval point [batch_id, poly_id, point_id]
-                        typename std::vector<std::vector<std::tuple<std::size_t, std::size_t>>> poly_map(points.size());
+                        typename std::vector<std::vector<std::tuple<std::size_t, std::size_t>>> poly_map(total_points);
 
                         value_type theta = transcript.template challenge<field_type>();
                         value_type theta_acc(1);
@@ -222,6 +232,19 @@ namespace nil {
                                     auto it = std::find(this->_points[i][j].begin(), this->_points[i][j].end(), point);
                                     if( it == this->_points[i][j].end()) continue;
                                     U[p] += this->_z.get(i, j, it - this->_points[i][j].begin()) * theta_acc;
+                                    poly_map[p].push_back(std::make_tuple(i, j));
+                                    theta_acc *= theta;
+                                }
+                            }
+                        }
+
+                        if( total_points > points.size()){
+                            std::size_t p = points.size();
+                            V[p] = {-_etha, 1};
+                            for(std::size_t i:this->_z.get_batches()){
+                                if( !_batch_fixed[i] )continue;
+                                for(std::size_t j = 0; j < this->_z.get_batch_size(i); j++){
+                                    U[p] += _fixed_polys_values[i][j] * theta_acc;
                                     poly_map[p].push_back(std::make_tuple(i, j));
                                     theta_acc *= theta;
                                 }
@@ -254,7 +277,6 @@ namespace nil {
                         params.put("type", "LPC");
                         params.put("r", _fri_params.r);
                         params.put("m", fri_type::m);
-                        params.put("lambda", fri_type::lambda);
                         params.put("max_degree", _fri_params.max_degree);
 
                         boost::property_tree::ptree step_list_node;
@@ -272,23 +294,17 @@ namespace nil {
                             D_omegas_node.push_back(std::make_pair("", D_omega_node));
                         }
                         params.add_child("D_omegas", D_omegas_node);
-
-                        if( fri_type::use_grinding ){
-                            params.add_child("grinding_params", fri_type::grinding_type::get_params());
-                        }
                         return params;
                     }
                 };
 
-                template<typename MerkleTreeHashType, typename TranscriptHashType, std::size_t Lambda,
-                        std::size_t M, bool UseGrinding = false, typename GrindingType = proof_of_work<TranscriptHashType>>
+                template<typename MerkleTreeHashType, typename TranscriptHashType,
+                        std::size_t M, typename GrindingType = proof_of_work<TranscriptHashType>>
                 struct list_polynomial_commitment_params {
                     typedef MerkleTreeHashType merkle_hash_type;
                     typedef TranscriptHashType transcript_hash_type;
 
-                    constexpr static const std::size_t lambda = Lambda;
                     constexpr static const std::size_t m = M;
-                    constexpr static const bool use_grinding = UseGrinding;
                     typedef GrindingType grinding_type;
                 };
                 /**
@@ -312,25 +328,21 @@ namespace nil {
                     FieldType,
                     typename LPCParams::merkle_hash_type,
                     typename LPCParams::transcript_hash_type,
-                    LPCParams::lambda,
                     LPCParams::m,
-                    LPCParams::use_grinding,
                     typename LPCParams::grinding_type
                 > {
                     using fri_type = typename detail::basic_batched_fri<
                         FieldType,
                         typename LPCParams::merkle_hash_type,
                         typename LPCParams::transcript_hash_type,
-                        LPCParams::lambda,
                         LPCParams::m,
-                        LPCParams::use_grinding,
                         typename LPCParams::grinding_type
                     >;
                     using merkle_hash_type = typename LPCParams::merkle_hash_type;
 
-                    constexpr static const std::size_t lambda = LPCParams::lambda;
                     constexpr static const std::size_t m = LPCParams::m;
                     constexpr static const bool is_const_size = LPCParams::is_const_size;
+                    constexpr static const bool is_batched_list_polynomial_commitment = true;
 
                     typedef LPCParams lpc_params;
 
@@ -338,8 +350,8 @@ namespace nil {
 
                     using basic_fri = detail::basic_batched_fri<FieldType, typename LPCParams::merkle_hash_type,
                             typename LPCParams::transcript_hash_type,
-                            LPCParams::lambda, LPCParams::m,
-                            LPCParams::use_grinding, typename LPCParams::grinding_type>;
+                            LPCParams::m,
+                            typename LPCParams::grinding_type>;
 
                     using precommitment_type = typename basic_fri::precommitment_type;
                     using commitment_type = typename basic_fri::commitment_type;
@@ -367,16 +379,16 @@ namespace nil {
                 template<typename FieldType, typename LPCParams>
                 using batched_lpc = batched_list_polynomial_commitment<
                         FieldType, commitments::list_polynomial_commitment_params<
-                                typename LPCParams::merkle_hash_type, typename LPCParams::transcript_hash_type,
-                                LPCParams::lambda, LPCParams::m,
-                                LPCParams::use_grinding, typename LPCParams::grinding_type
+                            typename LPCParams::merkle_hash_type, typename LPCParams::transcript_hash_type,
+                            LPCParams::m,
+                            typename LPCParams::grinding_type
                         >>;
                 template<typename FieldType, typename LPCParams>
                 using lpc = batched_list_polynomial_commitment<
                         FieldType, list_polynomial_commitment_params<
-                                typename LPCParams::merkle_hash_type, typename LPCParams::transcript_hash_type,
-                                LPCParams::lambda, LPCParams::m,
-                                LPCParams::use_grinding, typename LPCParams::grinding_type
+                            typename LPCParams::merkle_hash_type, typename LPCParams::transcript_hash_type,
+                            LPCParams::m,
+                            typename LPCParams::grinding_type
                         >>;
 
                 template<typename FieldType, typename LPCParams>

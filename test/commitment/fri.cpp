@@ -95,7 +95,7 @@ BOOST_AUTO_TEST_CASE(fri_basic_test) {
     constexpr static const std::size_t m = 2;
     constexpr static const std::size_t lambda = 40;
 
-    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, lambda, m, true /* use_grinding */> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m> fri_type;
 
     static_assert(zk::is_commitment<fri_type>::value);
     static_assert(!zk::is_commitment<merkle_hash_type>::value);
@@ -113,7 +113,10 @@ BOOST_AUTO_TEST_CASE(fri_basic_test) {
         d - 1, // max_degree
         D,
         generate_random_step_list(r, 1),
-        2 //expand_factor
+        2, //expand_factor
+        lambda,
+        true,
+        0xFFFFF
     );
 
     BOOST_CHECK(D[1]->m == D[0]->m / 2);

@@ -64,21 +64,18 @@ namespace nil {
                 template<typename FieldType,
                         typename MerkleTreeHashType,
                         typename TranscriptHashType,
-                        std::size_t Lambda,
                         std::size_t M,
-                        bool UseGrinding =false,
                         typename GrindingType = proof_of_work<TranscriptHashType>
                 >
                 struct fri : public detail::basic_batched_fri<FieldType,
                         MerkleTreeHashType,
                         TranscriptHashType,
-                        Lambda, M,
-                        UseGrinding, GrindingType
+                        M, GrindingType
                 > {
                     using basic_fri = detail::basic_batched_fri<FieldType,
                             MerkleTreeHashType,
                             TranscriptHashType,
-                            Lambda, M, UseGrinding, GrindingType>;
+                            M, GrindingType>;
                     constexpr static const std::size_t m = basic_fri::m;
                     constexpr static const std::size_t batches_num = basic_fri::batches_num;
 
@@ -104,8 +101,7 @@ namespace nil {
                     typename std::enable_if<std::is_base_of<commitments::fri<typename FRI::field_type,
                             typename FRI::merkle_tree_hash_type,
                             typename FRI::transcript_hash_type,
-                            FRI::lambda, FRI::m,
-                            FRI::use_grinding,
+                            FRI::m,
                             typename FRI::grinding_type
                         >,
                         FRI>::value,
@@ -129,8 +125,7 @@ namespace nil {
                             typename FRI::field_type,
                             typename FRI::merkle_tree_hash_type,
                             typename FRI::transcript_hash_type,
-                            FRI::lambda, FRI::m,
-                            FRI::use_grinding,
+                            FRI::m,
                             typename FRI::grinding_type
                         >,
                         FRI>::value,

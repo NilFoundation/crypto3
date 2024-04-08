@@ -56,6 +56,11 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
+                template <typename FieldType>
+                std::vector<std::size_t> lookup_parts(
+                    const plonk_constraint_system<FieldType> &constraint_system,
+                    std::size_t max_quotient_chunks
+                );
 
                 template<typename FieldType, typename ParamsType>
                 class placeholder_public_preprocessor {
@@ -70,6 +75,17 @@ namespace nil {
                     using transcript_hash_type = typename commitment_scheme_type::transcript_hash_type;
 
                 public:
+                    static std::size_t permutation_partitions_num(
+                        std::size_t permutation_size,
+                        std::size_t max_quotient_chunks
+                    ){
+                        if( permutation_size == 0 ) return 0;
+                        if( max_quotient_chunks == 0 ){
+                            return 1;
+                        }
+                        return (permutation_size % (max_quotient_chunks - 1) == 0)? permutation_size / (max_quotient_chunks - 1) : permutation_size / (max_quotient_chunks - 1) + 1;
+                    }
+
                     struct preprocessed_data_type {
                         struct public_commitments_type {
                             commitment_type fixed_values;
@@ -95,10 +111,13 @@ namespace nil {
                                 return !(rhs == *this);
                             }
 
+
                             std::string to_string() const{
                                 std::stringstream ss;
 
-                                ss << constraint_system_with_params_hash << " " << fixed_values_commitment;
+                                // TODO: KZG fixed_values_commitments are vector<uint8_t>
+                                // need operator<<(ostream,vector<uint8_t>)?
+                                ss << constraint_system_with_params_hash /*<< " " << fixed_values_commitment*/;
                                 return ss.str();
                             }
                         };
@@ -113,17 +132,14 @@ namespace nil {
                             using verification_key_type = verification_key;
                             using transcript_hash_type = typename ParamsType::transcript_hash_type;
                             using table_description_type = plonk_table_description<FieldType>;
+                            using commitment_scheme_data_type = typename commitment_scheme_type::preprocessed_data_type;
+                            using commitment_params_type = typename commitment_scheme_type::params_type;
 
                             // marshalled
                             public_commitments_type commitments;
                             columns_rotations_type columns_rotations;
 
-                            std::size_t rows_amount;
-                            std::size_t usable_rows_amount;
-                            std::size_t witness_columns;
-                            std::size_t public_input_columns;
-                            std::size_t constant_columns;
-                            std::size_t selector_columns;
+                            table_description_type desc;
 
                             // not marshalled. They can be derived from other fields.
                             polynomial_dfs_type lagrange_0;
@@ -131,29 +147,41 @@ namespace nil {
                             std::shared_ptr<math::evaluation_domain<FieldType>> basic_domain;
                             std::uint32_t max_gates_degree;
                             verification_key vk;
-                            typename commitment_scheme_type::preprocessed_data_type commitment_scheme_data;
+                            commitment_scheme_data_type commitment_scheme_data;
+                            commitment_params_type commitment_params;
+                            std::vector<std::size_t> permuted_columns;
+                            std::uint32_t max_quotient_chunks;
+                            std::uint32_t permutation_parts;
+                            std::uint32_t lookup_parts;
 
                             // Constructor with pregenerated domain
                             common_data_type(
                                 std::shared_ptr<math::evaluation_domain<FieldType>> D,
                                 public_commitments_type commts,
                                 std::vector<std::set<int>> col_rotations,
-                                std::size_t rows,
-                                std::size_t usable_rows,
-                                std::size_t witness_columns,
-                                std::size_t public_input_columns,
-                                std::size_t constant_columns,
-                                std::size_t selector_columns,
+                                const table_description_type &table_description,
                                 std::uint32_t max_gates_degree,
-                                verification_key vk
+                                std::uint32_t permutation_parts,
+                                std::uint32_t lookup_parts,
+                                verification_key vk,
+                                const std::vector<std::size_t> &_permuted_columns,
+                                const commitment_params_type &_commitment_params,
+                                const commitment_scheme_data_type &_commitment_scheme_data,
+                                std::size_t max_quotient_chunks = 0
                             ):  commitments(commts),
-                                columns_rotations(col_rotations), rows_amount(rows), usable_rows_amount(usable_rows),
+                                columns_rotations(col_rotations),
+                                desc(table_description),
                                 lagrange_0(D->size() - 1, D->size(), FieldType::value_type::zero()),
-                                Z(std::vector<typename FieldType::value_type>(rows + 1, FieldType::value_type::zero())),
+                                Z(std::vector<typename FieldType::value_type>(table_description.rows_amount + 1, FieldType::value_type::zero())),
                                 basic_domain(D),
-                                max_gates_degree(max_gates_degree), vk(vk),
-                                witness_columns(witness_columns), public_input_columns(public_input_columns),
-                                constant_columns(constant_columns), selector_columns(selector_columns)
+                                max_gates_degree(max_gates_degree),
+                                vk(vk),
+                                commitment_scheme_data(_commitment_scheme_data),
+                                commitment_params(_commitment_params),
+                                permuted_columns(_permuted_columns),
+                                max_quotient_chunks(max_quotient_chunks),
+                                permutation_parts(permutation_parts),
+                                lookup_parts(lookup_parts)
                             {
                                 // Z is polynomial -1, 0,..., 0, 1
                                 Z[0] = -FieldType::value_type::one();
@@ -167,21 +195,28 @@ namespace nil {
                             common_data_type(
                                 public_commitments_type commts,
                                 std::vector<std::set<int>> col_rotations,
-                                std::size_t rows,
-                                std::size_t usable_rows,
-                                std::size_t witness_columns,
-                                std::size_t public_input_columns,
-                                std::size_t constant_columns,
-                                std::size_t selector_columns,
+                                const table_description_type &table_description,
                                 std::uint32_t max_gates_degree,
-                                verification_key vk
+                                std::uint32_t permutation_parts,
+                                std::uint32_t lookup_parts,
+                                verification_key vk,
+                                const std::vector<std::size_t> &_permuted_columns,
+                                const commitment_params_type &_commitment_params,
+                                const commitment_scheme_data_type &_commitment_scheme_data,
+                                std::size_t max_quotient_chunks
                             ):  commitments(commts),
-                                columns_rotations(col_rotations), rows_amount(rows), usable_rows_amount(usable_rows),
-                                lagrange_0(rows - 1, rows, FieldType::value_type::zero()),
-                                Z(std::vector<typename FieldType::value_type>(rows + 1, FieldType::value_type::zero())),
-                                max_gates_degree(max_gates_degree), vk(vk),
-                                witness_columns(witness_columns), public_input_columns(public_input_columns),
-                                constant_columns(constant_columns), selector_columns(selector_columns)
+                                columns_rotations(col_rotations),
+                                desc(table_description),
+                                lagrange_0(table_description.rows_amount - 1, table_description.rows_amount, FieldType::value_type::zero()),
+                                Z(std::vector<typename FieldType::value_type>(table_description.rows_amount + 1, FieldType::value_type::zero())),
+                                max_gates_degree(max_gates_degree),
+                                vk(vk),
+                                commitment_scheme_data(_commitment_scheme_data),
+                                commitment_params(_commitment_params),
+                                permuted_columns(_permuted_columns),
+                                max_quotient_chunks(max_quotient_chunks),
+                                permutation_parts(permutation_parts),
+                                lookup_parts(lookup_parts)
                             {
                                 // Z is polynomial -1, 0,..., 0, 1
                                 Z[0] = -FieldType::value_type::one();
@@ -190,25 +225,27 @@ namespace nil {
                                 // lagrange_0:  1, 0,...,0
                                 lagrange_0[0] = FieldType::value_type::one();
 
-                                basic_domain = math::make_evaluation_domain<FieldType>(rows);
+                                basic_domain = math::make_evaluation_domain<FieldType>(table_description.rows_amount);
                             }
 
                             // These operators are useful for marshalling
                             // They will be implemented with marshalling procedures implementation
                             bool operator==(const common_data_type &rhs) const {
-                                return rows_amount == rhs.rows_amount &&
-                                usable_rows_amount == rhs.usable_rows_amount &&
+                                return desc == rhs.desc &&
                                 columns_rotations == rhs.columns_rotations &&
-                                witness_columns == rhs.witness_columns &&
-                                public_input_columns == rhs.public_input_columns &&
-                                constant_columns == rhs.constant_columns &&
-                                selector_columns == rhs.selector_columns &&
                                 commitments == rhs.commitments &&
                                 basic_domain->size() == rhs.basic_domain->size() &&
                                 lagrange_0 == rhs.lagrange_0 &&
                                 Z == rhs.Z &&
-                                max_gates_degree == rhs.max_gates_degree &&
-                                vk == rhs.vk;
+                                max_gates_degree == rhs.max_gates_degree
+                                && vk == rhs.vk
+                                && permuted_columns == rhs.permuted_columns
+                                && commitment_params == rhs.commitment_params
+                                && commitment_scheme_data == rhs.commitment_scheme_data
+                                && max_quotient_chunks == rhs.max_quotient_chunks
+                                && permutation_parts == rhs.permutation_parts
+                                && lookup_parts == rhs.lookup_parts
+                                ;
                             }
                             bool operator!=(const common_data_type &rhs) const {
                                 return !(rhs == *this);
@@ -379,7 +416,7 @@ namespace nil {
                     }
 
                     static inline std::vector<polynomial_dfs_type> identity_polynomials(
-                        std::size_t permutation_size,
+                        const std::size_t permutation_size,
                         const typename FieldType::value_type &omega,
                         const typename FieldType::value_type &delta,
                         std::shared_ptr<math::evaluation_domain<FieldType>> domain
@@ -400,20 +437,21 @@ namespace nil {
                     }
 
                     static inline std::vector<polynomial_dfs_type> permutation_polynomials(
-                        std::size_t permutation_size,
+                        const std::vector<std::size_t> &global_indices, // ordered global indices
                         const typename FieldType::value_type &omega,
                         const typename FieldType::value_type &delta,
                         cycle_representation &permutation,
                         std::shared_ptr<math::evaluation_domain<FieldType>> domain
                     ) {
-                        std::vector<polynomial_dfs_type> S_perm(permutation_size);
-                        for (std::size_t i = 0; i < permutation_size; i++) {
+                        std::vector<polynomial_dfs_type> S_perm(global_indices.size());
+                        for (std::size_t i = 0; i < global_indices.size(); i++) {
                             S_perm[i] = polynomial_dfs_type(
                                 domain->size() - 1, domain->size(), FieldType::value_type::zero());
 
                             for (std::size_t j = 0; j < domain->size(); j++) {
-                                auto key = std::make_pair(i, j);
-                                S_perm[i][j] = delta.pow(permutation[key].first) * omega.pow(permutation[key].second);
+                                auto key = std::make_pair(global_indices[i], j);
+                                auto permuted_index = find(global_indices.begin(), global_indices.end(), permutation[key].first) - global_indices.begin();
+                                S_perm[i][j] = delta.pow(permuted_index) * omega.pow(permutation[key].second);
                             }
                         }
 
@@ -459,8 +497,11 @@ namespace nil {
                         const plonk_table_description<FieldType>
                             &table_description,
                         typename ParamsType::commitment_scheme_type &commitment_scheme,
-                        std::size_t columns_with_copy_constraints,
                         // TODO(martun): move delta back to placeholder_params, once template arguments are reduced.
+                        // To prevent work with too large polynomials during proof generation
+                        //    if 0 -- any degree
+                        //    else -- we have a bound for permutations and lookups F-s degree rows_amount * (2 ^ max_quotient_poly_expand)
+                        const std::size_t max_quotient_poly_chunks = 0,
                         const typename FieldType::value_type& delta=algebra::fields::arithmetic_params<FieldType>::multiplicative_generator
                     ) {
                         PROFILE_PLACEHOLDER_SCOPE("Placeholder public preprocessor");
@@ -480,12 +521,18 @@ namespace nil {
                         // TODO: add std::vector<std::size_t> columns_with_copy_constraints;
                         cycle_representation permutation(constraint_system, table_description);
 
+                        auto permuted_columns = constraint_system.permuted_columns();
+                        std::vector<std::size_t> global_indices;
+                        for( auto it = permuted_columns.begin(); it != permuted_columns.end(); it++ ){
+                            global_indices.push_back(table_description.global_index(*it));
+                        }
+
                         std::vector<polynomial_dfs_type> id_perm_polys =
-                            identity_polynomials(columns_with_copy_constraints, basic_domain->get_domain_element(1),
+                            identity_polynomials(permuted_columns.size(), basic_domain->get_domain_element(1),
                                                  delta, basic_domain);
 
                         std::vector<polynomial_dfs_type> sigma_perm_polys =
-                            permutation_polynomials(columns_with_copy_constraints, basic_domain->get_domain_element(1),
+                            permutation_polynomials(global_indices, basic_domain->get_domain_element(1),
                                                     delta, permutation, basic_domain);
 
                         polynomial_dfs_type lagrange_0 = lagrange_polynomial(basic_domain, 0);
@@ -509,6 +556,10 @@ namespace nil {
                         //    precommitments(public_polynomial_table, id_perm_polys, sigma_perm_polys, q_last_q_blind,
                         //                   commitment_params);
 
+                        BOOST_ASSERT(max_quotient_poly_chunks == 0 || max_quotient_poly_chunks > max_gates_degree );
+                        std::size_t permutation_parts_num = permutation_partitions_num(permuted_columns.size(), max_quotient_poly_chunks);
+                        std::size_t lookup_parts_num = lookup_parts<FieldType>(constraint_system, max_quotient_poly_chunks).size();
+
                         typename preprocessed_data_type::public_commitments_type public_commitments = commitments(
                             public_polynomial_table, id_perm_polys,
                             sigma_perm_polys, q_last_q_blind, commitment_scheme
@@ -528,22 +579,23 @@ namespace nil {
                                 delta);
 
                         typename preprocessed_data_type::verification_key vk = {constraint_system_with_params_hash, public_commitments.fixed_values};
-                        typename preprocessed_data_type::common_data_type common_data (
-                            std::move(public_commitments), std::move(c_rotations),
-                            table_description.rows_amount,
-                            table_description.usable_rows_amount,
-                            table_description.witness_columns,
-                            table_description.public_input_columns,
-                            table_description.constant_columns,
-                            table_description.selector_columns,
-                            max_gates_degree, vk
-                        );
 
                         transcript_type transcript(std::vector<std::uint8_t>({}));
                         transcript(vk.constraint_system_with_params_hash);
                         transcript(vk.fixed_values_commitment);
 
-                        common_data.commitment_scheme_data = commitment_scheme.preprocess(transcript);
+                        typename preprocessed_data_type::common_data_type common_data (
+                            std::move(public_commitments), std::move(c_rotations),
+                            table_description,
+                            max_gates_degree,
+                            permutation_parts_num,
+                            lookup_parts_num,
+                            vk,
+                            global_indices,
+                            commitment_scheme.get_commitment_params(),
+                            commitment_scheme.preprocess(transcript),
+                            max_quotient_poly_chunks
+                        );
 
                         // Push circuit description to transcript
                         preprocessed_data_type preprocessed_data({

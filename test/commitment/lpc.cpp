@@ -180,10 +180,10 @@ BOOST_FIXTURE_TEST_CASE(lpc_basic_test, test_fixture) {
 
     constexpr static const std::size_t m = 2;
 
-    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, lambda, m> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m> fri_type;
 
     typedef zk::commitments::
-        list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, m>
+        list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, m>
             lpc_params_type;
     typedef zk::commitments::list_polynomial_commitment<FieldType, lpc_params_type> lpc_type;
 
@@ -204,7 +204,10 @@ BOOST_FIXTURE_TEST_CASE(lpc_basic_test, test_fixture) {
         d - 1, // max_degree
         D,
         generate_random_step_list(r, 1, test_global_rnd_engine),
-        2 //expand_factor
+        2, //expand_factor
+        lambda,
+        true,
+        0xFFF
     );
 
     using lpc_scheme_type = nil::crypto3::zk::commitments::lpc_commitment_scheme<lpc_type, math::polynomial<typename FieldType::value_type>>;
@@ -277,10 +280,10 @@ BOOST_FIXTURE_TEST_CASE(lpc_basic_skipping_layers_test, test_fixture) {
     constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
     constexpr static const std::size_t m = 2;
 
-    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, lambda, m> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m> fri_type;
 
     typedef zk::commitments::
-        list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, m>
+        list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, m>
             lpc_params_type;
     typedef zk::commitments::list_polynomial_commitment<FieldType, lpc_params_type> lpc_type;
 
@@ -295,14 +298,15 @@ BOOST_FIXTURE_TEST_CASE(lpc_basic_skipping_layers_test, test_fixture) {
     std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
         math::calculate_domain_set<FieldType>(extended_log, r);
 
-    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, lambda, m> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m> fri_type;
 
     // Setup params
     typename fri_type::params_type fri_params(
         d - 1, // max_degree
         D,
         generate_random_step_list(r, 5, test_global_rnd_engine),
-        2 //expand_factor
+        2, //expand_factor
+        lambda
     );
 
     using lpc_scheme_type = nil::crypto3::zk::commitments::lpc_commitment_scheme<lpc_type, math::polynomial<typename FieldType::value_type>>;
@@ -371,10 +375,10 @@ BOOST_FIXTURE_TEST_CASE(lpc_dfs_basic_test, test_fixture) {
     constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
     constexpr static const std::size_t m = 2;
 
-    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, lambda, m> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m> fri_type;
 
     typedef zk::commitments::
-        list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, m>
+        list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, m>
             lpc_params_type;
     typedef zk::commitments::list_polynomial_commitment<FieldType, lpc_params_type> lpc_type;
 
@@ -395,7 +399,9 @@ BOOST_FIXTURE_TEST_CASE(lpc_dfs_basic_test, test_fixture) {
         d - 1, // max_degree
         D,
         generate_random_step_list(r, 1, test_global_rnd_engine),
-        2 //expand_factor
+        2, //expand_factor
+        lambda,
+        true
     );
 
     using lpc_scheme_type = nil::crypto3::zk::commitments::lpc_commitment_scheme<lpc_type>;
@@ -466,10 +472,10 @@ BOOST_FIXTURE_TEST_CASE(lpc_batches_num_3_test, test_fixture){
     constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
     constexpr static const std::size_t m = 2;
 
-    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, lambda, m> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m> fri_type;
 
     typedef zk::commitments::
-        list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, m>
+        list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, m>
             lpc_params_type;
     typedef zk::commitments::list_polynomial_commitment<FieldType, lpc_params_type> lpc_type;
 
@@ -488,7 +494,10 @@ BOOST_FIXTURE_TEST_CASE(lpc_batches_num_3_test, test_fixture){
         d - 1, // max_degree
         D,
         generate_random_step_list(r, 1, test_global_rnd_engine),
-        2 //expand_factor
+        2,  //expand_factor
+        lambda,
+        true,
+        0xFF
     );
 
     using lpc_scheme_type = nil::crypto3::zk::commitments::lpc_commitment_scheme<lpc_type, math::polynomial<typename FieldType::value_type>>;
@@ -555,10 +564,10 @@ BOOST_FIXTURE_TEST_CASE(lpc_different_hash_types_test, test_fixture) {
 
     constexpr static const std::size_t m = 2;
 
-    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, lambda, m> fri_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m> fri_type;
 
     typedef zk::commitments::
-        list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, m>
+        list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, m>
             lpc_params_type;
     typedef zk::commitments::list_polynomial_commitment<FieldType, lpc_params_type> lpc_type;
 
@@ -577,7 +586,8 @@ BOOST_FIXTURE_TEST_CASE(lpc_different_hash_types_test, test_fixture) {
         d - 1, // max_degree
         D,
         generate_random_step_list(r, 1, test_global_rnd_engine),
-        2 //expand_factor
+        2, //expand_factor
+        lambda
     );
 
     using lpc_scheme_type = nil::crypto3::zk::commitments::lpc_commitment_scheme<lpc_type, math::polynomial<typename FieldType::value_type>>;

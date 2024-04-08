@@ -52,6 +52,60 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
+                template <typename FieldType>
+                std::vector<std::size_t> lookup_parts(
+                    const plonk_constraint_system<FieldType> &constraint_system,
+                    std::size_t max_quotient_chunks
+                ){
+                    if( max_quotient_chunks == 0 ){
+                        return {constraint_system.sorted_lookup_columns_number()};
+                    }
+
+                    using VariableType = plonk_variable<typename FieldType::value_type>;
+                    typedef math::expression_max_degree_visitor<VariableType> degree_visitor_type;
+                    std::vector<std::size_t> lookup_parts;
+                    degree_visitor_type lookup_visitor;
+
+                    std::size_t lookup_chunk = 0;
+                    std::size_t lookup_part = 0;
+                    std::size_t max_constraint_degree;
+                    for (const auto& gate :constraint_system.lookup_gates()) {
+                        for (const auto& constr : gate.constraints) {
+                            max_constraint_degree = 0;
+                            for (const auto& li : constr.lookup_input) {
+                                std::size_t deg = lookup_visitor.compute_max_degree(li);
+                                max_constraint_degree = std::max(
+                                    max_constraint_degree,
+                                    deg
+                                );
+                            }
+                            if( lookup_chunk + max_constraint_degree + 1>= max_quotient_chunks ){
+                                lookup_parts.push_back(lookup_part);
+                                lookup_chunk = 0;
+                                lookup_part = 0;
+                            }
+                            // +1 because lookup input is multiplied by selector
+                            lookup_chunk += max_constraint_degree + 1;
+                            lookup_part++;
+                        }
+                    }
+                    for (const auto& table : constraint_system.lookup_tables()) {
+                        for( const auto &lookup_options: table.lookup_options ){
+                            // +3 because now any lookup option is lookup_column * lookup_selector * (1-q_last-q_blind) -- three polynomials degree rows_amount-1
+                            if( lookup_chunk + 3 >= max_quotient_chunks ){
+                                lookup_parts.push_back(lookup_part);
+                                lookup_chunk = 0;
+                                lookup_part = 0;
+                            }
+                            lookup_chunk += 3;
+                            lookup_part++;
+                        }
+                    }
+
+                    lookup_parts.push_back(lookup_part);
+                    return lookup_parts;
+                }
+
                 template<typename FieldType, typename CommitmentSchemeTypePermutation, typename ParamsType>
                 class placeholder_lookup_argument_prover {
                     using transcript_hash_type = typename ParamsType::transcript_hash_type;
@@ -90,6 +144,7 @@ namespace nil {
                         , basic_domain(preprocessed_data.common_data.basic_domain)
                         , lookup_gates(constraint_system.lookup_gates())
                         , lookup_tables(constraint_system.lookup_tables())
+                        , lookup_chunks(0)
                     {
                         // $/theta = \challenge$
                         theta = transcript.template challenge<FieldType>();
@@ -131,7 +186,7 @@ namespace nil {
                         }
                         //    Sort
                         auto sorted = sort_polynomials(reduced_input, reduced_value, basic_domain->m,
-                            preprocessed_data.common_data.usable_rows_amount);
+                            preprocessed_data.common_data.desc.usable_rows_amount);
 
                         // 4. Commit sorted polys
                         for( std::size_t i = 0; i < sorted.size(); i++){
@@ -144,6 +199,12 @@ namespace nil {
                         typename FieldType::value_type beta  = transcript.template challenge<FieldType>();
                         typename FieldType::value_type gamma = transcript.template challenge<FieldType>();
 
+                        auto part_sizes = lookup_parts(constraint_system, preprocessed_data.common_data.max_quotient_chunks);
+                        std::vector<typename FieldType::value_type> lookup_alphas;
+                        for(std::size_t i = 0; i < part_sizes.size() - 1; i++){
+                            lookup_alphas.push_back(transcript.template challenge<FieldType>());
+                        }
+
                         math::polynomial_dfs<typename FieldType::value_type> V_L = compute_V_L(
                             sorted, reduced_input, reduced_value, beta, gamma);
 
@@ -153,13 +214,20 @@ namespace nil {
 
                         commitment_scheme.append_to_batch(PERMUTATION_BATCH, V_L);
 
-                        BOOST_CHECK(V_L[preprocessed_data.common_data.usable_rows_amount] ==  FieldType::value_type::one());
+                        BOOST_CHECK(V_L[preprocessed_data.common_data.desc.usable_rows_amount] ==  FieldType::value_type::one());
 
-                        // After this call of compute_g lookup_input_ptr and lookup_value_ptr are deleted.
-                        math::polynomial_dfs<typename FieldType::value_type> g = compute_g(
-                            std::move(lookup_input_ptr), std::move(lookup_value_ptr), beta, gamma);
 
-                        math::polynomial_dfs<typename FieldType::value_type> h = compute_h(sorted, beta, gamma);
+                        BOOST_ASSERT(std::accumulate(part_sizes.begin(), part_sizes.end(), 0) == sorted.size());
+
+                        // Compute gs and hs products for each part
+                        std::vector<math::polynomial_dfs<typename FieldType::value_type>> gs = compute_gs(
+                             std::move(lookup_input_ptr), std::move(lookup_value_ptr), beta, gamma, part_sizes
+                        );
+
+                        std::vector<math::polynomial_dfs<typename FieldType::value_type>> hs = compute_hs(
+                            sorted, beta, gamma, part_sizes
+                        );
+
                         math::polynomial_dfs<typename FieldType::value_type> V_L_shifted =
                             math::polynomial_shift(V_L, 1, basic_domain->m);
 
@@ -171,18 +239,48 @@ namespace nil {
                         // Polynomial g is waaay too large, saving memory here, by making code very unreadable.
                         //F_dfs[2] = (one_polynomial - (preprocessed_data.q_last + preprocessed_data.q_blind)) *
                         //           (V_L_shifted * h - V_L * g);
-                        g *= V_L;
-                        h *= V_L_shifted;
-                        g -= h;
-                        h = math::polynomial_dfs<typename FieldType::value_type>(); // just clean the memory of h.
-                        g *= (preprocessed_data.q_last + preprocessed_data.q_blind) - one_polynomial;
-                        F_dfs[2] = std::move(g);
+                        F_dfs[2] = zero_polynomial;
+                        if( part_sizes.size() == 1 ){
+                            auto &g = gs[0];
+                            auto &h = hs[0];
+                            g *= V_L;
+                            h *= V_L_shifted;
+                            g -= h;
+                            h = math::polynomial_dfs<typename FieldType::value_type>(); // just clean the memory of h.
+                            g *= (preprocessed_data.q_last + preprocessed_data.q_blind) - one_polynomial;
+                            F_dfs[2] = std::move(g);
+                        } else {
+                            math::polynomial_dfs<typename FieldType::value_type> current_poly = V_L;
+                            math::polynomial_dfs<typename FieldType::value_type> previous_poly = V_L;
+                            std::vector<math::polynomial_dfs<typename FieldType::value_type>> parts;
+                            BOOST_ASSERT(part_sizes.size() == gs.size());
+                            BOOST_ASSERT(part_sizes.size() == hs.size());
+                            BOOST_ASSERT(part_sizes.size() == lookup_alphas.size() + 1);
+                            for( std::size_t i = 0; i < lookup_alphas.size(); i ++ ){
+                                auto &g = gs[i];
+                                auto &h = hs[i];
+                                auto reduced_g = reduce_dfs_polynomial_domain(g, basic_domain->m);
+                                auto reduced_h = reduce_dfs_polynomial_domain(h, basic_domain->m);
+                                for( std::size_t j = 0; j < preprocessed_data.common_data.desc.usable_rows_amount; j++){
+                                    current_poly[j] = (previous_poly[j] * reduced_g[j]) / reduced_h[j];
+                                }
+                                commitment_scheme.append_to_batch(PERMUTATION_BATCH, current_poly);
+                                auto par = lookup_alphas[i] * (previous_poly * g - current_poly * h);
+                                F_dfs[2] += par;
+                                previous_poly = current_poly;
+                            }
+                            std::size_t last = lookup_alphas.size();
+                            auto &g = gs[last];
+                            auto &h = hs[last];
+                            F_dfs[2] += (previous_poly * g - V_L_shifted * h);
+                            F_dfs[2] *= (preprocessed_data.q_last + preprocessed_data.q_blind) - one_polynomial;
+                        }
 
                         F_dfs[3] = zero_polynomial;
 
                         for (std::size_t i = 1; i < sorted.size(); i++) {
                             typename FieldType::value_type alpha =  transcript.template challenge<FieldType>();
-                            math::polynomial_dfs sorted_shifted = math::polynomial_shift(sorted[i-1], preprocessed_data.common_data.usable_rows_amount , basic_domain->m);
+                            math::polynomial_dfs sorted_shifted = math::polynomial_shift(sorted[i-1], preprocessed_data.common_data.desc.usable_rows_amount , basic_domain->m);
                             F_dfs[3] += alpha * preprocessed_data.common_data.lagrange_0 * (sorted[i] - sorted_shifted);
                         }
 
@@ -199,22 +297,31 @@ namespace nil {
                         };
                     }
 
-                    math::polynomial_dfs<typename FieldType::value_type> compute_g(
+                    std::vector<math::polynomial_dfs<typename FieldType::value_type>> compute_gs(
                             std::unique_ptr<std::vector<math::polynomial_dfs<typename FieldType::value_type>>> lookup_input_ptr,
                             std::unique_ptr<std::vector<math::polynomial_dfs<typename FieldType::value_type>>> lookup_value_ptr,
                             const typename FieldType::value_type& beta,
-                            const typename FieldType::value_type& gamma) {
-
+                            const typename FieldType::value_type& gamma,
+                            std::vector<std::size_t> lookup_part_sizes
+                    ) {
+                        std::vector<math::polynomial_dfs<typename FieldType::value_type>> result;
                         auto& lookup_value = *lookup_value_ptr;
                         auto& lookup_input = *lookup_input_ptr;
 
                         auto g = math::polynomial_dfs<typename FieldType::value_type>::one();
                         auto one = FieldType::value_type::one();
-                        g *= (one + beta).pow(lookup_input.size());
 
+                        std::size_t current_part = 0;
                         std::vector<math::polynomial_dfs<typename FieldType::value_type>> g_multipliers;
                         for (std::size_t i = 0; i < lookup_input.size(); i++) {
-                            g_multipliers.push_back(gamma + lookup_input[i]);
+                            g_multipliers.push_back((one + beta) * (gamma + lookup_input[i]));
+                            if( g_multipliers.size() == lookup_part_sizes[current_part] ){
+                                g *= math::polynomial_product<FieldType>(std::move(g_multipliers));
+                                result.push_back(g);
+                                g_multipliers.clear();
+                                g = math::polynomial_dfs<typename FieldType::value_type>::one();
+                                current_part++;
+                            }
                         }
 
                         // We don't use lookup_input after this line.
@@ -224,28 +331,49 @@ namespace nil {
                         for (std::size_t i = 0; i < lookup_value.size(); i++) {
                             auto lookup_shifted = math::polynomial_shift(lookup_value[i], 1, basic_domain->m);
                             g_multipliers.push_back( part1 + lookup_value[i] + beta * lookup_shifted);
+                            if( g_multipliers.size() == lookup_part_sizes[current_part] ){
+                                g *= math::polynomial_product<FieldType>(std::move(g_multipliers));
+                                result.push_back(g);
+                                g_multipliers.clear();
+                                g.clear();
+                                g = math::polynomial_dfs<typename FieldType::value_type>::one();
+                                current_part++;
+                            }
                         }
+                        BOOST_ASSERT(g_multipliers.size() == 0);
 
                         // We don't use lookup_value after this line.
                         lookup_value_ptr.reset(nullptr);
-
-                        g *= math::polynomial_product<FieldType>(std::move(g_multipliers));
-                        return g;
+                        return std::move(result);
                     }
 
-                    math::polynomial_dfs<typename FieldType::value_type> compute_h(
+                    std::vector<math::polynomial_dfs<typename FieldType::value_type>> compute_hs(
                             const std::vector<math::polynomial_dfs<typename FieldType::value_type>>& sorted,
                             const typename FieldType::value_type& beta,
-                            const typename FieldType::value_type& gamma
+                            const typename FieldType::value_type& gamma,
+                            const std::vector<std::size_t> &lookup_part_sizes
                         ) {
                         auto one = FieldType::value_type::one();
 
+                        std::vector<math::polynomial_dfs<typename FieldType::value_type>> result;
                         std::vector<math::polynomial_dfs<typename FieldType::value_type>> h_multipliers;
+                        math::polynomial_dfs<typename FieldType::value_type> h = math::polynomial_dfs<typename FieldType::value_type>::one();
+
+                        std::size_t current_part = 0;
                         for (std::size_t i = 0; i < sorted.size(); i++) {
                             auto sorted_shifted = math::polynomial_shift(sorted[i], 1, basic_domain->m);
                             h_multipliers.push_back((one + beta) * gamma + sorted[i] + beta * sorted_shifted);
+                            if( h_multipliers.size() == lookup_part_sizes[current_part] ){
+                                h = math::polynomial_product<FieldType>(h_multipliers);
+                                result.push_back(h);
+                                h_multipliers.clear();
+                                h.clear();
+                                h = math::polynomial_dfs<typename FieldType::value_type>::one();
+                                current_part++;
+                            }
                         }
-                        return math::polynomial_product<FieldType>(h_multipliers);
+                        BOOST_ASSERT(h_multipliers.size() == 0);
+                        return std::move(result);
                     }
 
                     math::polynomial_dfs<typename FieldType::value_type> compute_V_L(
@@ -260,7 +388,7 @@ namespace nil {
                         V_L[0] = FieldType::value_type::one();
                         auto one = FieldType::value_type::one();
 
-                        for (std::size_t k = 1; k <= preprocessed_data.common_data.usable_rows_amount; k++) {
+                        for (std::size_t k = 1; k <= preprocessed_data.common_data.desc.usable_rows_amount; k++) {
                             V_L[k] = V_L[k-1];
 
                             typename FieldType::value_type g_tmp = (one + beta).pow(reduced_input.size());
@@ -514,7 +642,7 @@ namespace nil {
                     const std::vector<plonk_lookup_gate<FieldType, plonk_lookup_constraint<FieldType>>>& lookup_gates;
                     const std::vector<plonk_lookup_table<FieldType>>& lookup_tables;
                     typename FieldType::value_type theta;
-
+                    std::size_t lookup_chunks;
                 };
 
                 template<typename FieldType, typename CommitmentSchemeTypePermutation, typename ParamsType>
@@ -533,9 +661,10 @@ namespace nil {
 
                 public:
                     std::array<typename FieldType::value_type, argument_size> verify_eval(
-                        const typename placeholder_public_preprocessor<FieldType, ParamsType>::preprocessed_data_type &preprocessed_data,
-                        const std::vector<plonk_lookup_gate<FieldType, plonk_lookup_constraint<FieldType>>> &lookup_gates,
-                        const std::vector<plonk_lookup_table<FieldType>> &lookup_tables,
+                        const typename placeholder_public_preprocessor<FieldType, ParamsType>::preprocessed_data_type::common_data_type &common_data,
+                        const std::vector<typename FieldType::value_type> &special_selector_values,
+                        const std::vector<typename FieldType::value_type> &special_selector_values_shifted,
+                        const plonk_constraint_system<FieldType> &constraint_system,
                         // y
                         const typename FieldType::value_type &challenge,
                         typename policy_type::evaluation_map &evaluations,
@@ -543,15 +672,17 @@ namespace nil {
                         const std::vector<std::vector<typename FieldType::value_type>> &sorted,
                         // V_L(y), V_L(omega* Y)
                         std::vector<typename FieldType::value_type> V_L_values,
+                        // parts values
+                        std::vector<typename FieldType::value_type> parts_values,
                         // Commitment
                         const typename CommitmentSchemeTypePermutation::commitment_type &lookup_commitment,
                         transcript_type &transcript = transcript_type()
                     ) {
+                        const std::vector<plonk_lookup_gate<FieldType, plonk_lookup_constraint<FieldType>>> &lookup_gates = constraint_system.lookup_gates();
+                        const std::vector<plonk_lookup_table<FieldType>> &lookup_tables = constraint_system.lookup_tables();
                         std::array<typename FieldType::value_type, argument_size> F;
                         // 1. Get theta
                         typename FieldType::value_type theta = transcript.template challenge<FieldType>();
-                        typename FieldType::value_type omega = preprocessed_data.common_data.basic_domain->get_domain_element(1);
-
 
                         // 2. Add commitments to transcript
                         transcript(lookup_commitment);
@@ -559,8 +690,8 @@ namespace nil {
                         // 3. Calculate lookup_value compression
                         typename FieldType::value_type one = FieldType::value_type::one();
 
-                        auto mask_value = (one - (preprocessed_data.q_last.evaluate(challenge) + preprocessed_data.q_blind.evaluate(challenge)));
-                        auto shifted_mask_value = (one - (preprocessed_data.q_last.evaluate(challenge*omega) + preprocessed_data.q_blind.evaluate(challenge*omega)));
+                        auto mask_value = (one - (special_selector_values[1] + special_selector_values[2]));
+                        auto shifted_mask_value = (one - (special_selector_values_shifted[0] + special_selector_values_shifted[1]));
 
 
                         typename FieldType::value_type theta_acc = FieldType::value_type::one();
@@ -613,30 +744,89 @@ namespace nil {
                         typename FieldType::value_type beta = transcript.template challenge<FieldType>();
                         typename FieldType::value_type gamma = transcript.template challenge<FieldType>();
 
+                        std::vector<typename FieldType::value_type> lookup_alphas;
+                        auto parts = lookup_parts(constraint_system, common_data.max_quotient_chunks);
+                        for(std::size_t i = 0; i < parts.size() - 1; i++){
+                            lookup_alphas.push_back(transcript.template challenge<FieldType>());
+                        }
+                        BOOST_ASSERT(lookup_alphas.size() == parts_values.size());
+
+                        std::vector<typename FieldType::value_type> gs;
+                        std::vector<typename FieldType::value_type> hs;
+
+                        std::size_t current_part = 0;
+                        std::size_t current_size = 0;
                         typename FieldType::value_type g(1);
                         for( std::size_t i = 0; i < lookup_input.size(); i++){
                             g *= (one+beta)*(gamma + lookup_input[i]);
+                            current_size++;
+                            if( current_size == parts[current_part] ){
+                                gs.push_back(g);
+                                g = FieldType::value_type::one();
+                                current_size = 0;
+                                current_part++;
+                            }
                         }
                         for( std::size_t i = 0; i < lookup_value.size(); i++ ){
                             g *= (one+beta) * gamma + lookup_value[i] + beta * shifted_lookup_value[i];
+                            current_size++;
+                            if( current_size == parts[current_part] ){
+                                gs.push_back(g);
+                                g = FieldType::value_type::one();
+                                current_size = 0;
+                                current_part++;
+                            }
                         }
+                        BOOST_ASSERT(current_size == 0);
 
                         typename FieldType::value_type h(1);
+                        current_part = 0;
+                        current_size = 0;
                         for( std::size_t i = 0; i < sorted.size(); i++){
                             h *= (one+beta) * gamma + sorted[i][0] + beta * sorted[i][1];
+                            current_size++;
+                            if( current_size == parts[current_part] ){
+                                hs.push_back(h);
+                                h = FieldType::value_type::one();
+                                current_size = 0;
+                                current_part++;
+                            }
                         }
+                        BOOST_ASSERT(current_size == 0);
+                        BOOST_ASSERT(gs.size() == parts_values.size() + 1);
+                        BOOST_ASSERT(hs.size() == parts_values.size() + 1);
 
                         auto V_L_value = V_L_values[0];
                         auto V_L_shifted = V_L_values[1];
 
-                        F[0] = (one - V_L_value) * preprocessed_data.common_data.lagrange_0.evaluate(challenge);
-                        F[1] = preprocessed_data.q_last.evaluate(challenge) * (V_L_value * V_L_value - V_L_value);
-                        F[2] = (one - (preprocessed_data.q_last.evaluate(challenge) + preprocessed_data.q_blind.evaluate(challenge))) *
+                        F[0] = (one - V_L_value) * special_selector_values[0];
+                        F[1] = special_selector_values[1] * (V_L_value * V_L_value - V_L_value);
+                        if(parts.size() == 1){
+                            g = gs[0];
+                            h = hs[0];
+                            F[2] = (one - (special_selector_values[1] + special_selector_values[2])) *
                                    (V_L_shifted * h - V_L_value * g);
+                        } else {
+                            typename FieldType::value_type current_value;
+                            typename FieldType::value_type previous_value = V_L_value;
+                            for( std::size_t i = 0; i < lookup_alphas.size(); i ++ ){
+                                auto g = gs[i];
+                                auto h = hs[i];
+                                current_value = parts_values[i];
+                                auto part = lookup_alphas[i] * (previous_value * g - current_value * h);
+                                F[2] += part;
+                                previous_value = current_value;
+                            }
+                            std::size_t last = lookup_alphas.size();
+                            auto g = gs[last];
+                            auto h = hs[last];
+                            F[2] += (previous_value * g - V_L_shifted * h);
+                            F[2] *= (special_selector_values[1] + special_selector_values[2]) - one;
+                        }
                         F[3] = 0;
                         for( std::size_t i = 1; i < sorted.size(); i++ ){
                             typename FieldType::value_type alpha = transcript.template challenge<FieldType>();
-                            F[3] += (sorted[i][0] - sorted[i-1][2]) * alpha * preprocessed_data.common_data.lagrange_0.evaluate(challenge);
+                            F[3] += (sorted[i][0] - sorted[i-1][2]) * alpha * special_selector_values[0];
                         }
                         return F;
                     }

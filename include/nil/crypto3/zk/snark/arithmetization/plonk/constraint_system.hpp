@@ -37,6 +37,7 @@
 
 #include <cstdlib>
 #include <vector>
+#include <unordered_set>
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/gate.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint.hpp>
@@ -67,6 +68,7 @@ namespace nil {
                     typedef math::binary_arithmetic_operation<variable_type> binary_operation_type;
                     typedef math::pow_operation<variable_type> pow_operation_type;
                     typedef std::vector<std::size_t> public_input_sizes_type;
+                    typedef FieldType field_type;
 
                 protected:
                     gates_container_type _gates;
@@ -76,7 +78,6 @@ namespace nil {
                     // If empty, then check full column
                     public_input_sizes_type _public_input_sizes;
                 public:
-                    typedef FieldType field_type;
 
                     plonk_constraint_system() {
                     }
@@ -95,6 +96,17 @@ namespace nil {
                         _lookup_tables(lookup_tables),
                         _public_input_sizes(public_input_sizes)
                     {
+                    }
+
+                    std::unordered_set<variable_type> permuted_columns() const{
+                        std::unordered_set<variable_type> result;
+                        for( std::size_t i = 0; i < _copy_constraints.size(); i++){
+                            auto var0 = _copy_constraints[i].first;
+                            auto var1 = _copy_constraints[i].second;
+                            result.insert(variable_type(var0.index, 0, true, var0.type));
+                            result.insert(variable_type(var1.index, 0, true, var1.type));
+                        }
+                        return std::move(result);
                     }
 
                     std::size_t public_input_total_size() const {
@@ -127,6 +139,10 @@ namespace nil {
                     }
 
                     const copy_constraints_container_type &copy_constraints() const {
+                        return _copy_constraints;
+                    }
+
+                    copy_constraints_container_type &mutable_copy_constraints() {
                         return _copy_constraints;
                     }
 

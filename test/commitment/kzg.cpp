@@ -57,6 +57,7 @@
 #include <nil/crypto3/algebra/fields/arithmetic_params/mnt4.hpp>
 
 #include <nil/crypto3/zk/commitments/polynomial/kzg.hpp>
+#include <nil/crypto3/zk/commitments/polynomial/kzg_v2.hpp>
 
 using namespace nil::crypto3;
 using namespace nil::crypto3::math;
@@ -947,7 +948,7 @@ struct placeholder_class_test_initializer {
         using kzg_scheme_type = typename zk::commitments::kzg_commitment_scheme_v2<kzg_type>;
 
         scalar_value_type alpha = 7;
-        auto params = typename kzg_type::params_type(8, 8, alpha);
+        auto params = kzg_scheme_type::create_params(8, alpha);
         kzg_scheme_type kzg(params);
 
         typename kzg_type::batch_of_polynomials_type polys(4);

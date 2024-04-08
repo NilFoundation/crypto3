@@ -33,7 +33,6 @@
 namespace nil {
     namespace crypto3 {
         namespace zk {
-
             BOOST_TTI_HAS_TYPE(commitment_type)
             BOOST_TTI_HAS_TYPE(proof_type)
 
@@ -109,12 +108,41 @@ namespace nil {
                 typedef T type;
             };
 
+            // An idea was copied from this example:
+            //    https://stackoverflow.com/questions/54920801/check-if-static-function-is-available-in-class-at-compile-time
+
+            template<typename T, typename Enable = void>
+            struct is_kzg_struct: std::false_type{
+                static const bool value = false;
+            };
+
+            template<class T>
+            struct is_kzg_struct<T, std::enable_if_t<std::is_invocable_r<bool, decltype(T::is_kzg)>::value>>
+            : std::integral_constant<bool, T::is_kzg()>
+            {};
+
+            template<class T>
+            constexpr bool is_kzg = is_kzg_struct<T>::value;
+
+
+            template<typename T, typename Enable = void>
+            struct is_lpc_struct: std::false_type{
+                static const bool value = false;
+            };
+
+            template<class T>
+            struct is_lpc_struct<T, std::enable_if_t<std::is_invocable_r<bool, decltype(T::is_lpc)>::value>>
+            : std::integral_constant<bool, T::is_lpc()>
+            {};
+
+            template<class T>
+            constexpr bool is_lpc = is_lpc_struct<T>::value;
+
             template<bool Condition, typename Type, std::size_t Size>
             struct select_container {
                 using type = typename std::
                     conditional<Condition, std::array<Type, Size>, std::vector<Type>>::type;
             };
-
         }    // namespace zk
     }        // namespace crypto3
 }    // namespace nil

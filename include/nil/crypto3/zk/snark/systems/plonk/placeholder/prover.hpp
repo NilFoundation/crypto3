@@ -98,7 +98,6 @@ namespace nil {
                         const plonk_constraint_system<FieldType> &constraint_system,
                         commitment_scheme_type commitment_scheme
                     ) {
-
                         auto prover = placeholder_prover<FieldType, ParamsType>(
                             preprocessed_public_data, std::move(preprocessed_private_data), table_description,
                             constraint_system, commitment_scheme);
@@ -144,7 +143,7 @@ namespace nil {
                         transcript(_proof.commitments[VARIABLE_VALUES_BATCH]);
 
                         // 4. permutation_argument
-                        {
+                        if( constraint_system.copy_constraints().size() > 0 ){
                             auto permutation_argument = placeholder_permutation_argument<FieldType, ParamsType>::prove_eval(
                                 constraint_system,
                                 preprocessed_public_data,
@@ -167,8 +166,10 @@ namespace nil {
                             _F_dfs[6] = std::move(lookup_argument_result.F_dfs[3]);
                         }
 
-                        _proof.commitments[PERMUTATION_BATCH] = _commitment_scheme.commit(PERMUTATION_BATCH);
-                        transcript(_proof.commitments[PERMUTATION_BATCH]);
+                        if( constraint_system.copy_constraints().size() > 0 || constraint_system.lookup_gates().size() > 0){
+                            _proof.commitments[PERMUTATION_BATCH] = _commitment_scheme.commit(PERMUTATION_BATCH);
+                            transcript(_proof.commitments[PERMUTATION_BATCH]);
+                        }
 
                         // 6. circuit-satisfability
 
@@ -190,7 +191,6 @@ namespace nil {
 #ifdef ZK_PLACEHOLDER_DEBUG_ENABLED
                         placeholder_debug_output();
 #endif
-
                         // _polynomial_table not needed, clean its memory
                         _polynomial_table.reset(nullptr);
 
@@ -226,16 +226,20 @@ namespace nil {
                         PROFILE_PLACEHOLDER_SCOPE("split_polynomial_dfs_conversion_time");
 
                         std::size_t split_polynomial_size = std::max(
-                            (preprocessed_public_data.identity_polynomials.size() + 2) * (preprocessed_public_data.common_data.rows_amount -1 ),
-                            (constraint_system.lookup_poly_degree_bound() + 1) * (preprocessed_public_data.common_data.rows_amount -1 )//,
+                            (preprocessed_public_data.identity_polynomials.size() + 2) * (preprocessed_public_data.common_data.desc.rows_amount -1 ),
+                            (constraint_system.lookup_poly_degree_bound() + 1) * (preprocessed_public_data.common_data.desc.rows_amount -1 )//,
                         );
                         split_polynomial_size = std::max(
                             split_polynomial_size,
-                            (preprocessed_public_data.common_data.max_gates_degree + 1) * (preprocessed_public_data.common_data.rows_amount -1)
+                            (preprocessed_public_data.common_data.max_gates_degree + 1) * (preprocessed_public_data.common_data.desc.rows_amount -1)
                         );
-                        split_polynomial_size = (split_polynomial_size % preprocessed_public_data.common_data.rows_amount != 0)?
-                            (split_polynomial_size / preprocessed_public_data.common_data.rows_amount + 1):
-                            (split_polynomial_size / preprocessed_public_data.common_data.rows_amount);
+                        split_polynomial_size = (split_polynomial_size % preprocessed_public_data.common_data.desc.rows_amount != 0)?
+                            (split_polynomial_size / preprocessed_public_data.common_data.desc.rows_amount + 1):
+                            (split_polynomial_size / preprocessed_public_data.common_data.desc.rows_amount);
+
+                        if( preprocessed_public_data.common_data.max_quotient_chunks != 0 && split_polynomial_size > preprocessed_public_data.common_data.max_quotient_chunks){
+                            split_polynomial_size = preprocessed_public_data.common_data.max_quotient_chunks;
+                        }
 
                         // We need split_polynomial_size computation because proof size shouldn't depend on public input size.
                         // we set this size as maximum of
@@ -250,7 +254,6 @@ namespace nil {
                         for (std::size_t k = 0; k < T_splitted.size(); k++) {
                             T_splitted_dfs[k].from_coefficients(T_splitted[k]);
                         }
-
                         return T_splitted_dfs;
                     }
 
@@ -365,14 +368,18 @@ namespace nil {
                             }
                         }
 
-                        _commitment_scheme.append_eval_point(PERMUTATION_BATCH, _proof.eval_proof.challenge);
-                        _commitment_scheme.append_eval_point(PERMUTATION_BATCH, _proof.eval_proof.challenge * _omega);
+                        if(_is_lookup_enabled || constraint_system.copy_constraints().size() > 0){
+                            _commitment_scheme.append_eval_point(PERMUTATION_BATCH, _proof.eval_proof.challenge);
+                            _commitment_scheme.append_eval_point(PERMUTATION_BATCH, 0, _proof.eval_proof.challenge * _omega);
+                        }
+
 
                         if(_is_lookup_enabled){
+                            _commitment_scheme.append_eval_point(PERMUTATION_BATCH, preprocessed_public_data.common_data.permutation_parts , _proof.eval_proof.challenge * _omega);
                             _commitment_scheme.append_eval_point(LOOKUP_BATCH, _proof.eval_proof.challenge);
                             _commitment_scheme.append_eval_point(LOOKUP_BATCH, _proof.eval_proof.challenge * _omega);
                             _commitment_scheme.append_eval_point(LOOKUP_BATCH, _proof.eval_proof.challenge *
-                                _omega.pow(preprocessed_public_data.common_data.usable_rows_amount));
+                                _omega.pow(preprocessed_public_data.common_data.desc.usable_rows_amount));
                         }
 
                         _commitment_scheme.append_eval_point(QUOTIENT_BATCH, _proof.eval_proof.challenge);

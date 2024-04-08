@@ -33,14 +33,74 @@
 
 #include <nil/crypto3/math/algorithms/make_evaluation_domain.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/params.hpp>
+#include <nil/crypto3/zk/commitments/type_traits.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
 
-                template<typename PlaceholderParams>
-                struct placeholder_profiling;
+                // We have a piece of logic that is may be easily computed from constraint system,
+                // common data and commitment parameters,
+                // but it is not convenient to place it inside any of these classes.
+                //
+                // This piece of code is used in different projects with verifiers, and it's not good ot repeat it.
+                struct placeholder_info{
+                    std::size_t batches_num;
+                    std::vector<std::size_t> batches_sizes;
+                    std::size_t poly_num;
+                    std::size_t quotient_size;
+                    bool use_lookups;
+                    std::size_t permutation_size;
+                    std::size_t round_proof_layers_num;
+                };
+
+
+                template<typename PlaceholderParams, typename enable = void>
+                placeholder_info prepare_placeholder_info();
+
+                // TODO remove permutation size
+                template<typename PlaceholderParams, std::enable_if_t<nil::crypto3::zk::is_lpc<typename PlaceholderParams::commitment_scheme_type>, bool> = true>
+                placeholder_info prepare_placeholder_info(
+                    const typename PlaceholderParams::constraint_system_type &constraint_system,
+                    const typename nil::crypto3::zk::snark::placeholder_public_preprocessor<typename PlaceholderParams::field_type, PlaceholderParams>::preprocessed_data_type::common_data_type &common_data,
+                    const typename PlaceholderParams::commitment_scheme_type::params_type &fri_params,
+                    std::size_t perm_size
+                ) {
+                    auto &desc = common_data.desc;
+                    placeholder_info res;
+
+                    res.permutation_size = perm_size;
+                    res.use_lookups = constraint_system.num_lookup_gates() != 0;
+                    res.batches_num = res.use_lookups ? 5 : 4;
+                    res.batches_sizes.resize(res.batches_num);
+                    res.batches_sizes[0] = res.permutation_size * 2 + 2 + desc.constant_columns + desc.selector_columns;
+                    res.batches_sizes[1] = desc.witness_columns + desc.public_input_columns;
+                    res.batches_sizes[2] = res.use_lookups ? 2 : 1;
+                    // TODO: place it to one single place to prevent code duplication
+                    std::size_t split_polynomial_size = std::max(
+                        (res.permutation_size + 2) * (desc.rows_amount -1 ),
+                        (constraint_system.lookup_poly_degree_bound() + 1) * (desc.rows_amount -1 )//,
+                    );
+                    split_polynomial_size = std::max(
+                        split_polynomial_size,
+                        (common_data.max_gates_degree + 1) * (desc.rows_amount -1)
+                    );
+                    split_polynomial_size = (split_polynomial_size % desc.rows_amount != 0)?
+                        (split_polynomial_size / desc.rows_amount + 1):
+                        (split_polynomial_size / desc.rows_amount);
+                    res.quotient_size = res.batches_sizes[3] = split_polynomial_size;
+                    if(res.use_lookups) res.batches_sizes[4] = constraint_system.sorted_lookup_columns_number();
+                    res.poly_num = std::accumulate(res.batches_sizes.begin(), res.batches_sizes.end(), 0);
+
+                    res.round_proof_layers_num = 0;
+                    for(std::size_t i = 0; i < fri_params.r; i++ ){
+                        res.round_proof_layers_num += log2(fri_params.D[i]->m) -1;
+                    }
+
+                    return res;
+                }
+
 
                 template<typename PlaceholderParams>
                 void print_placeholder_params(
@@ -56,8 +116,8 @@ namespace nil {
                     boost::property_tree::ptree root;
                     root.put("test_name", circuit_name);
                     root.put("modulus", PlaceholderParams::field_type::modulus);
-                    root.put("rows_amount", preprocessed_data.common_data.rows_amount);
-                    root.put("usable_rows_amount", preprocessed_data.common_data.usable_rows_amount);
+                    root.put("rows_amount", preprocessed_data.common_data.desc.rows_amount);
+                    root.put("usable_rows_amount", preprocessed_data.common_data.desc.usable_rows_amount);
                     root.put("omega", preprocessed_data.common_data.basic_domain->get_domain_element(1));
                     root.put("verification_key", preprocessed_data.common_data.vk.to_string());
 

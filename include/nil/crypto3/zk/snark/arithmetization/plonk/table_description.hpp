@@ -28,6 +28,7 @@
 #define CRYPTO3_ZK_PLONK_PLACEHOLDER_TABLE_DESCRIPTION_HPP
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/variable.hpp>
+#include <limits>
 
 namespace nil {
     namespace crypto3 {
@@ -74,10 +75,25 @@ namespace nil {
                             case plonk_variable<typename FieldType::value_type>::column_type::selector:
                                 return witness_columns + public_input_columns + constant_columns + a.index;
                         }
+                        /* unreachable*/
+                        return std::numeric_limits<size_t>::max();
                     }
 
                     std::size_t table_width() const {
                         return witness_columns + public_input_columns + constant_columns + selector_columns;
+                    }
+
+                    bool operator==(const plonk_table_description &rhs) const {
+                        return
+                            rows_amount == rhs.rows_amount &&
+                            usable_rows_amount == rhs.usable_rows_amount &&
+                            witness_columns == rhs.witness_columns &&
+                            public_input_columns == rhs.public_input_columns &&
+                            constant_columns == rhs.constant_columns &&
+                            selector_columns == rhs.selector_columns;
+                    }
+                    bool operator!=(const plonk_table_description &rhs) const {
+                        return !(rhs == *this);
                     }
                 };
             }    // namespace snark

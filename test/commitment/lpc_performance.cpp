@@ -138,8 +138,8 @@ BOOST_AUTO_TEST_CASE(step_list_1) {
 
     constexpr static const std::size_t m = 2;
 
-    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, lambda, m > fri_type;
-    typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, m>  lpc_params_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m > fri_type;
+    typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, m>  lpc_params_type;
     typedef zk::commitments::list_polynomial_commitment<FieldType, lpc_params_type> lpc_type;
 
     constexpr static const std::size_t d_extended = d;
@@ -151,7 +151,8 @@ BOOST_AUTO_TEST_CASE(step_list_1) {
         d - 1,
         D,
         generate_random_step_list(r, 1),
-        r
+        r,
+        lambda
     );
 
     using lpc_scheme_type = nil::crypto3::zk::commitments::lpc_commitment_scheme<lpc_type, math::polynomial<typename FieldType::value_type>>;
@@ -225,8 +226,8 @@ BOOST_AUTO_TEST_CASE(step_list_3) {
     constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
     constexpr static const std::size_t m = 2;
 
-    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, lambda, m > fri_type;
-    typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, m>  lpc_params_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m > fri_type;
+    typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, m>  lpc_params_type;
     typedef zk::commitments::list_polynomial_commitment<FieldType, lpc_params_type> lpc_type;
 
     constexpr static const std::size_t d_extended = d;
@@ -238,7 +239,8 @@ BOOST_AUTO_TEST_CASE(step_list_3) {
         d - 1,
         D,
         generate_random_step_list(r, 3),
-        r
+        r,
+        lambda
     );
 
     using lpc_scheme_type = nil::crypto3::zk::commitments::lpc_commitment_scheme<lpc_type, math::polynomial<typename FieldType::value_type>>;
@@ -311,8 +313,8 @@ BOOST_AUTO_TEST_CASE(step_list_5) {
     constexpr static const std::size_t m = 2;
     constexpr static const std::size_t r = boost::static_log2<(d - k)>::value;
 
-    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, lambda, m > fri_type;
-    typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, lambda, m>  lpc_params_type;
+    typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m > fri_type;
+    typedef zk::commitments::list_polynomial_commitment_params<merkle_hash_type, transcript_hash_type, m>  lpc_params_type;
     typedef zk::commitments::list_polynomial_commitment<FieldType, lpc_params_type> lpc_type;
 
     constexpr static const std::size_t d_extended = d;
@@ -324,7 +326,8 @@ BOOST_AUTO_TEST_CASE(step_list_5) {
         d - 1,
         D,
         generate_random_step_list(r, 5),
-        r
+        r,
+        lambda
     );
 
     using lpc_scheme_type = nil::crypto3::zk::commitments::lpc_commitment_scheme<lpc_type, math::polynomial<typename FieldType::value_type>>;

@@ -27,6 +27,8 @@
 #ifndef CRYPTO3_ZK_PLONK_COPY_CONSTRAINT_HPP
 #define CRYPTO3_ZK_PLONK_COPY_CONSTRAINT_HPP
 
+#include <utility>
+
 #include <nil/crypto3/zk/snark/arithmetization/plonk/variable.hpp>
 
 namespace nil {
@@ -35,8 +37,74 @@ namespace nil {
             namespace snark {
 
                 template<typename FieldType>
-                using plonk_copy_constraint = std::pair<plonk_variable<typename FieldType::value_type>, plonk_variable<typename FieldType::value_type>>;
+                struct plonk_copy_constraint {
+                    plonk_copy_constraint() = default;
+                    plonk_copy_constraint(const plonk_copy_constraint<FieldType> &other){
+                        initialize(other.first, other.second);
+                    }
+                    plonk_copy_constraint(
+                        const plonk_variable<typename FieldType::value_type> &_first,
+                        const plonk_variable<typename FieldType::value_type> &_second
+                    ){
+                        initialize(_first, _second);
+                    }
+                    plonk_variable<typename FieldType::value_type> first;
+                    plonk_variable<typename FieldType::value_type> second;
+                    bool operator==(const plonk_copy_constraint<FieldType> &other){
+                        return ((first == other.first ) && (second == other.second));
+                    }
+                protected:
+                    void initialize(
+                        const plonk_variable<typename FieldType::value_type> &_first,
+                        const plonk_variable<typename FieldType::value_type> &_second
+                    ){
+                        BOOST_ASSERT(_first.relative == false);
+                        BOOST_ASSERT(_second.relative == false);
+                        if(_first.type == _second.type){
+                            if(_first.index < _second.index){
+                                first = plonk_variable<typename FieldType::value_type>(_first);
+                                second = plonk_variable<typename FieldType::value_type>(_second);
+                            } else if (_first.index > _second.index){
+                                first = plonk_variable<typename FieldType::value_type>(_second);
+                                second = plonk_variable<typename FieldType::value_type>(_first);
+                            } else if (_first.rotation < _second.rotation){
+                                first = plonk_variable<typename FieldType::value_type>(_first);
+                                second = plonk_variable<typename FieldType::value_type>(_second);
+                            } else if (_first.rotation > _second.rotation){
+                                first = plonk_variable<typename FieldType::value_type>(_second);
+                                second = plonk_variable<typename FieldType::value_type>(_first);
+                            } else {
+                                BOOST_ASSERT_MSG(false, "Copy constraint with equal variables");
+                            }
+                            return;
+                        }
+                        if( _first.type == plonk_variable<typename FieldType::value_type>::column_type::witness){
+                            first = plonk_variable<typename FieldType::value_type>(_first);
+                            second = plonk_variable<typename FieldType::value_type>(_second);
+                        } else if (
+                            _first.type == plonk_variable<typename FieldType::value_type>::column_type::public_input &&
+                            _second.type != plonk_variable<typename FieldType::value_type>::column_type::witness
+                        ){
+                            first = plonk_variable<typename FieldType::value_type>(_first);
+                            second = plonk_variable<typename FieldType::value_type>(_second);
+                        } else if(
+                            _first.type == plonk_variable<typename FieldType::value_type>::column_type::constant &&
+                            _second.type == plonk_variable<typename FieldType::value_type>::column_type::selector
+                        ){
+                            first = plonk_variable<typename FieldType::value_type>(_first);
+                            second = plonk_variable<typename FieldType::value_type>(_second);
+                        } else {
+                            first = plonk_variable<typename FieldType::value_type>(_second);
+                            second = plonk_variable<typename FieldType::value_type>(_first);
+                        }
+                        return;
+                   }
+                };
 
+                template <typename FieldType>
+                bool operator==(const plonk_copy_constraint<FieldType> &a, const plonk_copy_constraint<FieldType> &b) {
+                    return a.first == b.first && a.second == b.second;
+                }
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3

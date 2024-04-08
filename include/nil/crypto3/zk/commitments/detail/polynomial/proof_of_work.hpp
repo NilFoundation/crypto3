@@ -37,22 +37,14 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace commitments {
-                template<typename TranscriptHashType, typename OutType = std::uint32_t, std::uint32_t MASK=0xFFFF0000>
+                template<typename TranscriptHashType, typename OutType = std::uint32_t>
                 class proof_of_work {
                 public:
                     using transcript_hash_type = TranscriptHashType;
                     using transcript_type = transcript::fiat_shamir_heuristic_sequential<transcript_hash_type>;
                     using output_type = OutType;
 
-                    constexpr static std::uint32_t mask = MASK;
-
-                    static inline boost::property_tree::ptree get_params() {
-                        boost::property_tree::ptree params;
-                        params.put("mask", mask);
-                        return params;
-                    }
-
-                    static inline OutType generate(transcript_type &transcript) {
+                    static inline OutType generate(transcript_type &transcript, OutType mask=0xFFFF) {
                         output_type proof_of_work = std::rand();
                         output_type result;
                         std::vector<std::uint8_t> bytes(4);
@@ -75,7 +67,7 @@ namespace nil {
                         return proof_of_work;
                     }
 
-                    static inline bool verify(transcript_type &transcript, output_type proof_of_work) {
+                    static inline bool verify(transcript_type &transcript, output_type proof_of_work, OutType mask=0xFFFF) {
                         std::vector<std::uint8_t> bytes(4);
                         bytes[0] = std::uint8_t((proof_of_work&0xFF000000)>>24);
                         bytes[1] = std::uint8_t((proof_of_work&0x00FF0000)>>16);
@@ -91,7 +83,7 @@ namespace nil {
                 // amount of bits for grinding instead of the mask.
                 // This was done because the actual mask is applied to the high bits instead of the low bits
                 // which makes manually setting the mask error-prone.
-                template<typename TranscriptHashType, typename FieldType, std::uint8_t GrindingBits=16>
+                template<typename TranscriptHashType, typename FieldType>
                 class field_proof_of_work {
                 public:
                     using transcript_hash_type = TranscriptHashType;
@@ -99,22 +91,16 @@ namespace nil {
                     using value_type = typename FieldType::value_type;
                     using integral_type = typename FieldType::integral_type;
 
-                    constexpr static const integral_type mask =
-                        (GrindingBits > 0 ?
-                            ((integral_type(2) << GrindingBits - 1) - 1) << (FieldType::modulus_bits - GrindingBits)
-                            : 0);
-
-                    static inline boost::property_tree::ptree get_params() {
-                        boost::property_tree::ptree params;
-                        params.put("mask", mask);
-                        return params;
-                    }
-
-                    static inline value_type generate(transcript_type &transcript) {
+                    static inline value_type generate(transcript_type &transcript, std::size_t GrindingBits=16) {
                         static boost::random::random_device dev;
                         static nil::crypto3::random::algebraic_engine<FieldType> random_engine(dev);
                         value_type proof_of_work = random_engine();
                         integral_type result;
+
+                        integral_type mask =
+                            (GrindingBits > 0 ?
+                                ((integral_type(1) << GrindingBits) - 1) << (FieldType::modulus_bits - GrindingBits)
+                                : 0);
 
                         while( true ) {
                             transcript_type tmp_transcript = transcript;
@@ -129,8 +115,13 @@ namespace nil {
                         return proof_of_work;
                     }
 
-                    static inline bool verify(transcript_type &transcript, value_type proof_of_work) {
+                    static inline bool verify(transcript_type &transcript, value_type proof_of_work, std::size_t GrindingBits=16) {
                         transcript(proof_of_work);
+                        integral_type mask =
+                            (GrindingBits > 0 ?
+                                ((integral_type(1) << GrindingBits) - 1) << (FieldType::modulus_bits - GrindingBits)
+                                : 0);
+
                         integral_type result = integral_type(transcript.template challenge<FieldType>().data);
                         return ((result & mask) == 0);
                     }
