@@ -139,7 +139,7 @@
             (makeCrypto3Derivation { inherit system; }).overrideAttrs (oldAttrs: {
               name = "Crypto3-${name}-tests";
 
-              nativeBuildInputs = oldAttrs.nativeBuildInputs ++ [
+              nativeBuildInputs = oldAttrs.nativeBuildInputs ++ oldAttrs.propagatedBuildInputs ++ [
                 (if compiler == "gcc" then pkgs.gcc else pkgs.clang)
               ];
 
