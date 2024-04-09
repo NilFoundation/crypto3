@@ -27,8 +27,11 @@
           nativeBuildInputs = with pkgs; [
             cmake
             ninja
-            boost183
             pkg-config
+          ];
+
+          propagatedBuildInputs = with pkgs; [
+            boost183
           ];
 
           # If we put BUILD_TESTS in cmakeFlags, tests would be built with install target. Without it they wouldn't be built at all.
