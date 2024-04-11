@@ -145,7 +145,10 @@ namespace nil {
                         nil::marshalling::types::integral<TTypeBase, octet_type>,
                         nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, std::size_t>>
                     > filled_constraint_system_with_params_hash;
-                    if constexpr(nil::crypto3::hashes::is_poseidon<typename CommonDataType::transcript_hash_type>::value){
+
+                    if constexpr(nil::crypto3::algebra::is_field_element<
+                        typename CommonDataType::transcript_hash_type::word_type
+                    >::value) {
                         auto integral = typename CommonDataType::field_type::integral_type(common_data.vk.constraint_system_with_params_hash.data);
                         std::vector<unsigned char> blob;
                         export_bits(integral, std::back_inserter(blob), 8);
@@ -239,7 +242,9 @@ namespace nil {
 
                     typename CommonDataType::verification_key_type vk;
                     vk.fixed_values_commitment = fixed_values;
-                    if constexpr(nil::crypto3::hashes::is_poseidon<typename CommonDataType::transcript_hash_type>::value){
+                    if constexpr(nil::crypto3::algebra::is_field_element<
+                        typename CommonDataType::transcript_hash_type::word_type
+                    >::value) {
                         std::vector<std::uint8_t> blob;
                         for( std::size_t i = 0; i < std::get<13>(filled_common_data.value()).value().size(); i++){
                             blob.push_back(std::uint8_t(std::get<13>(filled_common_data.value()).value()[i].value()));

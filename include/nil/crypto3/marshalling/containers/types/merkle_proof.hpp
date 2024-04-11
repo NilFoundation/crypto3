@@ -71,7 +71,10 @@ namespace nil {
                 struct merkle_node_value<
                     TTypeBase,
                     GroupElementType,
-                    typename std::enable_if<nil::crypto3::algebra::is_field_element<GroupElementType>::value>::type> {
+                    typename std::enable_if<nil::crypto3::algebra::is_field_element<
+                        GroupElementType
+                    >::value>::type
+                > {
                     using type = field_element<TTypeBase, GroupElementType>;
                 };
 
@@ -170,14 +173,19 @@ namespace nil {
                 template<
                     typename GroupElementType,
                     typename Endianness,
-                    typename std::enable_if<nil::crypto3::algebra::is_field_element<GroupElementType>::value, bool>::type = true>
-                typename merkle_node_value<nil::marshalling::field_type<Endianness>, GroupElementType>::type
+                    typename std::enable_if<nil::crypto3::algebra::is_field_element<
+                        GroupElementType
+                    >::value, bool>::type = true>
+                typename merkle_node_value<
+                    nil::marshalling::field_type<Endianness>,
+                    GroupElementType
+                >::type
                     fill_merkle_node_value(const GroupElementType &node_value) {
 
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
 
-                    typename merkle_node_value<nil::marshalling::field_type<Endianness>, GroupElementType>::type filled_node_value = 
-                        field_element<TTypeBase, GroupElementType>(node_value); 
+                    typename merkle_node_value<nil::marshalling::field_type<Endianness>, GroupElementType>::type filled_node_value =
+                        field_element<TTypeBase, GroupElementType>(node_value);
                     return filled_node_value;
                 }
 
@@ -214,9 +222,12 @@ namespace nil {
                 template<
                     typename GroupElementType,
                     typename Endianness,
-                    typename std::enable_if<nil::crypto3::algebra::is_field_element<GroupElementType>::value, bool>::type = true>
+                    typename std::enable_if<nil::crypto3::algebra::is_field_element<
+                        GroupElementType
+                    >::value, bool>::type = true>
                 GroupElementType make_merkle_node_value(const typename merkle_node_value<
-                    nil::marshalling::field_type<Endianness>, GroupElementType>::type &filled_node_value) {
+                    nil::marshalling::field_type<Endianness>, GroupElementType
+                >::type &filled_node_value) {
                     return filled_node_value.value();
                 }
 

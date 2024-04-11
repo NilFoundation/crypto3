@@ -39,9 +39,11 @@
 #include <nil/marshalling/field_type.hpp>
 #include <nil/marshalling/endianness.hpp>
 
+#include <nil/crypto3/algebra/type_traits.hpp>
 #include <nil/crypto3/multiprecision/cpp_int.hpp>
 #include <nil/crypto3/multiprecision/number.hpp>
 
+#include <nil/crypto3/hash/block_to_field_elements_wrapper.hpp>
 #include <nil/crypto3/hash/sha2.hpp>
 #include <nil/crypto3/hash/keccak.hpp>
 #include <nil/crypto3/hash/poseidon.hpp>
@@ -105,8 +107,25 @@ void test_merkle_proof(std::size_t tree_depth) {
             types::merkle_proof<nil::marshalling::field_type<Endianness>, merkle_proof_type>;
 
     std::size_t leafs_number = std::pow(Arity, tree_depth);
+    // You can also lazy convert byte stream to field elements stream using <nil/crypto3/hash/block_to_field_elements_wrapper.hpp>
     auto data = generate_random_data<std::uint8_t, LeafSize>(leafs_number);
-    merkle_tree_type tree = nil::crypto3::containers::make_merkle_tree<Hash, Arity>(data.begin(), data.end());
+    merkle_tree_type tree;
+
+    if constexpr (nil::crypto3::algebra::is_field_element<typename Hash::word_type>::value) {
+        // Populate the vector with wrappers, one for each block
+        std::vector<
+            nil::crypto3::hashes::block_to_field_elements_wrapper<
+                typename Hash::word_type::field_type,
+                std::array<std::uint8_t, LeafSize>
+            >
+        > wrappers;
+        for (const auto& inner_containers : data) {
+            wrappers.emplace_back(inner_containers);
+        }
+        tree = nil::crypto3::containers::make_merkle_tree<Hash, Arity>(wrappers.begin(), wrappers.end());
+    } else {
+        tree = nil::crypto3::containers::make_merkle_tree<Hash, Arity>(data.begin(), data.end());
+    }
     std::size_t proof_idx = std::rand() % leafs_number;
     merkle_proof_type proof(tree, proof_idx);
 
