@@ -1,15 +1,17 @@
 {
-  description = "Blueprint circuits library.";
+  description = "Nix flake for zkllvm-blueprint";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs";
+    nil_crypto3 = {
+      url = "https://github.com/NilFoundation/crypto3";
+      type = "git";
+      submodules = true;
+    };
   };
 
-  outputs = { self, nixpkgs }:
+  outputs = { self, nixpkgs, nil_crypto3 }:
     let
-      revCount = self.revCount or 1;
-      package_version = "0.1.0-${toString revCount}";
-
       # Systems supported
       allSystems = [
         "x86_64-linux" # 64-bit Intel/AMD Linux
@@ -22,67 +24,108 @@
         pkgs = import nixpkgs { inherit system; };
       });
 
-
-      make_package = pkgs: with pkgs;
+      # This library is header-only, so we don't need to provide debug and
+      # release versions of package.
+      makePackage = { pkgs }:
         let
-          stdenv =  pkgs.llvmPackages_16.stdenv;
+          stdenv = pkgs.llvmPackages_16.stdenv;
+          crypto3 = nil_crypto3.packages.${pkgs.system}.default;
         in
-          stdenv.mkDerivation {
-            name = "blueprint_circuits";
-            src = self;
-            dontFixCmake = true;
-            env.CXXFLAGS = toString([
-              "-fPIC"
-            ]);
-            env.NIX_CFLAGS_COMPILE = toString([
-              "-Wno-unused-but-set-variable"
-            ]);
-            nativeBuildInputs = [
-              cmake
-              boost
-              pkg-config
-              clang-tools_16
-              clang_16
-            ];
-            cmakeFlags = [
-              "-DCMAKE_CXX_STANDARD=17"
-              "-DBUILD_SHARED_LIBS=TRUE"
-              "-DBUILD_TESTS=TRUE"
-              "-DBUILD_EXAMPLES=TRUE"
-              "-DCMAKE_BUILD_TYPE=Debug"
-              "-DCMAKE_CXX_COMPILER=clang++"
-              "-DCMAKE_C_COMPILER=clang"
-            ];
-          };
+        stdenv.mkDerivation {
+          name = "zkllvm-blueprint";
+
+          src = self;
+
+          env.CXXFLAGS = toString ([
+            "-fPIC"
+          ]);
+
+          env.NIX_CFLAGS_COMPILE = toString ([
+            "-Wno-unused-but-set-variable"
+          ]);
+
+          buildInputs = with pkgs; [
+            cmake
+            pkg-config
+            clang_16
+            boost
+          ];
+
+          # Because crypto3 is header-only, we must propagate it so users
+          # of this flake must not specify crypto3 in their derivations manually
+          propagatedBuildInputs = [
+            crypto3
+          ];
+
+          cmakeFlags = [
+            "-DCMAKE_BUILD_TYPE=Release"
+            "-DCMAKE_CXX_STANDARD=17"
+          ];
+
+          doCheck = false;
+        };
+
+      makeChecks = { pkgs }:
+        let
+          stdenv = pkgs.llvmPackages_16.stdenv;
+          crypto3 = nil_crypto3.packages.${pkgs.system}.default;
+        in
+        stdenv.mkDerivation {
+          # TODO: rewrite this using overrideAttrs on makePackage
+          name = "zkllvm-blueprint-tests";
+
+          src = self;
+
+          env.CXXFLAGS = toString ([
+            "-fPIC"
+          ]);
+
+          env.NIX_CFLAGS_COMPILE = toString ([
+            "-Wno-unused-but-set-variable"
+          ]);
+
+          buildInputs = with pkgs; [
+            cmake
+            pkg-config
+            clang_16
+            boost
+            crypto3
+          ];
+
+          cmakeFlags = [
+            "-DCMAKE_BUILD_TYPE=Release"
+            "-DCMAKE_CXX_STANDARD=17"
+            "-DBUILD_TESTS=TRUE"
+          ];
+
+          doCheck = true;
+        };
+
+      makeDevShell = { pkgs }:
+        let
+          crypto3 = nil_crypto3.packages.${pkgs.system}.default;
+        in
+        pkgs.mkShell {
+          buildInputs = with pkgs; [
+            cmake
+            pkg-config
+            boost
+            clang_16
+            clang-tools_16
+            crypto3
+          ];
+
+          shellHook = ''
+            echo "zkllvm-blueprint dev environment activated"
+          '';
+        };
     in
-      {
-        packages = forAllSystems({ pkgs }: {
-          blueprint_circuits = make_package pkgs;
-          default = make_package pkgs;
-
-          devShell.x86_64-linux = pkgs.mkShell {
-            buildInputs = [
-              make_package pkgs
-            ];
-          };
-
-          devShell.aarch64-linux = pkgs.mkShell {
-            buildInputs = [
-              make_package pkgs
-            ];
-          };
-
-          devShell.x86_64-darwin = pkgs.mkShell {
-            buildInputs = [
-              make_package pkgs
-            ];
-          };
-
-          devShell.aarch64-darwin = pkgs.mkShell {
-            buildInputs = [
-              make_package pkgs
-            ];
-          };
-        });
-      };
+    {
+      packages = forAllSystems ({ pkgs }: { default = makePackage { inherit pkgs; }; });
+      # TODO: because of issues in CMakeLists, these checks cannot be run right now.
+      # After fixing the way we bring Crypto3 dependency in CMake, these checks
+      # may be used in testing and CI workflow.
+      checks = forAllSystems ({ pkgs }: { default = makeChecks { inherit pkgs; }; });
+      devShells = forAllSystems ({ pkgs }: { default = makeDevShell { inherit pkgs; }; });
+    };
 }

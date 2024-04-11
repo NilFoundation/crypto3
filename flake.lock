@@ -1,12 +1,48 @@
 {
   "nodes": {
+    "nil_crypto3": {
+      "inputs": {
+        "nixpkgs": "nixpkgs"
+      },
+      "locked": {
+        "lastModified": 1712603294,
+        "narHash": "sha256-0L7ir0E+jFv9dxmLV6Vxlf+st6BNaJrhRXyNCK3xPsY=",
+        "ref": "refs/heads/master",
+        "rev": "13909af052a998c92d2a6a96e0bcfd21156aed72",
+        "revCount": 701,
+        "submodules": true,
+        "type": "git",
+        "url": "https://github.com/NilFoundation/crypto3"
+      },
+      "original": {
+        "submodules": true,
+        "type": "git",
+        "url": "https://github.com/NilFoundation/crypto3"
+      }
+    },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1694180918,
-        "narHash": "sha256-LHvfU2B9DyzFBSrxLApBUbzIzcypw/kZKtz07wRc38E=",
+        "lastModified": 1708831307,
+        "narHash": "sha256-0iL/DuGjiUeck1zEaL+aIe2WvA3/cVhp/SlmTcOZXH4=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "f1944ba7b7c042528a58c6135453a0848f9183b7",
+        "rev": "5bf1cadb72ab4e77cb0b700dab76bcdaf88f706b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixos-23.11",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs_2": {
+      "locked": {
+        "lastModified": 1712848325,
+        "narHash": "sha256-fToon5B6TsycEAAkY3hscsdXH89DkazPI472jKQRo80=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "9030f1e684935133b5d93af802a10075bf4cb6f7",
         "type": "github"
       },
       "original": {
@@ -17,7 +53,8 @@
     },
     "root": {
       "inputs": {
-        "nixpkgs": "nixpkgs"
+        "nil_crypto3": "nil_crypto3",
+        "nixpkgs": "nixpkgs_2"
       }
     }
   },
