@@ -2,7 +2,7 @@
   description = "Nix flake for zkllvm-blueprint";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.11";
     nil_crypto3 = {
       url = "https://github.com/NilFoundation/crypto3";
       type = "git";
