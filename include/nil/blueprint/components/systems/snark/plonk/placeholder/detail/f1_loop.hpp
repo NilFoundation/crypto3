@@ -66,8 +66,7 @@ namespace nil {
                     using var = typename component_type::var;
                     using manifest_type = nil::blueprint::plonk_component_manifest;
 
-                    constexpr static std::size_t get_rows_amount(std::size_t witness_amount,
-                                                                 std::size_t lookup_column_amount, std::size_t m) {
+                    constexpr static std::size_t get_rows_amount(std::size_t witness_amount, std::size_t m) {
                         return rows_amount_internal(witness_amount, m);
                     }
 
@@ -96,13 +95,12 @@ namespace nil {
                     };
 
                     static gate_manifest get_gate_manifest(std::size_t witness_amount,
-                                                           std::size_t lookup_column_amount,
                                                            std::size_t degree) {
                         gate_manifest manifest = gate_manifest(gate_manifest_type(witness_amount, degree));
                         return manifest;
                     }
 
-                    static manifest_type get_manifest() {
+                    static manifest_type get_manifest(std::size_t m) {
                         static manifest_type manifest =
                             manifest_type(std::shared_ptr<manifest_param>(new manifest_range_param(4, 15)), false);
                         return manifest;
@@ -147,13 +145,13 @@ namespace nil {
 
                     template<typename ContainerType>
                     f1_loop(ContainerType witness, std::size_t m_) :
-                        component_type(witness, {}, {}, get_manifest()), m(m_) {};
+                        component_type(witness, {}, {}, get_manifest(m_)), m(m_) {};
 
                     template<typename WitnessContainerType, typename ConstantContainerType,
                              typename PublicInputContainerType>
                     f1_loop(WitnessContainerType witness, ConstantContainerType constant,
                             PublicInputContainerType public_input, std::size_t m_) :
-                        component_type(witness, constant, public_input, get_manifest()),
+                        component_type(witness, constant, public_input, get_manifest(m_)),
                         m(m_) {};
 
                     f1_loop(std::initializer_list<typename component_type::witness_container_type::value_type>
@@ -163,7 +161,7 @@ namespace nil {
                             std::initializer_list<typename component_type::public_input_container_type::value_type>
                                 public_inputs,
                             std::size_t m_) :
-                        component_type(witnesses, constants, public_inputs, get_manifest()),
+                        component_type(witnesses, constants, public_inputs, get_manifest(m_)),
                         m(m_) {};
                 };
             }    // namespace detail

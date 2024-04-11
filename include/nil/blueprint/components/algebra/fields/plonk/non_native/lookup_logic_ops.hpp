@@ -67,8 +67,7 @@ namespace nil {
                     }
                 };
 
-                static gate_manifest get_gate_manifest(std::size_t witness_amount,
-                                                       std::size_t lookup_column_amount) {
+                static gate_manifest get_gate_manifest(std::size_t witness_amount) {
                     static gate_manifest manifest = gate_manifest(gate_manifest_type());
                     return manifest;
                 }
@@ -77,9 +76,8 @@ namespace nil {
                     return component_type::get_manifest();
                 }
 
-                constexpr static std::size_t get_rows_amount(std::size_t witness_amount,
-                                                             std::size_t lookup_column_amount) {
-                    return component_type::get_rows_amount(witness_amount, lookup_column_amount);
+                constexpr static std::size_t get_rows_amount(std::size_t witness_amount) {
+                    return component_type::get_rows_amount(witness_amount);
                 }
 
                 virtual crypto3::zk::snark::plonk_lookup_constraint<BlueprintFieldType> op_lookup_constraint(
@@ -146,8 +144,7 @@ namespace nil {
                     }
                 };
 
-                static gate_manifest get_gate_manifest(std::size_t witness_amount,
-                                                       std::size_t lookup_column_amount) {
+                static gate_manifest get_gate_manifest(std::size_t witness_amount) {
                     static gate_manifest manifest = gate_manifest(gate_manifest_type());
                     return manifest;
                 }
@@ -156,9 +153,8 @@ namespace nil {
                     return component_type::get_manifest();
                 }
 
-                constexpr static std::size_t get_rows_amount(std::size_t witness_amount,
-                                                             std::size_t lookup_column_amount) {
-                    return component_type::get_rows_amount(witness_amount, lookup_column_amount);
+                constexpr static std::size_t get_rows_amount(std::size_t witness_amount) {
+                    return component_type::get_rows_amount(witness_amount);
                 }
 
                 virtual crypto3::zk::snark::plonk_lookup_constraint<BlueprintFieldType> op_lookup_constraint(

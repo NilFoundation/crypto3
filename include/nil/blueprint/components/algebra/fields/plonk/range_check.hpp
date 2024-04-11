@@ -129,23 +129,21 @@ namespace nil {
                 };
 
                 static gate_manifest get_gate_manifest(std::size_t witness_amount,
-                                                       std::size_t lookup_column_amount,
                                                        std::size_t bits_amount) {
                     gate_manifest manifest = gate_manifest(gate_manifest_type(witness_amount, bits_amount));
                     return manifest;
                 }
 
-                static manifest_type get_manifest() {
+                static manifest_type get_manifest(std::size_t bits_amount) {
                     static manifest_type manifest = manifest_type(
                         std::shared_ptr<manifest_param>(
-                            new manifest_range_param(2, BlueprintFieldType::modulus_bits / chunk_size + 1)),
+                            new manifest_range_param(2, std::max<std::size_t>(3, bits_amount / chunk_size + 2))),
                         true
                     );
                     return manifest;
                 }
 
                 constexpr static std::size_t get_rows_amount(std::size_t witness_amount,
-                                                             std::size_t lookup_column_amount,
                                                              std::size_t bits_amount) {
                     return rows_amount_internal(witness_amount, bits_amount);
                 }
@@ -190,7 +188,7 @@ namespace nil {
                     range_check(WitnessContainerType witness, ConstantContainerType constant,
                                 PublicInputContainerType public_input,
                                 std::size_t bits_amount_):
-                        component_type(witness, constant, public_input, get_manifest()),
+                        component_type(witness, constant, public_input, get_manifest(bits_amount_)),
                         bits_amount(bits_amount_) {}
 
                 range_check(
@@ -199,7 +197,7 @@ namespace nil {
                     std::initializer_list<typename component_type::public_input_container_type::value_type>
                         public_inputs,
                     std::size_t bits_amount_) :
-                        component_type(witnesses, constants, public_inputs, get_manifest()),
+                        component_type(witnesses, constants, public_inputs, get_manifest(bits_amount_)),
                         bits_amount(bits_amount_) {}
             };
 

@@ -71,12 +71,11 @@ namespace nil {
                         return manifest;
                     }
 
-                    constexpr static std::size_t get_rows_amount(std::size_t witness_amount,
-                                                                 std::size_t lookup_column_amount) {
+                    constexpr static std::size_t get_rows_amount(std::size_t witness_amount) {
                         return 1;
                     }
 
-                    const std::size_t rows_amount = get_rows_amount(this->witness_amount(), 0);
+                    const std::size_t rows_amount = get_rows_amount(this->witness_amount());
                     constexpr static const std::size_t gates_amount = 1;
 
                     virtual crypto3::zk::snark::plonk_constraint<BlueprintFieldType>

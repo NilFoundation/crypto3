@@ -90,6 +90,10 @@ namespace nil {
                 return ArithmetizationType::copy_constraints();
             }
 
+            virtual typename ArithmetizationType::copy_constraints_container_type& mutable_copy_constraints() {
+                return ArithmetizationType::mutable_copy_constraints();
+            }
+
             virtual const typename ArithmetizationType::lookup_gates_container_type& lookup_gates() const {
                 return ArithmetizationType::lookup_gates();
             }
@@ -111,7 +115,7 @@ namespace nil {
                 if (it != mapping.end()) { \
                     return it->second; \
                 } else { \
-                    std::size_t selector_index = next_selector_index; \
+                    const std::size_t selector_index = next_selector_index; \
                     mapping[gate_id] = selector_index; \
                     this->gate_container.emplace_back(selector_index, args); \
                     next_selector_index++; \

@@ -65,14 +65,12 @@ namespace nil {
                     }
                 };
 
-                static gate_manifest get_gate_manifest(std::size_t witness_amount,
-                                                       std::size_t lookup_column_amount) {
+                static gate_manifest get_gate_manifest(std::size_t witness_amount) {
                     static gate_manifest manifest = gate_manifest(gate_manifest_type());
                     return manifest;
                 }
 
-                constexpr static std::size_t get_rows_amount(std::size_t witness_amount,
-                                                             std::size_t lookup_column_amount) {
+                constexpr static std::size_t get_rows_amount(std::size_t witness_amount) {
                     return 1;
                 }
                 constexpr static std::size_t get_empty_rows_amount() {
@@ -80,7 +78,7 @@ namespace nil {
                 }
 
                 constexpr static const std::size_t gates_amount = 1;
-                const std::size_t rows_amount = get_rows_amount(this->witness_amount(), 0);
+                const std::size_t rows_amount = get_rows_amount(this->witness_amount());
                 const std::size_t empty_rows_amount = get_empty_rows_amount();
                 const std::string component_name = "native field subtraction";
 
@@ -107,10 +105,6 @@ namespace nil {
                 struct result_type {
                     var output = var(0, 0, false);
                     result_type(const subtraction &component, std::uint32_t start_row_index) {
-                        output = var(component.W(2), start_row_index, false, var::column_type::witness);
-                    }
-
-                    result_type(const subtraction &component, std::size_t start_row_index) {
                         output = var(component.W(2), start_row_index, false, var::column_type::witness);
                     }
 

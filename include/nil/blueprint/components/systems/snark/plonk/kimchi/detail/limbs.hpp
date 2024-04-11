@@ -73,8 +73,7 @@ namespace nil {
                     }
                 };
 
-                static gate_manifest get_gate_manifest(std::size_t witness_amount,
-                                                        std::size_t lookup_column_amount) {
+                static gate_manifest get_gate_manifest(std::size_t witness_amount) {
                     static gate_manifest manifest = gate_manifest(gate_manifest_type());
                     return manifest;
                 }
@@ -87,12 +86,11 @@ namespace nil {
                     return manifest;
                 }
 
-                constexpr static std::size_t get_rows_amount(std::size_t witness_amount,
-                                                                std::size_t lookup_column_amount) {
+                constexpr static std::size_t get_rows_amount(std::size_t witness_amount) {
                     return 1;
                 }
 
-                const std::size_t rows_amount = get_rows_amount(this->witness_amount(), 0);
+                const std::size_t rows_amount = get_rows_amount(this->witness_amount());
                 static constexpr const std::size_t gates_amount = 1;
 
                 struct input_type {
@@ -243,13 +241,10 @@ namespace nil {
                     }
                 };
 
-                static gate_manifest get_gate_manifest(std::size_t witness_amount,
-                                                        std::size_t lookup_column_amount) {
-                    static gate_manifest manifest =
+                static gate_manifest get_gate_manifest(std::size_t witness_amount) {
+                    gate_manifest manifest =
                         gate_manifest(gate_manifest_type())
-                        .merge_with(range_check_component::get_gate_manifest(witness_amount,
-                                                                                lookup_column_amount,
-                                                                                chunk_size));
+                        .merge_with(range_check_component::get_gate_manifest(witness_amount, chunk_size));
                     return manifest;
                 }
 
@@ -257,20 +252,18 @@ namespace nil {
                     static manifest_type manifest = manifest_type(
                         std::shared_ptr<manifest_param>(new manifest_single_value_param(15)),
                         false
-                    ).merge_with(range_check_component::get_manifest());
+                    ).merge_with(range_check_component::get_manifest(chunk_size_public));
                     return manifest;
                 }
 
-                constexpr static std::size_t get_rows_amount(std::size_t witness_amount,
-                                                             std::size_t lookup_column_amount) {
+                constexpr static std::size_t get_rows_amount(std::size_t witness_amount) {
                     return 1 + 2 * chunk_amount *
-                                range_check_component::get_rows_amount(witness_amount, lookup_column_amount,
-                                                                       chunk_size);
+                                range_check_component::get_rows_amount(witness_amount, chunk_size);
                 }
 
                 constexpr static const std::size_t chunk_size_public = chunk_size;
                 constexpr static const std::size_t chunk_amount = 4;
-                const std::size_t rows_amount = get_rows_amount(this->witness_amount(), 0);
+                const std::size_t rows_amount = get_rows_amount(this->witness_amount());
 
                 constexpr static const std::size_t gates_amount = 1;
 

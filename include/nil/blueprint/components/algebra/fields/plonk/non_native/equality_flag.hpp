@@ -67,27 +67,25 @@ namespace nil {
                 };
 
                 static gate_manifest get_gate_manifest(std::size_t witness_amount,
-                                                       std::size_t lookup_column_amount,
                                                        bool inequality) {
                     gate_manifest manifest = gate_manifest(gate_manifest_type(inequality));
                     return manifest;
                 }
 
                 constexpr static std::size_t get_rows_amount(std::size_t witness_amount,
-                                                             std::size_t lookup_column_amount,
                                                              bool inequality) {
                     return 1;
                 }
 
                 bool inequality;
                 constexpr static const std::size_t gates_amount = 1;
-                const std::size_t rows_amount = get_rows_amount(this->witness_amount(), 0, inequality);
+                const std::size_t rows_amount = get_rows_amount(this->witness_amount(), inequality);
                 const std::string component_name = "equaluty flag (returns 1 if x==y and 0 otherwise)";
 
                 using var = typename component_type::var;
                 using manifest_type = plonk_component_manifest;
 
-                static manifest_type get_manifest() {
+                static manifest_type get_manifest(bool inequality) {
                     static manifest_type manifest = manifest_type(
                         std::shared_ptr<manifest_param>(new manifest_single_value_param(4)),
                         false
@@ -110,10 +108,6 @@ namespace nil {
                         output = var(component.W(3), start_row_index, false, var::column_type::witness);
                     }
 
-                    result_type(const equality_flag &component, std::size_t start_row_index) {
-                        output = var(component.W(3), start_row_index, false, var::column_type::witness);
-                    }
-
                     std::vector<std::reference_wrapper<var>> all_vars() {
                         return {output};
                     }
@@ -122,7 +116,7 @@ namespace nil {
 
                 template <typename ContainerType>
                 equality_flag(ContainerType witness, bool inequality_):
-                    component_type(witness, {}, {}, get_manifest()),
+                    component_type(witness, {}, {}, get_manifest(inequality_)),
                     inequality(inequality_)
                     {};
 
@@ -130,7 +124,7 @@ namespace nil {
                     typename PublicInputContainerType>
                 equality_flag(WitnessContainerType witness, ConstantContainerType constant,
                         PublicInputContainerType public_input, bool inequality_):
-                    component_type(witness, constant, public_input, get_manifest()),
+                    component_type(witness, constant, public_input, get_manifest(inequality_)),
                     inequality(inequality_)
                     {};
 
@@ -141,7 +135,7 @@ namespace nil {
                                std::initializer_list<
                         typename component_type::public_input_container_type::value_type> public_inputs,
                         bool inequality_):
-                    component_type(witnesses, constants, public_inputs, get_manifest()),
+                    component_type(witnesses, constants, public_inputs, get_manifest(inequality_)),
                     inequality(inequality_)
                     {};
             };

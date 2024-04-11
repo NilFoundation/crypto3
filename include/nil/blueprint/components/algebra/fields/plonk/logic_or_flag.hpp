@@ -92,8 +92,7 @@ namespace nil {
                     }
                 };
 
-                static gate_manifest get_gate_manifest(std::size_t witness_amount,
-                                                       std::size_t lookup_column_amount) {
+                static gate_manifest get_gate_manifest(std::size_t witness_amount) {
                     gate_manifest manifest = gate_manifest(gate_manifest_type(witness_amount));
                     return manifest;
                 }
@@ -106,8 +105,7 @@ namespace nil {
                     return manifest;
                 }
 
-                constexpr static std::size_t get_rows_amount(std::size_t witness_amount,
-                                                             std::size_t lookup_column_amount) {
+                constexpr static std::size_t get_rows_amount(std::size_t witness_amount) {
                     return rows_amount_internal(witness_amount);
                 }
                 constexpr static std::size_t get_empty_rows_amount() {
@@ -115,7 +113,7 @@ namespace nil {
                 }
 
                 const std::size_t gates_amount = gates_amount_internal(this->witness_amount());
-                const std::size_t rows_amount = get_rows_amount(this->witness_amount(), 0);
+                const std::size_t rows_amount = get_rows_amount(this->witness_amount());
                 const std::size_t empty_rows_amount = get_empty_rows_amount();
 
                 struct input_type {

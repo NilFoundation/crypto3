@@ -58,10 +58,10 @@ namespace nil {
 
                 constexpr static std::size_t rows() {
                     std::size_t row = 0;
-                    const std::size_t exp_rows_amount = exp_component::get_rows_amount(15, 0);
-                    const std::size_t mul_rows_amount = mul_component::get_rows_amount(3, 0);
-                    const std::size_t sub_rows_amount = sub_component::get_rows_amount(3, 0);
-                    const std::size_t add_rows_amount = add_component::get_rows_amount(3, 0);
+                    const std::size_t exp_rows_amount = exp_component::get_rows_amount(15);
+                    const std::size_t mul_rows_amount = mul_component::get_rows_amount(3);
+                    const std::size_t sub_rows_amount = sub_component::get_rows_amount(3);
+                    const std::size_t add_rows_amount = add_component::get_rows_amount(3);
 
                     row += 3; // leave empty cells for exp_component's constants
 
@@ -111,14 +111,13 @@ namespace nil {
                     }
                 };
 
-                static gate_manifest get_gate_manifest(std::size_t witness_amount,
-                                                       std::size_t lookup_column_amount) {
+                static gate_manifest get_gate_manifest(std::size_t witness_amount) {
                     static gate_manifest manifest = \
                         gate_manifest(gate_manifest_type())
-                        .merge_with(mul_component::get_gate_manifest(witness_amount, lookup_column_amount))
-                        .merge_with(add_component::get_gate_manifest(witness_amount, lookup_column_amount))
-                        .merge_with(sub_component::get_gate_manifest(witness_amount, lookup_column_amount))
-                        .merge_with(exp_component::get_gate_manifest(witness_amount, lookup_column_amount));
+                        .merge_with(mul_component::get_gate_manifest(witness_amount))
+                        .merge_with(add_component::get_gate_manifest(witness_amount))
+                        .merge_with(sub_component::get_gate_manifest(witness_amount))
+                        .merge_with(exp_component::get_gate_manifest(witness_amount));
                     return manifest;
                 }
 
@@ -131,8 +130,7 @@ namespace nil {
                     return manifest;
                 }
 
-                constexpr static std::size_t get_rows_amount(std::size_t witness_amount,
-                                                             std::size_t lookup_column_amount) {
+                constexpr static std::size_t get_rows_amount(std::size_t witness_amount) {
                     return rows();
                 }
 
@@ -151,8 +149,11 @@ namespace nil {
                     var output;
 
                     result_type(const sqrt &component, std::size_t component_start_row) {
-                        output = var(component.W(0), component_start_row + 3 +
-                                     exp_component::get_rows_amount(15, 0));
+                        output = var(
+                            component.W(0),
+                            component_start_row + 3 + exp_component::get_rows_amount(15),
+                            false
+                        );
                     }
 
                     std::vector<std::reference_wrapper<var>> all_vars() {
@@ -207,14 +208,15 @@ namespace nil {
                 // check if y \in QR(q)
                 auto exp_instance =
                 // qr_check = 1 if y \in QR(q), -1 if y \in QNR(q), 0 if y = 0
-                    exp_component({component.W(0), component.W(1), component.W(2), component.W(3),
-                                   component.W(4), component.W(5), component.W(6), component.W(7),
-                                   component.W(8), component.W(9), component.W(10), component.W(11),
-                                   component.W(12), component.W(13), component.W(14)}, {component.C(0)},
-                                  {});
+                exp_component({
+                    component.W(0), component.W(1), component.W(2), component.W(3),
+                    component.W(4), component.W(5), component.W(6), component.W(7),
+                    component.W(8), component.W(9), component.W(10), component.W(11),
+                    component.W(12), component.W(13), component.W(14)}, {component.C(0)},
+                    {}
+                );
                 var qr_check = generate_circuit(exp_instance, bp, assignment, {instance_input.y, exp}, row).output;
                 row += exp_instance.rows_amount;
-
                 // x = sqrt(y) if y \in QR(q) or y = 0, -1 otherwise
                 auto mul_instance = mul_component({component.W(0), component.W(1), component.W(2)}, {}, {});
                 var x(component.W(0), row, false);
@@ -272,7 +274,7 @@ namespace nil {
             template<typename BlueprintFieldType>
             typename plonk_sqrt<BlueprintFieldType>::result_type
                 generate_assignments(
-                    const plonk_sqrt<BlueprintFieldType> &component,\
+                    const plonk_sqrt<BlueprintFieldType> &component,
                     assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                         &assignment,
                     const typename plonk_sqrt<BlueprintFieldType>::input_type

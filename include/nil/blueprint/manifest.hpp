@@ -899,40 +899,18 @@ namespace nil {
 
             param_ptr_type witness_amount;
             manifest_constant_type constant_required;
-            manifest_lookup_type lookup_usage;
-            param_ptr_type lookup_column_amount;
-            lookup_size_func_type lookup_size_for_column_amount;
 
             plonk_component_manifest(param_ptr_type witness_params, manifest_constant_type constant_required)
                 : witness_amount(witness_params),
-                  constant_required(constant_required),
-                  lookup_usage(manifest_lookup_type::type::NONE),
-                  lookup_column_amount(param_ptr_type(new manifest_single_value_param(0))),
-                  lookup_size_for_column_amount(empty_lookup_size_for_column_amount) {}
-
-            plonk_component_manifest(param_ptr_type witness_params, manifest_constant_type constant_required,
-                                     manifest_lookup_type lookup_usage,
-                                     param_ptr_type lookup_column_amount,
-                                     const lookup_size_func_type
-                                        &lookup_size_for_column_amount)
-                : witness_amount(witness_params),
-                    constant_required(constant_required),
-                    lookup_usage(lookup_usage),
-                    lookup_column_amount(lookup_column_amount),
-                    lookup_size_for_column_amount(lookup_size_for_column_amount) {}
+                  constant_required(constant_required) {}
 
             plonk_component_manifest(const plonk_component_manifest &other) {
                 witness_amount = other.witness_amount;
                 constant_required = other.constant_required;
-                lookup_usage = other.lookup_usage;
-                lookup_column_amount = other.lookup_column_amount;
-                lookup_size_for_column_amount = other.lookup_size_for_column_amount;
             }
 
             // Checks if the manifest would be satisfied for passed params.
             bool check_manifest(std::uint32_t witness_amount, std::uint32_t constant_amount,
-                                std::uint32_t lookup_column_amount,
-                                const std::vector<std::uint32_t> &lookup_size_for_column,
                                 bool strict = false) const {
                 if (!this->witness_amount->check_manifest_param(witness_amount, strict)) {
                     return false;
@@ -940,23 +918,6 @@ namespace nil {
                 if (constant_required == manifest_constant_type::type::UNSAT ||
                     (constant_required == manifest_constant_type::type::REQUIRED && constant_amount == 0)) {
                     return false;
-                }
-                // We do not check what happens to lookups if they are unused.
-                if (lookup_usage == manifest_lookup_type::type::NONE) {
-                    return true;
-                } else if (lookup_usage == manifest_lookup_type::type::UNSAT) {
-                    return false;
-                }
-                if (this->lookup_column_amount->check_manifest_param(lookup_column_amount, strict)) {
-                    return false;
-                }
-                if (lookup_size_for_column.size() != lookup_column_amount) {
-                    return false;
-                }
-                for (std::uint32_t i = 0; i < lookup_column_amount; ++i) {
-                    if (lookup_size_for_column_amount(i) > lookup_size_for_column[i]) {
-                        return false;
-                    }
                 }
                 return true;
             }
@@ -967,8 +928,7 @@ namespace nil {
             bool check_manifest(
                 const nil::blueprint::components::plonk_component<BlueprintFieldType>
                     &component) const {
-                // TODO: add lookups when they arrive.
-                return check_manifest(component.witness_amount(), component.constant_amount(), 0, {});
+                return check_manifest(component.witness_amount(), component.constant_amount());
             }
 
             // merge_with is intended to be used to automatically calculate new manifest in case of one component
@@ -977,60 +937,22 @@ namespace nil {
             // Thus this is mostly an intersection of params. The only exception is lookup_usage, which is a union,
             // and lookup_size_for_column_amount, which is a sum.
             plonk_component_manifest merge_with(const plonk_component_manifest &other) const {
-                manifest_lookup_type new_lookup_usage = lookup_usage.merge_with(other.lookup_usage);
-
-                std::shared_ptr<manifest_param> new_lookup_column_amount =
-                    this->lookup_column_amount->merge_with(other.lookup_column_amount);
-                lookup_size_func_type new_lookup_size_for_column_amount = empty_lookup_size_for_column_amount;
-                if (new_lookup_usage == manifest_lookup_type::type::REQUIRED ||
-                    new_lookup_usage == manifest_lookup_type::type::OPTIONAL) {
-
-                    std::map<std::uint32_t, std::uint32_t> new_lookup_size_for_column_map;
-
-                    for (auto value : *new_lookup_column_amount) {
-                        std::uint32_t column = lookup_size_for_column_amount(value);
-                        std::uint32_t other_column = other.lookup_size_for_column_amount(value);
-                        new_lookup_size_for_column_map[value] = column + other_column;
-                    }
-
-                    new_lookup_size_for_column_amount = [new_lookup_size_for_column_map](std::uint32_t size) {
-                        return new_lookup_size_for_column_map.at(size);
-                    };
-                } else {
-                    new_lookup_size_for_column_amount = empty_lookup_size_for_column_amount;
-                }
-
                 return plonk_component_manifest(
                     witness_amount->merge_with(other.witness_amount),
-                    constant_required.merge_with(other.constant_required),
-                    new_lookup_usage,
-                    new_lookup_column_amount,
-                    new_lookup_size_for_column_amount
+                    constant_required.merge_with(other.constant_required)
                 );
             }
 
             // Checks if there is at least a single set of parameters which satisfies this manifest
             bool is_satisfiable() const {
                 return witness_amount->is_satisfiable() &&
-                       constant_required != manifest_constant_type::type::UNSAT &&
-                       lookup_usage != manifest_lookup_type::type::UNSAT &&
-                       lookup_column_amount->is_satisfiable();
+                       constant_required != manifest_constant_type::type::UNSAT;
             }
         };
 
         inline std::ostream& operator<<(std::ostream& os, const plonk_component_manifest &manifest) {
             os << "witness_amount: " << (*manifest.witness_amount) << " "
-                << "constant_required: " << manifest.constant_required << " "
-                << "lookup_usage: " << manifest.lookup_usage << " "
-                << "lookup_column_amount: " << (*manifest.lookup_column_amount);
-            if (manifest.lookup_usage == manifest_lookup_type::type::REQUIRED ||
-                manifest.lookup_usage == manifest_lookup_type::type::OPTIONAL) {
-
-                os << " lookup_size_for_column_amount: ";
-                for (auto value : *manifest.lookup_column_amount) {
-                    os << "[" << value << "]: " << manifest.lookup_size_for_column_amount(value) << " ";
-                }
-            }
+               << "constant_required: " << manifest.constant_required;
             return os;
         }
 
@@ -1040,96 +962,38 @@ namespace nil {
             using manifest_param_ptr = std::shared_ptr<manifest_param>;
 
             std::uint32_t max_witness_columns;
-            std::uint32_t max_lookup_columns;
 
             manifest_param_ptr witness_amount;
-            manifest_param_ptr lookup_column_amount;
         public:
-            std::uint32_t max_lookup_size;
             bool has_constant;
-
-            bool has_lookup() const {
-                return max_lookup_columns > 0;
-            }
 
             void set_max_witness_amount(std::uint32_t max) {
                 max_witness_columns = max;
                 witness_amount = std::shared_ptr<manifest_param>(new manifest_range_param(0, max));
             }
 
-            void set_max_lookup_column_amount(std::uint32_t max) {
-                max_lookup_columns = max;
-                lookup_column_amount = std::shared_ptr<manifest_param>(new manifest_range_param(0, max));
-            }
-
-            void set_max_lookup_size(std::uint32_t max) {
-                max_lookup_size = max;
-            }
-
             std::uint32_t get_max_witness_amount() const {
                 return max_witness_columns;
             }
 
-            std::uint32_t get_max_lookup_amount() const {
-                return max_lookup_columns;
-            }
-
             // Intended to be used only in tests to put this into an std::map
             bool operator<(const compiler_manifest &other) const {
-                return std::tie(max_witness_columns, max_lookup_columns, max_lookup_size, has_constant) <
-                       std::tie(other.max_witness_columns, other.max_lookup_columns, other.max_lookup_size,
-                                other.has_constant);
+                return std::tie(max_witness_columns, has_constant) <
+                       std::tie(other.max_witness_columns, other.has_constant);
             }
 
-            compiler_manifest(std::uint32_t max_witness_columns, std::uint32_t max_lookup_columns,
-                              std::uint32_t max_lookup_size, bool has_constant)
+            compiler_manifest(std::uint32_t max_witness_columns, bool has_constant)
                 : max_witness_columns(max_witness_columns),
-                  max_lookup_columns(max_lookup_columns),
-                  max_lookup_size(max_lookup_size),
                   has_constant(has_constant) {
 
                 witness_amount = std::shared_ptr<manifest_param>(new manifest_range_param(0, max_witness_columns + 1));
-                lookup_column_amount =
-                    std::shared_ptr<manifest_param>(new manifest_range_param(0, max_lookup_columns + 1));
             }
 
             // Generates a new component manifest based on intersection with given compiler manifest.
             plonk_component_manifest intersect(const plonk_component_manifest &component_manifest) const {
-                manifest_lookup_type compiler_lookup_usage = max_lookup_columns > 0
-                                                                  ? manifest_lookup_type::type::OPTIONAL
-                                                                  : manifest_lookup_type::type::NONE;
-                manifest_lookup_type new_lookup_usage =
-                    component_manifest.lookup_usage.intersect(compiler_lookup_usage);
-                plonk_component_manifest::lookup_size_func_type new_lookup_size_for_column_amount =
-                    component_manifest.lookup_size_for_column_amount;
-                auto new_lookup_column_amount =
-                    component_manifest.lookup_column_amount->intersect(lookup_column_amount);
-
-                if (new_lookup_usage == manifest_lookup_type::type::OPTIONAL ||
-                    new_lookup_usage == manifest_lookup_type::type::REQUIRED) {
-
-                    std::set<std::uint32_t> invalid_values;
-                    for (auto value : *new_lookup_column_amount) {
-                        if (component_manifest.lookup_size_for_column_amount(value) > max_lookup_size) {
-                            invalid_values.insert(value);
-                        }
-                    }
-                    new_lookup_column_amount = new_lookup_column_amount->subtract(invalid_values);
-                    if (!new_lookup_column_amount->is_satisfiable()) {
-                        if (new_lookup_usage == manifest_lookup_type::type::OPTIONAL) {
-                            new_lookup_usage = manifest_lookup_type::type::NONE;
-                        } else {
-                            new_lookup_usage = manifest_lookup_type::type::UNSAT;
-                        }
-                    }
-                }
-
                 return plonk_component_manifest(
                     component_manifest.witness_amount->intersect(witness_amount),
-                    component_manifest.constant_required.intersect(*this),
-                    new_lookup_usage,
-                    new_lookup_column_amount,
-                    new_lookup_size_for_column_amount
+                    component_manifest.constant_required.intersect(*this)
                 );
             }
         };
@@ -1154,7 +1018,7 @@ namespace nil {
             // This is called in comparison function
             // Derived classes should only support compariosn with instances of themselves
             // The case of different classes is already handled in the comparator
-            // Default implementation is to return false, meaning equality of all instances in set terms.
+            // Default implementation is to return false, meaning equivalence of all instances in set terms.
             virtual bool operator<(const component_gate_manifest *other) const {
                 return false;
             }
@@ -1167,8 +1031,8 @@ namespace nil {
                 #pragma clang diagnostic push
                 #pragma clang diagnostic ignored "-Wpotentially-evaluated-expression"
                 if (typeid(*(a.get())) != typeid(*(b.get()))) {
+                    return std::type_index(typeid(*(a.get()))) < std::type_index(typeid(*(b.get())));
                 #pragma clang diagnostic pop
-                    return a.get() < b.get();
                 } else {
                     return a->operator<(b.get());
                 }

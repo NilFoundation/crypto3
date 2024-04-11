@@ -79,7 +79,7 @@ void test_decomposition(std::vector<typename BlueprintFieldType::value_type> pub
                 assert(expected_res[i] == var_value(assignment, real_res.output[i]));
             }
     };
-    auto result_check_to_fail = [&expected_res](AssignmentType &assignment,
+    auto result_check_to_fail = [](AssignmentType &assignment,
         typename component_type::result_type &real_res) { };
 
     component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8},{},{});

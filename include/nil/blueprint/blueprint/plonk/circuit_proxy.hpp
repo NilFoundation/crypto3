@@ -105,6 +105,10 @@ namespace nil {
                 return circuit_ptr->copy_constraints();
             }
 
+            virtual typename ArithmetizationType::copy_constraints_container_type& mutable_copy_constraints() override {
+                return circuit_ptr->mutable_copy_constraints();
+            }
+
             const std::set<std::uint32_t>& get_used_lookup_gates() const {
                 return used_lookup_gates;
             }

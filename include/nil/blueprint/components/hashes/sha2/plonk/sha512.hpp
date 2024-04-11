@@ -63,11 +63,10 @@ namespace nil {
                     }
                 };
 
-                static gate_manifest get_gate_manifest(std::size_t witness_amount,
-                                                       std::size_t lookup_column_amount) {
+                static gate_manifest get_gate_manifest(std::size_t witness_amount) {
                     static gate_manifest manifest =
                         gate_manifest(gate_manifest_type())
-                        .merge_with(sha512_process_component::get_gate_manifest(witness_amount, lookup_column_amount));
+                        .merge_with(sha512_process_component::get_gate_manifest(witness_amount));
                     return manifest;
                 }
 
@@ -80,18 +79,17 @@ namespace nil {
                     return manifest;
                 }
 
-                constexpr static std::size_t get_rows_amount(std::size_t witness_amount,
-                                                             std::size_t lookup_column_amount) {
+                constexpr static std::size_t get_rows_amount(std::size_t witness_amount) {
                     return
                         rows_amount_creating_input_words_component +
-                        sha512_process_component::get_rows_amount(witness_amount, lookup_column_amount) * 2 /* + 2 */;
+                        sha512_process_component::get_rows_amount(witness_amount) * 2 /* + 2 */;
                 }
 
                 constexpr static const std::size_t gates_amount = 5;
                 constexpr static const std::size_t rows_amount_creating_input_words_component = 15;
                 const std::string component_name = "sha512 hash";
 //
-                const std::size_t rows_amount = get_rows_amount(this->witness_amount(), 0);
+                const std::size_t rows_amount = get_rows_amount(this->witness_amount());
 
                 struct var_ec_point {
                     std::array<var, 4> x;

@@ -55,15 +55,15 @@ namespace nil {
 
                     for (std::size_t i = 0; i < gate_sizes.size(); i++) {
                         if (gate_sizes[i] == 1) {
-                            r += mul::get_rows_amount(witness_amount, 0);
+                            r += mul::get_rows_amount(witness_amount);
                         } else {
-                            r += gate_component::get_rows_amount(witness_amount, 0, gate_sizes[i] - 1);
+                            r += gate_component::get_rows_amount(witness_amount, gate_sizes[i] - 1);
                         }
                     }
 
                     if (gate_sizes.size() > 1) {
                         std::size_t total_deg = std::accumulate(gate_sizes.begin(), gate_sizes.end() - 1, 0);
-                        r += gate_component::get_rows_amount(witness_amount, 0, total_deg);
+                        r += gate_component::get_rows_amount(witness_amount, total_deg);
                     }
 
                     return r;
@@ -82,7 +82,6 @@ namespace nil {
                                            basic_non_native_policy<BlueprintFieldType>>;
 
                 constexpr static std::size_t get_rows_amount(std::size_t witness_amount,
-                                                             std::size_t lookup_column_amount,
                                                              std::vector<std::size_t> &gate_sizes) {
                     return rows_amount_internal(witness_amount, gate_sizes);
                 }
@@ -100,7 +99,6 @@ namespace nil {
                 };
 
                 static gate_manifest get_gate_manifest(std::size_t witness_amount,
-                                                       std::size_t lookup_column_amount,
                                                        std::vector<std::size_t> &gate_sizes) {
 
                     std::vector<std::size_t>::iterator min_degree =
@@ -110,31 +108,31 @@ namespace nil {
 
                     gate_manifest manifest = gate_manifest(gate_manifest_type());
                     if (*min_degree == 1 && *max_degree > *min_degree) {
-                        manifest = manifest.merge_with(mul::get_gate_manifest(witness_amount, lookup_column_amount))
+                        manifest = manifest.merge_with(mul::get_gate_manifest(witness_amount))
                                        .merge_with(gate_component::get_gate_manifest(
-                                           witness_amount, lookup_column_amount, *max_degree - 1));
+                                           witness_amount, *max_degree - 1));
 
                     } else if (*min_degree == 1 && *min_degree == *max_degree) {
-                        manifest = manifest.merge_with(mul::get_gate_manifest(witness_amount, lookup_column_amount));
+                        manifest = manifest.merge_with(mul::get_gate_manifest(witness_amount));
 
                     } else {
                         manifest = manifest.merge_with(
-                            gate_component::get_gate_manifest(witness_amount, lookup_column_amount, *min_degree - 1));
+                            gate_component::get_gate_manifest(witness_amount, *min_degree - 1));
                     }
 
                     if (gate_sizes.size() > 1 && *max_degree == 1) {
                         std::size_t total_deg = std::accumulate(gate_sizes.begin(), gate_sizes.end() - 1, 0);
                         manifest = manifest.merge_with(
-                            gate_component::get_gate_manifest(witness_amount, lookup_column_amount, total_deg));
+                            gate_component::get_gate_manifest(witness_amount, total_deg));
                     }
 
                     return manifest;
                 }
 
-                static manifest_type get_manifest() {
+                static manifest_type get_manifest(std::vector<std::size_t> &gate_sizes_) {
                     static manifest_type manifest =
                         manifest_type(std::shared_ptr<manifest_param>(new manifest_range_param(3, 15)), false)
-                            .merge_with(gate_component::get_manifest());
+                            .merge_with(gate_component::get_manifest(0)); // independent of degree
                     return manifest;
                 }
 
@@ -171,14 +169,14 @@ namespace nil {
 
                 template<typename ContainerType>
                 basic_constraints_verifier(ContainerType witness, std::vector<std::size_t> &gate_sizes_) :
-                    component_type(witness, {}, {}, get_manifest()), gate_sizes(gate_sizes_) {};
+                    component_type(witness, {}, {}, get_manifest(gate_sizes_)), gate_sizes(gate_sizes_) {};
 
                 template<typename WitnessContainerType, typename ConstantContainerType,
                          typename PublicInputContainerType>
                 basic_constraints_verifier(WitnessContainerType witness, ConstantContainerType constant,
                                            PublicInputContainerType public_input,
                                            std::vector<std::size_t> &gate_sizes_) :
-                    component_type(witness, constant, public_input, get_manifest()),
+                    component_type(witness, constant, public_input, get_manifest(gate_sizes_)),
                     gate_sizes(gate_sizes_) {};
 
                 basic_constraints_verifier(
@@ -189,7 +187,7 @@ namespace nil {
                     std::initializer_list<typename component_type::public_input_container_type::value_type>
                         public_inputs,
                     std::vector<std::size_t> &gate_sizes_) :
-                    component_type(witnesses, constants, public_inputs, get_manifest()),
+                    component_type(witnesses, constants, public_inputs, get_manifest(gate_sizes_)),
                     gate_sizes(gate_sizes_) {};
             };
 

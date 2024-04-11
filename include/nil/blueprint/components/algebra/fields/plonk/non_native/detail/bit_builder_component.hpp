@@ -97,7 +97,7 @@ namespace nil {
                                     : public plonk_component<BlueprintFieldType> {
 
                     static std::size_t rows_amount_internal(std::size_t witness_amount,
-                                                     std::size_t bits_amount, bool check_bits) {
+                                                            std::size_t bits_amount, bool check_bits) {
                         std::size_t total_bits = bits_amount +
                                                  sum_bits_amount_internal(witness_amount, bits_amount, check_bits) +
                                                  padding_bits_amount_internal(witness_amount, bits_amount, check_bits);
@@ -184,17 +184,18 @@ namespace nil {
                     };
 
                     static gate_manifest get_gate_manifest(std::size_t witness_amount,
-                                                           std::size_t lookup_column_amount,
                                                            std::size_t bits_amount,
-                                                           bool check_bits) {
+                                                           bool check_bits,
+                                                           bit_composition_mode mode) {
                         gate_manifest manifest = gate_manifest(gate_manifest_type(bits_amount, check_bits));
                         return manifest;
                     }
 
-                    static manifest_type get_manifest() {
-                        static manifest_type manifest = manifest_type(
+                    static manifest_type get_manifest(
+                            std::size_t bits_amount, bool check_bits, bit_composition_mode mode) {
+                        manifest_type manifest = manifest_type(
                             std::shared_ptr<manifest_param>(new manifest_range_param(
-                                3, BlueprintFieldType::modulus_bits / 3 + 1)),
+                                3, std::max<std::size_t>(4, bits_amount / 3 + 2))),
                             false
                         );
                         return manifest;
@@ -217,7 +218,6 @@ namespace nil {
                     const std::size_t rows_amount = rows_amount_internal(this->witness_amount(), bits_amount, check_bits);
 
                     constexpr static std::size_t get_rows_amount(std::size_t witness_amount,
-                                                                 std::size_t lookup_column_amount,
                                                                  std::size_t bits_amount, bool check_bits) {
                         return rows_amount_internal(witness_amount, bits_amount, check_bits);
                     }

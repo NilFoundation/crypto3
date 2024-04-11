@@ -73,7 +73,6 @@ namespace nil {
                     using manifest_type = nil::blueprint::plonk_component_manifest;
 
                     constexpr static std::size_t get_rows_amount(std::size_t witness_amount,
-                                                                 std::size_t lookup_column_amount,
                                                                  std::size_t degree) {
                         return rows_amount_internal(witness_amount, degree);
                     }
@@ -103,13 +102,12 @@ namespace nil {
                     };
 
                     static gate_manifest get_gate_manifest(std::size_t witness_amount,
-                                                           std::size_t lookup_column_amount,
                                                            std::size_t degree) {
                         gate_manifest manifest = gate_manifest(gate_manifest_type(witness_amount));
                         return manifest;
                     }
 
-                    static manifest_type get_manifest() {
+                    static manifest_type get_manifest(std::size_t degree) {
                         static manifest_type manifest =
                             manifest_type(std::shared_ptr<manifest_param>(new manifest_range_param(3, 15)), false);
                         return manifest;
@@ -144,7 +142,7 @@ namespace nil {
 
                     template<typename ContainerType>
                     gate_component(ContainerType witness, std::size_t _d_) :
-                        component_type(witness, {}, {}, get_manifest()), _d(_d_) {
+                        component_type(witness, {}, {}, get_manifest(_d_)), _d(_d_) {
                         std::size_t WitnessesAmount = this->witness_amount();
                         if ((2 * _d - 1) % (WitnessesAmount - 1) + 1 >= WitnessesAmount - 3) {
                             need_extra_row = true;
@@ -155,7 +153,7 @@ namespace nil {
                              typename PublicInputContainerType>
                     gate_component(WitnessContainerType witness, ConstantContainerType constant,
                                    PublicInputContainerType public_input, std::size_t _d_) :
-                        component_type(witness, constant, public_input, get_manifest()),
+                        component_type(witness, constant, public_input, get_manifest(_d_)),
                         _d(_d_) {
                         std::size_t WitnessesAmount = this->witness_amount();
                         if ((2 * _d - 1) % (WitnessesAmount - 1) + 1 >= WitnessesAmount - 3) {
@@ -171,7 +169,7 @@ namespace nil {
                         std::initializer_list<typename component_type::public_input_container_type::value_type>
                             public_inputs,
                         std::size_t _d_) :
-                        component_type(witnesses, constants, public_inputs, get_manifest()),
+                        component_type(witnesses, constants, public_inputs, get_manifest(_d_)),
                         _d(_d_) {
                         std::size_t WitnessesAmount = this->witness_amount();
                         if ((2 * _d - 1) % (WitnessesAmount - 1) + 1 >= WitnessesAmount - 3) {

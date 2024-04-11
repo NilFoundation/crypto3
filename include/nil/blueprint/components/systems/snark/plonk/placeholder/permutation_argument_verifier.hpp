@@ -62,8 +62,7 @@ namespace nil {
                 constexpr static const std::size_t gates_amount = 4;
                 const std::string component_name = "permutation argument verifier component";
 
-                constexpr static std::size_t get_rows_amount(std::size_t witness_amount,
-                                                             std::size_t lookup_column_amount, std::size_t m) {
+                constexpr static std::size_t get_rows_amount(std::size_t witness_amount, std::size_t m) {
                     return rows_amount_internal(witness_amount, m);
                 }
 
@@ -74,13 +73,13 @@ namespace nil {
                     }
                 };
 
-                static gate_manifest get_gate_manifest(std::size_t witness_amount, std::size_t lookup_column_amount,
+                static gate_manifest get_gate_manifest(std::size_t witness_amount,
                                                        std::size_t m) {
                     gate_manifest manifest = gate_manifest(gate_manifest_type());
                     return manifest;
                 }
 
-                static manifest_type get_manifest() {
+                static manifest_type get_manifest(std::size_t m) {
                     static manifest_type manifest =
                         manifest_type(std::shared_ptr<manifest_param>(new manifest_single_value_param(6)), false);
                     return manifest;
@@ -129,13 +128,13 @@ namespace nil {
 
                 template<typename ContainerType>
                 permutation_verifier(ContainerType witness, std::size_t m_) :
-                    component_type(witness, {}, {}, get_manifest()), m(m_) {};
+                    component_type(witness, {}, {}, get_manifest(m_)), m(m_) {};
 
                 template<typename WitnessContainerType, typename ConstantContainerType,
                          typename PublicInputContainerType>
                 permutation_verifier(WitnessContainerType witness, ConstantContainerType constant,
                                      PublicInputContainerType public_input, std::size_t m_) :
-                    component_type(witness, constant, public_input, get_manifest()),
+                    component_type(witness, constant, public_input, get_manifest(m_)),
                     m(m_) {};
 
                 permutation_verifier(
@@ -146,7 +145,7 @@ namespace nil {
                     std::initializer_list<typename component_type::public_input_container_type::value_type>
                         public_inputs,
                     std::size_t m_) :
-                    component_type(witnesses, constants, public_inputs, get_manifest()),
+                    component_type(witnesses, constants, public_inputs, get_manifest(m_)),
                     m(m_) {};
             };
 

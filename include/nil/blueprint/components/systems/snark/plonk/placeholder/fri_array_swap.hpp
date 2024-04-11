@@ -81,30 +81,28 @@ namespace nil {
                 };
 
                 static gate_manifest get_gate_manifest(std::size_t witness_amount,
-                                                       std::size_t lookup_column_amount,
                                                        std::size_t half_array_size) {
                     gate_manifest manifest = gate_manifest(gate_manifest_type(witness_amount, half_array_size));
                     return manifest;
                 }
 
-                static manifest_type get_manifest() {
+                static manifest_type get_manifest(std::size_t half_array_size) {
                     static manifest_type manifest = manifest_type(
                         // TODO: make the manifest depend on half_array_size
                         // this requires the manifest rework
-                        std::shared_ptr<manifest_param>(new manifest_range_param(5, 100500, 4)),
+                        std::shared_ptr<manifest_param>(new manifest_range_param(5, 5 + 4 * (half_array_size - 1) + 1, 4)),
                         false
                     );
                     return manifest;
                 }
 
                 constexpr static std::size_t get_rows_amount(std::size_t witness_amount,
-                                                             std::size_t lookup_column_amount,
                                                              std::size_t half_array_size) {
                     return (2 * half_array_size + (witness_amount - 1) / 4 - 1) / ((witness_amount - 1) / 4);
                 }
 
                 constexpr static const std::size_t gates_amount = 1;
-                const std::size_t rows_amount = get_rows_amount(this->witness_amount(), 0, half_array_size);
+                const std::size_t rows_amount = get_rows_amount(this->witness_amount(), half_array_size);
                 const std::string component_name = "fri array swap component";
 
                 struct input_type {
@@ -150,14 +148,14 @@ namespace nil {
 
                 template<typename ContainerType>
                 explicit fri_array_swap(ContainerType witness, std::size_t half_array_size_) :
-                    component_type(witness, {}, {}, get_manifest()),
+                    component_type(witness, {}, {}, get_manifest(half_array_size_)),
                     half_array_size(half_array_size_) {};
 
                 template<typename WitnessContainerType, typename ConstantContainerType,
                          typename PublicInputContainerType>
                 fri_array_swap(WitnessContainerType witness, ConstantContainerType constant,
                          PublicInputContainerType public_input, std::size_t half_array_size_) :
-                    component_type(witness, constant, public_input, get_manifest()),
+                    component_type(witness, constant, public_input, get_manifest(half_array_size_)),
                     half_array_size(half_array_size_) {};
 
                 fri_array_swap(
@@ -167,7 +165,7 @@ namespace nil {
                     std::initializer_list<typename component_type::public_input_container_type::value_type>
                         public_inputs,
                     std::size_t half_array_size_) :
-                    component_type(witnesses, constants, public_inputs, get_manifest()),
+                    component_type(witnesses, constants, public_inputs, get_manifest(half_array_size_)),
                     half_array_size(half_array_size_) {};
             };
 

@@ -187,6 +187,7 @@ namespace nil {
                     std::cout << "Copy constraint number " << i << " is not satisfied."
                               << " First variable: " << copy_constraints[i].first
                               << " second variable: " << copy_constraints[i].second << std::endl;
+                    std::cout << var_value(assignments, copy_constraints[i].first) << " != " << var_value(assignments, copy_constraints[i].second) << std::endl;
                     return false;
                 }
             }

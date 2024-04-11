@@ -82,7 +82,7 @@ void test_linear_inter_coefs(const std::vector<typename BlueprintFieldType::valu
         expected_res = {0, 0};
     }
 
-    auto result_check = [&expected_res, &public_input](AssignmentType &assignment,
+    auto result_check = [&expected_res](AssignmentType &assignment,
 	    typename component_type::result_type &real_res) {
 
         BOOST_ASSERT(var_value(assignment, real_res.output[0]) == expected_res[0]);
@@ -153,7 +153,7 @@ void test_quadratic_inter_coefs(const std::vector<typename BlueprintFieldType::v
         expected_res = {0, 0, 0};
     }
 
-    auto result_check = [&expected_res, &public_input](AssignmentType &assignment,
+    auto result_check = [&expected_res](AssignmentType &assignment,
 	    typename component_type::result_type &real_res) {
 
         BOOST_ASSERT(var_value(assignment, real_res.output[0]) == expected_res[0]);

@@ -65,9 +65,9 @@ namespace nil {
 
                 static std::size_t rows_amount_internal(std::size_t witness_amount, std::size_t bits_amount,
                                                  std::size_t shift, bit_shift_mode mode) {
-                    return decomposition_component_type::get_rows_amount(witness_amount, 0, bits_amount) +
-                           composition_component_type::get_rows_amount(witness_amount, 0,
-                                calculate_composition_bits_amount(bits_amount, shift, mode), false);
+                    return decomposition_component_type::get_rows_amount(witness_amount, bits_amount, bit_composition_mode::LSB) +
+                           composition_component_type::get_rows_amount(witness_amount,
+                                calculate_composition_bits_amount(bits_amount, shift, mode), false, bit_composition_mode::LSB);
                 }
             public:
                 using component_type =
@@ -89,29 +89,32 @@ namespace nil {
                 };
 
                 static gate_manifest get_gate_manifest(std::size_t witness_amount,
-                                                       std::size_t lookup_column_amount,
                                                        std::size_t bits_amount,
                                                        std::size_t shift,
                                                        bit_shift_mode mode) {
                     gate_manifest manifest =
                         gate_manifest(gate_manifest_type())
                         .merge_with(decomposition_component_type::get_gate_manifest(
-                                            witness_amount, lookup_column_amount, bits_amount))
+                                            witness_amount, bits_amount, bit_composition_mode::LSB))
                         .merge_with(composition_component_type::get_gate_manifest(
-                                            witness_amount, lookup_column_amount,
-                                            calculate_composition_bits_amount(bits_amount, shift, mode), false));
+                                            witness_amount,
+                                            calculate_composition_bits_amount(bits_amount, shift, mode),
+                                            false, bit_composition_mode::LSB));
                     return manifest;
                 }
 
-                static manifest_type get_manifest() {
-                    static manifest_type manifest =
-                        decomposition_component_type::get_manifest().merge_with(
-                            composition_component_type::get_manifest());
+                static manifest_type get_manifest(std::size_t bits_amount, std::size_t shift, bit_shift_mode mode) {
+                    manifest_type manifest =
+                        decomposition_component_type::get_manifest(
+                            bits_amount, bit_composition_mode::LSB
+                        ).merge_with(
+                            composition_component_type::get_manifest(
+                                calculate_composition_bits_amount(bits_amount, shift, mode),
+                                false, bit_composition_mode::LSB));
                     return manifest;
                 }
 
                 constexpr static std::size_t get_rows_amount(std::size_t witness_amount,
-                                                             std::size_t lookup_column_amount,
                                                              std::size_t bits_amount,
                                                              std::size_t shift, bit_shift_mode mode) {
                     return rows_amount_internal(witness_amount, bits_amount, shift, mode);
@@ -169,7 +172,7 @@ namespace nil {
                 template<typename ContainerType>
                 explicit bit_shift_constant(ContainerType witness, std::uint32_t bits_amount_, std::uint32_t shift_,
                                             bit_shift_mode mode_) :
-                    component_type(witness, {}, {}, get_manifest()),
+                    component_type(witness, {}, {}, get_manifest(bits_amount_, shift_, mode_)),
                     decomposition_subcomponent(witness, bits_amount_, bit_composition_mode::MSB),
                     composition_subcomponent(witness,
                                              calculate_composition_bits_amount(bits_amount_, shift_, mode_),
@@ -183,7 +186,7 @@ namespace nil {
                 bit_shift_constant(WitnessContainerType witness, ConstantContainerType constant,
                                    PublicInputContainerType public_input, std::uint32_t bits_amount_,
                                    std::uint32_t shift_, bit_shift_mode mode_) :
-                    component_type(witness, constant, public_input, get_manifest()),
+                    component_type(witness, constant, public_input, get_manifest(bits_amount_, shift_, mode_)),
                     decomposition_subcomponent(witness, constant, public_input,
                                                bits_amount_, bit_composition_mode::MSB),
                     composition_subcomponent(witness, constant, public_input,
@@ -201,7 +204,7 @@ namespace nil {
                     std::initializer_list<typename component_type::public_input_container_type::value_type>
                         public_inputs,
                     std::uint32_t bits_amount_, std::uint32_t shift_, bit_shift_mode mode_) :
-                        component_type(witnesses, constants, public_inputs, get_manifest()),
+                        component_type(witnesses, constants, public_inputs, get_manifest(bits_amount_, shift_, mode_)),
                         decomposition_subcomponent(witnesses, constants, public_inputs,
                                                    bits_amount_, bit_composition_mode::MSB),
                         composition_subcomponent(witnesses, constants, public_inputs,

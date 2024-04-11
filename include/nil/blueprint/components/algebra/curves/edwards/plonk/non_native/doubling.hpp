@@ -77,15 +77,14 @@ namespace nil {
                     }
                 };
 
-                static gate_manifest get_gate_manifest(std::size_t witness_amount,
-                                                       std::size_t lookup_column_amount) {
+                static gate_manifest get_gate_manifest(std::size_t witness_amount) {
                     static gate_manifest manifest =
                         gate_manifest(gate_manifest_type())
                         .merge_with(
-                            non_native_range_component::get_gate_manifest(witness_amount, lookup_column_amount))
-                        .merge_with(multiplication_component::get_gate_manifest(witness_amount, lookup_column_amount))
-                        .merge_with(addition_component::get_gate_manifest(witness_amount, lookup_column_amount))
-                        .merge_with(subtraction_component::get_gate_manifest(witness_amount, lookup_column_amount));
+                            non_native_range_component::get_gate_manifest(witness_amount))
+                        .merge_with(multiplication_component::get_gate_manifest(witness_amount))
+                        .merge_with(addition_component::get_gate_manifest(witness_amount))
+                        .merge_with(subtraction_component::get_gate_manifest(witness_amount));
                     return manifest;
                 }
 
@@ -100,16 +99,15 @@ namespace nil {
                     return manifest;
                 }
 
-                constexpr static std::size_t get_rows_amount(std::size_t witness_amount,
-                                                             std::size_t lookup_column_amount) {
+                constexpr static std::size_t get_rows_amount(std::size_t witness_amount) {
                     return
-                        2 * non_native_range_component::get_rows_amount(witness_amount, lookup_column_amount) +
-                        5 * multiplication_component::get_rows_amount(witness_amount, lookup_column_amount) +
-                        4 * addition_component::get_rows_amount(witness_amount, lookup_column_amount) +
-                        2 * subtraction_component::get_rows_amount(witness_amount, lookup_column_amount);
+                        2 * non_native_range_component::get_rows_amount(witness_amount) +
+                        5 * multiplication_component::get_rows_amount(witness_amount) +
+                        4 * addition_component::get_rows_amount(witness_amount) +
+                        2 * subtraction_component::get_rows_amount(witness_amount);
                 }
 
-                const std::size_t rows_amount = get_rows_amount(this->witness_amount(), 0);
+                const std::size_t rows_amount = get_rows_amount(this->witness_amount());
                 constexpr static const std::size_t gates_amount = 0;
 
                 struct input_type {
@@ -138,7 +136,7 @@ namespace nil {
                                     var(component.W(2), start_row_index, false),
                                     var(component.W(3), start_row_index, false)};
                         std::size_t non_native_rows_amount = non_native_range_component::get_rows_amount(
-                            component.witness_amount(), 0);
+                            component.witness_amount());
                         output.y = {
                             var(component.W(0), start_row_index + non_native_rows_amount, false),
                             var(component.W(1), start_row_index + non_native_rows_amount, false),
@@ -490,23 +488,23 @@ namespace nil {
                     std::size_t row = start_row_index;
                     using component_type = plonk_ed25519_doubling<BlueprintFieldType, CurveType>;
 
-                    row += component_type::non_native_range_component::get_rows_amount(component.witness_amount(), 0);
-                    row += component_type::non_native_range_component::get_rows_amount(component.witness_amount(), 0);
-                    row += component_type::multiplication_component::get_rows_amount(component.witness_amount(), 0);
-                    row += component_type::multiplication_component::get_rows_amount(component.witness_amount(), 0);
-                    row += component_type::multiplication_component::get_rows_amount(component.witness_amount(), 0);
-                    row += component_type::subtraction_component::get_rows_amount(component.witness_amount(), 0);
+                    row += component_type::non_native_range_component::get_rows_amount(component.witness_amount());
+                    row += component_type::non_native_range_component::get_rows_amount(component.witness_amount());
+                    row += component_type::multiplication_component::get_rows_amount(component.witness_amount());
+                    row += component_type::multiplication_component::get_rows_amount(component.witness_amount());
+                    row += component_type::multiplication_component::get_rows_amount(component.witness_amount());
+                    row += component_type::subtraction_component::get_rows_amount(component.witness_amount());
                     std::size_t t4_row = row;
-                    row += component_type::addition_component::get_rows_amount(component.witness_amount(), 0);
+                    row += component_type::addition_component::get_rows_amount(component.witness_amount());
                     std::size_t t5_row = row;
-                    row += component_type::addition_component::get_rows_amount(component.witness_amount(), 0);
-                    row += component_type::subtraction_component::get_rows_amount(component.witness_amount(), 0);
+                    row += component_type::addition_component::get_rows_amount(component.witness_amount());
+                    row += component_type::subtraction_component::get_rows_amount(component.witness_amount());
                     std::size_t t7_row = row;
-                    row += component_type::multiplication_component::get_rows_amount(component.witness_amount(), 0);
-                    row += component_type::addition_component::get_rows_amount(component.witness_amount(), 0);
-                    row += component_type::multiplication_component::get_rows_amount(component.witness_amount(), 0);
+                    row += component_type::multiplication_component::get_rows_amount(component.witness_amount());
+                    row += component_type::addition_component::get_rows_amount(component.witness_amount());
+                    row += component_type::multiplication_component::get_rows_amount(component.witness_amount());
                     std::size_t t10_row = row;
-                    row += component_type::addition_component::get_rows_amount(component.witness_amount(), 0);
+                    row += component_type::addition_component::get_rows_amount(component.witness_amount());
 
                     for (std::size_t i = 0; i < 4; i++) {
                         bp.add_copy_constraint(

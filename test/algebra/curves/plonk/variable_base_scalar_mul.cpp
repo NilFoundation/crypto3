@@ -46,8 +46,6 @@
 #include <nil/blueprint/components/algebra/curves/pasta/plonk/variable_base_scalar_mul.hpp>
 #include "../../../test_plonk_component.hpp"
 
-#include "../../zk/include/nil/crypto3/zk/snark/systems/plonk/placeholder/profiling.hpp"
-
 template <typename CurveType, bool Stretched = false>
 void test_variable_base_scalar_mul (
 		const std::vector<typename CurveType::base_field_type::value_type> &public_input,

@@ -82,7 +82,7 @@ void test_bool_scalar_multiplication(const std::vector<typename BlueprintFieldTy
 
     typename component_type::input_type instance_input = {{T_x, T_y}, var(0, 8, false, var::column_type::public_input)};
 
-    auto result_check = [&expected_res, &public_input, &expected_to_pass](AssignmentType &assignment,
+    auto result_check = [&expected_res, &expected_to_pass](AssignmentType &assignment,
                                                        typename component_type::result_type &real_res) {
 #ifdef BLUEPRINT_PLONK_PROFILING_ENABLED
         std::array<typename BlueprintFieldType::value_type, 4> x, y, expected_x, expected_y, real_x, real_y;

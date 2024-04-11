@@ -27,9 +27,18 @@
 #define CRYPTO3_BLUEPRINT_ASSIGNMENT_PLONK_HPP
 
 #include <algorithm>
+#include <functional>
 #include <limits>
+#include <unordered_map>
 #include <unordered_set>
 
+#include <boost/type_erasure/any.hpp>
+#include <boost/type_erasure/same_type.hpp>
+#include <boost/type_erasure/operators.hpp>
+#include <boost/type_erasure/any_cast.hpp>
+#include <boost/container/stable_vector.hpp>
+
+#include <nil/crypto3/zk/math/expression_visitors.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/table_description.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/assignment.hpp>
@@ -38,15 +47,56 @@
 #include <nil/blueprint/assert.hpp>
 #include <nil/blueprint/gate_id.hpp>
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
+#include <nil/blueprint/component_batch.hpp>
 
 namespace nil {
     namespace blueprint {
+        namespace detail {
+            template<typename BlueprintFieldType>
+            struct constant_batch_ref_compare {
+                using value_type = typename BlueprintFieldType::value_type;
+                using ref_type = std::reference_wrapper<const value_type>;
+                using pair_type = std::pair<ref_type, std::size_t>;
+
+                bool operator()(const pair_type &p1, const pair_type &p2) const {
+                    return p1.first.get() < p2.first.get();
+                }
+            };
+        }   // namespace detail
 
         template<typename ArithmetizationType>
         class assignment;
 
         template<typename ArithmetizationType>
         class circuit;
+
+        template<typename ArithmetizationType, typename BlueprintFieldType, typename ComponentType,
+                 typename... ComponentParams>
+        class component_batch;
+
+        template<typename BatchType, typename InputType, typename ResultType>
+        struct has_add_input;
+
+        template<typename BatchType, typename ArithmetizationType, typename VariableType>
+        struct has_finalize_batch;
+
+        template<typename BatchType>
+        struct has_name;
+
+        template<typename ComponentType>
+        struct input_type_v;
+
+        template<typename ComponentType>
+        struct result_type_v;
+
+        template<typename ComponentType>
+        struct component_params_type_v;;
+
+        struct _batch : boost::type_erasure::placeholder {};
+        struct _component : boost::type_erasure::placeholder {};
+        struct _input_type : boost::type_erasure::placeholder {};
+        struct _result_type : boost::type_erasure::placeholder {};
+        struct _variadics : boost::type_erasure::placeholder {};
 
         template<typename BlueprintFieldType>
         class assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
@@ -61,14 +111,43 @@ namespace nil {
             using column_type = typename crypto3::zk::snark::plonk_column<BlueprintFieldType>;
             using shared_container_type = typename std::array<column_type, 1>;
 
+            using constant_set_compare_type = detail::constant_batch_ref_compare<BlueprintFieldType>;
+
             std::size_t next_selector_index = 0;
             std::uint32_t assignment_allocated_rows = 0;
             std::vector<value_type> assignment_private_storage;
+            // for variables used in component batching
+            std::vector<value_type> assignment_batch_private_storage;
+            using batcher_type = boost::type_erasure::any<
+                boost::mpl::vector<
+                    has_add_input<_batch, _input_type, _result_type>,
+                    has_finalize_batch<_batch, ArithmetizationType, var>,
+                    has_name<_batch>,
+                    boost::type_erasure::same_type<boost::type_erasure::deduced<input_type_v<_batch>>, _input_type>,
+                    boost::type_erasure::same_type<boost::type_erasure::deduced<result_type_v<_batch>>, _result_type>,
+                    boost::type_erasure::same_type<boost::type_erasure::deduced<component_params_type_v<_batch>>, _variadics>,
+                    boost::type_erasure::less_than_comparable<_batch>,
+                    boost::type_erasure::copy_constructible<_batch>,
+                    boost::type_erasure::constructible<_batch(assignment<ArithmetizationType>&, _variadics)>,
+                    boost::type_erasure::destructible<_batch>,
+                    boost::type_erasure::typeid_<_batch>,
+                    boost::type_erasure::relaxed>,
+                _batch>;
+            std::set<batcher_type> component_batches;
+            // technically we can delete this one after finalization
+            // but tests require it to replace the outputs
+            std::unordered_map<var, var> batch_variable_map;
+            // for constants which we are going to try to put into aribtrary places
+            boost::container::stable_vector<value_type> assignment_batch_constant_storage;
+            std::set<std::pair<std::reference_wrapper<const value_type>, std::size_t>, constant_set_compare_type>
+                assignment_batch_constant_storage_set;
             shared_container_type shared_storage; // results of the previously prover
             std::set<std::uint32_t> lookup_constant_cols;
             std::set<std::uint32_t> lookup_selector_cols;
         public:
             static constexpr const std::size_t private_storage_index = std::numeric_limits<std::size_t>::max();
+            static constexpr const std::size_t batch_private_storage_index = std::numeric_limits<std::size_t>::max() - 1;
+            static constexpr const std::size_t batch_constant_storage_index = std::numeric_limits<std::size_t>::max() - 2;
 
             assignment(std::size_t witness_amount, std::size_t public_input_amount,
                        std::size_t constant_amount, std::size_t selector_amount)
@@ -78,6 +157,163 @@ namespace nil {
             assignment(const crypto3::zk::snark::plonk_table_description<BlueprintFieldType> &desc)
                 : zk_type(desc.witness_columns, desc.public_input_columns,
                           desc.constant_columns, desc.selector_columns) {
+            }
+
+            template<typename ComponentType, typename... ComponentParams>
+            typename ComponentType::result_type add_input_to_batch_assignment(
+                    const typename ComponentType::input_type &input,
+                    ComponentParams... params) {
+
+                return add_input_to_batch<ComponentType>(input, false, params...);
+            }
+
+            template<typename ComponentType, typename... ComponentParams>
+            typename ComponentType::result_type add_input_to_batch_circuit(
+                    const typename ComponentType::input_type &input,
+                    ComponentParams... params) {
+
+                return add_input_to_batch<ComponentType>(input, true, params...);
+            }
+
+            template<typename ComponentType, typename... ComponentParams>
+            typename ComponentType::result_type add_input_to_batch(
+                    const typename ComponentType::input_type &input,
+                    bool called_from_generate_circuit,
+                    ComponentParams... params) {
+                using batching_type = component_batch<ArithmetizationType, BlueprintFieldType, ComponentType,
+                                                      ComponentParams...>;
+                batching_type batch(*this, std::tuple<ComponentParams...>(params...));
+                auto it = component_batches.find(batch);
+                if (it == component_batches.end()) {
+                    auto result = batch.add_input(input, called_from_generate_circuit);
+                    component_batches.insert(batch);
+                    return result;
+                } else {
+                    // safe because the ordering doesn't depend on the batch inputs
+                    return boost::type_erasure::any_cast<batching_type&>(const_cast<batcher_type&>(*it))
+                            .add_input(input, called_from_generate_circuit);
+                }
+            }
+
+            std::size_t finalize_component_batches(nil::blueprint::circuit<ArithmetizationType> &bp,
+                                                   std::size_t start_row_index) {
+                std::size_t next_row_index = start_row_index;
+                for (auto& batch : component_batches) {
+                    // safe because the ordering doesn't depend on the batch inputs
+                    next_row_index = const_cast<batcher_type&>(batch).finalize_batch(
+                            bp, batch_variable_map, next_row_index);
+                }
+                auto &copy_constraints = bp.mutable_copy_constraints();
+                for (auto &constraint : copy_constraints) {
+                    for (auto variable : {&(constraint.first), &(constraint.second)}) {
+                        if (batch_variable_map.find(*variable) != batch_variable_map.end()) {
+                            *variable = batch_variable_map[*variable];
+                        }
+                    }
+                }
+                return next_row_index;
+            }
+
+            const std::unordered_map<var, var>& get_batch_variable_map() const {
+                return batch_variable_map;
+            }
+
+            // currently only supports a single constant column to batch things into
+            // ideally we should not require more than one
+            std::size_t finalize_constant_batches(
+                    nil::blueprint::circuit<ArithmetizationType> &bp,
+                    std::size_t const_column,
+                    std::size_t start_row_index = 1) {
+                if (assignment_batch_constant_storage.size() == 0) {
+                    return start_row_index;
+                }
+                BOOST_ASSERT(start_row_index >= 1);
+                std::vector<bool> used_constants;
+                if (this->constant_column_size(const_column) > start_row_index) {
+                    used_constants.resize(this->constant_column_size(const_column) - start_row_index, false);
+                    const auto &immutable_copy_constraints = bp.copy_constraints();
+                    auto var_check = [const_column, start_row_index](const var &variable) -> bool {
+                        return variable.type == var::column_type::constant &&
+                                variable.index == const_column &&
+                                variable.rotation >= start_row_index;
+                    };
+                    for (const auto &constraint : immutable_copy_constraints) {
+                        for (const auto variable : {&(constraint.first), &(constraint.second)}) {
+                            if (var_check(*variable)) {
+                                used_constants[variable->rotation - start_row_index] = true;
+                            }
+                        }
+                    }
+                    const auto &gates = bp.gates();
+                    for (const auto &gate : gates) {
+                        std::unordered_set<var> variable_set;
+                        std::function<void(var)> variable_extractor =
+                            [&variable_set, &var_check](const var &variable) {
+                                if (var_check(variable)) {
+                                    variable_set.insert(variable);
+                                }
+                            };
+                        nil::crypto3::math::expression_for_each_variable_visitor<var> visitor(variable_extractor);
+                        for (const auto &constraint : gate.constraints) {
+                            visitor.visit(constraint);
+                        }
+                        for (const auto &variable : variable_set) {
+                            for (std::size_t row = start_row_index - 1;
+                                 row < this->selector_column_size(gate.selector_index); row++) {
+                                if (this->selector(gate.selector_index, row) == value_type::one()) {
+                                    used_constants[row + variable.rotation - start_row_index] = true;
+                                }
+                            }
+                        }
+                    }
+                    const auto &lookup_gates = bp.lookup_gates();
+                    for (const auto &gate : lookup_gates) {
+                        std::unordered_set<var> variable_set;
+                        std::function<void(var)> variable_extractor =
+                            [&variable_set, &var_check](const var &variable) {
+                                if (var_check(variable)) {
+                                    variable_set.insert(variable);
+                                }
+                            };
+                        nil::crypto3::math::expression_for_each_variable_visitor<var> visitor(variable_extractor);
+                        for (const auto &lookup_constraint : gate.constraints) {
+                            for (const auto &constraint : lookup_constraint.lookup_input) {
+                                visitor.visit(constraint);
+                            }
+                        }
+                        for (const auto &variable : variable_set) {
+                            for (std::size_t row = start_row_index - 1;
+                                 row < this->selector_column_size(gate.tag_index); row++) {
+                                if (this->selector(gate.tag_index, row) == BlueprintFieldType::value_type::one()) {
+                                    used_constants[row + variable.rotation - start_row_index] = true;
+                                }
+                            }
+                        }
+                    }
+                }
+                std::size_t row = start_row_index;
+                std::unordered_map<var, var> batch_variable_map;
+                for (std::size_t constant_index = 0; constant_index < assignment_batch_constant_storage.size();
+                     constant_index++) {
+                    while (row < (used_constants.size() + start_row_index) && used_constants[row - start_row_index]) {
+                        row++;
+                    }
+                    const var curr_batch_var =
+                        var(batch_constant_storage_index, constant_index, false, var::column_type::constant);
+                    const var curr_bp_var = var(const_column, row, false, var::column_type::constant);
+                    this->constant(const_column, row) = assignment_batch_constant_storage[constant_index];
+                    batch_variable_map[curr_batch_var] = curr_bp_var;
+                    row++;
+                }
+                auto &copy_constraints = bp.mutable_copy_constraints();
+                for (auto &constraint : copy_constraints) {
+                    for (auto variable : {&(constraint.first), &(constraint.second)}) {
+                        if (batch_variable_map.find(*variable) != batch_variable_map.end()) {
+                            *variable = batch_variable_map[*variable];
+                        }
+                    }
+                }
+                return row;
             }
 
             virtual value_type &selector(std::size_t selector_index, std::uint32_t row_index) {
@@ -182,8 +418,8 @@ namespace nil {
             }
 
             virtual value_type witness(std::uint32_t witness_index, std::uint32_t row_index) const {
-                BLUEPRINT_ASSERT(witness_index < this->_private_table._witnesses.size());
-                BLUEPRINT_ASSERT(row_index < this->_private_table._witnesses[witness_index].size());
+                BLUEPRINT_RELEASE_ASSERT(witness_index < this->_private_table._witnesses.size());
+                BLUEPRINT_RELEASE_ASSERT(row_index < this->_private_table._witnesses[witness_index].size());
 
                 return this->_private_table._witnesses[witness_index][row_index];
             }
@@ -279,7 +515,7 @@ namespace nil {
             }
 
             virtual value_type private_storage(std::uint32_t storage_index) const {
-                BLUEPRINT_ASSERT(storage_index < private_storage.size());
+                BLUEPRINT_ASSERT(storage_index < assignment_private_storage.size());
                 return assignment_private_storage[storage_index];
             }
 
@@ -301,6 +537,48 @@ namespace nil {
 
             virtual std::size_t private_storage_size() const {
                 return assignment_private_storage.size();
+            }
+
+            virtual std::size_t batch_private_storage_size() const {
+                return assignment_batch_private_storage.size();
+            }
+
+            virtual value_type batch_private_storage(std::uint32_t storage_index) const {
+                BLUEPRINT_ASSERT(storage_index < assignment_batch_private_storage.size());
+                return assignment_batch_private_storage[storage_index];
+            }
+
+            virtual value_type &batch_private_storage(std::uint32_t storage_index) {
+                if (assignment_batch_private_storage.size() <= storage_index) {
+                    assignment_batch_private_storage.resize(storage_index + 1);
+                }
+                return assignment_batch_private_storage[storage_index];
+            }
+
+            virtual var add_batch_variable(const value_type &value) {
+                assignment_batch_private_storage.push_back(value);
+                return var(batch_private_storage_index, assignment_batch_private_storage.size() - 1, false,
+                           var::column_type::public_input);
+            }
+
+            virtual value_type batch_constant_storage(std::uint32_t storage_index) const {
+                BLUEPRINT_ASSERT(storage_index < assignment_batch_constant_storage.size());
+                return assignment_batch_constant_storage[storage_index];
+            }
+
+            virtual var add_batch_constant_variable(const value_type &value) {
+                auto existing_const = assignment_batch_constant_storage_set.find(
+                    std::make_pair<std::reference_wrapper<const value_type>, std::size_t>(std::cref(value), 0));
+                if (existing_const == assignment_batch_constant_storage_set.end()) {
+                    assignment_batch_constant_storage.push_back(value);
+                    assignment_batch_constant_storage_set.insert(std::make_pair(std::cref(assignment_batch_constant_storage.back()),
+                                                                                assignment_batch_constant_storage.size() - 1));
+                    return var(batch_constant_storage_index, assignment_batch_constant_storage.size() - 1, false,
+                               var::column_type::constant);
+                } else {
+                    return var(batch_constant_storage_index, existing_const->second, false,
+                               var::column_type::constant);
+                }
             }
 
             virtual void export_table(std::ostream& os, bool wide_export = false) const {
@@ -387,6 +665,12 @@ namespace nil {
             // So we add a type without actually adding a type
             if (input_var.index == assignment_type::private_storage_index) {
                 return input_assignment.private_storage(input_var.rotation);
+            }
+            if (input_var.index == assignment_type::batch_private_storage_index) {
+                return input_assignment.batch_private_storage(input_var.rotation);
+            }
+            if (input_var.index == assignment_type::batch_constant_storage_index) {
+                return input_assignment.batch_constant_storage(input_var.rotation);
             }
             if (input_var.type == var_column_type::public_input && input_var.index > 0) {
                 return input_assignment.shared(input_var.index - 1, input_var.rotation);

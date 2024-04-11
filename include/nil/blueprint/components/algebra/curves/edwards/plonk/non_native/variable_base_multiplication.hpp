@@ -27,6 +27,7 @@
 #ifndef CRYPTO3_BLUEPRINT_COMPONENTS_VARIABLE_BASE_MULTIPLICATION_EDWARD25519_HPP
 #define CRYPTO3_BLUEPRINT_COMPONENTS_VARIABLE_BASE_MULTIPLICATION_EDWARD25519_HPP
 
+#include "nil/blueprint/components/algebra/fields/plonk/non_native/detail/bit_builder_component.hpp"
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
 #include <nil/blueprint/components/algebra/curves/edwards/plonk/non_native/variable_base_multiplication_per_bit.hpp>
@@ -52,13 +53,12 @@ namespace nil {
                 public plonk_component<BlueprintFieldType> {
 
                 constexpr static const std::size_t rows_amount_internal(std::size_t witness_amount,
-                                                                        std::size_t lookup_column_amount,
                                                                         std::size_t bits_amount) {
                         return
-                            decomposition_component_type::get_rows_amount(witness_amount, lookup_column_amount,
-                                                                          bits_amount) +
-                            252 * mul_per_bit_component::get_rows_amount(witness_amount, lookup_column_amount) +
-                            bool_scalar_mul_component::get_rows_amount(witness_amount, lookup_column_amount);
+                            decomposition_component_type::get_rows_amount(witness_amount, bits_amount,
+                                                                          bit_composition_mode::MSB) +
+                            252 * mul_per_bit_component::get_rows_amount(witness_amount) +
+                            bool_scalar_mul_component::get_rows_amount(witness_amount);
                 }
 
             public:
@@ -87,34 +87,31 @@ namespace nil {
                 };
 
                 static gate_manifest get_gate_manifest(std::size_t witness_amount,
-                                                       std::size_t lookup_column_amount,
-                                                       std::size_t bits_amount, bit_shift_mode mode) {
-                    static gate_manifest manifest =
+                                                       std::size_t bits_amount, bit_composition_mode mode) {
+                    gate_manifest manifest =
                         gate_manifest(gate_manifest_type())
                         .merge_with(
-                            bool_scalar_mul_component::get_gate_manifest(witness_amount, lookup_column_amount))
-                        .merge_with(mul_per_bit_component::get_gate_manifest(witness_amount, lookup_column_amount))
+                            bool_scalar_mul_component::get_gate_manifest(witness_amount))
+                        .merge_with(mul_per_bit_component::get_gate_manifest(witness_amount))
                         .merge_with(
-                            decomposition_component_type::get_gate_manifest(witness_amount, lookup_column_amount,
-                                                                            bits_amount));
+                            decomposition_component_type::get_gate_manifest(witness_amount, bits_amount, mode));
 
                     return manifest;
                 }
 
-                static manifest_type get_manifest() {
-                    static manifest_type manifest = manifest_type(
+                manifest_type get_manifest(std::size_t bits_amount, bit_composition_mode mode) {
+                    manifest_type manifest = manifest_type(
                         std::shared_ptr<manifest_param>(new manifest_single_value_param(9)),
                         false
                     ).merge_with(mul_per_bit_component::get_manifest())
-                     .merge_with(decomposition_component_type::get_manifest())
+                     .merge_with(decomposition_component_type::get_manifest(bits_amount, mode))
                      .merge_with(bool_scalar_mul_component::get_manifest());
                     return manifest;
                 }
 
                 constexpr static std::size_t get_rows_amount(std::size_t witness_amount,
-                                                             std::size_t lookup_column_amount,
-                                                             std::size_t bits_amount, bit_shift_mode mode) {
-                    return rows_amount_internal(witness_amount, lookup_column_amount, bits_amount);
+                                                             std::size_t bits_amount, bit_composition_mode mode) {
+                    return rows_amount_internal(witness_amount, bits_amount);
                 }
 
                 // We use bits_amount from decomposition subcomponent to initialize rows_amount
@@ -124,7 +121,7 @@ namespace nil {
                 const mul_per_bit_component mul_per_bit_subcomponent;
                 const bool_scalar_mul_component bool_scalar_mul_subcomponent;
 
-                const std::size_t rows_amount = rows_amount_internal(this->witness_amount(), 0, decomposition_subcomponent.bits_amount);
+                const std::size_t rows_amount = rows_amount_internal(this->witness_amount(), decomposition_subcomponent.bits_amount);
                 constexpr static const std::size_t gates_amount = 0;
                 const std::string component_name = "non-native curve multiplication";
 
@@ -177,20 +174,20 @@ namespace nil {
 
                 template<typename ContainerType>
                 explicit variable_base_multiplication(ContainerType witness, std::uint32_t bits_amount,
-                                                      bit_shift_mode mode_) :
-                    component_type(witness, {}, {}, get_manifest()),
-                    decomposition_subcomponent(witness, bits_amount, bit_composition_mode::MSB),
+                                                      bit_composition_mode mode_) :
+                    component_type(witness, {}, {}, get_manifest(bits_amount, mode_)),
+                    decomposition_subcomponent(witness, bits_amount, mode_),
                     mul_per_bit_subcomponent(witness),
                     bool_scalar_mul_subcomponent(witness) {};
 
                 template<typename WitnessContainerType, typename ConstantContainerType,
                          typename PublicInputContainerType>
                 variable_base_multiplication(WitnessContainerType witness, ConstantContainerType constant,
-                                   PublicInputContainerType public_input, std::uint32_t bits_amount,
-                                   bit_shift_mode mode_) :
-                    component_type(witness, constant, public_input, get_manifest()),
+                                   PublicInputContainerType public_input, std::uint32_t bits_amount = 253,
+                                   bit_composition_mode mode_ = bit_composition_mode::MSB) :
+                    component_type(witness, constant, public_input, get_manifest(bits_amount, mode_)),
                     decomposition_subcomponent(witness, constant, public_input,
-                                               bits_amount, bit_composition_mode::MSB),
+                                               bits_amount, mode_),
                     mul_per_bit_subcomponent(witness, constant, public_input),
                     bool_scalar_mul_subcomponent(witness, constant, public_input) {};
 
@@ -201,10 +198,10 @@ namespace nil {
                         constants,
                     std::initializer_list<typename component_type::public_input_container_type::value_type>
                         public_inputs,
-                    std::uint32_t bits_amount = 253, bit_shift_mode mode_ = bit_shift_mode::RIGHT) :
-                        component_type(witnesses, constants, public_inputs, get_manifest()),
+                    std::uint32_t bits_amount = 253, bit_composition_mode mode_ = bit_composition_mode::MSB) :
+                        component_type(witnesses, constants, public_inputs, get_manifest(bits_amount, mode_)),
                         decomposition_subcomponent(witnesses, constants, public_inputs,
-                                                   bits_amount, bit_composition_mode::MSB),
+                                                   bits_amount, mode_),
                         mul_per_bit_subcomponent(witnesses, constants, public_inputs),
                         bool_scalar_mul_subcomponent(witnesses, constants, public_inputs) {};
             };

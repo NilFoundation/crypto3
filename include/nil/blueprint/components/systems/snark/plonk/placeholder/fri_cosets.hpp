@@ -131,16 +131,15 @@ namespace nil {
                 using manifest_type = plonk_component_manifest;
 
                 static gate_manifest get_gate_manifest(std::size_t witness_amount,
-                                                       std::size_t lookup_column_amount,
                                                        std::size_t n, value_type omega) {
                     gate_manifest manifest = gate_manifest(gate_manifest_type(witness_amount,n));
                     return manifest;
                 }
 
-                static manifest_type get_manifest() {
+                static manifest_type get_manifest(std::size_t n, value_type omega) {
                     static manifest_type manifest = manifest_type(
                         std::shared_ptr<manifest_param>(
-                            new manifest_range_param(9,2295,9) // 2295 = 9*255, because we expect n <= 255
+                            new manifest_range_param(9, n * 9 + 1, 9)
                         ),
                         true // constant column required
                     );
@@ -148,7 +147,6 @@ namespace nil {
                 }
 
                 constexpr static std::size_t get_rows_amount(std::size_t witness_amount,
-                                                             std::size_t lookup_column_amount,
                                                              std::size_t n, value_type omega) {
                     return rows_amount_internal(witness_amount,n,BlueprintFieldType::modulus_bits);
                 }
@@ -207,7 +205,7 @@ namespace nil {
                            PublicInputContainerType public_input,
                            std::size_t n_,
                            value_type omega_):
-                    component_type(witness, constant, public_input, get_manifest()),
+                    component_type(witness, constant, public_input, get_manifest(n_, omega_)),
                     n(n_),
                     omega(omega_) {
                 };
@@ -220,7 +218,7 @@ namespace nil {
                         typename component_type::public_input_container_type::value_type> public_inputs,
                         std::size_t n_,
                         value_type omega_):
-                    component_type(witnesses, constants, public_inputs, get_manifest()),
+                    component_type(witnesses, constants, public_inputs, get_manifest(n_, omega_)),
                     n(n_),
                     omega(omega_) {
                 };

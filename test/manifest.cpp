@@ -242,53 +242,10 @@ void test_table_operation(const std::map<std::pair<TestType1, TestType2>, TestTy
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_manifest_lookup_type_intersection) {
-    std::map<std::pair<manifest_lookup_type, manifest_lookup_type>, manifest_lookup_type> intersection_test_table = {
-        {{manifest_lookup_type::type::UNSAT, manifest_lookup_type::type::UNSAT}, manifest_lookup_type::type::UNSAT},
-        {{manifest_lookup_type::type::UNSAT, manifest_lookup_type::type::NONE}, manifest_lookup_type::type::UNSAT},
-        {{manifest_lookup_type::type::UNSAT, manifest_lookup_type::type::REQUIRED}, manifest_lookup_type::type::UNSAT},
-        {{manifest_lookup_type::type::UNSAT, manifest_lookup_type::type::OPTIONAL}, manifest_lookup_type::type::UNSAT},
-        {{manifest_lookup_type::type::NONE, manifest_lookup_type::type::NONE}, manifest_lookup_type::type::NONE},
-        {{manifest_lookup_type::type::NONE, manifest_lookup_type::type::REQUIRED}, manifest_lookup_type::type::UNSAT},
-        {{manifest_lookup_type::type::NONE, manifest_lookup_type::type::OPTIONAL}, manifest_lookup_type::type::NONE},
-        {{manifest_lookup_type::type::REQUIRED, manifest_lookup_type::type::REQUIRED}, manifest_lookup_type::type::REQUIRED},
-        {{manifest_lookup_type::type::REQUIRED, manifest_lookup_type::type::OPTIONAL}, manifest_lookup_type::type::REQUIRED},
-        {{manifest_lookup_type::type::OPTIONAL, manifest_lookup_type::type::OPTIONAL}, manifest_lookup_type::type::OPTIONAL},
-    };
-
-    std::function<manifest_lookup_type(const manifest_lookup_type&, const manifest_lookup_type&)> test_intersect =
-        [](const manifest_lookup_type &type_1, const manifest_lookup_type &type_2) {
-            return type_1.intersect(type_2);
-    };
-
-    test_table_operation(intersection_test_table, test_intersect);
-}
-
-BOOST_AUTO_TEST_CASE(test_manifest_lookup_type_merge_with) {
-    std::map<std::pair<manifest_lookup_type, manifest_lookup_type>, manifest_lookup_type> merge_with_test_table = {
-        {{manifest_lookup_type::type::UNSAT, manifest_lookup_type::type::UNSAT}, manifest_lookup_type::type::UNSAT},
-        {{manifest_lookup_type::type::UNSAT, manifest_lookup_type::type::NONE}, manifest_lookup_type::type::UNSAT},
-        {{manifest_lookup_type::type::UNSAT, manifest_lookup_type::type::REQUIRED}, manifest_lookup_type::type::UNSAT},
-        {{manifest_lookup_type::type::UNSAT, manifest_lookup_type::type::OPTIONAL}, manifest_lookup_type::type::UNSAT},
-        {{manifest_lookup_type::type::NONE, manifest_lookup_type::type::NONE}, manifest_lookup_type::type::NONE},
-        {{manifest_lookup_type::type::NONE, manifest_lookup_type::type::REQUIRED}, manifest_lookup_type::type::REQUIRED},
-        {{manifest_lookup_type::type::NONE, manifest_lookup_type::type::OPTIONAL}, manifest_lookup_type::type::OPTIONAL},
-        {{manifest_lookup_type::type::REQUIRED, manifest_lookup_type::type::REQUIRED}, manifest_lookup_type::type::REQUIRED},
-        {{manifest_lookup_type::type::REQUIRED, manifest_lookup_type::type::OPTIONAL}, manifest_lookup_type::type::REQUIRED},
-        {{manifest_lookup_type::type::OPTIONAL, manifest_lookup_type::type::OPTIONAL}, manifest_lookup_type::type::OPTIONAL},
-    };
-
-    std::function<manifest_lookup_type(const manifest_lookup_type&, const manifest_lookup_type&)> test_merge_with =
-        [](const manifest_lookup_type &type_1, const manifest_lookup_type &type_2) {
-            return type_1.merge_with(type_2);
-    };
-    test_table_operation(merge_with_test_table, test_merge_with);
-}
-
 BOOST_AUTO_TEST_CASE(test_manifest_constant_type_intersection) {
     compiler_manifest
-        has_constant(0, 0, 0, true),
-        has_no_constant(0, 0, 0, false);
+        has_constant(0, true),
+        has_no_constant(0, false);
     std::map<std::pair<manifest_constant_type, compiler_manifest>, manifest_constant_type>
             intersection_test_table = {
         {{manifest_constant_type::type::UNSAT, has_constant}, manifest_constant_type::type::UNSAT},
@@ -356,87 +313,46 @@ bool check_manifest_equality(const plonk_component_manifest& manifest_1,
     if (manifest_1.constant_required != manifest_2.constant_required) {
         return false;
     }
-    if (manifest_1.lookup_usage != manifest_2.lookup_usage) {
-        return false;
-    }
-    if (manifest_1.lookup_usage == manifest_lookup_type::type::NONE ||
-        manifest_1.lookup_usage == manifest_lookup_type::type::UNSAT) {
-        return true;
-    }
-    if (!check_param_equality(manifest_1.lookup_column_amount, manifest_2.lookup_column_amount)) {
-        return false;
-    }
-
-    for (auto value : *manifest_1.lookup_column_amount) {
-        if (manifest_1.lookup_size_for_column_amount(value) !=
-            manifest_2.lookup_size_for_column_amount(value)) {
-            return false;
-        }
-    }
     return true;
 }
 
 BOOST_AUTO_TEST_CASE(test_manifest_intersect) {
-    compiler_manifest comp_manifest_1(9, 2, 32, false);
+    compiler_manifest comp_manifest_1(9, false);
     plonk_component_manifest manifest_1(
         std::make_shared<manifest_range_param>(3, 12, 3),
-        manifest_constant_type::type::NONE,
-        manifest_lookup_type::type::REQUIRED,
-        std::make_shared<manifest_single_value_param>(3),
-        [](size_t) { return 8; });
+        manifest_constant_type::type::NONE);
     plonk_component_manifest manifest_res_1 = comp_manifest_1.intersect(manifest_1);
     plonk_component_manifest expected_res_1 = plonk_component_manifest(
         std::make_shared<manifest_range_param>(3, 10, 3),
-        manifest_constant_type::type::NONE,
-        manifest_lookup_type::type::UNSAT,
-        std::make_shared<manifest_unsat_param>(),
-        [](size_t) { return 8; });
+        manifest_constant_type::type::NONE);
     BOOST_ASSERT(check_manifest_equality(manifest_res_1, expected_res_1));
 
     plonk_component_manifest manifest_2(
         std::make_shared<manifest_range_param>(3, 12, 3),
-        manifest_constant_type::type::NONE,
-        manifest_lookup_type::type::REQUIRED,
-        std::make_shared<manifest_range_param>(2, 4),
-        [](size_t) { return 8; });
+        manifest_constant_type::type::NONE);
     plonk_component_manifest manifest_res_2 = comp_manifest_1.intersect(manifest_2);
     plonk_component_manifest expected_res_2 = plonk_component_manifest(
         std::make_shared<manifest_range_param>(3, 10, 3),
-        manifest_constant_type::type::NONE,
-        manifest_lookup_type::type::REQUIRED,
-        std::make_shared<manifest_single_value_param>(2),
-        [](size_t) { return 8; });
+        manifest_constant_type::type::NONE);
     BOOST_ASSERT(check_manifest_equality(manifest_res_2, expected_res_2));
 
     plonk_component_manifest manifest_3(
         std::make_shared<manifest_single_value_param>(5),
-        manifest_constant_type::type::REQUIRED,
-        manifest_lookup_type::type::NONE,
-        std::make_shared<manifest_unsat_param>(),
-        [](size_t) { return 0; });
+        manifest_constant_type::type::REQUIRED);
     plonk_component_manifest manifest_res_3 = comp_manifest_1.intersect(manifest_3);
     plonk_component_manifest expected_res_3 = plonk_component_manifest(
         std::make_shared<manifest_single_value_param>(5),
-        manifest_constant_type::type::UNSAT,
-        manifest_lookup_type::type::NONE,
-        std::make_shared<manifest_unsat_param>(),
-        [](size_t) { return 0; });
+        manifest_constant_type::type::UNSAT);
     BOOST_ASSERT(check_manifest_equality(manifest_res_3, expected_res_3));
 
-    compiler_manifest comp_manifest_2(20, 9, 32, true);
+    compiler_manifest comp_manifest_2(20, true);
     plonk_component_manifest manifest_4(
         std::make_shared<manifest_set_param>(std::set<std::uint32_t>{1, 2, 3, 11, 21, 22}),
-        manifest_constant_type::type::REQUIRED,
-        manifest_lookup_type::type::REQUIRED,
-        std::make_shared<manifest_range_param>(2, 11),
-        [](size_t i) { return i; });
+        manifest_constant_type::type::REQUIRED);
     plonk_component_manifest manifest_res_4 = comp_manifest_2.intersect(manifest_4);
     plonk_component_manifest expected_res_4 = plonk_component_manifest(
         std::make_shared<manifest_set_param>(std::set<std::uint32_t>{1, 2, 3, 11}),
-        manifest_constant_type::type::REQUIRED,
-        manifest_lookup_type::type::REQUIRED,
-        std::make_shared<manifest_range_param>(2, 10),
-        [](size_t i) { return i; });
+        manifest_constant_type::type::REQUIRED);
     BOOST_ASSERT(check_manifest_equality(manifest_res_4, expected_res_4));
 }
 

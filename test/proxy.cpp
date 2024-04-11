@@ -100,9 +100,9 @@ BOOST_AUTO_TEST_CASE(blueprint_circuit_proxy_copy_constraints_test) {
     circuits.emplace_back(bp_ptr, 0);
     circuits.emplace_back(bp_ptr, 1);
 
-    circuits[0].add_copy_constraint({var(0, 0, true, var::column_type::witness), var(0, -1, true, var::column_type::witness)});
-    circuits[0].add_copy_constraint({var(0, 1, true, var::column_type::witness), var(0, -1, true, var::column_type::witness)});
-    circuits[1].add_copy_constraint({var(0, 2, true, var::column_type::witness), var(0, -1, true, var::column_type::witness)});
+    circuits[0].add_copy_constraint({var(0, 0, false, var::column_type::witness), var(0, -1, false, var::column_type::witness)});
+    circuits[0].add_copy_constraint({var(0, 1, false, var::column_type::witness), var(0, -1, false, var::column_type::witness)});
+    circuits[1].add_copy_constraint({var(0, 2, false, var::column_type::witness), var(0, -1, false, var::column_type::witness)});
 
     std::set<uint32_t> used_copy_constraints_0 = {0, 1};
     BOOST_ASSERT(circuits[0].get_used_copy_constraints() == used_copy_constraints_0);

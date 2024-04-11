@@ -83,32 +83,28 @@ namespace nil {
                 };
 
                 static gate_manifest get_gate_manifest(std::size_t witness_amount,
-                                                       std::size_t lookup_column_amount,
-                                                       std::size_t bits_amount, bit_composition_mode mode = bit_composition_mode::MSB) {
+                                                       std::size_t bits_amount, bit_composition_mode mode) {
                     gate_manifest manifest =
                         gate_manifest(gate_manifest_type())
-                        .merge_with(component_type::get_gate_manifest(witness_amount, lookup_column_amount,
-                                                                      bits_amount, true));
+                        .merge_with(component_type::get_gate_manifest(witness_amount, bits_amount, true, mode));
                     return manifest;
                 }
 
-                static manifest_type get_manifest() {
-                    return component_type::get_manifest();
+                static manifest_type get_manifest(std::size_t bits_amount, bit_composition_mode mode) {
+                    return component_type::get_manifest(bits_amount, true, mode);
                 }
 
                 constexpr static std::size_t get_rows_amount(std::size_t witness_amount,
-                                                             std::size_t lookup_column_amount,
-                                                             std::size_t bits_amount, bit_composition_mode mode = bit_composition_mode::MSB) {
-                    return component_type::get_rows_amount(witness_amount, lookup_column_amount,
-                                                           bits_amount, true);
+                                                             std::size_t bits_amount, bit_composition_mode mode) {
+                    return component_type::get_rows_amount(witness_amount, bits_amount, true);
                 }
 
-                constexpr static std::size_t get_empty_rows_amount(std::size_t bits_amount) {
+                constexpr static std::size_t get_empty_rows_amount(std::size_t bits_amount, bit_composition_mode mode) {
                     return bits_amount / 9 + (bits_amount % 9 != 0);
                 }
 
                 const bit_composition_mode mode;
-                const std::size_t empty_rows_amount = get_empty_rows_amount(this->bits_amount);
+                const std::size_t empty_rows_amount = get_empty_rows_amount(this->bits_amount, this->mode);
                 const std::string component_name = "bit_decomposition";
 
                 struct input_type {
@@ -154,8 +150,9 @@ namespace nil {
                 template<typename ContainerType>
                 explicit bit_decomposition(ContainerType witness, std::uint32_t bits_amount,
                                            bit_composition_mode mode_) :
-                                        component_type(witness, get_manifest(), bits_amount, true),
-                                        mode(mode_) {
+                    component_type(witness, get_manifest(bits_amount, mode_), bits_amount, true),
+                    mode(mode_) {
+
                     check_params(bits_amount, mode);
                 };
 
@@ -164,7 +161,8 @@ namespace nil {
                 bit_decomposition(WitnessContainerType witness, ConstantContainerType constant,
                                   PublicInputContainerType public_input, std::uint32_t bits_amount,
                                   bit_composition_mode mode_) :
-                    component_type(witness, constant, public_input, get_manifest(), bits_amount, true),
+                    component_type(witness, constant, public_input,
+                                   get_manifest(bits_amount, mode_), bits_amount, true),
                     mode(mode_) {
 
                     check_params(bits_amount, mode);
@@ -178,7 +176,8 @@ namespace nil {
                     std::initializer_list<typename component_type::public_input_container_type::value_type>
                         public_inputs,
                     std::uint32_t bits_amount, bit_composition_mode mode_) :
-                    component_type(witnesses, constants, public_inputs, get_manifest(), bits_amount, true),
+                    component_type(witnesses, constants, public_inputs,
+                                   get_manifest(bits_amount, mode_), bits_amount, true),
                     mode(mode_) {
 
                     check_params(bits_amount, mode);

@@ -65,8 +65,8 @@ namespace nil {
                     for (std::size_t i = 0; i < lookup_tables_size; i++) {
                         for (std::size_t j = 0; j < lookup_table_lookup_options_sizes[i]; j++) {
                             row +=
-                                2 * gate_component::get_rows_amount(witness_amount, 0, lookup_table_columns_numbers[i]);
-                            row += 2 * mul::get_rows_amount(witness_amount, 0);
+                                2 * gate_component::get_rows_amount(witness_amount, lookup_table_columns_numbers[i]);
+                            row += 2 * mul::get_rows_amount(witness_amount);
                             lu_value_size++;
                         }
                     }
@@ -75,15 +75,15 @@ namespace nil {
                     for (std::size_t g_id = 0; g_id < lookup_gates_size; g_id++) {
                         for (std::size_t c_id = 0; c_id < lookup_gate_constraints_sizes[g_id]; c_id++) {
                             std::size_t lookup_input_size = lookup_gate_constraints_lookup_input_sizes[lu_input_size++];
-                            row += gate_component::get_rows_amount(witness_amount, 0, lookup_input_size);
+                            row += gate_component::get_rows_amount(witness_amount, lookup_input_size);
                         }
                     }
 
-                    row += f1_loop::get_rows_amount(witness_amount, 0, lu_input_size);
-                    row += f1_loop::get_rows_amount(witness_amount, 0, lu_value_size);
-                    row += f1_loop::get_rows_amount(witness_amount, 0, lu_input_size + lu_value_size);
-                    row += 2 * mul::get_rows_amount(witness_amount, 0);
-                    row += f3_loop::get_rows_amount(witness_amount, 0, lu_input_size + lu_value_size - 1);
+                    row += f1_loop::get_rows_amount(witness_amount, lu_input_size);
+                    row += f1_loop::get_rows_amount(witness_amount, lu_value_size);
+                    row += f1_loop::get_rows_amount(witness_amount, lu_input_size + lu_value_size);
+                    row += 2 * mul::get_rows_amount(witness_amount);
+                    row += f3_loop::get_rows_amount(witness_amount, lu_input_size + lu_value_size - 1);
                     row += 4 / witness_amount + 1;
                     row += 5 / witness_amount + 1;
                     return row;
@@ -103,7 +103,7 @@ namespace nil {
                                            basic_non_native_policy<BlueprintFieldType>>;
 
                 constexpr static std::size_t get_rows_amount(
-                    std::size_t witness_amount, std::size_t lookup_column_amount, std::size_t lookup_gates_size,
+                    std::size_t witness_amount, std::size_t lookup_gates_size,
                     std::vector<std::size_t> &lookup_gate_constraints_sizes,
                     std::vector<std::size_t> &lookup_gate_constraints_lookup_input_sizes,
                     std::size_t lookup_tables_size, std::vector<std::size_t> &lookup_table_lookup_options_sizes,
@@ -136,7 +136,7 @@ namespace nil {
                 };
 
                 static gate_manifest get_gate_manifest(
-                    std::size_t witness_amount, std::size_t lookup_column_amount, std::size_t lookup_gates_size,
+                    std::size_t witness_amount, std::size_t lookup_gates_size,
                     std::vector<std::size_t> &lookup_gate_constraints_sizes,
                     std::vector<std::size_t> &lookup_gate_constraints_lookup_input_sizes,
                     std::size_t lookup_tables_size, std::vector<std::size_t> &lookup_table_lookup_options_sizes,
@@ -144,21 +144,35 @@ namespace nil {
 
                     gate_manifest manifest =
                         gate_manifest(gate_manifest_type())
-                            .merge_with(mul::get_gate_manifest(witness_amount, lookup_column_amount))
-                            .merge_with(f1_loop::get_gate_manifest(witness_amount, lookup_column_amount, 1))
-                            .merge_with(f3_loop::get_gate_manifest(witness_amount, lookup_column_amount, 1))
-                            .merge_with(gate_component::get_gate_manifest(witness_amount, lookup_column_amount, 1));
+                            .merge_with(mul::get_gate_manifest(witness_amount))
+                            // depends only on witness amount, so we skip proper calculation
+                            .merge_with(f1_loop::get_gate_manifest(witness_amount, 1))
+                            // depends only on witness amount, so we skip proper calculation
+                            .merge_with(f3_loop::get_gate_manifest(witness_amount, 1))
+                            // incorrect, but the manifest doesn't depend on the degree
+                            // because all gates are instantiated anyways
+                            .merge_with(gate_component::get_gate_manifest(witness_amount, 1));
 
                     return manifest;
                 }
 
-                static manifest_type get_manifest() {
+                static manifest_type get_manifest(
+                    std::size_t lookup_gates_size,
+                    std::vector<std::size_t> &lookup_gate_constraints_sizes,
+                    std::vector<std::size_t> &lookup_gate_constraints_lookup_input_sizes,
+                    std::size_t lookup_tables_size,
+                    std::vector<std::size_t> &lookup_table_lookup_options_sizes,
+                    std::vector<std::size_t> &lookup_table_columns_numbers
+                ) {
                     static manifest_type manifest =
                         manifest_type(std::shared_ptr<manifest_param>(new manifest_range_param(4, 15)), false)
                             .merge_with(mul::get_manifest())
-                            .merge_with(f1_loop::get_manifest())
-                            .merge_with(f3_loop::get_manifest())
-                            .merge_with(gate_component::get_manifest());
+                            // does not depend on actual value, so we cheat here
+                            .merge_with(f1_loop::get_manifest(1))
+                            // does not depend on actual value, so we cheat here
+                            .merge_with(f3_loop::get_manifest(1))
+                            // does not depend on actual value, so we cheat here
+                            .merge_with(gate_component::get_manifest(1));
                     return manifest;
                 }
 
@@ -237,7 +251,10 @@ namespace nil {
                                 std::size_t lookup_tables_size_,
                                 std::vector<std::size_t> &lookup_table_lookup_options_sizes_,
                                 std::vector<std::size_t> &lookup_table_columns_numbers_) :
-                    component_type(witness, {}, {}, get_manifest()),
+                    component_type(witness, {}, {},
+                                   get_manifest(lookup_gates_size_, lookup_gate_constraints_sizes_,
+                                                lookup_gate_constraints_lookup_input_sizes_, lookup_tables_size_,
+                                                lookup_table_lookup_options_sizes_, lookup_table_columns_numbers_)),
                     lookup_gates_size(lookup_gates_size_),
                     lookup_tables_size(lookup_tables_size_),
                     lookup_table_lookup_options_sizes(lookup_table_lookup_options_sizes_),
@@ -254,7 +271,10 @@ namespace nil {
                                 std::size_t lookup_tables_size_,
                                 std::vector<std::size_t> &lookup_table_lookup_options_sizes_,
                                 std::vector<std::size_t> &lookup_table_columns_numbers_) :
-                    component_type(witness, constant, public_input, get_manifest()),
+                    component_type(witness, constant, public_input,
+                                get_manifest(lookup_gates_size_, lookup_gate_constraints_sizes_,
+                                             lookup_gate_constraints_lookup_input_sizes_, lookup_tables_size_,
+                                             lookup_table_lookup_options_sizes_, lookup_table_columns_numbers_)),
                     lookup_gates_size(lookup_gates_size_),
                     lookup_tables_size(lookup_tables_size_),
                     lookup_table_lookup_options_sizes(lookup_table_lookup_options_sizes_),
@@ -271,7 +291,10 @@ namespace nil {
                     std::vector<std::size_t> &lookup_gate_constraints_lookup_input_sizes_,
                     std::size_t lookup_tables_size_, std::vector<std::size_t> &lookup_table_lookup_options_sizes_,
                     std::vector<std::size_t> &lookup_table_columns_numbers_) :
-                    component_type(witnesses, constants, public_inputs, get_manifest()),
+                    component_type(witnesses, constants, public_inputs,
+                                   get_manifest(lookup_gates_size_, lookup_gate_constraints_sizes_,
+                                             lookup_gate_constraints_lookup_input_sizes_, lookup_tables_size_,
+                                             lookup_table_lookup_options_sizes_, lookup_table_columns_numbers_)),
                     lookup_gates_size(lookup_gates_size_),
                     lookup_tables_size(lookup_tables_size_),
                     lookup_table_lookup_options_sizes(lookup_table_lookup_options_sizes_),
@@ -654,9 +677,9 @@ namespace nil {
                 std::size_t lu_value_size = 0;
                 for (std::size_t i = 0; i < component.lookup_tables_size; i++) {
                     for (std::size_t j = 0; j < component.lookup_table_lookup_options_sizes[i]; j++) {
-                        row += 2 * gate_component::get_rows_amount(witness_amount, 0,
+                        row += 2 * gate_component::get_rows_amount(witness_amount,
                                                                    component.lookup_table_columns_numbers[i]);
-                        row += 2 * mul::get_rows_amount(witness_amount, 0);
+                        row += 2 * mul::get_rows_amount(witness_amount);
                         lu_value_size++;
                     }
                 }
@@ -666,13 +689,13 @@ namespace nil {
                     for (std::size_t c_id = 0; c_id < component.lookup_gate_constraints_sizes[g_id]; c_id++) {
                         std::size_t lookup_input_size =
                             component.lookup_gate_constraints_lookup_input_sizes[lu_input_size];
-                        row += gate_component::get_rows_amount(witness_amount, 0, lookup_input_size);
+                        row += gate_component::get_rows_amount(witness_amount, lookup_input_size);
                         lu_input_size++;
                     }
                 }
 
                 std::size_t m = lu_value_size + lu_input_size;
-                row += f1_loop::get_rows_amount(witness_amount, 0, m);
+                row += f1_loop::get_rows_amount(witness_amount, m);
                 std::size_t h_output_col = (3 * m) % (witness_amount - 1);
                 if (h_output_col == 0) {
                     h_output_col = witness_amount - 1;
@@ -682,12 +705,12 @@ namespace nil {
                     h_row_offset = 2;
                 }
                 var h_var = var(component.W(h_output_col), row - h_row_offset, false);
-                row += f1_loop::get_rows_amount(witness_amount, 0, lu_value_size);
-                row += f1_loop::get_rows_amount(witness_amount, 0, lu_input_size);
-                row += mul::get_rows_amount(witness_amount, 0);
+                row += f1_loop::get_rows_amount(witness_amount, lu_value_size);
+                row += f1_loop::get_rows_amount(witness_amount, lu_input_size);
+                row += mul::get_rows_amount(witness_amount);
                 var g_var = var(component.W(2), row - 1, false);
-                row += f3_loop::get_rows_amount(witness_amount, 0, m - 1);
-                row += mul::get_rows_amount(witness_amount, 0);
+                row += f3_loop::get_rows_amount(witness_amount, m - 1);
+                row += mul::get_rows_amount(witness_amount);
 
                 bp.add_copy_constraint({var(component.W(0), row, false), instance_input.V_L_values[0]});
                 bp.add_copy_constraint({var(component.W(1), row, false), instance_input.L0});

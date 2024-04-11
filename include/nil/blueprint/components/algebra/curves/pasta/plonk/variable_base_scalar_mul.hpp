@@ -124,11 +124,10 @@ namespace nil {
                     }
                 };
 
-                static gate_manifest get_gate_manifest(std::size_t witness_amount,
-                                                        std::size_t lookup_column_amount) {
+                static gate_manifest get_gate_manifest(std::size_t witness_amount) {
                     static gate_manifest manifest =
                         gate_manifest(gate_manifest_type())
-                        .merge_with(add_component::get_gate_manifest(witness_amount, lookup_column_amount));
+                        .merge_with(add_component::get_gate_manifest(witness_amount));
                     return manifest;
                 }
 
@@ -140,14 +139,12 @@ namespace nil {
                     return manifest;
                 }
 
-                constexpr static std::size_t get_rows_amount(std::size_t witness_amount,
-                                                                std::size_t lookup_column_amount) {
+                constexpr static std::size_t get_rows_amount(std::size_t witness_amount) {
                     return rows_amount;
                 }
 
                 constexpr static const std::size_t mul_rows_amount = 102;
-                constexpr static const std::size_t add_component_rows_amount =
-                    add_component::get_rows_amount(11, 0);
+                constexpr static const std::size_t add_component_rows_amount = add_component::get_rows_amount(11);
                 constexpr static const std::size_t rows_amount = add_component_rows_amount + mul_rows_amount + 1;
                 constexpr static const std::size_t gates_amount = 3;
                 const std::string component_name = "native curve multiplication by shifted const (https://arxiv.org/pdf/math/0208038.pdf)";
@@ -187,10 +184,6 @@ namespace nil {
                 struct result_type {
                     var X;
                     var Y;
-                    result_type(const curve_element_variable_base_scalar_mul &component, input_type &params, std::size_t start_row_index) {
-                        X = var(component.W(0), start_row_index + component.rows_amount - 1, false, var::column_type::witness);
-                        Y = var(component.W(1), start_row_index + component.rows_amount - 1, false, var::column_type::witness);
-                    }
                     result_type(const curve_element_variable_base_scalar_mul &component, std::size_t start_row_index) {
                         X = var(component.W(0), start_row_index + component.rows_amount - 1, false, var::column_type::witness);
                         Y = var(component.W(1), start_row_index + component.rows_amount - 1, false, var::column_type::witness);

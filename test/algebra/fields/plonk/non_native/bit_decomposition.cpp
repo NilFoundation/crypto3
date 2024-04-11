@@ -111,14 +111,14 @@ void test_bit_decomposition(typename BlueprintFieldType::value_type input,
         if (expected_to_pass) {
             crypto3::test_component<component_type, BlueprintFieldType, hash_type, Lambda>(
                 component_instance, desc, public_input, result_check, instance_input,
-                nil::blueprint::connectedness_check_type::type::STRONG, BitsAmount);
+                nil::blueprint::connectedness_check_type::type::STRONG, BitsAmount, Mode);
             crypto3::test_empty_component<component_type, BlueprintFieldType, hash_type, Lambda>(
                 component_instance, desc, public_input, result_check, instance_input,
-                nil::blueprint::connectedness_check_type::type::STRONG, BitsAmount);
+                nil::blueprint::connectedness_check_type::type::STRONG, BitsAmount, Mode);
         } else {
             crypto3::test_component_to_fail<component_type, BlueprintFieldType, hash_type, Lambda>(
                 component_instance, desc, public_input, result_check, instance_input,
-                nil::blueprint::connectedness_check_type::type::STRONG, BitsAmount);
+                nil::blueprint::connectedness_check_type::type::STRONG, BitsAmount, Mode);
         }
     } else {
         auto custom_assignments = crypto3::generate_patched_assignments<BlueprintFieldType,
@@ -126,7 +126,7 @@ void test_bit_decomposition(typename BlueprintFieldType::value_type input,
         crypto3::test_component_to_fail_custom_assignments<
             component_type, BlueprintFieldType, hash_type, Lambda>
                 (component_instance, desc, public_input, result_check, custom_assignments, instance_input,
-                 nil::blueprint::connectedness_check_type::type::STRONG, BitsAmount);
+                 nil::blueprint::connectedness_check_type::type::STRONG, BitsAmount, Mode);
     }
 }
 

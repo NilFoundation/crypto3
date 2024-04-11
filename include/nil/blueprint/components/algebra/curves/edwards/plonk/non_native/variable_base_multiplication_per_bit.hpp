@@ -52,13 +52,11 @@ namespace nil {
                     basic_non_native_policy<BlueprintFieldType>>:
                 public plonk_component<BlueprintFieldType> {
 
-                constexpr static const std::size_t rows_amount_internal(std::size_t witness_amount,
-                                                                        std::size_t lookup_column_amount) {
+                constexpr static const std::size_t rows_amount_internal(std::size_t witness_amount) {
                     return
-                        doubling_component::get_rows_amount(witness_amount, lookup_column_amount) +
-                        complete_addition_component::get_rows_amount(witness_amount, lookup_column_amount) +
-                        bool_scalar_multiplication_component::get_rows_amount(witness_amount, lookup_column_amount);
-
+                        doubling_component::get_rows_amount(witness_amount) +
+                        complete_addition_component::get_rows_amount(witness_amount) +
+                        bool_scalar_multiplication_component::get_rows_amount(witness_amount);
                 }
 
             public:
@@ -90,18 +88,14 @@ namespace nil {
                     }
                 };
 
-                static gate_manifest get_gate_manifest(std::size_t witness_amount,
-                                                       std::size_t lookup_column_amount) {
-                    static gate_manifest manifest =
+                static gate_manifest get_gate_manifest(std::size_t witness_amount) {
+                    gate_manifest manifest =
                         gate_manifest(gate_manifest_type())
                         .merge_with(
-                            non_native_range_component::get_gate_manifest(witness_amount, lookup_column_amount))
-                        .merge_with(doubling_component::get_gate_manifest(witness_amount, lookup_column_amount))
-                        .merge_with(
-                            complete_addition_component::get_gate_manifest(witness_amount, lookup_column_amount))
-                        .merge_with(
-                            bool_scalar_multiplication_component::get_gate_manifest(witness_amount,
-                                                                                    lookup_column_amount));
+                            non_native_range_component::get_gate_manifest(witness_amount))
+                        .merge_with(doubling_component::get_gate_manifest(witness_amount))
+                        .merge_with(complete_addition_component::get_gate_manifest(witness_amount))
+                        .merge_with(bool_scalar_multiplication_component::get_gate_manifest(witness_amount));
 
                     return manifest;
                 }
@@ -117,12 +111,11 @@ namespace nil {
                     return manifest;
                 }
 
-                constexpr static std::size_t get_rows_amount(std::size_t witness_amount,
-                                                             std::size_t lookup_column_amount) {
-                    return rows_amount_internal(witness_amount, lookup_column_amount);
+                constexpr static std::size_t get_rows_amount(std::size_t witness_amount) {
+                    return rows_amount_internal(witness_amount);
                 }
 
-                const std::size_t rows_amount = rows_amount_internal(this->witness_amount(), 0);
+                const std::size_t rows_amount = rows_amount_internal(this->witness_amount());
                 constexpr static const std::size_t gates_amount = 0;
 
                 struct input_type {
@@ -156,7 +149,7 @@ namespace nil {
                         complete_addition_component component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8}, {0}, {});
 
                         auto final_addition_res = typename plonk_ed25519_complete_addition<BlueprintFieldType, CurveType>::result_type(
-                            component_instance, start_row_index + component.rows_amount - complete_addition_component::get_rows_amount(component.witness_amount(), 0));
+                            component_instance, start_row_index + component.rows_amount - complete_addition_component::get_rows_amount(component.witness_amount()));
 
                         output.x = {final_addition_res.output.x[0],
                                     final_addition_res.output.x[1],

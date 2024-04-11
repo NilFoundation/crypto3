@@ -69,8 +69,7 @@ namespace nil {
                     }
                 };
 
-                static gate_manifest get_gate_manifest(std::size_t witness_amount,
-                                                       std::size_t lookup_column_amount) {
+                static gate_manifest get_gate_manifest(std::size_t witness_amount) {
                     static gate_manifest manifest = gate_manifest(gate_manifest_type());
                     return manifest;
                 }
@@ -79,11 +78,10 @@ namespace nil {
                     return component_type::get_manifest();
                 }
 
-                constexpr static std::size_t get_rows_amount(std::size_t witness_amount,
-                                                             std::size_t lookup_column_amount) {
-                    return component_type::get_rows_amount(witness_amount, lookup_column_amount);
+                constexpr static std::size_t get_rows_amount(std::size_t witness_amount) {
+                    return component_type::get_rows_amount(witness_amount);
                 }
-                const std::size_t rows_amount = get_rows_amount(this->witness_amount(), 0);
+                const std::size_t rows_amount = get_rows_amount(this->witness_amount());
                 const std::string component_name = "logic_not";
 
                 virtual crypto3::zk::snark::plonk_constraint<BlueprintFieldType>
@@ -139,8 +137,7 @@ namespace nil {
                     }
                 };
 
-                static gate_manifest get_gate_manifest(std::size_t witness_amount,
-                                                       std::size_t lookup_column_amount) {
+                static gate_manifest get_gate_manifest(std::size_t witness_amount) {
                     static gate_manifest manifest = gate_manifest(gate_manifest_type());
                     return manifest;
                 }
@@ -149,11 +146,10 @@ namespace nil {
                     return component_type::get_manifest();
                 }
 
-                constexpr static std::size_t get_rows_amount(std::size_t witness_amount,
-                                                             std::size_t lookup_column_amount) {
-                    return component_type::get_rows_amount(witness_amount, lookup_column_amount);
+                constexpr static std::size_t get_rows_amount(std::size_t witness_amount) {
+                    return component_type::get_rows_amount(witness_amount);
                 }
-                const std::size_t rows_amount = get_rows_amount(this->witness_amount(), 0);
+                const std::size_t rows_amount = get_rows_amount(this->witness_amount());
                 const std::string component_name = "logic_and";
 
                 virtual crypto3::zk::snark::plonk_constraint<BlueprintFieldType>
@@ -209,8 +205,7 @@ namespace nil {
                     }
                 };
 
-                static gate_manifest get_gate_manifest(std::size_t witness_amount,
-                                                       std::size_t lookup_column_amount) {
+                static gate_manifest get_gate_manifest(std::size_t witness_amount) {
                     static gate_manifest manifest = gate_manifest(gate_manifest_type());
                     return manifest;
                 }
@@ -219,11 +214,10 @@ namespace nil {
                     return component_type::get_manifest();
                 }
 
-                constexpr static std::size_t get_rows_amount(std::size_t witness_amount,
-                                                             std::size_t lookup_column_amount) {
-                    return component_type::get_rows_amount(witness_amount, lookup_column_amount);
+                constexpr static std::size_t get_rows_amount(std::size_t witness_amount) {
+                    return component_type::get_rows_amount(witness_amount);
                 }
-                const std::size_t rows_amount = get_rows_amount(this->witness_amount(), 0);
+                const std::size_t rows_amount = get_rows_amount(this->witness_amount());
                 const std::string component_name = "logic_or";
 
                 virtual crypto3::zk::snark::plonk_constraint<BlueprintFieldType>
@@ -279,8 +273,7 @@ namespace nil {
                     }
                 };
 
-                static gate_manifest get_gate_manifest(std::size_t witness_amount,
-                                                       std::size_t lookup_column_amount) {
+                static gate_manifest get_gate_manifest(std::size_t witness_amount) {
                     static gate_manifest manifest = gate_manifest(gate_manifest_type());
                     return manifest;
                 }
@@ -289,11 +282,10 @@ namespace nil {
                     return component_type::get_manifest();
                 }
 
-                constexpr static std::size_t get_rows_amount(std::size_t witness_amount,
-                                                             std::size_t lookup_column_amount) {
-                    return component_type::get_rows_amount(witness_amount, lookup_column_amount);
+                constexpr static std::size_t get_rows_amount(std::size_t witness_amount) {
+                    return component_type::get_rows_amount(witness_amount);
                 }
-                const std::size_t rows_amount = get_rows_amount(this->witness_amount(), 0);
+                const std::size_t rows_amount = get_rows_amount(this->witness_amount());
                 const std::string component_name = "logic_xor";
 
                 virtual crypto3::zk::snark::plonk_constraint<BlueprintFieldType>
@@ -351,8 +343,7 @@ namespace nil {
                     }
                 };
 
-                static gate_manifest get_gate_manifest(std::size_t witness_amount,
-                                                       std::size_t lookup_column_amount) {
+                static gate_manifest get_gate_manifest(std::size_t witness_amount) {
                     static gate_manifest manifest = gate_manifest(gate_manifest_type());
                     return manifest;
                 }
@@ -361,11 +352,10 @@ namespace nil {
                     return component_type::get_manifest();
                 }
 
-                constexpr static std::size_t get_rows_amount(std::size_t witness_amount,
-                                                             std::size_t lookup_column_amount) {
-                    return component_type::get_rows_amount(witness_amount, lookup_column_amount);
+                constexpr static std::size_t get_rows_amount(std::size_t witness_amount) {
+                    return component_type::get_rows_amount(witness_amount);
                 }
-                const std::size_t rows_amount = get_rows_amount(this->witness_amount(), 0);
+                const std::size_t rows_amount = get_rows_amount(this->witness_amount());
                 const std::string component_name = "logic_nand";
 
                 virtual crypto3::zk::snark::plonk_constraint<BlueprintFieldType>
@@ -420,8 +410,7 @@ namespace nil {
                     }
                 };
 
-                static gate_manifest get_gate_manifest(std::size_t witness_amount,
-                                                       std::size_t lookup_column_amount) {
+                static gate_manifest get_gate_manifest(std::size_t witness_amount) {
                     static gate_manifest manifest = gate_manifest(gate_manifest_type());
                     return manifest;
                 }
@@ -430,11 +419,10 @@ namespace nil {
                     return component_type::get_manifest();
                 }
 
-                constexpr static std::size_t get_rows_amount(std::size_t witness_amount,
-                                                             std::size_t lookup_column_amount) {
-                    return component_type::get_rows_amount(witness_amount, lookup_column_amount);
+                constexpr static std::size_t get_rows_amount(std::size_t witness_amount) {
+                    return component_type::get_rows_amount(witness_amount);
                 }
-                const std::size_t rows_amount = get_rows_amount(this->witness_amount(), 0);
+                const std::size_t rows_amount = get_rows_amount(this->witness_amount());
                 const std::string component_name = "logic_nor";
 
                 virtual crypto3::zk::snark::plonk_constraint<BlueprintFieldType>
@@ -491,8 +479,7 @@ namespace nil {
                     }
                 };
 
-                static gate_manifest get_gate_manifest(std::size_t witness_amount,
-                                                       std::size_t lookup_column_amount) {
+                static gate_manifest get_gate_manifest(std::size_t witness_amount) {
                     static gate_manifest manifest = gate_manifest(gate_manifest_type());
                     return manifest;
                 }
@@ -501,9 +488,8 @@ namespace nil {
                     return component_type::get_manifest();
                 }
 
-                constexpr static std::size_t get_rows_amount(std::size_t witness_amount,
-                                                             std::size_t lookup_column_amount) {
-                    return component_type::get_rows_amount(witness_amount, lookup_column_amount);
+                constexpr static std::size_t get_rows_amount(std::size_t witness_amount) {
+                    return component_type::get_rows_amount(witness_amount);
                 }
 
                 virtual crypto3::zk::snark::plonk_constraint<BlueprintFieldType>

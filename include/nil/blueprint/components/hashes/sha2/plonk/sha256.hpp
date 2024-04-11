@@ -71,12 +71,11 @@ namespace nil {
                     }
                 };
 
-                static gate_manifest get_gate_manifest(std::size_t witness_amount,
-                                                       std::size_t lookup_column_amount) {
+                static gate_manifest get_gate_manifest(std::size_t witness_amount) {
                     static gate_manifest manifest =
                         gate_manifest(gate_manifest_type())
-                        .merge_with(sha256_process_type::get_gate_manifest(witness_amount, lookup_column_amount))
-                        .merge_with(decomposition_type::get_gate_manifest(witness_amount, lookup_column_amount));
+                        .merge_with(sha256_process_type::get_gate_manifest(witness_amount))
+                        .merge_with(decomposition_type::get_gate_manifest(witness_amount));
                     return manifest;
                 }
 
@@ -90,18 +89,17 @@ namespace nil {
                     return manifest;
                 }
 
-                constexpr static std::size_t get_rows_amount(std::size_t witness_amount,
-                                                             std::size_t lookup_column_amount) {
+                constexpr static std::size_t get_rows_amount(std::size_t witness_amount) {
                     return
-                        2 * sha256_process_type::get_rows_amount(witness_amount, lookup_column_amount) +
-                        2 * decomposition_type::get_rows_amount(witness_amount, lookup_column_amount) +
+                        2 * sha256_process_type::get_rows_amount(witness_amount) +
+                        2 * decomposition_type::get_rows_amount(witness_amount) +
                         2;
                 }
                 constexpr static std::size_t get_empty_rows_amount() {
                     return 1;
                 }
 
-                const std::size_t rows_amount = get_rows_amount(this->witness_amount(), 0);
+                const std::size_t rows_amount = get_rows_amount(this->witness_amount());
                 const std::size_t empty_rows_amount = get_empty_rows_amount();
 
                 constexpr static const std::size_t gates_amount = 1;

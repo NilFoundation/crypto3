@@ -72,7 +72,7 @@ namespace nil {
                 static std::size_t rows_amount_internal(std::size_t witness_amount, std::size_t bits_amount,
                                                         bool check_inputs) {
                     return range_check_amount_internal(check_inputs) *
-                           range_check_component_type::get_rows_amount(witness_amount, 0, bits_amount) +
+                           range_check_component_type::get_rows_amount(witness_amount, bits_amount) +
                             1 + needs_bonus_row_internal(witness_amount);
                 }
 
@@ -105,28 +105,24 @@ namespace nil {
                 };
 
                 static gate_manifest get_gate_manifest(std::size_t witness_amount,
-                                                       std::size_t lookup_column_amount,
                                                        std::size_t bits_amount,
                                                        bool check_inputs) {
                     gate_manifest manifest =
                         gate_manifest(gate_manifest_type(witness_amount))
-                        .merge_with(range_check_component_type::get_gate_manifest(witness_amount,
-                                                                                  lookup_column_amount,
-                                                                                  bits_amount));
+                        .merge_with(range_check_component_type::get_gate_manifest(witness_amount, bits_amount));
                     return manifest;
                 }
 
-                static manifest_type get_manifest() {
-                    static manifest_type manifest = manifest_type(
+                static manifest_type get_manifest(std::size_t bits_amount, bool check_inputs) {
+                    manifest_type manifest = manifest_type(
                         std::shared_ptr<manifest_param>(
                             new manifest_range_param(3, 6)),
                         true
-                    ).merge_with(range_check_component_type::get_manifest());
+                    ).merge_with(range_check_component_type::get_manifest(bits_amount));
                     return manifest;
                 }
 
                 constexpr static std::size_t get_rows_amount(std::size_t witness_amount,
-                                                             std::size_t lookup_column_amount,
                                                              std::size_t bits_amount,
                                                              bool check_inputs) {
                     return rows_amount_internal(witness_amount, bits_amount, check_inputs);
@@ -204,7 +200,7 @@ namespace nil {
                 division_remainder(WitnessContainerType witness, ConstantContainerType constant,
                                    PublicInputContainerType public_input,
                                    std::size_t bits_amount_, bool check_inputs_):
-                    component_type(witness, constant, public_input, get_manifest()),
+                    component_type(witness, constant, public_input, get_manifest(bits_amount_, check_inputs_)),
                     bits_amount(bits_amount_),
                     check_inputs(check_inputs_),
                     range_checks(range_check_amount, range_check_component_type(witness, constant,
@@ -217,7 +213,7 @@ namespace nil {
                     std::initializer_list<typename component_type::public_input_container_type::value_type>
                         public_inputs,
                     std::size_t bits_amount_, bool check_inputs_) :
-                        component_type(witnesses, constants, public_inputs, get_manifest()),
+                        component_type(witnesses, constants, public_inputs, get_manifest(bits_amount_, check_inputs_)),
                         bits_amount(bits_amount_),
                         check_inputs(check_inputs_),
                         range_checks(range_check_amount, range_check_component_type(witnesses, constants,

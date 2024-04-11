@@ -73,7 +73,7 @@ void test_fri_lin_inter(const std::vector<typename BlueprintFieldType::value_typ
                alpha = public_input[3];
     value_type expected_res = y0 + (y1 - y0) * (s - alpha) / (2 * s);
 
-    auto result_check = [&expected_res, &public_input](AssignmentType &assignment,
+    auto result_check = [&expected_res](AssignmentType &assignment,
 	    typename component_type::result_type &real_res) {
 
         BOOST_ASSERT(var_value(assignment, real_res.output) == expected_res);

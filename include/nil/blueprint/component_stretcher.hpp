@@ -35,6 +35,7 @@
 #include <nil/blueprint/component.hpp>
 #include <nil/blueprint/manifest.hpp>
 #include <nil/blueprint/detail/huang_lu.hpp>
+#include <nil/blueprint/utils/gate_mover.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/copy_constraint.hpp>
 #include <nil/crypto3/zk/math/expression.hpp>
 
@@ -183,59 +184,6 @@ namespace nil {
                 std::size_t witness_amount() const {
                     return stretched_witness_amount;
                 }
-
-                // Visitor for expressions, used to move the gate to a new location
-                class gate_mover : public boost::static_visitor<nil::crypto3::math::expression<var>> {
-                public:
-                    using expression = nil::crypto3::math::expression<var>;
-                    using term_type = nil::crypto3::math::term<var>;
-                    using pow_operation = nil::crypto3::math::pow_operation<var>;
-                    using binary_arithmetic_operation = nil::crypto3::math::binary_arithmetic_operation<var>;
-
-                    gate_mover(const component_stretcher *stretcher_, std::size_t selector_)
-                        : stretcher(stretcher_), selector(selector_) {}
-
-                    expression visit(const expression& expr) {
-                        return boost::apply_visitor(*this, expr.get_expr());
-                    }
-
-                    expression operator()(const term_type& term) {
-                        std::vector<var> vars;
-                        auto coeff = term.get_coeff();
-                        for (const auto& var: term.get_vars()) {
-                            vars.emplace_back(stretcher->move_gate_var(var, selector));
-                        }
-                        term_type result(vars, coeff);
-                        return result;
-                    }
-
-                    expression operator()(const pow_operation& pow) {
-                        expression base = boost::apply_visitor(
-                            *this, pow.get_expr().get_expr());
-                        return pow_operation(base, pow.get_power());
-                    }
-
-                    expression operator()(
-                            const binary_arithmetic_operation& op) {
-                        expression left =
-                            boost::apply_visitor(*this, op.get_expr_left().get_expr());
-                        expression right =
-                            boost::apply_visitor(*this, op.get_expr_right().get_expr());
-                        switch (op.get_op()) {
-                            case nil::crypto3::math::ArithmeticOperator::ADD:
-                                return left + right;
-                            case nil::crypto3::math::ArithmeticOperator::SUB:
-                                return left - right;
-                            case nil::crypto3::math::ArithmeticOperator::MULT:
-                                return left * right;
-                            default:
-                                __builtin_unreachable();
-                        }
-                    }
-                private:
-                    const component_stretcher *stretcher;
-                    const std::size_t selector;
-                };
 
                 ComponentType &component;
                 const std::size_t old_witness_amount;
@@ -401,7 +349,9 @@ namespace nil {
                     // 1) Move gates, including properly generating them
                     for (auto gate : tmp_circuit.gates()) {
                         std::vector<nil::crypto3::zk::snark::plonk_constraint<BlueprintFieldType>> new_constraints;
-                        gate_mover gate_displacer = gate_mover(this, gate.selector_index);
+                        gate_mover gate_displacer = gate_mover<BlueprintFieldType>(
+                            std::bind(&component_stretcher::move_gate_var,
+                                      this, std::placeholders::_1, gate.selector_index));
                         for (auto constraint: gate.constraints) {
                             auto new_constraint = gate_displacer.visit(constraint);
                             new_constraints.push_back(new_constraint);

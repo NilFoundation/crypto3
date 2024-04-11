@@ -105,8 +105,7 @@ namespace nil {
                         }
                     };
 
-                    static gate_manifest get_gate_manifest(std::size_t witness_amount,
-                                                           std::size_t lookup_column_amount) {
+                    static gate_manifest get_gate_manifest(std::size_t witness_amount) {
                         static gate_manifest manifest = gate_manifest(gate_manifest_type());
                         return manifest;
                     }
@@ -120,8 +119,7 @@ namespace nil {
                         return manifest;
                     }
 
-                    constexpr static std::size_t get_rows_amount(std::size_t witness_amount,
-                                                                 std::size_t lookup_column_amount) {
+                    constexpr static std::size_t get_rows_amount(std::size_t witness_amount) {
                         return rows_amount_internal(witness_amount);
                     }
 
@@ -150,11 +148,6 @@ namespace nil {
 
                     struct result_type {
                         var output = var(0, 0);
-
-                        result_type(const exponentiation &component, input_type &params, std::size_t start_row_index) {
-                            output = var(component.W(intermediate_start + component.intermediate_results_per_row - 1),
-                                         start_row_index + component.rows_amount - 1, false);
-                        }
 
                         result_type(const exponentiation &component, std::size_t start_row_index) {
                             output = var(component.W(intermediate_start + component.intermediate_results_per_row - 1),
