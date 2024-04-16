@@ -87,9 +87,9 @@ namespace nil {
                         }
 
                         template<typename Backend,
-                                 multiprecision::expression_template_option ExpressionTemplates>
+                                 boost::multiprecision::expression_template_option ExpressionTemplates>
                         explicit constexpr curve_element(
-                                  const multiprecision::number<Backend, ExpressionTemplates> &value) {
+                                  const boost::multiprecision::number<Backend, ExpressionTemplates> &value) {
                             *this = one() * value;
                         }
 
@@ -175,9 +175,9 @@ namespace nil {
                         }
 
                         template<typename Backend,
-                                 multiprecision::expression_template_option ExpressionTemplates>
+                                 boost::multiprecision::expression_template_option ExpressionTemplates>
                         constexpr const curve_element& operator=(
-                                  const multiprecision::number<Backend, ExpressionTemplates> &value) {
+                                  const boost::multiprecision::number<Backend, ExpressionTemplates> &value) {
                             *this = one() * value;
                             return *this;
                         }
@@ -227,8 +227,8 @@ namespace nil {
                         }
 
                         template<typename Backend,
-                             multiprecision::expression_template_option ExpressionTemplates>
-                        constexpr curve_element& operator*=(const multiprecision::number<Backend, ExpressionTemplates> &right) {
+                             boost::multiprecision::expression_template_option ExpressionTemplates>
+                        constexpr curve_element& operator*=(const boost::multiprecision::number<Backend, ExpressionTemplates> &right) {
                             (*this) = (*this) * right;
                             return *this;
                         }

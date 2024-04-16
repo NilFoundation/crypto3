@@ -26,8 +26,8 @@
 #ifndef CRYPTO3_ALGEBRA_PAIRING_BLS12_ATE_PRECOMPUTE_G2_HPP
 #define CRYPTO3_ALGEBRA_PAIRING_BLS12_ATE_PRECOMPUTE_G2_HPP
 
-#include <nil/crypto3/multiprecision/number.hpp>
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <boost/multiprecision/number.hpp>
+#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
 
 #include <nil/crypto3/algebra/curves/edwards.hpp>
 #include <nil/crypto3/algebra/pairing/detail/edwards/183/params.hpp>
@@ -178,7 +178,7 @@ namespace nil {
 
                         bool found_one = false;
                         for (long i = params_type::integral_type_max_bits - 1; i >= 0; --i) {
-                            const bool bit = nil::crypto3::multiprecision::bit_test(loop_count, i);
+                            const bool bit = boost::multiprecision::bit_test(loop_count, i);
                             if (!found_one) {
                                 /* this skips the MSB itself */
                                 found_one |= bit;

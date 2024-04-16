@@ -56,12 +56,12 @@ namespace nil {
 
                     constexpr static const std::size_t number_bits = policy_type::number_bits;
 
-                    constexpr static const integral_type modulus = 0xE95E4A5F737059DC60DF5991D45029409E60FC09_cppui160;
+                    constexpr static const integral_type modulus = 0xE95E4A5F737059DC60DF5991D45029409E60FC09_cppui_modular160;
 
                     typedef typename policy_type::modular_backend modular_backend;
-                    constexpr static const modular_params_type modulus_params = modulus;
-                    typedef nil::crypto3::multiprecision::number<
-                        nil::crypto3::multiprecision::backends::modular_adaptor<modular_backend, nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
+                    constexpr static const modular_params_type modulus_params = modulus.backend();
+                    typedef boost::multiprecision::number<
+                        boost::multiprecision::backends::modular_adaptor<modular_backend, boost::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
                         modular_type;
 
                     typedef typename detail::element_fp<params<brainpool_r1_scalar_field<160>>> value_type;
@@ -80,12 +80,12 @@ namespace nil {
                     typedef typename policy_type::extended_integral_type extended_integral_type;
 
                     constexpr static const integral_type modulus =
-                        0xC302F41D932A36CDA7A3462F9E9E916B5BE8F1029AC4ACC1_cppui192;
+                        0xC302F41D932A36CDA7A3462F9E9E916B5BE8F1029AC4ACC1_cppui_modular192;
 
                     typedef typename policy_type::modular_backend modular_backend;
-                    constexpr static const modular_params_type modulus_params = modulus;
-                    typedef nil::crypto3::multiprecision::number<
-                        nil::crypto3::multiprecision::backends::modular_adaptor<modular_backend, nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
+                    constexpr static const modular_params_type modulus_params = modulus.backend();
+                    typedef boost::multiprecision::number<
+                        boost::multiprecision::backends::modular_adaptor<modular_backend, boost::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
                         modular_type;
 
                     typedef typename detail::element_fp<params<brainpool_r1_scalar_field<192>>> value_type;
@@ -104,12 +104,12 @@ namespace nil {
                     typedef typename policy_type::extended_integral_type extended_integral_type;
 
                     constexpr static const integral_type modulus =
-                        0xD7C134AA264366862A18302575D0FB98D116BC4B6DDEBCA3A5A7939F_cppui224;
+                        0xD7C134AA264366862A18302575D0FB98D116BC4B6DDEBCA3A5A7939F_cppui_modular224;
 
                     typedef typename policy_type::modular_backend modular_backend;
-                    constexpr static const modular_params_type modulus_params = modulus;
-                    typedef nil::crypto3::multiprecision::number<
-                        nil::crypto3::multiprecision::backends::modular_adaptor<modular_backend, nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
+                    constexpr static const modular_params_type modulus_params = modulus.backend();
+                    typedef boost::multiprecision::number<
+                        boost::multiprecision::backends::modular_adaptor<modular_backend, boost::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
                         modular_type;
 
                     typedef typename detail::element_fp<params<brainpool_r1_scalar_field<224>>> value_type;
@@ -128,12 +128,12 @@ namespace nil {
                     typedef typename policy_type::extended_integral_type extended_integral_type;
 
                     constexpr static const integral_type modulus =
-                        0xA9FB57DBA1EEA9BC3E660A909D838D718C397AA3B561A6F7901E0E82974856A7_cppui256;
+                        0xA9FB57DBA1EEA9BC3E660A909D838D718C397AA3B561A6F7901E0E82974856A7_cppui_modular256;
 
                     typedef typename policy_type::modular_backend modular_backend;
-                    constexpr static const modular_params_type modulus_params = modulus;
-                    typedef nil::crypto3::multiprecision::number<
-                        nil::crypto3::multiprecision::backends::modular_adaptor<modular_backend, nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
+                    constexpr static const modular_params_type modulus_params = modulus.backend();
+                    typedef boost::multiprecision::number<
+                        boost::multiprecision::backends::modular_adaptor<modular_backend, boost::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
                         modular_type;
 
                     typedef typename detail::element_fp<params<brainpool_r1_scalar_field<256>>> value_type;
@@ -152,12 +152,12 @@ namespace nil {
                     typedef typename policy_type::extended_integral_type extended_integral_type;
 
                     constexpr static const integral_type modulus =
-                        0xD35E472036BC4FB7E13C785ED201E065F98FCFA5B68F12A32D482EC7EE8658E98691555B44C59311_cppui320;
+                        0xD35E472036BC4FB7E13C785ED201E065F98FCFA5B68F12A32D482EC7EE8658E98691555B44C59311_cppui_modular320;
 
                     typedef typename policy_type::modular_backend modular_backend;
-                    constexpr static const modular_params_type modulus_params = modulus;
-                    typedef nil::crypto3::multiprecision::number<
-                        nil::crypto3::multiprecision::backends::modular_adaptor<modular_backend, nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
+                    constexpr static const modular_params_type modulus_params = modulus.backend();
+                    typedef boost::multiprecision::number<
+                        boost::multiprecision::backends::modular_adaptor<modular_backend, boost::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
                         modular_type;
 
                     typedef typename detail::element_fp<params<brainpool_r1_scalar_field<320>>> value_type;
@@ -176,12 +176,12 @@ namespace nil {
                     typedef typename policy_type::extended_integral_type extended_integral_type;
 
                     constexpr static const integral_type modulus =
-                        0x8CB91E82A3386D280F5D6F7E50E641DF152F7109ED5456B31F166E6CAC0425A7CF3AB6AF6B7FC3103B883202E9046565_cppui384;
+                        0x8CB91E82A3386D280F5D6F7E50E641DF152F7109ED5456B31F166E6CAC0425A7CF3AB6AF6B7FC3103B883202E9046565_cppui_modular384;
 
                     typedef typename policy_type::modular_backend modular_backend;
-                    constexpr static const modular_params_type modulus_params = modulus;
-                    typedef nil::crypto3::multiprecision::number<
-                        nil::crypto3::multiprecision::backends::modular_adaptor<modular_backend, nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
+                    constexpr static const modular_params_type modulus_params = modulus.backend();
+                    typedef boost::multiprecision::number<
+                        boost::multiprecision::backends::modular_adaptor<modular_backend, boost::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
                         modular_type;
 
                     typedef typename detail::element_fp<params<brainpool_r1_scalar_field<384>>> value_type;
@@ -200,12 +200,12 @@ namespace nil {
                     typedef typename policy_type::extended_integral_type extended_integral_type;
 
                     constexpr static const integral_type modulus =
-                        0xAADD9DB8DBE9C48B3FD4E6AE33C9FC07CB308DB3B3C9D20ED6639CCA70330870553E5C414CA92619418661197FAC10471DB1D381085DDADDB58796829CA90069_cppui512;
+                        0xAADD9DB8DBE9C48B3FD4E6AE33C9FC07CB308DB3B3C9D20ED6639CCA70330870553E5C414CA92619418661197FAC10471DB1D381085DDADDB58796829CA90069_cppui_modular512;
 
                     typedef typename policy_type::modular_backend modular_backend;
-                    constexpr static const modular_params_type modulus_params = modulus;
-                    typedef nil::crypto3::multiprecision::number<
-                        nil::crypto3::multiprecision::backends::modular_adaptor<modular_backend, nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
+                    constexpr static const modular_params_type modulus_params = modulus.backend();
+                    typedef boost::multiprecision::number<
+                        boost::multiprecision::backends::modular_adaptor<modular_backend, boost::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
                         modular_type;
 
                     typedef typename detail::element_fp<params<brainpool_r1_scalar_field<512>>> value_type;

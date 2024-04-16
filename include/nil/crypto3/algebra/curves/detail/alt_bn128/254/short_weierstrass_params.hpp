@@ -64,7 +64,7 @@ namespace nil {
                             field_type::value_type::zero(), field_type::value_type::one()};
 
                         constexpr static const std::array<typename field_type::value_type, 2> one_fill = {
-                            field_type::value_type::one(), typename field_type::value_type(0x02)};
+                            field_type::value_type::one(), typename field_type::value_type(0x02u)};
                     };
 
                     template<>
@@ -77,7 +77,7 @@ namespace nil {
                         using group_type = alt_bn128_types<254>::g2_type<forms::short_weierstrass, Coordinates>;
 
                         constexpr static const typename field_type::value_type twist =
-                            typename field_type::value_type(0x09, 0x01);
+                            typename field_type::value_type(0x09u, 0x01u);
                         constexpr static const typename field_type::value_type::underlying_type g1_b =
                             typename field_type::value_type::underlying_type(b);
                         constexpr static const typename field_type::value_type b = g1_b * twist.inversed();
@@ -87,11 +87,11 @@ namespace nil {
 
                         constexpr static const std::array<typename field_type::value_type, 2> one_fill = {
                             typename field_type::value_type(
-                                0x1800DEEF121F1E76426A00665E5C4479674322D4F75EDADD46DEBD5CD992F6ED_cppui254,
-                                0x198E9393920D483A7260BFB731FB5D25F1AA493335A9E71297E485B7AEF312C2_cppui254),
+                                0x1800DEEF121F1E76426A00665E5C4479674322D4F75EDADD46DEBD5CD992F6ED_cppui_modular254,
+                                0x198E9393920D483A7260BFB731FB5D25F1AA493335A9E71297E485B7AEF312C2_cppui_modular254),
                             typename field_type::value_type(
-                                0x12C85EA5DB8C6DEB4AAB71808DCB408FE3D1E7690C43D37B4CE6CC0166FA7DAA_cppui254,
-                                0x90689D0585FF075EC9E99AD690C3395BC4B313370B38EF355ACDADCD122975B_cppui254)};
+                                0x12C85EA5DB8C6DEB4AAB71808DCB408FE3D1E7690C43D37B4CE6CC0166FA7DAA_cppui_modular254,
+                                0x90689D0585FF075EC9E99AD690C3395BC4B313370B38EF355ACDADCD122975B_cppui_modular254)};
                     };
 
                     constexpr typename alt_bn128_types<254>::integral_type const

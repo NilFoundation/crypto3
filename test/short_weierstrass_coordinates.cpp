@@ -41,7 +41,7 @@
 
 #include <nil/crypto3/algebra/random_element.hpp>
 
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
 
 using namespace nil::crypto3::algebra;
 
@@ -82,18 +82,18 @@ enum curve_operation_test_points : std::size_t {
 template<typename CurveGroup>
 void check_curve_operations(const std::vector<typename CurveGroup::value_type> &points,
                             const std::vector<std::size_t> &constants) {
-    using nil::crypto3::multiprecision::cpp_int;
+    using integral_type = typename CurveGroup::field_type::value_type::integral_type;
 
     BOOST_CHECK_EQUAL(points[p1] + points[p2], points[p1_plus_p2]);
     BOOST_CHECK_EQUAL(points[p1] - points[p2], points[p1_minus_p2]);
     BOOST_CHECK_EQUAL(points[p1].doubled(), points[p1_dbl]);
-    BOOST_CHECK_EQUAL(points[p1] * static_cast<cpp_int>(constants[C1]), points[p1_mul_C1]);
-    BOOST_CHECK_EQUAL((points[p2] * static_cast<cpp_int>(constants[C1])) +
-                          (points[p2] * static_cast<cpp_int>(constants[C2])),
+    BOOST_CHECK_EQUAL(points[p1] * static_cast<integral_type>(constants[C1]), points[p1_mul_C1]);
+    BOOST_CHECK_EQUAL((points[p2] * static_cast<integral_type>(constants[C1])) +
+                          (points[p2] * static_cast<integral_type>(constants[C2])),
                       points[p2_mul_C1_plus_p2_mul_C2]);
-    BOOST_CHECK_EQUAL((points[p2] * static_cast<cpp_int>(constants[C1])) +
-                          (points[p2] * static_cast<cpp_int>(constants[C2])),
-                      points[p2] * static_cast<cpp_int>(constants[C1] + constants[C2]));
+    BOOST_CHECK_EQUAL((points[p2] * static_cast<integral_type>(constants[C1])) +
+                          (points[p2] * static_cast<integral_type>(constants[C2])),
+                      points[p2] * static_cast<integral_type>(constants[C1] + constants[C2]));
 }
 
 template<typename FpCurveGroup, typename TestSet>

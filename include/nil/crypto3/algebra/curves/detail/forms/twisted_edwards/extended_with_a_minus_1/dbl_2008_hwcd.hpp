@@ -51,7 +51,7 @@ namespace nil {
 
                                 field_value_type A = (first.X).squared();                        // A = X1^2
                                 field_value_type B = (first.Y).squared();                        // B = Y1^2
-                                field_value_type C = field_value_type(2) * first.Z.squared();    // C = 2*Z1^2
+                                field_value_type C = field_value_type(2u) * first.Z.squared();   // C = 2*Z1^2
                                 field_value_type D = ElementType::params_type::a * A;            // D = a*A
                                 field_value_type E = (first.X + first.Y).squared() - A - B;      // E = (X1+Y1)^2-A-B
                                 field_value_type G = D + B;                                      // G = D+B

@@ -53,9 +53,9 @@ macro(define_runtime_algebra_test name)
     endif()
 
     if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-        target_compile_options(${test_name} PRIVATE "-fconstexpr-steps=2147483647")
+        target_compile_options(${test_name} PRIVATE "-fconstexpr-steps=2147483647" "-ftemplate-backtrace-limit=0")
     elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-        target_compile_options(${test_name} PRIVATE "-fconstexpr-ops-limit=4294967295")
+        target_compile_options(${test_name} PRIVATE "-fconstexpr-ops-limit=4294967295" "-ftemplate-backtrace-limit=0")
     endif()
 
     target_compile_definitions(${test_name} PRIVATE TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/data/")

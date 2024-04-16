@@ -29,7 +29,7 @@
 
 #include <set>
 
-#include <nil/crypto3/multiprecision/miller_rabin.hpp>
+#include <boost/multiprecision/miller_rabin.hpp>
 #include <nil/crypto3/multiprecision/modular/modular_adaptor.hpp>
 #include "random_element.hpp"
 
@@ -42,25 +42,25 @@ namespace nil {
              Output: a factor of n.
              */
             template<typename Backend,
-                    multiprecision::expression_template_option ExpressionTemplates>
-            multiprecision::number<Backend, ExpressionTemplates>
-            pollard_rho_factorization(const multiprecision::number<Backend, ExpressionTemplates> &n) {
-                using namespace multiprecision;
+                    boost::multiprecision::expression_template_option ExpressionTemplates>
+            boost::multiprecision::number<Backend, ExpressionTemplates>
+            pollard_rho_factorization(const boost::multiprecision::number<Backend, ExpressionTemplates> &n) {
+                using namespace boost::multiprecision;
 
                 if (!(n % 2)) {
                     return 2;
                 }
 
                 boost::random::independent_bits_engine<std::mt19937, 256, number<Backend, ExpressionTemplates>> rng;
-                number<modular_adaptor<Backend, backends::modular_params_rt<Backend>>, ExpressionTemplates> divisor,
+                number<backends::modular_adaptor<Backend, backends::modular_params_rt<Backend>>, ExpressionTemplates> divisor,
                         c(rng(), n), x(rng(), n), nn(n, n), xx = x;
                 do {
                     x = x * x + c;
                     xx = xx * xx + c;
                     xx = xx * xx + c;
-                    divisor = multiprecision::gcd((x > xx) ? x - xx : xx - x, nn);
+                    divisor = boost::multiprecision::gcd((x > xx) ? x - xx : xx - x, nn);
                 } while (static_cast<int>(divisor) == 1);
-                return static_cast<multiprecision::number<Backend, ExpressionTemplates>>(divisor);
+                return static_cast<boost::multiprecision::number<Backend, ExpressionTemplates>>(divisor);
             }
 
             /*
@@ -72,7 +72,7 @@ namespace nil {
             void prime_factorize(IntegerType n, std::set<IntegerType> &prime_factors) {
                 if (n == 0 || n == 1)
                     return;
-                if (multiprecision::miller_rabin_test(n, 100)) {
+                if (boost::multiprecision::miller_rabin_test(n, 100)) {
                     prime_factors.insert(n);
                     return;
                 }
@@ -92,7 +92,7 @@ namespace nil {
                 if (r > IntegerType(0))
                     qNew2 += (mi - r);
                 BOOST_ASSERT_MSG(qNew2 >= qNew, "FirstPrime parameters overflow this integer implementation");
-                while (!multiprecision::miller_rabin_test((qNew = qNew2), 100)) {
+                while (!boost::multiprecision::miller_rabin_test((qNew = qNew2), 100)) {
                     qNew2 = qNew + mi;
                     BOOST_ASSERT_MSG(qNew2 >= qNew, "FirstPrime overflow growing candidate");
                 }
@@ -102,7 +102,7 @@ namespace nil {
             template<typename IntegerType>
             IntegerType next_prime(const IntegerType &q, uint64_t m) {
                 IntegerType M(m), qNew(q + M);
-                while (!multiprecision::miller_rabin_test(qNew, 100)) {
+                while (!boost::multiprecision::miller_rabin_test(qNew, 100)) {
                     BOOST_VERIFY_MSG((qNew += M) >= q, "NextPrime overflow growing candidate");
                 }
                 return qNew;
@@ -111,7 +111,7 @@ namespace nil {
             template<typename IntegerType>
             IntegerType previous_prime(const IntegerType &q, uint64_t m) {
                 IntegerType M(m), qNew(q - M);
-                while (!multiprecision::miller_rabin_test(qNew, 100)) {
+                while (!boost::multiprecision::miller_rabin_test(qNew, 100)) {
                     BOOST_VERIFY_MSG((qNew -= M) <= q, "Moduli size is not sufficient! Must be increased.");
                 }
                 return qNew;

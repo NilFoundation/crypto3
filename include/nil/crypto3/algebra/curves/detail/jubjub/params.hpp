@@ -44,7 +44,7 @@ namespace nil {
                         // Edwards representation constants a and d
                         constexpr static const typename jubjub_types::integral_type
                             a =    ///< twisted Edwards elliptic curve
-                            0x73EDA753299D7D483339D80809A1D80553BDA402FFFE5BFEFFFFFFFF00000000_cppui255;    ///< described
+                            0x73EDA753299D7D483339D80809A1D80553BDA402FFFE5BFEFFFFFFFF00000000_cppui_modular255;    ///< described
                                                                                                             ///< by
                                                                                                             ///< equation
                                                                                                             ///< ax^2 +
@@ -53,7 +53,7 @@ namespace nil {
                                                                                                             ///< dx^2y^2
                         constexpr static const typename jubjub_types::integral_type
                             d =    ///< twisted Edwards elliptic curve
-                            0x2A9318E74BFA2B48F5FD9207E6BD7FD4292D7F6D37579D2601065FD6D6343EB1_cppui254;    ///< described
+                            0x2A9318E74BFA2B48F5FD9207E6BD7FD4292D7F6D37579D2601065FD6D6343EB1_cppui_modular254;    ///< described
                                                                                                             ///< by
                                                                                                             ///< equation
                                                                                                             ///< ax^2 +
@@ -74,7 +74,7 @@ namespace nil {
                         // Montgomery representation constants A and B
                         constexpr static const typename jubjub_types::integral_type
                             A =                ///< Montgomery elliptic curve
-                            0xA002_cppui16;    ///< described by equation b*y^2 = x^3 + a*x^2 + x
+                            0xA002_cppui_modular16;    ///< described by equation b*y^2 = x^3 + a*x^2 + x
                         constexpr static const typename jubjub_types::integral_type
                             B =      ///< Montgomery elliptic curve
                             0x01;    ///< described by equation b*y^2 = x^3 + a*x^2 + x
@@ -97,9 +97,9 @@ namespace nil {
                         // according to https://neuromancer.sk/std/other/JubJub
                         constexpr static const std::array<typename field_type::value_type, 2> one_fill = {
                             typename field_type::value_type(
-                                0x11dafe5d23e1218086a365b99fbf3d3be72f6afd7d1f72623e6b071492d1122b_cppui253),
+                                0x11dafe5d23e1218086a365b99fbf3d3be72f6afd7d1f72623e6b071492d1122b_cppui_modular253),
                             typename field_type::value_type(
-                                0x1d523cf1ddab1a1793132e78c866c0c33e26ba5cc220fed7cc3f870e59d292aa_cppui253)};
+                                0x1d523cf1ddab1a1793132e78c866c0c33e26ba5cc220fed7cc3f870e59d292aa_cppui_modular253)};
                     };
 
                     constexpr std::array<typename jubjub_g1_params<forms::twisted_edwards>::base_field_type::value_type,
@@ -117,9 +117,9 @@ namespace nil {
                         // TODO: check correctness of the base point coordinates
                         constexpr static const std::array<typename field_type::value_type, 2> one_fill = {
                             typename field_type::value_type(
-                                0x52a47af6ec47deb77d663b6a45b148d1ccdaa4e2299ecfbd5504c409b3ea62c0_cppui255),
+                                0x52a47af6ec47deb77d663b6a45b148d1ccdaa4e2299ecfbd5504c409b3ea62c0_cppui_modular255),
                             typename field_type::value_type(
-                                0x399b020832f6a499ba9d5334ca932dc9faaeea860e9a49a8f8854f55f3b676d4_cppui254)};
+                                0x399b020832f6a499ba9d5334ca932dc9faaeea860e9a49a8f8854f55f3b676d4_cppui_modular254)};
                     };
 
                     constexpr std::array<typename jubjub_g1_params<forms::montgomery>::base_field_type::value_type,

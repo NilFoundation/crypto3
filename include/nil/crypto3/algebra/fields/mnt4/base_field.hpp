@@ -57,17 +57,17 @@ namespace nil {
                     constexpr static const std::size_t number_bits = policy_type::number_bits;
 
                     constexpr static const integral_type modulus =
-                        0x3BCF7BCD473A266249DA7B0548ECAEEC9635D1330EA41A9E35E51200E12C90CD65A71660001_cppui298;
+                        0x3BCF7BCD473A266249DA7B0548ECAEEC9635D1330EA41A9E35E51200E12C90CD65A71660001_cppui_modular298;
 
                     constexpr static const integral_type group_order_minus_one_half =
-                        0x1DE7BDE6A39D133124ED3D82A47657764B1AE89987520D4F1AF2890070964866B2D38B30000_cppui298;
+                        0x1DE7BDE6A39D133124ED3D82A47657764B1AE89987520D4F1AF2890070964866B2D38B30000_cppui_modular298;
 
                     typedef typename policy_type::modular_backend modular_backend;
-                    constexpr static const modular_params_type modulus_params = modulus;
-                    typedef nil::crypto3::multiprecision::number<
-                        nil::crypto3::multiprecision::backends::modular_adaptor<
+                    constexpr static const modular_params_type modulus_params = modulus.backend();
+                    typedef boost::multiprecision::number<
+                        boost::multiprecision::backends::modular_adaptor<
                             modular_backend,
-                            nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
+                            boost::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
                         modular_type;
 
                     typedef typename detail::element_fp<params<mnt4_base_field<298>>> value_type;

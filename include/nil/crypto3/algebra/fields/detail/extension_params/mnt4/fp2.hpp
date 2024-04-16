@@ -68,26 +68,26 @@ namespace nil {
 
                         constexpr static const std::size_t s = 0x12;
                         constexpr static const extended_integral_type t =
-                            0x37E52CE842B39321A34D7BA62E2C735153C68D35F7A312CDB18451030CB297F3B772167A8487033D5772A0EF6BEA9BCA60190FFE1CDB642F88A0FF2EFF7A6A3A80FD00203385638B3_cppui578;
+                            0x37E52CE842B39321A34D7BA62E2C735153C68D35F7A312CDB18451030CB297F3B772167A8487033D5772A0EF6BEA9BCA60190FFE1CDB642F88A0FF2EFF7A6A3A80FD00203385638B3_cppui_modular578;
                         constexpr static const extended_integral_type t_minus_1_over_2 =
-                            0x1BF296742159C990D1A6BDD3171639A8A9E3469AFBD18966D8C2288186594BF9DBB90B3D4243819EABB95077B5F54DE5300C87FF0E6DB217C4507F977FBD351D407E801019C2B1C59_cppui577;
+                            0x1BF296742159C990D1A6BDD3171639A8A9E3469AFBD18966D8C2288186594BF9DBB90B3D4243819EABB95077B5F54DE5300C87FF0E6DB217C4507F977FBD351D407E801019C2B1C59_cppui_modular577;
                         constexpr static const std::array<integral_type, 2> nqr = {0x08, 0x01};
                         constexpr static const std::array<integral_type, 2> nqr_to_t = {
                             0x00,
-                            0x3B1F45391287A9CB585B8E5504C24BF1EC2010553885078C85899ACD708205080134A9BE6A_cppui294};
+                            0x3B1F45391287A9CB585B8E5504C24BF1EC2010553885078C85899ACD708205080134A9BE6A_cppui_modular294};
 
                         constexpr static const extended_integral_type group_order =
-                            0x6FCA59D085672643469AF74C5C58E6A2A78D1A6BEF46259B6308A20619652FE76EE42CF5090E067AAEE541DED7D53794C0321FFC39B6C85F1141FE5DFEF4D47501FA0040670AC71660000_cppui595;
+                            0x6FCA59D085672643469AF74C5C58E6A2A78D1A6BEF46259B6308A20619652FE76EE42CF5090E067AAEE541DED7D53794C0321FFC39B6C85F1141FE5DFEF4D47501FA0040670AC71660000_cppui_modular595;
 
                         /*constexpr static const std::array<non_residue_type, 2> Frobenius_coeffs_c1 =
                            {non_residue_type(0x01),
-                            non_residue_type(0x3BCF7BCD473A266249DA7B0548ECAEEC9635D1330EA41A9E35E51200E12C90CD65A71660000_cppui298)};*/
+                            non_residue_type(0x3BCF7BCD473A266249DA7B0548ECAEEC9635D1330EA41A9E35E51200E12C90CD65A71660000_cppui_modular298)};*/
 
                         constexpr static const std::array<integral_type, 2> Frobenius_coeffs_c1 = {
                             0x01,
-                            0x3BCF7BCD473A266249DA7B0548ECAEEC9635D1330EA41A9E35E51200E12C90CD65A71660000_cppui298};
+                            0x3BCF7BCD473A266249DA7B0548ECAEEC9635D1330EA41A9E35E51200E12C90CD65A71660000_cppui_modular298};
 
-                        constexpr static const non_residue_type non_residue = non_residue_type(0x11);
+                        constexpr static const non_residue_type non_residue = non_residue_type(0x11u);
                     };
 
                     template<std::size_t Version>

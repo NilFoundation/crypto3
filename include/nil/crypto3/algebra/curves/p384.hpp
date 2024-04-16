@@ -44,7 +44,7 @@ namespace nil {
                     typedef typename curve_nist<384>::integral_type integral_type;
 
                     constexpr static const integral_type p =
-                        0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFF0000000000000000FFFFFFFF_cppui384;
+                        0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFF0000000000000000FFFFFFFF_cppui_modular384;
                 };
             }    // namespace curves
         }        // namespace algebra

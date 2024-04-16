@@ -57,14 +57,14 @@ namespace nil {
                     constexpr static const std::size_t number_bits = policy_type::number_bits;
 
                     constexpr static const integral_type modulus =
-                        0xF1FD178C0B3AD58F10126DE8CE42435B53DC67E140D2BF941FFDD459C6D655E1_cppui256;
+                        0xF1FD178C0B3AD58F10126DE8CE42435B53DC67E140D2BF941FFDD459C6D655E1_cppui_modular256;
 
                     typedef typename policy_type::modular_backend modular_backend;
-                    constexpr static const modular_params_type modulus_params = modulus;
-                    typedef nil::crypto3::multiprecision::number<
-                        nil::crypto3::multiprecision::backends::modular_adaptor<
+                    constexpr static const modular_params_type modulus_params = modulus.backend();
+                    typedef boost::multiprecision::number<
+                        boost::multiprecision::backends::modular_adaptor<
                             modular_backend,
-                            nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
+                            boost::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
                         modular_type;
 
                     typedef typename detail::element_fp<params<frp_v1_scalar_field<256>>> value_type;

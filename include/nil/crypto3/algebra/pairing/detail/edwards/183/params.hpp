@@ -49,16 +49,16 @@ namespace nil {
                             curve_type::base_field_type::modulus_bits;
 
                         constexpr static const integral_type ate_loop_count =
-                            integral_type(0xE841DEEC0A9E39280000003_cppui92);
+                            integral_type(0xE841DEEC0A9E39280000003_cppui_modular92);
 
                         constexpr static const integral_type final_exponent_last_chunk_abs_of_w0 =
-                            integral_type(0x3A1077BB02A78E4A00000003_cppui94);
+                            integral_type(0x3A1077BB02A78E4A00000003_cppui_modular94);
                         constexpr static const bool final_exponent_last_chunk_is_w0_neg = true;
 
                         constexpr static const integral_type final_exponent_last_chunk_w1 = integral_type(0x4);
 
                         constexpr static const extended_integral_type final_exponent = extended_integral_type(
-                            0x11128FF78CE1BA3ED7BDC08DC0E8027077FC9348F971A3EF1053C9D33B1AA7CEBA86030D02292F9F5E784FDE9EE9D0176DBE7DA7ECBBCB64CDC0ACD4E64D7156C2F84EE1AAFA1098707148DB1E4797E330E5D507E78D8246A4843B4A174E7CD7CA937BDC5D67A6176F9A48984764500000000_cppui913);
+                            0x11128FF78CE1BA3ED7BDC08DC0E8027077FC9348F971A3EF1053C9D33B1AA7CEBA86030D02292F9F5E784FDE9EE9D0176DBE7DA7ECBBCB64CDC0ACD4E64D7156C2F84EE1AAFA1098707148DB1E4797E330E5D507E78D8246A4843B4A174E7CD7CA937BDC5D67A6176F9A48984764500000000_cppui_modular913);
 
                         using g2_field_type_value = typename curve_type::template g2_type<>::field_type::value_type;
 

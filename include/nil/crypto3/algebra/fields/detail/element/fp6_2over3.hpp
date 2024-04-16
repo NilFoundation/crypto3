@@ -245,7 +245,7 @@ namespace nil {
                             element_fp6_2over3 this_inverse = this->unitary_inversed();
 
                             bool found_nonzero = false;
-                            std::vector<long> NAF = nil::crypto3::multiprecision::find_wnaf(1, exponent);
+                            std::vector<long> NAF = boost::multiprecision::find_wnaf(1, exponent);
 
                             for (long i = static_cast<long>(NAF.size() - 1); i >= 0; --i) {
                                 if (found_nonzero) {

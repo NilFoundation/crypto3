@@ -36,7 +36,7 @@
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
 
 #include <nil/crypto3/algebra/curves/detail/h2c/ep.hpp>
 #include <nil/crypto3/algebra/curves/detail/h2c/ep2.hpp>
@@ -50,7 +50,7 @@
 #include <nil/crypto3/hash/algorithm/hash.hpp>
 #include <nil/crypto3/hash/accumulators/hash.hpp>
 
-using namespace nil::crypto3::multiprecision;
+using namespace boost::multiprecision;
 using namespace nil::crypto3;
 using namespace nil::crypto3::algebra;
 using namespace nil::crypto3::algebra::curves::detail;
@@ -420,17 +420,17 @@ BOOST_AUTO_TEST_CASE(hash_to_curve_bls12_381_g1_h2c_sha256_test) {
                                           "20925451441746926395141598720928151969"),
                               integral_type("1343412193624222137939591894701031123123641958980729764240763391191550653712"
                                           "890272928110356903136085217047453540965"),
-                              1)},
+                              1u)},
         {"abc", group_value_type(integral_type("5137384602176159439212852477034485676478758747455673727961641554723831277"
                                              "56567780059136521508428662765965997467907"),
                                  integral_type("1786897908129645780825838873875416513994655004408749907941296449131605892"
                                              "957529391590865627492442562626458913769565"),
-                                 1)},
+                                 1u)},
         {"abcdef0123456789", group_value_type(integral_type("275162876137213708468320729543710526816637518402774837215695"
                                                           "2770986741873369176463286511518644061904904607431667096"),
                                               integral_type("563036982304416203921640398061260377444881693369806087719971"
                                                           "277317609936727208012968659302318886963927918562170633"),
-                                              1)},
+                                              1u)},
         {"q128_"
          "qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq"
          "qqqqqqqqqqqqqqqqqqq",
@@ -438,7 +438,7 @@ BOOST_AUTO_TEST_CASE(hash_to_curve_bls12_381_g1_h2c_sha256_test) {
                                       "65460350679208315690319508336723080"),
                           integral_type("36985267390728644087495710822706285617644155774454041155969909198015237931383482"
                                       "54443092179877354467167123794222392"),
-                          1)},
+                          1u)},
         {"a512_"
          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
@@ -449,7 +449,7 @@ BOOST_AUTO_TEST_CASE(hash_to_curve_bls12_381_g1_h2c_sha256_test) {
                                       "29514132077573887342346961531624702"),
                           integral_type("88037208240369454347695990925650426721558805545001688510379770085674653213458594"
                                       "2561958795215862304181527267736264"),
-                          1)},
+                          1u)},
         // {"",
         //  group_value_type(
         //      integral_type(""),

@@ -44,10 +44,10 @@ namespace nil {
                         // Edwards representation constants a and d
                         constexpr static const typename babyjubjub_types::integral_type
                             a =                 ///< twisted Edwards elliptic curve
-                            0x292FC_cppui18;    ///< described by equation ax^2 + y^2 = 1 + dx^2y^2
+                            0x292FC_cppui_modular18;    ///< described by equation ax^2 + y^2 = 1 + dx^2y^2
                         constexpr static const typename babyjubjub_types::integral_type
                             d =                 ///< twisted Edwards elliptic curve
-                            0x292F8_cppui18;    ///< described by equation ax^2 + y^2 = 1 + dx^2y^2
+                            0x292F8_cppui_modular18;    ///< described by equation ax^2 + y^2 = 1 + dx^2y^2
                     };
 
                     constexpr
@@ -63,7 +63,7 @@ namespace nil {
                         // Montgomery representation constants A and B
                         constexpr static const typename babyjubjub_types::integral_type
                             A =                 ///< Montgomery elliptic curve
-                            0x292FA_cppui18;    ///< described by equation b*y^2 = x^3 + a*x^2 + x
+                            0x292FA_cppui_modular18;    ///< described by equation b*y^2 = x^3 + a*x^2 + x
                         constexpr static const typename babyjubjub_types::integral_type
                             B =      ///< Montgomery elliptic curve
                             0x01;    ///< described by equation b*y^2 = x^3 + a*x^2 + x
@@ -85,9 +85,9 @@ namespace nil {
 
                         constexpr static const std::array<typename base_field_type::value_type, 2> one_fill = {
                             typename base_field_type::value_type(
-                                0xBB77A6AD63E739B4EACB2E09D6277C12AB8D8010534E0B62893F3F6BB957051_cppui252),
+                                0xBB77A6AD63E739B4EACB2E09D6277C12AB8D8010534E0B62893F3F6BB957051_cppui_modular252),
                             typename base_field_type::value_type(
-                                0x25797203F7A0B24925572E1CD16BF9EDFCE0051FB9E133774B3C257A872D7D8B_cppui254)};
+                                0x25797203F7A0B24925572E1CD16BF9EDFCE0051FB9E133774B3C257A872D7D8B_cppui_modular254)};
                     };
 
                     constexpr std::array<
@@ -106,9 +106,9 @@ namespace nil {
 
                         constexpr static const std::array<typename base_field_type::value_type, 2> one_fill = {
                             typename base_field_type::value_type(
-                                0xfbc9ac10c16d45d4eacdd6489fa006480b17a811cdba46922896085f89faaf6_cppui252),
+                                0xfbc9ac10c16d45d4eacdd6489fa006480b17a811cdba46922896085f89faaf6_cppui_modular252),
                             typename base_field_type::value_type(
-                                0x203a710160811d5c07ebaeb8fe1d9ce201c66b970d66f18d0d2b264c195309aa_cppui254)};
+                                0x203a710160811d5c07ebaeb8fe1d9ce201c66b970d66f18d0d2b264c195309aa_cppui_modular254)};
                     };
 
                     constexpr std::array<typename babyjubjub_g1_params<forms::montgomery>::base_field_type::value_type,

@@ -26,6 +26,8 @@
 #ifndef CRYPTO3_ALGEBRA_FIELDS_ELEMENT_FP2_HPP
 #define CRYPTO3_ALGEBRA_FIELDS_ELEMENT_FP2_HPP
 
+#include <type_traits>
+
 #include <nil/crypto3/algebra/fields/detail/exponentiation.hpp>
 #include <nil/crypto3/algebra/fields/detail/element/operations.hpp>
 
@@ -37,13 +39,12 @@ namespace nil {
 
                     template<typename FieldParams>
                     class element_fp2 {
+                    public:
                         typedef FieldParams policy_type;
 
                         typedef typename policy_type::integral_type integral_type;
-
                         constexpr static const integral_type modulus = policy_type::modulus;
 
-                    public:
                         typedef typename policy_type::field_type field_type;
 
                         typedef typename policy_type::non_residue_type non_residue_type;
@@ -57,7 +58,8 @@ namespace nil {
 
                         constexpr element_fp2() = default;
 
-                        template<typename Number1, typename Number2>
+                        template<typename Number1, typename Number2,
+                            typename std::enable_if<std::is_unsigned<Number1>::value && std::is_unsigned<Number2>::value, bool>::type* = true>
                         constexpr element_fp2(const Number1 &in_data0, const Number2 &in_data1)
                             : data({underlying_type(in_data0), underlying_type(in_data1)}) {}
 

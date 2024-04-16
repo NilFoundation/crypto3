@@ -63,8 +63,8 @@ namespace nil {
 
                         static value_type one () {
                             return make_value(
-                                0x40000000000000000000000000000000224698fc094cf91b992d30ed00000000_cppui256,
-                                0x2_cppui256
+                                0x40000000000000000000000000000000224698fc094cf91b992d30ed00000000_cppui_modular256,
+                                0x2_cppui_modular256
                                 );
                         }
 

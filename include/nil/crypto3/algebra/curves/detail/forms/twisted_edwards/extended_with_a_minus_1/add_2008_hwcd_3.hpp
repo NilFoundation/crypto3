@@ -46,9 +46,9 @@ namespace nil {
 
                             field_value_type A = (first.Y - first.X) * (second.Y - second.X);    // A = (Y1-X1)*(Y2-X2)
                             field_value_type B = (first.Y + first.X) * (second.Y + second.X);    // B = (Y1+X1)*(Y2+X2)
-                            field_value_type C = first.T * field_value_type(2) * ElementType::params_type::d *
+                            field_value_type C = first.T * field_value_type(2u) * ElementType::params_type::d *
                                                  second.T;                                    // C = T1*k*T2
-                            field_value_type D = first.Z * field_value_type(2) * second.Z;    // D = Z1*2*Z2
+                            field_value_type D = first.Z * field_value_type(2u) * second.Z;   // D = Z1*2*Z2
                             field_value_type E = B - A;                                       // E = B-A
                             field_value_type F = D - C;                                       // F = D-C
                             field_value_type G = D + C;                                       // G = D+C

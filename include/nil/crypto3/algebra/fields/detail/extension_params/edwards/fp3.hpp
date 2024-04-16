@@ -65,35 +65,35 @@ namespace nil {
 
                         constexpr static const std::size_t s = 0x1F;
                         constexpr static const extended_integral_type t =
-                            0x8514C337908664095AA1E4077718C1F93B49FEBD3E1DE5A3BF284A7BC8C90EE457BC1D3D59409F6A8049FB3D3B1E20915D50941493A9E2B4B0685ACA3C9847645_cppui516;
+                            0x8514C337908664095AA1E4077718C1F93B49FEBD3E1DE5A3BF284A7BC8C90EE457BC1D3D59409F6A8049FB3D3B1E20915D50941493A9E2B4B0685ACA3C9847645_cppui_modular516;
                         constexpr static const extended_integral_type t_minus_1_over_2 =
-                            0x428A619BC8433204AD50F203BB8C60FC9DA4FF5E9F0EF2D1DF94253DE46487722BDE0E9EACA04FB54024FD9E9D8F1048AEA84A0A49D4F15A58342D651E4C23B22_cppui515;
+                            0x428A619BC8433204AD50F203BB8C60FC9DA4FF5E9F0EF2D1DF94253DE46487722BDE0E9EACA04FB54024FD9E9D8F1048AEA84A0A49D4F15A58342D651E4C23B22_cppui_modular515;
                         constexpr static const std::array<integral_type, 3> nqr = {0x17, 0x00, 0x00};
                         constexpr static const std::array<integral_type, 3> nqr_to_t = {
-                            0x118228ECB464A2F6EB8DACC18FA757E45B3989330150C_cppui177, 0x00, 0x00};
+                            0x118228ECB464A2F6EB8DACC18FA757E45B3989330150C_cppui_modular177, 0x00, 0x00};
 
                         constexpr static const extended_integral_type group_order =
-                            0x214530CDE421990256A87901DDC6307E4ED27FAF4F877968EFCA129EF23243B915EF074F565027DAA0127ECF4EC788245754250524EA78AD2C1A16B28F2611D9140000000_cppui546;
+                            0x214530CDE421990256A87901DDC6307E4ED27FAF4F877968EFCA129EF23243B915EF074F565027DAA0127ECF4EC788245754250524EA78AD2C1A16B28F2611D9140000000_cppui_modular546;
 
                         /*constexpr static const std::array<non_residue_type, 3> Frobenius_coeffs_c1 =
                         {non_residue_type(0x01),
-                            non_residue_type(0xB35E3665A18365954D018902935D4419423F84321BC3D_cppui180),
-                            non_residue_type(0x35A01936D02124BA36C236460AF76D755745133CDE43C3_cppui182)};
+                            non_residue_type(0xB35E3665A18365954D018902935D4419423F84321BC3D_cppui_modular180),
+                            non_residue_type(0x35A01936D02124BA36C236460AF76D755745133CDE43C3_cppui_modular182)};
 
                         constexpr static const std::array<non_residue_type, 3> Frobenius_coeffs_c2 =
                         {non_residue_type(0x01),
-                            non_residue_type(0x35A01936D02124BA36C236460AF76D755745133CDE43C3_cppui182),
-                            non_residue_type(0xB35E3665A18365954D018902935D4419423F84321BC3D_cppui180)};*/
+                            non_residue_type(0x35A01936D02124BA36C236460AF76D755745133CDE43C3_cppui_modular182),
+                            non_residue_type(0xB35E3665A18365954D018902935D4419423F84321BC3D_cppui_modular180)};*/
 
                         constexpr static const std::array<integral_type, 3> Frobenius_coeffs_c1 = {
-                            0x01, 0xB35E3665A18365954D018902935D4419423F84321BC3D_cppui180,
-                            0x35A01936D02124BA36C236460AF76D755745133CDE43C3_cppui182};
+                            0x01, 0xB35E3665A18365954D018902935D4419423F84321BC3D_cppui_modular180,
+                            0x35A01936D02124BA36C236460AF76D755745133CDE43C3_cppui_modular182};
 
                         constexpr static const std::array<integral_type, 3> Frobenius_coeffs_c2 = {
-                            0x01, 0x35A01936D02124BA36C236460AF76D755745133CDE43C3_cppui182,
-                            0xB35E3665A18365954D018902935D4419423F84321BC3D_cppui180};
+                            0x01, 0x35A01936D02124BA36C236460AF76D755745133CDE43C3_cppui_modular182,
+                            0xB35E3665A18365954D018902935D4419423F84321BC3D_cppui_modular180};
 
-                        constexpr static const non_residue_type non_residue = non_residue_type(0x3D);
+                        constexpr static const non_residue_type non_residue = non_residue_type(0x3Du);
                     };
 
                     template<std::size_t Version>

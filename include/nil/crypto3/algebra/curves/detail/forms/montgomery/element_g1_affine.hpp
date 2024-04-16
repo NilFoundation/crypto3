@@ -88,9 +88,9 @@ namespace nil {
                             is_inf_point(false), X(in_X), Y(in_Y) {};
 
                         template<typename Backend,
-                                 multiprecision::expression_template_option ExpressionTemplates>
+                                 boost::multiprecision::expression_template_option ExpressionTemplates>
                         explicit constexpr curve_element(
-                                  const multiprecision::number<Backend, ExpressionTemplates> &value) {
+                                  const boost::multiprecision::number<Backend, ExpressionTemplates> &value) {
                             *this = one() * value;
                         }
 
@@ -204,9 +204,9 @@ namespace nil {
                         }
 
                         template<typename Backend,
-                                 multiprecision::expression_template_option ExpressionTemplates>
+                                 boost::multiprecision::expression_template_option ExpressionTemplates>
                         constexpr const curve_element& operator=(
-                                  const multiprecision::number<Backend, ExpressionTemplates> &value) {
+                                  const boost::multiprecision::number<Backend, ExpressionTemplates> &value) {
                             *this = one() * value;
                             return *this;
                         }
@@ -259,8 +259,8 @@ namespace nil {
                         }
 
                         template<typename Backend,
-                             multiprecision::expression_template_option ExpressionTemplates>
-                        constexpr curve_element& operator*=(const multiprecision::number<Backend, ExpressionTemplates> &right) {
+                             boost::multiprecision::expression_template_option ExpressionTemplates>
+                        constexpr curve_element& operator*=(const boost::multiprecision::number<Backend, ExpressionTemplates> &right) {
                             (*this) = (*this) * right;
                             return *this;
                         }
@@ -279,8 +279,8 @@ namespace nil {
                             if (this->is_zero()) {
                                 return (*this);
                             } else {
-                                const field_value_type two(2);
-                                const field_value_type three(3);
+                                const field_value_type two(2u);
+                                const field_value_type three(3u);
                                 const field_value_type A(params_type::A);
                                 const field_value_type B(params_type::B);
 
@@ -308,7 +308,7 @@ namespace nil {
                          * @return addition of two elements from group G1
                          */
                         constexpr curve_element add(const curve_element &other) const {
-                            const field_value_type two(2);
+                            const field_value_type two(2u);
                             const field_value_type A(params_type::A);
                             const field_value_type B(params_type::B);
 
@@ -373,7 +373,7 @@ namespace nil {
                             }
 
                             assert(static_cast<field_value_type>(params_type::A) ==
-                                   static_cast<field_value_type>(2) *
+                                   static_cast<field_value_type>(2u) *
                                        (static_cast<field_value_type>(result_params::a) +
                                         static_cast<field_value_type>(result_params::d)) /
                                        (static_cast<field_value_type>(result_params::a) -
@@ -381,7 +381,7 @@ namespace nil {
 
                             field_value_type s_inv = field_value_type::one();
                             field_value_type B_ =
-                                static_cast<field_value_type>(4) / (static_cast<field_value_type>(result_params::a) -
+                                static_cast<field_value_type>(4u) / (static_cast<field_value_type>(result_params::a) -
                                                                     static_cast<field_value_type>(result_params::d));
                             if (static_cast<field_value_type>(params_type::B) != B_) {
                                 s_inv = (B_ / static_cast<field_value_type>(params_type::B)).sqrt();

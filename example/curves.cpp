@@ -26,8 +26,8 @@
 #include <iostream>
 
 #include <nil/crypto3/multiprecision/cpp_modular.hpp>
-#include <nil/crypto3/multiprecision/number.hpp>
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <boost/multiprecision/number.hpp>
+#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
 #include <nil/crypto3/multiprecision/modular/modular_adaptor.hpp>
 
 #include <nil/crypto3/algebra/curves/alt_bn128.hpp>
@@ -169,12 +169,12 @@ int main() {
     using bjj_g1_f_v = typename babyjubjub_g1_type::field_type::value_type;
 
     typename babyjubjub_g1_type::value_type 
-                        P1(bjj_g1_f_v(0x274DBCE8D15179969BC0D49FA725BDDF9DE555E0BA6A693C6ADB52FC9EE7A82C_cppui254),
-                           bjj_g1_f_v(0x5CE98C61B05F47FE2EAE9A542BD99F6B2E78246231640B54595FEBFD51EB853_cppui251)), 
-                        P2(bjj_g1_f_v(0x2491ABA8D3A191A76E35BC47BD9AFE6CC88FEE14D607CBE779F2349047D5C157_cppui254),
-                           bjj_g1_f_v(0x2E07297F8D3C3D7818DBDDFD24C35583F9A9D4ED0CB0C1D1348DD8F7F99152D7_cppui254)),
-                        P3(bjj_g1_f_v(0x11805510440A3488B3B811EAACD0EC7C72DDED51978190E19067A2AFAEBAF361_cppui253),
-                           bjj_g1_f_v(0x1F07AA1B3C598E2FF9FF77744A39298A0A89A9027777AF9FA100DD448E072C13_cppui253));
+                        P1(bjj_g1_f_v(0x274DBCE8D15179969BC0D49FA725BDDF9DE555E0BA6A693C6ADB52FC9EE7A82C_cppui_modular254),
+                           bjj_g1_f_v(0x5CE98C61B05F47FE2EAE9A542BD99F6B2E78246231640B54595FEBFD51EB853_cppui_modular251)), 
+                        P2(bjj_g1_f_v(0x2491ABA8D3A191A76E35BC47BD9AFE6CC88FEE14D607CBE779F2349047D5C157_cppui_modular254),
+                           bjj_g1_f_v(0x2E07297F8D3C3D7818DBDDFD24C35583F9A9D4ED0CB0C1D1348DD8F7F99152D7_cppui_modular254)),
+                        P3(bjj_g1_f_v(0x11805510440A3488B3B811EAACD0EC7C72DDED51978190E19067A2AFAEBAF361_cppui_modular253),
+                           bjj_g1_f_v(0x1F07AA1B3C598E2FF9FF77744A39298A0A89A9027777AF9FA100DD448E072C13_cppui_modular253));
 
     std::cout << "BabyJubJub addition test: " << std::endl;
     typename babyjubjub_g1_type::value_type P1pP2 = P1 + P2;

@@ -29,8 +29,8 @@
 
 #include <cstdint>
 
-#include <nil/crypto3/multiprecision/number.hpp>
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
+
 
 namespace nil {
     namespace crypto3 {
@@ -41,17 +41,17 @@ namespace nil {
                     constexpr FieldValueType power(const FieldValueType &base, const NumberType &exponent) {
                         FieldValueType result = FieldValueType::one();
 
-                        if (exponent == 0)
+                        if (exponent == 0u)
                             return result;
 
                         bool found_one = false;
 
-                        for (long i = nil::crypto3::multiprecision::msb(exponent); i >= 0; --i) {
+                        for (long i = boost::multiprecision::msb(exponent); i >= 0; --i) {
                             if (found_one) {
                                 result = result.squared();
                             }
 
-                            if (nil::crypto3::multiprecision::bit_test(exponent, i)) {
+                            if (boost::multiprecision::bit_test(exponent, i)) {
                                 found_one = true;
                                 // TODO(martun): create an operator *= for this.
                                 result = result * base;

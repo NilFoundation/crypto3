@@ -63,19 +63,19 @@ namespace nil {
 
                         /*constexpr static const std::array<non_residue_type, 6> Frobenius_coeffs_c1 =
                            {non_residue_type(0x01),
-                            non_residue_type(0xB35E3665A18365954D018902935D4419423F84321BC3E_cppui180),
-                            non_residue_type(0xB35E3665A18365954D018902935D4419423F84321BC3D_cppui180),
-                            non_residue_type(0x40D5FC9D2A395B138B924ED6342D41B6EB690B80000000_cppui183),
-                            non_residue_type(0x35A01936D02124BA36C236460AF76D755745133CDE43C3_cppui182),
-                            non_residue_type(0x35A01936D02124BA36C236460AF76D755745133CDE43C4_cppui182)};*/
+                            non_residue_type(0xB35E3665A18365954D018902935D4419423F84321BC3E_cppui_modular180),
+                            non_residue_type(0xB35E3665A18365954D018902935D4419423F84321BC3D_cppui_modular180),
+                            non_residue_type(0x40D5FC9D2A395B138B924ED6342D41B6EB690B80000000_cppui_modular183),
+                            non_residue_type(0x35A01936D02124BA36C236460AF76D755745133CDE43C3_cppui_modular182),
+                            non_residue_type(0x35A01936D02124BA36C236460AF76D755745133CDE43C4_cppui_modular182)};*/
 
                         constexpr static const std::array<integral_type, 6> Frobenius_coeffs_c1 = {
                             0x01,
-                            0xB35E3665A18365954D018902935D4419423F84321BC3E_cppui180,
-                            0xB35E3665A18365954D018902935D4419423F84321BC3D_cppui180,
-                            0x40D5FC9D2A395B138B924ED6342D41B6EB690B80000000_cppui183,
-                            0x35A01936D02124BA36C236460AF76D755745133CDE43C3_cppui182,
-                            0x35A01936D02124BA36C236460AF76D755745133CDE43C4_cppui182};
+                            0xB35E3665A18365954D018902935D4419423F84321BC3E_cppui_modular180,
+                            0xB35E3665A18365954D018902935D4419423F84321BC3D_cppui_modular180,
+                            0x40D5FC9D2A395B138B924ED6342D41B6EB690B80000000_cppui_modular183,
+                            0x35A01936D02124BA36C236460AF76D755745133CDE43C3_cppui_modular182,
+                            0x35A01936D02124BA36C236460AF76D755745133CDE43C4_cppui_modular182};
 
                         constexpr static const non_residue_type non_residue = non_residue_type(0x3D);
                     };

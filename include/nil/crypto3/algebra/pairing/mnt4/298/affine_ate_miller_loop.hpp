@@ -26,8 +26,8 @@
 #ifndef CRYPTO3_ALGEBRA_PAIRING_MNT4_298_AFFINE_ATE_MILLER_LOOP_HPP
 #define CRYPTO3_ALGEBRA_PAIRING_MNT4_298_AFFINE_ATE_MILLER_LOOP_HPP
 
-#include <nil/crypto3/multiprecision/number.hpp>
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <boost/multiprecision/number.hpp>
+#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
 
 #include <nil/crypto3/algebra/curves/mnt4.hpp>
 #include <nil/crypto3/algebra/pairing/detail/mnt4/298/params.hpp>
@@ -58,7 +58,7 @@ namespace nil {
                         bool found_nonzero = false;
                         std::size_t idx = 0;
 
-                        std::vector<long> NAF = multiprecision::find_wnaf(1, policy_type::ate_loop_count);
+                        std::vector<long> NAF = boost::multiprecision::find_wnaf(1, policy_type::ate_loop_count);
 
                         for (long i = NAF.size() - 1; i >= 0; --i) {
                             if (!found_nonzero) {

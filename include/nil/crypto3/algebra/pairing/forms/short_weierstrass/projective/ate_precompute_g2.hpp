@@ -26,8 +26,8 @@
 #ifndef CRYPTO3_ALGEBRA_PAIRING_SHORT_WEIERSTRASS_PROJECTIVE_ATE_PRECOMPUTE_G2_HPP
 #define CRYPTO3_ALGEBRA_PAIRING_SHORT_WEIERSTRASS_PROJECTIVE_ATE_PRECOMPUTE_G2_HPP
 
-#include <nil/crypto3/multiprecision/number.hpp>
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <boost/multiprecision/number.hpp>
+#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
 
 #include <nil/crypto3/algebra/pairing/detail/forms/short_weierstrass/projective/types.hpp>
 
@@ -71,7 +71,7 @@ namespace nil {
                         const g2_field_type_value G = F.squared();           // G = F^2
 
                         current.X = -E.doubled().doubled() + G;    // X3 = -4*E+G
-                        current.Y = -typename base_field_type::value_type(0x08) * D +
+                        current.Y = -typename base_field_type::value_type(0x08u) * D +
                                     F * (E + E - current.X);                // Y3 = -8*D+F*(2*E-X3)
                         current.Z = (Y + Z).squared() - C - Z.squared();    // Z3 = (Y1+Z1)^2-C-Z1^2
                         current.T = current.Z.squared();                    // T3 = Z3^2
@@ -135,7 +135,7 @@ namespace nil {
                         bool found_one = false;
 
                         for (long i = params_type::integral_type_max_bits - 1; i >= 0; --i) {
-                            const bool bit = multiprecision::bit_test(params_type::ate_loop_count, i);
+                            const bool bit = boost::multiprecision::bit_test(params_type::ate_loop_count, i);
                             if (!found_one) {
                                 /* this skips the MSB itself */
                                 found_one |= bit;

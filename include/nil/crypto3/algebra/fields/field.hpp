@@ -26,8 +26,8 @@
 #ifndef CRYPTO3_ALGEBRA_FIELDS_FIELD_HPP
 #define CRYPTO3_ALGEBRA_FIELDS_FIELD_HPP
 
-#include <nil/crypto3/multiprecision/number.hpp>
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <boost/multiprecision/number.hpp>
+#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
 #include <nil/crypto3/multiprecision/modular/modular_adaptor.hpp>
 
 namespace nil {
@@ -52,26 +52,18 @@ namespace nil {
                     typedef int integral_type;
                     typedef int extended_integral_type;
 #else
-                    typedef nil::crypto3::multiprecision::number<
-                        nil::crypto3::multiprecision::backends::cpp_int_backend<
-                            modulus_bits, modulus_bits, nil::crypto3::multiprecision::unsigned_magnitude,
-                            nil::crypto3::multiprecision::unchecked, void>>
+                    typedef boost::multiprecision::number<
+                        boost::multiprecision::backends::cpp_int_modular_backend<modulus_bits>>
                         integral_type;
 
                     // TODO(martun): check why extended integral type must be 16x wider.
-                    typedef nil::crypto3::multiprecision::number<
-                        nil::crypto3::multiprecision::backends::cpp_int_backend<
-                            16 * modulus_bits, 16 * modulus_bits, nil::crypto3::multiprecision::unsigned_magnitude,
-                            nil::crypto3::multiprecision::unchecked, void>>
+                    typedef boost::multiprecision::number<
+                        boost::multiprecision::backends::cpp_int_modular_backend<16 * modulus_bits>>
                         extended_integral_type;
 
-                    // TODO(martun): Check why we need signed_magnitude here, even though we operate in a group and integral_type has unsigned_magnitude.
-                    typedef nil::crypto3::multiprecision::backends::cpp_int_backend<
-                        modulus_bits, modulus_bits, nil::crypto3::multiprecision::signed_magnitude,
-                        nil::crypto3::multiprecision::unchecked, void>
-                        modular_backend;
+                    typedef boost::multiprecision::backends::cpp_int_modular_backend<modulus_bits> modular_backend;
 
-                    typedef nil::crypto3::multiprecision::modular_params<modular_backend> modular_params_type;
+                    typedef boost::multiprecision::backends::modular_params<modular_backend> modular_params_type;
 #endif
                 };
 

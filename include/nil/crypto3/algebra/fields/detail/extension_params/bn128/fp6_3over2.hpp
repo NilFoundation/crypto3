@@ -82,7 +82,7 @@ namespace nil {
                         constexpr static const std::array<integral_type, 6 * 2> Frobenius_coeffs_c2 = {
                             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
-                        constexpr static const non_residue_type non_residue = non_residue_type(0x09, 0x01);
+                        constexpr static const non_residue_type non_residue = non_residue_type(0x09u, 0x01u);
                     };
 
                     template<std::size_t Version>

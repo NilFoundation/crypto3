@@ -75,10 +75,11 @@ namespace nil {
                             field_type::value_type::zero(), field_type::value_type::one()};
 
                         constexpr static std::array<typename field_type::value_type, 2> one_fill = {
-                            typename field_type::value_type(-1),
-                                //0x7706c37b5a84128a3884a5d71811f1b55da3230ffb17a8ab0b32e48d31a6685c_cppui255),
-                            typename field_type::value_type(2)};
-                                //0x0f60480c7a5c0e1140340adc79d6a2bf0cb57ad049d025dc38d80c77985f0329_cppui255)};
+                            // TODO(martun): This is "modulus - 1". Figure out what are the other commented constants below.
+                            0x40000000000000000000000000000000224698fc094cf91b992d30ed00000000_cppui_modular255,
+                                //0x7706c37b5a84128a3884a5d71811f1b55da3230ffb17a8ab0b32e48d31a6685c_cppui_modular255),
+                            typename field_type::value_type(2u)};
+                                //0x0f60480c7a5c0e1140340adc79d6a2bf0cb57ad049d025dc38d80c77985f0329_cppui_modular255)};
 #endif
                     };
 

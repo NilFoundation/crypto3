@@ -53,7 +53,7 @@ namespace nil {
                     constexpr static const integral_type geometric_generator = 0x02;
                     constexpr static const integral_type multiplicative_generator = 0x05;
                     constexpr static const integral_type root_of_unity =
-                        0x1ea14637cbe1870c65d520c6cd47d259883000713dc3c2a1adf8b071592f247a_cppui255;
+                        0x1ea14637cbe1870c65d520c6cd47d259883000713dc3c2a1adf8b071592f247a_cppui_modular255;
                     constexpr static const integral_type nqr = 0x05;
                 };
 

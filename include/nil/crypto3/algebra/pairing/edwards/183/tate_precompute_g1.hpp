@@ -26,8 +26,8 @@
 #ifndef CRYPTO3_ALGEBRA_PAIRING_EDWARDS_183_TATE_PRECOMPUTE_G1_HPP
 #define CRYPTO3_ALGEBRA_PAIRING_EDWARDS_183_TATE_PRECOMPUTE_G1_HPP
 
-#include <nil/crypto3/multiprecision/number.hpp>
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <boost/multiprecision/number.hpp>
+#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
 
 #include <nil/crypto3/algebra/curves/edwards.hpp>
 #include <nil/crypto3/algebra/pairing/detail/bls12/381/params.hpp>
@@ -162,7 +162,7 @@ namespace nil {
                         bool found_one = false;
                         for (long i = params_type::scalar_field_bits; i >= 0; --i) {
                             const bool bit =
-                                nil::crypto3::multiprecision::bit_test(params_type::scalar_field_modulus, i);
+                                boost::multiprecision::bit_test(params_type::scalar_field_modulus, i);
                             if (!found_one) {
                                 /* this skips the MSB itself */
                                 found_one |= bit;

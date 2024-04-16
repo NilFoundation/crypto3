@@ -31,15 +31,16 @@
 #include <nil/crypto3/algebra/curves/detail/h2c/h2c_expand.hpp>
 
 #include <type_traits>
+#include <climits>
 
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace curves {
                 namespace detail {
-                    using namespace nil::crypto3::multiprecision;
+                    using namespace boost::multiprecision;
 
                     template<typename GroupType>
                     struct ep_map {
@@ -48,16 +49,22 @@ namespace nil {
                         typedef typename suite_type::group_value_type group_value_type;
                         typedef typename suite_type::field_value_type field_value_type;
                         typedef typename suite_type::modular_type modular_type;
+                        typedef typename modular_type::backend_type modular_adaptor_type;
                         typedef typename suite_type::modular_backend modular_backend;
 
-                        typedef nil::crypto3::multiprecision::modular_params<modular_backend> modular_params_type;
+                        typedef boost::multiprecision::backends::modular_params<modular_backend> modular_params_type;
 
                         typedef typename suite_type::hash_type hash_type;
 
                         constexpr static std::size_t m = suite_type::m;
                         constexpr static std::size_t L = suite_type::L;
                         constexpr static std::size_t k = suite_type::k;
-                        constexpr static const modular_params_type p_modulus_params = suite_type::p;
+
+                        // Sometimes hash is 512 bits, while the group element is 256 or 381 bits.
+                        // In these cases we take the number module the modulus of the group.
+                        typedef typename boost::multiprecision::cpp_int_modular_backend<L * CHAR_BIT> modular_backend_of_hash_size;
+
+                        constexpr static const modular_params_type p_modulus_params = suite_type::p.backend();
 
                         typedef expand_message_xmd<k, hash_type> expand_message_ro;
                         // typedef expand_message_xof<k, hash_type> expand_message_nu;
@@ -93,7 +100,7 @@ namespace nil {
                             std::array<std::uint8_t, N * m * L> uniform_bytes {0};
                             expand_message_type::process(N * m * L, msg, dst, uniform_bytes);
 
-                            cpp_int e;
+                            number<modular_backend_of_hash_size> e;
                             std::array<modular_type, m> coordinates;
                             std::array<field_value_type, N> result;
                             for (std::size_t i = 0; i < N; i++) {
@@ -101,7 +108,13 @@ namespace nil {
                                     auto elm_offset = L * (j + i * m);
                                     import_bits(e, uniform_bytes.begin() + elm_offset,
                                                 uniform_bytes.begin() + elm_offset + L);
-                                    coordinates[j] = modular_type(e, p_modulus_params);
+
+                                    // Sometimes hash is 512 bits, while the group element is 256 or 381 bits.
+                                    // In these cases we take the number module the modulus of the group.
+                                    e %= p_modulus_params.get_mod();
+
+                                    coordinates[j] = modular_type(modular_adaptor_type(
+                                        modular_backend(e.backend()), p_modulus_params));
                                 }
                                 result[i] = field_value_type(coordinates[0]);
                             }

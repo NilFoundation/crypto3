@@ -28,7 +28,7 @@
 
 #include <nil/crypto3/algebra/curves/bls12.hpp>
 
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
 
 #include <boost/concept/assert.hpp>
 
@@ -76,7 +76,7 @@ namespace nil {
                 auto m_byte = evaluate_m_byte(point, point_affine, true);
                 // TODO: check possibilities for TA
                 if (!(I_bit & m_byte)) {
-                    multiprecision::export_bits(
+                    boost::multiprecision::export_bits(
                         point_affine.X.data.template convert_to<integral_type>(), result.rbegin(), 8, false);
                 }
                 result[0] |= m_byte;
@@ -89,9 +89,9 @@ namespace nil {
                 auto m_byte = evaluate_m_byte(point, point_affine, false);
                 // TODO: check possibilities for TA
                 if (!(I_bit & m_byte)) {
-                    multiprecision::export_bits(
+                    boost::multiprecision::export_bits(
                         point_affine.Y.data.template convert_to<integral_type>(), result.rbegin(), 8, false);
-                    multiprecision::export_bits(point_affine.X.data.template convert_to<integral_type>(),
+                    boost::multiprecision::export_bits(point_affine.X.data.template convert_to<integral_type>(),
                                                 result.rbegin() + sizeof_field_element,
                                                 8,
                                                 false);
@@ -106,9 +106,9 @@ namespace nil {
                 auto m_byte = evaluate_m_byte(point, point_affine, true);
                 // TODO: check possibilities for TA
                 if (!(I_bit & m_byte)) {
-                    multiprecision::export_bits(
+                    boost::multiprecision::export_bits(
                         point_affine.X.data[0].data.template convert_to<integral_type>(), result.rbegin(), 8, false);
-                    multiprecision::export_bits(point_affine.X.data[1].data.template convert_to<integral_type>(),
+                    boost::multiprecision::export_bits(point_affine.X.data[1].data.template convert_to<integral_type>(),
                                                 result.rbegin() + sizeof_field_element,
                                                 8,
                                                 false);
@@ -123,17 +123,17 @@ namespace nil {
                 auto m_byte = evaluate_m_byte(point, point_affine, false);
                 // TODO: check possibilities for TA
                 if (!(I_bit & m_byte)) {
-                    multiprecision::export_bits(
+                    boost::multiprecision::export_bits(
                         point_affine.Y.data[0].data.template convert_to<integral_type>(), result.rbegin(), 8, false);
-                    multiprecision::export_bits(point_affine.Y.data[1].data.template convert_to<integral_type>(),
+                    boost::multiprecision::export_bits(point_affine.Y.data[1].data.template convert_to<integral_type>(),
                                                 result.rbegin() + sizeof_field_element,
                                                 8,
                                                 false);
-                    multiprecision::export_bits(point_affine.X.data[0].data.template convert_to<integral_type>(),
+                    boost::multiprecision::export_bits(point_affine.X.data[0].data.template convert_to<integral_type>(),
                                                 result.rbegin() + 2 * sizeof_field_element,
                                                 8,
                                                 false);
-                    multiprecision::export_bits(point_affine.X.data[1].data.template convert_to<integral_type>(),
+                    boost::multiprecision::export_bits(point_affine.X.data[1].data.template convert_to<integral_type>(),
                                                 result.rbegin() + 3 * sizeof_field_element,
                                                 8,
                                                 false);
@@ -202,9 +202,9 @@ namespace nil {
                 }
 
                 integral_type x;
-                multiprecision::import_bits(x, point_octets.rbegin(), point_octets.rend(), 8, false);
+                boost::multiprecision::import_bits(x, point_octets.rbegin(), point_octets.rend(), 8, false);
                 g1_field_value_type x_mod(x);
-                g1_field_value_type y2_mod = x_mod.pow(3) + g1_field_value_type(4);
+                g1_field_value_type y2_mod = x_mod.pow(3u) + g1_field_value_type(4u);
                 BOOST_ASSERT(y2_mod.is_square());
                 g1_field_value_type y_mod = y2_mod.sqrt();
                 bool Y_bit = sign_gf_p(y_mod);
@@ -230,9 +230,9 @@ namespace nil {
                 }
 
                 integral_type x, y;
-                multiprecision::import_bits(
+                boost::multiprecision::import_bits(
                     y, point_octets.rbegin(), point_octets.rbegin() + sizeof_field_element, 8, false);
-                multiprecision::import_bits(
+                boost::multiprecision::import_bits(
                     x, point_octets.rbegin() + sizeof_field_element, point_octets.rend(), 8, false);
                 g1_value_type result(g1_field_value_type(x), g1_field_value_type(y), g1_field_value_type::one());
                 BOOST_ASSERT(result.is_well_formed());
@@ -251,12 +251,12 @@ namespace nil {
                 }
 
                 integral_type x_0, x_1;
-                multiprecision::import_bits(
+                boost::multiprecision::import_bits(
                     x_0, point_octets.rbegin(), point_octets.rbegin() + sizeof_field_element, 8, false);
-                multiprecision::import_bits(
+                boost::multiprecision::import_bits(
                     x_1, point_octets.rbegin() + sizeof_field_element, point_octets.rend(), 8, false);
                 g2_field_value_type x_mod(x_0, x_1);
-                g2_field_value_type y2_mod = x_mod.pow(3) + g2_field_value_type(4, 4);
+                g2_field_value_type y2_mod = x_mod.pow(3u) + g2_field_value_type(4u, 4u);
                 BOOST_ASSERT(y2_mod.is_square());
                 g2_field_value_type y_mod = y2_mod.sqrt();
                 bool Y_bit = sign_gf_p(y_mod);
@@ -282,19 +282,19 @@ namespace nil {
                 }
 
                 integral_type x_0, x_1, y_0, y_1;
-                multiprecision::import_bits(
+                boost::multiprecision::import_bits(
                     y_0, point_octets.rbegin(), point_octets.rbegin() + sizeof_field_element, 8, false);
-                multiprecision::import_bits(y_1,
+                boost::multiprecision::import_bits(y_1,
                                             point_octets.rbegin() + sizeof_field_element,
                                             point_octets.rbegin() + 2 * sizeof_field_element,
                                             8,
                                             false);
-                multiprecision::import_bits(x_0,
+                boost::multiprecision::import_bits(x_0,
                                             point_octets.rbegin() + 2 * sizeof_field_element,
                                             point_octets.rbegin() + 3 * sizeof_field_element,
                                             8,
                                             false);
-                multiprecision::import_bits(
+                boost::multiprecision::import_bits(
                     x_1, point_octets.rbegin() + 3 * sizeof_field_element, point_octets.rend(), 8, false);
                 g2_value_type result(g2_field_value_type(g1_field_value_type(x_0), g1_field_value_type(x_1)),
                                      g2_field_value_type(g1_field_value_type(y_0), g1_field_value_type(y_1)),
@@ -314,7 +314,7 @@ namespace nil {
             }
 
             static inline bool sign_gf_p(const g2_field_value_type &v) {
-                if (v.data[1] == 0) {
+                if (v.data[1] == 0u) {
                     return sign_gf_p(v.data[0]);
                 }
                 return sign_gf_p(v.data[1]);

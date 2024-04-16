@@ -33,8 +33,8 @@
 
 #include <nil/crypto3/multiprecision/ressol.hpp>
 #include <nil/crypto3/multiprecision/inverse.hpp>
-#include <nil/crypto3/multiprecision/number.hpp>
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <boost/multiprecision/number.hpp>
+#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
 #include <nil/crypto3/multiprecision/modular/modular_adaptor.hpp>
 
 #include <boost/type_traits/is_integral.hpp>
@@ -69,11 +69,14 @@ namespace nil {
                         constexpr element_fp(const data_type &data) : data(data) {}
 
                         template<typename Number,
-                                 typename std::enable_if<(multiprecision::is_number<Number>::value &&
-                                                          !multiprecision::is_modular_number<Number>::value) ||
-                                                             std::is_integral<Number>::value,
-                                                         bool>::type = true>
-                        constexpr element_fp(const Number &data) : data(data, modulus_params) {}
+                                 typename std::enable_if<(boost::multiprecision::is_number<Number>::value), bool>::type = true>
+                        constexpr element_fp(const Number &data)
+                            : data(typename modular_type::backend_type(data.backend(), modulus_params)) {}
+
+                        template<typename Number, typename std::enable_if<
+                            std::is_integral<Number>::value && std::is_unsigned<Number>::value, bool>::type = true>
+                        constexpr element_fp(const Number &data)
+                            : data(typename modular_type::backend_type(data, modulus_params)) {}
 
                         constexpr element_fp(const element_fp &B)
                             : data(B.data) {}
@@ -117,12 +120,16 @@ namespace nil {
                         }
 
                         constexpr element_fp &operator-=(const element_fp &B) {
+                            // TODO(martun): consider directly taking the backend and calling
+                            // eval_add to improve performance.
                             data -= B.data;
 
                             return *this;
                         }
 
                         constexpr element_fp &operator+=(const element_fp &B) {
+                            // TODO(martun): consider directly taking the backend and calling
+                            // eval_add to improve performance.
                             data += B.data;
 
                             return *this;
@@ -170,7 +177,8 @@ namespace nil {
                         }
 
                         constexpr element_fp &operator++() {
-                            data = data + data_type(1, modulus_params);
+                            // TODO(martun): fix this.
+                            data = data + one().data;
                             return *this;
                         }
 
@@ -195,9 +203,14 @@ namespace nil {
                             return element_fp(data + data);
                         }
 
-                        // TODO: maybe incorrect result here
                         constexpr element_fp sqrt() const {
-                            return element_fp(ressol(data));
+                            if (this->is_zero())
+                                return zero();
+                            element_fp result = ressol(data);
+                            // If the element does not have a square root, this function must not be called.
+                            assert(!result.is_zero());
+
+                            return result;
                         }
 
                         constexpr element_fp inversed() const {
@@ -220,13 +233,13 @@ namespace nil {
                         template<typename PowerType,
                                  typename = typename std::enable_if<boost::is_integral<PowerType>::value>::type>
                         constexpr element_fp pow(const PowerType pwr) const {
-                            return element_fp(multiprecision::powm(data, multiprecision::uint128_t(pwr)));
+                            return element_fp(boost::multiprecision::powm(data, boost::multiprecision::uint128_t(pwr)));
                         }
 
-                        template<typename Backend, multiprecision::expression_template_option ExpressionTemplates>
+                        template<typename Backend, boost::multiprecision::expression_template_option ExpressionTemplates>
                         constexpr element_fp
-                            pow(const multiprecision::number<Backend, ExpressionTemplates> &pwr) const {
-                            return element_fp(multiprecision::powm(data, pwr));
+                            pow(const boost::multiprecision::number<Backend, ExpressionTemplates> &pwr) const {
+                            return element_fp(boost::multiprecision::powm(data, pwr));
                         }
                     };
 
@@ -240,10 +253,10 @@ namespace nil {
                         // These constexpr static variables can not be members of element_fp, because 
                         // element_fp is incomplete type until the end of its declaration.
                         template<typename FieldParams>
-                        constexpr static element_fp<FieldParams> zero_instance = 0;
+                        constexpr static element_fp<FieldParams> zero_instance = 0u;
 
                         template<typename FieldParams>
-                        constexpr static element_fp<FieldParams> one_instance = 1;
+                        constexpr static element_fp<FieldParams> one_instance = 1u;
                     }
 
                     template<typename FieldParams>

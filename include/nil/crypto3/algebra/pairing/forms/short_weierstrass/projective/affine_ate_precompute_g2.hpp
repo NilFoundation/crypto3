@@ -26,8 +26,8 @@
 #ifndef CRYPTO3_ALGEBRA_PAIRING_SHORT_WEIERSTRASS_PROJECTIVE_AFFINE_ATE_PRECOMPUTE_G2_HPP
 #define CRYPTO3_ALGEBRA_PAIRING_SHORT_WEIERSTRASS_PROJECTIVE_AFFINE_ATE_PRECOMPUTE_G2_HPP
 
-#include <nil/crypto3/multiprecision/number.hpp>
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <boost/multiprecision/number.hpp>
+#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
 
 #include <nil/crypto3/algebra/pairing/detail/forms/short_weierstrass/projective/types.hpp>
 
@@ -64,7 +64,7 @@ namespace nil {
                         g2_field_type_value RY = Qcopy.Y;
                         bool found_nonzero = false;
 
-                        std::vector<long> NAF = multiprecision::find_wnaf(1, policy_type::ate_loop_count);
+                        std::vector<long> NAF = boost::multiprecision::find_wnaf(1, policy_type::ate_loop_count);
 
                         for (long i = NAF.size() - 1; i >= 0; --i) {
                             if (!found_nonzero) {

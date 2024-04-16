@@ -59,11 +59,11 @@ namespace nil {
                     constexpr static const integral_type q = scalar_field_modulus;
 
                     constexpr static const integral_type a =
-                        0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFD94_cppui256;
-                    constexpr static const integral_type b = 0xA6_cppui256;
-                    constexpr static const integral_type x = 0x1_cppui256;
+                        0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFD94_cppui_modular256;
+                    constexpr static const integral_type b = 0xA6_cppui_modular256;
+                    constexpr static const integral_type x = 0x1_cppui_modular256;
                     constexpr static const integral_type y =
-                        0x8D91E471E0989CDA27DF505A453F2B7635294F2DDF23E3B122ACC99C9E9F1E14_cppui256;
+                        0x8D91E471E0989CDA27DF505A453F2B7635294F2DDF23E3B122ACC99C9E9F1E14_cppui_modular256;
                 };
             }    // namespace curves
         }        // namespace algebra

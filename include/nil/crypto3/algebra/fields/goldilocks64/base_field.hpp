@@ -54,14 +54,14 @@ namespace nil {
 #else               
                     // 2^64 - 2^32 + 1
                     constexpr static const integral_type modulus =
-                        0xFFFFFFFF00000001_cppui64;
+                        0xFFFFFFFF00000001_cppui_modular64;
 
                     typedef typename policy_type::modular_backend modular_backend;
-                    constexpr static const modular_params_type modulus_params = modulus;
-                    typedef nil::crypto3::multiprecision::number<
-                        nil::crypto3::multiprecision::backends::modular_adaptor<
+                    constexpr static const modular_params_type modulus_params = modulus.backend();
+                    typedef boost::multiprecision::number<
+                        boost::multiprecision::backends::modular_adaptor<
                             modular_backend,
-                            nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
+                            boost::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
                         modular_type;
 
                     typedef typename detail::element_fp<params<goldilocks64_base_field>> value_type;

@@ -59,14 +59,14 @@ namespace nil {
 #else
 
                     constexpr static const integral_type modulus =
-                        0x1000000000000000000000000000000014def9dea2f79cd65812631a5cf5d3ed_cppui253;
+                        0x1000000000000000000000000000000014def9dea2f79cd65812631a5cf5d3ed_cppui_modular253;
 
                     typedef typename policy_type::modular_backend modular_backend;
-                    constexpr static const modular_params_type modulus_params = modulus;
-                    typedef nil::crypto3::multiprecision::number<
-                        nil::crypto3::multiprecision::backends::modular_adaptor<
+                    constexpr static const modular_params_type modulus_params = modulus.backend();
+                    typedef boost::multiprecision::number<
+                        boost::multiprecision::backends::modular_adaptor<
                             modular_backend,
-                            nil::crypto3::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
+                            boost::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
                         modular_type;
 
                     typedef typename detail::element_fp<params<curve25519_scalar_field>> value_type;

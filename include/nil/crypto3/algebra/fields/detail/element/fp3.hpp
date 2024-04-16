@@ -37,13 +37,13 @@ namespace nil {
 
                     template<typename FieldParams>
                     class element_fp3 {
+                    public:
                         typedef FieldParams policy_type;
 
                         typedef typename policy_type::integral_type integral_type;
 
                         constexpr static const integral_type modulus = policy_type::modulus;
 
-                    public:
                         typedef typename policy_type::field_type field_type;
 
                         typedef typename policy_type::non_residue_type non_residue_type;

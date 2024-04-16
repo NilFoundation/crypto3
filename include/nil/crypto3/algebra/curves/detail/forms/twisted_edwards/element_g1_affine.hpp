@@ -87,9 +87,9 @@ namespace nil {
                         { }
 
                         template<typename Backend,
-                                 multiprecision::expression_template_option ExpressionTemplates>
+                                 boost::multiprecision::expression_template_option ExpressionTemplates>
                         explicit constexpr curve_element(
-                                  const multiprecision::number<Backend, ExpressionTemplates> &value) {
+                                  const boost::multiprecision::number<Backend, ExpressionTemplates> &value) {
                             *this = one() * value;
                         }
 
@@ -231,9 +231,9 @@ namespace nil {
                         }
 
                         template<typename Backend,
-                                 multiprecision::expression_template_option ExpressionTemplates>
+                                 boost::multiprecision::expression_template_option ExpressionTemplates>
                         constexpr const curve_element& operator=(
-                                  const multiprecision::number<Backend, ExpressionTemplates> &value) {
+                                  const boost::multiprecision::number<Backend, ExpressionTemplates> &value) {
                             *this = one() * value;
                             return *this;
                         }
@@ -282,8 +282,8 @@ namespace nil {
                         }
 
                         template<typename Backend,
-                             multiprecision::expression_template_option ExpressionTemplates>
-                        constexpr curve_element& operator*=(const multiprecision::number<Backend, ExpressionTemplates> &right) {
+                             boost::multiprecision::expression_template_option ExpressionTemplates>
+                        constexpr curve_element& operator*=(const boost::multiprecision::number<Backend, ExpressionTemplates> &right) {
                             (*this) = (*this) * right;
                             return *this;
                         }
@@ -373,7 +373,7 @@ namespace nil {
                             }
 
                             assert(static_cast<field_value_type>(result_params::A) ==
-                                   static_cast<field_value_type>(2) *
+                                   static_cast<field_value_type>(2u) *
                                        (static_cast<field_value_type>(params_type::a) +
                                         static_cast<field_value_type>(params_type::d)) /
                                        (static_cast<field_value_type>(params_type::a) -
@@ -381,7 +381,7 @@ namespace nil {
 
                             field_value_type s_inv = field_value_type::one();
                             field_value_type B_ =
-                                static_cast<field_value_type>(4) / (static_cast<field_value_type>(params_type::a) -
+                                static_cast<field_value_type>(4u) / (static_cast<field_value_type>(params_type::a) -
                                                                     static_cast<field_value_type>(params_type::d));
                             if (static_cast<field_value_type>(result_params::B) != B_) {
                                 s_inv = (B_ / static_cast<field_value_type>(result_params::B)).sqrt();

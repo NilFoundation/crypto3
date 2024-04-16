@@ -65,9 +65,9 @@ namespace nil {
                         constexpr static const g1_field_type_value twist_mul_by_d_c1 = d;
                         constexpr static const g1_field_type_value twist_mul_by_d_c2 = d;
                         constexpr static const g1_field_type_value twist_mul_by_q_Y =
-                            g1_field_type_value(0xB35E3665A18365954D018902935D4419423F84321BC3E_cppui180);
+                            g1_field_type_value(0xB35E3665A18365954D018902935D4419423F84321BC3E_cppui_modular180);
                         constexpr static const g1_field_type_value twist_mul_by_q_Z =
-                            g1_field_type_value(0xB35E3665A18365954D018902935D4419423F84321BC3E_cppui180);
+                            g1_field_type_value(0xB35E3665A18365954D018902935D4419423F84321BC3E_cppui_modular180);
                     };
                 }    // namespace detail
             }        // namespace curves

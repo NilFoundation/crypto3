@@ -37,7 +37,7 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
 
 #include <nil/crypto3/algebra/curves/bls12.hpp>
 #include <nil/crypto3/algebra/curves/mnt4.hpp>
@@ -56,7 +56,7 @@
 
 using namespace nil::crypto3::algebra::pairing;
 using namespace nil::crypto3::algebra;
-using namespace nil::crypto3::multiprecision;
+using namespace boost::multiprecision;
 
 namespace boost {
     namespace test_tools {
@@ -164,7 +164,7 @@ void check_pairing_operations(std::vector<Fr_value_type> &Fr_elements,
     std::cout << " * Reduced pairing tests with scalar multiplication started..." << std::endl;
     BOOST_CHECK_EQUAL(pair_reduced<CurveType>(G1_elements[A1], G2_elements[B1]) *
                           pair_reduced<CurveType>(G1_elements[A2], G2_elements[B2]),
-                      pair_reduced<CurveType>(Fr_value_type(2) * G1_elements[VKx], G2_elements[VKy]) *
+                      pair_reduced<CurveType>(Fr_value_type(2u) * G1_elements[VKx], G2_elements[VKy]) *
                           pair_reduced<CurveType>(G1_elements[C1] + G1_elements[C2], G2_elements[VKz]));
     BOOST_CHECK_EQUAL(pair_reduced<CurveType>(Fr_elements[VKx_poly] * G1_elements[A1], G2_elements[B1]),
                       GT_elements[pair_reduceding_VKx_poly_A1_B1]);
@@ -177,7 +177,7 @@ void check_pairing_operations(std::vector<Fr_value_type> &Fr_elements,
     BOOST_CHECK_EQUAL(
         pair_reduced<CurveType>(Fr_elements[VKx_poly] * G1_elements[A1], G2_elements[B1]),
         // TODO: fix pow to accept field element as exponent
-        pair_reduced<CurveType>(G1_elements[A1], G2_elements[B1]).pow(cpp_int(Fr_elements[VKx_poly].data)));
+        pair_reduced<CurveType>(G1_elements[A1], G2_elements[B1]).pow(Fr_elements[VKx_poly].data));
     std::cout << " * Reduced pairing tests with pow finished." << std::endl << std::endl;
 
     std::cout << " * Miller loop tests started..." << std::endl;

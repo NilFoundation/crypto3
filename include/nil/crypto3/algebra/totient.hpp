@@ -66,7 +66,7 @@ namespace nil {
                 IntegerType one = 1;
 
                 for (IntegerType i = 1; i < n; i++) {
-                    if (multiprecision::gcd(i, n) == one)
+                    if (boost::multiprecision::gcd(i, n) == one)
                         result.push_back(i);
                 }
 

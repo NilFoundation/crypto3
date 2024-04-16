@@ -24,8 +24,8 @@
 //---------------------------------------------------------------------------//
 
 #include <nil/crypto3/multiprecision/cpp_modular.hpp>
-#include <nil/crypto3/multiprecision/number.hpp>
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <boost/multiprecision/number.hpp>
+#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
 #include <nil/crypto3/multiprecision/modular/modular_adaptor.hpp>
 
 #include <nil/crypto3/algebra/curves/secp_r1.hpp>
@@ -37,10 +37,10 @@ void coordinates_examples() {
     typedef typename FpCurveGroup::value_type group_value_type;
     typedef typename FpCurveGroup::field_type::value_type field_value_type;
 
-    field_value_type e1 = field_value_type(0xfadaf4efc388b9fb1f5f6286032868c8c29a4d7b359f17bff792511cdbcea8ba_cppui256),
-    e2(0x609eaeb55609889d764de70df4536a52a6773ce14244d2109afb1f6140d64ed2_cppui256), e3(1),
-    e4(0x72213568b6cec6bad10c649c22d9388857085132ea254320c7d3c12727f55d97_cppui256),
-    e5(0xff9d5ca60a4f5ae00b2abdb6dddb3f4fc5c853ed56a33a85ccaa7d3093084579_cppui256), e6(1);
+    field_value_type e1 = field_value_type(0xfadaf4efc388b9fb1f5f6286032868c8c29a4d7b359f17bff792511cdbcea8ba_cppui_modular256),
+    e2(0x609eaeb55609889d764de70df4536a52a6773ce14244d2109afb1f6140d64ed2_cppui_modular256), e3(1),
+    e4(0x72213568b6cec6bad10c649c22d9388857085132ea254320c7d3c12727f55d97_cppui_modular256),
+    e5(0xff9d5ca60a4f5ae00b2abdb6dddb3f4fc5c853ed56a33a85ccaa7d3093084579_cppui_modular256), e6(1);
   
 
 	

@@ -29,7 +29,7 @@
 
 #include <nil/crypto3/algebra/type_traits.hpp>
 
-#include <nil/crypto3/multiprecision/number.hpp>
+#include <boost/multiprecision/number.hpp>
 #include <nil/crypto3/multiprecision/modular/modular_adaptor.hpp>
 
 #include <cstdint>
@@ -41,22 +41,22 @@ namespace nil {
                 namespace detail {
                     template<typename GroupValueType,
                              typename Backend,
-                             multiprecision::expression_template_option ExpressionTemplates>
+                             boost::multiprecision::expression_template_option ExpressionTemplates>
                     constexpr GroupValueType
                         scalar_mul(const GroupValueType &base,
-                                   const multiprecision::number<Backend, ExpressionTemplates> &scalar) {
+                                   const boost::multiprecision::number<Backend, ExpressionTemplates> &scalar) {
                         if (scalar.is_zero()) {
                             return GroupValueType::zero();
                         }
                         GroupValueType result;
 
                         bool found_one = false;
-                        for (auto i = static_cast<std::int64_t>(multiprecision::msb(scalar)); i >= 0; --i) {
+                        for (auto i = static_cast<std::int64_t>(boost::multiprecision::msb(scalar)); i >= 0; --i) {
                             if (found_one) {
                                 result = result.doubled();
                             }
 
-                            if (multiprecision::bit_test(scalar, i)) {
+                            if (boost::multiprecision::bit_test(scalar, i)) {
                                 found_one = true;
                                 result = result + base;
                             }
@@ -67,27 +67,27 @@ namespace nil {
 
                     template<typename GroupValueType,
                              typename Backend, typename SafeType,
-                             multiprecision::expression_template_option ExpressionTemplates>
+                             boost::multiprecision::expression_template_option ExpressionTemplates>
                     constexpr GroupValueType
                         operator*(const GroupValueType &left,
-                                  const multiprecision::number<nil::crypto3::multiprecision::backends::modular_adaptor<Backend, SafeType>, ExpressionTemplates> &right) {
+                                  const boost::multiprecision::number<boost::multiprecision::backends::modular_adaptor<Backend, SafeType>, ExpressionTemplates> &right) {
                         return scalar_mul(left, right);
                     }
 
                     template<typename GroupValueType,
                              typename Backend,
-                             multiprecision::expression_template_option ExpressionTemplates>
+                             boost::multiprecision::expression_template_option ExpressionTemplates>
                     constexpr GroupValueType
                         operator*(const GroupValueType &left,
-                                  const multiprecision::number<Backend, ExpressionTemplates> &right) {
+                                  const boost::multiprecision::number<Backend, ExpressionTemplates> &right) {
 
                         return scalar_mul(left, right);
                     }
 
                     template<typename GroupValueType,
                              typename Backend,
-                             multiprecision::expression_template_option ExpressionTemplates>
-                    constexpr GroupValueType operator*(const multiprecision::number<Backend, ExpressionTemplates> &left,
+                             boost::multiprecision::expression_template_option ExpressionTemplates>
+                    constexpr GroupValueType operator*(const boost::multiprecision::number<Backend, ExpressionTemplates> &left,
                                                        const GroupValueType &right) {
 
                         return right * left;

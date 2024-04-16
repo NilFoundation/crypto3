@@ -40,7 +40,7 @@ namespace nil {
                     inline bool sgn0(const element_fp<FieldParams> &e) {
                         using modular_type = typename FieldParams::modular_type;
 
-                        static const modular_type two = modular_type(2, element_fp<FieldParams>::modulus);
+                        static const modular_type two = typename modular_type::backend_type(2u);
 
                         return static_cast<bool>(e.data % two);
                     }
@@ -50,7 +50,7 @@ namespace nil {
                         using underlying_type = typename element_fp2<FieldParams>::underlying_type;
                         using modular_type = typename FieldParams::modular_type;
 
-                        static const modular_type two = modular_type(2, underlying_type::modulus);
+                        static const modular_type two = typename modular_type::backend_type(2u);
 
                         modular_type sign_0 = e.data[0].data % two;
                         bool zero_0 = e.data[0].data.is_zero();

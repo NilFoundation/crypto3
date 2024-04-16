@@ -63,16 +63,16 @@ namespace nil {
 
                         /*constexpr static const std::array<non_residue_type, 4> Frobenius_coeffs_c1 =
                            {non_residue_type(0x01),
-                            non_residue_type(0xF73779FE09916DFDCC2FD1F968D534BEB17DAF7518CD9FAE5C1F7BDCF94DD5D7DEF6980C4_cppui292),
-                            non_residue_type(0x3BCF7BCD473A266249DA7B0548ECAEEC9635D1330EA41A9E35E51200E12C90CD65A71660000_cppui298),
-                            non_residue_type(0x3AD84453493094F44C0E4B334F83D9B7D7845383998B4CFE8788F285043342F78DC81FC7F3D_cppui298)};*/
+                            non_residue_type(0xF73779FE09916DFDCC2FD1F968D534BEB17DAF7518CD9FAE5C1F7BDCF94DD5D7DEF6980C4_cppui_modular292),
+                            non_residue_type(0x3BCF7BCD473A266249DA7B0548ECAEEC9635D1330EA41A9E35E51200E12C90CD65A71660000_cppui_modular298),
+                            non_residue_type(0x3AD84453493094F44C0E4B334F83D9B7D7845383998B4CFE8788F285043342F78DC81FC7F3D_cppui_modular298)};*/
 
                         constexpr static const std::array<integral_type, 4> Frobenius_coeffs_c1 = {
-                            0x01, 0xF73779FE09916DFDCC2FD1F968D534BEB17DAF7518CD9FAE5C1F7BDCF94DD5D7DEF6980C4_cppui292,
-                            0x3BCF7BCD473A266249DA7B0548ECAEEC9635D1330EA41A9E35E51200E12C90CD65A71660000_cppui298,
-                            0x3AD84453493094F44C0E4B334F83D9B7D7845383998B4CFE8788F285043342F78DC81FC7F3D_cppui298};
+                            0x01, 0xF73779FE09916DFDCC2FD1F968D534BEB17DAF7518CD9FAE5C1F7BDCF94DD5D7DEF6980C4_cppui_modular292,
+                            0x3BCF7BCD473A266249DA7B0548ECAEEC9635D1330EA41A9E35E51200E12C90CD65A71660000_cppui_modular298,
+                            0x3AD84453493094F44C0E4B334F83D9B7D7845383998B4CFE8788F285043342F78DC81FC7F3D_cppui_modular298};
 
-                        constexpr static const non_residue_type non_residue = non_residue_type(0x11);
+                        constexpr static const non_residue_type non_residue = non_residue_type(0x11u);
                     };
 
                     template<std::size_t Version>

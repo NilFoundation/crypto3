@@ -26,8 +26,8 @@
 #ifndef CRYPTO3_ALGEBRA_PAIRING_SHORT_WEIERSTRASS_JACOBIAN_WITH_A4_0_ATE_PRECOMPUTE_G2_HPP
 #define CRYPTO3_ALGEBRA_PAIRING_SHORT_WEIERSTRASS_JACOBIAN_WITH_A4_0_ATE_PRECOMPUTE_G2_HPP
 
-#include <nil/crypto3/multiprecision/number.hpp>
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <boost/multiprecision/number.hpp>
+#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
 
 #include <nil/crypto3/algebra/pairing/detail/forms/short_weierstrass/jacobian_with_a4_0/types.hpp>
 
@@ -58,10 +58,10 @@ namespace nil {
                         const g2_field_type_value A = two_inv * (X * Y);                 // A = X1 * Y1 / 2
                         const g2_field_type_value B = Y.squared();                       // B = Y1^2
                         const g2_field_type_value C = Z.squared();                       // C = Z1^2
-                        const g2_field_type_value D = 0x03 * C;                          // D = 3 * C
+                        const g2_field_type_value D = 0x03u * C;                          // D = 3 * C
                         const g2_field_type_value E = params_type::twist_coeff_b * D;    // E = twist_b * D
 
-                        const g2_field_type_value F = 0x03 * E;                       // F = 3 * E
+                        const g2_field_type_value F = 0x03u * E;                       // F = 3 * E
                         const g2_field_type_value G = two_inv * (B + F);              // G = (B+F)/2
                         const g2_field_type_value H = (Y + Z).squared() - (B + C);    // H = (Y1+Z1)^2-(B+C)
                         const g2_field_type_value I = E - B;                          // I = E-B
@@ -69,11 +69,11 @@ namespace nil {
                         const g2_field_type_value E_squared = E.squared();            // E_squared = E^2
 
                         current.X = A * (B - F);                         // X3 = A * (B-F)
-                        current.Y = G.squared() - (0x03 * E_squared);    // Y3 = G^2 - 3*E^2
+                        current.Y = G.squared() - (0x03u * E_squared);    // Y3 = G^2 - 3*E^2
                         current.Z = B * H;                               // Z3 = B * H
                         c.ell_0 = I;                                     // ell_0 = xi * I
                         c.ell_VW = -params_type::twist * H;              // ell_VW = - H (later: * yP)
-                        c.ell_VV = 0x03 * J;                             // ell_VV = 3*J (later: * xP)
+                        c.ell_VV = 0x03u * J;                             // ell_VV = 3*J (later: * xP)
                     }
 
                     static void mixed_addition_step_for_miller_loop(const typename g2_affine_type::value_type base,
@@ -107,7 +107,7 @@ namespace nil {
                         typename g2_affine_type::value_type Qcopy = Q.to_affine();
 
                         typename base_field_type::value_type two_inv =
-                            (typename base_field_type::value_type(0x02).inversed());
+                            (typename base_field_type::value_type(0x02u).inversed());
 
                         g2_precomputed_type result;
                         result.QX = Qcopy.X;
@@ -124,7 +124,7 @@ namespace nil {
                         typename policy_type::ate_ell_coeffs c;
 
                         for (long i = params_type::integral_type_max_bits; i >= 0; --i) {
-                            const bool bit = multiprecision::bit_test(loop_count, i);
+                            const bool bit = boost::multiprecision::bit_test(loop_count, i);
                             if (!found_one) {
                                 /* this skips the MSB itself */
                                 found_one |= bit;
