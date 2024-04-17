@@ -87,15 +87,16 @@ namespace nil {
                         math::expression_evaluator<VariableType> evaluator(
                             *this,
                             [&assignments, row_index](const VariableType &var) {
+                                std::size_t rows_amount = assignments.rows_amount();
                                 switch (var.type) {
                                     case VariableType::column_type::witness:
-                                        return assignments.witness(var.index)[row_index + var.rotation];
+                                        return assignments.witness(var.index)[(rows_amount + row_index + var.rotation) % rows_amount];
                                     case VariableType::column_type::public_input:
-                                        return assignments.public_input(var.index)[row_index + var.rotation];
+                                        return assignments.public_input(var.index)[(rows_amount + row_index + var.rotation) % rows_amount];
                                     case VariableType::column_type::constant:
-                                        return assignments.constant(var.index)[row_index + var.rotation];
+                                        return assignments.constant(var.index)[(rows_amount + row_index + var.rotation) % rows_amount];
                                     case VariableType::column_type::selector:
-                                        return assignments.selector(var.index)[row_index + var.rotation];
+                                        return assignments.selector(var.index)[(rows_amount + row_index + var.rotation) % rows_amount];
                                     default:
                                         BOOST_ASSERT_MSG(false, "Invalid column type");
                                         return VariableType::assignment_type::zero();
