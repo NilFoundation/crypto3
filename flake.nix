@@ -143,6 +143,8 @@
                 (if compiler == "gcc" then pkgs.gcc else pkgs.clang)
               ];
 
+              propagatedBuildInputs = [];
+
               cmakeFlags = [
                 "-G Ninja"
                 "-DCMAKE_CXX_COMPILER=${if compiler == "gcc" then "g++" else "clang++"}"
