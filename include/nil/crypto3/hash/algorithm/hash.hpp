@@ -189,8 +189,8 @@ namespace nil {
          * @return
          */
         template<typename Hash, typename SinglePassRange, typename HashAccumulator = accumulator_set<Hash>>
-        typename std::enable_if<boost::accumulators::detail::is_accumulator_set<HashAccumulator>::value,
-                                HashAccumulator>::type
+        typename std::enable_if_t<boost::accumulators::detail::is_accumulator_set<HashAccumulator>::value && detail::is_range<SinglePassRange>::value,
+                                HashAccumulator>
             hash(const SinglePassRange &rng, HashAccumulator &sh) {
 
             typedef hashes::detail::ref_hash_impl<HashAccumulator> StreamHashImpl;
@@ -213,7 +213,7 @@ namespace nil {
          * @return
          */
         template<typename Hash, typename SinglePassRange, typename HashAccumulator = accumulator_set<Hash>>
-        hashes::detail::range_hash_impl<hashes::detail::value_hash_impl<HashAccumulator>>
+        typename std::enable_if_t<detail::is_range<SinglePassRange>::value, hashes::detail::range_hash_impl<hashes::detail::value_hash_impl<HashAccumulator>>>
             hash(const SinglePassRange &r) {
 
             typedef hashes::detail::value_hash_impl<HashAccumulator> StreamHashImpl;
@@ -295,6 +295,95 @@ namespace nil {
 
             return HashImpl(r, HashAccumulator());
         }
+
+        /*!
+        * @brief Hashes a single value by wrapping it into an array and processing it as a range.
+        *
+        * @ingroup hash_algorithms
+        *
+        * @tparam Hash The hash function to be used.
+        * @tparam T The type of the value being hashed.
+        * @tparam OutputIterator The type of the output iterator.
+        *
+        * @param value The single value to be hashed.
+        * @param out The iterator to which the hash will be written.
+        *
+        * @return The updated OutputIterator after processing the value.
+        */
+        template<typename Hash, typename T, typename OutputIterator>
+        typename std::enable_if_t<
+            ::nil::crypto3::detail::is_iterator<OutputIterator>::value && !detail::is_range<T>::value,
+            OutputIterator
+        >
+            hash(T value, OutputIterator out) {
+
+            typedef accumulator_set<Hash> HashAccumulator;
+
+            typedef hashes::detail::value_hash_impl<HashAccumulator> StreamHashImpl;
+            typedef hashes::detail::itr_hash_impl<StreamHashImpl, OutputIterator> HashImpl;
+
+            std::array<T, 1> wrapped_value = {value};
+
+            return HashImpl(wrapped_value, std::move(out), HashAccumulator());
+        }
+
+        /*!
+        * @brief Hashes a single value by wrapping it into an array and processing it as a range.
+        *
+        * @ingroup hash_algorithms
+        *
+        * @tparam Hash The hash function to be used.
+        * @tparam T The type of the value being hashed.
+        * @tparam HashAccumulator The type of the accumulator, defaulted to accumulator_set<Hash>.
+        *
+        * @param value The single value to be hashed.
+        * @param sh The accumulator to which the hash will be added.
+        *
+        * @return The updated HashAccumulator after processing the value.
+        */
+        template<typename Hash, typename T, typename HashAccumulator = accumulator_set<Hash>>
+        typename std::enable_if_t<
+            boost::accumulators::detail::is_accumulator_set<HashAccumulator>::value && !detail::is_range<T>::value,
+            HashAccumulator
+        >
+            hash(T value, HashAccumulator &sh) {
+
+            typedef hashes::detail::ref_hash_impl<HashAccumulator> StreamHashImpl;
+            typedef hashes::detail::range_hash_impl<StreamHashImpl> HashImpl;
+
+            std::array<T, 1> wrapped_value = {value};
+
+            return HashImpl(wrapped_value, sh);
+        }
+
+        /*!
+        * @brief Hashes a single value by wrapping it into an array and processing it as a range.
+        *
+        * @ingroup hash_algorithms
+        *
+        * @tparam Hash The hash function to be used.
+        * @tparam T The type of the value being hashed.
+        * @tparam HashAccumulator The type of the accumulator, defaulted to accumulator_set<Hash>.
+        *
+        * @param value The single value to be hashed.
+        *
+        * @return
+        */
+        template<typename Hash, typename T, typename HashAccumulator = accumulator_set<Hash>>
+        typename std::enable_if_t<
+            boost::accumulators::detail::is_accumulator_set<HashAccumulator>::value && !detail::is_range<T>::value,
+            hashes::detail::range_hash_impl<hashes::detail::value_hash_impl<HashAccumulator>>
+        >
+            hash(T value) {
+
+            typedef hashes::detail::value_hash_impl<HashAccumulator> StreamHashImpl;
+            typedef hashes::detail::range_hash_impl<StreamHashImpl> HashImpl;
+
+            std::array<T, 1> wrapped_value = {value};
+
+            return HashImpl(wrapped_value, HashAccumulator());
+        }
+
 #endif    // #ifdef __ZKLLVM__ else
     }    // namespace crypto3
 }    // namespace nil
