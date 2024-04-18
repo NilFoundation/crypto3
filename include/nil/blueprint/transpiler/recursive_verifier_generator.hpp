@@ -242,12 +242,6 @@ namespace nil {
 
             template<typename CommitmentSchemeType>
             static inline std::string generate_eval_proof(typename CommitmentSchemeType::proof_type eval_proof) {
-                if( CommitmentSchemeType::lpc::use_grinding ){
-                    BOOST_ASSERT_MSG(false, "grinding is not supported");
-                    std::cout << "Grinding is not supported" << std::endl;
-                    return "Grinding is not supported";
-                }
-
                 std::stringstream out;
                 out << "\t\t{\"array\":[" << std::endl;
                 auto batch_info = eval_proof.z.get_batch_info();
@@ -690,7 +684,7 @@ namespace nil {
 
                 auto fri_params = commitment_scheme.get_commitment_params();
                 std::size_t batches_num = use_lookups?5:4;
-                auto lambda = PlaceholderParams::commitment_scheme_type::fri_type::lambda;
+                auto lambda = fri_params.lambda;
 
                 std::size_t round_proof_layers_num = 0;
                 for(std::size_t i = 0; i < fri_params.r; i++ ){
