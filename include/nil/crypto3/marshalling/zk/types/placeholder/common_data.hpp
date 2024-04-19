@@ -41,6 +41,8 @@
 
 #include <nil/crypto3/marshalling/zk/types/commitments/commitment_params.hpp>
 #include <nil/crypto3/marshalling/zk/types/commitments/eval_storage.hpp>
+#include <nil/crypto3/marshalling/zk/types/commitments/kzg.hpp>
+#include <nil/crypto3/marshalling/zk/types/commitments/lpc.hpp>
 #include <nil/crypto3/marshalling/containers/types/merkle_proof.hpp>
 
 namespace nil {
