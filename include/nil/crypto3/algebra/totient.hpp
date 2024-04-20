@@ -25,6 +25,7 @@
 #ifndef CRYPTO3_ALGEBRA_TOTIENT_HPP
 #define CRYPTO3_ALGEBRA_TOTIENT_HPP
 
+#include <nil/crypto3/algebra/primes.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -37,10 +38,10 @@ namespace nil {
              * n.
              */
             template<typename IntegerType>
-            IntegerType totient(const IntegerType n) {
+            IntegerType totient(const IntegerType &n) {
                 std::set < IntegerType > factors;
                 IntegerType enn(n);
-                PrimeFactorize(enn, factors);
+                prime_factorize(enn, factors);
 
                 IntegerType primeProd(1);
                 IntegerType numerator(1);
