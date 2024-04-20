@@ -38,8 +38,8 @@ namespace nil {
              * @param &m the input cyclotomic order.
              * @return resultant m-th cyclotomic polynomial.
              */
-            template<typename FieldValueType>
-            polynomial<FieldValueType> make_cyclotomic_recursive(uint32_t m) {
+            template<typename FieldValueType, typename IntegerType>
+            polynomial<FieldValueType> make_cyclotomic_recursive(IntegerType m) {
                 polynomial<FieldValueType> result;
                 if (m == 1) {
                     result = {-1, 1};
@@ -110,15 +110,15 @@ namespace nil {
                     uint32_t divisorPtr;
                     for (uint32_t i = 0; i < runs; i++) {
                         // get the highest degree coeff
-                        int divConst = (runningDividend.at(dividendLength - 1));
+                        int divConst = (runningDividend[dividendLength - 1]);
                         divisorPtr = divisorLength - 1;
                         for (uint32_t j = 0; j < dividendLength - i - 1; j++) {
                             if (divisorPtr > j) {
-                                runningDividend.at(dividendLength - 1 - j) =
-                                        mat(divisor.at(divisorPtr - 1 - j), divConst,
-                                            runningDividend.at(dividendLength - 2 - j));
+                                runningDividend[dividendLength - 1 - j] =
+                                        mat(divisor[divisorPtr - 1 - j], divConst,
+                                            runningDividend[dividendLength - 2 - j]);
                             } else {
-                                runningDividend.at(dividendLength - 1 - j) = runningDividend.at(dividendLength - 2 - j);
+                                runningDividend[dividendLength - 1 - j] = runningDividend[dividendLength - 2 - j];
                             }
                         }
                         quotient.at(i + 1) = runningDividend.at(dividendLength - 1);
@@ -155,8 +155,8 @@ namespace nil {
              * @param &modulus is the working modulus.
              * @return resultant m-th cyclotomic polynomial with coefficients in modulus.
              */
-            template<typename FieldRange>
-            FieldRange make_cyclotomic(uint32_t m, const typename FieldRange::value_type &modulus) {
+            template<typename FieldRange, typename IntegerType>
+            FieldRange make_cyclotomic(IntegerType m, const typename FieldRange::value_type &modulus) {
                 auto intCP = make_cyclotomic_recursive<typename FieldRange::value_type>(m);
                 FieldRange result(intCP.size(), modulus);
                 for (uint32_t i = 0; i < intCP.size(); i++) {

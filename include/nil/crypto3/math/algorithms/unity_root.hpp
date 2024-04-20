@@ -46,7 +46,7 @@ namespace nil {
             template<typename IntegerType>
             static typename std::enable_if<!algebra::is_field_element<IntegerType>::value, IntegerType>::type
             find_generator(const IntegerType &q) {
-                std::set < IntegerType > prime_factors;
+                std::set<IntegerType> prime_factors;
 
                 IntegerType qm1 = q - IntegerType(1);
                 IntegerType qm2 = q - IntegerType(2);
@@ -120,19 +120,20 @@ namespace nil {
                  *
                  */
 
-                IntegerType mu = modulo.ComputeMu();
-                IntegerType x(1);
+                multiprecision::number<Backend, ExpressionTemplates> mu = modulo.ComputeMu();
+                multiprecision::number<Backend, ExpressionTemplates> x(1);
                 x.ModMulEq(result, modulo, mu);
-                IntegerType minRU(x);
-                IntegerType curPowIdx(1);
-                std::vector<IntegerType> coprimes = algebra::totient_list<IntegerType>(m);
+                multiprecision::number<Backend, ExpressionTemplates> minRU(x);
+                multiprecision::number<Backend, ExpressionTemplates> curPowIdx(1);
+                std::vector<multiprecision::number<Backend, ExpressionTemplates>> coprimes = algebra::totient_list<multiprecision::number<Backend, ExpressionTemplates>>(
+                        m);
                 for (uint32_t i = 0; i < coprimes.size(); i++) {
                     auto nextPowIdx = coprimes[i];
-                    IntegerType diffPow(nextPowIdx - curPowIdx);
-                    for (IntegerType j(0); j < diffPow; j += IntegerType(1)) {
+                    multiprecision::number<Backend, ExpressionTemplates> diffPow(nextPowIdx - curPowIdx);
+                    for (std::size_t j = 0; j < diffPow; j++) {
                         x.ModMulEq(result, modulo, mu);
                     }
-                    if (x < minRU && x != IntegerType(1)) {
+                    if (x < minRU && x != multiprecision::number<Backend, ExpressionTemplates>(1)) {
                         minRU = x;
                     }
                     curPowIdx = nextPowIdx;
