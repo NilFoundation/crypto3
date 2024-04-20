@@ -49,6 +49,7 @@ namespace nil {
             */
             template<typename FieldType, typename ValueType = typename FieldType::value_type>
             std::shared_ptr<evaluation_domain<FieldType, ValueType>> make_evaluation_domain(std::size_t m) {
+
                 typedef std::shared_ptr<evaluation_domain<FieldType, ValueType>> result_type;
 
                 const std::size_t big = 1ul << (std::size_t(std::ceil(std::log2(m))) - 1);

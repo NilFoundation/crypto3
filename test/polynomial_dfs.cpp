@@ -34,6 +34,7 @@
 #include <boost/test/data/monomorphic.hpp>
 
 #include <nil/crypto3/algebra/fields/arithmetic_params/bls12.hpp>
+#include <nil/crypto3/algebra/random_element.hpp>
 
 #include <nil/crypto3/math/algorithms/make_evaluation_domain.hpp>
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
@@ -1024,7 +1025,7 @@ BOOST_AUTO_TEST_CASE(polynomial_dfs_division) {
 }
 
 BOOST_AUTO_TEST_CASE(polynomial_dfs_shift) {
-    
+
     polynomial_dfs<typename FieldType::value_type> a = {
         0,
         {0x01,
@@ -1039,7 +1040,7 @@ BOOST_AUTO_TEST_CASE(polynomial_dfs_shift) {
     std::vector<typename FieldType::value_type> a_coefficients =
         a.coefficients();
 
-    polynomial<typename FieldType::value_type> a_normal = 
+    polynomial<typename FieldType::value_type> a_normal =
         polynomial<typename FieldType::value_type>(a_coefficients);
 
     polynomial_dfs<typename FieldType::value_type> a_ans;
@@ -1134,10 +1135,10 @@ BOOST_AUTO_TEST_CASE(polynomial_dfs_sub_constant) {
          0x2292a9419fc78dfa76e936e03b4374c51f1b1702fa1c61018f51109bb9ab2d1b_cppui253,
          0x69fd599ad882439cb1024001d88240000000bfffffffffff5_cppui253,
          0x225563a322dac633d1c77fc14960780266d5b167b8a62ccc942322dcfdb216f7_cppui253}};
-         
+
     polynomial_dfs<typename FieldType::value_type> c2_res = {
         5,
-        {0x73eda753299d7d483339d80809a1d80553bda402fffe5bfefffffffefffffffe_cppui253, 
+        {0x73eda753299d7d483339d80809a1d80553bda402fffe5bfefffffffefffffffe_cppui253,
          0x2292a9419fc78dfa76e936e03b4374c51f1b1702fa1c61018f51109bb9ab2d31_cppui253,
          0x69fd599ad882439cb1024001d88240000000c00000000000b_cppui253,
          0x225563a322dac633d1c77fc14960780266d5b167b8a62ccc942322dcfdb2170d_cppui253,
@@ -1180,7 +1181,7 @@ BOOST_AUTO_TEST_CASE(polynomial_dfs_mul_constant) {
          0x4aa11aeeffeaf5820679a035dc419bec892909fe768e4dbce45b05c05b05aaf_cppui253,
          0x4eeb4b3446e9b3c3c79e9cedc89af1d7017a5b7f4dcd61879d800d4191e44d8a_cppui253
         }};
-         
+
     polynomial_dfs<typename FieldType::value_type> c1 = a * c;
     polynomial_dfs<typename FieldType::value_type> c2 = c * a;
     a *= c;
@@ -1210,7 +1211,7 @@ BOOST_AUTO_TEST_CASE(polynomial_dfs_pow_eq_test) {
     polynomial_dfs<typename FieldType::value_type> res = a;
     for (int i = 1; i < 7; ++i)
         res *= a;
-    
+
     BOOST_CHECK_EQUAL(res, a.pow(7));
 }
 
@@ -1258,7 +1259,7 @@ BOOST_AUTO_TEST_CASE(polynomial_dfs_evaluate_after_resize_and_shift_test) {
 
     typename FieldType::value_type point = 0x10_cppui253;
     polynomial_dfs<typename FieldType::value_type> large_poly = small_poly;
-    small_poly = polynomial_shift(small_poly, -1, 8); 
+    small_poly = polynomial_shift(small_poly, -1, 8);
     for (size_t new_size : {16, 32, 64, 128, 256, 512}) {
         large_poly.resize(new_size);
         auto large_poly_shifted = polynomial_shift(large_poly, -1, 8);
@@ -1291,6 +1292,60 @@ BOOST_AUTO_TEST_CASE(polynomial_dfs_zero_one_test) {
 
     one.resize(100);
     BOOST_CHECK((small_poly - one * small_poly).is_zero());
+}
+
+BOOST_AUTO_TEST_CASE(polynomial_dfs_multiplication_perf_test, *boost::unit_test::disabled()) {
+    size_t size = 131072 * 4;
+
+    polynomial_dfs<typename FieldType::value_type> poly = {
+        size / 128, size, nil::crypto3::algebra::random_element<FieldType>()};
+
+    std::vector<polynomial_dfs<typename FieldType::value_type>> poly4(64, poly);
+
+    auto start = std::chrono::high_resolution_clock::now();
+    for (int i = 0; i < poly4.size(); ++i) {
+        for (int j = 0; j < 32; ++j)
+            poly4[i] *= poly;
+    }
+
+    for (int i = 1; i < poly4.size(); ++i) {
+        BOOST_CHECK(poly4[i] == poly4[0]);
+    }
+
+    // Record the end time
+    auto end = std::chrono::high_resolution_clock::now();
+
+    // Calculate the duration
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+
+    std::cout << "Multiplication time: " << duration.count() << " microseconds." << std::endl;
+}
+
+BOOST_AUTO_TEST_CASE(polynomial_dfs_resize_perf_test, *boost::unit_test::disabled()) {
+    std::vector<typename FieldType::value_type> values;
+    size_t size = 131072 * 16;
+    for (int i = 0; i < size; i++) {
+        values.push_back(nil::crypto3::algebra::random_element<FieldType>());
+    }
+
+    polynomial_dfs<typename FieldType::value_type> poly = {
+        size - 1, values};
+
+    auto start = std::chrono::high_resolution_clock::now();
+    for (int i = 0; i < 10; ++i) {
+        auto poly2 = poly;
+        poly2.resize(8 * size);
+
+        BOOST_CHECK(poly2.size() == 8 * size);
+    }
+
+    // Record the end time
+    auto end = std::chrono::high_resolution_clock::now();
+
+    // Calculate the duration
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+
+    std::cout << "Resize time: " << duration.count() << " microseconds." << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

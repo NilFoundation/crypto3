@@ -268,7 +268,7 @@ namespace nil {
 
                 const field_value_type sconst = field_value_type(n).inversed();
 
-                for (std::size_t i = 0; i < n; ++i) {
+                for(std::size_t i = 0; i < n; ++i) {
                     c[i] = c[i] * sconst;
                 }
 
@@ -281,11 +281,7 @@ namespace nil {
              * [Bostan, Lecerf, & Schost, 2003. Tellegen's Principle in Practice, on page 39].
              */
             template<typename AlgebraicRange, typename FieldRange>
-            AlgebraicRange
-            transpose_multiplication(const std::size_t &n, const AlgebraicRange &a, const FieldRange &c) {
-                typedef
-                typename std::iterator_traits<decltype(std::begin(
-                        std::declval<AlgebraicRange>()))>::value_type value_type;
+            AlgebraicRange transpose_multiplication(const std::size_t &n, const AlgebraicRange &a, const FieldRange &c) {
 
                 const std::size_t m = a.size();
                 // if (c.size() - 1 > m + n)
