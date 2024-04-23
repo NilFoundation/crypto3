@@ -591,8 +591,6 @@ namespace nil {
                     constexpr static const std::size_t public_input_columns = public_columns_5;
                     constexpr static const std::size_t constant_columns = constant_columns_5;
                     constexpr static const std::size_t selector_columns = selector_columns_5;
-                    constexpr static const std::size_t table_columns =
-                            witness_columns + public_input_columns + constant_columns;
 
                     typedef placeholder_circuit_params<FieldType> circuit_params;
 
