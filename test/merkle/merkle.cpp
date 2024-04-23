@@ -29,6 +29,7 @@
 #include <nil/crypto3/hash/sha2.hpp>
 #include <nil/crypto3/hash/md5.hpp>
 #include <nil/crypto3/hash/blake2b.hpp>
+#include <nil/crypto3/hash/keccak.hpp>
 #include <nil/crypto3/hash/pedersen.hpp>
 #include <nil/crypto3/hash/poseidon.hpp>
 
@@ -323,6 +324,17 @@ BOOST_AUTO_TEST_CASE(merkletree_hash_test_1) {
     testing_hash_template<hashes::sha2<256>, 2>(v, "3b828c4f4b48c5d4cb5562a474ec9e2fd8d5546fae40e90732ef635892e42720");
     testing_hash_template<hashes::md5, 2>(v, "11ee8b50825ce6f816a1ae06d4aa0045");
     testing_hash_template<hashes::blake2b<224>, 2>(v, "0ed2a2145cae554ca57f08420d6cb58629ca1e89dc92f819c6c1d13d");
+    testing_hash_template<hashes::keccak_1600<256>, 2>(v, "568ff5eb286f51b8a3e8de4e53aa8daed44594a246deebbde119ea2eb27acd6b");
+    testing_hash_template<hashes::keccak_1600<512>, 2>(v, "1a0ca31dd9e0b27afdf77021dc50023cdd814eb53ede16e8c5c322a0bcb6bd7d26a0404e5af53971e1566c1649bb9686905cdedfa9a358023065e423522d4372");
+
+    std::vector<std::string> v_64 = {
+        "0123456789012345678901234567890123456789012345678901234567890123",
+        "0123456789012345678901234567890123456789012345678901234567890123",
+        "0123456789012345678901234567890123456789012345678901234567890123",
+        "0123456789012345678901234567890123456789012345678901234567890123"
+    };
+    merkle_tree<poseidon_type, 2> tree = make_merkle_tree<poseidon_type, 2>(v_64.begin(), v_64.end());
+    BOOST_CHECK(tree.root() == 0x6E7641F1EAE17C0DA8227840EFEA6E1D17FB5EBA600D9DC34F314D5400E5BF3_cppui255);
 }
 
 BOOST_AUTO_TEST_CASE(merkletree_hash_test_2) {
