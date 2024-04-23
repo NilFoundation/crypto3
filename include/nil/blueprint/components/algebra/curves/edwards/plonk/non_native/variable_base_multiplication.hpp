@@ -99,7 +99,7 @@ namespace nil {
                     return manifest;
                 }
 
-                manifest_type get_manifest(std::size_t bits_amount, bit_composition_mode mode) {
+                static manifest_type get_manifest(std::size_t bits_amount, bit_composition_mode mode) {
                     manifest_type manifest = manifest_type(
                         std::shared_ptr<manifest_param>(new manifest_single_value_param(9)),
                         false

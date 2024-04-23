@@ -78,6 +78,7 @@ namespace nil {
                 constexpr static const std::size_t gates_amount = 1;
                 const std::size_t rows_amount = get_rows_amount(this->witness_amount());
                 const std::size_t empty_rows_amount = get_empty_rows_amount();
+                const std::string component_name = "native field division or zero";
 
                 using var = typename component_type::var;
                 using manifest_type = plonk_component_manifest;
