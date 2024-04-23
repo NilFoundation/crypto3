@@ -44,8 +44,10 @@
 #include <nil/crypto3/zk/math/expression_visitors.hpp>
 #include <nil/crypto3/zk/math/expression_evaluator.hpp>
 
-#include<nil/blueprint/transpiler/templates/recursive_verifier.hpp>
-#include<nil/blueprint/transpiler/util.hpp>
+#include <nil/blueprint/transpiler/templates/recursive_verifier.hpp>
+#include <nil/blueprint/transpiler/util.hpp>
+
+#include <nil/crypto3/zk/snark/systems/plonk/placeholder/detail/profiling.hpp>
 
 namespace nil {
     namespace blueprint {
@@ -672,17 +674,22 @@ namespace nil {
             std::string generate_recursive_verifier(
                 const constraint_system_type &constraint_system,
                 const common_data_type &common_data,
-                const commitment_scheme_type &commitment_scheme,
-                std::size_t permutation_size,
                 const std::vector<std::size_t> public_input_sizes
             ){
+                auto placeholder_info = nil::crypto3::zk::snark::prepare_placeholder_info<PlaceholderParams>(
+                    constraint_system,
+                    common_data
+                );
+
+                std::size_t permutation_size = common_data.permuted_columns.size();
+                const auto &desc = common_data.desc;
                 BOOST_ASSERT(desc.public_input_columns == public_input_sizes.size());
                 std::string result = nil::blueprint::recursive_verifier_template;
                 bool use_lookups = constraint_system.lookup_gates().size() > 0;
                 transpiler_replacements lookup_reps;
                 transpiler_replacements reps;
 
-                auto fri_params = commitment_scheme.get_commitment_params();
+                auto fri_params = common_data.commitment_params;
                 std::size_t batches_num = use_lookups?5:4;
                 auto lambda = fri_params.lambda;
 
@@ -693,10 +700,10 @@ namespace nil {
 
                 std::size_t lookup_degree = constraint_system.lookup_poly_degree_bound();
 
-                std::size_t rows_amount = common_data.rows_amount;
+                std::size_t rows_amount = desc.rows_amount;
                 std::size_t quotient_degree = std::max(
-                    (permutation_size + 2) * (common_data.rows_amount -1 ),
-                    (lookup_degree + 1) * (common_data.rows_amount -1 )
+                    (permutation_size + 2) * (desc.rows_amount -1 ),
+                    (lookup_degree + 1) * (desc.rows_amount -1 )
                 );
 
                 std::size_t quotient_polys = (quotient_degree % rows_amount != 0)? (quotient_degree / rows_amount + 1): (quotient_degree / rows_amount);
@@ -807,8 +814,9 @@ namespace nil {
                 }
 
                 auto [z_points_indices, singles_strs, singles_map, poly_ids] = calculate_unique_points<PlaceholderParams, common_data_type>(
+                    placeholder_info,
                     desc,
-                    common_data, permutation_size, use_lookups, quotient_polys,
+                    common_data, permutation_size, quotient_polys,
                     use_lookups?constraint_system.sorted_lookup_columns_number():0,
                     "recursive" // Generator mode
                 );

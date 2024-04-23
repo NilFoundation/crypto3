@@ -35,6 +35,7 @@
 #include <nil/blueprint/transpiler/util.hpp>
 #include <nil/blueprint/transpiler/templates/commitment_scheme.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/preprocessor.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/placeholder/detail/profiling.hpp>
 
 namespace nil {
     namespace blueprint {
@@ -46,6 +47,7 @@ namespace nil {
 
         template<typename PlaceholderParams>
         void commitment_scheme_replaces(
+            const zk::snark::placeholder_info<PlaceholderParams> &placeholder_info,
             zk::snark::plonk_table_description<typename PlaceholderParams::field_type> desc,
             transpiler_replacements& replacements,
             const common_data_type<PlaceholderParams> &common_data,
@@ -59,8 +61,9 @@ namespace nil {
             std::vector<std::string> points;
 
             auto [z_points_indices, singles_strs, singles_map, poly_ids] = calculate_unique_points<PlaceholderParams, common_data_type<PlaceholderParams>>(
+                placeholder_info,
                 desc,
-                common_data, permutation_size, use_lookups, quotient_polys, lookup_polys,
+                common_data, permutation_size, quotient_polys, lookup_polys,
                 "evm" // Generator mode
             );
 
@@ -86,6 +89,16 @@ namespace nil {
                 }
             }
 
+            std::string eta_point_U;
+            std::vector<typename PlaceholderParams::field_type::value_type> eta_points;
+            for( const auto &it:common_data.commitment_scheme_data){
+                for( std::size_t i = 0; i < it.second.size(); i++ )
+                    eta_points.push_back(it.second[i]);
+            }
+            for( std::size_t i = 0; i < eta_points.size(); i++){
+                eta_point_U += "\t\tresult = addmod(0x" +to_hex_string(eta_points[eta_points.size() - i - 1]) + ", mulmod(result, theta, modulus), modulus);\n";
+            }
+
             std::vector<std::uint8_t> init_blob = {};
             nil::crypto3::zk::transcript::fiat_shamir_heuristic_sequential<typename PlaceholderParams::transcript_hash_type> transcript(init_blob);
             transcript(common_data.vk.constraint_system_with_params_hash);
@@ -94,8 +107,9 @@ namespace nil {
 
             auto fri_params = lpc_scheme.get_commitment_params();
             replacements["$R$"] = to_string(fri_params.r);
-            replacements["$LAMBDA$"] = to_string(PlaceholderParams::commitment_scheme_type::fri_type::lambda);
+            replacements["$LAMBDA$"] = to_string(fri_params.lambda);
             replacements["$D0_SIZE$"] = to_string(fri_params.D[0]->m);
+            replacements["$D0_LOG$"] = to_string(log2(fri_params.D[0]->m));
             replacements["$D0_OMEGA$"] = to_string(fri_params.D[0]->get_domain_element(1));
             replacements["$MAX_DEGREE$"] = to_string(fri_params.max_degree);
             replacements["$UNIQUE_POINTS$"] = to_string(singles_strs.size());
@@ -105,24 +119,25 @@ namespace nil {
             replacements["$POLY_POINTS_NUM$"] = poly_points_num.str();
             replacements["$POINTS_INITIALIZATION$"] = points_initializer.str();
             replacements["$ETA$"] = to_string(etha);
-            if( PlaceholderParams::commitment_scheme_type::fri_type::use_grinding){
+            replacements["$ETA_POINT_U$"] = eta_point_U;
+            replacements["$FIXED_BATCH_SIZE$"] = to_string(placeholder_info.batches_sizes[0]);
+/*          if( fri_params.use_grinding){
                 auto params = PlaceholderParams::commitment_scheme_type::fri_type::grinding_type::get_params();
                 uint32_t mask_value = params.template get<uint32_t>("mask", 0);
                 std::stringstream mask_value_hex;
                 mask_value_hex << std::hex << std::showbase << std::setw(8) << std::setfill('0') << mask_value;
                 replacements["$GRINDING_CHECK$"] = modular_commitment_grinding_check_template;
                 replacements["$GRINDING_MASK$"] = mask_value_hex.str();
-            } else {
+            } else {*/
                 replacements["$GRINDING_CHECK$"] = "";
-            }
+//            }
         }
 
         template<typename PlaceholderParams>
         std::string generate_commitment_scheme_code(
             const common_data_type<PlaceholderParams> &common_data,
-            const typename PlaceholderParams::commitment_scheme_type& lpc_scheme
+            const typename PlaceholderParams::commitment_scheme_type::params_type& fri_params
         ){
-            auto fri_params = lpc_scheme.get_commitment_params();
             BOOST_ASSERT(fri_params.step_list.size() == fri_params.r);
             for(std::size_t i = 0; i < fri_params.step_list.size(); i++){
                 BOOST_ASSERT(fri_params.step_list[i] == 1);

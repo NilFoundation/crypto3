@@ -46,11 +46,13 @@ library modular_commitment_scheme_$TEST_NAME$ {
     uint256 constant r = $R$;
     uint256 constant lambda = $LAMBDA$;
     uint256 constant D0_size = $D0_SIZE$;
+    uint256 constant D0_log = $D0_LOG$;
     uint256 constant max_degree = $MAX_DEGREE$;
     uint256 constant D0_omega = $D0_OMEGA$;
     uint256 constant unique_points = $UNIQUE_POINTS$;
     uint256 constant omega = $OMEGA$;
     uint256 constant _eta = $ETA$;
+    uint64  constant fixed_batch_size = $FIXED_BATCH_SIZE$;
     bytes constant point_ids = hex"$POINTS_IDS$"; // 1 byte -- point id
     bytes constant poly_points_num = hex"$POLY_POINTS_NUM$"; // 2 byte lengths
     bytes constant poly_ids = hex"$POLY_IDS$"; // 2 byte poly_id 2 byte
@@ -74,19 +76,20 @@ library modular_commitment_scheme_$TEST_NAME$ {
         uint256 domain_size;
         uint256[] final_polynomial;
         uint256 leaf_length;
-        uint256[2][unique_points] denominators;
-        uint256[unique_points] U;
+        uint256[2][unique_points+1] denominators;
+        uint256[unique_points+1] U;
         uint256[unique_points] unique_eval_points;
-        uint256[unique_points] theta_factors;
+        uint256[unique_points+1] theta_factors;
         uint256[2] y;
         uint256[2] Q;
         uint256 j;
         uint256 offset;
+        uint256 interpolant;
         uint16[][unique_points] poly_inds;
     }
 
 
-    function prepare_eval_points(uint256[unique_points] memory result, uint256 xi, uint256 eta) internal view {
+    function prepare_eval_points(uint256[unique_points] memory result, uint256 xi) internal view {
         uint256 inversed_omega = field.inverse_static(omega, modulus);
 $POINTS_INITIALIZATION$
     }
@@ -117,6 +120,25 @@ $POINTS_INITIALIZATION$
                 state.Q[0] = 0;
                 state.Q[1] = 0;
             }
+            for( uint256 cur_poly = fixed_batch_size; cur_poly > 0; ){
+                cur_poly--;
+                uint256 cur_offset = cur_poly * 0x40;
+                cur_offset = state.query_proof_offset + cur_offset;
+                state.Q[0] = mulmod(state.Q[0], state.theta, modulus);
+                state.Q[1] = mulmod(state.Q[1], state.theta, modulus);
+                state.Q[0] = addmod(state.Q[0], basic_marshalling.get_uint256_be(blob, cur_offset), modulus);
+                state.Q[1] = addmod(state.Q[1], basic_marshalling.get_uint256_be(blob, cur_offset + 0x20), modulus);
+            }
+            state.Q[0] = addmod(state.Q[0], modulus - state.U[unique_points], modulus);
+            state.Q[1] = addmod(state.Q[1], modulus - state.U[unique_points], modulus);
+            state.Q[0] = mulmod(state.Q[0], state.denominators[unique_points][0], modulus);
+            state.Q[1] = mulmod(state.Q[1], state.denominators[unique_points][1], modulus);
+            state.Q[0] = mulmod(state.Q[0], state.theta_factors[unique_points], modulus);
+            state.Q[1] = mulmod(state.Q[1], state.theta_factors[unique_points], modulus);
+            state.y[0] = addmod(state.y[0], state.Q[0], modulus);
+            state.y[1] = addmod(state.y[1], state.Q[1], modulus);
+            state.Q[0] = 0;
+            state.Q[1] = 0;
         }
     }
 
@@ -245,13 +267,16 @@ $POINTS_INITIALIZATION$
         }
     }
 
+    function prepare_eta_U(uint256 theta) internal pure returns (uint256 result){
+$ETA_POINT_U$
+    }
+
     function verify_eval(
         bytes calldata blob,
         uint256[5] memory commitments,
         uint256 challenge,
         bytes32 transcript_state
     ) internal view returns (bool){
-
 unchecked {
         types.transcript_data memory tr_state;
         tr_state.current_challenge = transcript_state;
@@ -260,7 +285,8 @@ unchecked {
         {
             uint256 offset;
 
-            if (challenge!= transcript.get_field_challenge(tr_state, modulus)) {
+            uint256 challenge2 = transcript.get_field_challenge(tr_state, modulus);
+            if (challenge!= challenge2) {
                 console.log("Wrong challenge");
                 return false;
             }
@@ -334,7 +360,8 @@ unchecked {
             return false;
         }
 
-        prepare_eval_points(state.unique_eval_points, challenge, _eta);
+        prepare_eval_points(state.unique_eval_points, challenge);
+        // Prepare U
         {
             uint256 sum;
 
@@ -343,6 +370,8 @@ unchecked {
                 sum += (uint256(uint8(poly_points_num[2*i])) << 8) + uint256(uint8(poly_points_num[2*i + 1]));
                 i++;
             }
+            state.theta_factors[unique_points] = field.pow_small(state.theta, sum, modulus);
+
             uint256 off = point_ids.length * 0x20 - 0x18;
             for(uint256 i = 0; i < point_ids.length;){
                 uint256 p = uint256(uint8(point_ids[point_ids.length - i - 1]));
@@ -351,11 +380,8 @@ unchecked {
                 off -= 0x20;
                 i++;
             }
-            for(uint256 i = 0; i < state.unique_eval_points.length;){
-                i++;
-            }
+            state.U[unique_points] = prepare_eta_U(state.theta);
         }
-$ETA_VALUES_VERIFICATION$
 
         uint64 cur = 0;
         for(uint64 p = 0; p < unique_points; p++){
@@ -370,48 +396,74 @@ $ETA_VALUES_VERIFICATION$
         for(uint64 i = 0; i < lambda;){
             // Initial proofs
             state.query_proof_offset = state.initial_data_offset;
-            state.x_index = uint256(transcript.get_integral_challenge_be(tr_state, 8))  % D0_size;
-            state.x = field.pow_small(D0_omega, state.x_index, modulus);
+            state.x = transcript.get_field_challenge(tr_state, modulus);
+            state.x = field.pow_small(state.x, (modulus-1) / D0_size , modulus);
+            state.x_index = 0;
+            for( uint64 j = 0; j < D0_log - 1; j++){
+                state.x_index += (uint64(1 - uint8(blob[state.initial_proof_offset + 0x47 + 0x38 * j])) << j );
+            }
+            {
+                uint256 tmp = field.pow_small(D0_omega, state.x_index, modulus);
+                if( tmp != state.x ){
+                    state.x_index += D0_size/2;
+                    tmp = modulus - tmp;
+                    if( tmp != state.x ){
+                        console.log("Wrong x_index");
+                        return false;
+                    }
+                }
+            }
             state.domain_size = D0_size >> 1;
             for(uint64 j = 0; j < batches_num;){
-                if( state.x_index < state.domain_size ){
-                    if(!copy_pairs_and_check(blob, state.initial_data_offset, state.leaf_data, state.batch_sizes[j], state.initial_proof_offset)){
-                        console.log("Error in initial mekle proof");
-                        return false;
-                    }
-                } else {
-                    if(!copy_reverted_pairs_and_check(blob, state.initial_data_offset, state.leaf_data, state.batch_sizes[j], state.initial_proof_offset)){
-                        console.log("Error in initial mekle proof");
-                        return false;
-                    }
+                if(!copy_pairs_and_check(blob, state.initial_data_offset, state.leaf_data, state.batch_sizes[j], state.initial_proof_offset)){
+                    console.log("Error in initial mekle proof");
+                    return false;
                 }
                 state.leaf_length = state.batch_sizes[j] * 0x40;
                 state.initial_data_offset += state.batch_sizes[j] * 0x40;
                 state.initial_proof_offset = merkle_verifier.skip_merkle_proof_be(blob, state.initial_proof_offset);
                 j++;
             }
-
             for( uint64 p = 0; p < unique_points; p++){
                 state.denominators[p][0] = addmod(state.x, modulus - state.unique_eval_points[p], modulus);
                 state.denominators[p][1] = addmod(modulus - state.x, modulus - state.unique_eval_points[p], modulus);
                 state.denominators[p][0] = field.inverse_static(state.denominators[p][0], modulus);
                 state.denominators[p][1] = field.inverse_static(state.denominators[p][1], modulus);
             }
-            prepare_Y(blob, state.query_proof_offset, state);
-            if( state.x_index < state.domain_size ){
-                if( !copy_memory_pair_and_check(blob, state.round_proof_offset, state.leaf_data, state.y) ){
-                    console.log("Not validated!");
-                    return false;
-                }
-            }else{
-                if( !copy_reverted_memory_pair_and_check(blob, state.round_proof_offset, state.leaf_data, state.y) ){
-                    console.log("Not validated!");
-                    return false;
+            state.denominators[unique_points][0] = addmod(state.x, modulus - _eta, modulus);
+            state.denominators[unique_points][1] = addmod(modulus - state.x, modulus - _eta, modulus);
+            state.denominators[unique_points][0] = field.inverse_static(state.denominators[unique_points][0], modulus);
+            state.denominators[unique_points][1] = field.inverse_static(state.denominators[unique_points][1], modulus);
+
+            if(state.x_index >= state.domain_size){
+                for( uint64 p = 0; p < unique_points + 1; p++ ){
+                    uint256 tmp;
+                    tmp = state.denominators[p][0];
+                    state.denominators[p][0] = state.denominators[p][1];
+                    state.denominators[p][1] = tmp;
                 }
             }
-            if( !colinear_check(state.x, state.y, state.alphas[0], basic_marshalling.get_uint256_be(blob,state.round_data_offset)) ){
-                console.log("Colinear check failed");
+
+            prepare_Y(blob, state.query_proof_offset, state);
+            if( !copy_memory_pair_and_check(blob, state.round_proof_offset, state.leaf_data, state.y) ){
+                console.log("Not validated!");
                 return false;
+            }
+            if( state.x_index % (state.domain_size) < state.domain_size/2){
+                state.interpolant = basic_marshalling.get_uint256_be(blob,state.round_data_offset);
+            } else {
+                state.interpolant = basic_marshalling.get_uint256_be(blob,state.round_data_offset + 0x20);
+            }
+            if( state.x_index < state.domain_size ) {
+                if( !colinear_check(state.x, state.y, state.alphas[0], state.interpolant) ){
+                    console.log("Colinear check failed");
+                    return false;
+                }
+            } else {
+                if( !colinear_check(modulus - state.x, state.y, state.alphas[0], state.interpolant) ){
+                    console.log("Colinear check failed");
+                    return false;
+                }
             }
 
             state.round_proof_offset = merkle_verifier.skip_merkle_proof_be(blob, state.round_proof_offset);
@@ -419,35 +471,51 @@ $ETA_VALUES_VERIFICATION$
                 state.x_index %= state.domain_size;
                 state.x = mulmod(state.x, state.x, modulus);
                 state.domain_size >>= 1;
-                if( state.x_index < state.domain_size ){
-                    if(!copy_pairs_and_check(blob, state.round_data_offset, state.leaf_data, 1, state.round_proof_offset)) {
-                        console.log("Error in round mekle proof");
-                        return false;
-                    }
-                } else {
-                    if(!copy_reverted_pairs_and_check(blob, state.round_data_offset, state.leaf_data, 1, state.round_proof_offset)) {
-                        console.log("Error in round mekle proof");
-                        return false;
-                    }
+                if(!copy_pairs_and_check(blob, state.round_data_offset, state.leaf_data, 1, state.round_proof_offset)) {
+                    console.log("Error in round mekle proof");
+                    return false;
                 }
                 state.y[0] = basic_marshalling.get_uint256_be(blob, state.round_data_offset);
                 state.y[1] = basic_marshalling.get_uint256_be(blob, state.round_data_offset + 0x20);
-                if( !colinear_check(state.x, state.y, state.alphas[state.j], basic_marshalling.get_uint256_be(blob,state.round_data_offset + 0x40)) ){
-                    console.log("Round colinear check failed");
-                    return false;
+                if( state.x_index % (state.domain_size) < state.domain_size/2){
+                    state.interpolant = basic_marshalling.get_uint256_be(blob,state.round_data_offset + 0x40);
+                } else {
+                    state.interpolant = basic_marshalling.get_uint256_be(blob,state.round_data_offset + 0x60);
+                }
+                if( state.x_index < state.domain_size ) {
+                    if( !colinear_check(state.x, state.y, state.alphas[state.j], state.interpolant) ){
+                        console.log("Round colinear check failed", state.j);
+                        return false;
+                    }
+                } else {
+                    if( !colinear_check(modulus - state.x, state.y, state.alphas[state.j], state.interpolant) ){
+                        console.log("Round colinear check failed", state.j);
+                        return false;
+                    }
                 }
                 state.j++; state.round_data_offset += 0x40;
                 state.round_proof_offset = merkle_verifier.skip_merkle_proof_be(blob, state.round_proof_offset);
             }
 
             state.x = mulmod(state.x, state.x, modulus);
-            if(polynomial.evaluate(state.final_polynomial, state.x, modulus) != basic_marshalling.get_uint256_be(blob, state.round_data_offset)) {
-                console.log("Wrong final poly check");
-                return false;
+            state.x_index = state.x_index%state.domain_size;
+            if( state.x_index % state.domain_size/2 < state.domain_size/4 ){
+                state.y[0] = basic_marshalling.get_uint256_be(blob, state.round_data_offset);
+                state.y[1] = basic_marshalling.get_uint256_be(blob, state.round_data_offset + 0x20);
+            } else {
+                state.y[0] = basic_marshalling.get_uint256_be(blob, state.round_data_offset + 0x20);
+                state.y[1] = basic_marshalling.get_uint256_be(blob, state.round_data_offset);
             }
-            if(polynomial.evaluate(state.final_polynomial, modulus - state.x, modulus) != basic_marshalling.get_uint256_be(blob, state.round_data_offset + 0x20)){
-                console.log("Wrong final poly check");
-                return false;
+
+            if(polynomial.evaluate(state.final_polynomial, state.x, modulus) != state.y[0]) {
+                console.log("Wrong final poly check", polynomial.evaluate(state.final_polynomial, state.x, modulus));
+                console.log(state.y[0]);
+//                return false;
+            }
+            if(polynomial.evaluate(state.final_polynomial, modulus - state.x, modulus) != state.y[1]){
+                console.log("Wrong final poly check",polynomial.evaluate(state.final_polynomial, modulus-state.x, modulus));
+                console.log(state.y[1]);
+//                return false;
             }
             state.round_data_offset += 0x40;
             i++;

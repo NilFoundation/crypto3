@@ -7,9 +7,9 @@ namespace nil {
     namespace blueprint {
         std::string lookup_library_call = R"(
         {
-            uint256 lookup_offset = table_offset + quotient_offset + uint256(uint8(blob[z_offset + basic_marshalling.get_length(blob, z_offset - 0x8) *0x20 + 0xf])) * 0x20;
+            uint256 lookup_offset = $LOOKUP_OFFSET$;
             uint256[4] memory lookup_argument;
-            uint256 lookup_commitment = basic_marshalling.get_uint256_be(blob, 0x81);
+            uint256 lookup_commitment = basic_marshalling.get_uint256_be(blob, $SORTED_COMMITMENT_OFFSET$);
             ILookupArgument lookup_contract = ILookupArgument(_lookup_argument_address);
             (lookup_argument, tr_state.current_challenge) = lookup_contract.verify(
                 blob[special_selectors_offset: table_offset + quotient_offset],
@@ -22,6 +22,20 @@ namespace nil {
             state.F[4] = lookup_argument[1];
             state.F[5] = lookup_argument[2];
             state.F[6] = lookup_argument[3];
+        }
+        )";
+
+        std::string permutation_call = R"(
+        {
+            uint256[3] memory permutation_argument;
+            (permutation_argument, tr_state.current_challenge) = modular_permutation_argument_$TEST_NAME$.verify(
+                blob[z_offset:quotient_offset],
+                state.l0,
+                tr_state.current_challenge
+            );
+            state.F[0] = permutation_argument[0];
+            state.F[1] = permutation_argument[1];
+            state.F[2] = permutation_argument[2];
         }
         )";
 
@@ -58,7 +72,6 @@ import "../../algebra/field.sol";
 
 contract modular_verifier_$TEST_NAME$ is IModularVerifier{
     uint256 constant modulus = $MODULUS$;
-    bool    constant use_lookups = false;
     bytes32 constant vk1 = bytes32($VERIFICATION_KEY1$);
     bytes32 constant vk2 = bytes32($VERIFICATION_KEY2$);
     bytes32 transcript_state;
@@ -69,12 +82,13 @@ contract modular_verifier_$TEST_NAME$ is IModularVerifier{
     uint64 constant sorted_columns = $SORTED_COLUMNS_NUMBER$;
     uint64   constant f_parts = 8;   // Individually on parts
     uint64  constant z_offset = $Z_OFFSET$;
-    uint64  constant table_offset = z_offset + 0x80 * $PERMUTATION_SIZE$ + 0xc0;
-    uint64  constant table_end_offset = table_offset + $PERMUTATION_TABLE_OFFSET$;
+    uint64  constant table_offset = $TABLE_OFFSET$;
+    uint64  constant special_selectors_offset = $SPECIAL_SELECTORS_OFFSET$;
+    uint64  constant table_end_offset = $TABLE_END_OFFSET$;
     uint64  constant quotient_offset = $QUOTIENT_OFFSET$;
     uint64  constant rows_amount = $ROWS_AMOUNT$;
     uint256 constant omega = $OMEGA$;
-    uint256 constant special_selectors_offset = z_offset + $PERMUTATION_SIZE$ * 0x80;
+    uint64  constant quotient_size = $QUOTIENT_SIZE$;
 
     function initialize(
 //        address permutation_argument_address,
@@ -163,7 +177,7 @@ contract modular_verifier_$TEST_NAME$ is IModularVerifier{
 
         //0. Direct public input check
         if(public_input.length > 0) {
-            if (!public_input_direct(blob[$TABLE_Z_OFFSET$:$TABLE_Z_OFFSET$+$QUOTIENT_OFFSET$], public_input, state)) {
+            if (!public_input_direct(blob[$TABLE_OFFSET$:$TABLE_END_OFFSET$], public_input, state)) {
                 emit WrongPublicInput();
                 state.b = false;
             }
@@ -178,40 +192,40 @@ contract modular_verifier_$TEST_NAME$ is IModularVerifier{
             transcript.update_transcript_b32_by_offset_calldata(tr_state, blob, 0x9);
 
             //3. Permutation argument
-            uint256[3] memory permutation_argument = modular_permutation_argument_$TEST_NAME$.verify(
-                blob[$Z_OFFSET$:$TABLE_Z_OFFSET$+$QUOTIENT_OFFSET$],
-                transcript.get_field_challenge(tr_state, modulus),
-                transcript.get_field_challenge(tr_state, modulus),
-                state.l0
-            );
-            state.F[0] = permutation_argument[0];
-            state.F[1] = permutation_argument[1];
-            state.F[2] = permutation_argument[2];
+            $PERMUTATION_ARGUMENT_CALL$
         }
-
         //4. Lookup library call
         $LOOKUP_LIBRARY_CALL$
 
         //5. Push permutation batch to transcript
-        transcript.update_transcript_b32_by_offset_calldata(tr_state, blob, 0x31);
-
+        $PERMUTATION_BATCH_TRANSCRIPT_PUSH$
         {
             //6. Gate argument
             IGateArgument modular_gate_argument = IGateArgument(_gate_argument_address);
-            state.F[7] = modular_gate_argument.verify(blob[table_offset:table_end_offset], transcript.get_field_challenge(tr_state, modulus));
+            uint256 theta = transcript.get_field_challenge(tr_state, modulus);
+
+            state.F[7] = modular_gate_argument.verify(blob[table_offset:table_end_offset], theta);
             state.F[7] = mulmod(
                 state.F[7],
                 addmod(
                     1,
                     modulus - addmod(
                         basic_marshalling.get_uint256_be(blob, special_selectors_offset),
-                        basic_marshalling.get_uint256_be(blob, special_selectors_offset + 0x60),
+                        basic_marshalling.get_uint256_be(blob, special_selectors_offset + 0x40),
                         modulus
                     ),
                     modulus
                 ),
                 modulus
             );
+//            console.log("F[0] = ", state.F[0]);
+//            console.log("F[1] = ", state.F[1]);
+//            console.log("F[2] = ", state.F[2]);
+//            console.log("F[3] = ", state.F[3]);
+//            console.log("F[4] = ", state.F[4]);
+//            console.log("F[5] = ", state.F[5]);
+//            console.log("F[6] = ", state.F[6]);
+//            console.log("F[7] = ", state.F[7]);
         }
 
         // No public input gate
@@ -220,10 +234,12 @@ contract modular_verifier_$TEST_NAME$ is IModularVerifier{
         {
             //7. Push quotient to transcript
             for( uint8 i = 0; i < f_parts;){
-                F_consolidated = addmod(F_consolidated, mulmod(state.F[i],transcript.get_field_challenge(tr_state, modulus), modulus), modulus);
+                uint256 alpha = transcript.get_field_challenge(tr_state, modulus);
+                F_consolidated = addmod(F_consolidated, mulmod(state.F[i], alpha, modulus), modulus);
                 unchecked{i++;}
             }
-            transcript.update_transcript_b32_by_offset_calldata(tr_state, blob, 0x59);
+
+            transcript.update_transcript_b32_by_offset_calldata(tr_state, blob, $QUOTIENT_COMMITMENT_OFFSET$);
         }
 
         //8. Commitment scheme verify_eval
@@ -247,7 +263,7 @@ contract modular_verifier_$TEST_NAME$ is IModularVerifier{
         {
             uint256 T_consolidated;
             uint256 factor = 1;
-            for(uint64 i = 0; i < uint64(uint8(blob[z_offset + basic_marshalling.get_length(blob, z_offset - 0x8) *0x20 + 0xf]));){
+            for(uint64 i = 0; i < quotient_size;){
                 T_consolidated = addmod(
                     T_consolidated,
                     mulmod(basic_marshalling.get_uint256_be(blob, table_offset + quotient_offset + i *0x20), factor, modulus),

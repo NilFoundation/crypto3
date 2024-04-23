@@ -36,7 +36,9 @@
 #include <nil/blueprint/transpiler/templates/modular_verifier.hpp>
 #include <nil/blueprint/transpiler/templates/gate_argument.hpp>
 #include <nil/blueprint/transpiler/templates/permutation_argument.hpp>
+#include <nil/blueprint/transpiler/templates/permutation_argument_chunked.hpp>
 #include <nil/blueprint/transpiler/templates/lookup_argument.hpp>
+#include <nil/blueprint/transpiler/templates/lookup_argument_chunked.hpp>
 #include <nil/blueprint/transpiler/templates/commitment_scheme.hpp>
 #include <nil/blueprint/transpiler/templates/external_gate.hpp>
 #include <nil/blueprint/transpiler/templates/external_lookup.hpp>
@@ -47,6 +49,8 @@
 #include <nil/crypto3/hash/keccak.hpp>
 #include <nil/crypto3/hash/algorithm/hash.hpp>
 #include <nil/crypto3/detail/digest.hpp>
+
+#include <nil/crypto3/zk/snark/systems/plonk/placeholder/detail/profiling.hpp>
 
 namespace nil {
     namespace blueprint {
@@ -65,81 +69,7 @@ namespace nil {
             using variable_indices_type = std::map<nil::crypto3::zk::snark::plonk_variable<typename PlaceholderParams::field_type::value_type>, std::size_t>;
             using columns_rotations_type = std::vector<std::set<int>>;
 
-            variable_indices_type get_plonk_variable_indices(const columns_rotations_type &col_rotations){
-                using variable_type = nil::crypto3::zk::snark::plonk_variable<typename PlaceholderParams::field_type::value_type>;
-                std::map<variable_type, std::size_t> result;
-                std::size_t j = 0;
-                for(std::size_t i = 0; i < _desc.constant_columns; i++){
-                    for(auto& rot: col_rotations[i + _desc.witness_columns + _desc.public_input_columns]){
-                        variable_type v(i, rot, true, variable_type::column_type::constant);
-                        result[v] = j;
-                        j++;
-                    }
-                    j++;
-                }
-                for(std::size_t i = 0; i < _desc.selector_columns; i++){
-                    for(auto& rot: col_rotations[i + _desc.witness_columns + _desc.public_input_columns + _desc.constant_columns]){
-                        variable_type v(i, rot, true, variable_type::column_type::selector);
-                        result[v] = j;
-                        j++;
-                    }
-                    j++;
-                }
-                for(std::size_t i = 0; i < _desc.witness_columns; i++){
-                    for(auto& rot: col_rotations[i]){
-                        variable_type v(i, rot, true, variable_type::column_type::witness);
-                        result[v] = j;
-                        j++;
-                    }
-                }
-                for(std::size_t i = 0; i < _desc.public_input_columns; i++){
-                    for(auto& rot: col_rotations[i + _desc.witness_columns]){
-                        variable_type v(i, rot, true, variable_type::column_type::public_input);
-                        result[v] = j;
-                        j++;
-                    }
-                }
-                return result;
-            }
-
-            std::string zero_indices(columns_rotations_type col_rotations){
-                std::vector<std::size_t> zero_indices;
-                std::uint16_t fixed_values_points = 0;
-                std::stringstream result;
-
-                for(std::size_t i= 0; i < _desc.constant_columns + _desc.selector_columns; i++){
-                    fixed_values_points += col_rotations[i + _desc.witness_columns + _desc.public_input_columns].size() + 1;
-                }
-
-                for(std::size_t i= 0; i < _desc.table_width(); i++){
-                    std::size_t j = 0;
-                    for(auto& rot: col_rotations[i]){
-                        if(rot == 0){
-                            zero_indices.push_back(j);
-                            break;
-                        }
-                        j++;
-                    }
-                }
-
-                std::uint16_t sum = fixed_values_points;
-                std::size_t i = 0;
-                for(; i < _desc.witness_columns + _desc.public_input_columns; i++){
-                    zero_indices[i] = (sum + zero_indices[i]) * 0x20;
-                    sum += col_rotations[i].size();
-                    result << std::hex << std::setfill('0') << std::setw(4) << zero_indices[i];
-                }
-
-                sum = 0;
-                for(; i < _desc.table_width(); i++){
-                    zero_indices[i] = (sum + zero_indices[i]) * 0x20;
-                    sum += col_rotations[i].size() + 1;
-                    result << std::hex << std::setfill('0') << std::setw(4) << zero_indices[i];
-                }
-                return result.str();
-            }
-
-            /* Detect whether combination is a polynomial over one variable */
+            // Detect whether combination is a polynomial over one variable
             bool detect_polynomial(crypto3::math::non_linear_combination<variable_type> const& comb) {
                 std::unordered_set<variable_type> comb_vars;
 
@@ -153,7 +83,7 @@ namespace nil {
                 return comb_vars.size() == 1;
             }
 
-            /* Detect whether term is a power of one variable. If such, return this power */
+            // Detect whether term is a power of one variable. If such, return this power
             std::size_t term_is_power(crypto3::math::term<variable_type> const& term) {
                 const auto &vars = term.get_vars();
                 auto var = std::cbegin(vars);
@@ -282,11 +212,8 @@ namespace nil {
             }
         public:
             evm_verifier_printer(
-                zk::snark::plonk_table_description<typename PlaceholderParams::field_type> desc,
                 const typename PlaceholderParams::constraint_system_type &constraint_system,
                 const common_data_type &common_data,
-                const typename PlaceholderParams::commitment_scheme_type &lpc_scheme,
-                std::size_t permutation_size,
                 std::string folder_name,
                 std::size_t gates_contract_size_threshold = 800,
                 std::size_t lookups_library_size_threshold = 1000,
@@ -294,18 +221,22 @@ namespace nil {
                 bool deduce_horner = true,
                 bool optimize_powers = true
             ) :
-            _desc(desc),
             _constraint_system(constraint_system),
             _common_data(common_data),
-            _lpc_scheme(lpc_scheme),
-            _permutation_size(permutation_size),
             _folder_name(folder_name),
             _lookups_library_size_threshold(lookups_library_size_threshold),
             _gates_contract_size_threshold(gates_contract_size_threshold),
             _lookups_contract_size_threshold(lookups_contract_size_threshold),
             _deduce_horner(deduce_horner),
-            _optimize_powers(optimize_powers)
+            _optimize_powers(optimize_powers),
+            _desc(common_data.desc),
+            _permutation_size(common_data.permuted_columns.size()),
+            _fri_params(common_data.commitment_params)
             {
+                _placeholder_info = nil::crypto3::zk::snark::prepare_placeholder_info<PlaceholderParams>(
+                    constraint_system,
+                    common_data
+                );
                 std::size_t found = folder_name.rfind("/");
                 if( found == std::string::npos ){
                     _test_name = folder_name;
@@ -313,14 +244,15 @@ namespace nil {
                     _test_name = folder_name.substr(found + 1);
                 }
                 _use_lookups = _constraint_system.lookup_gates().size() > 0;
+                _use_permutations = common_data.permuted_columns.size() > 0;
 
-                _z_offset = _use_lookups ? 0xc9 : 0xa1;
-                _special_selectors_offset = _z_offset + _permutation_size * 0x80;
-                _table_z_offset = _special_selectors_offset + 0xc0;
+                _z_offset = (_placeholder_info.batches_num - 1) * 0x28 + 0x29;
+                _special_selectors_offset = _z_offset + _permutation_size * 0x40;
+                _table_offset = _special_selectors_offset + 0x80;
+
                 _variable_values_offset = 0;
-
                 for( std::size_t i = 0; i < _desc.constant_columns + _desc.selector_columns; i++){
-                    _variable_values_offset += 0x20 * (_common_data.columns_rotations[i + _desc.witness_columns + _desc.public_input_columns].size()+1);
+                    _variable_values_offset += 0x20 * (_common_data.columns_rotations[i + _desc.witness_columns + _desc.public_input_columns].size());
                 }
 
                 _permutation_offset = _variable_values_offset;
@@ -332,9 +264,16 @@ namespace nil {
                     _permutation_offset += 0x20 * (_common_data.columns_rotations[i].size());
                 }
 
-                _quotient_offset = _use_lookups? _permutation_offset + 0x80: _permutation_offset + 0x40;
+                _table_end_offset = _permutation_offset + _table_offset;
+                _quotient_offset = _permutation_offset;
 
-                _var_indices = get_plonk_variable_indices(_common_data.columns_rotations);
+                if(_use_permutations) _quotient_offset += (_placeholder_info.permutation_poly_amount + 1) * 0x20;
+                _v_l_offset = _quotient_offset;
+                if(_use_lookups) _quotient_offset += (_placeholder_info.lookup_poly_amount + 1) * 0x20;
+
+                _lookup_offset = _table_offset + _quotient_offset + 0x20 * (_placeholder_info.quotient_size);
+
+                _var_indices = _placeholder_info.var_indices;
             }
 
             void print_gates_library_file(std::size_t library_id,
@@ -600,7 +539,6 @@ namespace nil {
                 } else {
                     auto it = constraints.begin();
                     while (it != constraints.end()) {
-                        std::cout << "Gates modules count" <<  gate_modules_count << std::endl;
                         std::string code = print_constraint_series(it, constraints.end());
 
                         std::string result = modular_external_gate_library_template;
@@ -688,7 +626,7 @@ namespace nil {
                         return a.second > b.second;
                         });
 
-                /* Fill contract inline lookup computation, inline small first */
+                // Fill contract inline lookup computation, inline small first
                 std::unordered_set<std::size_t> inlined_lookup_codes;
                 std::size_t inlined_lookup_codes_size = 0;
                 for (auto lookup = lookup_costs.rbegin(); lookup != lookup_costs.rend(); ++lookup) {
@@ -723,9 +661,9 @@ namespace nil {
                 for (i = 0; i < _constraint_system.lookup_gates().size(); ++i) {
                     if (inlined_lookup_codes.count(i) == 1) {
                         boost::replace_all(lookup_codes[i], "$STATE$", "state.");
-                        lookup_str << "/* -- lookup " << i << " is inlined -- */" << std::endl;
+                        lookup_str << "// -- lookup " << i << " is inlined -- " << std::endl;
                         lookup_str << lookup_codes[i] << std::endl;
-                        lookup_str << "/* -- /lookup " << i << " is inlined -- */" << std::endl;
+                        lookup_str << "// -- /lookup " << i << " is inlined -- " << std::endl;
                     } else {
                         std::string lookup_eval_string = lookup_call_template;
                         boost::replace_all(lookup_eval_string, "$TEST_NAME$", _test_name);
@@ -796,7 +734,7 @@ namespace nil {
                 if (fixed_poly_values.size() == 0)
                     return "";
 
-                result << "\t\t\t///* 1 - 2*permutation_size */" << std::endl;
+                result << "\t\t\t// 1 - 2*permutation_size " << std::endl;
                 std::vector<std::uint8_t> eta_buf;
 
                 std::size_t poly_points = 2*_permutation_size;
@@ -879,63 +817,98 @@ namespace nil {
                 return result.str();
             }
 
+            std::string permuted_indices_to_hex_str(std::vector<std::size_t> indices){
+                std::stringstream result;
+                for(std::size_t i = 0; i < indices.size(); i++){
+                    result << std::hex << std::setfill('0') << std::setw(4) << indices[i] * 0x20;
+                }
+                return result.str();
+            }
+
+            std::string lookup_parts_hex_string(const std::vector<std::size_t> &lookup_parts){
+                std::stringstream result;
+                for(std::size_t i = 0; i < lookup_parts.size(); i++){
+                    result << std::hex << std::setw(2) << std::setfill('0') << lookup_parts[i];
+                }
+                return result.str();
+            }
+
             void print(){
+                if(_use_lookups && _placeholder_info.lookup_poly_amount > 1){
+                    std::cout << "Lookup argument chunking not supported" << std::endl;
+                    exit(1);
+                }
                 std::filesystem::create_directory(_folder_name);
                 std::string gate_argument = print_gate_argument();
                 std::string lookup_argument = print_lookup_argument();
 
-                std::string commitment_code = generate_commitment_scheme_code<PlaceholderParams>(_common_data, _lpc_scheme);
+                std::string commitment_code = generate_commitment_scheme_code<PlaceholderParams>(_common_data, _fri_params);
 
                 // Prepare all necessary replacements
                 transpiler_replacements reps;
-                reps["$LOOKUP_LIBRARY_CALL$"] = _use_lookups ? lookup_library_call :"        //No lookups";
+                reps["$LOOKUP_LIBRARY_CALL$"] = _use_lookups ? lookup_library_call :"//No lookups";
+                reps["$PERMUTATION_ARGUMENT_CALL$"] = _common_data.permuted_columns.size() == 0 ? "//No permutations" : permutation_call;
+                reps["$PERMUTATION_BATCH_TRANSCRIPT_PUSH$"] = _use_lookups || _use_permutations ? "transcript.update_transcript_b32_by_offset_calldata(tr_state, blob, 0x31);" :  "//No lookups and no permutation";
+                reps["$QUOTIENT_COMMITMENT_OFFSET$"] = "0x" + to_hex_string(_placeholder_info.quotient_batch_order * 0x28 + 0x9);
                 reps["$TEST_NAME$"] = _test_name;
                 reps["$MODULUS$"] = to_string(PlaceholderParams::field_type::modulus);
                 reps["$VERIFICATION_KEY1$"] = "0x" + to_string(_common_data.vk.constraint_system_with_params_hash);
                 reps["$VERIFICATION_KEY2$"] = "0x" + to_string(_common_data.vk.fixed_values_commitment);
-                reps["$BATCHES_NUM$"] = _use_lookups ? "5" :"4";
-                reps["$EVAL_PROOF_OFFSET$"] = _use_lookups ? "0xa1" :"0x79";
+                reps["$BATCHES_NUM$"] = to_string(_placeholder_info.batches_num);
+                reps["$EVAL_PROOF_OFFSET$"] = "0x" + to_hex_string(_placeholder_info.batches_num * 0x28 - 0x27);
                 reps["$SORTED_COLUMNS_NUMBER$"] = to_string(_constraint_system.sorted_lookup_columns_number());
                 reps["$LOOKUP_OPTIONS_NUMBER$"] = to_string(_constraint_system.lookup_options_num());
                 reps["$LOOKUP_CONSTRAINTS_NUMBER$"] = to_string(_constraint_system.lookup_constraints_num());
-                reps["$Z_OFFSET$"] = _use_lookups ? "0xc9" :"0xa1";
+                reps["$Z_OFFSET$"] = "0x" + to_hex_string(_z_offset);
                 reps["$PERMUTATION_SIZE$"] = to_string(_permutation_size);
                 reps["$SPECIAL_SELECTORS_OFFSET$"] = to_string(_special_selectors_offset);
-                reps["$TABLE_Z_OFFSET$"] = to_string(_table_z_offset);
+                reps["$TABLE_OFFSET$"] = "0x" + to_hex_string(_table_offset);
+                reps["$TABLE_END_OFFSET$"] = "0x" + to_hex_string(_table_end_offset);
                 reps["$PUBLIC_INPUT_OFFSET$"] = to_string(_public_input_offset);
                 reps["$PERMUTATION_TABLE_OFFSET$"] = to_string(_permutation_offset);
-                reps["$QUOTIENT_OFFSET$"] = to_string(_quotient_offset);
-                reps["$ROWS_AMOUNT$"] = to_string(_common_data.rows_amount);
+                reps["$QUOTIENT_OFFSET$"] = "0x" + to_hex_string(_quotient_offset);
+                reps["$V_L_OFFSET$"] = "0x" + to_hex_string(_v_l_offset);
+                reps["$LOOKUP_OFFSET$"] = "0x" + to_hex_string(_lookup_offset);
+                reps["$SORTED_COMMITMENT_OFFSET$"] = "0x" + to_hex_string(_placeholder_info.lookup_batch_order * 0x28 + 0x9);
+                reps["$ROWS_AMOUNT$"] = to_string(_desc.rows_amount);
                 reps["$OMEGA$"] = to_string(_common_data.basic_domain->get_domain_element(1));
-                reps["$ZERO_INDICES$"] = zero_indices(_common_data.columns_rotations);
+                reps["$ZERO_INDICES$"] = permuted_indices_to_hex_str(_placeholder_info.permuted_zero_indices);
                 reps["$GATE_ARGUMENT_COMPUTATION$"] = gate_argument;
                 reps["$GATE_INCLUDES$"] = _gate_includes;
                 reps["$LOOKUP_INCLUDES$"] = _lookup_includes;
                 reps["$LOOKUP_ARGUMENT_COMPUTATION$"] = lookup_argument;
                 reps["$COMMITMENT_CODE$"] = commitment_code;
                 reps["$ETA_VALUES_VERIFICATION$"] = eta_point_verification_code();
+                reps["$QUOTIENT_SIZE$"] = to_string(_placeholder_info.quotient_size);
+                reps["$PERMUTATION_PARTS$"] = to_string(_placeholder_info.permutation_poly_amount);
+                reps["$LOOKUP_PARTS_AMOUNT$"] = to_string(_placeholder_info.lookup_poly_amount);
+                reps["$LOOKUP_PARTS$"] = lookup_parts_hex_string(_constraint_system.lookup_parts(_common_data.max_quotient_chunks));
+                reps["$MAX_QUOTIENT_CHUNKS$"] = to_string(_common_data.max_quotient_chunks);
 
                 std::size_t _lookup_degree = _constraint_system.lookup_poly_degree_bound();
-                std::size_t _rows_amount = _common_data.rows_amount;
-                std::size_t _quotient_degree = std::max(
-                    (_permutation_size + 2) * (_common_data.rows_amount -1 ),
-                    (_lookup_degree + 1) * (_common_data.rows_amount -1 )
-                );
-
-                std::size_t _quotient_polys = (_quotient_degree % _rows_amount != 0)? (_quotient_degree / _rows_amount + 1): (_quotient_degree / _rows_amount);
+                std::size_t _rows_amount = _desc.rows_amount;
 
                 commitment_scheme_replaces<PlaceholderParams>(
+                    _placeholder_info,
                     _desc,
-                    reps, _common_data, _lpc_scheme, _permutation_size, _quotient_polys,
+                    reps, _common_data, _fri_params, _permutation_size, _placeholder_info.quotient_size,
                     _use_lookups?_constraint_system.sorted_lookup_columns_number():0, _use_lookups);
 
                 replace_and_print(modular_verifier_template, reps, _folder_name + "/modular_verifier.sol");
-                replace_and_print(modular_permutation_argument_library_template, reps, _folder_name + "/permutation_argument.sol");
+                if( _placeholder_info.permutation_poly_amount == 1 ){
+                    replace_and_print(modular_permutation_argument_library_template, reps, _folder_name + "/permutation_argument.sol");
+                } else {
+                    replace_and_print(modular_permutation_argument_chunked_library_template, reps, _folder_name + "/permutation_argument.sol");
+                }
                 replace_and_print(modular_gate_argument_library_template, reps, _folder_name + "/gate_argument.sol");
                 replace_and_print(modular_commitment_library_template, reps, _folder_name + "/commitment.sol");
-                if(_use_lookups)
-                    replace_and_print(modular_lookup_argument_library_template, reps, _folder_name + "/lookup_argument.sol");
-                else
+                if(_use_lookups){
+                    if( _placeholder_info.lookup_poly_amount == 1)
+                        replace_and_print(modular_lookup_argument_library_template, reps, _folder_name + "/lookup_argument.sol");
+                    else{
+                        replace_and_print(modular_lookup_argument_chunked_library_template, reps, _folder_name + "/lookup_argument.sol");
+                    }
+                } else
                     replace_and_print(modular_dummy_lookup_argument_library_template, reps, _folder_name + "/lookup_argument.sol");
             }
 
@@ -943,19 +916,24 @@ namespace nil {
             const zk::snark::plonk_table_description<typename PlaceholderParams::field_type> _desc;
             const typename PlaceholderParams::constraint_system_type &_constraint_system;
             const common_data_type &_common_data;
-            const typename PlaceholderParams::commitment_scheme_type &_lpc_scheme;
+            const typename PlaceholderParams::commitment_scheme_type::params_type &_fri_params;
             std::size_t _permutation_size;
             std::string _folder_name;
             std::string _test_name;
             bool        _use_lookups;
+            bool        _use_permutations;
             std::size_t _z_offset;
             std::size_t _special_selectors_offset;
-            std::size_t _table_z_offset;
+            std::size_t _table_offset;
             std::size_t _variable_values_offset;
+            std::size_t _table_end_offset;
             std::size_t _permutation_offset;
+            std::size_t _v_l_offset;
             std::size_t _quotient_offset;
+            std::size_t _lookup_offset;
             std::size_t _public_input_offset;
-            variable_indices_type _var_indices;
+            typename nil::crypto3::zk::snark::placeholder_info<PlaceholderParams>::variable_indices_type _var_indices;
+            nil::crypto3::zk::snark::placeholder_info<PlaceholderParams> _placeholder_info;
 
             bool _deduce_horner;
 
