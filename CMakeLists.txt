@@ -24,11 +24,6 @@ if(NOT Boost_FOUND AND NOT CMAKE_CROSSCOMPILING)
     cm_find_package(Boost COMPONENTS)
 endif()
 
-#cm_find_package(${CMAKE_WORKSPACE_NAME}_codec)
-cm_find_package(${CMAKE_WORKSPACE_NAME}_hash)
-cm_find_package(${CMAKE_WORKSPACE_NAME}_algebra)
-cm_find_package(${CMAKE_WORKSPACE_NAME}_marshalling)
-
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
         include/nil/crypto3/pkpad/algorithm/encode.hpp
         include/nil/crypto3/pkpad/algorithm/verify.hpp)

@@ -1,9 +1,5 @@
 include(CMTest)
 
-cm_find_package(${CMAKE_WORKSPACE_NAME}_codec)
-cm_find_package(${CMAKE_WORKSPACE_NAME}_hash)
-cm_find_package(${CMAKE_WORKSPACE_NAME}_algebra)
-
 if (NOT Boost_UNIT_TEST_FRAMEWORK_FOUND)
     cm_find_package(Boost REQUIRED COMPONENTS unit_test_framework)
 endif ()
