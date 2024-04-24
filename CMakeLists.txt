@@ -30,10 +30,6 @@ cm_find_package(CM)
 include(CMConfig)
 include(CMSetupVersion)
 
-cm_find_package(${CMAKE_WORKSPACE_NAME}_block)
-cm_find_package(${CMAKE_WORKSPACE_NAME}_codec)
-cm_find_package(${CMAKE_WORKSPACE_NAME}_hash)
-
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS)
 
 list(APPEND ${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES)
