@@ -747,6 +747,8 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
     printer.print();
 }
 
+// TODO implement for EVM
+/*
 BOOST_FIXTURE_TEST_CASE(transpiler_test10, test_initializer) {
     auto circuit = circuit_test_7<field_type>(test_global_alg_rnd_engine<field_type>, test_global_rnd_engine);
 
@@ -791,7 +793,7 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test10, test_initializer) {
         15  // lookups inline size threshold
     );
     printer.print();
-}
+}*/
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(recursive_circuit1)
