@@ -85,6 +85,16 @@ BOOST_AUTO_TEST_CASE(zk_poseidon_transcript_init_test) {
     BOOST_CHECK_EQUAL(ch1.data, field_type::value_type(0x27B1BE8A820DE1A5E91A441F59F29D42D9DB9FC7778A0852819F331D5CD60B43_cppui256).data);
     BOOST_CHECK_EQUAL(ch2.data, field_type::value_type(0x12096E03B2ADEC9B317042D36F048C06AF123EED4A3FC040579E66DCE46C0AEE_cppui256).data);
     BOOST_CHECK_EQUAL(ch_int, 0x6296);
+
+    init_blob = {};
+    tr = transcript::fiat_shamir_heuristic_sequential<poseidon_type>(init_blob);
+    ch1 = tr.challenge<field_type>();
+    ch2 = tr.challenge<field_type>();
+    ch_int = tr.int_challenge<int>();
+
+    BOOST_CHECK_EQUAL(ch1.data, field_type::value_type(0x35626947FA1063436F4E5434029CCAEC64075C9FC80034C0923054A2B1D30BD2_cppui256).data);
+    BOOST_CHECK_EQUAL(ch2.data, field_type::value_type(0x1B961886411EE8722DD6B576CBA5876EB30999B5237FE0E14255E6D006CFF63C_cppui256).data);
+    BOOST_CHECK_EQUAL(ch_int, 0xC92);
 }
 
 BOOST_AUTO_TEST_CASE(zk_poseidon_transcript_no_init_test) {
