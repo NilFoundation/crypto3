@@ -810,7 +810,7 @@ BOOST_AUTO_TEST_SUITE(recursive_circuit1)
         constexpr static const std::size_t constant_columns = constant_columns_1;
         constexpr static const std::size_t selector_columns = selector_columns_1;
 
-        constexpr static const std::size_t lambda = 2;
+        constexpr static const std::size_t lambda = 4;
         constexpr static const std::size_t m = 2;
     };
     typedef placeholder_circuit_params<field_type> circuit_params;

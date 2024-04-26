@@ -388,13 +388,12 @@ $LOOKUP_EXPRESSIONS$
 
 template<std::size_t start_index, std::size_t leaf_size>
 pallas::base_field_type::value_type calculate_leaf_hash(
-    std::array<pallas::base_field_type::value_type, initial_proof_points_num> val,
-    bool reversed
+    std::array<pallas::base_field_type::value_type, initial_proof_points_num> val
 ){
     pallas::base_field_type::value_type hash_state = pallas::base_field_type::value_type(0);
     for(std::size_t pos = 0; pos < leaf_size*2; pos+=2){
         hash_state = __builtin_assigner_poseidon_pallas_base(
-            {hash_state, reversed?val[start_index + pos]:val[start_index + pos+1], reversed?val[start_index + pos+1]:val[start_index + pos]}
+            {hash_state, val[start_index + pos], val[start_index + pos+1]}
         )[2];
     }
     return hash_state;
@@ -472,12 +471,13 @@ $GATE_ARG_PREPARE$
         factor *= (precomputed_values.Z_at_xi + pallas::base_field_type::value_type(1));
     }
     __builtin_assigner_exit_check(precomputed_values.F_consolidated == precomputed_values.T_consolidated * precomputed_values.Z_at_xi);
-/*
+
     // Commitment scheme
     std::array<pallas::base_field_type::value_type, singles_amount> singles = fill_singles(challenges.xi, challenges.eta);
-    std::array<pallas::base_field_type::value_type, unique_points> U;
+    std::array<pallas::base_field_type::value_type, unique_points+1> U;
 
 $PREPARE_U_AND_V$
+
 
     std::array<std::array<typename pallas::base_field_type::value_type, 3>, D0_log> res;
     std::size_t round_proof_ind = 0;
@@ -488,8 +488,12 @@ $PREPARE_U_AND_V$
     std::size_t round_proof_hash_ind = 0;
 
     for(std::size_t i = 0; i < lambda; i++){
-        __builtin_assigner_fri_cosets(res.data(), D0_log, D0_omega, challenges.fri_x_indices[i]);
         cur_val = 0;
+        pallas::base_field_type::value_type x(1);
+        pallas::base_field_type::value_type x_challenge = challenges.fri_x_indices[i];
+        pallas::base_field_type::value_type x_2(1);
+$X_CHALLENGE_POW$
+        __builtin_assigner_exit_check(x == x_2 || x == -x_2);
 
         pallas::base_field_type::value_type hash_state;
         pallas::base_field_type::value_type pos;
@@ -502,12 +506,15 @@ $INITIAL_PROOF_CHECK$
         theta_acc = pallas::base_field_type::value_type(1);
         pallas::base_field_type::value_type Q0;
         pallas::base_field_type::value_type Q1;
+
 $LPC_Y_COMPUTATION$
+
         std::size_t D = D0_log - 1;
         pallas::base_field_type::value_type rhash;
+
 $ROUND_PROOF_CHECK$
+
         interpolant = pallas::base_field_type::value_type(0);
-        pallas::base_field_type::value_type x = res[fri_rounds][0];
         pallas::base_field_type::value_type factor = pallas::base_field_type::value_type(1);
         for(std::size_t j = 0; j < final_polynomial_size; j++){
             interpolant = interpolant + proof.final_polynomial[j] * factor;
@@ -515,15 +522,15 @@ $ROUND_PROOF_CHECK$
         }
         __builtin_assigner_exit_check(interpolant == y0);
 
+        x = -x;
         interpolant = pallas::base_field_type::value_type(0);
-        x = res[fri_rounds][1];
         factor = pallas::base_field_type::value_type(1);
         for(std::size_t j = 0; j < final_polynomial_size; j++){
             interpolant = interpolant + proof.final_polynomial[j] * factor;
             factor = factor * x;
         }
         __builtin_assigner_exit_check(interpolant == y1);
-	}*/
+	}
     return true;
 }
 

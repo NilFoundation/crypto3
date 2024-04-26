@@ -661,6 +661,9 @@ namespace nil {
                     }
                     prepare_U_V_str << "\n";
                 }
+                for( std::size_t j = 0; j < placeholder_info.batches_sizes[0]; j++){
+                    prepare_U_V_str << "\tU[unique_points] += theta_acc * pallas::base_field_type::value_type(0x"<< std::hex << common_data.commitment_scheme_data.at(0)[j] << std::dec << "_cppui255); theta_acc *= challenges.lpc_theta;\n";
+                }
 
                 std::stringstream lpc_y_computation;
                 for( std::size_t i = 0; i < singles_strs.size(); i++){
@@ -673,11 +676,24 @@ namespace nil {
                     }
                     lpc_y_computation << "\t\tQ0 -= U["<< i << "];" << std::endl;
                     lpc_y_computation << "\t\tQ1 -= U["<< i << "];" << std::endl;
-                    lpc_y_computation << "\t\tQ0 /= (res[0][0] - singles[" << i << "]);" << std::endl;
-                    lpc_y_computation << "\t\tQ1 /= (res[0][1] - singles[" << i << "]);" << std::endl;
+                    lpc_y_computation << "\t\tQ0 /= (x_2 - singles[" << i << "]);" << std::endl;
+                    lpc_y_computation << "\t\tQ1 /= (-x_2 - singles[" << i << "]);" << std::endl;
                     lpc_y_computation << "\t\ty0 += Q0;" << std::endl;
                     lpc_y_computation << "\t\ty1 += Q1;" << std::endl;
                 }
+                lpc_y_computation << "\t\tQ0 = pallas::base_field_type::value_type(0);" << std::endl;
+                lpc_y_computation << "\t\tQ1 = pallas::base_field_type::value_type(0);" << std::endl;
+                for( std::size_t j = 0; j < placeholder_info.batches_sizes[0]; j++){
+                    lpc_y_computation << "\t\tQ0 += proof.initial_proof_values[i]["<< j*2 <<"] * theta_acc;" << std::endl;
+                    lpc_y_computation << "\t\tQ1 += proof.initial_proof_values[i]["<< j*2 + 1 <<"] * theta_acc;" << std::endl;
+                    lpc_y_computation << "\t\ttheta_acc *= challenges.lpc_theta;\n";
+                }
+                lpc_y_computation << "\t\tQ0 -= U[unique_points];" << std::endl;
+                lpc_y_computation << "\t\tQ1 -= U[unique_points];" << std::endl;
+                lpc_y_computation << "\t\tQ0 /= (x_2 - challenges.eta);" << std::endl;
+                lpc_y_computation << "\t\tQ1 /= (-x_2 - challenges.eta);" << std::endl;
+                lpc_y_computation << "\t\ty0 += Q0;" << std::endl;
+                lpc_y_computation << "\t\ty1 += Q1;" << std::endl;
 
                 std::string initial_proof_check_str = "";
                 const std::vector<std::size_t> &batches_sizes = placeholder_info.batches_sizes;
@@ -686,7 +702,7 @@ namespace nil {
                 std::size_t initial_merkle_proofs_position_num = (log2(fri_params.D[0]->m) - 1);
                 cur = 0;
                 for(std::size_t i = 0; i < batches_num; i++){
-                    initial_proof_check_str += "\t\thash_state = calculate_leaf_hash<"+to_string(start_position*2)+"," + to_string(batches_sizes[i]) + ">(proof.initial_proof_values[i], res[0][2] == pallas::base_field_type::value_type(0));\n";
+                    initial_proof_check_str += "\t\thash_state = calculate_leaf_hash<"+to_string(start_position*2)+"," + to_string(batches_sizes[i]) + ">(proof.initial_proof_values[i]);\n";
                     for(std::size_t j = 0; j < initial_merkle_proofs_position_num; j++){
                         initial_proof_check_str += "\t\tpos = pallas::base_field_type::value_type(proof.initial_proof_positions[i][" + to_string(j) + "]);";
                         initial_proof_check_str += " npos = pallas::base_field_type::value_type(1) - pos;\n";
@@ -763,7 +779,7 @@ namespace nil {
                 }
 
                 placeholder_challenges_str += "\tfor(std::size_t i = 0; i < fri_roots_num; i++){\n";
-                placeholder_challenges_str += "\tchallenges.fri_alphas[i] = state = __builtin_assigner_poseidon_pallas_base({state, proof.fri_roots[i], 0})[2];\n";
+                placeholder_challenges_str += "\t\tchallenges.fri_alphas[i] = state = __builtin_assigner_poseidon_pallas_base({state, proof.fri_roots[i], 0})[2];\n";
                 placeholder_challenges_str += "\t}\n";
 
                 placeholder_challenges_str += "\tfor(std::size_t i = 0; i < lambda; i++){\n";
@@ -781,9 +797,9 @@ namespace nil {
                 for( std::size_t i = 0; i < fri_params.r; i++){
                     round_proof_check_str += "\t\tpos = res[" + to_string(i) + "][2]; npos = pallas::base_field_type::value_type(1) - pos;\n";
                     if(i == 0)
-                        round_proof_check_str += "\t\trhash = __builtin_assigner_poseidon_pallas_base({0, npos * y0 + pos * y1, pos * y0 + npos * y1})[2];\n";
+                        round_proof_check_str += "\t\trhash = __builtin_assigner_poseidon_pallas_base({0, y0, y1})[2];\n";
                     else
-                        round_proof_check_str += "\t\trhash = __builtin_assigner_poseidon_pallas_base({0, npos * proof.round_proof_values[i]["+to_string(i*2-2)+"] + pos * proof.round_proof_values[i]["+to_string(i*2-1)+"], npos * proof.round_proof_values[i]["+to_string(i*2-1)+"] + pos * proof.round_proof_values[i]["+to_string(i*2-2)+"]})[2];\n";
+                        round_proof_check_str += "\t\trhash = __builtin_assigner_poseidon_pallas_base({0, proof.round_proof_values[i]["+to_string(i*2-2)+"], proof.round_proof_values[i]["+to_string(i*2-1)+"]})[2];\n";
                     for ( std::size_t j = 0; j < log2(fri_params.D[0]->m) - i - 1; j++){
                         round_proof_check_str += "\t\tpos = pallas::base_field_type::value_type(proof.round_merkle_proof_positions[i][" + to_string(cur) + "]); npos = pallas::base_field_type::value_type(1) - pos;\n";
                         round_proof_check_str += "\t\trhash = __builtin_assigner_poseidon_pallas_base({0, pos * rhash + npos * proof.round_proof_hashes[i]["+to_string(cur)+"], npos * rhash + pos * proof.round_proof_hashes[i]["+to_string(cur)+"]})[2];\n";
@@ -792,12 +808,26 @@ namespace nil {
                     round_proof_check_str += "\t\t__builtin_assigner_exit_check(rhash == proof.fri_roots["+to_string(i)+"]);\n\n";
                 }
 
+
+                std::size_t domain_size_log = std::ceil(std::log2(fri_params.D[0]->size())) - 1;
                 for(std::size_t i = 0; i < fri_params.r; i++){
-                    round_proof_check_str += "\t\tinterpolant = __builtin_assigner_fri_lin_inter(res["+to_string(i)+"][0], y0, y1, challenges.fri_alphas["+to_string(i)+"]);\n";
-                    round_proof_check_str += "\t\t__builtin_assigner_exit_check(interpolant == proof.round_proof_values[i]["+to_string(2*i)+"]);\n";
+                    if( i == 0){
+                        round_proof_check_str += "\t\tinterpolant = __builtin_assigner_fri_lin_inter(x_2, y0, y1, challenges.fri_alphas["+to_string(i)+"]);\n";
+                        round_proof_check_str += "\t\t__builtin_assigner_exit_check_eq_pallas(proof.initial_proof_positions[i][" + to_string(domain_size_log - 1) + "] * (interpolant - proof.round_proof_values[i]["+to_string(2*i)+"]),0);\n";
+                        round_proof_check_str += "\t\t__builtin_assigner_exit_check_eq_pallas((1 - proof.initial_proof_positions[i][" + to_string(domain_size_log - 1) + "]) * (interpolant - proof.round_proof_values[i]["+to_string(2*i + 1)+"]),0);\n";
+                        round_proof_check_str += "\t\t\n";
+                    }
+                    else{
+                        round_proof_check_str += "\t\tinterpolant = __builtin_assigner_fri_lin_inter(2 * proof.initial_proof_positions[i][" + to_string(domain_size_log - i) + "] * x - x, y0, y1, challenges.fri_alphas["+to_string(i)+"]);\n";
+                        round_proof_check_str += "\t\t__builtin_assigner_exit_check_eq_pallas(proof.initial_proof_positions[i][" + to_string(domain_size_log - i - 1) + "] * (interpolant - proof.round_proof_values[i]["+to_string(2*i)+"]),0);\n";
+                        round_proof_check_str += "\t\t__builtin_assigner_exit_check_eq_pallas((1 - proof.initial_proof_positions[i][" + to_string(domain_size_log - i - 1) + "]) * (interpolant - proof.round_proof_values[i]["+to_string(2*i + 1)+"]),0);\n";
+                        round_proof_check_str += "\t\t\n";
+                    }
                     round_proof_check_str += "\t\ty0 = proof.round_proof_values[i]["+to_string(2*i)+"];\n";
                     round_proof_check_str += "\t\ty1 = proof.round_proof_values[i]["+to_string(2*i+1)+"];\n";
+                    round_proof_check_str += "\t\tx = x * x;\n";
                 }
+                round_proof_check_str += "\t\tx = 2 * proof.initial_proof_positions[i][" + to_string(domain_size_log - fri_params.r) + "] * x - x;\n";
 
                 std::vector<std::size_t> selectors_indices;
                 for(const auto &gate: constraint_system.gates()){
@@ -937,6 +967,26 @@ namespace nil {
                     }
                 }
 
+                std::string x_challenge_pow_str = "\t\t";
+                typename PlaceholderParams::field_type::integral_type x_power = (PlaceholderParams::field_type::modulus - 1)/fri_params.D[0]->size();
+                typename PlaceholderParams::field_type::integral_type mask = 1;
+                while( mask < x_power ){ mask <<= 1; }
+                mask >>= 1;
+                while( mask > 0 ){
+                    x_challenge_pow_str += "x = x * x;";
+                    if( mask & x_power ) x_challenge_pow_str += " x = x * x_challenge; ";
+                    mask >>= 1;
+                }
+                x_challenge_pow_str += "\n";
+
+//             for( uint64 j = 0; j < D0_log - 1; j++){
+//                state.x_index += (uint64(1 - uint8(blob[state.initial_proof_offset + 0x47 + 0x38 * j])) << j );
+//             }
+
+                for( std::size_t i = 0; i < domain_size_log; i++){
+                    x_challenge_pow_str += "\t\tx_2 = x_2 * x_2; x_2 *= (proof.initial_proof_positions[i]["+ to_string(domain_size_log - i - 1) + "] + (1 - proof.initial_proof_positions[i]["+ to_string(domain_size_log - i - 1) + "]) * D0_omega);\n";
+                }
+
                 lookup_reps["$LOOKUP_VARS$"] = use_lookups?lookup_vars:"";
                 lookup_reps["$LOOKUP_EXPRESSIONS$"] = use_lookups?lookup_expressions:"";
                 lookup_reps["$LOOKUP_CODE$"] = use_lookups?lookup_code:"";
@@ -1025,6 +1075,7 @@ namespace nil {
                 reps["$PLACEHOLDER_CHALLENGES_STR$"] = placeholder_challenges_str;
                 reps["$V_P_INDEX$"] = placeholder_info.use_permutations? to_string(2*permutation_size + 4 + placeholder_info.table_values_num):"0";
                 reps["$V_L_INDEX$"] = placeholder_info.use_permutations? to_string(2*permutation_size + 4 + placeholder_info.table_values_num + placeholder_info.permutation_poly_amount + 1):to_string(2*permutation_size + 4 + placeholder_info.table_values_num);
+                reps["$X_CHALLENGE_POW$"] = x_challenge_pow_str;
 
                 result = replace_all(result, reps);
                 result = replace_all(result, reps);
