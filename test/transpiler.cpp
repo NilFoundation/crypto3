@@ -214,7 +214,6 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
             constraint_system, assignments.public_table(), desc, lpc_scheme
         );
 
-    std::cout << "Start printing" << std::endl;
     auto printer = nil::blueprint::evm_verifier_printer<lpc_placeholder_params_type>(
         constraint_system,
         lpc_preprocessed_public_data.common_data,
@@ -225,7 +224,6 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
         15 // lookups inline size threshold
     );
     printer.print();
-    std::cout << "Finish printing" << std::endl;
 }
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -806,9 +804,6 @@ BOOST_AUTO_TEST_SUITE(recursive_circuit1)
     using merkle_hash_type = hashes::poseidon<policy>;
     using transcript_hash_type = hashes::poseidon<policy>;
 
-    constexpr static const std::size_t table_rows_log = 4;
-    constexpr static const std::size_t table_rows = 1 << table_rows_log;
-
     struct placeholder_test_params {
         constexpr static const std::size_t witness_columns = witness_columns_1;
         constexpr static const std::size_t public_input_columns = public_columns_1;
@@ -858,7 +853,7 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
     typename policy_type::variable_assignment_type assignments = circuit.table;
 
     typename lpc_type::fri_type::params_type fri_params(
-        1, table_rows_log, placeholder_test_params::lambda, 4, true
+        1, table_rows_log, placeholder_test_params::lambda, 4
     );
     lpc_scheme_type lpc_scheme(fri_params);
 
@@ -881,7 +876,8 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
             constraint_system, assignments.private_table(), desc);
 
     auto proof = placeholder_prover<field_type, lpc_placeholder_params_type>::process(
-        preprocessed_public_data, preprocessed_private_data, desc, constraint_system, lpc_scheme);
+        preprocessed_public_data, preprocessed_private_data, desc, constraint_system, lpc_scheme
+    );
 
     bool verifier_res = placeholder_verifier<field_type, lpc_placeholder_params_type>::process(
         preprocessed_public_data.common_data,
@@ -970,7 +966,7 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
 
     // LPC commitment scheme
     typename lpc_type::fri_type::params_type fri_params(
-        1, table_rows_log, placeholder_test_params::lambda, 4, true
+        1, table_rows_log, placeholder_test_params::lambda, 4
     );
     lpc_scheme_type lpc_scheme(fri_params);
 
@@ -1074,7 +1070,7 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
     typename policy_type::variable_assignment_type assignments = circuit.table;
 
     typename lpc_type::fri_type::params_type fri_params(
-        1, table_rows_log, placeholder_test_params::lambda, 4, true
+        1, table_rows_log, placeholder_test_params::lambda, 4
     );
     lpc_scheme_type lpc_scheme(fri_params);
 
@@ -1082,15 +1078,14 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
         preprocessed_public_data = placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::process(
             constraint_system, assignments.public_table(), desc, lpc_scheme
         );
-    {
-        std::string cpp_path = "./circuit3/placeholder_verifier.cpp";
-        std::ofstream output_file;
-        output_file.open(cpp_path);
-        output_file << nil::blueprint::recursive_verifier_generator<lpc_placeholder_params_type, proof_type, common_data_type>(desc).generate_recursive_verifier(
-            constraint_system, preprocessed_public_data.common_data, std::vector<std::size_t>()
-        );
-        output_file.close();
-    }
+
+    std::string cpp_path = "./circuit3/placeholder_verifier.cpp";
+    std::ofstream output_file;
+    output_file.open(cpp_path);
+    output_file << nil::blueprint::recursive_verifier_generator<lpc_placeholder_params_type, proof_type, common_data_type>(desc).generate_recursive_verifier(
+        constraint_system, preprocessed_public_data.common_data, std::vector<std::size_t>()
+    );
+    output_file.close();
 
     typename placeholder_private_preprocessor<field_type, lpc_placeholder_params_type>::preprocessed_data_type
         preprocessed_private_data = placeholder_private_preprocessor<field_type, lpc_placeholder_params_type>::process(
@@ -1178,7 +1173,7 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
     typename policy_type::variable_assignment_type assignments = circuit.table;
 
     typename lpc_type::fri_type::params_type fri_params(
-        1, table_rows_log, placeholder_test_params::lambda, 4, true
+        1, table_rows_log, placeholder_test_params::lambda, 4
     );
     lpc_scheme_type lpc_scheme(fri_params);
 
@@ -1224,7 +1219,7 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
 }
 BOOST_AUTO_TEST_SUITE_END()
 
-BOOST_AUTO_TEST_SUITE(recursive_circuit5)
+BOOST_AUTO_TEST_SUITE(recursive_circuit5_chunk10)
     using curve_type = algebra::curves::pallas;
     using field_type = typename curve_type::base_field_type;
 
@@ -1291,7 +1286,7 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
             constraint_system, assignments.public_table(), desc, lpc_scheme, 10
         );
     {
-        std::string cpp_path = "./circuit4/placeholder_verifier.cpp";
+        std::string cpp_path = "./circuit5_chunk10/placeholder_verifier.cpp";
         std::ofstream output_file;
         output_file.open(cpp_path);
         output_file << nil::blueprint::recursive_verifier_generator<lpc_placeholder_params_type, proof_type, common_data_type>(desc).generate_recursive_verifier(
@@ -1317,7 +1312,111 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
     BOOST_CHECK(verifier_res);
 
     {
-        std::string inp_path = "./circuit5/placeholder_verifier.inp";
+        std::string inp_path = "./circuit5_chunk10/placeholder_verifier.inp";
+        std::ofstream output_file;
+        output_file.open(inp_path);
+        output_file << nil::blueprint::recursive_verifier_generator<lpc_placeholder_params_type, proof_type, common_data_type>(desc).generate_input(
+            assignments.public_inputs(), proof, {135}
+        );
+        output_file.close();
+    }
+}
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(recursive_circuit5_chunk100)
+    using curve_type = algebra::curves::pallas;
+    using field_type = typename curve_type::base_field_type;
+
+    struct placeholder_test_params {
+        using BlueprintFieldType = algebra::curves::pallas::base_field_type;
+        using policy = hashes::detail::mina_poseidon_policy<field_type>;
+        using merkle_hash_type = hashes::poseidon<policy>;
+        using transcript_hash_type = hashes::poseidon<policy>;
+
+        constexpr static const std::size_t witness_columns = witness_columns_5;
+        constexpr static const std::size_t public_input_columns = public_columns_5;
+        constexpr static const std::size_t constant_columns = constant_columns_5;
+        constexpr static const std::size_t selector_columns = selector_columns_5;
+
+        constexpr static const std::size_t lambda = 10;
+        constexpr static const std::size_t m = 2;
+    };
+
+    using circuit_params = placeholder_circuit_params<field_type>;
+    using transcript_type = typename transcript::fiat_shamir_heuristic_sequential<typename placeholder_test_params::transcript_hash_type>;
+    using lpc_params_type = commitments::list_polynomial_commitment_params<
+        typename placeholder_test_params::merkle_hash_type,
+        typename placeholder_test_params::transcript_hash_type,
+        placeholder_test_params::m
+    >;
+
+    using lpc_type = commitments::list_polynomial_commitment<field_type, lpc_params_type>;
+    using lpc_scheme_type = typename commitments::lpc_commitment_scheme<lpc_type>;
+    using lpc_placeholder_params_type = nil::crypto3::zk::snark::placeholder_params<circuit_params, lpc_scheme_type>;
+    using policy_type = zk::snark::detail::placeholder_policy<field_type, circuit_params>;
+    using proof_type = nil::crypto3::zk::snark::placeholder_proof<field_type, lpc_placeholder_params_type>;
+    using common_data_type = nil::crypto3::zk::snark::placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::preprocessed_data_type::common_data_type;
+
+BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
+    std::cout << "Recursive_circuit 5" << std::endl;
+    auto circuit = circuit_test_5<field_type>(test_global_alg_rnd_engine<field_type>, test_global_rnd_engine);
+
+    plonk_table_description<field_type> desc(
+        placeholder_test_params::witness_columns,
+        placeholder_test_params::public_input_columns,
+        placeholder_test_params::constant_columns,
+        placeholder_test_params::selector_columns
+    );
+
+    desc.rows_amount = circuit.table_rows;
+    desc.usable_rows_amount = circuit.usable_rows;
+    std::size_t table_rows_log = std::ceil(std::log2(circuit.table_rows));
+
+    typename policy_type::constraint_system_type constraint_system(
+        circuit.gates,
+        circuit.copy_constraints,
+        circuit.lookup_gates,
+        circuit.lookup_tables
+    );
+    typename policy_type::variable_assignment_type assignments = circuit.table;
+
+    typename lpc_type::fri_type::params_type fri_params(
+        1, table_rows_log, placeholder_test_params::lambda, 4
+    );
+    lpc_scheme_type lpc_scheme(fri_params);
+
+    typename placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::preprocessed_data_type
+        preprocessed_public_data = placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::process(
+            constraint_system, assignments.public_table(), desc, lpc_scheme, 100
+        );
+    {
+        std::string cpp_path = "./circuit5_chunk100/placeholder_verifier.cpp";
+        std::ofstream output_file;
+        output_file.open(cpp_path);
+        output_file << nil::blueprint::recursive_verifier_generator<lpc_placeholder_params_type, proof_type, common_data_type>(desc).generate_recursive_verifier(
+            constraint_system, preprocessed_public_data.common_data, {135}
+        );
+        output_file.close();
+    }
+
+    typename placeholder_private_preprocessor<field_type, lpc_placeholder_params_type>::preprocessed_data_type
+        preprocessed_private_data = placeholder_private_preprocessor<field_type, lpc_placeholder_params_type>::process(
+            constraint_system, assignments.private_table(), desc);
+
+    auto proof = placeholder_prover<field_type, lpc_placeholder_params_type>::process(
+        preprocessed_public_data, preprocessed_private_data, desc, constraint_system, lpc_scheme);
+
+    bool verifier_res = placeholder_verifier<field_type, lpc_placeholder_params_type>::process(
+        preprocessed_public_data.common_data,
+        proof,
+        desc,
+        constraint_system,
+        lpc_scheme
+    );
+    BOOST_CHECK(verifier_res);
+
+    {
+        std::string inp_path = "./circuit5_chunk100/placeholder_verifier.inp";
         std::ofstream output_file;
         output_file.open(inp_path);
         output_file << nil::blueprint::recursive_verifier_generator<lpc_placeholder_params_type, proof_type, common_data_type>(desc).generate_input(
@@ -1388,7 +1487,7 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
     typename policy_type::variable_assignment_type assignments = circuit.table;
 
     typename lpc_type::fri_type::params_type fri_params(
-        1, table_rows_log, placeholder_test_params::lambda, 4, true
+        1, table_rows_log, placeholder_test_params::lambda, 4
     );
     lpc_scheme_type lpc_scheme(fri_params);
 
@@ -1492,7 +1591,7 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
     typename policy_type::variable_assignment_type assignments = circuit.table;
 
     typename lpc_type::fri_type::params_type fri_params(
-        1, table_rows_log, placeholder_test_params::lambda, 4, true
+        1, table_rows_log, placeholder_test_params::lambda, 4
     );
     lpc_scheme_type lpc_scheme(fri_params);
 
@@ -1530,6 +1629,114 @@ BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
 
     {
         std::string inp_path = "./circuit7/placeholder_verifier.inp";
+        std::ofstream output_file;
+        output_file.open(inp_path);
+        output_file << nil::blueprint::recursive_verifier_generator<lpc_placeholder_params_type, proof_type, common_data_type>(desc).generate_input(
+            assignments.public_inputs(), proof, std::vector<std::size_t>()
+        );
+        output_file.close();
+    }
+}
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(recursive_circuit7_chunk10)
+    using Endianness = nil::marshalling::option::big_endian;
+    using TTypeBase = nil::marshalling::field_type<Endianness>;
+    using curve_type = algebra::curves::pallas;
+    using field_type = typename curve_type::base_field_type;
+
+    struct placeholder_test_params {
+        using BlueprintFieldType = algebra::curves::pallas::base_field_type;
+        using policy = hashes::detail::mina_poseidon_policy<field_type>;
+        using merkle_hash_type = hashes::poseidon<policy>;
+        using transcript_hash_type = hashes::poseidon<policy>;
+
+        constexpr static const std::size_t witness_columns = witness_columns_7;
+        constexpr static const std::size_t public_input_columns = public_columns_7;
+        constexpr static const std::size_t constant_columns = constant_columns_7;
+        constexpr static const std::size_t selector_columns = selector_columns_7;
+
+        constexpr static const std::size_t lambda = 10;
+        constexpr static const std::size_t m = 2;
+    };
+
+    using circuit_params = placeholder_circuit_params<field_type>;
+    using transcript_type = typename transcript::fiat_shamir_heuristic_sequential<typename placeholder_test_params::transcript_hash_type>;
+    using lpc_params_type = commitments::list_polynomial_commitment_params<
+        typename placeholder_test_params::merkle_hash_type,
+        typename placeholder_test_params::transcript_hash_type,
+        placeholder_test_params::m
+    >;
+
+    using lpc_type = commitments::list_polynomial_commitment<field_type, lpc_params_type>;
+    using lpc_scheme_type = typename commitments::lpc_commitment_scheme<lpc_type>;
+    using lpc_placeholder_params_type = nil::crypto3::zk::snark::placeholder_params<circuit_params, lpc_scheme_type>;
+    using policy_type = zk::snark::detail::placeholder_policy<field_type, circuit_params>;
+    using proof_type = nil::crypto3::zk::snark::placeholder_proof<field_type, lpc_placeholder_params_type>;
+    using common_data_type = nil::crypto3::zk::snark::placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::preprocessed_data_type::common_data_type;
+
+BOOST_FIXTURE_TEST_CASE(transpiler_test, test_initializer) {
+    std::cout << "Recursive_circuit 7 chunk 10" << std::endl;
+    std::filesystem::create_directory("./circuit7_chunk10");
+    auto circuit = circuit_test_7<field_type>(test_global_alg_rnd_engine<field_type>, test_global_rnd_engine);
+    plonk_table_description<field_type> desc(
+        placeholder_test_params::witness_columns,
+        placeholder_test_params::public_input_columns,
+        placeholder_test_params::constant_columns,
+        placeholder_test_params::selector_columns
+    );
+
+    desc.rows_amount = circuit.table_rows;
+    desc.usable_rows_amount = circuit.usable_rows;
+    std::size_t table_rows_log = std::ceil(std::log2(circuit.table_rows));
+
+    typename policy_type::constraint_system_type constraint_system(
+        circuit.gates,
+        circuit.copy_constraints,
+        circuit.lookup_gates,
+        circuit.lookup_tables
+    );
+    typename policy_type::variable_assignment_type assignments = circuit.table;
+
+    typename lpc_type::fri_type::params_type fri_params(
+        1, table_rows_log, placeholder_test_params::lambda, 4
+    );
+    lpc_scheme_type lpc_scheme(fri_params);
+
+    transcript_type transcript;
+
+    typename placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::preprocessed_data_type
+        preprocessed_public_data = placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::process(
+            constraint_system, assignments.public_table(), desc, lpc_scheme, 10
+        );
+    {
+        std::string cpp_path = "./circuit7_chunk10/placeholder_verifier.cpp";
+        std::ofstream output_file;
+        output_file.open(cpp_path);
+        output_file << nil::blueprint::recursive_verifier_generator<lpc_placeholder_params_type, proof_type, common_data_type>(desc).generate_recursive_verifier(
+            constraint_system, preprocessed_public_data.common_data, std::vector<std::size_t>()
+        );
+        output_file.close();
+    }
+
+    typename placeholder_private_preprocessor<field_type, lpc_placeholder_params_type>::preprocessed_data_type
+        preprocessed_private_data = placeholder_private_preprocessor<field_type, lpc_placeholder_params_type>::process(
+            constraint_system, assignments.private_table(), desc);
+
+    auto proof = placeholder_prover<field_type, lpc_placeholder_params_type>::process(
+        preprocessed_public_data, preprocessed_private_data, desc, constraint_system, lpc_scheme);
+
+    bool verifier_res = placeholder_verifier<field_type, lpc_placeholder_params_type>::process(
+        preprocessed_public_data.common_data,
+        proof,
+        desc,
+        constraint_system,
+        lpc_scheme
+    );
+    BOOST_CHECK(verifier_res);
+
+    {
+        std::string inp_path = "./circuit7_chunk10/placeholder_verifier.inp";
         std::ofstream output_file;
         output_file.open(inp_path);
         output_file << nil::blueprint::recursive_verifier_generator<lpc_placeholder_params_type, proof_type, common_data_type>(desc).generate_input(

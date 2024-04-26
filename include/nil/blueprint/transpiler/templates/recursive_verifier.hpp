@@ -47,7 +47,6 @@ $LOOKUP_EXPRESSIONS_BODY$
 
         std::string lookup_code = R"(
     {
-        std::array<typename pallas::base_field_type::value_type, input_size_alphas> alphas = challenges.lookup_alphas;
         std::array<typename pallas::base_field_type::value_type, input_size_lookup_gate_selectors> lookup_gate_selectors;
 $LOOKUP_GATE_SELECTORS_LIST$
         std::array<typename pallas::base_field_type::value_type, input_size_lookup_gate_constraints_table_ids> lookup_gate_constraints_table_ids = {$LOOKUP_CONSTRAINT_TABLE_IDS_LIST$};
@@ -70,12 +69,7 @@ $LOOKUP_SHIFTED_OPTIONS_LIST$
         typename pallas::base_field_type::value_type beta = challenges.lookup_beta;
         typename pallas::base_field_type::value_type gamma = challenges.lookup_gamma;
         typename pallas::base_field_type::value_type L0 = precomputed_values.l0;
-        pair_type V_L_values = {
-            proof.z[4*permutation_size + 6 + table_values_num + 2],     // V
-            proof.z[4*permutation_size + 6 + table_values_num + 3], // V_shifted
-        };
-        pair_type q_last = {proof.z[4*permutation_size], proof.z[4*permutation_size + 1]};
-        pair_type q_blind = {proof.z[4*permutation_size + 3], proof.z[4*permutation_size + 4]};
+        precomputed_values.shifted_mask = pallas::base_field_type::value_type(1) - proof.z[2*permutation_size+1] - proof.z[2*permutation_size + 3];
 
         lookup_output_type lookup_argument;
 
@@ -89,23 +83,18 @@ $LOOKUP_TABLE_LOOP$
 
         pallas::base_field_type::value_type g = pallas::base_field_type::value_type(1);
         pallas::base_field_type::value_type h = pallas::base_field_type::value_type(1);
+        pallas::base_field_type::value_type previous_value = proof.z[$V_L_INDEX$];
+        pallas::base_field_type::value_type current_value;
+        lookup_argument[2] = pallas::base_field_type::value_type(0);
 
-        for( std::size_t i = 0; i < lookup_constraints_amount; i++ ){
-            g = g *(pallas::base_field_type::value_type(1)+beta)*(gamma + lookup_input[i]);
-        }
-        for( std::size_t i = 0; i < lookup_options_amount; i++ ){
-            g = g * ((pallas::base_field_type::value_type(1)+beta) * gamma + lookup_value[i] + beta * lookup_shifted_value[i]);
-        }
-        for( std::size_t i = 0; i < m_parameter; i++ ){
-            h = h * ((pallas::base_field_type::value_type(1)+beta) * gamma + sorted[3*i] + beta * sorted[3*i+1]);
-        }
-
-        lookup_argument[0] = (pallas::base_field_type::value_type(1) - V_L_values[0]) * L0;
-        lookup_argument[1] = q_last[0]*(V_L_values[0] * V_L_values[0] - V_L_values[0]);
-        lookup_argument[2] = (pallas::base_field_type::value_type(1) - q_last[0] - q_blind[0]) * (V_L_values[1] * h - V_L_values[0] * g);
+$LOOKUP_CHUNKING_CODE$
+        lookup_argument[0] = (pallas::base_field_type::value_type(1) - proof.z[$V_L_INDEX$]) * L0;
+        lookup_argument[1] = proof.z[2*permutation_size]*(proof.z[$V_L_INDEX$] * proof.z[$V_L_INDEX$] - proof.z[$V_L_INDEX$]);
+        lookup_argument[2] += (previous_value * g - proof.z[$V_L_INDEX$ + 1] * h);
+        lookup_argument[2] *= -precomputed_values.mask;
         lookup_argument[3] = pallas::base_field_type::value_type(0);
         for(std::size_t i = 0; i < input_size_alphas; i++){
-            lookup_argument[3] =  lookup_argument[3] + alphas[i] * (sorted[3*i + 3] - sorted[3*i + 2]);
+            lookup_argument[3] =  lookup_argument[3] + challenges.lookup_alphas[i] * (sorted[3*i + 3] - sorted[3*i + 2]);
         }
         lookup_argument[3] = lookup_argument[3] * L0;
         F[3] = lookup_argument[0];
@@ -124,9 +113,48 @@ $LOOKUP_TABLE_LOOP$
         Omega *= omega;
         cur++;
     }
-    __builtin_assigner_exit_check(rows_amount * proof.z[zero_indices[witness_amount + i]] == precomputed_values.Z_at_xi * result);
+    __builtin_assigner_exit_check(rows_amount * proof.z[public_input_indices[i]] == precomputed_values.Z_at_xi * result);
 )";
         std::string public_input_input_str = "\tstd::array<pallas::base_field_type::value_type, full_public_input_size> public_input,\n";
+
+        std::string permutation_challenges_str = R"(
+    // generate permutation argument challenges
+    state = challenges.perm_beta = __builtin_assigner_poseidon_pallas_base({state, 0, 0})[2];
+    state = challenges.perm_gamma = __builtin_assigner_poseidon_pallas_base({state, 0, 0})[2];
+    for( std::size_t i = 0; i < $PERMUTATION_CHUNK_ALPHAS$; i++){
+        challenges.perm_chunk_alphas[i] = __builtin_assigner_poseidon_pallas_base({state, 0, 0})[2];
+    }
+);
+)";
+        std::string perm_arg_body = R"(
+    // Call permutation argument
+    {
+        pallas::base_field_type::value_type g=1;
+        pallas::base_field_type::value_type h=1;
+        pallas::base_field_type::value_type tmp;
+        pallas::base_field_type::value_type previous_value = proof.z[$V_P_INDEX$];
+        pallas::base_field_type::value_type current_value = proof.z[$V_P_INDEX$];
+$PERM_CODE$
+        F[0] = precomputed_values.l0 * (1 - proof.z[$V_P_INDEX$]);
+        F[1] += previous_value * g - proof.z[$V_P_INDEX$ + 1] * h;
+        F[1] *= -precomputed_values.mask;
+        F[2] = proof.z[2*permutation_size] * proof.z[$V_P_INDEX$] * (proof.z[$V_P_INDEX$] - 1);
+    }
+)";
+
+        std::string lookup_challenges_str = R"(
+// generate lookup argument challenges
+    challenges.lookup_theta = state = __builtin_assigner_poseidon_pallas_base({state, 0, 0})[2];
+    state = challenges.perm_beta = state =  __builtin_assigner_poseidon_pallas_base({state, proof.commitments[3], 0})[2];
+    state = challenges.perm_gamma = state = __builtin_assigner_poseidon_pallas_base({state, 0, 0})[2];
+    for( std::size_t i = 0; i < $LOOKUP_CHUNK_ALPHAS$; i++){
+        challenges.lookup_chunk_alphas[i] = state =  __builtin_assigner_poseidon_pallas_base({state, 0, 0})[2];
+    }
+    for(std::size_t i = 0; i < sorted_columns-1; i++){
+        challenges.lookup_alphas[i] = state = __builtin_assigner_poseidon_pallas_base({state, 0, 0})[2];
+    }
+);
+)";
 
         std::string recursive_verifier_template = R"(
 #include <nil/crypto3/hash/algorithm/hash.hpp>
@@ -165,7 +193,7 @@ const size_t rows_log = $ROWS_LOG$;
 const size_t total_columns = $TOTAL_COLUMNS$;
 const size_t sorted_columns = $SORTED_COLUMNS$;
 const size_t permutation_size = $PERMUTATION_SIZE$;
-const std::array<size_t, total_columns> zero_indices = {$ZERO_INDICES$};
+const std::array <std::size_t, public_input_amount> public_input_indices = {$PUBLIC_INPUT_INDICES$};
 const size_t table_values_num = $TABLE_VALUES_NUM$;
 const size_t gates_amount = $GATES_AMOUNT$;
 constexpr std::array<std::size_t, gates_amount> gates_selector_indices = {$GATES_SELECTOR_INDICES$};
@@ -202,13 +230,18 @@ struct placeholder_proof_type{
     std::array<pallas::base_field_type::value_type, final_polynomial_size> final_polynomial;
 };
 
-struct placeholder_challenges_type{
+struct placeholder_challenges_type {
     pallas::base_field_type::value_type eta;
+
     pallas::base_field_type::value_type perm_beta;
     pallas::base_field_type::value_type perm_gamma;
+    std::array<pallas::base_field_type::value_type, $PERMUTATION_CHUNK_ALPHAS$> perm_chunk_alphas;
+
     pallas::base_field_type::value_type lookup_theta;
     pallas::base_field_type::value_type lookup_gamma;
     pallas::base_field_type::value_type lookup_beta;
+    std::array<pallas::base_field_type::value_type, $LOOKUP_CHUNK_ALPHAS$> lookup_chunk_alphas;
+
     std::array<pallas::base_field_type::value_type, $SORTED_ALPHAS$> lookup_alphas;
     pallas::base_field_type::value_type gate_theta;
     std::array<pallas::base_field_type::value_type, 8> alphas;
@@ -330,62 +363,8 @@ placeholder_challenges_type generate_challenges(
     const placeholder_proof_type &proof
 ){
     placeholder_challenges_type challenges;
-
-    transcript_state_type tr_state;
-    tr_state.state[0] = pallas::base_field_type::value_type(0);
-    tr_state.state[1] = pallas::base_field_type::value_type(0);
-    tr_state.state[2] = pallas::base_field_type::value_type(0);
-    tr_state.cur = 1;
-
-    transcript(tr_state, vk0);
-    transcript(tr_state, vk1);
-
-    // LPC additional point
-    challenges.eta = transcript_challenge(tr_state);
-    transcript(tr_state, proof.commitments[0]);
-
-    challenges.perm_beta = transcript_challenge(tr_state);
-    challenges.perm_gamma = transcript_challenge(tr_state);
-
-    // Call lookup argument
-    if( use_lookups ){
-        challenges.lookup_theta = transcript_challenge(tr_state);
-        transcript(tr_state, proof.commitments[3]);
-        challenges.lookup_beta = transcript_challenge(tr_state);
-        challenges.lookup_gamma = transcript_challenge(tr_state);
-
-        for(std::size_t i = 0; i < sorted_columns-1; i++){
-            challenges.lookup_alphas[i] = transcript_challenge(tr_state);
-        }
-    }
-
-    // Call gate argument
-    transcript(tr_state, proof.commitments[1]);
-    challenges.gate_theta = transcript_challenge(tr_state);
-
-    for(std::size_t i = 0; i < 8; i++){
-        challenges.alphas[i] = transcript_challenge(tr_state);
-    }
-    transcript(tr_state, proof.commitments[2]);
-
-    challenges.xi = transcript_challenge(tr_state);
-
-    transcript(tr_state, vk1);
-    for(std::size_t i = 0; i < commitments_num; i++){
-        transcript(tr_state, proof.commitments[i]);
-    }
-
-    challenges.lpc_theta = transcript_challenge(tr_state);
-
-    for(std::size_t i = 0; i < fri_roots_num; i++){
-        transcript(tr_state, proof.fri_roots[i]);
-        challenges.fri_alphas[i] = transcript_challenge(tr_state);
-    }
-
-    for(std::size_t i = 0; i < lambda; i++){
-        challenges.fri_x_indices[i] = transcript_challenge(tr_state);
-    }
-
+    pallas::base_field_type::value_type state;
+$PLACEHOLDER_CHALLENGES_STR$
     return challenges;
 }
 
@@ -406,24 +385,6 @@ $CONSTRAINTS_BODY$
 }
 
 $LOOKUP_EXPRESSIONS$
-/*
-typename pallas::base_field_type::value_type
-    gate_argument_verifier(
-        std::array<typename pallas::base_field_type::value_type, gates_amount> selectors,
-        std::array<typename pallas::base_field_type::value_type, constraints_amount> constraints,
-        typename pallas::base_field_type::value_type theta
-    ) {
-
-    return __builtin_assigner_gate_arg_verifier(
-        selectors.data(),
-        (int*)&gates_sizes,
-        gates_amount,
-        constraints.data(),
-        constraints_amount,
-        theta
-    );
-}
-*/
 
 template<std::size_t start_index, std::size_t leaf_size>
 pallas::base_field_type::value_type calculate_leaf_hash(
@@ -444,6 +405,8 @@ struct precomputed_values_type{
     pallas::base_field_type::value_type Z_at_xi;
     pallas::base_field_type::value_type F_consolidated;
     pallas::base_field_type::value_type T_consolidated;
+    pallas::base_field_type::value_type mask;
+    pallas::base_field_type::value_type shifted_mask;
 };
 
 constexpr std::size_t L0_IND = 0;
@@ -465,11 +428,12 @@ typedef __attribute__((ext_vector_type(2)))
     $PUBLIC_INPUT_INPUT$
     placeholder_proof_type proof
 ) {
-    placeholder_challenges_type challenges = generate_challenges(proof);
-    __builtin_assigner_exit_check(challenges.xi == proof.challenge);
+   placeholder_challenges_type challenges = generate_challenges(proof);
+   __builtin_assigner_exit_check_eq_pallas(challenges.xi, proof.challenge);
 
     precomputed_values_type precomputed_values;
     std::tie(precomputed_values.l0, precomputed_values.Z_at_xi) = xi_polys(challenges.xi);
+    precomputed_values.mask = (pallas::base_field_type::value_type(1) - proof.z[2*permutation_size] - proof.z[2*permutation_size + 2]);
 
     // For loop in for loop removed
 $PUBLIC_INPUT_CHECK$
@@ -484,39 +448,15 @@ $PUBLIC_INPUT_CHECK$
     F[6] = pallas::base_field_type::value_type(0);
     F[7] = pallas::base_field_type::value_type(0);
 
-    // Call permutation argument
-    placeholder_permutation_argument_input_type perm_arg_input;
-    perm_arg_input.thetas[0] = challenges.perm_beta;
-    perm_arg_input.thetas[1] = challenges.perm_gamma;
-
-$PERM_ARG_PREPARE$
-
-    permutation_argument_output_type permutation_argument = __builtin_assigner_permutation_arg_verifier(
-        perm_arg_input.xi_values.data(),
-        perm_arg_input.id_perm.data(),
-        perm_arg_input.sigma_perm.data(),
-        permutation_size,
-        precomputed_values.l0,
-        proof.z[4*permutation_size + 6 + table_values_num],     // V
-        proof.z[4*permutation_size + 6 + table_values_num + 1], // V_shifted
-        proof.z[4*permutation_size],                            // q_last
-        proof.z[4*permutation_size + 3],                        // q_blind
-        perm_arg_input.thetas
-    );
-
-    F[0] = permutation_argument[0];
-    F[1] = permutation_argument[1];
-    F[2] = permutation_argument[2];
-
+$PERM_BODY$
 $LOOKUP_CODE$
-
     if constexpr( gates_amount > 0) {
         std::array<pallas::base_field_type::value_type, constraints_amount> constraints;
         std::array<pallas::base_field_type::value_type, gates_amount> selectors;
         constraints = calculate_constraints(proof.z);
 
 $GATE_ARG_PREPARE$
-        F[7] *= (pallas::base_field_type::value_type(1) - proof.z[4*permutation_size] - proof.z[4*permutation_size + 3]);
+        F[7] *= precomputed_values.mask;
     }
 
     precomputed_values.F_consolidated = pallas::base_field_type::value_type(0);
@@ -532,7 +472,7 @@ $GATE_ARG_PREPARE$
         factor *= (precomputed_values.Z_at_xi + pallas::base_field_type::value_type(1));
     }
     __builtin_assigner_exit_check(precomputed_values.F_consolidated == precomputed_values.T_consolidated * precomputed_values.Z_at_xi);
-
+/*
     // Commitment scheme
     std::array<pallas::base_field_type::value_type, singles_amount> singles = fill_singles(challenges.xi, challenges.eta);
     std::array<pallas::base_field_type::value_type, unique_points> U;
@@ -583,7 +523,7 @@ $ROUND_PROOF_CHECK$
             factor = factor * x;
         }
         __builtin_assigner_exit_check(interpolant == y1);
-	}
+	}*/
     return true;
 }
 

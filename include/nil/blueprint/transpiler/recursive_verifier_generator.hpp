@@ -69,16 +69,16 @@ namespace nil {
             using pow_operation_type = typename constraint_system_type::pow_operation_type;
             using assignment_table_type = typename PlaceholderParams::assignment_table_type;
 
-            std::vector<std::size_t> zero_indices(columns_rotations_type col_rotations, std::size_t permutation_size){
+            std::vector<std::size_t> zero_indices(const columns_rotations_type &col_rotations, std::size_t permutation_size){
                 std::vector<std::size_t> zero_indices;
                 std::uint16_t fixed_values_points = 0;
                 std::stringstream result;
 
                 for(std::size_t i= 0; i < desc.constant_columns + desc.selector_columns; i++){
-                    fixed_values_points += col_rotations[i + desc.witness_columns + desc.public_input_columns].size() + 1;
+                    fixed_values_points += col_rotations[i + desc.witness_columns + desc.public_input_columns].size();
                 }
 
-                for(std::size_t i= 0; i < desc.table_width(); i++){
+                for(std::size_t i= 0; i < desc.witness_columns + desc.public_input_columns + desc.constant_columns + desc.selector_columns; i++){
                     std::size_t j = 0;
                     for(auto& rot: col_rotations[i]){
                         if(rot == 0){
@@ -92,58 +92,17 @@ namespace nil {
                 std::uint16_t sum = fixed_values_points;
                 std::size_t i = 0;
                 for(; i < desc.witness_columns + desc.public_input_columns; i++){
-                    zero_indices[i] = sum + zero_indices[i] + 4 * permutation_size + 6;
+                    zero_indices[i] = sum + zero_indices[i] + 2 * permutation_size + 4;
                     sum += col_rotations[i].size();
                 }
 
                 sum = 0;
-                for(; i < desc.table_width(); i++){
-                    zero_indices[i] = sum + zero_indices[i] + 4 * permutation_size + 6;
-                    sum += col_rotations[i].size() + 1;
+                for(; i < desc.witness_columns + desc.public_input_columns + desc.constant_columns + desc.selector_columns; i++){
+                    zero_indices[i] = sum + zero_indices[i] + 2 * permutation_size + 4;
+                    sum += col_rotations[i].size();
                 }
 
                 return zero_indices;
-            }
-
-            // TODO: Move logic to utils.hpp. It's similar to EVM verifier generator
-            std::string zero_indices_str(columns_rotations_type col_rotations, std::size_t permutation_size){
-                std::vector<std::size_t> zero_indices;
-                std::uint16_t fixed_values_points = 0;
-                std::stringstream result;
-
-                for(std::size_t i= 0; i < desc.constant_columns + desc.selector_columns; i++){
-                    fixed_values_points += col_rotations[i + desc.witness_columns + desc.public_input_columns].size() + 1;
-                }
-
-                for(std::size_t i= 0; i < desc.table_width(); i++){
-                    std::size_t j = 0;
-                    for(auto& rot: col_rotations[i]){
-                        if(rot == 0){
-                            zero_indices.push_back(j);
-                            break;
-                        }
-                        j++;
-                    }
-                }
-
-                std::uint16_t sum = fixed_values_points;
-                std::size_t i = 0;
-                for(; i < desc.witness_columns + desc.public_input_columns; i++){
-                    zero_indices[i] = sum + zero_indices[i];
-                    sum += col_rotations[i].size();
-                }
-
-                sum = 0;
-                for(; i < desc.table_width(); i++){
-                    zero_indices[i] = sum + zero_indices[i];
-                    sum += col_rotations[i].size() + 1;
-                }
-
-                for( i = 0; i < desc.table_width(); i++){
-                    if( i != 0 ) result << ", ";
-                    result << zero_indices[i] + 4 * permutation_size + 6;
-                }
-                return result.str();
             }
 
             static std::string generate_field_array2_from_64_hex_string(std::string str){
@@ -427,23 +386,13 @@ namespace nil {
 
                 out << "\t{\"struct\":[" << std::endl;
                 out << "\t\t{\"array\":[" << std::endl;
-                out << "\t\t\t" << generate_commitment<typename PlaceholderParams::commitment_scheme_type>(proof.commitments.at(1))//(nil::crypto3::zk::snark::VARIABLE_VALUES_BATCH)
-                    << "," << std::endl;
-                out << "\t\t\t" << generate_commitment<typename PlaceholderParams::commitment_scheme_type>(
-                    proof.commitments.at(2))//(nil::crypto3::zk::snark::PERMUTATION_BATCH)
-                    << "," << std::endl;
-                out << "\t\t\t" << generate_commitment<typename PlaceholderParams::commitment_scheme_type>(
-                    proof.commitments.at(3)) // (nil::crypto3::zk::snark::QUOTIENT_BATCH)
-                ;
-
-                if( proof.commitments.find(4) != proof.commitments.end() ){ /*nil::crypto3::zk::snark::LOOKUP_BATCH*/
-                    out << "," << std::endl << "\t\t\t" << generate_commitment<typename PlaceholderParams::commitment_scheme_type>(
-                        proof.commitments.at(4) //nil::crypto3::zk::snark::LOOKUP_BATCH)
-                    );
+                bool first = true;
+                for( const auto &it: proof.commitments ){
+                    if( !first ) out << "," << std::endl; else first = false;
+                    out << "\t\t\t" << generate_commitment<typename PlaceholderParams::commitment_scheme_type>(proof.commitments.at(it.first));//(nil::crypto3::zk::snark::VARIABLE_VALUES_BATCH)
                 }
-                out << std::endl;
-
                 out << "\t\t]}," << std::endl;
+
                 out << "\t\t{\"field\": \"" << proof.eval_proof.challenge << "\"}," << std::endl;
                 out << generate_eval_proof<typename PlaceholderParams::commitment_scheme_type>(
                     proof.eval_proof.eval_proof
@@ -464,7 +413,6 @@ namespace nil {
                         result[v] = j + start_index;
                         j++;
                     }
-                    j++;
                 }
                 for(std::size_t i = 0; i < desc.selector_columns; i++){
                     for(auto& rot: col_rotations[i + desc.witness_columns + desc.public_input_columns + desc.constant_columns]){
@@ -472,7 +420,6 @@ namespace nil {
                         result[v] = j + start_index;
                         j++;
                     }
-                    j++;
                 }
                 for(std::size_t i = 0; i < desc.witness_columns; i++){
                     for(auto& rot: col_rotations[i]){
@@ -534,6 +481,7 @@ namespace nil {
                         case binary_operation_type::ArithmeticOperatorType::MULT:
                             return "(" + left + " * " + right + ")";
                     }
+                    return "";
                 }
             };
 
@@ -560,117 +508,6 @@ namespace nil {
                 return result;
             }
 
-            inline std::tuple<
-                std::vector<std::vector<std::string>>, std::vector<std::size_t>, std::map<std::string, std::size_t>
-            > calculate_unique_point_sets(
-                const common_data_type &common_data,
-                std::size_t permutation_size,
-                bool use_lookups,
-                std::size_t quotient_size,
-                std::size_t sorted_size
-            ){
-                std::set<std::string> unique_points;
-                std::vector<std::string> points;
-                std::map<std::string, std::size_t> singles;
-                std::vector<std::vector<std::string>> result;
-                std::vector<std::size_t> points_ids;
-
-                singles["eta"] = singles.size();
-                singles[rot_string(0)] = singles.size();
-                singles[rot_string(1)] = singles.size();
-
-                for(std::size_t i = 0; i < permutation_size*2; i++){
-                    points.push_back(rot_string(0) + "& eta& ");
-                }
-                unique_points.insert(rot_string(0) + "& eta& ");
-                points.push_back(rot_string(0) + "& "+ rot_string(1) + "& eta& ");
-                points.push_back(rot_string(0) + "& "+ rot_string(1) + "& eta& ");
-                unique_points.insert(rot_string(0) + "& "+ rot_string(1) + "& eta& ");
-
-                for(std::size_t i = 0; i < desc.constant_columns; i++){
-                    std::stringstream str;
-                    for(auto j:common_data.columns_rotations[i + desc.witness_columns + desc.public_input_columns]){
-                        if(singles.find(rot_string(j)) == singles.end())
-                            singles[rot_string(j)] = singles.size();
-                        str << rot_string(j) << "& ";
-                    }
-                    str << "eta& ";
-                    unique_points.insert(str.str());
-                    points.push_back(str.str());
-                }
-
-                for(std::size_t i = 0; i < desc.selector_columns; i++){
-                    std::stringstream str;
-                    for(auto j:common_data.columns_rotations[i + desc.witness_columns + desc.public_input_columns + desc.constant_columns]){
-                        if(singles.find(rot_string(j)) == singles.end())
-                            singles[rot_string(j)] = singles.size();
-                        str << rot_string(j) << "& ";
-                    }
-                    str << "eta& ";
-                    unique_points.insert(str.str());
-                    points.push_back(str.str());
-                }
-
-                for(std::size_t i = 0; i < desc.witness_columns; i++){
-                    std::stringstream str;
-                    for(auto j:common_data.columns_rotations[i]){
-                        if(singles.find(rot_string(j)) == singles.end())
-                            singles[rot_string(j)] = singles.size();
-                        str << rot_string(j) << "& ";
-                    }
-                    unique_points.insert(str.str());
-                    points.push_back(str.str());
-                }
-
-                for(std::size_t i = 0; i < desc.public_input_columns; i++){
-                    std::stringstream str;
-                    for(auto j:common_data.columns_rotations[i + desc.witness_columns]){
-                        if(singles.find(rot_string(j)) == singles.end())
-                            singles[rot_string(j)] = singles.size();
-                        str << rot_string(j) << "& ";
-                    }
-                    unique_points.insert(str.str());
-                    points.push_back(str.str());
-                }
-
-                unique_points.insert(rot_string(0) + "& " + rot_string(1) + "& ");//Permutation
-                points.push_back(rot_string(0) + "& " + rot_string(1) + "& ");
-                if(use_lookups){
-                    points.push_back(rot_string(0) + "& " + rot_string(1) + "& ");
-                }
-                unique_points.insert(rot_string(0) + "& ");// Quotient
-                for(std::size_t i = 0; i < quotient_size; i++){
-                    points.push_back(rot_string(0) + "& ");
-                }
-                if(use_lookups){
-                    unique_points.insert(rot_string(0) + "& " + rot_string(1) + "& " + rot_string(common_data.usable_rows_amount) + "& "); // Lookups
-                    for( std::size_t i = 0; i < sorted_size; i++ ){
-                        points.push_back(rot_string(0) + "& " + rot_string(1) + "& " + rot_string(common_data.usable_rows_amount) + "& ");
-                    }
-                    singles[rot_string(common_data.usable_rows_amount)] = singles.size();
-                }
-
-                for(std::size_t i = 0; i < points.size(); i++){
-                    std::size_t j = 0;
-                    bool found = false;
-                    for(const auto &unique_point:unique_points){
-                        if(points[i] == unique_point){
-                            found = true;
-                            points_ids.push_back(j);
-                            break;
-                        }
-                        j++;
-                    }
-                    BOOST_ASSERT(found);
-                }
-
-                for( const auto &p: unique_points){
-                    result.push_back(split_point_string(p));
-                }
-
-                return std::make_tuple(result, points_ids, singles);
-            }
-
             std::string generate_recursive_verifier(
                 const constraint_system_type &constraint_system,
                 const common_data_type &common_data,
@@ -690,7 +527,7 @@ namespace nil {
                 transpiler_replacements reps;
 
                 auto fri_params = common_data.commitment_params;
-                std::size_t batches_num = use_lookups?5:4;
+                std::size_t batches_num = placeholder_info.batches_num;
                 auto lambda = fri_params.lambda;
 
                 std::size_t round_proof_layers_num = 0;
@@ -701,40 +538,18 @@ namespace nil {
                 std::size_t lookup_degree = constraint_system.lookup_poly_degree_bound();
 
                 std::size_t rows_amount = desc.rows_amount;
-                std::size_t quotient_degree = std::max(
-                    (permutation_size + 2) * (desc.rows_amount -1 ),
-                    (lookup_degree + 1) * (desc.rows_amount -1 )
-                );
+                std::size_t quotient_polys = placeholder_info.quotient_size;
 
-                std::size_t quotient_polys = (quotient_degree % rows_amount != 0)? (quotient_degree / rows_amount + 1): (quotient_degree / rows_amount);
+                std::size_t poly_num = placeholder_info.poly_num;
 
-                std::size_t poly_num = 2 * permutation_size + 2 + (use_lookups?2:1)
-                    + desc.table_width()
-                    + constraint_system.sorted_lookup_columns_number() + quotient_polys;
-
-                std::size_t points_num = 4 * permutation_size + 6;
-                std::size_t table_values_num = 0;
-                for(std::size_t i = 0; i < desc.constant_columns + desc.selector_columns; i++){
-                    points_num += common_data.columns_rotations[i + desc.witness_columns + desc.public_input_columns].size() + 1;
-                    table_values_num += common_data.columns_rotations[i + desc.witness_columns + desc.public_input_columns].size() + 1;
-                }
-                for(std::size_t i = 0; i < desc.witness_columns + desc.public_input_columns; i++){
-                    points_num += common_data.columns_rotations[i].size();
-                    table_values_num += common_data.columns_rotations[i].size();
-                }
-                points_num += use_lookups? 4 : 2;
-                points_num += quotient_polys;
-
-                if( use_lookups ) {
-                    points_num += constraint_system.sorted_lookup_columns_number() * 3;
-                }
-
+                std::size_t points_num = placeholder_info.points_num;
+                std::size_t table_values_num = placeholder_info.table_values_num;
 
                 std::size_t constraints_amount = 0;
                 std::string gates_sizes = "";
                 std::stringstream constraints_body;
                 std::size_t cur = 0;
-                auto verifier_indices = get_plonk_variable_indices(common_data.columns_rotations, 4*permutation_size + 6);
+                auto verifier_indices = get_plonk_variable_indices(common_data.columns_rotations, 2*permutation_size + 4);
 
                 expression_gen_code_visitor<variable_type> visitor(verifier_indices);
                 for(std::size_t i = 0; i < constraint_system.gates().size(); i++){
@@ -847,14 +662,6 @@ namespace nil {
                     prepare_U_V_str << "\n";
                 }
 
-                std::string public_input_sizes_str = "";
-                std::size_t full_public_input_size = 0;
-                for(std::size_t i = 0; i < public_input_sizes.size(); i++){
-                    if(i != 0) public_input_sizes_str += ", ";
-                    public_input_sizes_str += to_string(public_input_sizes[i]);
-                    full_public_input_size += public_input_sizes[i];
-                }
-
                 std::stringstream lpc_y_computation;
                 for( std::size_t i = 0; i < singles_strs.size(); i++){
                     lpc_y_computation << "\t\tQ0 = pallas::base_field_type::value_type(0);" << std::endl;
@@ -872,35 +679,8 @@ namespace nil {
                     lpc_y_computation << "\t\ty1 += Q1;" << std::endl;
                 }
 
-                // We need remove loop there because we can't use for loops in for loops
-                cur = 0;
-                std::string full_public_input_check_str = "";
-                full_public_input_check_str += "\tstd::array<pallas::base_field_type::value_type, "+ to_string(full_public_input_size) + "> Omegas ;\n";
-                full_public_input_check_str += "\tOmegas[0] = pallas::base_field_type::value_type(1);\n";
-                full_public_input_check_str += "\tpallas::base_field_type::value_type result(0);\n";
-                for (std::size_t i = 0; i < desc.public_input_columns; i++){
-                    full_public_input_check_str += "\t{\n";
-                    full_public_input_check_str += "\tresult = pallas::base_field_type::value_type(0);\n";
-                    for( std::size_t j = 0; j < public_input_sizes[i]; j++){
-                        full_public_input_check_str += "\t\tresult += public_input[" + to_string(cur) + "] * Omegas["+to_string(j)+"] / (challenges.xi - Omegas["+to_string(j)+"]);";
-                        if( j != public_input_sizes[i] - 1)
-                            full_public_input_check_str += "  Omegas["+to_string(j+1)+"] = Omegas["+to_string(j)+"] * omega;\n";
-                        cur++;
-                    }
-                    full_public_input_check_str += "\n\t\t__builtin_assigner_exit_check(rows_amount * proof.z[zero_indices[witness_amount + " + to_string(i) + " ]] == precomputed_values.Z_at_xi * result);\n";
-                    full_public_input_check_str += "\t}\n";
-                }
-
-                std::size_t fixed_values_size = permutation_size * 2 + 2 + desc.constant_columns + desc.selector_columns;
-                std::size_t variable_values_size = desc.witness_columns + desc.public_input_columns;
-
                 std::string initial_proof_check_str = "";
-                std::vector<std::size_t> batches_sizes;
-                batches_sizes.push_back(fixed_values_size);
-                batches_sizes.push_back(variable_values_size);
-                batches_sizes.push_back(use_lookups?2:1);
-                batches_sizes.push_back(quotient_polys);
-                if(use_lookups) batches_sizes.push_back(constraint_system.sorted_lookup_columns_number());
+                const std::vector<std::size_t> &batches_sizes = placeholder_info.batches_sizes;
 
                 std::size_t start_position = 0;
                 std::size_t initial_merkle_proofs_position_num = (log2(fri_params.D[0]->m) - 1);
@@ -925,9 +705,76 @@ namespace nil {
                         initial_proof_check_str += "\t\t__builtin_assigner_exit_check(hash_state == proof.commitments[" + to_string(i-1) + "]);\n\n";
                 }
 
-                std::string batches_size_list = to_string(batches_sizes[0]) + ", " + to_string(batches_sizes[1]) + ", " +
-                    to_string(batches_sizes[2]) + ", " + to_string(batches_sizes[3]);
-                if(use_lookups) batches_size_list += ", " + to_string(batches_sizes[4]);
+                std::string placeholder_challenges_str = "\tchallenges.eta = state = __builtin_assigner_poseidon_pallas_base({0, vk0, vk1})[2];\n";
+                if(placeholder_info.use_permutations){
+                    placeholder_challenges_str += "\t// generate permutation argument challenges\n";
+                    placeholder_challenges_str += "\tchallenges.perm_beta = state = __builtin_assigner_poseidon_pallas_base({state, proof.commitments[0], 0})[2];\n";
+                    placeholder_challenges_str += "\tchallenges.perm_gamma = state = __builtin_assigner_poseidon_pallas_base({state, 0, 0})[2];\n";
+                    if( placeholder_info.permutation_poly_amount  > 1 ){
+                        placeholder_challenges_str += "\tfor( std::size_t i = 0; i < " + to_string(placeholder_info.permutation_poly_amount - 1) + "; i++){\n";
+                        placeholder_challenges_str += "\t\tchallenges.perm_chunk_alphas[i] = state = __builtin_assigner_poseidon_pallas_base({state, 0, 0})[2];\n";
+                        placeholder_challenges_str += "\t}\n";
+                    }
+                }
+                if(placeholder_info.use_lookups){
+                    placeholder_challenges_str += "\t// generate permutation argument challenges\n";
+                    if( placeholder_info.use_permutations ) {
+                        placeholder_challenges_str += "\tchallenges.lookup_theta = state = __builtin_assigner_poseidon_pallas_base({state, 0, 0})[2];\n";
+                        placeholder_challenges_str += "\tchallenges.lookup_beta = state = __builtin_assigner_poseidon_pallas_base({state, proof.commitments[3], 0})[2];";
+                    } else {
+                        placeholder_challenges_str += "\tchallenges.lookup_theta = state = __builtin_assigner_poseidon_pallas_base({state, proof.commitments[0], 0})[2];\n";
+                        placeholder_challenges_str += "\tchallenges.lookup_beta = state = __builtin_assigner_poseidon_pallas_base({state, proof.commitments[3], 0})[2];";
+                    }
+                    placeholder_challenges_str += "\tchallenges.lookup_gamma = state = __builtin_assigner_poseidon_pallas_base({state, 0, 0})[2];\n";
+                    if( placeholder_info.lookup_poly_amount  > 1 ){
+                        placeholder_challenges_str += "\tfor( std::size_t i = 0; i < " + to_string(placeholder_info.lookup_poly_amount - 1) + "; i++){\n";
+                        placeholder_challenges_str += "\t\tchallenges.lookup_chunk_alphas[i] = state = __builtin_assigner_poseidon_pallas_base({state, 0, 0})[2];\n";
+                        placeholder_challenges_str += "\t}\n";
+                    }
+                    placeholder_challenges_str += "\tfor( std::size_t i = 0; i < " + to_string(placeholder_info.sorted_poly_amount -1) + "; i++){\n";
+                    placeholder_challenges_str += "\t\tchallenges.lookup_alphas[i] = state =__builtin_assigner_poseidon_pallas_base({state, 0, 0})[2];\n";
+                    placeholder_challenges_str += "\t}\n";
+                }
+                if(placeholder_info.use_permutations || placeholder_info.use_lookups){
+                    placeholder_challenges_str += "\tchallenges.gate_theta = state = __builtin_assigner_poseidon_pallas_base({state, proof.commitments[1], 0})[2];\n";
+                } else {
+                    placeholder_challenges_str += "\tchallenges.gate_theta = state = __builtin_assigner_poseidon_pallas_base({state, proof.commitments[0]})[2];\n";
+                }
+
+                for( std::size_t i = 0; i < 8; i++){
+                    placeholder_challenges_str += "\tchallenges.alphas[" + to_string(i) + "] = state = __builtin_assigner_poseidon_pallas_base({state, 0, 0})[2];\n";
+                }
+
+                if( placeholder_info.use_permutations || placeholder_info.use_lookups )
+                    placeholder_challenges_str += "\tchallenges.xi = state = __builtin_assigner_poseidon_pallas_base({state, proof.commitments[2], 0})[2];\n";
+                else
+                    placeholder_challenges_str += "\tchallenges.xi = state = __builtin_assigner_poseidon_pallas_base({state, proof.commitments[1], 0})[2];\n";
+
+                if( placeholder_info.use_lookups ){
+                    placeholder_challenges_str += "\tstate = __builtin_assigner_poseidon_pallas_base({state, vk1, proof.commitments[0]})[2];\n";
+                    placeholder_challenges_str += "\tstate = __builtin_assigner_poseidon_pallas_base({state, proof.commitments[1], proof.commitments[2]})[2];\n";
+                    placeholder_challenges_str += "\tchallenges.lpc_theta = state = __builtin_assigner_poseidon_pallas_base({state, proof.commitments[3], 0})[2];\n";
+                } else if (placeholder_info.use_permutations){
+                    placeholder_challenges_str += "\tstate = __builtin_assigner_poseidon_pallas_base({state, vk1, proof.commitments[0]})[2];\n";
+                    placeholder_challenges_str += "\tchallenges.lpc_theta = state = __builtin_assigner_poseidon_pallas_base({state, proof.commitments[1], proof.commitments[2]})[2];\n";
+                } else {
+                    placeholder_challenges_str += "\tstate = __builtin_assigner_poseidon_pallas_base({state, vk1, proof.commitments[0]})[2];\n";
+                    placeholder_challenges_str += "\tchallenges.lpc_theta = state = __builtin_assigner_poseidon_pallas_base({state, proof.commitments[1], 0})[2];\n";
+                }
+
+                placeholder_challenges_str += "\tfor(std::size_t i = 0; i < fri_roots_num; i++){\n";
+                placeholder_challenges_str += "\tchallenges.fri_alphas[i] = state = __builtin_assigner_poseidon_pallas_base({state, proof.fri_roots[i], 0})[2];\n";
+                placeholder_challenges_str += "\t}\n";
+
+                placeholder_challenges_str += "\tfor(std::size_t i = 0; i < lambda; i++){\n";
+                placeholder_challenges_str += "\t\tchallenges.fri_x_indices[i] = state = __builtin_assigner_poseidon_pallas_base({state, 0, 0})[2];\n";
+                placeholder_challenges_str += "\t}\n";
+
+                std::string batches_size_list;
+                for( std::size_t  i = 0; i < batches_num; i++){
+                    if( i != 0) batches_size_list += ", ";
+                    batches_size_list += to_string(batches_sizes[i]);
+                }
 
                 std::string round_proof_check_str = "";
                 cur = 0;
@@ -958,11 +805,57 @@ namespace nil {
                 }
 
                 auto zeroes = zero_indices(common_data.columns_rotations, permutation_size);
-                std::string perm_arg_prepare_str = "";
-                for( std::size_t i = 0; i < permutation_size; i++ ){
-                    perm_arg_prepare_str += "\tperm_arg_input.xi_values["+to_string(i)+"] = proof.z["+to_string(zeroes[i])+"];\n";
-                    perm_arg_prepare_str += "\tperm_arg_input.id_perm["+to_string(i)+"] = proof.z["+to_string(2*i)+"];\n";
-                    perm_arg_prepare_str += "\tperm_arg_input.sigma_perm["+to_string(i)+"] = proof.z["+to_string(2*permutation_size + 2*i)+"];\n";
+                std::string public_input_sizes_str = "";
+                std::string public_input_indices_str = "";
+                std::size_t full_public_input_size = 0;
+                for(std::size_t i = 0; i < public_input_sizes.size(); i++){
+                    if(i != 0) {
+                        public_input_sizes_str += ", ";
+                        public_input_indices_str += ", ";
+                    }
+                    public_input_sizes_str += to_string(public_input_sizes[i]);
+                    public_input_indices_str += to_string(zeroes[desc.witness_columns + i]);
+                    full_public_input_size += public_input_sizes[i];
+                }
+
+                cur = 0;
+                std::string full_public_input_check_str = "";
+                if( desc.public_input_columns != 0){
+                    full_public_input_check_str += "\tstd::array<pallas::base_field_type::value_type, "+ to_string(full_public_input_size) + "> Omegas ;\n";
+                    full_public_input_check_str += "\tOmegas[0] = pallas::base_field_type::value_type(1);\n";
+                    full_public_input_check_str += "\tpallas::base_field_type::value_type result(0);\n";
+                    for (std::size_t i = 0; i < desc.public_input_columns; i++){
+                        full_public_input_check_str += "\t{\n";
+                        full_public_input_check_str += "\tresult = pallas::base_field_type::value_type(0);\n";
+                        for( std::size_t j = 0; j < public_input_sizes[i]; j++){
+                            full_public_input_check_str += "\t\tresult += public_input[" + to_string(cur) + "] * Omegas["+to_string(j)+"] / (challenges.xi - Omegas["+to_string(j)+"]);";
+                            if( j != public_input_sizes[i] - 1)
+                                full_public_input_check_str += "  Omegas["+to_string(j+1)+"] = Omegas["+to_string(j)+"] * omega;\n";
+                            cur++;
+                        }
+                        full_public_input_check_str += "\n\t\t__builtin_assigner_exit_check_eq_pallas(rows_amount * proof.z[public_input_indices[" + to_string(i) + " ]], precomputed_values.Z_at_xi * result);\n";
+                        full_public_input_check_str += "\t}\n";
+                    }
+                }
+
+                std::string perm_arg_str = "";
+                if( placeholder_info.use_permutations){
+                    cur = 0;
+                    std::size_t chunk = 0;
+                    for( std::size_t i = 0; i < permutation_size; i++ ){
+                        perm_arg_str += "\t\ttmp = challenges.perm_gamma +  proof.z["+to_string(zeroes[common_data.permuted_columns[i]])+"];\n";
+                        perm_arg_str += "\t\tg *= challenges.perm_beta *  proof.z["+to_string(i)+"] + tmp;\n";
+                        perm_arg_str += "\t\th *= challenges.perm_beta *  proof.z["+to_string(permutation_size + i)+"] + tmp;\n";
+                        cur++;
+                        if(common_data.max_quotient_chunks != 0 && cur == common_data.max_quotient_chunks - 1){
+                            perm_arg_str += "\t\tcurrent_value = proof.z["+to_string(2 * permutation_size + 4 + placeholder_info.table_values_num + 2 + chunk ) +"];\n";
+                            perm_arg_str += "\t\tF[1] += challenges.perm_chunk_alphas["+to_string(chunk)+"] * (previous_value * g - current_value * h);\n";
+                            perm_arg_str += "\t\tprevious_value = current_value;\n";
+                            perm_arg_str += "\t\tg = pallas::base_field_type::value_type(1); h = pallas::base_field_type::value_type(1);\n";
+                            chunk++;
+                            cur = 0;
+                        }
+                    }
                 }
 
                 std::string gate_arg_prepare_str = "\t\tpallas::base_field_type::value_type theta_acc(1);\n";
@@ -1004,9 +897,43 @@ namespace nil {
                             lookup_table_loop += "\t\ttheta_acc = theta_acc * theta;\n";
                             cur_o++;
                         }
-                        lookup_table_loop += "\t\tlookup_value["+to_string(cur)+"] *= (pallas::base_field_type::value_type(1) - q_last[0] - q_blind[0]);\n";
-                        lookup_table_loop += "\t\tlookup_shifted_value["+to_string(cur)+"] *= (pallas::base_field_type::value_type(1) - q_last[1] - q_blind[1]);\n";
+                        lookup_table_loop += "\t\tlookup_value["+to_string(cur)+"] *= precomputed_values.mask;\n";
+                        lookup_table_loop += "\t\tlookup_shifted_value["+to_string(cur)+"] *= precomputed_values.shifted_mask;\n";
                         cur++;
+                    }
+                }
+
+                std::string lookup_chunking_code_str = "";
+                if( placeholder_info.use_lookups ){
+                    std::vector<std::size_t> lookup_parts = constraint_system.lookup_parts(common_data.max_quotient_chunks);
+                    cur = 0;
+                    std::size_t chunk = 0;
+                    std::size_t v_l_start_index = placeholder_info.use_permutations? 2*permutation_size + 4 + placeholder_info.table_values_num + placeholder_info.permutation_poly_amount + 1:2*permutation_size + 4 + placeholder_info.table_values_num;
+                    for( std::size_t i = 0; i < constraint_system.lookup_constraints_num(); i++ ){
+                        lookup_chunking_code_str += "\t\tg = g *(pallas::base_field_type::value_type(1)+beta)*(gamma + lookup_input["+to_string(i)+"]);\n";
+                        lookup_chunking_code_str += "\t\th = h * ((pallas::base_field_type::value_type(1)+beta) * gamma + sorted["+to_string(3*i)+"] + beta * sorted[" + to_string(3*i+1) + "]);\n";
+                        cur++;
+                        if( common_data.max_quotient_chunks > 0 && cur == lookup_parts[chunk]){
+                            lookup_chunking_code_str += "\t\tcurrent_value = proof.z["+to_string(v_l_start_index + 2 + chunk)+"];\n";
+                            lookup_chunking_code_str += "\t\tlookup_argument[2] += challenges.lookup_chunk_alphas[" + to_string(chunk) + "] * (previous_value * g - current_value * h);\n";
+                            lookup_chunking_code_str += "\t\tprevious_value = current_value;\n";
+                            lookup_chunking_code_str += "\t\tg = pallas::base_field_type::value_type(1); h = pallas::base_field_type::value_type(1);\n";
+                            cur = 0;
+                            chunk++;
+                        }
+                    }
+                    for( std::size_t i = 0; i < constraint_system.lookup_options_num(); i++ ){
+                        lookup_chunking_code_str += "\t\tg = g * ((pallas::base_field_type::value_type(1)+beta) * gamma + lookup_value["+to_string(i)+"] + beta * lookup_shifted_value["+to_string(i)+"]);\n";
+                        lookup_chunking_code_str += "\t\th = h * ((pallas::base_field_type::value_type(1)+beta) * gamma + sorted["+to_string(3*(i+constraint_system.lookup_constraints_num()))+"] + beta * sorted[" + to_string(3*(i+constraint_system.lookup_constraints_num())+1) + "]);\n";
+                        cur++;
+                        if( common_data.max_quotient_chunks > 0 && cur ==  lookup_parts[chunk] && i != constraint_system.lookup_options_num() - 1 ){
+                            lookup_chunking_code_str += "\t\tcurrent_value = proof.z["+to_string(v_l_start_index + 2 + chunk)+"];\n";
+                            lookup_chunking_code_str += "\t\tlookup_argument[2] += challenges.lookup_chunk_alphas[" + to_string(chunk) + "] * (previous_value * g - current_value * h);\n";
+                            lookup_chunking_code_str += "\t\tprevious_value = current_value;\n";
+                            lookup_chunking_code_str += "\t\tg = pallas::base_field_type::value_type(1); h = pallas::base_field_type::value_type(1);\n";
+                            cur = 0;
+                            chunk++;
+                        }
                     }
                 }
 
@@ -1017,7 +944,7 @@ namespace nil {
                 lookup_reps["$LOOKUP_TABLE_LOOP$"] = use_lookups?lookup_table_loop:"";
                 result = replace_all(result, lookup_reps);
 
-                reps["$USE_LOOKUPS_DEFINE$"] = use_lookups?"#define __USE_LOOKUPS__ 1\n":"";
+                reps["$LOOKUP_CHUNKING_CODE$"] = use_lookups?lookup_chunking_code_str:"";
                 reps["$USE_LOOKUPS$"] = use_lookups? "true" : "false";
                 reps["$BATCHES_NUM$"] = to_string(batches_num);
                 reps["$COMMITMENTS_NUM$"] = to_string(batches_num - 1);
@@ -1036,7 +963,6 @@ namespace nil {
                 reps["$FINAL_POLYNOMIAL_SIZE$"] = to_string(std::pow(2, std::log2(fri_params.max_degree + 1) - fri_params.r + 1) - 2);
                 reps["$LAMBDA$"] = to_string(lambda);
                 reps["$PERMUTATION_SIZE$"] = to_string(permutation_size);
-                reps["$ZERO_INDICES$"] = zero_indices_str(common_data.columns_rotations, permutation_size);
                 reps["$TOTAL_COLUMNS$"] = to_string(desc.table_width());
                 reps["$ROWS_LOG$"] = to_string(log2(rows_amount));
                 reps["$ROWS_AMOUNT$"] = to_string(rows_amount);
@@ -1050,7 +976,7 @@ namespace nil {
                 reps["$PUBLIC_INPUT_COLUMNS_AMOUNT$"] = to_string(desc.public_input_columns);
                 reps["$CONSTANT_COLUMNS_AMOUNT$"] = to_string(desc.constant_columns);
                 reps["$SELECTOR_COLUMNS_AMOUNT$"] = to_string(desc.selector_columns);
-                reps["$QUOTIENT_POLYS_START$"] = to_string(4*permutation_size + 6 + table_values_num + (use_lookups?4:2));
+                reps["$QUOTIENT_POLYS_START$"] = to_string(placeholder_info.quotient_poly_first_index);
                 reps["$QUOTIENT_POLYS_AMOUNT$"] = to_string(quotient_polys);
                 reps["$D0_SIZE$"] = to_string(fri_params.D[0]->m);
                 reps["$D0_LOG$"] = to_string(log2(fri_params.D[0]->m));
@@ -1062,7 +988,7 @@ namespace nil {
                 reps["$SINGLES_COMPUTATION$"] = singles_str;
                 reps["$PREPARE_U_AND_V$"] = prepare_U_V_str.str();
                 reps["$SORTED_COLUMNS$"] = to_string(constraint_system.sorted_lookup_columns_number());
-                reps["$SORTED_ALPHAS$"] = to_string(use_lookups? constraint_system.sorted_lookup_columns_number() - 1: 1);
+                reps["$SORTED_ALPHAS$"] = to_string(use_lookups? constraint_system.sorted_lookup_columns_number() - 1: 0);
                 reps["$LOOKUP_TABLE_AMOUNT$"] = to_string(constraint_system.lookup_tables().size());
                 reps["$LOOKUP_GATE_AMOUNT$"] = to_string(constraint_system.lookup_gates().size());
                 reps["$LOOKUP_OPTIONS_AMOUNT$"] = to_string(constraint_system.lookup_options_num());
@@ -1080,9 +1006,10 @@ namespace nil {
                 reps["$LOOKUP_SHIFTED_TABLE_SELECTORS_LIST$"] = lookup_shifted_table_selectors_list.str();
                 reps["$LOOKUP_OPTIONS_LIST$"] = lookup_options_list.str();
                 reps["$LOOKUP_SHIFTED_OPTIONS_LIST$"] = lookup_shifted_options_list.str();
-                reps["$LOOKUP_SORTED_START$"] = to_string(4*permutation_size + 6 + table_values_num + (use_lookups?4:2) + quotient_polys);
+                reps["$LOOKUP_SORTED_START$"] = to_string(2*permutation_size + 4 + table_values_num + (placeholder_info.use_permutations?placeholder_info.permutation_poly_amount+1:0)  + (placeholder_info.use_lookups?placeholder_info.lookup_poly_amount+1:0) + quotient_polys);
                 reps["$BATCHES_AMOUNT_LIST$"] = batches_size_list;
                 reps["$PUBLIC_INPUT_SIZES$"] = public_input_sizes_str;
+                reps["$PUBLIC_INPUT_INDICES$"] = public_input_indices_str;
                 reps["$FULL_PUBLIC_INPUT_SIZE$"] = to_string(full_public_input_size);
                 reps["$LPC_POLY_IDS_CONSTANT_ARRAYS$"] = lpc_poly_ids_const_arrays;
                 reps["$LPC_Y_COMPUTATION$"] = lpc_y_computation.str();
@@ -1090,9 +1017,16 @@ namespace nil {
                 reps["$PUBLIC_INPUT_INPUT$"] = desc.public_input_columns == 0 ? "" : public_input_input_str;
                 reps["$VK0$"] = to_hex_string(common_data.vk.constraint_system_with_params_hash);
                 reps["$VK1$"] = to_hex_string(common_data.vk.fixed_values_commitment);
-                reps["$PERM_ARG_PREPARE$"] = perm_arg_prepare_str;
+                reps["$PERM_BODY$"] = placeholder_info.use_permutations? perm_arg_body:"";
+                reps["$PERM_CODE$"] = placeholder_info.use_permutations? perm_arg_str: "";
                 reps["$GATE_ARG_PREPARE$"] = gate_arg_prepare_str;
+                reps["$PERMUTATION_CHUNK_ALPHAS$"] = to_string(placeholder_info.use_permutations? placeholder_info.permutation_poly_amount - 1: 0);
+                reps["$LOOKUP_CHUNK_ALPHAS$"] = to_string(placeholder_info.use_lookups? placeholder_info.lookup_poly_amount - 1: 0);
+                reps["$PLACEHOLDER_CHALLENGES_STR$"] = placeholder_challenges_str;
+                reps["$V_P_INDEX$"] = placeholder_info.use_permutations? to_string(2*permutation_size + 4 + placeholder_info.table_values_num):"0";
+                reps["$V_L_INDEX$"] = placeholder_info.use_permutations? to_string(2*permutation_size + 4 + placeholder_info.table_values_num + placeholder_info.permutation_poly_amount + 1):to_string(2*permutation_size + 4 + placeholder_info.table_values_num);
 
+                result = replace_all(result, reps);
                 result = replace_all(result, reps);
                 return result;
             }
