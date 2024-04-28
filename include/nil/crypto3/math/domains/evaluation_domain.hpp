@@ -47,8 +47,8 @@ namespace nil {
             public:
                 typedef FieldType field_type;
 
-                const std::size_t m;
-                const std::size_t log2_size;
+                std::size_t m;
+                std::size_t log2_size;
 
                 /**
                  * Construct an evaluation domain S of size m, if possible.
