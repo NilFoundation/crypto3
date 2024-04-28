@@ -49,13 +49,15 @@ namespace nil {
                 typedef typename FieldType::value_type field_value_type;
                 typedef ValueType value_type;
                 typedef std::pair<std::vector<field_value_type>, std::vector<field_value_type>> cache_type;
-                std::unique_ptr<cache_type> fft_cache;
+                std::shared_ptr<cache_type> fft_cache;
 
                 void create_fft_cache() {
-                    fft_cache = std::make_unique<cache_type>(std::vector<field_value_type>(), std::vector<field_value_type>());
+                    fft_cache = std::make_shared<cache_type>(std::vector<field_value_type>(),
+                                                             std::vector<field_value_type>());
                     detail::create_fft_cache<FieldType>(this->m, omega, fft_cache->first);
                     detail::create_fft_cache<FieldType>(this->m, omega.inversed(), fft_cache->second);
                 }
+
             public:
                 typedef FieldType field_type;
 
@@ -71,7 +73,7 @@ namespace nil {
                         const std::size_t logm = static_cast<std::size_t>(std::ceil(std::log2(m)));
                         if (logm > (fields::arithmetic_params<FieldType>::s))
                             throw std::invalid_argument(
-                                "basic_radix2(): expected logm <= fields::arithmetic_params<FieldType>::s");
+                                    "basic_radix2(): expected logm <= fields::arithmetic_params<FieldType>::s");
                     }
                 }
 
@@ -84,7 +86,7 @@ namespace nil {
                         }
                     }
 
-                    if (fft_cache == nullptr) {
+                    if (!fft_cache) {
                         create_fft_cache();
                     }
                     detail::basic_radix2_fft_cached<FieldType>(a, fft_cache->first);
@@ -99,7 +101,7 @@ namespace nil {
                         }
                     }
 
-                    if (fft_cache == nullptr) {
+                    if (!fft_cache) {
                         create_fft_cache();
                     }
                     detail::basic_radix2_fft_cached<FieldType>(a, fft_cache->second);
@@ -114,17 +116,19 @@ namespace nil {
                     return detail::basic_radix2_evaluate_all_lagrange_polynomials<FieldType>(this->m, t);
                 }
 
-                std::vector<value_type> evaluate_all_lagrange_polynomials(const typename std::vector<value_type>::const_iterator &t_powers_begin,
-                                                                          const typename std::vector<value_type>::const_iterator &t_powers_end) override {
+                std::vector<value_type> evaluate_all_lagrange_polynomials(
+                        const typename std::vector<value_type>::const_iterator &t_powers_begin,
+                        const typename std::vector<value_type>::const_iterator &t_powers_end) override {
                     if (std::size_t(std::distance(t_powers_begin, t_powers_end)) < this->m) {
-                        throw std::invalid_argument("basic_radix2: expected std::distance(t_powers_begin, t_powers_end) >= this->m");
+                        throw std::invalid_argument(
+                                "basic_radix2: expected std::distance(t_powers_begin, t_powers_end) >= this->m");
                     }
                     std::vector<value_type> tmp(t_powers_begin, t_powers_begin + this->m);
                     this->inverse_fft(tmp);
                     return tmp;
                 }
 
-                const field_value_type& get_unity_root() override {
+                const field_value_type &get_unity_root() override {
                     return omega;
                 }
 
