@@ -38,8 +38,8 @@ namespace nil {
              * n.
              */
             template<typename IntegerType>
-            IntegerType totient(const IntegerType &n) {
-                std::set < IntegerType > factors;
+            IntegerType totient(IntegerType n) {
+                std::set<IntegerType> factors;
                 IntegerType enn(n);
                 prime_factorize(enn, factors);
 
@@ -61,7 +61,7 @@ namespace nil {
              * @return vector of mi's such that 1 <= mi <= n and gcd(mi,n)==1.
              */
             template<typename IntegerType>
-            std::vector<IntegerType> totient_list(const IntegerType &n) {
+            std::vector<IntegerType> totient_list(IntegerType n) {
                 std::vector<IntegerType> result;
                 IntegerType one = 1;
 
