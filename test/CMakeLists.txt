@@ -9,6 +9,9 @@
 
 include(CMTest)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+
+
 cm_find_package(Boost REQUIRED COMPONENTS random unit_test_framework)
 
 cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
