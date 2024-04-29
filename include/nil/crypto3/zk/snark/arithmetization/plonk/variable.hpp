@@ -138,6 +138,10 @@ namespace nil {
                             return this->type < other.type;
                         return this->relative < other.relative;
                     }
+
+                    bool operator>(const plonk_variable &other) const {
+                        return *this != other && !(*this < other);
+                    }
                 };
 
                 template<typename AssignmentType, typename LeftType,

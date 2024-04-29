@@ -60,44 +60,12 @@ namespace nil {
                     ){
                         BOOST_ASSERT(_first.relative == false);
                         BOOST_ASSERT(_second.relative == false);
-                        if(_first.type == _second.type){
-                            if(_first.index < _second.index){
-                                first = plonk_variable<typename FieldType::value_type>(_first);
-                                second = plonk_variable<typename FieldType::value_type>(_second);
-                            } else if (_first.index > _second.index){
-                                first = plonk_variable<typename FieldType::value_type>(_second);
-                                second = plonk_variable<typename FieldType::value_type>(_first);
-                            } else if (_first.rotation < _second.rotation){
-                                first = plonk_variable<typename FieldType::value_type>(_first);
-                                second = plonk_variable<typename FieldType::value_type>(_second);
-                            } else if (_first.rotation > _second.rotation){
-                                first = plonk_variable<typename FieldType::value_type>(_second);
-                                second = plonk_variable<typename FieldType::value_type>(_first);
-                            } else {
-                                BOOST_ASSERT_MSG(false, "Copy constraint with equal variables");
-                            }
-                            return;
+                        first = _first;
+                        second = _second;
+
+                        if (_first > _second) {
+                            std::swap(first, second);
                         }
-                        if( _first.type == plonk_variable<typename FieldType::value_type>::column_type::witness){
-                            first = plonk_variable<typename FieldType::value_type>(_first);
-                            second = plonk_variable<typename FieldType::value_type>(_second);
-                        } else if (
-                            _first.type == plonk_variable<typename FieldType::value_type>::column_type::public_input &&
-                            _second.type != plonk_variable<typename FieldType::value_type>::column_type::witness
-                        ){
-                            first = plonk_variable<typename FieldType::value_type>(_first);
-                            second = plonk_variable<typename FieldType::value_type>(_second);
-                        } else if(
-                            _first.type == plonk_variable<typename FieldType::value_type>::column_type::constant &&
-                            _second.type == plonk_variable<typename FieldType::value_type>::column_type::selector
-                        ){
-                            first = plonk_variable<typename FieldType::value_type>(_first);
-                            second = plonk_variable<typename FieldType::value_type>(_second);
-                        } else {
-                            first = plonk_variable<typename FieldType::value_type>(_second);
-                            second = plonk_variable<typename FieldType::value_type>(_first);
-                        }
-                        return;
                    }
                 };
 
