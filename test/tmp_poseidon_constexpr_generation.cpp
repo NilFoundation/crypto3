@@ -32,21 +32,21 @@ struct round_constants_generator {
     typedef number<cpp_int_backend<state_bits, state_bits, cpp_integer_type::unsigned_magnitude, cpp_int_check_type::unchecked, void>>
         state_type;
 
-    constexpr static integral_type mod = 0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000001_cppui255;
+    constexpr static integral_type mod = 0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000001_cppui_modular255;
 
 
     constexpr void generate_round_constants() {
-        integral_type constant = 0x0_cppui255;
+        integral_type constant = 0x0_cppui_modular255;
         state_type lfsr_state = get_lfsr_init_state();
 
         for (std::size_t i = 0; i < (full_rounds + part_rounds) * t; i++) {
             while (true) {
-                constant = 0x0_cppui255;
+                constant = 0x0_cppui_modular255;
                 for (std::size_t i = 0; i < modulus_bits; i++) {
                     lfsr_state = update_state(lfsr_state);
                     constant = set_new_bit<integral_type>(constant, get_state_bit(lfsr_state, state_bits - 1));
                 }
-                if (constant < 0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000001_cppui255) {
+                if (constant < 0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000001_cppui_modular255) {
                     constants[i] = constant;
                     break;
                 }
@@ -55,44 +55,44 @@ struct round_constants_generator {
     }
 
     constexpr void generate_round_constants_unfolded() {
-        integral_type constant = 0x0_cppui255;
+        integral_type constant = 0x0_cppui_modular255;
         bool new_bit = false;
         state_type lfsr_state = get_lfsr_init_state();
 
         for (std::size_t i = 0; i < (full_rounds + part_rounds) * t; i++) {
             while (true) {
-                constant = 0x0_cppui255;
+                constant = 0x0_cppui_modular255;
                 for (std::size_t i = 0; i < modulus_bits; i++) {
                     while (true) {
-                        new_bit = ((lfsr_state & (0x1_cppui80 << (state_bits - 1))) != 0) !=
-                                  ((lfsr_state & (0x1_cppui80 << (state_bits - 1 - 13))) != 0) !=
-                                  ((lfsr_state & (0x1_cppui80 << (state_bits - 1 - 23))) != 0) !=
-                                  ((lfsr_state & (0x1_cppui80 << (state_bits - 1 - 38))) != 0) !=
-                                  ((lfsr_state & (0x1_cppui80 << (state_bits - 1 - 51))) != 0) !=
-                                  ((lfsr_state & (0x1_cppui80 << (state_bits - 1 - 62))) != 0);
+                        new_bit = ((lfsr_state & (0x1_cppui_modular80 << (state_bits - 1))) != 0) !=
+                                  ((lfsr_state & (0x1_cppui_modular80 << (state_bits - 1 - 13))) != 0) !=
+                                  ((lfsr_state & (0x1_cppui_modular80 << (state_bits - 1 - 23))) != 0) !=
+                                  ((lfsr_state & (0x1_cppui_modular80 << (state_bits - 1 - 38))) != 0) !=
+                                  ((lfsr_state & (0x1_cppui_modular80 << (state_bits - 1 - 51))) != 0) !=
+                                  ((lfsr_state & (0x1_cppui_modular80 << (state_bits - 1 - 62))) != 0);
                         lfsr_state = (lfsr_state << 1) | (new_bit ? 1 : 0);
                         if (new_bit)
                             break;
                         else {
-                            new_bit = ((lfsr_state & (0x1_cppui80 << (state_bits - 1))) != 0) !=
-                                      ((lfsr_state & (0x1_cppui80 << (state_bits - 1 - 13))) != 0) !=
-                                      ((lfsr_state & (0x1_cppui80 << (state_bits - 1 - 23))) != 0) !=
-                                      ((lfsr_state & (0x1_cppui80 << (state_bits - 1 - 38))) != 0) !=
-                                      ((lfsr_state & (0x1_cppui80 << (state_bits - 1 - 51))) != 0) !=
-                                      ((lfsr_state & (0x1_cppui80 << (state_bits - 1 - 62))) != 0);
+                            new_bit = ((lfsr_state & (0x1_cppui_modular80 << (state_bits - 1))) != 0) !=
+                                      ((lfsr_state & (0x1_cppui_modular80 << (state_bits - 1 - 13))) != 0) !=
+                                      ((lfsr_state & (0x1_cppui_modular80 << (state_bits - 1 - 23))) != 0) !=
+                                      ((lfsr_state & (0x1_cppui_modular80 << (state_bits - 1 - 38))) != 0) !=
+                                      ((lfsr_state & (0x1_cppui_modular80 << (state_bits - 1 - 51))) != 0) !=
+                                      ((lfsr_state & (0x1_cppui_modular80 << (state_bits - 1 - 62))) != 0);
                             lfsr_state = (lfsr_state << 1) | (new_bit ? 1 : 0);
                         }
                     }
-                    new_bit = ((lfsr_state & (0x1_cppui80 << (state_bits - 1))) != 0) !=
-                              ((lfsr_state & (0x1_cppui80 << (state_bits - 1 - 13))) != 0) !=
-                              ((lfsr_state & (0x1_cppui80 << (state_bits - 1 - 23))) != 0) !=
-                              ((lfsr_state & (0x1_cppui80 << (state_bits - 1 - 38))) != 0) !=
-                              ((lfsr_state & (0x1_cppui80 << (state_bits - 1 - 51))) != 0) !=
-                              ((lfsr_state & (0x1_cppui80 << (state_bits - 1 - 62))) != 0);
+                    new_bit = ((lfsr_state & (0x1_cppui_modular80 << (state_bits - 1))) != 0) !=
+                              ((lfsr_state & (0x1_cppui_modular80 << (state_bits - 1 - 13))) != 0) !=
+                              ((lfsr_state & (0x1_cppui_modular80 << (state_bits - 1 - 23))) != 0) !=
+                              ((lfsr_state & (0x1_cppui_modular80 << (state_bits - 1 - 38))) != 0) !=
+                              ((lfsr_state & (0x1_cppui_modular80 << (state_bits - 1 - 51))) != 0) !=
+                              ((lfsr_state & (0x1_cppui_modular80 << (state_bits - 1 - 62))) != 0);
                     lfsr_state = (lfsr_state << 1) | (new_bit ? 1 : 0);
                     constant = (constant << 1) | (lfsr_state & 1);
                 }
-                if (constant < 0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000001_cppui255) {
+                if (constant < 0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000001_cppui_modular255) {
                     constants[i] = constant;
                     break;
                 }
@@ -101,32 +101,32 @@ struct round_constants_generator {
     }
 
     constexpr static integral_type get_round_constant(std::size_t constant_number) {
-        integral_type constant = 0x0_cppui255;
+        integral_type constant = 0x0_cppui_modular255;
 
         state_type lfsr_state = get_lfsr_init_state();
 
         // previous constants
         for (std::size_t i = 0; i < constant_number; i++) {
-            constant = 0x0_cppui255;
+            constant = 0x0_cppui_modular255;
             while (true) {
-                constant = 0x0_cppui255;
+                constant = 0x0_cppui_modular255;
                 for (std::size_t i = 0; i < modulus_bits; i++) {
                     lfsr_state = update_state(lfsr_state);
                     constant = set_new_bit<integral_type>(constant, get_state_bit(lfsr_state, state_bits - 1));
                 }
-                if (constant < 0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000001_cppui255)
+                if (constant < 0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000001_cppui_modular255)
                     break;
             }
         }
 
         // requested constant
         while (true) {
-            constant = 0x0_cppui255;
+            constant = 0x0_cppui_modular255;
             for (std::size_t i = 0; i < modulus_bits; i++) {
                 lfsr_state = update_state(lfsr_state);
                 constant = set_new_bit<integral_type>(constant, get_state_bit(lfsr_state, state_bits - 1));
             }
-            if (constant < 0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000001_cppui255)
+            if (constant < 0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000001_cppui_modular255)
                 break;
         }
 
@@ -134,7 +134,7 @@ struct round_constants_generator {
     }
 
     constexpr static state_type get_lfsr_init_state() {
-        state_type state = 0x0_cppui80;
+        state_type state = 0x0_cppui_modular80;
         int i = 0;
         for (i = 1; i >= 0; i--)
             state = set_new_bit(state, (1 >> i) & 1); // field - as in filecoin
@@ -174,7 +174,7 @@ struct round_constants_generator {
     }
 
     constexpr static bool get_state_bit(state_type state, std::size_t pos) {
-        state_type bit_getter = 0x1_cppui80;
+        state_type bit_getter = 0x1_cppui_modular80;
         bit_getter <<= (state_bits - 1 - pos);
         return (state & bit_getter) ? true : false;
     }

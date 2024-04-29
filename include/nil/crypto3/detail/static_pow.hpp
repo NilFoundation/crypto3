@@ -30,7 +30,7 @@ namespace nil {
         namespace detail {
             template<typename T, typename U>
             constexpr T pow(T x, U n) {
-                T result = 1;
+                T result = 1u;
                 while (n > 0) {
                     if (n % 2 == 0) {
                         // n is even

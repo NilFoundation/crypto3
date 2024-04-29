@@ -6,6 +6,8 @@
 # http://www.boost.org/LICENSE_1_0.txt
 #---------------------------------------------------------------------------#
 
+include(CMTest)
+
 cm_find_package(${CMAKE_WORKSPACE_NAME}_block)
 
 if(NOT Boost_UNIT_TEST_FRAMEWORK_FOUND)
@@ -61,6 +63,12 @@ macro(define_hash_test name)
 
     string(CONCAT TEST_DATA ${CMAKE_CURRENT_SOURCE_DIR} "/data/" "${name}" ".json")
     target_compile_definitions(${test_name} PRIVATE TEST_DATA="${TEST_DATA}")
+
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+        target_compile_options(${test_name} PRIVATE "-fconstexpr-steps=2147483647")
+    elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        target_compile_options(${test_name} PRIVATE "-fconstexpr-ops-limit=4294967295")
+    endif()
 
 endmacro()
 

@@ -40,7 +40,10 @@ namespace nil {
                     
                     template<typename BitRange>
                     static inline result_type process(const BitRange &bits) {
-                        return (1 - 2 * bits[2]) * (1 + bits[0] + 2 * bits[1]);
+                        int result = (1 - 2 * bits[2]) * (1 + bits[0] + 2 * bits[1]);
+                        if (result > 0)
+                            return static_cast<result_type>(unsigned(result));
+                        return result_type::modulus - unsigned(-result);
                     }
                 };
             }

@@ -67,7 +67,7 @@ namespace nil {
                         // When you permute, the last element becomes first, the others zero out.
                         state_[0] = state_[state_words - 1];
                         for (size_t i = 1; i < state_words; ++i) {
-                            state_[i] = 0;
+                            state_[i] = 0u;
                         }
                         state_count_ = 1;
                     }
@@ -90,7 +90,7 @@ namespace nil {
                     }
 
                     void reset() {
-                        state_.fill(0);
+                        state_.fill(0u);
                         state_count_ = 1;
                     }
 

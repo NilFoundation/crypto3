@@ -58,7 +58,7 @@ namespace nil {
                         static state_type generate() {
                             static const state_type H0 = []() {
                                 state_type H;
-                                H.fill(word_type(0));
+                                H.fill(word_type(0u));
                                 return H;
                             }();
                             return H0;

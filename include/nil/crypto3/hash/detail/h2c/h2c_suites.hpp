@@ -53,11 +53,11 @@ namespace nil {
                 typedef typename field_type::value_type field_value_type;
 
                 constexpr static inline const field_value_type Ai = field_value_type(
-                    0x144698a3b8e9433d693a02c96d4982b0ea985383ee66a8d8e8981aefd881ac98936f8da0e0f97f5cf428082d584c1d_cppui381);
+                    0x144698a3b8e9433d693a02c96d4982b0ea985383ee66a8d8e8981aefd881ac98936f8da0e0f97f5cf428082d584c1d_cppui_modular381);
                 constexpr static inline const field_value_type Bi = field_value_type(
-                    0x12e2908d11688030018b12e8753eee3b2016c1f0f24f4070a0b9c14fcef35ef55a23215a316ceaa5d1cc48e98e172be0_cppui381);
-                constexpr static inline const field_value_type Z = field_value_type(11);
-                constexpr static integral_type h_eff = 0xd201000000010001_cppui381;
+                    0x12e2908d11688030018b12e8753eee3b2016c1f0f24f4070a0b9c14fcef35ef55a23215a316ceaa5d1cc48e98e172be0_cppui_modular381);
+                constexpr static inline const field_value_type Z = field_value_type(11u);
+                constexpr static integral_type h_eff = 0xd201000000010001_cppui_modular381;
             };
 
             template<typename Coordinates, typename Form>
@@ -71,11 +71,11 @@ namespace nil {
                 typedef typename group_type::field_type field_type;
                 typedef typename field_type::value_type field_value_type;
 
-                constexpr static inline field_value_type Ai = field_value_type(0, 240);
-                constexpr static inline field_value_type Bi = field_value_type(1012, 1012);
-                constexpr static inline field_value_type Z = []() { return -field_value_type(2, 1); }();
+                constexpr static inline field_value_type Ai = field_value_type(0u, 240u);
+                constexpr static inline field_value_type Bi = field_value_type(1012u, 1012u);
+                constexpr static inline field_value_type Z = []() { return -field_value_type(2u, 1u); }();
                 constexpr static inline auto h_eff =
-                    0xbc69f08f2ee75b3584c6a0ea91b352888e2a8e9145ad7689986ff031508ffe1329c2f178731db956d82bf015d1212b02ec0ec69d7477c1ae954cbc06689f6a359894c0adebbf6b4e8020005aaa95551_cppui636;
+                    0xbc69f08f2ee75b3584c6a0ea91b352888e2a8e9145ad7689986ff031508ffe1329c2f178731db956d82bf015d1212b02ec0ec69d7477c1ae954cbc06689f6a359894c0adebbf6b4e8020005aaa95551_cppui_modular636;
             };
         }    // namespace hashes
     }        // namespace crypto3

@@ -43,7 +43,6 @@
 #include <nil/crypto3/hash/type_traits.hpp>
 
 using namespace nil::crypto3;
-using namespace nil::crypto3::multiprecision;
 using namespace nil::crypto3::algebra;
 
 template<typename FieldParams>

@@ -62,7 +62,7 @@ namespace nil {
                             return {};
                         }
                         for (std::size_t idx_to_zero = words_filled; idx_to_zero < block_words; ++idx_to_zero) {
-                            block[idx_to_zero] = 0;
+                            block[idx_to_zero] = 0u;
                         }
                         return {block};
                     }
