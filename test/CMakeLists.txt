@@ -64,6 +64,13 @@ macro(define_marshalling_test test)
 
         endif()
     endif()
+    
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+        target_compile_options(${full_test_name} PRIVATE "-fconstexpr-steps=2147483647")
+    elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        target_compile_options(${full_test_name} PRIVATE "-fconstexpr-ops-limit=4294967295")
+    endif()
+
 endmacro()
 
 set(TESTS_NAMES

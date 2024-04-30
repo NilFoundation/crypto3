@@ -40,8 +40,8 @@
 #include <nil/marshalling/endianness.hpp>
 
 #include <nil/crypto3/algebra/type_traits.hpp>
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
-#include <nil/crypto3/multiprecision/number.hpp>
+#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
+#include <boost/multiprecision/number.hpp>
 
 #include <nil/crypto3/hash/block_to_field_elements_wrapper.hpp>
 #include <nil/crypto3/hash/sha2.hpp>

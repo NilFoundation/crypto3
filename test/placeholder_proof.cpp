@@ -42,8 +42,8 @@
 #include <nil/marshalling/field_type.hpp>
 #include <nil/marshalling/endianness.hpp>
 
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
-#include <nil/crypto3/multiprecision/number.hpp>
+#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
+#include <boost/multiprecision/number.hpp>
 
 #include <nil/crypto3/algebra/random_element.hpp>
 
@@ -250,7 +250,7 @@ template<typename ColumnType>
 void print_public_input(ColumnType &public_input, std::string filename){
     std::size_t max_non_zero = 0;
     for(std::size_t i = 0; i < public_input.size(); i++){
-        if( public_input[i] != 0 ){
+        if( public_input[i] != 0u ){
             max_non_zero = i + 1;
         }
     }
@@ -1162,7 +1162,7 @@ struct placeholder_kzg_test_fixture_v2 : public test_tools::random_test_initiali
         typename policy_type::variable_assignment_type assignments = circuit.table;
 
         // KZG commitment scheme
-        typename kzg_type::field_type::value_type alpha (7);
+        typename kzg_type::field_type::value_type alpha(7u);
         auto kzg_params = kzg_scheme_type::create_params(1 << table_rows_log, alpha);
         kzg_scheme_type kzg_scheme(kzg_params);
 
