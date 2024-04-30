@@ -32,8 +32,8 @@
 
 #include <nil/marshalling/status_type.hpp>
 
-#include <nil/crypto3/multiprecision/number.hpp>
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <boost/multiprecision/number.hpp>
+#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
 
 #include <nil/crypto3/marshalling/multiprecision/processing/integral.hpp>
 #include <nil/crypto3/marshalling/multiprecision/types/detail/integral/basic_type.hpp>
@@ -45,9 +45,9 @@ namespace nil {
                 namespace detail {
                     template<typename TTypeBase,
                              typename Backend,
-                             multiprecision::expression_template_option ExpressionTemplates>
+                             boost::multiprecision::expression_template_option ExpressionTemplates>
                     class basic_integral<TTypeBase, Backend, ExpressionTemplates, false> : public TTypeBase {
-                        using T = multiprecision::number<Backend, ExpressionTemplates>;
+                        using T = boost::multiprecision::number<Backend, ExpressionTemplates>;
 
                         using base_impl_type = TTypeBase;
 
@@ -60,7 +60,7 @@ namespace nil {
 
                         explicit basic_integral(value_type val) : value_(val) {
 
-                            std::size_t bits_count = multiprecision::msb(val) + 1;
+                            std::size_t bits_count = boost::multiprecision::msb(val) + 1;
 
                             cur_length = bits_count / 8 + (bits_count%8?1:0);
                         }
@@ -92,7 +92,7 @@ namespace nil {
                         }
 
                         constexpr std::size_t bit_length() {
-                            return multiprecision::msb(value_) + 1;
+                            return boost::multiprecision::msb(value_) + 1;
                         }
 
                         // static constexpr std::size_t max_length() {

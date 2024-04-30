@@ -32,7 +32,7 @@
 
 #include <boost/type_traits/is_integral.hpp>
 
-#include <nil/crypto3/multiprecision/number.hpp>
+#include <boost/multiprecision/number.hpp>
 
 #include <nil/marshalling/field_type.hpp>
 #include <nil/marshalling/types/integral.hpp>
@@ -62,9 +62,9 @@ namespace nil {
                 ///
                 ///         constexpr static const std::size_t modulus_bits = 381;
                 ///         using modulus_type =
-                ///         nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::backends::cpp_int_backend<
-                ///            modulus_bits, modulus_bits, nil::crypto3::multiprecision::unsigned_magnitude,
-                ///            nil::crypto3::multiprecision::unchecked, void>>;
+                ///         boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<
+                ///            modulus_bits, modulus_bits, boost::multiprecision::unsigned_magnitude,
+                ///            boost::multiprecision::unchecked, void>>;
                 ///         using MyField = nil::crypto3::marshalling::types::integral<MyFieldBase, modulus_type>;
                 ///     @endcode
                 ///     In the example above it will
@@ -98,9 +98,9 @@ namespace nil {
 
                 template<typename TTypeBase,
                          typename Backend,
-                         multiprecision::expression_template_option ExpressionTemplates,
+                         boost::multiprecision::expression_template_option ExpressionTemplates,
                          typename... TOptions>
-                class integral<TTypeBase, multiprecision::number<Backend, ExpressionTemplates>, TOptions...>
+                class integral<TTypeBase, boost::multiprecision::number<Backend, ExpressionTemplates>, TOptions...>
                     : public ::nil::marshalling::types::detail::adapt_basic_field_type<
                           crypto3::marshalling::types::detail::basic_integral<TTypeBase, Backend, ExpressionTemplates>,
                           TOptions...> {
@@ -328,12 +328,12 @@ namespace nil {
                 /// @related integral
                 template<typename TTypeBase,
                          typename Backend,
-                         multiprecision::expression_template_option ExpressionTemplates,
+                         boost::multiprecision::expression_template_option ExpressionTemplates,
                          typename... TOptions>
                 bool operator==(
-                    const integral<TTypeBase, multiprecision::number<Backend, ExpressionTemplates>, TOptions...>
+                    const integral<TTypeBase, boost::multiprecision::number<Backend, ExpressionTemplates>, TOptions...>
                         &field1,
-                    const integral<TTypeBase, multiprecision::number<Backend, ExpressionTemplates>, TOptions...>
+                    const integral<TTypeBase, boost::multiprecision::number<Backend, ExpressionTemplates>, TOptions...>
                         &field2) {
                     return field1.value() == field2.value();
                 }
@@ -345,12 +345,12 @@ namespace nil {
                 /// @related integral
                 template<typename TTypeBase,
                          typename Backend,
-                         multiprecision::expression_template_option ExpressionTemplates,
+                         boost::multiprecision::expression_template_option ExpressionTemplates,
                          typename... TOptions>
                 bool operator!=(
-                    const integral<TTypeBase, multiprecision::number<Backend, ExpressionTemplates>, TOptions...>
+                    const integral<TTypeBase, boost::multiprecision::number<Backend, ExpressionTemplates>, TOptions...>
                         &field1,
-                    const integral<TTypeBase, multiprecision::number<Backend, ExpressionTemplates>, TOptions...>
+                    const integral<TTypeBase, boost::multiprecision::number<Backend, ExpressionTemplates>, TOptions...>
                         &field2) {
                     return field1.value() != field2.value();
                 }
@@ -362,12 +362,12 @@ namespace nil {
                 /// @related integral
                 template<typename TTypeBase,
                          typename Backend,
-                         multiprecision::expression_template_option ExpressionTemplates,
+                         boost::multiprecision::expression_template_option ExpressionTemplates,
                          typename... TOptions>
                 bool operator<(
-                    const integral<TTypeBase, multiprecision::number<Backend, ExpressionTemplates>, TOptions...>
+                    const integral<TTypeBase, boost::multiprecision::number<Backend, ExpressionTemplates>, TOptions...>
                         &field1,
-                    const integral<TTypeBase, multiprecision::number<Backend, ExpressionTemplates>, TOptions...>
+                    const integral<TTypeBase, boost::multiprecision::number<Backend, ExpressionTemplates>, TOptions...>
                         &field2) {
                     return field1.value() < field2.value();
                 }
@@ -377,11 +377,11 @@ namespace nil {
                 /// @related nil::marshalling::types::integral
                 template<typename TTypeBase,
                          typename Backend,
-                         multiprecision::expression_template_option ExpressionTemplates,
+                         boost::multiprecision::expression_template_option ExpressionTemplates,
                          typename... TOptions>
-                inline integral<TTypeBase, multiprecision::number<Backend, ExpressionTemplates>, TOptions...> &
+                inline integral<TTypeBase, boost::multiprecision::number<Backend, ExpressionTemplates>, TOptions...> &
                     to_field_base(
-                        integral<TTypeBase, multiprecision::number<Backend, ExpressionTemplates>, TOptions...> &field) {
+                        integral<TTypeBase, boost::multiprecision::number<Backend, ExpressionTemplates>, TOptions...> &field) {
                     return field;
                 }
 
@@ -390,11 +390,11 @@ namespace nil {
                 /// @related nil::marshalling::types::integral
                 template<typename TTypeBase,
                          typename Backend,
-                         multiprecision::expression_template_option ExpressionTemplates,
+                         boost::multiprecision::expression_template_option ExpressionTemplates,
                          typename... TOptions>
-                inline const integral<TTypeBase, multiprecision::number<Backend, ExpressionTemplates>, TOptions...> &
+                inline const integral<TTypeBase, boost::multiprecision::number<Backend, ExpressionTemplates>, TOptions...> &
                     to_field_base(
-                        const integral<TTypeBase, multiprecision::number<Backend, ExpressionTemplates>, TOptions...>
+                        const integral<TTypeBase, boost::multiprecision::number<Backend, ExpressionTemplates>, TOptions...>
                             &field) {
                     return field;
                 }

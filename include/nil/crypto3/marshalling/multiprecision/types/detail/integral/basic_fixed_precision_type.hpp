@@ -32,9 +32,9 @@
 
 #include <nil/marshalling/status_type.hpp>
 
-#include <nil/crypto3/multiprecision/number.hpp>
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
-#include <nil/crypto3/multiprecision/traits/max_digits10.hpp>
+#include <boost/multiprecision/number.hpp>
+#include <boost/multiprecision/traits/max_digits10.hpp>
+#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
 
 #include <nil/crypto3/marshalling/multiprecision/processing/integral.hpp>
 #include <nil/crypto3/marshalling/multiprecision/types/detail/integral/basic_type.hpp>
@@ -46,11 +46,11 @@ namespace nil {
                 namespace detail {
                     template<typename TTypeBase,
                              typename Backend,
-                             multiprecision::expression_template_option ExpressionTemplates>
+                             boost::multiprecision::expression_template_option ExpressionTemplates>
                     class basic_integral<TTypeBase, Backend, ExpressionTemplates, true> : public TTypeBase {
 
                         using backend_type = Backend;
-                        using T = multiprecision::number<backend_type, ExpressionTemplates>;
+                        using T = boost::multiprecision::number<backend_type, ExpressionTemplates>;
 
                         using base_impl_type = TTypeBase;
 
@@ -98,17 +98,17 @@ namespace nil {
                         }
 
                         static constexpr std::size_t min_bit_length() {
-                            return nil::crypto3::multiprecision::backends::min_precision<backend_type>::value ==
+                            return boost::multiprecision::backends::min_precision<backend_type>::value ==
                                            UINT_MAX ?
                                        INT_MAX :
-                                       nil::crypto3::multiprecision::backends::min_precision<backend_type>::value;
+                                       boost::multiprecision::backends::min_precision<backend_type>::value;
                         }
 
                         static constexpr std::size_t max_bit_length() {
-                            return nil::crypto3::multiprecision::backends::max_precision<backend_type>::value ==
+                            return boost::multiprecision::backends::max_precision<backend_type>::value ==
                                            UINT_MAX ?
                                        INT_MAX :
-                                       nil::crypto3::multiprecision::backends::max_precision<backend_type>::value;
+                                       boost::multiprecision::backends::max_precision<backend_type>::value;
                         }
 
                         static constexpr serialized_type to_serialized(value_type val) {

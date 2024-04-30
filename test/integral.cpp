@@ -37,8 +37,8 @@
 #include <nil/marshalling/field_type.hpp>
 #include <nil/marshalling/endianness.hpp>
 
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
-#include <nil/crypto3/multiprecision/number.hpp>
+#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
+#include <boost/multiprecision/number.hpp>
 
 #include <nil/marshalling/algorithms/pack.hpp>
 
@@ -49,15 +49,11 @@ struct unchecked_type {
     typedef T type;
 };
 
-template<unsigned MinBits, unsigned MaxBits, nil::crypto3::multiprecision::cpp_integer_type SignType,
-         nil::crypto3::multiprecision::cpp_int_check_type Checked, class Allocator,
-         nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-struct unchecked_type<nil::crypto3::multiprecision::number<
-    nil::crypto3::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>,
-    ExpressionTemplates>> {
-    typedef nil::crypto3::multiprecision::number<
-        nil::crypto3::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType,
-                                                      nil::crypto3::multiprecision::unchecked, Allocator>,
+template<unsigned Bits, boost::multiprecision::expression_template_option ExpressionTemplates>
+struct unchecked_type<boost::multiprecision::number<
+    boost::multiprecision::cpp_int_modular_backend<Bits>, ExpressionTemplates>> {
+    typedef boost::multiprecision::number<
+        boost::multiprecision::cpp_int_modular_backend<Bits>,
         ExpressionTemplates>
         type;
 };
@@ -99,8 +95,8 @@ void test_round_trip_fixed_precision_big_endian(T val) {
 
     std::vector<unit_type> cv;
     cv.resize(unitblob_size, 0x00);
-    std::size_t begin_index = cv.size() - ((nil::crypto3::multiprecision::msb(val) + 1) / units_bits +
-                                           (((nil::crypto3::multiprecision::msb(val) + 1) % units_bits) ? 1 : 0));
+    std::size_t begin_index = cv.size() - ((boost::multiprecision::msb(val) + 1) / units_bits +
+                                           (((boost::multiprecision::msb(val) + 1) % units_bits) ? 1 : 0));
 
     export_bits(val, cv.begin() + begin_index, units_bits, true);
 
@@ -209,26 +205,20 @@ void test_round_trip_non_fixed_precision() {
 
 BOOST_AUTO_TEST_SUITE(integral_test_suite)
 
-BOOST_AUTO_TEST_CASE(integral_cpp_int) {
-    test_round_trip_non_fixed_precision<nil::crypto3::multiprecision::cpp_int, unsigned char>();
-}
-
 BOOST_AUTO_TEST_CASE(integral_checked_int1024) {
-    test_round_trip_fixed_precision<nil::crypto3::multiprecision::checked_int1024_t, unsigned char>();
+    test_round_trip_fixed_precision<boost::multiprecision::uint1024_modular_t, unsigned char>();
 }
 
 BOOST_AUTO_TEST_CASE(integral_cpp_uint512) {
-    test_round_trip_fixed_precision<nil::crypto3::multiprecision::checked_uint512_t, unsigned char>();
+    test_round_trip_fixed_precision<boost::multiprecision::uint512_modular_t, unsigned char>();
 }
 
 BOOST_AUTO_TEST_CASE(integral_cpp_int_backend_64) {
-    test_round_trip_fixed_precision<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_int_backend<
-        64, 64, nil::crypto3::multiprecision::unsigned_magnitude, nil::crypto3::multiprecision::checked, void>>, unsigned char>();
+    test_round_trip_fixed_precision<boost::multiprecision::number<boost::multiprecision::cpp_int_modular_backend<64>>, unsigned char>();
 }
 
 BOOST_AUTO_TEST_CASE(integral_cpp_int_backend_23) {
-    test_round_trip_fixed_precision<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_int_backend<
-        23, 23, nil::crypto3::multiprecision::unsigned_magnitude, nil::crypto3::multiprecision::checked, void>>, unsigned char>();
+    test_round_trip_fixed_precision<boost::multiprecision::number<boost::multiprecision::cpp_int_modular_backend<23>>, unsigned char>();
 }
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -236,26 +226,20 @@ BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(integral_test_suite_bits)
 
-BOOST_AUTO_TEST_CASE(integral_cpp_int_bits) {
-    test_round_trip_non_fixed_precision<nil::crypto3::multiprecision::cpp_int, bool>();
-}
-
 BOOST_AUTO_TEST_CASE(integral_checked_int1024_bits) {
-    test_round_trip_fixed_precision<nil::crypto3::multiprecision::checked_int1024_t, bool>();
+    test_round_trip_fixed_precision<boost::multiprecision::uint1024_modular_t, bool>();
 }
 
 BOOST_AUTO_TEST_CASE(integral_cpp_uint512_bits) {
-    test_round_trip_fixed_precision<nil::crypto3::multiprecision::checked_uint512_t, bool>();
+    test_round_trip_fixed_precision<boost::multiprecision::uint512_modular_t, bool>();
 }
 
 BOOST_AUTO_TEST_CASE(integral_cpp_int_backend_64_bits) {
-    test_round_trip_fixed_precision<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_int_backend<
-        64, 64, nil::crypto3::multiprecision::unsigned_magnitude, nil::crypto3::multiprecision::checked, void>>, bool>();
+    test_round_trip_fixed_precision<boost::multiprecision::number<boost::multiprecision::cpp_int_modular_backend<64>>, bool>();
 }
 
 BOOST_AUTO_TEST_CASE(integral_cpp_int_backend_23_bits) {
-    test_round_trip_fixed_precision<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_int_backend<
-        23, 23, nil::crypto3::multiprecision::unsigned_magnitude, nil::crypto3::multiprecision::checked, void>>, bool>();
+    test_round_trip_fixed_precision<boost::multiprecision::number<boost::multiprecision::cpp_int_modular_backend<23>>, bool>();
 }
 
 BOOST_AUTO_TEST_SUITE_END()
