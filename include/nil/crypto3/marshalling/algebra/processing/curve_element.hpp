@@ -653,8 +653,8 @@ namespace nil {
                         std::is_same<bool, typename std::iterator_traits<TIter>::value_type>::value,
                         nil::marshalling::status_type>::type
                         process(const group_value_type &point, TIter &iter) {
-                        auto X_affine =
-                            static_cast<typename group_value_type::field_type::integral_type>(point.to_affine().X.data);
+                        auto X_affine = static_cast<typename group_value_type::field_type::integral_type>(
+                            point.to_affine().X.data);
                         for (std::size_t i = 0; i < params_type::bit_length(); ++i) {
                             *iter++ = bit_test(X_affine, 0);
                             X_affine >>= 1;
@@ -708,7 +708,7 @@ namespace nil {
                         integral_type x = read_data<sizeof_field_element, integral_type, endianness>(iter);
 
                         g1_field_value_type x_mod(x);
-                        g1_field_value_type y2_mod = x_mod.pow(3) + g1_field_value_type(4);
+                        g1_field_value_type y2_mod = x_mod.pow(3u) + g1_field_value_type(4u);
                         BOOST_ASSERT(y2_mod.is_square());
                         g1_field_value_type y_mod = y2_mod.sqrt();
                         bool Y_bit = detail::sign_gf_p<g1_field_type>(y_mod);
@@ -775,7 +775,7 @@ namespace nil {
                         integral_type x_0 = read_data<sizeof_field_element, integral_type, endianness>(read_iter);
 
                         g2_field_value_type x_mod(x_0, x_1);
-                        g2_field_value_type y2_mod = x_mod.pow(3) + g2_field_value_type(4, 4);
+                        g2_field_value_type y2_mod = x_mod.pow(3u) + g2_field_value_type(4u, 4u);
                         BOOST_ASSERT(y2_mod.is_square());
                         g2_field_value_type y_mod = y2_mod.sqrt();
                         bool Y_bit = detail::sign_gf_p<g2_field_type>(y_mod);
@@ -1249,7 +1249,8 @@ namespace nil {
                             u = field_type::value_type::zero();
                         } else {
                             u = fraction.sqrt();
-                            if (u == field_type::value_type(field_type::modulus - 1)) {
+                            // Sqrt now returns 0 on error. We will change this when proper error handling is implemented.
+                            if (u == field_type::value_type::zero()) {
                                 return nil::marshalling::status_type::invalid_msg_data;
                             }
                         }

@@ -64,7 +64,7 @@ namespace nil {
                     typename std::enable_if<algebra::is_extended_field<G2FieldType>::value, bool>::type
                         sign_gf_p(const typename G2FieldType::value_type &v) {
 
-                        if (v.data[1] == 0) {
+                        if (v.data[1] == 0u) {
                             return sign_gf_p<typename G2FieldType::underlying_field_type>(v.data[0]);
                         }
                         return sign_gf_p<typename G2FieldType::underlying_field_type>(v.data[1]);
