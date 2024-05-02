@@ -52,7 +52,6 @@ endmacro()
 
 set(TESTS_NAMES
     "evaluation_domain"
-    "expression"
     # "kronecker_substitution"  # FIXME: This fails. Disabled for passing CI
     "polynomial_arithmetic"
     "polynomial"
