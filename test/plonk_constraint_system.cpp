@@ -32,6 +32,7 @@
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/detail/placeholder_policy.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/params.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/variable.hpp>
+#include <nil/crypto3/zk/test_tools/random_test_initializer.hpp>
 
 #include <nil/crypto3/random/algebraic_random_device.hpp>
 #include <nil/crypto3/random/algebraic_engine.hpp>
@@ -97,53 +98,6 @@ void test_constraint_system(ConstraintSystem val, std::string folder_name = "") 
     }
 }
 
-// *******************************************************************************
-// * Randomness setup
-// *******************************************************************************/
-using dist_type = std::uniform_int_distribution<int>;
-std::size_t test_global_seed = 0;
-boost::random::mt11213b test_global_rnd_engine;
-template<typename FieldType>
-nil::crypto3::random::algebraic_engine<FieldType> test_global_alg_rnd_engine;
-
-struct test_initializer {
-    // Enumerate all fields used in tests;
-    using field1_type = algebra::curves::pallas::base_field_type;
-
-    test_initializer() {
-        test_global_seed = 0;
-
-        for (std::size_t i = 0; i < std::size_t(boost::unit_test::framework::master_test_suite().argc - 1); i++) {
-            if (std::string(boost::unit_test::framework::master_test_suite().argv[i]) == "--seed") {
-                if (std::string(boost::unit_test::framework::master_test_suite().argv[i + 1]) == "random") {
-                    std::random_device rd;
-                    test_global_seed = rd();
-                    std::cout << "Random seed = " << test_global_seed << std::endl;
-                    break;
-                }
-                if (std::regex_match(boost::unit_test::framework::master_test_suite().argv[i + 1],
-                                     std::regex(("((\\+|-)?[[:digit:]]+)(\\.(([[:digit:]]+)?))?")))) {
-                    test_global_seed = atoi(boost::unit_test::framework::master_test_suite().argv[i + 1]);
-                    break;
-                }
-            }
-        }
-
-        BOOST_TEST_MESSAGE("test_global_seed = " << test_global_seed);
-        test_global_rnd_engine = boost::random::mt11213b(test_global_seed);
-        test_global_alg_rnd_engine<field1_type> = nil::crypto3::random::algebraic_engine<field1_type>(test_global_seed);
-    }
-
-    void setup() {
-    }
-
-    void teardown() {
-    }
-
-    ~test_initializer() {
-    }
-};
-
 BOOST_AUTO_TEST_SUITE(placeholder_circuit1)
     using Endianness = nil::marshalling::option::big_endian;
     using TTypeBase = nil::marshalling::field_type<Endianness>;
@@ -176,7 +130,7 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit1)
     using lpc_placeholder_params_type = nil::crypto3::zk::snark::placeholder_params<circuit_params, lpc_scheme_type>;
     using policy_type = zk::snark::detail::placeholder_policy<field_type, lpc_placeholder_params_type>;
 
-BOOST_FIXTURE_TEST_CASE(constraint_system_marshalling_test, test_initializer) {
+BOOST_FIXTURE_TEST_CASE(constraint_system_marshalling_test, test_tools::random_test_initializer<field_type>) {
     auto circuit = circuit_test_1<field_type>();
 
     plonk_table_description<field_type> desc(
@@ -235,9 +189,13 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit2)
 
     using policy_type = zk::snark::detail::placeholder_policy<field_type, circuit_t_params>;
 
-BOOST_FIXTURE_TEST_CASE(constraint_system_marshalling_test, test_initializer) {
+BOOST_FIXTURE_TEST_CASE(constraint_system_marshalling_test, test_tools::random_test_initializer<field_type>) {
     auto pi0 = nil::crypto3::algebra::random_element<field_type>();
-    auto circuit = circuit_test_t<field_type>(pi0, test_global_alg_rnd_engine<field_type>, test_global_rnd_engine);
+    auto circuit = circuit_test_t<field_type>(
+        pi0,
+        alg_random_engines.template get_alg_engine<field_type>(),
+        generic_random_engine
+    );
 
     plonk_table_description<field_type> desc(
         placeholder_test_params::witness_columns,
@@ -291,8 +249,11 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit3)
     using lpc_placeholder_params_type = nil::crypto3::zk::snark::placeholder_params<circuit_params, lpc_scheme_type>;
     using policy_type = zk::snark::detail::placeholder_policy<field_type, circuit_params>;
 
-BOOST_FIXTURE_TEST_CASE(constraint_system_marshalling_test, test_initializer) {
-    auto circuit = circuit_test_3<field_type>();
+BOOST_FIXTURE_TEST_CASE(constraint_system_marshalling_test, test_tools::random_test_initializer<field_type>) {
+    auto circuit = circuit_test_3<field_type>(
+        alg_random_engines.template get_alg_engine<field_type>(),
+        generic_random_engine
+    );
 
     plonk_table_description<field_type> desc(
         placeholder_test_params::witness_columns,
@@ -352,8 +313,11 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit4)
     using lpc_placeholder_params_type = nil::crypto3::zk::snark::placeholder_params<circuit_params, lpc_scheme_type>;
     using policy_type = zk::snark::detail::placeholder_policy<field_type, circuit_params>;
 
-BOOST_FIXTURE_TEST_CASE(constraint_system_marshalling_test, test_initializer) {
-    auto circuit = circuit_test_4<field_type>();
+BOOST_FIXTURE_TEST_CASE(constraint_system_marshalling_test, test_tools::random_test_initializer<field_type>) {
+    auto circuit = circuit_test_4<field_type>(
+        alg_random_engines.template get_alg_engine<field_type>(),
+        generic_random_engine
+    );
 
     plonk_table_description<field_type> desc(
         placeholder_test_params::witness_columns,
@@ -415,9 +379,13 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit5)
 
     using policy_type = zk::snark::detail::placeholder_policy<field_type, circuit_t_params>;
 
-BOOST_FIXTURE_TEST_CASE(constraint_system_marshalling_test, test_initializer) {
+BOOST_FIXTURE_TEST_CASE(constraint_system_marshalling_test, test_tools::random_test_initializer<field_type>) {
     auto pi0 = nil::crypto3::algebra::random_element<field_type>();
-    auto circuit = circuit_test_t<field_type>(pi0);
+    auto circuit = circuit_test_t<field_type>(
+        pi0,
+        alg_random_engines.template get_alg_engine<field_type>(),
+        generic_random_engine
+    );
 
     plonk_table_description<field_type> desc(
         placeholder_test_params::witness_columns,
@@ -470,8 +438,11 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit6)
     using lpc_placeholder_params_type = nil::crypto3::zk::snark::placeholder_params<circuit_params, lpc_scheme_type>;
     using policy_type = zk::snark::detail::placeholder_policy<field_type, circuit_params>;
 
-BOOST_FIXTURE_TEST_CASE(constraint_system_marshalling_test, test_initializer) {
-    auto circuit = circuit_test_6<field_type>();
+BOOST_FIXTURE_TEST_CASE(constraint_system_marshalling_test, test_tools::random_test_initializer<field_type>) {
+    auto circuit = circuit_test_6<field_type>(
+        alg_random_engines.template get_alg_engine<field_type>(),
+        generic_random_engine
+    );
 
     plonk_table_description<field_type> desc(
         placeholder_test_params::witness_columns,
@@ -533,8 +504,11 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit7)
     using lpc_placeholder_params_type = nil::crypto3::zk::snark::placeholder_params<circuit_params, lpc_scheme_type>;
     using policy_type = zk::snark::detail::placeholder_policy<field_type, circuit_params>;
 
-BOOST_FIXTURE_TEST_CASE(constraint_system_marshalling_test, test_initializer) {
-    auto circuit = circuit_test_7<field_type>();
+BOOST_FIXTURE_TEST_CASE(constraint_system_marshalling_test, test_tools::random_test_initializer<field_type>) {
+    auto circuit = circuit_test_7<field_type>(
+        alg_random_engines.template get_alg_engine<field_type>(),
+        generic_random_engine
+    );
     plonk_table_description<field_type> desc(
         placeholder_test_params::witness_columns,
         placeholder_test_params::public_input_columns,

@@ -34,15 +34,6 @@ include(CMSetupVersion)
 option(BUILD_TESTS "Build unit tests" TRUE)
 option(BUILD_WITH_NO_WARNINGS "Build threading warnings as errors" FALSE)
 
-list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-     include/nil/network/marshalling/version.hpp)
-
-list(APPEND ${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES)
-
-list(APPEND ${CURRENT_PROJECT_NAME}_HEADERS ${${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS})
-
-list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES ${${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES})
-
 cm_setup_version(VERSION 0.1.0 PREFIX ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME})
 
 add_library(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE)
@@ -72,9 +63,6 @@ target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
 cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
           INCLUDE include
           NAMESPACE ${CMAKE_WORKSPACE_NAME}::)
-
-add_subdirectories("${CMAKE_CURRENT_LIST_DIR}/libs"
-                   SUBMODULE_DEFINITION_HEADER "cm_project\\(")
 
 if(BUILD_TESTS)
     add_subdirectory(test)

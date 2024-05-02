@@ -36,10 +36,6 @@
 #include <random>
 #include <regex>
 
-#include <nil/crypto3/random/algebraic_random_device.hpp>
-#include <nil/crypto3/random/algebraic_engine.hpp>
-#include <nil/crypto3/algebra/random_element.hpp>
-
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/field_type.hpp>
 #include <nil/marshalling/endianness.hpp>
@@ -71,6 +67,7 @@
 
 #include <nil/crypto3/zk/commitments/detail/polynomial/basic_fri.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/fri.hpp>
+#include <nil/crypto3/zk/test_tools/random_test_initializer.hpp>
 #include <nil/crypto3/marshalling/zk/types/commitments/fri.hpp>
 
 using namespace nil::crypto3;
@@ -319,54 +316,7 @@ void test_fri_proof(typename FRI::proof_type &proof, typename nil::crypto3::mars
     BOOST_CHECK(proof == constructed_val_read);
 }
 
-//
-// Randomness setup
-//
-std::size_t test_global_seed = 0;
-boost::random::mt11213b test_global_rnd_engine;
-template<typename FieldType>
-nil::crypto3::random::algebraic_engine<FieldType> test_global_alg_rnd_engine;
-
-struct test_initializer {
-    // Enumerate all fields used in tests;
-    using field1_type = algebra::curves::bls12<381>::scalar_field_type;
-
-    test_initializer() {
-        test_global_seed = 0;
-
-        for (std::size_t i = 0; i < std::size_t(boost::unit_test::framework::master_test_suite().argc - 1); i++) {
-            if (std::string(boost::unit_test::framework::master_test_suite().argv[i]) == "--seed") {
-                if (std::string(boost::unit_test::framework::master_test_suite().argv[i + 1]) == "random") {
-                    std::random_device rd;
-                    test_global_seed = rd();
-                    std::cout << "Random seed = " << test_global_seed << std::endl;
-                    break;
-                }
-                if (std::regex_match(boost::unit_test::framework::master_test_suite().argv[i + 1],
-                                     std::regex(("((\\+|-)?[[:digit:]]+)(\\.(([[:digit:]]+)?))?")))) {
-                    test_global_seed = atoi(boost::unit_test::framework::master_test_suite().argv[i + 1]);
-                    break;
-                }
-            }
-        }
-
-        BOOST_TEST_MESSAGE("test_global_seed = " << test_global_seed);
-        test_global_rnd_engine = boost::random::mt11213b(test_global_seed);
-        test_global_alg_rnd_engine<field1_type> = nil::crypto3::random::algebraic_engine<field1_type>(test_global_seed);
-    }
-
-    void setup() {
-    }
-
-    void teardown() {
-    }
-
-    ~test_initializer() {}
-};
-
-BOOST_TEST_GLOBAL_FIXTURE(test_initializer);
-
-BOOST_AUTO_TEST_SUITE(marshalling_fri_proof_elements)
+BOOST_FIXTURE_TEST_SUITE(marshalling_fri_proof_elements, zk::test_tools::random_test_initializer<algebra::curves::bls12<381>::scalar_field_type>)
     static constexpr std::size_t lambda = 40;
     static constexpr std::size_t m = 2;
 
@@ -387,24 +337,22 @@ BOOST_AUTO_TEST_SUITE(marshalling_fri_proof_elements)
         auto _f = nil::crypto3::marshalling::types::make_fri_math_polynomial<Endianness, polynomial_type>(filled_polynomial);
         BOOST_CHECK(f == _f);
 
-
-        f = generate_random_polynomial<field_type>(2048, test_global_alg_rnd_engine<field_type>);
+        f = generate_random_polynomial<field_type>(2048, alg_random_engines.template get_alg_engine<field_type>());
         filled_polynomial = nil::crypto3::marshalling::types::fill_fri_math_polynomial<Endianness, polynomial_type>(f);
 
         _f = nil::crypto3::marshalling::types::make_fri_math_polynomial<Endianness, polynomial_type>(filled_polynomial);
         BOOST_CHECK(f == _f);
     }
 
-
     BOOST_AUTO_TEST_CASE(merkle_proof_vector_test) {
         std::vector<typename FRI::merkle_proof_type> mp;
-        mp.push_back(generate_random_merkle_proof<FRI>(5, test_global_rnd_engine));
-        mp.push_back(generate_random_merkle_proof<FRI>(5, test_global_rnd_engine));
-        mp.push_back(generate_random_merkle_proof<FRI>(5, test_global_rnd_engine));
-        mp.push_back(generate_random_merkle_proof<FRI>(5, test_global_rnd_engine));
-        mp.push_back(generate_random_merkle_proof<FRI>(5, test_global_rnd_engine));
-        mp.push_back(generate_random_merkle_proof<FRI>(5, test_global_rnd_engine));
-        mp.push_back(generate_random_merkle_proof<FRI>(5, test_global_rnd_engine));
+        mp.push_back(generate_random_merkle_proof<FRI>(5, generic_random_engine));
+        mp.push_back(generate_random_merkle_proof<FRI>(5, generic_random_engine));
+        mp.push_back(generate_random_merkle_proof<FRI>(5, generic_random_engine));
+        mp.push_back(generate_random_merkle_proof<FRI>(5, generic_random_engine));
+        mp.push_back(generate_random_merkle_proof<FRI>(5, generic_random_engine));
+        mp.push_back(generate_random_merkle_proof<FRI>(5, generic_random_engine));
+        mp.push_back(generate_random_merkle_proof<FRI>(5, generic_random_engine));
 
         auto filled = nil::crypto3::marshalling::types::fill_merkle_proof_vector<Endianness, FRI>(mp);
         auto _f = nil::crypto3::marshalling::types::make_merkle_proof_vector<Endianness, FRI>(filled);
@@ -442,8 +390,8 @@ BOOST_AUTO_TEST_SUITE(marshalling_fri_proof_elements)
                 lambda,
                 false,
                 batch_info,
-                test_global_alg_rnd_engine<field_type>,
-                test_global_rnd_engine
+                alg_random_engines.template get_alg_engine<field_type>(),
+                generic_random_engine
         );
         test_fri_proof<Endianness, FRI>(proof, batch_info, fri_params);
     }
@@ -463,15 +411,15 @@ BOOST_AUTO_TEST_SUITE(marshalling_fri_proof_elements)
                 lambda,
                 true,
                 batch_info,
-                test_global_alg_rnd_engine<field_type>,
-                test_global_rnd_engine
+                alg_random_engines.template get_alg_engine<field_type>(),
+                generic_random_engine
         );
         test_fri_proof<Endianness, FRI>(proof, batch_info, fri_params);
     }
 BOOST_AUTO_TEST_SUITE_END()
 
 
-BOOST_AUTO_TEST_SUITE(marshalling_real_fri_proofs)
+BOOST_FIXTURE_TEST_SUITE(marshalling_real_fri_proofs, zk::test_tools::random_test_initializer<algebra::curves::pallas::base_field_type>)
     using Endianness = nil::marshalling::option::big_endian;
 
 BOOST_AUTO_TEST_CASE(marshalling_fri_basic_test) {
@@ -503,7 +451,7 @@ BOOST_AUTO_TEST_CASE(marshalling_fri_basic_test) {
     params_type params(
         d - 1, // max_degree
         D,
-        generate_random_step_list(r, 3, test_global_rnd_engine),
+        generate_random_step_list(r, 3, generic_random_engine),
         2, //expand_factor
         lambda
     );
@@ -535,4 +483,3 @@ BOOST_AUTO_TEST_CASE(marshalling_fri_basic_test) {
     //BOOST_CHECK(zk::algorithms::verify_eval<fri_type>(proof, root, params, transcript_verifier));
 }
 BOOST_AUTO_TEST_SUITE_END()
-

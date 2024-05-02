@@ -30,16 +30,9 @@
 
 #include <boost/test/included/unit_test.hpp>
 #include <boost/algorithm/string/case_conv.hpp>
-#include <boost/random/mersenne_twister.hpp>
-#include <boost/random/uniform_int.hpp>
 #include <iostream>
 #include <iomanip>
-#include <random>
 #include <regex>
-
-#include <nil/crypto3/random/algebraic_random_device.hpp>
-#include <nil/crypto3/random/algebraic_engine.hpp>
-#include <nil/crypto3/algebra/random_element.hpp>
 
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/field_type.hpp>
@@ -48,7 +41,6 @@
 #include <nil/crypto3/multiprecision/cpp_int.hpp>
 #include <nil/crypto3/multiprecision/number.hpp>
 
-#include <nil/crypto3/algebra/random_element.hpp>
 #include <nil/crypto3/algebra/curves/pallas.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/pallas.hpp>
 
@@ -78,8 +70,6 @@
 #include <nil/crypto3/hash/type_traits.hpp>
 #include <nil/crypto3/hash/sha2.hpp>
 #include <nil/crypto3/hash/keccak.hpp>
-
-#include <nil/crypto3/random/algebraic_random_device.hpp>
 
 #include <nil/crypto3/zk/commitments/detail/polynomial/eval_storage.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/kzg.hpp>
