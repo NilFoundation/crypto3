@@ -460,67 +460,6 @@ void field_not_square_test(const std::vector<std::array<const char *, 3>> &test_
 
 BOOST_AUTO_TEST_SUITE(fields_manual_tests)
 
-BOOST_AUTO_TEST_CASE(field_operation_perf_test_pallas, *boost::unit_test::disabled()) {
-    using namespace nil::crypto3;
-    using namespace nil::crypto3::algebra;
-    using namespace nil::crypto3::algebra::fields;
-
-    typedef typename pallas_base_field::value_type value_type;
-    std::vector<value_type> points1;
-    std::vector<value_type> points2;
-    for (int i = 0; i < 1000; ++i) {
-        points1.push_back(algebra::random_element<pallas_base_field>());
-    }
-    points2 = points1;
-
-    std::chrono::time_point<std::chrono::high_resolution_clock> start(std::chrono::high_resolution_clock::now());
-
-    size_t SAMPLES = 10000000;
-    for (int i = 0; i < SAMPLES; ++i) {
-        int index = i % points1.size();
-        points2[index] *= points1[index];
-    }
-    auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
-        std::chrono::high_resolution_clock::now() - start);
-    std::cout << "Multiplication time: " << std::fixed << std::setprecision(3)
-        << elapsed.count() / SAMPLES << " ns" << std::endl;
-
-    start = std::chrono::high_resolution_clock::now();
-
-    for (int i = 0; i < SAMPLES; ++i) {
-        int index = i % points1.size();
-        points2[index] += points1[index];
-    }
-    elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
-        std::chrono::high_resolution_clock::now() - start);
-    std::cout << "Addition time: " << std::fixed << std::setprecision(3)
-        << elapsed.count() / SAMPLES << " ns" << std::endl;
-
-    start = std::chrono::high_resolution_clock::now();
-
-    for (int i = 0; i < SAMPLES; ++i) {
-        int index = i % points1.size();
-        points2[index] -= points1[index];
-    }
-
-    elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
-        std::chrono::high_resolution_clock::now() - start);
-    std::cout << "Substraction time: " << std::fixed << std::setprecision(3)
-        << elapsed.count() / SAMPLES << " ns" << std::endl;
-
-    start = std::chrono::high_resolution_clock::now();
-
-    for (int i = 0; i < SAMPLES / 1000; ++i) {
-        int index = i % points1.size();
-        points2[index] = points1[index].inversed();
-    }
-
-    elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
-        std::chrono::high_resolution_clock::now() - start);
-    std::cout << "Inversion time: " << std::fixed << std::setprecision(3)
-        << elapsed.count() / (SAMPLES / 1000) << " ns" << std::endl;
-}
-
 BOOST_DATA_TEST_CASE(field_operation_test_goldilocks64_fq, string_data("field_operation_test_goldilocks64_fq"), data_set) {
     using policy_type = fields::goldilocks64_fq;
 

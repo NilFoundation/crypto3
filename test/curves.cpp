@@ -424,65 +424,6 @@ void curve_operation_test(const TestSet &test_set,
     check_curve_operations<CurveGroup>(points, constants);
 }
 
-template<typename CurveGroup>
-void curve_operations_perf_test() {
-    using namespace nil::crypto3;
-    using namespace nil::crypto3::algebra;
-
-    typedef typename CurveGroup::value_type value_type;
-    typedef typename CurveGroup::field_type::integral_type integral_type;
-
-    std::vector<value_type> points1;
-    std::vector<value_type> points2;
-    std::vector<integral_type> constants;
-
-    for (int i = 0; i < 1000; ++i) {
-        points1.push_back(algebra::random_element<CurveGroup>());
-        // We convert the number into string and back into number to convert the type, they are slightly different.
-        std::stringstream ss;
-        ss << algebra::random_element<typename CurveGroup::field_type>();
-
-        // For G2 group, we wil have 2 integral values in the ss, so taking only the first one.
-        constants.push_back(integral_type(ss.str().substr(0, ss.str().find(' '))));
-    }
-    points2 = points1;
-
-    std::chrono::time_point<std::chrono::high_resolution_clock> start(std::chrono::high_resolution_clock::now());
-
-    size_t SAMPLES = 10000;
-    for (int i = 0; i < SAMPLES; ++i) {
-        int index = i % points1.size();
-        points2[index] *= constants[index];
-    }
-    auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
-        std::chrono::high_resolution_clock::now() - start);
-    std::cout << "Scalar Multiplication time: " << std::fixed << std::setprecision(3)
-        << elapsed.count() / SAMPLES << " ns" << std::endl;
-
-    start = std::chrono::high_resolution_clock::now();
-
-    for (int i = 0; i < SAMPLES; ++i) {
-        int index = i % points1.size();
-        points2[index] += points1[index];
-    }
-    elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
-        std::chrono::high_resolution_clock::now() - start);
-    std::cout << "Addition time: " << std::fixed << std::setprecision(3)
-        << elapsed.count() / SAMPLES << " ns" << std::endl;
-
-    start = std::chrono::high_resolution_clock::now();
-
-    for (int i = 0; i < SAMPLES; ++i) {
-        int index = i % points1.size();
-        points2[index] -= points1[index];
-    }
-
-    elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
-        std::chrono::high_resolution_clock::now() - start);
-    std::cout << "Substraction time: " << std::fixed << std::setprecision(3)
-        << elapsed.count() / SAMPLES << " ns" << std::endl;
-}
-
 template<typename CurveGroup, typename TestSet>
 void curve_operation_test_twisted_edwards(
     const TestSet &test_set,
@@ -642,18 +583,6 @@ BOOST_DATA_TEST_CASE(curve_operation_test_bls12_381_g1, string_data("curve_opera
     using policy_type = curves::bls12<381>::g1_type<>;
 
     curve_operation_test<policy_type>(data_set, fp_curve_test_init<policy_type>);
-}
-
-BOOST_AUTO_TEST_CASE(curve_operations_perf_test_bls12_381_g1, *boost::unit_test::disabled()) {
-    using policy_type = curves::bls12<381>::g1_type<>;
-
-    curve_operations_perf_test<policy_type>();
-}
-
-BOOST_AUTO_TEST_CASE(curve_operations_perf_test_bls12_381_g2, *boost::unit_test::disabled()) {
-    using policy_type = curves::bls12<381>::g2_type<>;
-
-    curve_operations_perf_test<policy_type>();
 }
 
 BOOST_DATA_TEST_CASE(curve_operation_test_bls12_377_g1, string_data("curve_operation_test_bls12_377_g1"), data_set) {

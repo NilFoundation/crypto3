@@ -28,6 +28,7 @@ jobs:
         algebra_short_weierstrass_coordinates_example
         algebra_short_weierstrass_coordinates_test
         algebra_vector_compile_test
-
+        algebra_fields_bench_test
+        algebra_curves_bench_test
 #        This one fails on GCC: https://github.com/NilFoundation/crypto3-algebra/issues/124
 #        algebra_curves_static_test
