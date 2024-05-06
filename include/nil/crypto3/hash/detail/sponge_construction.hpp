@@ -86,9 +86,14 @@ namespace nil {
                     std::array<word_type, digest_words> squeezed_blocks_holder;
                     constexpr static std::size_t blocks_needed_for_digest =  digest_bits / block_bits + (digest_bits % block_bits == 0 ? 0 : 1);
                     for (std::size_t i = 0; i < blocks_needed_for_digest; ++i) {
+                        std::size_t dest_offset = i * block_words;
                         block_type squeezed = squeeze();
                         // TODO: check if this will break in case >1. sinse there could be not enough squeezed_blocks_holder
-                        pack_from<endian_type, word_bits, word_bits>(squeezed.begin(), squeezed.end(), squeezed_blocks_holder.begin() + i * block_words);
+                        pack_from<endian_type, word_bits, word_bits>(
+                            squeezed.begin(),
+                            squeezed.begin() + std::min(squeezed.size(), squeezed_blocks_holder.size() - dest_offset),
+                            squeezed_blocks_holder.begin() + dest_offset
+                        );
                     }
 
                     std::array<octet_type, digest_bits / octet_bits> d_full;
