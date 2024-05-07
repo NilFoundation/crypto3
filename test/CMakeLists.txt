@@ -100,7 +100,6 @@ set(TESTS_NAMES
     "systems/plonk/pickles/to_group"
 
     "systems/plonk/placeholder/placeholder"
-    "systems/plonk/placeholder/performance"
 
 #    "systems/pcd/r1cs_pcd/r1cs_mp_ppzkpcd/r1cs_mp_ppzkpcd"
 #    "systems/pcd/r1cs_pcd/r1cs_sp_ppzkpcd/r1cs_sp_ppzkpcd"
