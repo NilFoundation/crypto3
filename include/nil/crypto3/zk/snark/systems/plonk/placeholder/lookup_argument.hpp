@@ -199,7 +199,7 @@ namespace nil {
                         typename FieldType::value_type beta  = transcript.template challenge<FieldType>();
                         typename FieldType::value_type gamma = transcript.template challenge<FieldType>();
 
-                        auto part_sizes = lookup_parts(constraint_system, preprocessed_data.common_data.max_quotient_chunks);
+                        auto part_sizes = constraint_system.lookup_parts(preprocessed_data.common_data.max_quotient_chunks);
                         std::vector<typename FieldType::value_type> lookup_alphas;
                         for(std::size_t i = 0; i < part_sizes.size() - 1; i++){
                             lookup_alphas.push_back(transcript.template challenge<FieldType>());
@@ -749,7 +749,7 @@ namespace nil {
                         typename FieldType::value_type gamma = transcript.template challenge<FieldType>();
 
                         std::vector<typename FieldType::value_type> lookup_alphas;
-                        auto parts = lookup_parts(constraint_system, common_data.max_quotient_chunks);
+                        auto parts = constraint_system.lookup_parts(common_data.max_quotient_chunks);
                         for(std::size_t i = 0; i < parts.size() - 1; i++){
                             lookup_alphas.push_back(transcript.template challenge<FieldType>());
                         }

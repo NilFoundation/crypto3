@@ -558,7 +558,7 @@ namespace nil {
 
                         BOOST_ASSERT(max_quotient_poly_chunks == 0 || max_quotient_poly_chunks > max_gates_degree );
                         std::size_t permutation_parts_num = permutation_partitions_num(permuted_columns.size(), max_quotient_poly_chunks);
-                        std::size_t lookup_parts_num = lookup_parts<FieldType>(constraint_system, max_quotient_poly_chunks).size();
+                        std::size_t lookup_parts_num = constraint_system.lookup_parts(max_quotient_poly_chunks).size();
 
                         typename preprocessed_data_type::public_commitments_type public_commitments = commitments(
                             public_polynomial_table, id_perm_polys,

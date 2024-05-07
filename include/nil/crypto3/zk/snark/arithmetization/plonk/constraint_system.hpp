@@ -253,6 +253,58 @@ namespace nil {
                     }
 
 
+                    std::vector<std::size_t> lookup_parts(
+                        std::size_t max_quotient_chunks
+                    ) const {
+                        if( max_quotient_chunks == 0 ){
+                            return {this->sorted_lookup_columns_number()};
+                        }
+
+                        using VariableType = plonk_variable<typename FieldType::value_type>;
+                        typedef math::expression_max_degree_visitor<VariableType> degree_visitor_type;
+                        std::vector<std::size_t> lookup_parts;
+                        degree_visitor_type lookup_visitor;
+
+                        std::size_t lookup_chunk = 0;
+                        std::size_t lookup_part = 0;
+                        std::size_t max_constraint_degree;
+                        for (const auto& gate :_lookup_gates) {
+                            for (const auto& constr : gate.constraints) {
+                                max_constraint_degree = 0;
+                                for (const auto& li : constr.lookup_input) {
+                                    std::size_t deg = lookup_visitor.compute_max_degree(li);
+                                    max_constraint_degree = std::max(
+                                        max_constraint_degree,
+                                        deg
+                                    );
+                                }
+                                if( lookup_chunk + max_constraint_degree + 1>= max_quotient_chunks ){
+                                    lookup_parts.push_back(lookup_part);
+                                    lookup_chunk = 0;
+                                    lookup_part = 0;
+                                }
+                                // +1 because lookup input is multiplied by selector
+                                lookup_chunk += max_constraint_degree + 1;
+                                lookup_part++;
+                            }
+                        }
+                        for (const auto& table : _lookup_tables) {
+                            for( const auto &lookup_options: table.lookup_options ){
+                                // +3 because now any lookup option is lookup_column * lookup_selector * (1-q_last-q_blind) -- three polynomials degree rows_amount-1
+                                if( lookup_chunk + 3 >= max_quotient_chunks ){
+                                    lookup_parts.push_back(lookup_part);
+                                    lookup_chunk = 0;
+                                    lookup_part = 0;
+                                }
+                                lookup_chunk += 3;
+                                lookup_part++;
+                            }
+                        }
+
+                        lookup_parts.push_back(lookup_part);
+                        return lookup_parts;
+                    }
+
                     bool operator==(const plonk_constraint_system<FieldType> &other) const {
                         return (this->_gates == other._gates) && (this->_copy_constraints == other._copy_constraints) &&
                                (this->_lookup_gates == other._lookup_gates) && (this->_lookup_tables == other._lookup_tables) &&

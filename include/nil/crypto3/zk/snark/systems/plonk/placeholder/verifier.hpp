@@ -95,8 +95,10 @@ namespace nil {
 
                         if( _is_lookup_enabled || constraint_system.copy_constraints().size() > 0){
                             _commitment_scheme.append_eval_point(PERMUTATION_BATCH, challenge);
-                            _commitment_scheme.append_eval_point(PERMUTATION_BATCH, 0, challenge * _omega);
                         }
+
+                        if( constraint_system.copy_constraints().size() > 0 )
+                            _commitment_scheme.append_eval_point(PERMUTATION_BATCH, 0 , challenge * _omega);
 
                         if (_is_lookup_enabled) {
                             _commitment_scheme.append_eval_point(PERMUTATION_BATCH, common_data.permutation_parts , challenge * _omega);
@@ -267,7 +269,7 @@ namespace nil {
                             }
                         }
 
-                        for (std::size_t i = 0; i < 0 + public_input_columns; i++) {
+                        for (std::size_t i = 0; i < public_input_columns; i++) {
                             std::size_t i_global_index = witness_columns + i;
 
                             std::size_t j = 0;

@@ -258,7 +258,8 @@ namespace nil {
 
                     template<typename Field>
                     typename Field::value_type challenge() {
-                        return sponge.squeeze();
+                        typename Field::value_type result = sponge.squeeze();
+                        return result;
                     }
 
                     template<typename Integral>

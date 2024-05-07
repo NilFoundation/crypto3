@@ -50,9 +50,6 @@ namespace nil {
                     }
                     plonk_variable<typename FieldType::value_type> first;
                     plonk_variable<typename FieldType::value_type> second;
-                    bool operator==(const plonk_copy_constraint<FieldType> &other){
-                        return ((first == other.first ) && (second == other.second));
-                    }
                 protected:
                     void initialize(
                         const plonk_variable<typename FieldType::value_type> &_first,
@@ -72,6 +69,16 @@ namespace nil {
                 template <typename FieldType>
                 bool operator==(const plonk_copy_constraint<FieldType> &a, const plonk_copy_constraint<FieldType> &b) {
                     return a.first == b.first && a.second == b.second;
+                }
+
+                template <typename FieldType>
+                bool operator!=(const plonk_copy_constraint<FieldType> &a, const plonk_copy_constraint<FieldType> &b) {
+                    return !(a == b);
+                }
+
+                template <typename FieldType>
+                bool operator<(const plonk_copy_constraint<FieldType> &a, const plonk_copy_constraint<FieldType> &b) {
+                    return a.first < b.first || (a.first == b.first && a.second < b.second);
                 }
             }    // namespace snark
         }        // namespace zk
