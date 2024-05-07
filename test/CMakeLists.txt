@@ -426,10 +426,53 @@ endif()
 add_dependencies(${CURRENT_PROJECT_NAME}_test_suite_modular_cpp_int_tests ${CURRENT_PROJECT_NAME}_test_ressol_cpp_int)
 set_target_properties(${CURRENT_PROJECT_NAME}_test_ressol_cpp_int PROPERTIES CXX_STANDARD 14)
 
-cm_test(NAME ${CURRENT_PROJECT_NAME}_test_inverse_cpp_int SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_inverse.cpp)
-target_compile_definitions(${CURRENT_PROJECT_NAME}_test_inverse_cpp_int PUBLIC -DTEST_CPP_INT)
-target_link_libraries(${CURRENT_PROJECT_NAME}_test_inverse_cpp_int no_eh_support)
-add_dependencies(${CURRENT_PROJECT_NAME}_test_suite_modular_cpp_int_tests ${CURRENT_PROJECT_NAME}_test_inverse_cpp_int)
-set_target_properties(${CURRENT_PROJECT_NAME}_test_inverse_cpp_int PROPERTIES CXX_STANDARD 17)
 
 include_directories(${CMAKE_WORKSPACE_SOURCES_DIR})
+
+macro(define_runtime_multiprecision_test name)
+    set(test_name "${CURRENT_PROJECT_NAME}_${name}_test")
+
+    set(additional_args "")
+    if(ENABLE_JUNIT_TEST_OUTPUT)
+        set(TEST_RESULTS_DIR "${CMAKE_CURRENT_BINARY_DIR}/junit_results")
+        set(TEST_LOGS_DIR "${TEST_RESULTS_DIR}/logs")
+        file(MAKE_DIRECTORY ${TEST_LOGS_DIR})
+
+        set(additional_args "--log_format=JUNIT"
+                            "--log_sink=${TEST_LOGS_DIR}/${test_name}.xml")
+    endif()
+
+    cm_test(NAME ${test_name} SOURCES ${name}_test.cpp ARGS ${additional_args})
+
+    target_include_directories(${test_name} PRIVATE
+                               "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+                               "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>"
+
+                               ${Boost_INCLUDE_DIRS})
+
+    set_target_properties(${test_name} PROPERTIES CXX_STANDARD 17
+        CXX_STANDARD_REQUIRED TRUE)
+
+    get_target_property(target_type Boost::unit_test_framework TYPE)
+    if(target_type STREQUAL "SHARED_LIB")
+        target_compile_definitions(${test_name} PRIVATE BOOST_TEST_DYN_LINK)
+    elseif(target_type STREQUAL "STATIC_LIB")
+
+    endif()
+
+    if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+        target_compile_options(${test_name} PRIVATE "-fconstexpr-steps=2147483647")
+    elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        target_compile_options(${test_name} PRIVATE "-fconstexpr-ops-limit=4294967295")
+    endif()
+
+    target_compile_definitions(${test_name} PRIVATE TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/data/")
+endmacro()
+
+set(RUNTIME_TESTS_NAMES
+    "inverse_cpp_int"
+    )
+
+foreach(TEST_NAME ${RUNTIME_TESTS_NAMES})
+    define_runtime_multiprecision_test(${TEST_NAME})
+endforeach()
