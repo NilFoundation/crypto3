@@ -101,12 +101,10 @@ namespace nil {
                             return;
                         }
                         value_type field_element = value_type::zero();
-                        std::size_t field_bits_left_ = Field::modulus_bits;
                         auto tmp_iter = input_container_l_;
                         for (std::size_t i = 0; i < container_elements_per_field_element_ && tmp_iter != input_container_r_; ++i) {
                             field_element.data <<= input_value_bits_; // TODO: add shift operators to field values
                             field_element += *tmp_iter++;
-                            field_bits_left_ -= input_value_bits_;
                         }
                         field_element_ = field_element;
                         element_filled_ = true;
