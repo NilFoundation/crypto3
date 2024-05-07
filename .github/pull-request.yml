@@ -14,5 +14,4 @@ jobs:
     secrets: inherit
     with:
       targets: |
-        multiprecision_test_modular_adaptor_fixed_cpp_int
-        multiprecision_test_ressol_cpp_int
+        multiprecision_inverse_cpp_int_test
