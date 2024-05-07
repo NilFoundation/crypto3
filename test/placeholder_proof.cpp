@@ -416,7 +416,7 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit1)
         constexpr static const std::size_t constant_columns = constant_columns_1;
         constexpr static const std::size_t selector_columns = selector_columns_1;
 
-        constexpr static const std::size_t lambda = 40;
+        constexpr static const std::size_t lambda = 10;
         constexpr static const std::size_t m = 2;
     };
     typedef placeholder_circuit_params<field_type> circuit_params;
@@ -457,7 +457,7 @@ BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_initializer) {
     typename policy_type::variable_assignment_type assignments = circuit.table;
 
     typename lpc_type::fri_type::params_type fri_params(
-        1, table_rows_log, placeholder_test_params::lambda, 4, true, 0xFFFF8000
+        1, table_rows_log, placeholder_test_params::lambda, 4, false
     );
     lpc_scheme_type lpc_scheme(fri_params);
 
@@ -487,6 +487,9 @@ BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_initializer) {
     auto verifier_res = placeholder_verifier<field_type, lpc_placeholder_params_type>::process(
         lpc_preprocessed_public_data.common_data, lpc_proof, desc, constraint_system, lpc_scheme
     );
+    for(auto &it:lpc_proof.commitments ){
+        std::cout << "Commitment " << it.first << " = " << it.second << std::endl;
+    }
     BOOST_CHECK(verifier_res);
 }
 BOOST_AUTO_TEST_SUITE_END()
@@ -601,7 +604,7 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit3)
         constexpr static const std::size_t constant_columns = constant_columns_3;
         constexpr static const std::size_t selector_columns = selector_columns_3;
 
-        constexpr static const std::size_t lambda = 40;
+        constexpr static const std::size_t lambda = 10;
         constexpr static const std::size_t m = 2;
     };
 
@@ -641,7 +644,7 @@ BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_initializer) {
     typename policy_type::variable_assignment_type assignments = circuit.table;
 
     typename lpc_type::fri_type::params_type fri_params(
-        1, table_rows_log, placeholder_test_params::lambda, 4, true
+        1, table_rows_log, placeholder_test_params::lambda, 4
     );
     lpc_scheme_type lpc_scheme(fri_params);
 
@@ -678,10 +681,6 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit4)
     using curve_type = algebra::curves::pallas;
     using field_type = typename curve_type::base_field_type;
 
-    constexpr static const std::size_t table_rows_log = 3;
-    constexpr static const std::size_t table_rows = 1 << table_rows_log;
-    constexpr static const std::size_t usable_rows = 5;
-
     struct placeholder_test_params {
         using merkle_hash_type = hashes::keccak_1600<256>;
         using transcript_hash_type = hashes::keccak_1600<256>;
@@ -691,7 +690,7 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit4)
         constexpr static const std::size_t constant_columns = constant_columns_4;
         constexpr static const std::size_t selector_columns = selector_columns_4;
 
-        constexpr static const std::size_t lambda = 40;
+        constexpr static const std::size_t lambda = 10;
         constexpr static const std::size_t m = 2;
     };
 
@@ -718,8 +717,9 @@ BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_initializer) {
         placeholder_test_params::selector_columns
     );
 
-    desc.rows_amount = table_rows;
-    desc.usable_rows_amount = usable_rows;
+    desc.rows_amount = circuit.table_rows;
+    desc.usable_rows_amount = circuit.usable_rows;
+    std::size_t table_rows_log = std::ceil(std::log2(circuit.table_rows));
 
     typename policy_type::constraint_system_type constraint_system(
         circuit.gates,
@@ -730,7 +730,7 @@ BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_initializer) {
     typename policy_type::variable_assignment_type assignments = circuit.table;
 
     typename lpc_type::fri_type::params_type fri_params(
-        1, table_rows_log, placeholder_test_params::lambda, 4, true
+        1, table_rows_log, placeholder_test_params::lambda, 4
     );
     lpc_scheme_type lpc_scheme(fri_params);
 
@@ -776,7 +776,7 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit5)
         constexpr static const std::size_t constant_columns = constant_columns_5;
         constexpr static const std::size_t selector_columns = selector_columns_5;
 
-        constexpr static const std::size_t lambda = 40;
+        constexpr static const std::size_t lambda = 10;
         constexpr static const std::size_t m = 2;
     };
 
@@ -792,6 +792,59 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit5)
     using lpc_scheme_type = typename commitments::lpc_commitment_scheme<lpc_type>;
     using lpc_placeholder_params_type = nil::crypto3::zk::snark::placeholder_params<circuit_params, lpc_scheme_type>;
     using policy_type = zk::snark::detail::placeholder_policy<field_type, circuit_params>;
+
+BOOST_FIXTURE_TEST_CASE(proof_marshalling_test100, test_initializer) {
+    auto circuit = circuit_test_5<field_type>(test_global_alg_rnd_engine<field_type>);
+
+    plonk_table_description<field_type> desc(
+        placeholder_test_params::witness_columns,
+        placeholder_test_params::public_input_columns,
+        placeholder_test_params::constant_columns,
+        placeholder_test_params::selector_columns
+    );
+
+    desc.rows_amount = circuit.table_rows;
+    desc.usable_rows_amount = circuit.usable_rows;
+    std::size_t table_rows_log = std::ceil(std::log2(circuit.table_rows));
+
+    typename policy_type::constraint_system_type constraint_system(
+        circuit.gates,
+        circuit.copy_constraints,
+        circuit.lookup_gates,
+        circuit.lookup_tables
+    );
+    typename policy_type::variable_assignment_type assignments = circuit.table;
+
+    typename lpc_type::fri_type::params_type fri_params(
+        1, table_rows_log, placeholder_test_params::lambda, 4
+    );
+    lpc_scheme_type lpc_scheme(fri_params);
+
+    typename placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::preprocessed_data_type
+        preprocessed_public_data = placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::process(
+            constraint_system, assignments.public_table(), desc, lpc_scheme, 100);
+
+    typename placeholder_private_preprocessor<field_type, lpc_placeholder_params_type>::preprocessed_data_type
+        preprocessed_private_data = placeholder_private_preprocessor<field_type, lpc_placeholder_params_type>::process(
+            constraint_system, assignments.private_table(), desc);
+
+    auto proof = placeholder_prover<field_type, lpc_placeholder_params_type>::process(
+        preprocessed_public_data, preprocessed_private_data, desc, constraint_system, lpc_scheme);
+
+    if( has_argv("--print") ){
+        print_placeholder_proof_with_params<Endianness, lpc_placeholder_params_type>(
+            preprocessed_public_data,
+            proof, lpc_scheme, desc, "circuit5_chunk100"
+        );
+        print_public_input(desc.public_input_columns == 0? std::vector<typename field_type::value_type>({}):assignments.public_input(0), "circuit5_chunk100/public_input.inp");
+    }else {
+        test_placeholder_proof<Endianness, placeholder_proof<field_type, lpc_placeholder_params_type>>(proof, fri_params);
+    }
+
+    bool verifier_res = placeholder_verifier<field_type, lpc_placeholder_params_type>::process(
+        preprocessed_public_data.common_data, proof, desc, constraint_system, lpc_scheme);
+    BOOST_CHECK(verifier_res);
+}
 
 BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_initializer) {
     auto circuit = circuit_test_5<field_type>(test_global_alg_rnd_engine<field_type>);
@@ -816,7 +869,7 @@ BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_initializer) {
     typename policy_type::variable_assignment_type assignments = circuit.table;
 
     typename lpc_type::fri_type::params_type fri_params(
-        1, table_rows_log, placeholder_test_params::lambda, 4, true
+        1, table_rows_log, placeholder_test_params::lambda, 4
     );
     lpc_scheme_type lpc_scheme(fri_params);
 
@@ -834,9 +887,9 @@ BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_initializer) {
     if( has_argv("--print") ){
         print_placeholder_proof_with_params<Endianness, lpc_placeholder_params_type>(
             preprocessed_public_data,
-            proof, lpc_scheme, desc, "circuit5"
+            proof, lpc_scheme, desc, "circuit5_chunk10"
         );
-        print_public_input(desc.public_input_columns == 0? std::vector<typename field_type::value_type>({}):assignments.public_input(0), "circuit4/public_input.inp");
+        print_public_input(desc.public_input_columns == 0? std::vector<typename field_type::value_type>({}):assignments.public_input(0), "circuit5_chunk10/public_input.inp");
     }else {
         test_placeholder_proof<Endianness, placeholder_proof<field_type, lpc_placeholder_params_type>>(proof, fri_params);
     }
@@ -862,7 +915,7 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit6)
         constexpr static const std::size_t constant_columns = constant_columns_6;
         constexpr static const std::size_t selector_columns = selector_columns_6;
 
-        constexpr static const std::size_t lambda = 40;
+        constexpr static const std::size_t lambda = 10;
         constexpr static const std::size_t m = 2;
     };
 
@@ -902,7 +955,7 @@ BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_initializer) {
     typename policy_type::variable_assignment_type assignments = circuit.table;
 
     typename lpc_type::fri_type::params_type fri_params(
-        1, table_rows_log, placeholder_test_params::lambda, 4, true
+        1, table_rows_log, placeholder_test_params::lambda, 4
     );
     lpc_scheme_type lpc_scheme(fri_params);
 
@@ -947,7 +1000,7 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit7)
         constexpr static const std::size_t constant_columns = constant_columns_7;
         constexpr static const std::size_t selector_columns = selector_columns_7;
 
-        constexpr static const std::size_t lambda = 40;
+        constexpr static const std::size_t lambda = 10;
         constexpr static const std::size_t m = 2;
     };
 
@@ -986,7 +1039,7 @@ BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_initializer) {
     typename policy_type::variable_assignment_type assignments = circuit.table;
 
     typename lpc_type::fri_type::params_type fri_params(
-        1, table_rows_log, placeholder_test_params::lambda, 4, true
+        1, table_rows_log, placeholder_test_params::lambda, 4
     );
     lpc_scheme_type lpc_scheme(fri_params);
 
@@ -1006,6 +1059,57 @@ BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_initializer) {
             proof, lpc_scheme, desc, "circuit7"
         );
         print_public_input(desc.public_input_columns == 0? std::vector<typename field_type::value_type>({}):assignments.public_input(0), "circuit7/public_input.inp");
+    }else {
+        test_placeholder_proof<Endianness, placeholder_proof<field_type, lpc_placeholder_params_type>>(proof, fri_params);
+    }
+    bool verifier_res = placeholder_verifier<field_type, lpc_placeholder_params_type>::process(
+        preprocessed_public_data.common_data, proof, desc, constraint_system, lpc_scheme);
+    BOOST_CHECK(verifier_res);
+}
+
+BOOST_FIXTURE_TEST_CASE(proof_marshalling_test10, test_initializer) {
+    auto circuit = circuit_test_7<field_type>(test_global_alg_rnd_engine<field_type>, test_global_rnd_engine);
+    plonk_table_description<field_type> desc(
+        placeholder_test_params::witness_columns,
+        placeholder_test_params::public_input_columns,
+        placeholder_test_params::constant_columns,
+        placeholder_test_params::selector_columns
+    );
+
+    desc.rows_amount = circuit.table_rows;
+    desc.usable_rows_amount = circuit.usable_rows;
+    std::size_t table_rows_log = std::log2(circuit.table_rows);
+
+    typename policy_type::constraint_system_type constraint_system(
+        circuit.gates,
+        circuit.copy_constraints,
+        circuit.lookup_gates,
+        circuit.lookup_tables
+    );
+    typename policy_type::variable_assignment_type assignments = circuit.table;
+
+    typename lpc_type::fri_type::params_type fri_params(
+        1, table_rows_log, placeholder_test_params::lambda, 4
+    );
+    lpc_scheme_type lpc_scheme(fri_params);
+
+    typename placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::preprocessed_data_type
+        preprocessed_public_data = placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::process(
+            constraint_system, assignments.public_table(), desc, lpc_scheme, 10
+        );
+
+    typename placeholder_private_preprocessor<field_type, lpc_placeholder_params_type>::preprocessed_data_type
+        preprocessed_private_data = placeholder_private_preprocessor<field_type, lpc_placeholder_params_type>::process(
+            constraint_system, assignments.private_table(), desc);
+
+    auto proof = placeholder_prover<field_type, lpc_placeholder_params_type>::process(
+        preprocessed_public_data, preprocessed_private_data, desc, constraint_system, lpc_scheme);
+    if( has_argv("--print") ){
+        print_placeholder_proof_with_params<Endianness, lpc_placeholder_params_type>(
+            preprocessed_public_data,
+            proof, lpc_scheme, desc, "circuit7_chunk10"
+        );
+        print_public_input(desc.public_input_columns == 0? std::vector<typename field_type::value_type>({}):assignments.public_input(0), "circuit7_chunk10/public_input.inp");
     }else {
         test_placeholder_proof<Endianness, placeholder_proof<field_type, lpc_placeholder_params_type>>(proof, fri_params);
     }
