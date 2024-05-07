@@ -1,0 +1,18 @@
+name: PR Testing
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+
+jobs:
+  run-pull-request-actions:
+    name: Reusable Crypto3 Testing
+    uses: ./.github/workflows/pull-request-action.yml
+
+    secrets: inherit
+    with:
+      targets: |
+        multiprecision_test_modular_adaptor_fixed_cpp_int
+        multiprecision_test_ressol_cpp_int
