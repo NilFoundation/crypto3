@@ -37,7 +37,7 @@ jobs:
     secrets: inherit
     with:
       submodules-refs: ${{ needs.handle-syncwith.outputs.prs-refs }}
-
-      # TODO(martun): fix this sometime soon. All the targets must work on mac.
-      targets: crypto3_zk_math_expression_test # ${{ inputs.targets }} 
+      targets: |
+        multiprecision_test_modular_adaptor_fixed_cpp_int
+        multiprecision_test_ressol_cpp_int
 
