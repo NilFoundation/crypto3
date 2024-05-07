@@ -85,9 +85,6 @@ namespace nil {
 
             template<typename IntegerType>
             IntegerType first_prime(uint64_t nBits, uint64_t m) {
-                BOOST_ASSERT_MSG(nBits <= MAX_MODULUS_SIZE, "Requested bit length " + std::to_string(nBits) +
-                                                            " exceeds maximum allowed length " +
-                                                            std::to_string(MAX_MODULUS_SIZE));
                 IntegerType mi(m);
                 IntegerType qNew(IntegerType(1) << nBits);
                 IntegerType r(qNew % mi);
