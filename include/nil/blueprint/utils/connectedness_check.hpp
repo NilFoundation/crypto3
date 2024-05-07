@@ -82,8 +82,8 @@ namespace nil {
                 const std::size_t end_row = start_row_index + rows_amount;
 
                 nil::blueprint::assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> output_assignment(
-                    assignment.witnesses_amount(), assignment.constants_amount(),
-                    assignment.public_inputs_amount(), assignment.selectors_amount()
+                    assignment.witnesses_amount(), assignment.public_inputs_amount(),
+                    assignment.constants_amount(), assignment.selectors_amount()
                 );
 
                 // We do '+1' in all the assignments to separate the unassigned cells (0 by default)
