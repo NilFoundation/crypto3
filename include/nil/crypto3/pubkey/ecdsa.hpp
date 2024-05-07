@@ -127,9 +127,9 @@ namespace nil {
                     if (X.is_zero()) {
                         return false;
                     }
-                    return signature.first == scalar_field_value_type(scalar_modular_type(
+                    return signature.first == scalar_field_value_type(scalar_modular_type(typename scalar_modular_type::backend_type(
                                                   static_cast<base_integral_type>(X.to_affine().X.data),
-                                                  scalar_field_value_type::modulus));
+                                                  scalar_field_value_type::modulus)));
                 }
 
                 inline public_key_type pubkey_data() const {
@@ -207,9 +207,9 @@ namespace nil {
                         }
                         // TODO: review converting of kG x-coordinate to r - in case of 2^n order (binary) fields
                         //  procedure seems not to be trivial
-                        r = scalar_field_value_type(scalar_modular_type(
+                        r = scalar_field_value_type(scalar_modular_type(typename scalar_modular_type::backend_type(
                             static_cast<base_integral_type>((k * g1_value_type::one()).to_affine().X.data),
-                            scalar_field_value_type::modulus));
+                            scalar_field_value_type::modulus)));
                         s = k.inversed() * (privkey * r + encoded_m);
                     } while (r.is_zero() || s.is_zero());
 
@@ -289,9 +289,9 @@ namespace nil {
                         }
                         // TODO: review converting of kG x-coordinate to r - in case of 2^n order (binary) fields
                         //  procedure seems not to be trivial
-                        r = scalar_field_value_type(scalar_modular_type(
+                        r = scalar_field_value_type(scalar_modular_type(typename scalar_modular_type::backend_type(
                             static_cast<base_integral_type>((k * g1_value_type::one()).to_affine().X.data),
-                            scalar_field_value_type::modulus));
+                            scalar_field_value_type::modulus)));
                         s = (privkey * r + encoded_m) / k;
                     } while (r.is_zero() || s.is_zero());
 

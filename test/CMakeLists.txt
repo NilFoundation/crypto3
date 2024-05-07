@@ -29,6 +29,12 @@ macro(define_pubkey_test name)
     set_target_properties(pubkey_${name}_test PROPERTIES CXX_STANDARD 17)
 
     get_target_property(target_type Boost::unit_test_framework TYPE)
+    if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+        target_compile_options(pubkey_${name}_test PRIVATE "-fconstexpr-steps=2147483647" "-ftemplate-backtrace-limit=0")
+    elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        target_compile_options(pubkey_${name}_test PRIVATE "-fconstexpr-ops-limit=4294967295" "-ftemplate-backtrace-limit=0")
+    endif()
+
     if(target_type STREQUAL "SHARED_LIB")
         target_compile_definitions(pubkey_${name}_test PRIVATE BOOST_TEST_DYN_LINK)
     elseif(target_type STREQUAL "STATIC_LIB")

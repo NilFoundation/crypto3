@@ -118,12 +118,12 @@ void rfc6979_test(
     BOOST_CHECK(etalon_sig == sig1);
     BOOST_CHECK(static_cast<bool>(verify<policy_type>(msg, sig1, pk)));
     auto sig1_wrong1 = sig1;
-    sig1_wrong1.first -= 1;
+    sig1_wrong1.first -= 1u;
     BOOST_CHECK(!static_cast<bool>(verify<policy_type>(msg, sig1_wrong1, pk)));
     auto sig1_wrong2 = sig1;
-    sig1_wrong2.second -= 1;
+    sig1_wrong2.second -= 1u;
     BOOST_CHECK(!static_cast<bool>(verify<policy_type>(msg, sig1_wrong2, pk)));
-    sig1_wrong1.second -= 1;
+    sig1_wrong1.second -= 1u;
     BOOST_CHECK(!static_cast<bool>(verify<policy_type>(msg, sig1_wrong1, pk)));
 }
 
@@ -142,12 +142,12 @@ void rfc6979_test_wo_pk_check(
     BOOST_CHECK(etalon_sig == sig1);
     BOOST_CHECK(static_cast<bool>(verify<policy_type>(msg, sig1, pk)));
     auto sig1_wrong1 = sig1;
-    sig1_wrong1.first -= 1;
+    sig1_wrong1.first -= 1u;
     BOOST_CHECK(!static_cast<bool>(verify<policy_type>(msg, sig1_wrong1, pk)));
     auto sig1_wrong2 = sig1;
-    sig1_wrong2.second -= 1;
+    sig1_wrong2.second -= 1u;
     BOOST_CHECK(!static_cast<bool>(verify<policy_type>(msg, sig1_wrong2, pk)));
-    sig1_wrong1.second -= 1;
+    sig1_wrong1.second -= 1u;
     BOOST_CHECK(!static_cast<bool>(verify<policy_type>(msg, sig1_wrong1, pk)));
 }
 
@@ -1269,23 +1269,23 @@ BOOST_AUTO_TEST_CASE(ecdsa_rfc6979_secp256k1_sha1_range_sign) {
     using g1_affine_type = typename curve_type::g1_type<curves::coordinates::affine>;
     using g1_affine_value_type = typename g1_affine_type::value_type;
 
-    scalar_integral_type x(0xC9AFA9D845BA75166B5C215767B1D6934E50C3DB36E89B127B8A622B120F6721_cppui256);
+    scalar_integral_type x(0xC9AFA9D845BA75166B5C215767B1D6934E50C3DB36E89B127B8A622B120F6721_cppui_modular256);
 
     rfc6979_test_wo_pk_check<policy_type>(
         x,
         std::string("sample"),
         std::make_pair(scalar_field_value_type(
-                           0x432D36AD7C15F289D193D233332B4192EC52182354661263962826D8D53BC7E8_cppui256),
+                           0x432D36AD7C15F289D193D233332B4192EC52182354661263962826D8D53BC7E8_cppui_modular256),
                        scalar_field_value_type(
-                           0xEB08245738BC9F49419A4EE58EBEB045A7824A61C7CDCE7007EC2C490ECFB34B_cppui256)));
+                           0xEB08245738BC9F49419A4EE58EBEB045A7824A61C7CDCE7007EC2C490ECFB34B_cppui_modular256)));
 
     rfc6979_test_wo_pk_check<policy_type>(
         x,
         std::string("test"),
         std::make_pair(scalar_field_value_type(
-                           0x5A218C384E45F833F32D8B1DB49B4300B786D6C39DA00C59427287A72D186935_cppui256),
+                           0x5A218C384E45F833F32D8B1DB49B4300B786D6C39DA00C59427287A72D186935_cppui_modular256),
                        scalar_field_value_type(
-                           0xF7722F896A737B0B4397A5074C67F6154B063D58B58E4628322716E974CEAF40_cppui256)));
+                           0xF7722F896A737B0B4397A5074C67F6154B063D58B58E4628322716E974CEAF40_cppui_modular256)));
 }
 
 BOOST_AUTO_TEST_CASE(ecdsa_rfc6979_secp256k1_sha224_range_sign) {
@@ -1301,23 +1301,23 @@ BOOST_AUTO_TEST_CASE(ecdsa_rfc6979_secp256k1_sha224_range_sign) {
     using g1_affine_type = typename curve_type::g1_type<curves::coordinates::affine>;
     using g1_affine_value_type = typename g1_affine_type::value_type;
 
-    scalar_integral_type x(0xC9AFA9D845BA75166B5C215767B1D6934E50C3DB36E89B127B8A622B120F6721_cppui256);
+    scalar_integral_type x(0xC9AFA9D845BA75166B5C215767B1D6934E50C3DB36E89B127B8A622B120F6721_cppui_modular256);
 
     rfc6979_test_wo_pk_check<policy_type>(
         x,
         std::string("sample"),
         std::make_pair(scalar_field_value_type(
-                           0xEFE22812AEE54594AD645AC904F792A7B78DE889CDB203D45B0AD38E91877EA0_cppui256),
+                           0xEFE22812AEE54594AD645AC904F792A7B78DE889CDB203D45B0AD38E91877EA0_cppui_modular256),
                        scalar_field_value_type(
-                           0xE66176D972070CF93CFFFF669DAF62F72E4F169CAFCAE3152677C523D1C1EF39_cppui256)));
+                           0xE66176D972070CF93CFFFF669DAF62F72E4F169CAFCAE3152677C523D1C1EF39_cppui_modular256)));
 
     rfc6979_test_wo_pk_check<policy_type>(
         x,
         std::string("test"),
         std::make_pair(scalar_field_value_type(
-                           0x242670EB1D4D272FEC08D78B2F817CB38E2DEE1F721C338D2A71D1E2921F4DC2_cppui256),
+                           0x242670EB1D4D272FEC08D78B2F817CB38E2DEE1F721C338D2A71D1E2921F4DC2_cppui_modular256),
                        scalar_field_value_type(
-                           0x84CDF656B5F7F8E6F93E83B325C556D2F49EBFA9ACAF4A6C8CE338B5E3E0449C_cppui256)));
+                           0x84CDF656B5F7F8E6F93E83B325C556D2F49EBFA9ACAF4A6C8CE338B5E3E0449C_cppui_modular256)));
 }
 
 BOOST_AUTO_TEST_CASE(ecdsa_rfc6979_secp256k1_sha256_range_sign) {
@@ -1333,23 +1333,23 @@ BOOST_AUTO_TEST_CASE(ecdsa_rfc6979_secp256k1_sha256_range_sign) {
     using g1_affine_type = typename curve_type::g1_type<curves::coordinates::affine>;
     using g1_affine_value_type = typename g1_affine_type::value_type;
 
-    scalar_integral_type x(0xC9AFA9D845BA75166B5C215767B1D6934E50C3DB36E89B127B8A622B120F6721_cppui256);
+    scalar_integral_type x(0xC9AFA9D845BA75166B5C215767B1D6934E50C3DB36E89B127B8A622B120F6721_cppui_modular256);
 
     rfc6979_test_wo_pk_check<policy_type>(
         x,
         std::string("sample"),
         std::make_pair(scalar_field_value_type(
-                           0x432310E32CB80EB6503A26CE83CC165C783B870845FB8AAD6D970889FCD7A6C8_cppui256),
+                           0x432310E32CB80EB6503A26CE83CC165C783B870845FB8AAD6D970889FCD7A6C8_cppui_modular256),
                        scalar_field_value_type(
-                           0x530128B6B81C548874A6305D93ED071CA6E05074D85863D4056CE89B02BFAB69_cppui256)));
+                           0x530128B6B81C548874A6305D93ED071CA6E05074D85863D4056CE89B02BFAB69_cppui_modular256)));
 
     rfc6979_test_wo_pk_check<policy_type>(
         x,
         std::string("test"),
         std::make_pair(scalar_field_value_type(
-                           0xF2ADCEA7139057BE6409855EE96D008E0E5B5F532333EC17448E26A36F47BCB2_cppui256),
+                           0xF2ADCEA7139057BE6409855EE96D008E0E5B5F532333EC17448E26A36F47BCB2_cppui_modular256),
                        scalar_field_value_type(
-                           0x570C9D342779B40F513C0D75CBF93E3F3DE7B01F6593F17BFC2EE87151414D64_cppui256)));
+                           0x570C9D342779B40F513C0D75CBF93E3F3DE7B01F6593F17BFC2EE87151414D64_cppui_modular256)));
 }
 
 BOOST_AUTO_TEST_CASE(ecdsa_rfc6979_secp256k1_sha384_range_sign) {
@@ -1365,23 +1365,23 @@ BOOST_AUTO_TEST_CASE(ecdsa_rfc6979_secp256k1_sha384_range_sign) {
     using g1_affine_type = typename curve_type::g1_type<curves::coordinates::affine>;
     using g1_affine_value_type = typename g1_affine_type::value_type;
 
-    scalar_integral_type x(0xC9AFA9D845BA75166B5C215767B1D6934E50C3DB36E89B127B8A622B120F6721_cppui256);
+    scalar_integral_type x(0xC9AFA9D845BA75166B5C215767B1D6934E50C3DB36E89B127B8A622B120F6721_cppui_modular256);
 
     rfc6979_test_wo_pk_check<policy_type>(
         x,
         std::string("sample"),
         std::make_pair(scalar_field_value_type(
-                           0x16217648FC2AB9E82F4BC6304D6F7AE0E3C5728F75786BA13F258CF02D971D44_cppui256),
+                           0x16217648FC2AB9E82F4BC6304D6F7AE0E3C5728F75786BA13F258CF02D971D44_cppui_modular256),
                        scalar_field_value_type(
-                           0x899372870C08982344E4392ED218220E0B01E96F18425A2A4F2F74B0F6F57ABC_cppui256)));
+                           0x899372870C08982344E4392ED218220E0B01E96F18425A2A4F2F74B0F6F57ABC_cppui_modular256)));
 
     rfc6979_test_wo_pk_check<policy_type>(
         x,
         std::string("test"),
         std::make_pair(scalar_field_value_type(
-                           0xCA8D3ACA176FFA260E78ADA8736EC9EDD2A49D1A1C6686358120812145A7020F_cppui256),
+                           0xCA8D3ACA176FFA260E78ADA8736EC9EDD2A49D1A1C6686358120812145A7020F_cppui_modular256),
                        scalar_field_value_type(
-                           0xB6CE10567BDD40BDEB48EBCF87B1F82EE3A0EA15FAA7513FB815AD7403873A7E_cppui256)));
+                           0xB6CE10567BDD40BDEB48EBCF87B1F82EE3A0EA15FAA7513FB815AD7403873A7E_cppui_modular256)));
 }
 
 BOOST_AUTO_TEST_CASE(ecdsa_rfc6979_secp256k1_sha512_range_sign) {
@@ -1397,23 +1397,23 @@ BOOST_AUTO_TEST_CASE(ecdsa_rfc6979_secp256k1_sha512_range_sign) {
     using g1_affine_type = typename curve_type::g1_type<curves::coordinates::affine>;
     using g1_affine_value_type = typename g1_affine_type::value_type;
 
-    scalar_integral_type x(0xC9AFA9D845BA75166B5C215767B1D6934E50C3DB36E89B127B8A622B120F6721_cppui256);
+    scalar_integral_type x(0xC9AFA9D845BA75166B5C215767B1D6934E50C3DB36E89B127B8A622B120F6721_cppui_modular256);
 
     rfc6979_test_wo_pk_check<policy_type>(
         x,
         std::string("sample"),
         std::make_pair(scalar_field_value_type(
-                           0x12AF6086A07A3347920DDB0C997918077FA90EC44AD7939E051D9C76F010B0EF_cppui256),
+                           0x12AF6086A07A3347920DDB0C997918077FA90EC44AD7939E051D9C76F010B0EF_cppui_modular256),
                        scalar_field_value_type(
-                           0x00559F7289748A2C6EBE6501F2BEF64E5CE94FF89C90B0DB22F5E3E01F88CC04_cppui256)));
+                           0x00559F7289748A2C6EBE6501F2BEF64E5CE94FF89C90B0DB22F5E3E01F88CC04_cppui_modular256)));
 
     rfc6979_test_wo_pk_check<policy_type>(
         x,
         std::string("test"),
         std::make_pair(scalar_field_value_type(
-                           0x2AAED0E23C13F46ADFF7820B5C61F2692645AA9FADCEB3D05297A2D33790DD5A_cppui256),
+                           0x2AAED0E23C13F46ADFF7820B5C61F2692645AA9FADCEB3D05297A2D33790DD5A_cppui_modular256),
                        scalar_field_value_type(
-                           0x9B24785EEAFFEF0B188A3D0B65B6322495B0311FCC90FEF5331AEB5B10AAA6E4_cppui256)));
+                           0x9B24785EEAFFEF0B188A3D0B65B6322495B0311FCC90FEF5331AEB5B10AAA6E4_cppui_modular256)));
 }
 
 
