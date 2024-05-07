@@ -398,17 +398,6 @@ target_link_libraries(${CURRENT_PROJECT_NAME}_test_modular_adaptor_cpp_int no_eh
 add_dependencies(${CURRENT_PROJECT_NAME}_test_suite_modular_cpp_int_tests ${CURRENT_PROJECT_NAME}_test_modular_adaptor_cpp_int)
 set_target_properties(${CURRENT_PROJECT_NAME}_test_modular_adaptor_cpp_int PROPERTIES CXX_STANDARD 17)
 
-cm_test(NAME ${CURRENT_PROJECT_NAME}_test_modular_adaptor_fixed_cpp_int SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_modular_adaptor_fixed.cpp)
-target_compile_definitions(${CURRENT_PROJECT_NAME}_test_modular_adaptor_fixed_cpp_int PUBLIC -DTEST_CPP_INT)
-target_link_libraries(${CURRENT_PROJECT_NAME}_test_modular_adaptor_fixed_cpp_int no_eh_support)
-add_dependencies(${CURRENT_PROJECT_NAME}_test_suite_modular_cpp_int_tests ${CURRENT_PROJECT_NAME}_test_modular_adaptor_fixed_cpp_int)
-set_target_properties(${CURRENT_PROJECT_NAME}_test_modular_adaptor_fixed_cpp_int PROPERTIES CXX_STANDARD 17)
-if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-    target_compile_options(${CURRENT_PROJECT_NAME}_test_modular_adaptor_fixed_cpp_int PRIVATE "-fconstexpr-steps=2147483647")
-elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    target_compile_options(${CURRENT_PROJECT_NAME}_test_modular_adaptor_fixed_cpp_int PRIVATE "-fconstexpr-ops-limit=4294967295")
-endif()
-
 cm_test(NAME ${CURRENT_PROJECT_NAME}_test_jacobi_cpp_int SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_jacobi.cpp)
 target_compile_definitions(${CURRENT_PROJECT_NAME}_test_jacobi_cpp_int PUBLIC -DTEST_CPP_INT)
 target_link_libraries(${CURRENT_PROJECT_NAME}_test_jacobi_cpp_int no_eh_support)
@@ -467,16 +456,41 @@ macro(define_runtime_multiprecision_test name)
     endif()
 
     target_compile_definitions(${test_name} PRIVATE TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/data/")
-endmacro()
+endmacro(define_runtime_multiprecision_test)
+
+macro(define_modular_cpp_int_test name)
+    define_runtime_multiprecision_test(${name})
+
+    set(test_name "${CURRENT_PROJECT_NAME}_${name}_test")
+    target_compile_definitions(${test_name} PUBLIC -DTEST_CPP_INT)
+    target_link_libraries(${test_name} no_eh_support)
+    add_dependencies(${CURRENT_PROJECT_NAME}_test_suite_modular_cpp_int_tests ${test_name})
+    set_target_properties(${test_name} PROPERTIES CXX_STANDARD 17)
+    if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+        target_compile_options(${test_name} PRIVATE "-fconstexpr-steps=2147483647")
+    elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        target_compile_options(${test_name} PRIVATE "-fconstexpr-ops-limit=4294967295")
+    endif()
+
+endmacro(define_runtime_multiprecision_test)
 
 set(RUNTIME_TESTS_NAMES
     "inverse_cpp_int"
     )
 
+set(MODULAR_CPP_INT_TESTS
+    "modular_adaptor_fixed"
+)
+
 foreach(TEST_NAME ${RUNTIME_TESTS_NAMES})
     define_runtime_multiprecision_test(${TEST_NAME})
+endforeach()
+
+foreach(TEST_NAME ${MODULAR_CPP_INT_TESTS})
+    define_modular_cpp_int_test(${TEST_NAME})
 endforeach()
 
 if(BUILD_BENCH_TESTS)
     cm_add_test_subdirectory(bench_test)
 endif()
+
