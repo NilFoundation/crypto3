@@ -19,7 +19,7 @@ jobs:
     name: Call Reusable SyncWith Handler
     uses: NilFoundation/ci-cd/.github/workflows/reusable-handle-syncwith.yml@v1.2.0
     with:
-      ci-cd-ref: 'v1.2.0'
+      ci-cd-ref: 'v1.2.1'
     secrets: inherit
 
   test-linux:
