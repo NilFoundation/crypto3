@@ -10,6 +10,10 @@ include(CMTest)
 
 cm_find_package(Boost REQUIRED COMPONENTS unit_test_framework)
 
+target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+    "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>")
+
 cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
 
                        ${CMAKE_WORKSPACE_NAME}::algebra

@@ -44,7 +44,6 @@
 #include <nil/crypto3/algebra/fields/arithmetic_params/pallas.hpp>
 #include <nil/crypto3/algebra/curves/vesta.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/vesta.hpp>
-#include <nil/crypto3/algebra/random_element.hpp>
 /*
 #include <nil/crypto3/algebra/curves/alt_bn128.hpp>
 #include <nil/crypto3/algebra/pairing/alt_bn128.hpp>
@@ -63,9 +62,6 @@
 #include <nil/crypto3/math/algorithms/unity_root.hpp>
 #include <nil/crypto3/math/polynomial/lagrange_interpolation.hpp>
 #include <nil/crypto3/math/algorithms/calculate_domain_set.hpp>
-
-#include <nil/crypto3/random/algebraic_random_device.hpp>
-#include <nil/crypto3/random/algebraic_engine.hpp>
 
 #include <nil/crypto3/hash/algorithm/hash.hpp>
 #include <nil/crypto3/hash/sha2.hpp>
@@ -89,6 +85,7 @@
 #include <nil/crypto3/zk/commitments/polynomial/kzg.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/kzg_v2.hpp>
 #include <nil/crypto3/zk/commitments/batched_commitment.hpp>
+#include <nil/crypto3/zk/test_tools/random_test_initializer.hpp>
 
 #include "circuits.hpp"
 
@@ -192,59 +189,10 @@ typename kzg_type::params_type create_kzg_v2_params(std::size_t degree_log) {
     return params;
 }
 
-// *******************************************************************************
-// * Randomness setup
-// *******************************************************************************/
-using dist_type = std::uniform_int_distribution<int>;
-std::size_t test_global_seed = 0;
-boost::random::mt11213b test_global_rnd_engine;
-template<typename FieldType>
-nil::crypto3::random::algebraic_engine<FieldType> test_global_alg_rnd_engine;
-
-struct test_initializer {
-    // Enumerate all fields used in tests;
-    using field1_type = algebra::curves::pallas::base_field_type;
-
-    test_initializer() {
-        test_global_seed = 0;
-
-        for (std::size_t i = 0; i + 1 < std::size_t(boost::unit_test::framework::master_test_suite().argc); i++) {
-            if (std::string(boost::unit_test::framework::master_test_suite().argv[i]) == "--seed") {
-                std::cout << "Setting up randomness" << std::endl;
-                if (std::string(boost::unit_test::framework::master_test_suite().argv[i + 1]) == "random") {
-                    std::random_device rd;
-                    test_global_seed = rd();
-                    std::cout << "Random seed = " << test_global_seed << std::endl;
-                    break;
-                }
-                if (std::regex_match(boost::unit_test::framework::master_test_suite().argv[i + 1],
-                                     std::regex(("((\\+|-)?[[:digit:]]+)(\\.(([[:digit:]]+)?))?")))) {
-                    test_global_seed = atoi(boost::unit_test::framework::master_test_suite().argv[i + 1]);
-                    break;
-                }
-                std::cout << "Randomness is set up with seed: " << test_global_seed << std::endl;
-            }
-        }
-
-        BOOST_TEST_MESSAGE("test_global_seed = " << test_global_seed);
-        test_global_rnd_engine = boost::random::mt11213b(test_global_seed);
-        test_global_alg_rnd_engine<field1_type> = nil::crypto3::random::algebraic_engine<field1_type>(test_global_seed);
-    }
-
-    void setup() {
-    }
-
-    void teardown() {
-    }
-
-    ~test_initializer() {
-    }
-};
-
 template<typename FieldType, typename merkle_hash_type, typename transcript_hash_type,
     std::size_t WitnessColumns, std::size_t PublicInputColumns, std::size_t ConstantColumns, std::size_t SelectorColumns,
     std::size_t usable_rows_amount, bool UseGrinding = false, std::size_t max_quotient_poly_chunks = 0>
-struct placeholder_test_fixture : public test_initializer {
+struct placeholder_test_runner {
     using field_type = FieldType;
 
     struct placeholder_test_params {
@@ -274,7 +222,7 @@ struct placeholder_test_fixture : public test_initializer {
     using policy_type = zk::snark::detail::placeholder_policy<field_type, lpc_placeholder_params_type>;
     using circuit_type = circuit_description<field_type, placeholder_circuit_params<field_type>, usable_rows_amount>;
 
-    placeholder_test_fixture(const circuit_type& circuit_in, std::size_t usable_rows, std::size_t table_rows)
+    placeholder_test_runner(const circuit_type& circuit_in, std::size_t usable_rows, std::size_t table_rows)
         : circuit(circuit_in)
         , desc(WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns)
         , constraint_system(circuit.gates, circuit.copy_constraints, circuit.lookup_gates, circuit.lookup_tables)
@@ -287,7 +235,6 @@ struct placeholder_test_fixture : public test_initializer {
     }
 
     bool run_test() {
-        test_initializer::setup();
         lpc_scheme_type lpc_scheme(fri_params);
 
         typename placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::preprocessed_data_type
@@ -307,7 +254,6 @@ struct placeholder_test_fixture : public test_initializer {
         bool verifier_res = placeholder_verifier<field_type, lpc_placeholder_params_type>::process(
             lpc_preprocessed_public_data.common_data, lpc_proof, desc, constraint_system, lpc_scheme
         );
-        test_initializer::teardown();
         return verifier_res;
     }
 
@@ -360,9 +306,13 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit2)
     using kzg_scheme_type = typename commitments::kzg_commitment_scheme<kzg_type>;
     using kzg_placeholder_params_type = nil::crypto3::zk::snark::placeholder_params<circuit_t_params, kzg_scheme_type>;
 
-BOOST_FIXTURE_TEST_CASE(prover_test, test_initializer){
-    typename field_type::value_type pi0 = test_global_alg_rnd_engine<field_type>();
-    auto circuit = circuit_test_t<field_type>(pi0, test_global_alg_rnd_engine<field_type>);
+BOOST_FIXTURE_TEST_CASE(prover_test, test_tools::random_test_initializer<field_type>) {
+    typename field_type::value_type pi0 = alg_random_engines.template get_alg_engine<field_type>()();
+    auto circuit = circuit_test_t<field_type>(
+        pi0,
+        alg_random_engines.template get_alg_engine<field_type>(),
+        generic_random_engine
+    );
 
     plonk_table_description<field_type> desc(
         placeholder_test_params::witness_columns,
@@ -480,9 +430,13 @@ BOOST_FIXTURE_TEST_CASE(prover_test, test_initializer){
     BOOST_CHECK(verifier_res);
 }
 
-BOOST_AUTO_TEST_CASE(permutation_polynomials_test) {
-    typename field_type::value_type pi0 = test_global_alg_rnd_engine<field_type>();
-    auto circuit = circuit_test_t<field_type>(pi0, test_global_alg_rnd_engine<field_type>);
+BOOST_FIXTURE_TEST_CASE(permutation_polynomials_test, test_tools::random_test_initializer<field_type>) {
+    typename field_type::value_type pi0 = alg_random_engines.template get_alg_engine<field_type>()();
+    auto circuit = circuit_test_t<field_type>(
+        pi0,
+        alg_random_engines.template get_alg_engine<field_type>(),
+        generic_random_engine
+    );
 
     plonk_table_description<field_type> desc(
         placeholder_test_params::witness_columns,
@@ -556,7 +510,7 @@ BOOST_AUTO_TEST_CASE(permutation_polynomials_test) {
     BOOST_CHECK_MESSAGE(id_res == sigma_res, "Complex check");
 }
 
-BOOST_AUTO_TEST_CASE(placeholder_split_polynomial_test) {
+BOOST_FIXTURE_TEST_CASE(placeholder_split_polynomial_test, test_tools::random_test_initializer<field_type>) {
     math::polynomial<typename field_type::value_type> f = {1, 3, 4, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1};
     std::size_t expected_size = 4;
     std::size_t max_degree = 3;
@@ -566,7 +520,7 @@ BOOST_AUTO_TEST_CASE(placeholder_split_polynomial_test) {
 
     BOOST_CHECK(f_splitted.size() == expected_size);
 
-    typename field_type::value_type y = algebra::random_element<field_type>();
+    typename field_type::value_type y = alg_random_engines.template get_alg_engine<field_type>()();
 
     typename field_type::value_type f_at_y = f.evaluate(y);
     typename field_type::value_type f_splitted_at_y = field_type::value_type::zero();
@@ -577,8 +531,13 @@ BOOST_AUTO_TEST_CASE(placeholder_split_polynomial_test) {
     BOOST_CHECK(f_at_y == f_splitted_at_y);
 }
 
-BOOST_AUTO_TEST_CASE(permutation_argument_test) {
-    auto circuit = circuit_test_t<field_type>();
+BOOST_FIXTURE_TEST_CASE(permutation_argument_test, test_tools::random_test_initializer<field_type>) {
+    auto pi0 = alg_random_engines.template get_alg_engine<field_type>()();
+    auto circuit = circuit_test_t<field_type>(
+        pi0,
+        alg_random_engines.template get_alg_engine<field_type>(),
+        generic_random_engine
+    );
 
     plonk_table_description<field_type> desc(
         placeholder_test_params::witness_columns,
@@ -670,8 +629,13 @@ BOOST_AUTO_TEST_CASE(permutation_argument_test) {
     }
 }
 
-BOOST_AUTO_TEST_CASE(placeholder_gate_argument_test) {
-    auto circuit = circuit_test_t<field_type>();
+BOOST_FIXTURE_TEST_CASE(placeholder_gate_argument_test, test_tools::random_test_initializer<field_type>) {
+    auto pi0 = alg_random_engines.template get_alg_engine<field_type>()();
+    auto circuit = circuit_test_t<field_type>(
+        pi0,
+        alg_random_engines.template get_alg_engine<field_type>(),
+        generic_random_engine
+    );
 
     plonk_table_description<field_type> desc(
         placeholder_test_params::witness_columns,
@@ -821,8 +785,11 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit3_lookup_test)
     using lpc_placeholder_params_type = nil::crypto3::zk::snark::placeholder_params<circuit_params, lpc_scheme_type>;
     using policy_type = zk::snark::detail::placeholder_policy<field_type, circuit_params>;
 
-BOOST_AUTO_TEST_CASE(lookup_test) {
-    auto circuit = circuit_test_3<field_type>();
+BOOST_FIXTURE_TEST_CASE(lookup_test, test_tools::random_test_initializer<field_type>) {
+    auto circuit = circuit_test_3<field_type>(
+        alg_random_engines.template get_alg_engine<field_type>(),
+        generic_random_engine
+    );
     constexpr std::size_t argument_size = 4;
 
     plonk_table_description<field_type> desc(
@@ -993,8 +960,11 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit4_lookup_test)
     using lpc_placeholder_params_type = nil::crypto3::zk::snark::placeholder_params<circuit_params, lpc_scheme_type>;
     using policy_type = zk::snark::detail::placeholder_policy<field_type, circuit_params>;
 
-BOOST_AUTO_TEST_CASE(lookup_test) {
-    auto circuit = circuit_test_4<field_type>(test_global_alg_rnd_engine<field_type>);
+BOOST_FIXTURE_TEST_CASE(lookup_test, test_tools::random_test_initializer<field_type>) {
+    auto circuit = circuit_test_4<field_type>(
+        alg_random_engines.template get_alg_engine<field_type>(),
+        generic_random_engine
+    );
     constexpr std::size_t argument_size = 4;
 
     plonk_table_description<field_type> desc(
@@ -1043,7 +1013,7 @@ BOOST_AUTO_TEST_CASE(lookup_test) {
 
     // Challenge phase
     auto omega = preprocessed_public_data.common_data.basic_domain->get_domain_element(1);
-    typename field_type::value_type y = algebra::random_element<field_type>();
+    typename field_type::value_type y = alg_random_engines.template get_alg_engine<field_type>()();
     typename policy_type::evaluation_map columns_at_y;
     for (std::size_t i = 0; i < placeholder_test_params::witness_columns; i++) {
 
@@ -1142,14 +1112,37 @@ using curve_type = algebra::curves::pallas;
 using field_type = typename curve_type::base_field_type;
 using poseidon_type = hashes::poseidon<nil::crypto3::hashes::detail::mina_poseidon_policy<field_type>>;
 
-using TestFixtures = boost::mpl::list<
-    placeholder_test_fixture<algebra::curves::pallas::base_field_type, poseidon_type, poseidon_type, witness_columns_1, public_columns_1, constant_columns_1, selector_columns_1, rows_amount_1>,
-    placeholder_test_fixture<algebra::curves::pallas::base_field_type, hashes::keccak_1600<512>, hashes::keccak_1600<512>, witness_columns_1, public_columns_1, constant_columns_1, selector_columns_1, rows_amount_1>
-    >;
-BOOST_AUTO_TEST_CASE_TEMPLATE(prover_test, F, TestFixtures) {
-    auto circuit = circuit_test_1<field_type>(test_global_alg_rnd_engine<field_type>);
-    F fixture(circuit, circuit.usable_rows, circuit.table_rows);
-    BOOST_CHECK(fixture.run_test());
+using TestRunners = boost::mpl::list<
+    placeholder_test_runner<
+        algebra::curves::pallas::base_field_type,
+        poseidon_type,
+        poseidon_type,
+        witness_columns_1,
+        public_columns_1,
+        constant_columns_1,
+        selector_columns_1,
+        rows_amount_1
+    >,
+    placeholder_test_runner<
+        algebra::curves::pallas::base_field_type,
+        hashes::keccak_1600<512>,
+        hashes::keccak_1600<512>,
+        witness_columns_1,
+        public_columns_1,
+        constant_columns_1,
+        selector_columns_1,
+        rows_amount_1
+    >
+>;
+
+BOOST_AUTO_TEST_CASE_TEMPLATE(prover_test, TestRunner, TestRunners) {
+    test_tools::random_test_initializer<field_type> random_test_initializer;
+    auto circuit = circuit_test_1<field_type>(
+        random_test_initializer.alg_random_engines.template get_alg_engine<field_type>(),
+        random_test_initializer.generic_random_engine
+    );
+    TestRunner test_runner(circuit, circuit.usable_rows, circuit.table_rows);
+    BOOST_CHECK(test_runner.run_test());
 }
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -1158,13 +1151,26 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit1_goldilocks)
 using field_type = typename algebra::fields::goldilocks64;
 using poseidon_type = hashes::poseidon<nil::crypto3::hashes::detail::mina_poseidon_policy<field_type>>;
 
-using TestFixtures = boost::mpl::list<
-    placeholder_test_fixture<field_type, hashes::keccak_1600<512>, hashes::keccak_1600<512>, witness_columns_1, public_columns_1, constant_columns_1, selector_columns_1, rows_amount_1>
-    >;
-BOOST_AUTO_TEST_CASE_TEMPLATE(prover_test, F, TestFixtures) {
-    auto circuit = circuit_test_1<field_type>(test_global_alg_rnd_engine<field_type>);
-    F fixture(circuit, circuit.usable_rows, circuit.table_rows);
-    BOOST_CHECK(fixture.run_test());
+using TestRunners = boost::mpl::list<
+    placeholder_test_runner<
+        field_type,
+        hashes::keccak_1600<512>,
+        hashes::keccak_1600<512>,
+        witness_columns_1,
+        public_columns_1,
+        constant_columns_1,
+        selector_columns_1,
+        rows_amount_1
+    >
+>;
+BOOST_AUTO_TEST_CASE_TEMPLATE(prover_test, TestRunner, TestRunners) {
+    test_tools::random_test_initializer<field_type> random_test_initializer;
+    auto circuit = circuit_test_1<field_type>(
+        random_test_initializer.alg_random_engines.template get_alg_engine<field_type>(),
+        random_test_initializer.generic_random_engine
+    );
+    TestRunner test_runner(circuit, circuit.usable_rows, circuit.table_rows);
+    BOOST_CHECK(test_runner.run_test());
 }
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -1175,14 +1181,36 @@ using field_type = typename curve_type::base_field_type;
 using poseidon_type = hashes::poseidon<nil::crypto3::hashes::detail::mina_poseidon_policy<field_type>>;
 const size_t usable_rows_3 = 4;
 
-using TestFixtures = boost::mpl::list<
-    placeholder_test_fixture<algebra::curves::pallas::base_field_type, poseidon_type, poseidon_type, witness_columns_3, public_columns_3, constant_columns_3, selector_columns_3, usable_rows_3>,
-    placeholder_test_fixture<algebra::curves::pallas::base_field_type, hashes::keccak_1600<512>, hashes::keccak_1600<512>, witness_columns_3, public_columns_3, constant_columns_3, selector_columns_3, usable_rows_3>
-    >;
-BOOST_AUTO_TEST_CASE_TEMPLATE(prover_test, F, TestFixtures) {
-    auto circuit = circuit_test_3<field_type>(test_global_alg_rnd_engine<field_type>);
-    F fixture(circuit, usable_rows_3, 1 << 3);
-    BOOST_CHECK(fixture.run_test());
+using TestRunners = boost::mpl::list<
+    placeholder_test_runner<
+        algebra::curves::pallas::base_field_type,
+        poseidon_type,
+        poseidon_type,
+        witness_columns_3,
+        public_columns_3,
+        constant_columns_3,
+        selector_columns_3,
+        usable_rows_3
+    >,
+    placeholder_test_runner<
+        algebra::curves::pallas::base_field_type,
+        hashes::keccak_1600<512>,
+        hashes::keccak_1600<512>,
+        witness_columns_3,
+        public_columns_3,
+        constant_columns_3,
+        selector_columns_3,
+        usable_rows_3
+    >
+>;
+BOOST_AUTO_TEST_CASE_TEMPLATE(prover_test, TestRunner, TestRunners) {
+    test_tools::random_test_initializer<field_type> random_test_initializer;
+    auto circuit = circuit_test_3<field_type>(
+        random_test_initializer.alg_random_engines.template get_alg_engine<field_type>(),
+        random_test_initializer.generic_random_engine
+    );
+    TestRunner test_runner(circuit, usable_rows_3, 1 << 3);
+    BOOST_CHECK(test_runner.run_test());
 }
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -1193,14 +1221,18 @@ using field_type = typename curve_type::base_field_type;
 using poseidon_type = hashes::poseidon<nil::crypto3::hashes::detail::mina_poseidon_policy<field_type>>;
 const size_t usable_rows_4 = 5;
 
-using TestFixtures = boost::mpl::list<
-    placeholder_test_fixture<algebra::curves::pallas::base_field_type, poseidon_type, poseidon_type, witness_columns_4, public_columns_4, constant_columns_4, selector_columns_4, usable_rows_4>,
-    placeholder_test_fixture<algebra::curves::pallas::base_field_type, hashes::keccak_1600<512>, hashes::keccak_1600<512>, witness_columns_4, public_columns_4, constant_columns_4, selector_columns_4, usable_rows_4>
+using TestRunners = boost::mpl::list<
+    placeholder_test_runner<algebra::curves::pallas::base_field_type, poseidon_type, poseidon_type, witness_columns_4, public_columns_4, constant_columns_4, selector_columns_4, usable_rows_4>,
+    placeholder_test_runner<algebra::curves::pallas::base_field_type, hashes::keccak_1600<512>, hashes::keccak_1600<512>, witness_columns_4, public_columns_4, constant_columns_4, selector_columns_4, usable_rows_4>
     >;
-BOOST_AUTO_TEST_CASE_TEMPLATE(prover_test, F, TestFixtures) {
-    auto circuit = circuit_test_4<field_type>(test_global_alg_rnd_engine<field_type>);
-    F fixture(circuit, usable_rows_4, 1 << 3);
-    BOOST_CHECK(fixture.run_test());
+BOOST_AUTO_TEST_CASE_TEMPLATE(prover_test, TestRunner, TestRunners) {
+    test_tools::random_test_initializer<field_type> random_test_initializer;
+    auto circuit = circuit_test_4<field_type>(
+        random_test_initializer.alg_random_engines.template get_alg_engine<field_type>(),
+        random_test_initializer.generic_random_engine
+    );
+    TestRunner test_runner(circuit, usable_rows_4, 1 << 3);
+    BOOST_CHECK(test_runner.run_test());
 }
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -1209,14 +1241,18 @@ using curve_type = algebra::curves::pallas;
 using field_type = typename curve_type::base_field_type;
 using poseidon_type = hashes::poseidon<nil::crypto3::hashes::detail::mina_poseidon_policy<field_type>>;
 
-using TestFixtures = boost::mpl::list<
-    placeholder_test_fixture<algebra::curves::pallas::base_field_type, poseidon_type, poseidon_type, witness_columns_5, public_columns_5, constant_columns_5, selector_columns_5, usable_rows_5, false, 10>,
-    placeholder_test_fixture<algebra::curves::pallas::base_field_type, hashes::keccak_1600<512>, hashes::keccak_1600<512>, witness_columns_5, public_columns_5, constant_columns_5, selector_columns_5, usable_rows_5, false, 10>
+using TestRunners = boost::mpl::list<
+    placeholder_test_runner<algebra::curves::pallas::base_field_type, poseidon_type, poseidon_type, witness_columns_5, public_columns_5, constant_columns_5, selector_columns_5, usable_rows_5, false, 10>,
+    placeholder_test_runner<algebra::curves::pallas::base_field_type, hashes::keccak_1600<512>, hashes::keccak_1600<512>, witness_columns_5, public_columns_5, constant_columns_5, selector_columns_5, usable_rows_5, false, 10>
 >;
-BOOST_AUTO_TEST_CASE_TEMPLATE(prover_test, F, TestFixtures) {
-    auto circuit = circuit_test_5<field_type>(test_global_alg_rnd_engine<field_type>);
-    F fixture(circuit, circuit.usable_rows, circuit.table_rows);
-    BOOST_CHECK(fixture.run_test());
+BOOST_AUTO_TEST_CASE_TEMPLATE(prover_test, TestRunner, TestRunners) {
+    test_tools::random_test_initializer<field_type> random_test_initializer;
+    auto circuit = circuit_test_5<field_type>(
+        random_test_initializer.alg_random_engines.template get_alg_engine<field_type>(),
+        random_test_initializer.generic_random_engine
+    );
+    TestRunner test_runner(circuit, circuit.usable_rows, circuit.table_rows);
+    BOOST_CHECK(test_runner.run_test());
 }
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -1226,14 +1262,18 @@ using curve_type = algebra::curves::pallas;
 using field_type = typename curve_type::base_field_type;
 using poseidon_type = hashes::poseidon<nil::crypto3::hashes::detail::mina_poseidon_policy<field_type>>;
 
-using TestFixtures = boost::mpl::list<
-    placeholder_test_fixture<algebra::curves::pallas::base_field_type, poseidon_type, poseidon_type, witness_columns_6, public_columns_6, constant_columns_6, selector_columns_6, usable_rows_6, true>,
-    placeholder_test_fixture<algebra::curves::pallas::base_field_type, hashes::keccak_1600<512>, hashes::keccak_1600<512>, witness_columns_6, public_columns_6, constant_columns_6, selector_columns_6, usable_rows_6, true>
-    >;
-BOOST_AUTO_TEST_CASE_TEMPLATE(prover_test, F, TestFixtures) {
-    auto circuit = circuit_test_6<field_type>(test_global_alg_rnd_engine<field_type>);
-    F fixture(circuit, circuit.usable_rows, circuit.table_rows);
-    BOOST_CHECK(fixture.run_test());
+using TestRunners = boost::mpl::list<
+    placeholder_test_runner<algebra::curves::pallas::base_field_type, poseidon_type, poseidon_type, witness_columns_6, public_columns_6, constant_columns_6, selector_columns_6, usable_rows_6, true>,
+    placeholder_test_runner<algebra::curves::pallas::base_field_type, hashes::keccak_1600<512>, hashes::keccak_1600<512>, witness_columns_6, public_columns_6, constant_columns_6, selector_columns_6, usable_rows_6, true>
+>;
+BOOST_AUTO_TEST_CASE_TEMPLATE(prover_test, TestRunner, TestRunners) {
+    test_tools::random_test_initializer<field_type> random_test_initializer;
+    auto circuit = circuit_test_6<field_type>(
+        random_test_initializer.alg_random_engines.template get_alg_engine<field_type>(),
+        random_test_initializer.generic_random_engine
+    );
+    TestRunner test_runner(circuit, circuit.usable_rows, circuit.table_rows);
+    BOOST_CHECK(test_runner.run_test());
 }
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -1243,17 +1283,21 @@ using curve_type = algebra::curves::pallas;
 using field_type = typename curve_type::base_field_type;
 using poseidon_type = hashes::poseidon<nil::crypto3::hashes::detail::mina_poseidon_policy<field_type>>;
 
-using TestFixtures = boost::mpl::list<
-    placeholder_test_fixture<algebra::curves::pallas::base_field_type, poseidon_type, poseidon_type, witness_columns_7, public_columns_7, constant_columns_7, selector_columns_7, usable_rows_7, true, 8>,
-    placeholder_test_fixture<algebra::curves::pallas::base_field_type, hashes::keccak_1600<512>, hashes::keccak_1600<512>, witness_columns_7, public_columns_7, constant_columns_7, selector_columns_7, usable_rows_7, true, 8>,
-    placeholder_test_fixture<algebra::curves::pallas::base_field_type, hashes::keccak_1600<512>, hashes::keccak_1600<512>, witness_columns_7, public_columns_7, constant_columns_7, selector_columns_7, usable_rows_7, true, 10>,
-    placeholder_test_fixture<algebra::curves::pallas::base_field_type, hashes::keccak_1600<512>, hashes::keccak_1600<512>, witness_columns_7, public_columns_7, constant_columns_7, selector_columns_7, usable_rows_7, true, 30>,
-    placeholder_test_fixture<algebra::curves::pallas::base_field_type, hashes::keccak_1600<512>, hashes::keccak_1600<512>, witness_columns_7, public_columns_7, constant_columns_7, selector_columns_7, usable_rows_7, true, 50>
+using TestRunners = boost::mpl::list<
+    placeholder_test_runner<algebra::curves::pallas::base_field_type, poseidon_type, poseidon_type, witness_columns_7, public_columns_7, constant_columns_7, selector_columns_7, usable_rows_7, true, 8>,
+    placeholder_test_runner<algebra::curves::pallas::base_field_type, hashes::keccak_1600<512>, hashes::keccak_1600<512>, witness_columns_7, public_columns_7, constant_columns_7, selector_columns_7, usable_rows_7, true, 8>,
+    placeholder_test_runner<algebra::curves::pallas::base_field_type, hashes::keccak_1600<512>, hashes::keccak_1600<512>, witness_columns_7, public_columns_7, constant_columns_7, selector_columns_7, usable_rows_7, true, 10>,
+    placeholder_test_runner<algebra::curves::pallas::base_field_type, hashes::keccak_1600<512>, hashes::keccak_1600<512>, witness_columns_7, public_columns_7, constant_columns_7, selector_columns_7, usable_rows_7, true, 30>,
+    placeholder_test_runner<algebra::curves::pallas::base_field_type, hashes::keccak_1600<512>, hashes::keccak_1600<512>, witness_columns_7, public_columns_7, constant_columns_7, selector_columns_7, usable_rows_7, true, 50>
     >;
-BOOST_AUTO_TEST_CASE_TEMPLATE(prover_test, F, TestFixtures) {
-    auto circuit = circuit_test_7<field_type>(test_global_alg_rnd_engine<field_type>);
-    F fixture(circuit, circuit.usable_rows, circuit.table_rows);
-    BOOST_CHECK(fixture.run_test());
+BOOST_AUTO_TEST_CASE_TEMPLATE(prover_test, TestRunner, TestRunners) {
+    test_tools::random_test_initializer<field_type> random_test_initializer;
+    auto circuit = circuit_test_7<field_type>(
+        random_test_initializer.alg_random_engines.template get_alg_engine<field_type>(),
+        random_test_initializer.generic_random_engine
+    );
+    TestRunner test_runner(circuit, circuit.usable_rows, circuit.table_rows);
+    BOOST_CHECK(test_runner.run_test());
 }
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -1269,7 +1313,7 @@ template<
     std::size_t usable_rows_amount,
     std::size_t permutation,
     bool UseGrinding = false>
-struct placeholder_kzg_test_fixture : public test_initializer {
+struct placeholder_kzg_test_runner {
     using field_type = typename curve_type::scalar_field_type;
 
     struct placeholder_test_params {
@@ -1296,15 +1340,19 @@ struct placeholder_kzg_test_fixture : public test_initializer {
         placeholder_circuit_params<field_type>,
         usable_rows_amount>;
 
-    placeholder_kzg_test_fixture()
+    placeholder_kzg_test_runner()
         : desc(WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns)
     {
     }
 
     bool run_test() {
-        test_initializer::setup();
-        typename field_type::value_type pi0 = test_global_alg_rnd_engine<field_type>();
-        circuit_type circuit = circuit_test_t<field_type>(pi0, test_global_alg_rnd_engine<field_type>);
+        test_tools::random_test_initializer<field_type> random_test_initializer;
+        auto pi0 = random_test_initializer.alg_random_engines.template get_alg_engine<field_type>()();
+        auto circuit = circuit_test_t<field_type>(
+            pi0,
+            random_test_initializer.alg_random_engines.template get_alg_engine<field_type>(),
+            random_test_initializer.generic_random_engine
+        );
         desc.rows_amount = circuit.table_rows;
         desc.usable_rows_amount = circuit.usable_rows;
         std::size_t table_rows_log = std::log2(circuit.table_rows);
@@ -1336,7 +1384,6 @@ struct placeholder_kzg_test_fixture : public test_initializer {
         verifier_res = placeholder_verifier<field_type, kzg_placeholder_params_type>::process(
             kzg_preprocessed_public_data.common_data, kzg_proof, desc, constraint_system, kzg_scheme
         );
-        test_initializer::teardown();
         return verifier_res;
     }
 
@@ -1346,8 +1393,8 @@ struct placeholder_kzg_test_fixture : public test_initializer {
 
 BOOST_AUTO_TEST_SUITE(placeholder_circuit2_kzg)
 
-    using TestFixtures = boost::mpl::list<
-    placeholder_kzg_test_fixture<
+    using TestRunners = boost::mpl::list<
+    placeholder_kzg_test_runner<
         algebra::curves::bls12<381>,
         hashes::keccak_1600<256>,
         hashes::keccak_1600<256>,
@@ -1358,7 +1405,7 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit2_kzg)
         usable_rows_t,
         true>
         /*
-    , placeholder_kzg_test_fixture<
+    , placeholder_kzg_test_runner<
         algebra::curves::alt_bn128_254,
         hashes::keccak_1600<256>,
         hashes::keccak_1600<256>,
@@ -1368,7 +1415,7 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit2_kzg)
         selector_columns_t,
         usable_rows_t,
         4, true>*/
-    , placeholder_kzg_test_fixture<
+    , placeholder_kzg_test_runner<
         algebra::curves::mnt4_298,
         hashes::keccak_1600<256>,
         hashes::keccak_1600<256>,
@@ -1378,7 +1425,7 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit2_kzg)
         selector_columns_t,
         usable_rows_t,
         true>
-    , placeholder_kzg_test_fixture<
+    , placeholder_kzg_test_runner<
         algebra::curves::mnt6_298,
         hashes::keccak_1600<256>,
         hashes::keccak_1600<256>,
@@ -1389,7 +1436,7 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit2_kzg)
         usable_rows_t,
         true>
         /*, -- Not yet implemented
-    placeholder_kzg_test_fixture<
+    placeholder_kzg_test_runner<
         algebra::curves::mnt6_298,
         hashes::poseidon<nil::crypto3::hashes::detail::mina_poseidon_policy<algebra::curves::mnt6_298>>,
         hashes::poseidon<nil::crypto3::hashes::detail::mina_poseidon_policy<algebra::curves::mnt6_298>>,
@@ -1403,9 +1450,9 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit2_kzg)
         */
     >;
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(prover_test, F, TestFixtures) {
-    F fixture;
-    BOOST_CHECK(fixture.run_test());
+BOOST_AUTO_TEST_CASE_TEMPLATE(prover_test, TestRunner, TestRunners) {
+    TestRunner test_runner;
+    BOOST_CHECK(test_runner.run_test());
 }
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -1421,7 +1468,7 @@ template<
     std::size_t usable_rows_amount,
     std::size_t permutation,
     bool UseGrinding = false>
-struct placeholder_kzg_test_fixture_v2 : public test_initializer {
+struct placeholder_kzg_test_runner_v2 {
     using field_type = typename curve_type::scalar_field_type;
 
     struct placeholder_test_params {
@@ -1448,15 +1495,19 @@ struct placeholder_kzg_test_fixture_v2 : public test_initializer {
         placeholder_circuit_params<field_type>,
         usable_rows_amount>;
 
-    placeholder_kzg_test_fixture_v2()
+    placeholder_kzg_test_runner_v2()
         : desc(WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns)
     {
     }
 
     bool run_test() {
-        test_initializer::setup();
-        typename field_type::value_type pi0 = test_global_alg_rnd_engine<field_type>();
-        circuit_type circuit = circuit_test_t<field_type>(pi0, test_global_alg_rnd_engine<field_type>);
+        test_tools::random_test_initializer<field_type> random_test_initializer;
+        auto pi0 = random_test_initializer.alg_random_engines.template get_alg_engine<field_type>()();
+        auto circuit = circuit_test_t<field_type>(
+            pi0,
+            random_test_initializer.alg_random_engines.template get_alg_engine<field_type>(),
+            random_test_initializer.generic_random_engine
+        );
         desc.rows_amount = circuit.table_rows;
         desc.usable_rows_amount = circuit.usable_rows;
         std::size_t table_rows_log = std::log2(circuit.table_rows);
@@ -1488,7 +1539,6 @@ struct placeholder_kzg_test_fixture_v2 : public test_initializer {
         verifier_res = placeholder_verifier<field_type, kzg_placeholder_params_type>::process(
                 kzg_preprocessed_public_data.common_data, kzg_proof, desc, constraint_system, kzg_scheme
                 );
-        test_initializer::teardown();
         return verifier_res;
     }
 
@@ -1498,8 +1548,8 @@ struct placeholder_kzg_test_fixture_v2 : public test_initializer {
 
 BOOST_AUTO_TEST_SUITE(placeholder_circuit2_kzg_v2)
 
-    using TestFixtures = boost::mpl::list<
-    placeholder_kzg_test_fixture_v2<
+    using TestRunners = boost::mpl::list<
+    placeholder_kzg_test_runner_v2<
         algebra::curves::bls12_381,
         hashes::keccak_1600<256>,
         hashes::keccak_1600<256>,
@@ -1509,7 +1559,7 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit2_kzg_v2)
         selector_columns_t,
         usable_rows_t,
         true>
-/*  , placeholder_kzg_test_fixture<
+/*  , placeholder_kzg_test_runner<
         algebra::curves::alt_bn128_254,
         hashes::keccak_1600<256>,
         hashes::keccak_1600<256>,
@@ -1519,7 +1569,7 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit2_kzg_v2)
         selector_columns_t,
         usable_rows_t,
         4, true>*/
-    , placeholder_kzg_test_fixture<
+    , placeholder_kzg_test_runner<
         algebra::curves::mnt4_298,
         hashes::keccak_1600<256>,
         hashes::keccak_1600<256>,
@@ -1529,7 +1579,7 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit2_kzg_v2)
         selector_columns_t,
         usable_rows_t,
         true>
-    , placeholder_kzg_test_fixture_v2<
+    , placeholder_kzg_test_runner_v2<
         algebra::curves::mnt6_298,
         hashes::keccak_1600<256>,
         hashes::keccak_1600<256>,
@@ -1540,7 +1590,7 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit2_kzg_v2)
         usable_rows_t,
         true>
         /*, -- Not yet implemented
-    placeholder_kzg_test_fixture<
+    placeholder_kzg_test_runner<
         algebra::curves::mnt6_298,
         hashes::poseidon<nil::crypto3::hashes::detail::mina_poseidon_policy<algebra::curves::mnt6_298>>,
         hashes::poseidon<nil::crypto3::hashes::detail::mina_poseidon_policy<algebra::curves::mnt6_298>>,
@@ -1554,10 +1604,9 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit2_kzg_v2)
         */
     >;
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(prover_test, F, TestFixtures) {
-    F fixture;
-    BOOST_CHECK(fixture.run_test());
+BOOST_AUTO_TEST_CASE_TEMPLATE(prover_test, TestRunner, TestRunners) {
+    TestRunner test_runner;
+    BOOST_CHECK(test_runner.run_test());
 }
 
 BOOST_AUTO_TEST_SUITE_END()
-
