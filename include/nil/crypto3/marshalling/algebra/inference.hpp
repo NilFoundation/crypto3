@@ -31,6 +31,9 @@
 
 #include <nil/crypto3/algebra/type_traits.hpp>
 
+#include <nil/marshalling/field_type.hpp>
+#include <nil/marshalling/options.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace marshalling {
