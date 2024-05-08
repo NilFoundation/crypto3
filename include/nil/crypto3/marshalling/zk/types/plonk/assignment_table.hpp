@@ -36,6 +36,7 @@
 #include <nil/marshalling/types/integral.hpp>
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/options.hpp>
+#include <nil/crypto3/marshalling/algebra/types/field_element.hpp>
 
 namespace nil {
     namespace crypto3 {
