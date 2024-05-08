@@ -67,3 +67,21 @@ add_subdirectories("${CMAKE_CURRENT_LIST_DIR}/libs/marshalling")
 
 configure_file(${CMAKE_CURRENT_LIST_DIR}/docs/doxygen/${CMAKE_WORKSPACE_NAME}.doxyfile.in
     ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_WORKSPACE_NAME}.doxyfile @ONLY)
+
+# Configure package file to be able to import crypto3 headers
+# TODO: remove it after resolving cyclical dependencies in crypto3 modules
+include(CMakePackageConfigHelpers)
+include(GNUInstallDirs)
+set(CONFIG_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/crypto3)
+
+configure_package_config_file(
+    cmake/Config.cmake.in
+    crypto3Config.cmake
+    INSTALL_DESTINATION ${CONFIG_DIR}
+)
+
+install(
+    FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/crypto3Config.cmake
+    DESTINATION ${CONFIG_DIR}
+)
