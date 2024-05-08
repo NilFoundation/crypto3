@@ -41,7 +41,7 @@ namespace nil {
                     struct short_weierstrass_element_g1_jacobian_with_a4_0_add_2007_bl {
 
                         template<typename ElementType>
-                        constexpr static inline ElementType process(const ElementType &first,
+                        constexpr static inline void process(ElementType &first,
                                                                     const ElementType &second) {
 
                             using field_value_type = typename ElementType::field_type::value_type;
@@ -58,13 +58,13 @@ namespace nil {
                             field_value_type J = H * I;                         // J = H * I
                             field_value_type r = S2_minus_S1 + S2_minus_S1;     // r = 2 * (S2-S1)
                             field_value_type V = U1 * I;                        // V = U1 * I
-                            field_value_type X3 = r.squared() - J - (V + V);    // X3 = r^2 - J - 2 * V
                             field_value_type S1_J = S1 * J;
-                            field_value_type Y3 = r * (V - X3) - (S1_J + S1_J);    // Y3 = r * (V-X3)-2 S1 J
-                            field_value_type Z3 =
+
+                            first.X = r.squared() - J - (V + V);    // X3 = r^2 - J - 2 * V
+                            first.Y = r * (V - first.X) - (S1_J + S1_J);    // Y3 = r * (V-X3)-2 S1 J
+                            first.Z =
                                 ((first.Z + second.Z).squared() - Z1Z1 - Z2Z2) * H;    // Z3 = ((Z1+Z2)^2-Z1Z1-Z2Z2) * H
 
-                            return ElementType(X3, Y3, Z3);
                         }
                     };
 

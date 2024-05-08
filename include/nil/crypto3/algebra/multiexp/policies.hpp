@@ -135,7 +135,7 @@ namespace nil {
                         for (std::size_t k = num_groups - 1; k <= num_groups; k--) {
                             if (result_nonzero) {
                                 for (std::size_t i = 0; i < c; i++) {
-                                    result = result.doubled();
+                                    result.double_inplace();
                                 }
                             }
 

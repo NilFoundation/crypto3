@@ -72,7 +72,8 @@ namespace nil {
             BOOST_TTI_HAS_STATIC_MEMBER_FUNCTION(one)
             BOOST_TTI_HAS_FUNCTION(is_zero)
             BOOST_TTI_HAS_FUNCTION(is_well_formed)
-            BOOST_TTI_HAS_FUNCTION(doubled)
+            BOOST_TTI_HAS_FUNCTION(double_inplace)
+            BOOST_TTI_HAS_FUNCTION(mixed_add)
 
             template<typename T>
             struct is_curve {
@@ -118,7 +119,12 @@ namespace nil {
                     has_type_field_type<T>::value && has_type_group_type<T>::value &&
                     has_static_member_function_zero<T, T>::value && has_static_member_function_one<T, T>::value &&
                     has_function_is_zero<T, bool>::value && has_function_is_well_formed<T, bool>::value &&
-                    has_function_doubled<T, T>::value;
+                    has_function_double_inplace<T, T&>::value;
+            };
+
+            template<typename T>
+            struct has_mixed_add {
+                static const bool value = has_function_mixed_add<T, void, boost::mpl::vector<T const&>>::value;
             };
 
             namespace curves {

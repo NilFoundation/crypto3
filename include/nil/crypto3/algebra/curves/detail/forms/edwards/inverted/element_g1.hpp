@@ -161,7 +161,16 @@ namespace nil {
                          * @return true if element from group G1 lies on the elliptic curve
                          */
                         constexpr bool is_well_formed() const {
-                            assert(false && "Not implemented yet.");
+                            if (this->is_zero()) {
+                                return true;
+                            } else {
+
+                                const auto X2 = this->X.squared();
+                                const auto Y2 = this->Y.squared();
+                                const auto Z2 = this->Z.squared();
+
+                                return (params_type::a * Z2*Y2 + Z2*X2 == X2*Y2 + params_type::d * Z2*Z2);
+                            }
                         }
 
                         /*************************  Reducing operations  ***********************************/
@@ -182,7 +191,8 @@ namespace nil {
                                 return result_type::zero();
                             }
 
-                            return result_type(Z / X, Z / Y);    //  x=Z/X, y=Z/Y
+                            //  x=Z/X, y=Z/Y
+                            return result_type(Z * X.inversed(), Z * Y.inversed());
                         }
 
                         /*************************  Arithmetic operations  ***********************************/
@@ -205,7 +215,6 @@ namespace nil {
                         }
 
                         constexpr curve_element operator+(const curve_element &other) const {
-                            // handle special cases having to do with O
                             if (this->is_zero()) {
                                 return other;
                             }
@@ -214,11 +223,15 @@ namespace nil {
                                 return (*this);
                             }
 
+                            curve_element result = *this;
+
                             if (*this == other) {
-                                return this->doubled();
+                                result.double_inplace();
+                                return result;
                             }
 
-                            return common_addition_processor::process(*this, other);
+                            common_addition_processor::process(result, other);
+                            return result;
                         }
 
                         constexpr curve_element& operator+=(const curve_element &other) {
@@ -228,9 +241,9 @@ namespace nil {
                             } else if (other.is_zero()) {
                                 // Do nothing.
                             } else if (*this == other) {
-                                *this = this->doubled();
+                                common_doubling_processor::process(*this);
                             } else {
-                                *this = common_addition_processor::process(*this, other);
+                                common_addition_processor::process(*this, other);
                             }
                             return *this;
                         }
@@ -247,27 +260,12 @@ namespace nil {
                             return (*this) += (-other);
                         }
 
-                        template<typename Backend,
-                             boost::multiprecision::expression_template_option ExpressionTemplates>
-                        constexpr curve_element& operator*=(const boost::multiprecision::number<Backend, ExpressionTemplates> &right) {
-                            (*this) = (*this) * right;
-                            return *this;
-                        }
-
-                        template<typename FieldValueType>
-                        typename std::enable_if<is_field<typename FieldValueType::field_type>::value &&
-                                                !is_extended_field<typename FieldValueType::field_type>::value,
-                                                curve_element>::type
-                            operator*=(const FieldValueType &right) {
-                                return (*this) *= right.data;
-                        }
-
                         /** @brief
                          *
                          * @return doubled element from group G1
                          */
-                        constexpr curve_element doubled() const {
-                            return common_doubling_processor::process(*this);
+                        constexpr void double_inplace() {
+                            common_doubling_processor::process(*this);
                         }
 
                         /** @brief
@@ -275,18 +273,15 @@ namespace nil {
                          * “Mixed addition” refers to the case Z2 known to be 1.
                          * @return addition of two elements from group G1
                          */
-                        curve_element mixed_add(const curve_element &other) const {
-
+                        constexpr void mixed_add(const curve_element &other) {
                             // handle special cases having to do with O
                             if (this->is_zero()) {
-                                return other;
+                                return;
                             }
-
                             if (other.is_zero()) {
-                                return *this;
+                                return;
                             }
-
-                            return mixed_addition_processor::process(*this, other);
+                            mixed_addition_processor::process(*this, other);
                         }
 
                         friend std::ostream& operator<<(std::ostream& os, curve_element const& e)

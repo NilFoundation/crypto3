@@ -57,9 +57,9 @@ namespace nil {
 
                             field_value_type tv1 =
                                 (suite_type::Z.pow(2) * u.pow(4) + suite_type::Z * u.pow(2)).inversed();
-                            field_value_type x1 = (-suite_type::Bi / suite_type::Ai) * (one + tv1);
+                            field_value_type x1 = (-suite_type::Bi * suite_type::Ai.inversed()) * (one + tv1);
                             if (tv1.is_zero()) {
-                                x1 = suite_type::Bi / (suite_type::Z * suite_type::Ai);
+                                x1 = suite_type::Bi * (suite_type::Z * suite_type::Ai).inversed();
                             }
                             field_value_type gx1 = x1.pow(3) + suite_type::Ai * x1 + suite_type::Bi;
                             field_value_type x2 = suite_type::Z * u.pow(2) * x1;

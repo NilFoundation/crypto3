@@ -42,8 +42,42 @@ namespace nil {
                     template<typename GroupValueType,
                              typename Backend,
                              boost::multiprecision::expression_template_option ExpressionTemplates>
-                    constexpr GroupValueType
-                        scalar_mul(const GroupValueType &base,
+                    typename std::enable_if<
+                    has_mixed_add<GroupValueType>::value, GroupValueType>::type
+                    constexpr scalar_mul(const GroupValueType &base,
+                                   const boost::multiprecision::number<Backend, ExpressionTemplates> &scalar) {
+                        if (scalar.is_zero()) {
+                            return GroupValueType::zero();
+                        }
+                        GroupValueType result;
+
+                        bool found_one = false;
+                        bool use_mixed_add = base.Z.is_one();
+
+                        for (auto i = static_cast<std::int64_t>(boost::multiprecision::msb(scalar)); i >= 0; --i) {
+                            if (found_one) {
+                                result.double_inplace();
+                            }
+
+                            if (boost::multiprecision::bit_test(scalar, i)) {
+                                found_one = true;
+                                if(use_mixed_add) {
+                                    result.mixed_add(base);
+                                } else {
+                                    result += base;
+                                }
+                            }
+                        }
+
+                        return result;
+                    }
+
+                    template<typename GroupValueType,
+                             typename Backend,
+                             boost::multiprecision::expression_template_option ExpressionTemplates>
+                    typename std::enable_if<
+                    !has_mixed_add<GroupValueType>::value, GroupValueType>::type
+                    constexpr scalar_mul(const GroupValueType &base,
                                    const boost::multiprecision::number<Backend, ExpressionTemplates> &scalar) {
                         if (scalar.is_zero()) {
                             return GroupValueType::zero();
@@ -53,16 +87,81 @@ namespace nil {
                         bool found_one = false;
                         for (auto i = static_cast<std::int64_t>(boost::multiprecision::msb(scalar)); i >= 0; --i) {
                             if (found_one) {
-                                result = result.doubled();
+                                result.double_inplace();
                             }
 
                             if (boost::multiprecision::bit_test(scalar, i)) {
                                 found_one = true;
-                                result = result + base;
+                                result += base;
                             }
                         }
-
                         return result;
+                    }
+
+                    template<typename curve_element_type, typename scalar_value_type>
+                    typename std::enable_if<
+                    has_mixed_add<curve_element_type>::value, curve_element_type>::type
+                    & operator *= (
+                            curve_element_type& point,
+                            scalar_value_type const& scalar)
+                    {
+                        if (scalar.is_zero()) {
+                            point = curve_element_type::zero();
+                            return point;
+                        }
+
+                        bool found_one = false;
+                        bool use_mixed_add = point.Z.is_one();
+                        auto base = point;
+
+                        for (auto i = static_cast<std::int64_t>(boost::multiprecision::msb(scalar.data)); i >= 0; --i) {
+                            if (found_one) {
+                                point.double_inplace();
+                            }
+
+                            if (boost::multiprecision::bit_test(scalar.data, i)) {
+                                if (found_one) {
+                                    if(use_mixed_add) {
+                                        point.mixed_add(base);
+                                    } else {
+                                        point += base;
+                                    }
+                                }
+                                found_one = true;
+                            }
+                        }
+                        return point;
+                    }
+
+
+                    template<typename curve_element_type, typename scalar_value_type>
+                    typename std::enable_if<
+                    !has_mixed_add<curve_element_type>::value, curve_element_type>::type
+                    & operator *= (
+                            curve_element_type& point,
+                            scalar_value_type const& scalar)
+                    {
+                        if (scalar.is_zero()) {
+                            point = curve_element_type::zero();
+                            return point;
+                        }
+
+                        bool found_one = false;
+                        auto base = point;
+
+                        for (auto i = static_cast<std::int64_t>(boost::multiprecision::msb(scalar.data)); i >= 0; --i) {
+                            if (found_one) {
+                                point.double_inplace();
+                            }
+
+                            if (boost::multiprecision::bit_test(scalar.data, i)) {
+                                if (found_one) {
+                                    point += base;
+                                }
+                                found_one = true;
+                            }
+                        }
+                        return point;
                     }
 
                     template<typename GroupValueType,
@@ -77,41 +176,26 @@ namespace nil {
                     template<typename GroupValueType,
                              typename Backend,
                              boost::multiprecision::expression_template_option ExpressionTemplates>
-                    constexpr GroupValueType
-                        operator*(const GroupValueType &left,
-                                  const boost::multiprecision::number<Backend, ExpressionTemplates> &right) {
-
+                    typename std::enable_if<
+                        is_curve_group<typename GroupValueType::group_type>::value &&
+                        !is_field<typename GroupValueType::group_type>::value,
+                        GroupValueType>::type
+                    constexpr operator*(const GroupValueType &left,
+                            const boost::multiprecision::number<Backend, ExpressionTemplates> &right) {
                         return scalar_mul(left, right);
                     }
 
                     template<typename GroupValueType,
                              typename Backend,
                              boost::multiprecision::expression_template_option ExpressionTemplates>
-                    constexpr GroupValueType operator*(const boost::multiprecision::number<Backend, ExpressionTemplates> &left,
-                                                       const GroupValueType &right) {
-
-                        return right * left;
+                    typename std::enable_if<
+                        is_curve_group<typename GroupValueType::group_type>::value &&
+                        !is_field<typename GroupValueType::group_type>::value,
+                        GroupValueType>::type
+                    constexpr operator*(const boost::multiprecision::number<Backend, ExpressionTemplates> &left,
+                            const GroupValueType &right) {
+                        return scalar_mul(right, left);
                     }
-
-                    /*template<typename GroupValueType, typename =
-                        typename std::enable_if<is_curve_group<typename
-                    GroupValueType::group_type>::value &&
-                                                !is_field<typename
-                    GroupValueType::group_type>::value>::type> GroupValueType operator*( const GroupValueType &left,
-                        const typename GroupValueType::underlying_field_type::integral_type &right) {
-
-                        return scalar_mul(left, right);
-                    }
-
-                    template<typename GroupValueType, typename =
-                        typename std::enable_if<is_curve_group<typename
-                    GroupValueType::group_type>::value &&
-                                                !is_field<typename
-                    GroupValueType::group_type>::value>::type> GroupValueType operator*( const typename
-                    GroupValueType::underlying_field_type::integral_type &left, const GroupValueType &right) {
-
-                        return right * left;
-                    }*/
 
                     template<typename GroupValueType, typename FieldValueType>
                     typename std::enable_if<is_curve_group<typename GroupValueType::group_type>::value &&

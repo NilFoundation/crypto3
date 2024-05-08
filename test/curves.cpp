@@ -100,24 +100,28 @@ enum curve_operation_test_points : std::size_t {
 template<typename CurveGroup>
 void check_curve_operations(const std::vector<typename CurveGroup::value_type> &points,
                             const std::vector<std::size_t> &constants) {
-    using integral_type = typename CurveGroup::field_type::value_type::integral_type;
+    using scalar = typename CurveGroup::params_type::scalar_field_type::value_type;
 
     BOOST_CHECK_EQUAL(points[p1] + CurveGroup::value_type::zero(), points[p1]);
     BOOST_CHECK_EQUAL(points[p1] - CurveGroup::value_type::zero(), points[p1]);
     BOOST_CHECK_EQUAL(points[p1] - points[p1], CurveGroup::value_type::zero());
-    BOOST_CHECK_EQUAL(points[p1] * static_cast<integral_type>(0u), CurveGroup::value_type::zero());
+    BOOST_CHECK_EQUAL(points[p1] * static_cast<scalar>(0u), CurveGroup::value_type::zero());
 
     BOOST_CHECK_EQUAL(points[p1] + points[p2], points[p1_plus_p2]);
     BOOST_CHECK_EQUAL(points[p1] - points[p2], points[p1_minus_p2]);
-    BOOST_CHECK_EQUAL(points[p1].doubled(), points[p1_dbl]);
-    BOOST_CHECK_EQUAL(points[p1] * static_cast<integral_type>(constants[C1]), points[p1_mul_C1]);
-    BOOST_CHECK_EQUAL((points[p2] * static_cast<integral_type>(constants[C1])) +
-                          (points[p2] * static_cast<integral_type>(constants[C2])),
+    typename CurveGroup::value_type p_copy = points[p1];
+    p_copy.double_inplace();
+    BOOST_CHECK_EQUAL(p_copy, points[p1_dbl]);
+    BOOST_CHECK_EQUAL(points[p1] * static_cast<scalar>(constants[C1]), points[p1_mul_C1]);
+    BOOST_CHECK_EQUAL((points[p2] * static_cast<scalar>(constants[C1])) +
+                          (points[p2] * static_cast<scalar>(constants[C2])),
                       points[p2_mul_C1_plus_p2_mul_C2]);
-    BOOST_CHECK_EQUAL((points[p2] * static_cast<integral_type>(constants[C1])) +
-                          (points[p2] * static_cast<integral_type>(constants[C2])),
-                      points[p2] * static_cast<integral_type>(constants[C1] + constants[C2]));
-    BOOST_CHECK_EQUAL(points[p2].mixed_add(points[p1_to_affine]), points[p1_mixed_add_p2]);
+    BOOST_CHECK_EQUAL((points[p2] * static_cast<scalar>(constants[C1])) +
+                          (points[p2] * static_cast<scalar>(constants[C2])),
+                      points[p2] * static_cast<scalar>(constants[C1] + constants[C2]));
+    p_copy = points[p2];
+    p_copy.mixed_add(points[p1_to_affine]);
+    BOOST_CHECK_EQUAL(p_copy, points[p1_mixed_add_p2]);
     // typename CurveGroup::value_type p1_copy = points[p1].to_affine();
     BOOST_CHECK_EQUAL(points[p1].to_affine().X, points[p1_to_affine].to_affine().X);
     BOOST_CHECK_EQUAL(points[p1].to_affine().Y, points[p1_to_affine].to_affine().Y);
@@ -134,33 +138,38 @@ void check_curve_operations(const std::vector<typename CurveGroup::value_type> &
     BOOST_CHECK_EQUAL(result, points[p1_minus_p2]);
 
     result = points[p1];
-    result *= static_cast<integral_type>(constants[C1]);
+    result *= static_cast<scalar>(constants[C1]);
     BOOST_CHECK_EQUAL(result, points[p1_mul_C1]);
 
     result = points[p2];
-    result *= static_cast<integral_type>(constants[C1]);
-    result += points[p2] * static_cast<integral_type>(constants[C2]);
+    result *= static_cast<scalar>(constants[C1]);
+    result += points[p2] * static_cast<scalar>(constants[C2]);
     BOOST_CHECK_EQUAL(result, points[p2_mul_C1_plus_p2_mul_C2]);
 }
 
 // temporary separated test for JubJub and BabyJubJub
 template<typename CurveGroup>
 void check_curve_operations_twisted_edwards(
-    const std::vector<typename CurveGroup::value_type> &points,
+    std::vector<typename CurveGroup::value_type> &points,
     const std::vector<typename CurveGroup::field_type::integral_type> &constants) {
-    using integral_type = typename CurveGroup::field_type::value_type::integral_type;
+
+    using scalar = typename CurveGroup::params_type::scalar_field_type::value_type;
+
+    BOOST_CHECK_MESSAGE((points[p1]*(scalar::modulus)).is_zero(), "Point p1 subgroup check");
+    BOOST_CHECK_MESSAGE((points[p2]*(scalar::modulus)).is_zero(), "Point p2 subgroup check");
 
     BOOST_CHECK_EQUAL(points[p1] + points[p2], points[p1_plus_p2]);
     BOOST_CHECK_EQUAL(points[p1] - points[p2], points[p1_minus_p2]);
-    BOOST_CHECK_EQUAL(points[p1].doubled(), points[p1_dbl]);
-
-    BOOST_CHECK_EQUAL(points[p1] * static_cast<integral_type>(constants[C1]), points[p1_mul_C1]);
-    BOOST_CHECK_EQUAL((points[p2] * static_cast<integral_type>(constants[C1])) +
-                          (points[p2] * static_cast<integral_type>(constants[C2])),
+    typename CurveGroup::value_type p_copy = points[p1];
+    p_copy.double_inplace();
+    BOOST_CHECK_EQUAL(p_copy, points[p1_dbl]);
+    BOOST_CHECK_EQUAL(points[p1] * static_cast<scalar>(constants[C1]), points[p1_mul_C1]);
+    BOOST_CHECK_EQUAL((points[p2] * static_cast<scalar>(constants[C1])) +
+                          (points[p2] * static_cast<scalar>(constants[C2])),
                       points[p2_mul_C1_plus_p2_mul_C2]);
-    BOOST_CHECK_EQUAL((points[p2] * static_cast<integral_type>(constants[C1])) +
-                          (points[p2] * static_cast<integral_type>(constants[C2])),
-                      points[p2] * static_cast<integral_type>(constants[C1] + constants[C2]));
+    BOOST_CHECK_EQUAL((points[p2] * static_cast<scalar>(constants[C1])) +
+                          (points[p2] * static_cast<scalar>(constants[C2])),
+                      points[p2] * static_cast<scalar>(constants[C1] + constants[C2]));
     // BOOST_CHECK_EQUAL(points[p1].mixed_add(points[p2]), points[p1_mixed_add_p2]);
     // typename CurveGroup::value_type p1_copy = typename CurveGroup::value_type(points[p1]).to_affine();
     // BOOST_CHECK_EQUAL(p1_copy, points[p1_to_affine]);
@@ -177,12 +186,12 @@ void check_curve_operations_twisted_edwards(
     BOOST_CHECK_EQUAL(result, points[p1_minus_p2]);
 
     result = points[p1];
-    result *= static_cast<integral_type>(constants[C1]);
+    result *= static_cast<scalar>(constants[C1]);
     BOOST_CHECK_EQUAL(result, points[p1_mul_C1]);
 
     result = points[p2];
-    result *= static_cast<integral_type>(constants[C1]);
-    result += points[p2] * static_cast<integral_type>(constants[C2]);
+    result *= static_cast<scalar>(constants[C1]);
+    result += points[p2] * static_cast<scalar>(constants[C2]);
     BOOST_CHECK_EQUAL(result, points[p2_mul_C1_plus_p2_mul_C2]);
 }
 
@@ -268,9 +277,11 @@ void fp_extended_curve_twisted_edwards_test_init(
         for (auto &coordinate : point.second) {
             coordinates[i++] = field_value_type(typename field_value_type::integral_type(coordinate.second.data()));
         }
-        typename group_affine_type::value_type curve_element(coordinates[0], coordinates[1]);
-        BOOST_CHECK_MESSAGE(curve_element.is_well_formed(), "point " << p << " is not well-formed");
-        points.emplace_back(curve_element.to_extended_with_a_minus_1());
+        typename group_affine_type::value_type curve_element_affine(coordinates[0], coordinates[1]);
+        BOOST_CHECK_MESSAGE(curve_element_affine.is_well_formed(), "point " << p << " is not well-formed");
+        auto curve_element_extended = curve_element_affine.to_extended_with_a_minus_1();
+        BOOST_CHECK_MESSAGE(curve_element_extended.is_well_formed(), "point " << p << " is not well-formed");
+        points.emplace_back(curve_element_extended);
         ++p;
     }
 
@@ -411,8 +422,6 @@ BOOST_AUTO_TEST_CASE(curve_operation_test_babyjubjub_g1) {
            typename policy_type::field_type::value_type(
                0x1F07AA1B3C598E2FF9FF77744A39298A0A89A9027777AF9FA100DD448E072C13_cppui_modular253));
 
-    typename policy_type::value_type P1pP2 = P1 + P2;
-
     BOOST_CHECK_EQUAL(P1 + P2, P3);
 
     typename policy_type::value_type P4(
@@ -421,7 +430,8 @@ BOOST_AUTO_TEST_CASE(curve_operation_test_babyjubjub_g1) {
         typename policy_type::field_type::value_type(
             0x9979273078B5C735585107619130E62E315C5CAFE683A064F79DFED17EB14E1_cppui_modular252));
 
-    BOOST_CHECK_EQUAL(P1.doubled(), P4);
+    P1.double_inplace();
+    BOOST_CHECK_EQUAL(P1, P4);
 
     typename policy_type::value_type P5(
         typename policy_type::field_type::value_type(

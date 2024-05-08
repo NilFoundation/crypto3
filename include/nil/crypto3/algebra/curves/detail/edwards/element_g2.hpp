@@ -201,7 +201,6 @@ namespace nil {
                         }
 
                         constexpr element_edwards_g2 operator+(const element_edwards_g2 &other) const {
-                            // handle special cases having to do with O
                             if (this->is_zero()) {
                                 return other;
                             }
@@ -210,11 +209,15 @@ namespace nil {
                                 return (*this);
                             }
 
+                            element_edwards_g2 result = *this;
+
                             if (*this == other) {
-                                return this->doubled();
+                                result.double_inplace();
+                                return result;
                             }
 
-                            return this->add(other);
+                            result.add(other);
+                            return result;
                         }
 
                         constexpr element_edwards_g2& operator+=(const element_edwards_g2 &other) {
@@ -224,9 +227,9 @@ namespace nil {
                             } else if (other.is_zero()) {
                                 // Do nothing.
                             } else if (*this == other) {
-                                *this = this->doubled();
+                                this->double_inplace();
                             } else {
-                                *this = this->add(other);
+                                this->add(other);
                             }
                             return *this;
                         }
@@ -262,11 +265,9 @@ namespace nil {
                          *
                          * @return doubled element from group G2
                          */
-                        constexpr element_edwards_g2 doubled() const {
+                        constexpr void double_inplace() {
 
-                            if (this->is_zero()) {
-                                return (*this);
-                            } else {
+                            if (!this->is_zero()) {
                                 // NOTE: does not handle O and pts of order 2,4
                                 // http://www.hyperelliptic.org/EFD/g1p/auto-twisted-inverted.html#doubling-dbl-2008-bbjlp
 
@@ -277,28 +278,28 @@ namespace nil {
                                 const underlying_field_value_type D = A - U;                  // D = A-U
                                 const underlying_field_value_type E =
                                     (this->X + this->Y).squared() - A - B;       // E = (X1+Y1)^2-A-B
-                                const underlying_field_value_type X3 = C * D;    // X3 = C*D
                                 const underlying_field_value_type dZZ = mul_by_d(this->Z.squared());
-                                const underlying_field_value_type Y3 = E * (C - dZZ - dZZ);    // Y3 = E*(C-2*d*Z1^2)
-                                const underlying_field_value_type Z3 = D * E;                  // Z3 = D*E
-
-                                return element_edwards_g2(X3, Y3, Z3);
+                                X = C * D;    // X3 = C*D
+                                Y = E * (C - dZZ - dZZ);    // Y3 = E*(C-2*d*Z1^2)
+                                Z = D * E;                  // Z3 = D*E
                             }
                         }
+
                         /** @brief
                          *
                          * “Mixed addition” refers to the case Z2 known to be 1.
                          * @return addition of two elements from group G2
                          */
-                        constexpr element_edwards_g2 mixed_add(const element_edwards_g2 &other) const {
+                        constexpr void mixed_add(const element_edwards_g2 &other) {
 
                             // handle special cases having to do with O
-                            if (this->is_zero()) {
-                                return other;
+                            if (other.is_zero()) {
+                                return;
                             }
 
-                            if (other.is_zero()) {
-                                return *this;
+                            if (this->is_zero()) {
+                                *this = other;
+                                return;
                             }
 
                             // NOTE: does not handle O and pts of order 2,4
@@ -312,15 +313,13 @@ namespace nil {
                             const underlying_field_value_type H = C - mul_by_a(D);          // H = C-a*D
                             const underlying_field_value_type I =
                                 (this->X + this->Y) * (other.X + other.Y) - C - D;    // I = (X1+Y1)*(X2+Y2)-C-D
-                            const underlying_field_value_type X3 = (E + B) * H;       // X3 = (E+B)*H
-                            const underlying_field_value_type Y3 = (E - B) * I;       // Y3 = (E-B)*I
-                            const underlying_field_value_type Z3 = A * H * I;         // Z3 = A*H*I
-
-                            return element_edwards_g2(X3, Y3, Z3);
+                            X = (E + B) * H;       // X3 = (E+B)*H
+                            Y = (E - B) * I;       // Y3 = (E-B)*I
+                            Z = A * H * I;         // Z3 = A*H*I
                         }
 
                     private:
-                        constexpr element_edwards_g2 add(const element_edwards_g2 &other) const {
+                        constexpr void add(const element_edwards_g2 &other) {
                             // NOTE: does not handle O and pts of order 2,4
                             // http://www.hyperelliptic.org/EFD/g1p/auto-twisted-inverted.html#addition-add-2008-bbjlp
 
@@ -332,11 +331,9 @@ namespace nil {
                             const underlying_field_value_type H = C - this->mul_by_a(D);          // H = C-a*D
                             const underlying_field_value_type I =
                                 (this->X + this->Y) * (other.X + other.Y) - C - D;    // I = (X1+Y1)*(X2+Y2)-C-D
-                            const underlying_field_value_type X3 = (E + B) * H;       // X3 = (E+B)*H
-                            const underlying_field_value_type Y3 = (E - B) * I;       // Y3 = (E-B)*I
-                            const underlying_field_value_type Z3 = A * H * I;         // Z3 = A*H*I
-
-                            return element_edwards_g2(X3, Y3, Z3);
+                            X = (E + B) * H;       // X3 = (E+B)*H
+                            Y = (E - B) * I;       // Y3 = (E-B)*I
+                            Z = A * H * I;         // Z3 = A*H*I
                         }
 
                     public:

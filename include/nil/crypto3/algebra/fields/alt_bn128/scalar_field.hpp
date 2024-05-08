@@ -59,6 +59,9 @@ namespace nil {
                     constexpr static const integral_type modulus =
                         0x30644E72E131A029B85045B68181585D2833E84879B9709143E1F593F0000001_cppui_modular254;
 
+                    constexpr static const integral_type group_order_minus_one_half =
+                        0x183227397098d014dc2822db40c0ac2e9419f4243cdcb848a1f0fac9f8000000_cppui_modular254;
+
                     typedef typename policy_type::modular_backend modular_backend;
                     constexpr static const modular_params_type modulus_params = modulus.backend();
                     typedef boost::multiprecision::number<
@@ -81,8 +84,11 @@ namespace nil {
 
                 constexpr typename std::size_t const alt_bn128_scalar_field<254>::value_bits;
 
-                constexpr
-                    typename alt_bn128_scalar_field<254>::integral_type const alt_bn128_scalar_field<254>::modulus;
+                constexpr typename alt_bn128_scalar_field<254>::integral_type const
+                    alt_bn128_scalar_field<254>::modulus;
+
+                constexpr typename alt_bn128_scalar_field<254>::integral_type const
+                    alt_bn128_scalar_field<254>::group_order_minus_one_half;
 
                 constexpr typename alt_bn128_scalar_field<254>::modular_params_type const
                     alt_bn128_scalar_field<254>::modulus_params;

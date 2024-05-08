@@ -120,6 +120,7 @@ namespace nil {
                         constexpr element_fp3 &operator-=(const element_fp3 &B) {
                             data[0] -= B.data[0];
                             data[1] -= B.data[1];
+                            data[2] -= B.data[2];
 
                             return *this;
                         }
@@ -127,6 +128,7 @@ namespace nil {
                         constexpr element_fp3 &operator+=(const element_fp3 &B) {
                             data[0] += B.data[0];
                             data[1] += B.data[1];
+                            data[2] += B.data[2];
 
                             return *this;
                         }
@@ -143,6 +145,20 @@ namespace nil {
                                 A0B0 + non_residue * ((data[1] + data[2]) * (B.data[1] + B.data[2]) - A1B1 - A2B2),
                                 (data[0] + data[1]) * (B.data[0] + B.data[1]) - A0B0 - A1B1 + non_residue * A2B2,
                                 (data[0] + data[2]) * (B.data[0] + B.data[2]) - A0B0 + A1B1 - A2B2);
+                        }
+
+                        constexpr element_fp3& operator*=(const element_fp3 &B) {
+                            const underlying_type A0B0 = data[0] * B.data[0], A1B1 = data[1] * B.data[1],
+                                                  A2B2 = data[2] * B.data[2];
+                            const underlying_type
+                                r0 = A0B0 + non_residue * ((data[1] + data[2]) * (B.data[1] + B.data[2]) - A1B1 - A2B2),
+                                r1 = (data[0] + data[1]) * (B.data[0] + B.data[1]) - A0B0 - A1B1 + non_residue * A2B2,
+                                r2 = (data[0] + data[2]) * (B.data[0] + B.data[2]) - A0B0 + A1B1 - A2B2;
+
+                            data[0] = r0;
+                            data[1] = r1;
+                            data[2] = r2;
+                            return *this;
                         }
 
                         constexpr element_fp3 sqrt() const {
@@ -185,7 +201,7 @@ namespace nil {
                         }
 
                         constexpr bool is_square() const {
-                            element_fp3 tmp = this->pow(policy_type::group_order_minus_one_half);
+                            element_fp3 tmp = this->pow(field_type::extension_policy::group_order_minus_one_half);
                             return (tmp.is_one() || tmp.is_zero());    // maybe can be done more effective
                         }
 

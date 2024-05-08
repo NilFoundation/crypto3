@@ -87,6 +87,7 @@ namespace nil {
                     template<>
                     struct jubjub_g1_params<forms::twisted_edwards> : public jubjub_params<forms::twisted_edwards> {
                         using field_type = typename jubjub_params<forms::twisted_edwards>::base_field_type;
+                        using scalar_field_type = typename jubjub_params<forms::twisted_edwards>::scalar_field_type;
 
                         template<typename Coordinates>
                         using group_type = jubjub_types::g1_type<forms::twisted_edwards, Coordinates>;

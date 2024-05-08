@@ -252,6 +252,15 @@ void check_field_operations(const std::vector<element_type> &elements, const std
 }
 
 template<typename element_type>
+void check_field_eq_operations(const std::vector<element_type> &elements) {
+    element_type A;
+
+    A = elements[e1]; A += elements[e2]; BOOST_CHECK_EQUAL(A, elements[e1_plus_e2]);
+    A = elements[e1]; A -= elements[e2]; BOOST_CHECK_EQUAL(A, elements[e1_minus_e2]);
+    A = elements[e1]; A *= elements[e2]; BOOST_CHECK_EQUAL(A, elements[e1_mul_e2]);
+}
+
+template<typename element_type>
 void check_field_operations_wo_sqrt(const std::vector<element_type> &elements,
                                     const std::vector<constant_type> &constants) {
     BOOST_CHECK_EQUAL(elements[e1] + elements[e2], elements[e1_plus_e2]);
@@ -269,24 +278,28 @@ template<typename FieldParams>
 void check_field_operations(const std::vector<fields::detail::element_fp4<FieldParams>> &elements,
                             const std::vector<constant_type> &constants) {
     check_field_operations_wo_sqrt(elements, constants);
+    check_field_eq_operations(elements);
 }
 
 template<typename FieldParams>
 void check_field_operations(const std::vector<fields::detail::element_fp6_3over2<FieldParams>> &elements,
                             const std::vector<constant_type> &constants) {
     check_field_operations_wo_sqrt(elements, constants);
+    check_field_eq_operations(elements);
 }
 
 template<typename FieldParams>
 void check_field_operations(const std::vector<fields::detail::element_fp6_2over3<FieldParams>> &elements,
                             const std::vector<constant_type> &constants) {
     check_field_operations_wo_sqrt(elements, constants);
+    check_field_eq_operations(elements);
 }
 
 template<typename FieldParams>
 void check_field_operations(const std::vector<fields::detail::element_fp12_2over3over2<FieldParams>> &elements,
                             const std::vector<constant_type> &constants) {
     check_field_operations_wo_sqrt(elements, constants);
+    check_field_eq_operations(elements);
 }
 
 template<typename ElementType, typename TestSet>
@@ -310,6 +323,7 @@ void field_operation_test(const TestSet &test_set) {
     field_test_init(elements, constants, test_set);
 
     check_field_operations(elements, constants);
+    check_field_eq_operations(elements);
 }
 
 template<typename FieldType>

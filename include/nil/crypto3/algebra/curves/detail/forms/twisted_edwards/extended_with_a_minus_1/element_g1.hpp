@@ -88,8 +88,8 @@ namespace nil {
                          *
                          */
                         constexpr curve_element() :
-                            curve_element(params_type::zero_fill[0],
-                                          params_type::zero_fill[1],
+                            curve_element(field_value_type::zero(),
+                                          field_value_type::one(),
                                           field_value_type::zero(),
                                           field_value_type::one()) {}
 
@@ -164,16 +164,31 @@ namespace nil {
                          * @return true if element from group G1 is the point at infinity
                          */
                         constexpr bool is_zero() const {
-                            return (this->X.is_zero() && this->T.is_zero() && this->Z.is_zero());
+                            return (this->X.is_zero() && this->T.is_zero() && (this->Y == this->Z) );
                         }
 
                         /** @brief
                          *
                          * @return true if element from group G1 lies on the elliptic curve
-                         */
+                         * x=X/Z, y=Y/Z, T = X*Y/Z,
+                         * a*x^2 + y^2 = 1 + d*x^2*y^2
+                         * a*X^2 + Y^2 = Z^2 + d*T^2*Z^2
+                         * */
                         constexpr bool is_well_formed() const {
-                            assert(false && "Not implemented yet.");
-                            return true;
+                            if (this->is_zero()) {
+                                return true;
+                            }
+
+                            if (X*Y != T*Z) {
+                                return false;
+                            }
+
+                            const auto X2 = this->X.squared();
+                            const auto Y2 = this->Y.squared();
+                            const auto T2 = this->T.squared();
+                            const auto Z2 = this->Z.squared();
+
+                            return (params_type::a * X2 + Y2 == Z2 + params_type::d * T2);
                         }
 
                         /*************************  Reducing operations  ***********************************/
@@ -192,7 +207,8 @@ namespace nil {
                             }
 
                             // assert((X/Z)*(Y/Z) == (T/Z));
-                            return result_type(X / Z, Y / Z);    //  x=X/Z, y=Y/Z
+                            auto Zi = Z.inversed();
+                            return result_type(X * Zi, Y * Zi);    //  x=X/Z, y=Y/Z
                         }
 
                         /*************************  Arithmetic operations  ***********************************/
@@ -216,7 +232,6 @@ namespace nil {
                         }
 
                         constexpr curve_element operator+(const curve_element &other) const {
-                            // handle special cases having to do with O
                             if (this->is_zero()) {
                                 return other;
                             }
@@ -225,11 +240,15 @@ namespace nil {
                                 return (*this);
                             }
 
+                            curve_element result = *this;
+
                             if (*this == other) {
-                                return this->doubled();
+                                result.double_inplace();
+                                return result;
                             }
 
-                            return common_addition_processor::process(*this, other);
+                            common_addition_processor::process(result, other);
+                            return result;
                         }
 
                         constexpr curve_element& operator+=(const curve_element &other) {
@@ -239,9 +258,9 @@ namespace nil {
                             } else if (other.is_zero()) {
                                 // Do nothing.
                             } else if (*this == other) {
-                                *this = this->doubled();
+                                common_doubling_processor::process(*this);
                             } else {
-                                *this = common_addition_processor::process(*this, other);
+                                common_addition_processor::process(*this, other);
                             }
                             return *this;
                         }
@@ -258,19 +277,12 @@ namespace nil {
                             return (*this) += (-other);
                         }
 
-                        template<typename Backend,
-                             boost::multiprecision::expression_template_option ExpressionTemplates>
-                        constexpr curve_element& operator*=(const boost::multiprecision::number<Backend, ExpressionTemplates> &right) {
-                            (*this) = (*this) * right;
-                            return *this;
-                        }
-
                         /** @brief
                          *
                          * @return doubled element from group G1
                          */
-                        constexpr curve_element doubled() const {
-                            return common_doubling_processor::process(*this);
+                        constexpr void double_inplace() {
+                            common_doubling_processor::process(*this);
                         }
 
                         /** @brief
@@ -278,24 +290,25 @@ namespace nil {
                          * “Mixed addition” refers to the case Z2 known to be 1.
                          * @return addition of two elements from group G1
                          */
-                        curve_element mixed_add(const curve_element &other) const {
+                        void mixed_add(const curve_element &other) {
 
                             // handle special cases having to do with O
                             if (this->is_zero()) {
-                                return other;
+                                *this = other;
+                                return;
                             }
 
                             if (other.is_zero()) {
-                                return *this;
+                                return;
                             }
 
-                            return mixed_addition_processor::process(*this, other);
+                            mixed_addition_processor::process(*this, other);
                         }
 
                         friend std::ostream& operator<<(std::ostream& os, curve_element const& e)
                         {
                             os << "{\"X\":" << e.X << ",\"Y\":" << e.Y
-                                << ",\"Z\":" << e.Z << ",\"T\":" << e.T << "}";
+                                << ",\"T\":" << e.T << ",\"Z\":" << e.Z << "}";
                             return os;
                         }
                     };

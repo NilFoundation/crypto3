@@ -41,7 +41,7 @@ namespace nil {
                     struct edwards_element_g1_inverted_add_2007_bl {
 
                         template<typename ElementType>
-                        constexpr static inline ElementType process(const ElementType &first,
+                        constexpr static inline void process(ElementType &first,
                                                                     const ElementType &second) {
 
                             using field_value_type = typename ElementType::field_type::value_type;
@@ -54,11 +54,10 @@ namespace nil {
                             field_value_type H = C - D;                                        // H = C-D
                             field_value_type I =
                                 (first.X + first.Y) * (second.X + second.Y) - C - D;    // I = (X1+Y1)*(X2+Y2)-C-D
-                            field_value_type X3 = ElementType::params_type::c * (E + B) * H;    // X3 = c*(E+B)*H
-                            field_value_type Y3 = ElementType::params_type::c * (E - B) * I;    // Y3 = c*(E-B)*I
-                            field_value_type Z3 = A * H * I;                                    // Z3 = A*H*I
+                            first.X = ElementType::params_type::c * (E + B) * H;    // X3 = c*(E+B)*H
+                            first.Y = ElementType::params_type::c * (E - B) * I;    // Y3 = c*(E-B)*I
+                            first.Z = A * H * I;                                    // Z3 = A*H*I
 
-                            return ElementType(X3, Y3, Z3);
                         }
                     };
 

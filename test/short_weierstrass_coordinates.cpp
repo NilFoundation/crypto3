@@ -82,18 +82,20 @@ enum curve_operation_test_points : std::size_t {
 template<typename CurveGroup>
 void check_curve_operations(const std::vector<typename CurveGroup::value_type> &points,
                             const std::vector<std::size_t> &constants) {
-    using integral_type = typename CurveGroup::field_type::value_type::integral_type;
 
+    using scalar = typename CurveGroup::params_type::scalar_field_type::value_type;
     BOOST_CHECK_EQUAL(points[p1] + points[p2], points[p1_plus_p2]);
     BOOST_CHECK_EQUAL(points[p1] - points[p2], points[p1_minus_p2]);
-    BOOST_CHECK_EQUAL(points[p1].doubled(), points[p1_dbl]);
-    BOOST_CHECK_EQUAL(points[p1] * static_cast<integral_type>(constants[C1]), points[p1_mul_C1]);
-    BOOST_CHECK_EQUAL((points[p2] * static_cast<integral_type>(constants[C1])) +
-                          (points[p2] * static_cast<integral_type>(constants[C2])),
+    auto p1_copy = points[p1];
+    p1_copy.double_inplace();
+    BOOST_CHECK_EQUAL(p1_copy, points[p1_dbl]);
+    BOOST_CHECK_EQUAL(points[p1] * static_cast<scalar>(constants[C1]), points[p1_mul_C1]);
+    BOOST_CHECK_EQUAL((points[p2] * static_cast<scalar>(constants[C1])) +
+                          (points[p2] * static_cast<scalar>(constants[C2])),
                       points[p2_mul_C1_plus_p2_mul_C2]);
-    BOOST_CHECK_EQUAL((points[p2] * static_cast<integral_type>(constants[C1])) +
-                          (points[p2] * static_cast<integral_type>(constants[C2])),
-                      points[p2] * static_cast<integral_type>(constants[C1] + constants[C2]));
+    BOOST_CHECK_EQUAL((points[p2] * static_cast<scalar>(constants[C1])) +
+                          (points[p2] * static_cast<scalar>(constants[C2])),
+                      points[p2] * static_cast<scalar>(constants[C1] + constants[C2]));
 }
 
 template<typename FpCurveGroup, typename TestSet>

@@ -42,7 +42,7 @@ namespace nil {
         namespace algebra {
             namespace curves {
                 template<std::size_t Version>
-                struct secp_r1;
+                class secp_r1;
 
                 namespace detail {
                     /** @brief A struct representing a group G1 of SECP curves.
@@ -50,7 +50,8 @@ namespace nil {
                      *
                      */
                     template<std::size_t Version, typename Form, typename Coordinates>
-                    struct secp_r1_g1 {
+                    class secp_r1_g1 {
+                        public:
 
                         using params_type = secp_r1_g1_params<Version, Form>;
 

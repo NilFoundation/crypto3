@@ -183,7 +183,6 @@ namespace nil {
                         }
 
                         constexpr curve_element operator+(const curve_element &other) const {
-                            // handle special cases having to do with O
                             if (this->is_zero()) {
                                 return other;
                             }
@@ -192,11 +191,15 @@ namespace nil {
                                 return (*this);
                             }
 
+                            curve_element result = *this;
+
                             if (*this == other) {
-                                return this->doubled();
+                                result.double_inplace();
+                                return result;
                             }
 
-                            return this->add(other);
+                            result.add(other);
+                            return result;
                         }
 
                         constexpr curve_element& operator+=(const curve_element &other) {
@@ -206,9 +209,9 @@ namespace nil {
                             } else if (other.is_zero()) {
                                 // Do nothing.
                             } else if (*this == other) {
-                                *this = this->doubled();
+                                this->double_inplace();
                             } else {
-                                *this = this->add(other);
+                                this->add(other);
                             }
                             return *this;
                         }
@@ -226,40 +229,22 @@ namespace nil {
                             return (*this) += (-other);
                         }
 
-                        template<typename Backend,
-                             boost::multiprecision::expression_template_option ExpressionTemplates>
-                        constexpr curve_element& operator*=(const boost::multiprecision::number<Backend, ExpressionTemplates> &right) {
-                            (*this) = (*this) * right;
-                            return *this;
-                        }
-
-                        template<typename FieldValueType>
-                        typename std::enable_if<is_field<typename FieldValueType::field_type>::value &&
-                                                !is_extended_field<typename FieldValueType::field_type>::value,
-                                                curve_element>::type
-                            operator*=(const FieldValueType &right) {
-                                return (*this) *= right.data;
-                        }
-
                         /** @brief
                          * Affine doubling formulas: 2(x1,y1)=(x3,y3) where
                          * x3 = (3*x12+a)2/(2*y1)2-x1-x1
                          * y3 = (2*x1+x1)*(3*x12+a)/(2*y1)-(3*x12+a)3/(2*y1)3-y1
                          * @return doubled element from group G1
                          */
-                        constexpr curve_element doubled() const {
+                        constexpr void double_inplace() {
 
-                            if (this->is_zero()) {
-                                return (*this);
-                            } else {
+                            if (!this->is_zero()) {
                                 field_value_type Xsquared3pa = 3u * X.squared() + params_type::a;
                                 field_value_type Y2squared = Y.doubled().squared();
+                                field_value_type Y2i = Y.doubled().inversed();
 
-                                field_value_type X3 = Xsquared3pa.squared() / Y2squared - X - X;
-                                field_value_type Y3 = (X.doubled() + X) * Xsquared3pa / Y.doubled() -
-                                                      Xsquared3pa.pow(3u) / (Y.doubled()).pow(3u) - Y;
-
-                                return curve_element(X3, Y3);
+                                Y = (X.doubled() + X) * Xsquared3pa * Y2i -
+                                                      Xsquared3pa.pow(3u) * Y2i.pow(3u) - Y;
+                                X = Xsquared3pa.squared() * Y2i * Y2i - X - X;
                             }
                         }
 
@@ -275,18 +260,19 @@ namespace nil {
                          * x3 = (y2-y1)2/(x2-x1)2-x1-x2
                          * y3 = (2*x1+x2)*(y2-y1)/(x2-x1)-(y2-y1)3/(x2-x1)3-y1
                          */
-                        curve_element add(const curve_element &other) const {
-                            if(*this == - other){
-                                return curve_element();
-                            }
+                        void add(const curve_element &other) {
                             field_value_type Y2mY1 = other.Y - Y;
-                            field_value_type X2mX1 = other.X - X;
+                            field_value_type X2mX1i = other.X - X;
+                            if (X2mX1i == field_value_type::zero()) {
+                                X = params_type::zero_fill[0];
+                                Y = params_type::zero_fill[1];
+                                return;
+                            }
+                            X2mX1i = X2mX1i.inversed();
 
-                            field_value_type X3 = Y2mY1.squared() / X2mX1.squared() - X - other.X;
-                            field_value_type Y3 = (2u * X + other.X) * Y2mY1 / X2mX1 -
-                                                  (Y2mY1.pow(3u)) / (X2mX1.pow(3u)) - Y;
-
-                            return curve_element(X3, Y3);
+                            Y = (2 * X + other.X) * Y2mY1 * X2mX1i -
+                                                  (Y2mY1.pow(3u)) * X2mX1i.pow(3u) - Y;
+                            X = Y2mY1.squared() * X2mX1i * X2mX1i - X - other.X;
                         }
                     };
 

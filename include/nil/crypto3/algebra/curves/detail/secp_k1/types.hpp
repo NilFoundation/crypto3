@@ -36,7 +36,7 @@ namespace nil {
                 namespace detail {
 
                     template<std::size_t Version, typename Form, typename Coordinates>
-                    struct secp_k1_g1;
+                    class secp_k1_g1;
 
                     template<std::size_t Version, typename Form>
                     struct secp_k1_params;

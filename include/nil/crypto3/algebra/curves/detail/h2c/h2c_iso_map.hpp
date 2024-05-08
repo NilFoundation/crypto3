@@ -150,7 +150,7 @@ namespace nil {
                                 y_num += field_value_type(k_y_num[i]) * xi_powers[i];
                             }
 
-                            return group_value_type(x_num / x_den, ci.Y * y_num / y_den, field_value_type::one());
+                            return group_value_type(x_num * x_den.inversed(), ci.Y * y_num * y_den.inversed(), field_value_type::one());
                         }
                     };
 
@@ -237,7 +237,7 @@ namespace nil {
                                 y_num += field_value_type(k_y_num[i][0], k_y_num[i][1]) * xi_powers[i];
                             }
 
-                            return group_value_type(x_num / x_den, ci.Y * y_num / y_den, field_value_type::one());
+                            return group_value_type(x_num * x_den.inversed(), ci.Y * y_num * y_den.inversed(), field_value_type::one());
                         }
                     };
                 }    // namespace detail

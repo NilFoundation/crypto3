@@ -141,23 +141,12 @@ namespace nil {
                             return *this;
                         }
 
-                        constexpr element_fp &operator/=(const element_fp &B) {
-                            data *= B.inversed().data;
-
-                            return *this;
-                        }
-
                         constexpr element_fp operator-() const {
                             return element_fp(-data);
                         }
 
                         constexpr element_fp operator*(const element_fp &B) const {
                             return element_fp(data * B.data);
-                        }
-
-                        constexpr element_fp operator/(const element_fp &B) const {
-                            //                        return element_fp(data / B.data);
-                            return element_fp(data * B.inversed().data);
                         }
 
                         constexpr bool operator<(const element_fp &B) const {

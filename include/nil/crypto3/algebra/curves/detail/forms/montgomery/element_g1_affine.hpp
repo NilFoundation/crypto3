@@ -220,11 +220,15 @@ namespace nil {
                                 return (*this);
                             }
 
+                            curve_element result = *this;
+
                             if (*this == other) {
-                                return this->doubled();
+                                result.double_inplace();
+                                return result;
                             }
 
-                            return this->add(other);
+                            result.add(other);
+                            return result;
                         }
 
                         constexpr curve_element& operator+=(const curve_element &other) {
@@ -234,9 +238,9 @@ namespace nil {
                             } else if (other.is_zero()) {
                                 // Do nothing.
                             } else if (*this == other) {
-                                *this = this->doubled();
+                                this->double_inplace();
                             } else {
-                                *this = this->add(other);
+                                this->add(other);
                             }
                             return *this;
                         }
@@ -258,13 +262,6 @@ namespace nil {
                             return (*this) += (-other);
                         }
 
-                        template<typename Backend,
-                             boost::multiprecision::expression_template_option ExpressionTemplates>
-                        constexpr curve_element& operator*=(const boost::multiprecision::number<Backend, ExpressionTemplates> &right) {
-                            (*this) = (*this) * right;
-                            return *this;
-                        }
-
                         /**
                          * @brief Affine doubling formulas: 2(x1,y1)=(x3,y3) where
                          *
@@ -275,26 +272,31 @@ namespace nil {
                          *
                          * @return doubled element from group G1
                          */
-                        constexpr curve_element doubled() const {
-                            if (this->is_zero()) {
-                                return (*this);
-                            } else {
+                        constexpr void double_inplace() {
+                            if ( 2 * params_type::B * this->Y == field_value_type::zero() ) {
+                                this->is_inf_point = true;
+                            }
+                            if (!this->is_zero()) {
                                 const field_value_type two(2u);
                                 const field_value_type three(3u);
                                 const field_value_type A(params_type::A);
                                 const field_value_type B(params_type::B);
 
-                                const field_value_type temp1 = two * B * this->Y;
+                                const field_value_type temp1i = (two * B * this->Y).inversed();
                                 const field_value_type temp2 =
                                     three * this->X.squared() + two * A * this->X + field_value_type::one();
-                                const field_value_type temp1_sqr = temp1.squared();
+                                const field_value_type temp1i_sqr = temp1i.squared();
                                 const field_value_type temp2_sqr = temp2.squared();
 
-                                return curve_element((B * temp2_sqr) / temp1_sqr - A - this->X - this->X,
-                                                     ((three * this->X + A) * temp2) / temp1 -
-                                                         (B * temp2 * temp2_sqr) / (temp1 * temp1_sqr) - this->Y);
+                                const field_value_type
+                                    X2 = (B * temp2_sqr) * temp1i_sqr - A - this->X - this->X,
+                                    Y2 = ((three * this->X + A) * temp2) * temp1i -
+                                        (B * temp2 * temp2_sqr) * (temp1i * temp1i_sqr) - this->Y;
+                                X = X2;
+                                Y = Y2;
                             }
                         }
+
 
                     private:
                         /**
@@ -307,19 +309,27 @@ namespace nil {
                          *
                          * @return addition of two elements from group G1
                          */
-                        constexpr curve_element add(const curve_element &other) const {
-                            const field_value_type two(2u);
-                            const field_value_type A(params_type::A);
-                            const field_value_type B(params_type::B);
+                        constexpr void add(const curve_element &other) {
+                            if (this->X == other.X) {
+                                if (this->Y == -other.Y) {
+                                    this->is_inf_point = true;
+                                } else {
+                                    this->double_inplace();
+                                }
+                            } else {
+                                const field_value_type two(2u);
+                                const field_value_type A(params_type::A);
+                                const field_value_type B(params_type::B);
 
-                            const field_value_type temp1 = (other.Y) - (this->Y);
-                            const field_value_type temp2 = (other.X) - (this->X);
-                            const field_value_type temp1_sqr = temp1.squared();
-                            const field_value_type temp2_sqr = temp2.squared();
+                                const field_value_type temp1 = (other.Y) - (this->Y);
+                                const field_value_type temp2i = ((other.X) - (this->X)).inversed();
+                                const field_value_type temp1_sqr = temp1.squared();
+                                const field_value_type temp2i_sqr = temp2i.squared();
 
-                            return curve_element((B * temp1_sqr) / temp2_sqr - A - this->X - other.X,
-                                                 ((two * this->X + other.X + A) * temp1) / temp2 -
-                                                     (B * temp1 * temp1_sqr) / (temp2 * temp2_sqr) - this->Y);
+                                Y = ((two * this->X + other.X + A) * temp1) * temp2i -
+                                    (B * temp1 * temp1_sqr) * (temp2i * temp2i_sqr) - this->Y;
+                                X = (B * temp1_sqr) * temp2i_sqr - A - this->X - other.X;
+                            }
                         }
 
                     public:
@@ -375,21 +385,21 @@ namespace nil {
                             assert(static_cast<field_value_type>(params_type::A) ==
                                    static_cast<field_value_type>(2u) *
                                        (static_cast<field_value_type>(result_params::a) +
-                                        static_cast<field_value_type>(result_params::d)) /
+                                        static_cast<field_value_type>(result_params::d)) *
                                        (static_cast<field_value_type>(result_params::a) -
-                                        static_cast<field_value_type>(result_params::d)));
+                                        static_cast<field_value_type>(result_params::d)).inversed());
 
                             field_value_type s_inv = field_value_type::one();
                             field_value_type B_ =
-                                static_cast<field_value_type>(4u) / (static_cast<field_value_type>(result_params::a) -
-                                                                    static_cast<field_value_type>(result_params::d));
+                                static_cast<field_value_type>(4u) * (static_cast<field_value_type>(result_params::a) -
+                                                                    static_cast<field_value_type>(result_params::d)).inversed();
                             if (static_cast<field_value_type>(params_type::B) != B_) {
-                                s_inv = (B_ / static_cast<field_value_type>(params_type::B)).sqrt();
+                                s_inv = (B_ * static_cast<field_value_type>(params_type::B).inversed()).sqrt();
                             }
 
-                            return result_type(s_inv * this->X / this->Y,
-                                               (this->X - field_value_type::one()) /
-                                                   (this->X + field_value_type::one()));
+                            return result_type(s_inv * this->X * this->Y.inversed(),
+                                               (this->X - field_value_type::one()) *
+                                                   (this->X + field_value_type::one()).inversed());
                         }
 
                         friend std::ostream& operator<<(std::ostream& os, curve_element const& e)

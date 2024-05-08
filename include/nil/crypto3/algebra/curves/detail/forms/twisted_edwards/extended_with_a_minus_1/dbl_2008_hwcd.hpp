@@ -41,13 +41,11 @@ namespace nil {
                     struct twisted_edwards_element_g1_extended_with_a_minus_1_dbl_2008_hwcd {
 
                         template<typename ElementType>
-                        constexpr static inline ElementType process(const ElementType &first) {
+                        constexpr static inline void process(ElementType &first) {
 
                             using field_value_type = typename ElementType::field_type::value_type;
 
-                            if (first.is_zero()) {
-                                return (first);
-                            } else {
+                            if (!first.is_zero()) {
 
                                 field_value_type A = (first.X).squared();                        // A = X1^2
                                 field_value_type B = (first.Y).squared();                        // B = Y1^2
@@ -57,12 +55,10 @@ namespace nil {
                                 field_value_type G = D + B;                                      // G = D+B
                                 field_value_type F = G - C;                                      // F = G-C
                                 field_value_type H = D - B;                                      // H = D-B
-                                field_value_type X3 = E * F;                                     // X3 = E*F
-                                field_value_type Y3 = G * H;                                     // Y3 = G*H
-                                field_value_type T3 = E * H;                                     // T3 = E*H
-                                field_value_type Z3 = F * G;                                     // Z3 = F*G
-
-                                return ElementType(X3, Y3, T3, Z3);
+                                first.X = E * F;                                     // X3 = E*F
+                                first.Y = G * H;                                     // Y3 = G*H
+                                first.T = E * H;                                     // T3 = E*H
+                                first.Z = F * G;                                     // Z3 = F*G
                             }
                         }
                     };

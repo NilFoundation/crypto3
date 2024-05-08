@@ -41,7 +41,7 @@ namespace nil {
                     struct twisted_edwards_element_g1_inverted_madd_2008_bbjlp {
 
                         template<typename ElementType>
-                        constexpr static inline ElementType process(const ElementType &first,
+                        constexpr static inline void process(ElementType &first,
                                                                     const ElementType &second) {
 
                             using field_value_type = typename ElementType::field_type::value_type;
@@ -55,11 +55,11 @@ namespace nil {
                             field_value_type H = C - ElementType::params_type::a * D;                  // H = C-a*D
                             field_value_type I =
                                 (first.X + first.Y) * (second.X + second.Y) - C - D;    // I = (X1+Y1)*(X2+Y2)-C-D
-                            field_value_type X3 = (E + B) * H;                          // X3 = (E+B)*H
-                            field_value_type Y3 = (E - B) * I;                          // Y3 = (E-B)*I
-                            field_value_type Z3 = first.Z * H * I;                      // Z3 = Z1*H*I
 
-                            return ElementType(X3, Y3, Z3);
+                            first.X = (E + B) * H;                          // X3 = (E+B)*H
+                            first.Y = (E - B) * I;                          // Y3 = (E-B)*I
+                            first.Z = first.Z * H * I;                      // Z3 = Z1*H*I
+
                         }
                     };
 

@@ -42,7 +42,7 @@ namespace nil {
                     struct short_weierstrass_element_g1_projective_with_a4_minus_3_add_1998_cmo_2 {
 
                         template<typename ElementType>
-                        constexpr static inline ElementType process(const ElementType &first,
+                        constexpr static inline void process(ElementType &first,
                                                                     const ElementType &second) {
 
                             using field_value_type = typename ElementType::field_type::value_type;
@@ -57,11 +57,11 @@ namespace nil {
                             const field_value_type vvv = v * vv;                         // vvv  = v*vv
                             const field_value_type R = vv * X1Z2;                        // R    = vv*X1Z2
                             const field_value_type A = uu * Z1Z2 - (vvv + R + R);        // A    = uu*Z1Z2 - vvv - 2*R
-                            const field_value_type X3 = v * A;                           // X3   = v*A
-                            const field_value_type Y3 = u * (R - A) - vvv * Y1Z2;        // Y3   = u*(R-A) - vvv*Y1Z2
-                            const field_value_type Z3 = vvv * Z1Z2;                      // Z3   = vvv*Z1Z2
 
-                            return ElementType(X3, Y3, Z3);
+                            first.X = v * A;                           // X3   = v*A
+                            first.Y = u * (R - A) - vvv * Y1Z2;        // Y3   = u*(R-A) - vvv*Y1Z2
+                            first.Z = vvv * Z1Z2;                      // Z3   = vvv*Z1Z2
+
                         }
                     };
 

@@ -108,16 +108,6 @@ BOOST_AUTO_TEST_CASE(curve_operation_test_bls12_381_g1) {
         0xe65506b39c7874b40449480e82a0f94e09702038694504b36b90750c36b606c8691311677d524faa9d6d37ccd401880_cppui_modular381);
     constexpr auto C2 = 0x33345b17_cppui_modular381;
 
-    constexpr g_value_type p_dbl(
-        0x10d19f9eee3414eadafe29124a9fef7375febc627b1441803e4dad963d09933da41008344e943c78ffde3559f2178355_cppui_modular381,
-        0xdb1e67d87a21b1fdbbd3c144e316b160cc9b2c54d89899d6f653b67e55380f58998d689fa67365a0db92feb2c05cc2d_cppui_modular381,
-        0x148e0002306d83c5334f9224aa8ef6392241ccf700b85ace54543c16bb8cab1850ba1c98cd1b57e02e033ad0556fa2d9_cppui_modular381);
-
-    constexpr g_value_type p_mixed_add(
-        0x10b20f5e7f5b503c38c4b78ae6d9cbd6abd5290b6be91dcf7d68c7fa75b3f1c034625651fff0bd1d8f0fb860a2df3989_cppui_modular381,
-        0xbc3f46e7c56be14cb259b918e1c36ac8eabe791a408bd53bb14fb3c1211bfd7e445f7890fe369446943fb8de6cbe7_cppui_modular381,
-        0x7d39ff04059ee3118e7b1e694e5e5e0b4f8982bffddb4ae5cc35a00546819ea2a5c92c5e9fbf3078bc102d1dc8d1162_cppui_modular381);
-
     constexpr g_value_type_affine p_to_affine(
         0x97c062b9a9bee0bc02f762c7b7057a0cfa52f336f9bce0b130aaa2402bc7c820cc4f30f29ed69d87342c3137659af29_cppui_modular381,
         0x10eabcbf296774122daf3b60e289f0885485b66c4111d1a229bea7566aea5c9f87d1cbc8ae752e13288ec885d3f97eb6_cppui_modular381);
@@ -131,8 +121,6 @@ BOOST_AUTO_TEST_CASE(curve_operation_test_bls12_381_g1) {
     static_assert(p1 - p2 == p_sub, "sub error");
     static_assert(p1 * C1 == p_mul_C, "mul error");
     static_assert(p2 * C1 + p2 * C2 == p_mul_C1_plus_p_mul_C2, "mul add mul error");
-    static_assert(p1.doubled() == p_dbl, "double error");
-    static_assert(p1.mixed_add(p2) == p_mixed_add, "mixed add error");
     static_assert(p1.to_affine() == p_to_affine, "to affine error");
     static_assert(p2.to_projective() == p_to_projective, "to projective error");
 }
@@ -229,34 +217,6 @@ BOOST_AUTO_TEST_CASE(curve_operation_test_bls12_381_g2) {
         }});
     constexpr auto C2 = 0x3b74e323_cppui_modular381;
 
-    constexpr g_value_type p_dbl(
-        {{
-            0x40ede5268f054f3fbecc63e11ff77c55ac23ee3f7b9d3ee9a2000428a787dc996f11c4a5d272b8e728c85adfa1d7771_cppui_modular381,
-            0x16fb50dbd204e61dc7c6de08870e2c5d885113607a35d08c4782add16a698a32bf6edcf58186b7c35bda3d0072870a43_cppui_modular381,
-        }},
-        {{
-            0x6eac159ec84333b3b27a513ee1bb087468a192bb5bbe3e4acfcc439818fe79f1d77d3aeeb5cdd13c41330f58ed41186_cppui_modular381,
-            0x1219b8fa3ef9599cb9f124d146724e2ee4c80359cdcee7ded223ad997ca2edea487057e950d6ee2856de291100485017_cppui_modular381,
-        }},
-        {{
-            0x10022174172212768f9a54f4e19721d27b04209e0c9f55ed5c0e0ef468457a2f8e3b9101e8f9ab30192b21d960a6e568_cppui_modular381,
-            0xe31eb266fe27bb28d3f274c1f2c25d22772cc74ce3659be55eaaf8adf5522082a8e2c80263b8fe120a7325536f160c_cppui_modular381,
-        }});
-
-    constexpr g_value_type p_mixed_add(
-        {{
-            0xf77c15a147ce30de173890be4b04e68f9b481818fb7f00d72aa88103c8ebf2ba0c74b1cc3442aecc25ae768a5ffe7f3_cppui_modular381,
-            0x7a6ac32cdcfff426ebb03e56d29dc36af2a25fce8c68f4fb534e4992c54efb634e355ab62dfa6d11156500df73bdfbc_cppui_modular381,
-        }},
-        {{
-            0xcb16353fcaeb41b0e01e055892eb60cf28c2e1874af3065f757a895445a39a781c30c1b056fbdbc3bcb291c17bddae3_cppui_modular381,
-            0x1089f06544a98e721832fa6dc06bacca5e01f6c38249a135d65a059595eed4f98fc6fd6bdad3b2b1dc2665705a1f5077_cppui_modular381,
-        }},
-        {{
-            0x17b4ba53767171bd5ba8b7802ddaa2576208d325f8a1a023bd2acfc1cb227810391a14ed70cc5f86e2cfef306d33172f_cppui_modular381,
-            0xb45137c9784f2fed6d778d6d67229cb5dfb6b1d83895772d2f17de84fb611acb610f105daab1bddf5cfc8292f41d194_cppui_modular381,
-        }});
-
     constexpr g_value_type_affine p_to_affine(
         {{
             0x916d8851e884d2c3f4e22e7fc54e09e9df98728073c9004c5a3b609a9687b0361fc2b0f5e35e55ff18c88670319398c_cppui_modular381,
@@ -285,8 +245,6 @@ BOOST_AUTO_TEST_CASE(curve_operation_test_bls12_381_g2) {
     static_assert(p1 - p2 == p_sub, "sub error");
     static_assert(p1 * C1 == p_mul_C, "mul error");
     static_assert(p2 * C1 + p2 * C2 == p_mul_C1_plus_p_mul_C2, "mul add mul error");
-    static_assert(p1.doubled() == p_dbl, "double error");
-    static_assert(p1.mixed_add(p2) == p_mixed_add, "mixed add error");
     static_assert(p1.to_affine() == p_to_affine, "to affine error");
     static_assert(p2.to_projective() == p_to_projective, "to projective error");
 }
@@ -329,16 +287,6 @@ BOOST_AUTO_TEST_CASE(curve_operation_test_mnt4_g1) {
         0x13af3d5a92282e8469d99c2f9c57650d51de7f36af8826bf0db8c7ee58a3f26db28d8c13296_cppui_modular298);
     constexpr auto C2 = 0x3151bfb5_cppui_modular298;
 
-    constexpr g_value_type p_dbl(
-        0x2a48ecbdf5807fb7d39f773b5b43f24f105e86106474f375e649df3c2728675477421c2e1d_cppui_modular298,
-        0x21ddf574f1968843f17cbecb041272a9a6cc3d1b9f3bc54909fd0968cbe2e9b71b7e6ed5f81_cppui_modular298,
-        0x95f176809b80fb425fcc64da80dc6c382405fd1152f4c9df52d00826ac64674980c177ff53_cppui_modular298);
-
-    constexpr g_value_type p_mixed_add(
-        0x280833aeb56d66fba8d705719df6b3c92c52db82bd65e8d4839bd5257ab96d5dd98d3257a95_cppui_modular298,
-        0x10815554fe4e9a63397544e5463e94858641f87a06fe5e7c9c96dd4631f1f2fc898050cfe77_cppui_modular298,
-        0x2ae4b2da22a630d8ca5443abe81f70a12fc8e5573ffd2510618085844e76763c4471f88a77f_cppui_modular298);
-
     constexpr g_value_type_affine p_to_affine(
         0xbb3d23412558d18845c24476f095447170df03a009809ef6f50f72039948bf7346494e7453_cppui_modular298,
         0x1d8c86a75caf489bc5f3fa2ea263e5f2e991d22d244e732c5689b45ec5401fbdf940c589b0a_cppui_modular298);
@@ -347,8 +295,6 @@ BOOST_AUTO_TEST_CASE(curve_operation_test_mnt4_g1) {
     static_assert(p1 - p2 == p_sub, "sub error");
     static_assert(p1 * C1 == p_mul_C, "mul error");
     static_assert(p2 * C1 + p2 * C2 == p_mul_C1_plus_p_mul_C2, "mul add mul error");
-    static_assert(p1.doubled() == p_dbl, "double error");
-    static_assert(p1.mixed_add(p2) == p_mixed_add, "mixed add error");
     static_assert(p1.to_affine() == p_to_affine, "to affine error");
 }
 
@@ -444,34 +390,6 @@ BOOST_AUTO_TEST_CASE(curve_operation_test_mnt4_g2) {
         }});
     constexpr auto C2 = 0x2bb63f0d_cppui_modular298;
 
-    constexpr g_value_type p_dbl(
-        {{
-            0x2a3c09030f35a96b6de6d0df1bb0c1ee6d5c16430d5299b524300db87f6c019afb2a889a539_cppui_modular298,
-            0x15d58aace134c55dbe521aa681c426c6e6d6049be0f222c1372e6f30e4482bdaabf00ffcdbb_cppui_modular298,
-        }},
-        {{
-            0x194f28ad3bdb5a9aa9ef1979ff2af0a8e615e0607bf4df5586ca5a09cc09213bc0bbfee898b_cppui_modular298,
-            0x1571d72d5cc3ef43d01de66d4535b1a7e5474d2c8308d6d9a5c2bc6049197bea79fec940f8e_cppui_modular298,
-        }},
-        {{
-            0xa320f1c67d1c1195fc8e94621dc55448d6ec3f4c5ae49a74b3f652a78bd96a133ed75e7190_cppui_modular298,
-            0x497a3c12077238fd4c56401979bdbfdc1c5cd9121f6495ed9aee93bdd0e66c2d7dd43486b7_cppui_modular298,
-        }});
-
-    constexpr g_value_type p_mixed_add(
-        {{
-            0x2a26d18838d25ddf912fadce6e86c7b72038d32d78c1f9c8785956ba53dbf837d626333fa84_cppui_modular298,
-            0x25a77fed7e2314b8939d86bdee7bafaa1bde449df29fcea81c2e0aadafd1d4d65094e4fe30b_cppui_modular298,
-        }},
-        {{
-            0x22292813db78978c10453c6f8a5da96069cb2a16444b5383a145ba9890eb9c7b787fcf2738d_cppui_modular298,
-            0x1b404e089124c7a8971a0dca3cf3ae8c0010aa493f11a700779d939e6b4ad86977460d8a873_cppui_modular298,
-        }},
-        {{
-            0x3874c624010e3ebc08fdbb29a67d5cda038920dcb4f6379df217e7627384a2ff1c4313aca69_cppui_modular298,
-            0x11dc761023cf731a3e370ecf0f6fcb1b6c166375ddbfad03deec46ccaa608a553507cae9cb2_cppui_modular298,
-        }});
-
     constexpr g_value_type_affine p_to_affine(
         {{
             0xe4a4a941c54a49e9864402e2802dd02995ae0ccb2dec69d313fbef300c8e12e3079230df5b_cppui_modular298,
@@ -486,8 +404,6 @@ BOOST_AUTO_TEST_CASE(curve_operation_test_mnt4_g2) {
     static_assert(p1 - p2 == p_sub, "sub error");
     static_assert(p1 * C1 == p_mul_C, "mul error");
     static_assert(p2 * C1 + p2 * C2 == p_mul_C1_plus_p_mul_C2, "mul add mul error");
-    static_assert(p1.doubled() == p_dbl, "double error");
-    static_assert(p1.mixed_add(p2) == p_mixed_add, "mixed add error");
     static_assert(p1.to_affine() == p_to_affine, "to affine error");
 }
 
@@ -529,16 +445,6 @@ BOOST_AUTO_TEST_CASE(curve_operation_test_mnt6_g1) {
         0x222429673e7acd3578db38480bc1c2720cbf6a96477c13a04354f47bda90893087d7c9c3371_cppui_modular298);
     constexpr auto C2 = 0x3ea7e208_cppui_modular298;
 
-    constexpr g_value_type p_dbl(
-        0x2ac0c5890f442da8489db0811accad00f0ee95cb78f77623dbc6b5a74ff37c446896b6211d5_cppui_modular298,
-        0x9895fc15f20548353e3759406502f99b354e5835972c1c803594084a5e50be35559d412a1a_cppui_modular298,
-        0x9bc676f3c23070a7631feac44f44ad4ec1f454fdd5e8d758fa6978a867c0255529b9d209f1_cppui_modular298);
-
-    constexpr g_value_type p_mixed_add(
-        0x2f733d5f2afa2d7f628c002f50dfe5e3029238e2a5cd86f807546d26582e29e339ab2a89698_cppui_modular298,
-        0x2abef12d2dd602ec62ca060d9d444bbd2723902122722d69a4d20a7fa7b76509a273e04a90f_cppui_modular298,
-        0x38d8722392570b03df1e1843b6b0aaaec964bfc3386ed81fbc0141518273d7e90cf28b2bfeb_cppui_modular298);
-
     constexpr g_value_type_affine p_to_affine(
         0x99180b367e81aac8adcd54fd1ebd085d434d43e57304127deb54287885c301fb6a907a970f_cppui_modular298,
         0x1358a1a7c7c7db2f60e48b38ee4845caa21958caa41743406eb5d689e666a369f82320f7aba_cppui_modular298);
@@ -547,8 +453,6 @@ BOOST_AUTO_TEST_CASE(curve_operation_test_mnt6_g1) {
     static_assert(p1 - p2 == p_sub, "sub error");
     static_assert(p1 * C1 == p_mul_C, "mul error");
     static_assert(p2 * C1 + p2 * C2 == p_mul_C1_plus_p_mul_C2, "mul add mul error");
-    static_assert(p1.doubled() == p_dbl, "double error");
-    static_assert(p1.mixed_add(p2) == p_mixed_add, "mixed add error");
     static_assert(p1.to_affine() == p_to_affine, "to affine error");
 }
 
@@ -662,40 +566,6 @@ BOOST_AUTO_TEST_CASE(curve_operation_test_mnt6_g2) {
         }});
     constexpr auto C2 = 0x33c96283_cppui_modular298;
 
-    constexpr g_value_type p_dbl(
-        {{
-            0x33bb2cc24190f39c36b747ac204f11507c98e4f8855b93a6efc4516eb3bd75ed0686d51a737_cppui_modular298,
-            0x1b9a1c25999dab0e3165db31f5ef71ac193979f31e7b1aba8382de9704b91dd91297e8fc8b4_cppui_modular298,
-            0x222e650709258a60caf23a17a9374c10bbf43a473cf61e30531b68b836baee6a8d73690d119_cppui_modular298,
-        }},
-        {{
-            0x9eefbeda7e309a0e01d810aa884bafbc1eab62d863d602801838be878b7649e00249154f46_cppui_modular298,
-            0x230813da1975f41bdf2f8623e1bb627467492017c48b98525f2fceac0170c92766f732002fb_cppui_modular298,
-            0xbf357c03b53f7a4ce63719c0ea375f6fa381af4b0a4c76b320020baccf7561ad016c527064_cppui_modular298,
-        }},
-        {{
-            0xb11419d9197f12c792dae0172a6eb31e8e2da977dcd4543be57124f779ec293890ad0f8b59_cppui_modular298,
-            0x3bbb57d1ecf747acdb661dbeb3c4fa524c9949fb6113afc8ab81f24bfe917f6328d6c8790ea_cppui_modular298,
-            0x4618e17df4e4602e8024abcf03a4d174bc376f7a47a276ec93a3b865aceae689b66b193078_cppui_modular298,
-        }});
-
-    constexpr g_value_type p_mixed_add(
-        {{
-            0x28e26851361e80e2c0ad12a5394cf8e53406672f41fab0dc293fddcdd57c74763a81cbc9285_cppui_modular298,
-            0x152de62df99670839f97649f04642ddc44ed5506eb0a997cc9739cf708069990d6c23457b6b_cppui_modular298,
-            0x187c3c74036aa560e0c208d388adc984c7c54ab358567d0cbbcd51bf24fb8e9a59d2570ee0b_cppui_modular298,
-        }},
-        {{
-            0x2960662c8964ebda95c31580aeaaafc7e579d5feaaa88b01240582c28522ec97ccc3a9d23be_cppui_modular298,
-            0x1d86e986f16b51951ffb5f2c327014aae20aa948aba4e66b0f199917a06278975ee9ad642ab_cppui_modular298,
-            0x27024e00f549206e61f309e61385e9d9bae1ae7e35e19dc9b59868b1ea78dc608d72a90f1f7_cppui_modular298,
-        }},
-        {{
-            0x2a117d5bab47a685dd7cde9638be9daf49ef1294ee4b2830ff7027da8c743743024a38abeeb_cppui_modular298,
-            0x384bc9e102fef47565edb9fbbedc2e4ddfb0c4fe6ad21717fa526d0969d1f2739bda6f72757_cppui_modular298,
-            0xf4111937039e721f9519764d242d2fe2c16a8e180c66dba8776ecb3b8b6787fae315145a08_cppui_modular298,
-        }});
-
     constexpr g_value_type_affine p_to_affine(
         {{
             0x362c5501b25d0063dfa31dcf27b9862b51a8b89782424bfbfe688b2d042141e204e916aced4_cppui_modular298,
@@ -712,8 +582,6 @@ BOOST_AUTO_TEST_CASE(curve_operation_test_mnt6_g2) {
     static_assert(p1 - p2 == p_sub, "sub error");
     static_assert(p1 * C1 == p_mul_C, "mul error");
     static_assert(p2 * C1 + p2 * C2 == p_mul_C1_plus_p_mul_C2, "mul add mul error");
-    static_assert(p1.doubled() == p_dbl, "double error");
-    static_assert(p1.mixed_add(p2) == p_mixed_add, "mixed add error");
     static_assert(p1.to_affine() == p_to_affine, "to affine error");
 }
 

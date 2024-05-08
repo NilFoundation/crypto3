@@ -41,13 +41,11 @@ namespace nil {
                     struct short_weierstrass_element_g1_projective_with_a4_minus_3_dbl_2007_bl {
 
                         template<typename ElementType>
-                        constexpr static inline ElementType process(const ElementType &first) {
+                        constexpr static inline void process(ElementType &first) {
 
                             using field_value_type = typename ElementType::field_type::value_type;
 
-                            if (first.is_zero()) {
-                                return ElementType::zero();
-                            } else {
+                            if (! first.is_zero()) {
 
                                 const field_value_type XX = (first.X).squared();    // XX  = X1^2
                                 const field_value_type ZZ = (first.Z).squared();    // ZZ  = Z1^2
@@ -62,11 +60,10 @@ namespace nil {
                                 const field_value_type B =
                                     ((first.X) + R).squared() - XX - RR;                   // B   = (X1+R)^2 - XX - RR
                                 const field_value_type h = w.squared() - B.doubled();      // h   = w^2 - 2*B
-                                const field_value_type X3 = h * s;                         // X3  = h*s
-                                const field_value_type Y3 = w * (B - h) - RR.doubled();    // Y3  = w*(B-h) - 2*RR
-                                const field_value_type Z3 = sss;                           // Z3  = sss
 
-                                return ElementType(X3, Y3, Z3);
+                                first.X = h * s;                         // X3  = h*s
+                                first.Y = w * (B - h) - RR.doubled();    // Y3  = w*(B-h) - 2*RR
+                                first.Z = sss;                           // Z3  = sss
                             }
                         }
                     };

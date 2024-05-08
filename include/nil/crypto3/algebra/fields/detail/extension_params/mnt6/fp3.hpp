@@ -53,6 +53,8 @@ namespace nil {
                         typedef params<base_field_type> policy_type;
 
                     public:
+                        using field_type = fields::fp3<base_field_type>;
+
                         typedef typename policy_type::integral_type integral_type;
                         typedef typename policy_type::extended_integral_type extended_integral_type;
 

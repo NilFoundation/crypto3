@@ -138,6 +138,20 @@ namespace nil {
                                 (data[0] + data[2]) * (B.data[0] + B.data[2]) - A0B0 + A1B1 - A2B2);
                         }
 
+                        constexpr element_fp6_3over2& operator*=(const element_fp6_3over2 &B) {
+                            const underlying_type A0B0 = data[0] * B.data[0], A1B1 = data[1] * B.data[1],
+                                                  A2B2 = data[2] * B.data[2];
+                            const underlying_type
+                                r0 = A0B0 + non_residue * ((data[1] + data[2]) * (B.data[1] + B.data[2]) - A1B1 - A2B2),
+                                r1 = (data[0] + data[1]) * (B.data[0] + B.data[1]) - A0B0 - A1B1 + non_residue * A2B2,
+                                r2 = (data[0] + data[2]) * (B.data[0] + B.data[2]) - A0B0 + A1B1 - A2B2;
+
+                            data[0] = r0;
+                            data[1] = r1;
+                            data[2] = r2;
+                            return *this;
+                        }
+
                         element_fp6_3over2 sqrt() const {
 
                             // compute squared root with Tonelli--Shanks

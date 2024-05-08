@@ -206,7 +206,6 @@ namespace nil {
                         }
 
                         constexpr curve_element operator+(const curve_element &other) const {
-                            // handle special cases having to do with O
                             if (this->is_zero()) {
                                 return other;
                             }
@@ -215,11 +214,29 @@ namespace nil {
                                 return (*this);
                             }
 
+                            curve_element result = *this;
+
                             if (*this == other) {
-                                return this->doubled();
+                                result.double_inplace();
+                                return result;
                             }
 
-                            return common_addition_processor::process(*this, other);
+                            common_addition_processor::process(result, other);
+                            return result;
+                        }
+
+                        constexpr curve_element& operator+=(const curve_element &other) {
+                            // handle special cases having to do with O
+                            if (this->is_zero()) {
+                                *this = other;
+                            } else if (other.is_zero()) {
+                                // Do nothing.
+                            } else if (*this == other) {
+                                common_doubling_processor::process(*this);
+                            } else {
+                                common_addition_processor::process(*this, other);
+                            }
+                            return *this;
                         }
 
                         constexpr curve_element operator-() const {
@@ -234,8 +251,8 @@ namespace nil {
                          *
                          * @return doubled element from group G1
                          */
-                        constexpr curve_element doubled() const {
-                            return common_doubling_processor::process(*this);
+                        constexpr void double_inplace() {
+                            common_doubling_processor::process(*this);
                         }
 
                         /** @brief
@@ -243,17 +260,18 @@ namespace nil {
                          * “Mixed addition” refers to the case Z2 known to be 1.
                          * @return addition of two elements from group G1
                          */
-                        constexpr curve_element mixed_add(const curve_element &other) const {
+                        constexpr void mixed_add(const curve_element &other) {
 
                             // NOTE: does not handle O and pts of order 2,4
                             // http://www.hyperelliptic.org/EFD/g1p/auto-shortw-projective_with_a4_minus_3.html#addition-add-1998-cmo-2
 
                             if (this->is_zero()) {
-                                return other;
+                                *this = other;
+                                return;
                             }
 
                             if (other.is_zero()) {
-                                return (*this);
+                                return;
                             }
 
                             // Because for some reasons it's not so
@@ -270,7 +288,8 @@ namespace nil {
                             const field_value_type Y2Z1 = (this->Z) * (other.Y);    // Y2Z1 = Y2*Z1
 
                             if (X1Z2 == X2Z1 && Y1Z2 == Y2Z1) {
-                                return this->doubled();
+                                this->double_inplace();
+                                return;
                             }
 
                             const field_value_type u = Y2Z1 - this->Y;                  // u = Y2*Z1-Y1
@@ -280,11 +299,9 @@ namespace nil {
                             const field_value_type vvv = v * vv;                        // vvv = v*vv
                             const field_value_type R = vv * this->X;                    // R = vv*X1
                             const field_value_type A = uu * this->Z - vvv - R - R;      // A = uu*Z1-vvv-2*R
-                            const field_value_type X3 = v * A;                          // X3 = v*A
-                            const field_value_type Y3 = u * (R - A) - vvv * this->Y;    // Y3 = u*(R-A)-vvv*Y1
-                            const field_value_type Z3 = vvv * this->Z;                  // Z3 = vvv*Z1
-
-                            return curve_element(X3, Y3, Z3);
+                            X = v * A;                          // X3 = v*A
+                            Y = u * (R - A) - vvv * this->Y;    // Y3 = u*(R-A)-vvv*Y1
+                            Z = vvv * this->Z;                  // Z3 = vvv*Z1
                         }
 
                         friend std::ostream& operator<<(std::ostream& os, curve_element const& e)

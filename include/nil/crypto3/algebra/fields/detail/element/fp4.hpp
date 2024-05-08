@@ -130,6 +130,15 @@ namespace nil {
                                                (data[0] + data[1]) * (B.data[0] + B.data[1]) - A0B0 - A1B1);
                         }
 
+                        constexpr element_fp4& operator*=(const element_fp4 &B) {
+                            const underlying_type A0B0 = data[0] * B.data[0], A1B1 = data[1] * B.data[1];
+
+                            data[1] = (data[0] + data[1]) * (B.data[0] + B.data[1]) - A0B0 - A1B1;
+                            data[0] = A0B0 + mul_by_non_residue(A1B1);
+
+                            return *this;
+                        }
+
                         element_fp4 sqrt() const {
 
                             // compute squared root with Tonelli--Shanks

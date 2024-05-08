@@ -159,11 +159,11 @@ namespace nil {
                     std::size_t cur_in_window = outer == outerc - 1 ? last_in_window : in_window;
                     for (std::size_t inner = 0; inner < cur_in_window; ++inner) {
                         powers_of_g[outer][inner] = ginner;
-                        ginner = ginner + gouter;
+                        ginner += gouter;
                     }
 
                     for (std::size_t i = 0; i < window; ++i) {
-                        gouter = gouter.doubled();
+                        gouter.double_inplace();
                     }
                 }
 

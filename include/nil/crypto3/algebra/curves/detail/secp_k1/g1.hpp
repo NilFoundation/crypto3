@@ -44,7 +44,8 @@ namespace nil {
                      *
                      */
                     template<std::size_t Version, typename Form, typename Coordinates>
-                    struct secp_k1_g1 {
+                    class secp_k1_g1 {
+                        public:
 
                         using params_type = secp_k1_g1_params<Version, Form>;
 

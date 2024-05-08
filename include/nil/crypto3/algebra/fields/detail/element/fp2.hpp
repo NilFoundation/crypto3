@@ -141,10 +141,6 @@ namespace nil {
                             return *this;
                         }
 
-                        constexpr element_fp2 operator/(const element_fp2 &B) const {
-                            return *this * B.inversed();
-                        }
-
                         /*
                             For pairing bn128
                             XITAG
@@ -250,7 +246,7 @@ namespace nil {
                         }
 
                         constexpr bool is_square() const {
-                            element_fp2 tmp = this->pow(policy_type::group_order_minus_one_half);
+                            element_fp2 tmp = this->pow(field_type::extension_policy::group_order_minus_one_half);
                             return (tmp.is_one() || tmp.is_zero());    // maybe can be done more effective
                         }
 

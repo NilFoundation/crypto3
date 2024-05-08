@@ -40,31 +40,27 @@ namespace nil {
                     struct short_weierstrass_element_g1_jacobian_with_a4_0_dbl_2009_l {
 
                         template<typename ElementType>
-                        constexpr static inline ElementType process(const ElementType &first) {
+                        constexpr static inline void process(ElementType &first) {
 
                             using field_value_type = typename ElementType::field_type::value_type;
 
-                            // handle point at infinity
-                            if (first.is_zero()) {
-                                return (first);
+                            if (!first.is_zero()) {
+
+                                field_value_type A = (first.X).squared();    // A = X1^2
+                                field_value_type B = (first.Y).squared();    // B = Y1^2
+                                field_value_type C = B.squared();            // C = B^2
+                                field_value_type D = (first.X + B).squared() - A - C;
+                                D = D + D;                            // D = 2 * ((X1 + B)^2 - A - C)
+                                field_value_type E = A + A + A;       // E = 3 * A
+                                field_value_type F = E.squared();     // F = E^2
+                                field_value_type Y1Z1 = (first.Y) * (first.Z);
+
+                                first.X = F - (D + D);    // X3 = F - 2 D
+                                field_value_type eightC = C.doubled().doubled().doubled();
+
+                                first.Y = E * (D - first.X) - eightC;    // Y3 = E * (D - X3) - 8 * C
+                                first.Z = Y1Z1 + Y1Z1;    // Z3 = 2 * Y1 * Z1
                             }
-
-                            field_value_type A = (first.X).squared();    // A = X1^2
-                            field_value_type B = (first.Y).squared();    // B = Y1^2
-                            field_value_type C = B.squared();            // C = B^2
-                            field_value_type D = (first.X + B).squared() - A - C;
-                            D = D + D;                            // D = 2 * ((X1 + B)^2 - A - C)
-                            field_value_type E = A + A + A;       // E = 3 * A
-                            field_value_type F = E.squared();     // F = E^2
-                            field_value_type X3 = F - (D + D);    // X3 = F - 2 D
-                            field_value_type eightC = C + C;
-                            eightC = eightC + eightC;
-                            eightC = eightC + eightC;
-                            field_value_type Y3 = E * (D - X3) - eightC;    // Y3 = E * (D - X3) - 8 * C
-                            field_value_type Y1Z1 = (first.Y) * (first.Z);
-                            field_value_type Z3 = Y1Z1 + Y1Z1;    // Z3 = 2 * Y1 * Z1
-
-                            return ElementType(X3, Y3, Z3);
                         }
                     };
 

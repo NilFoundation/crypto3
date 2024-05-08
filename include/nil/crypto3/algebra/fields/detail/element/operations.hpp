@@ -57,14 +57,6 @@ namespace nil {
                     template<typename FieldElement, typename Integral,
                              typename = typename std::enable_if<is_field_element<FieldElement>::value &&
                                                      std::is_constructible<FieldElement, Integral>::value>::type>
-                    constexpr FieldElement operator/(const FieldElement &A, Integral B) {
-                        //                        return element_fp2(data / B.data);
-                        return A / FieldElement(B);
-                    }
-
-                    template<typename FieldElement, typename Integral,
-                             typename = typename std::enable_if<is_field_element<FieldElement>::value &&
-                                                     std::is_constructible<FieldElement, Integral>::value>::type>
                     constexpr FieldElement operator+(Integral A, const FieldElement &B) {
                         return FieldElement(A) + B;
                     }
@@ -81,14 +73,6 @@ namespace nil {
                                  std::is_constructible<FieldElement, Integral>::value>::type>
                     constexpr FieldElement operator*(Integral A, const FieldElement &B) {
                         return FieldElement(A) * B;
-                    }
-
-                    template<typename FieldElement, typename Integral,
-                             typename = typename std::enable_if<is_field_element<FieldElement>::value &&
-                                 std::is_constructible<FieldElement, Integral>::value>::type>
-                    constexpr FieldElement operator/(Integral A, const FieldElement &B) {
-                        //                        return element_fp2(data / B.data);
-                        return FieldElement(A) / B;
                     }
                 }    // namespace detail
             }        // namespace fields

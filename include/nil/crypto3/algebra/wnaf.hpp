@@ -39,7 +39,8 @@ namespace nil {
                 std::vector<long> naf = boost::multiprecision::find_wnaf(window_size, scalar);
                 std::vector<BaseValueType> table(1ul << (window_size - 1));
                 BaseValueType tmp = base;
-                BaseValueType dbl = base.doubled();
+                BaseValueType dbl = base;
+                dbl.double_inplace();
                 for (size_t i = 0; i < 1ul << (window_size - 1); ++i) {
                     table[i] = tmp;
                     tmp = tmp + dbl;
@@ -49,7 +50,7 @@ namespace nil {
                 bool found_nonzero = false;
                 for (long i = naf.size() - 1; i >= 0; --i) {
                     if (found_nonzero) {
-                        res = res.doubled();
+                        res.double_inplace();
                     }
 
                     if (naf[i] != 0) {
