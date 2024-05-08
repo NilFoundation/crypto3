@@ -476,3 +476,7 @@ set(RUNTIME_TESTS_NAMES
 foreach(TEST_NAME ${RUNTIME_TESTS_NAMES})
     define_runtime_multiprecision_test(${TEST_NAME})
 endforeach()
+
+if(BUILD_BENCH_TESTS)
+    cm_add_test_subdirectory(bench_test)
+endif()
