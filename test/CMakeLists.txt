@@ -465,12 +465,6 @@ macro(define_modular_cpp_int_test name)
     target_compile_definitions(${test_name} PUBLIC -DTEST_CPP_INT)
     target_link_libraries(${test_name} no_eh_support)
     add_dependencies(${CURRENT_PROJECT_NAME}_test_suite_modular_cpp_int_tests ${test_name})
-    set_target_properties(${test_name} PROPERTIES CXX_STANDARD 17)
-    if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-        target_compile_options(${test_name} PRIVATE "-fconstexpr-steps=2147483647")
-    elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-        target_compile_options(${test_name} PRIVATE "-fconstexpr-ops-limit=4294967295")
-    endif()
 
 endmacro(define_runtime_multiprecision_test)
 
