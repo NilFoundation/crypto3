@@ -28,6 +28,7 @@
 #define CRYPTO3_ZK_PLONK_PLACEHOLDER_TABLE_DESCRIPTION_HPP
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/variable.hpp>
+#include <iostream>
 #include <limits>
 
 namespace nil {
