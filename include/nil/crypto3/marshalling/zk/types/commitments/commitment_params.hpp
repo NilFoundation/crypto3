@@ -239,8 +239,6 @@ namespace nil {
                 template<typename Endianness, typename CommitmentSchemeType>
                 typename commitment_params<nil::marshalling::field_type<Endianness>, CommitmentSchemeType, std::enable_if_t<nil::crypto3::zk::is_kzg<CommitmentSchemeType>>>::type
                 fill_commitment_params(const typename CommitmentSchemeType::params_type &kzg_params) {
-                    using CommitmentParamsType = typename CommitmentSchemeType::params_type;
-                    using TTypeBase = typename nil::marshalling::field_type<Endianness>;
                     using result_type = typename commitment_params<nil::marshalling::field_type<Endianness>, CommitmentSchemeType>::type;
 
                     nil::marshalling::types::array_list<
@@ -267,9 +265,6 @@ namespace nil {
                 template<typename Endianness, typename CommitmentSchemeType>
                 typename CommitmentSchemeType::params_type
                 make_commitment_params(const typename commitment_params<nil::marshalling::field_type<Endianness>, CommitmentSchemeType, std::enable_if_t<nil::crypto3::zk::is_kzg<CommitmentSchemeType>>>::type &filled_kzg_params) {
-                    using CommitmentParamsType = typename CommitmentSchemeType::params_type;
-                    using TTypeBase = typename nil::marshalling::field_type<Endianness>;
-
                     return result_type(std::make_tuple(
                         make_curve_element_vector<typename CommitmentSchemeType::curve_type::template g1_type<>, Endianness>(std::get<0>(filled_kzg_params.value()).value()),
                         make_curve_element_vector<typename CommitmentSchemeType::curve_type::template g2_type<>, Endianness>(std::get<1>(filled_kzg_params.value()).value())
