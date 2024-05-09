@@ -156,13 +156,26 @@ namespace nil {
                             return (this->Y.is_zero() && this->Z.is_zero());
                         }
 
+
                         /** @brief
                          *
-                         * @return true if element from group G1 lies on the elliptic curve
+                         * @return true if element from group G2 lies on the elliptic curve
+                         * a*x^2 + y^2 = 1 + d*x^2*y^2
+                         * x = Z/X, y = Z/Y
+                         * a * Z^2/X^2 + Z^2/Y^2 == 1 + d * Z^4 / X^2 / Y^2
+                         * a * Z^2 * Y^2 + Z^2 * X^2 == X^2 * Y^2 + d * Z^4
                          */
                         constexpr bool is_well_formed() const {
-                            assert(false && "Not implemented yet.");
-                            return true;
+                            if (this->is_zero()) {
+                                return true;
+                            } else {
+
+                                const auto X2 = this->X.squared();
+                                const auto Y2 = this->Y.squared();
+                                const auto Z2 = this->Z.squared();
+
+                                return (params_type::a * Z2*Y2 + Z2*X2 == X2*Y2 + params_type::d * Z2*Z2);
+                            }
                         }
 
                         /*************************  Reducing operations  ***********************************/
