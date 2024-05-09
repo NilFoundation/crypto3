@@ -39,7 +39,6 @@ jobs:
           refs: ${{ inputs.submodules-refs }}
           paths: |
             ${{ github.workspace }}/**
-            !${{ github.workspace }}/
             !${{ github.workspace }}/**/.git/**
 
       - name: Determine submodule path
