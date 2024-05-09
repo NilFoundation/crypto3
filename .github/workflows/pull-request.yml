@@ -15,6 +15,7 @@ jobs:
     with:
       targets: |
         algebra_curves_example
+        algebra_curves_test
         algebra_fields_example
         algebra_fields_static_test
         algebra_fields_test
