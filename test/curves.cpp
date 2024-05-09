@@ -300,14 +300,16 @@ void fp_curve_test_init(std::vector<typename FpCurveGroup::value_type> &points,
     typedef typename FpCurveGroup::field_type::value_type field_value_type;
     std::array<field_value_type, 3> coordinates;
 
+    int p = 0;
     for (auto &point : test_set.second.get_child("point_coordinates")) {
         auto i = 0;
         for (auto &coordinate : point.second) {
             coordinates[i++] = field_value_type(typename field_value_type::integral_type(coordinate.second.data()));
         }
         typename FpCurveGroup::value_type curve_element(coordinates[0], coordinates[1], coordinates[2]);
-        BOOST_CHECK(curve_element.is_well_formed());
+        BOOST_CHECK_MESSAGE(curve_element.is_well_formed(), "point " << p << " is not well-formed");
         points.emplace_back(curve_element);
+        ++p;
     }
 
     for (auto &constant : test_set.second.get_child("constants")) {
@@ -322,14 +324,16 @@ void fp_curve_twisted_edwards_test_init(std::vector<typename FpCurveGroup::value
     typedef typename FpCurveGroup::field_type::value_type field_value_type;
     std::array<field_value_type, 2> coordinates;
 
+    int p = 0;
     for (auto &point : test_set.second.get_child("point_coordinates")) {
         auto i = 0;
         for (auto &coordinate : point.second) {
             coordinates[i++] = field_value_type(typename field_value_type::integral_type(coordinate.second.data()));
         }
         typename FpCurveGroup::value_type curve_element(coordinates[0], coordinates[1]);
-        BOOST_CHECK(curve_element.is_well_formed());
+        BOOST_CHECK_MESSAGE(curve_element.is_well_formed(), "point " << p << " is not well-formed");
         points.emplace_back(curve_element);
+        ++p;
     }
 
     for (auto &constant : test_set.second.get_child("constants")) {
@@ -348,14 +352,16 @@ void fp_extended_curve_twisted_edwards_test_init(
             group_affine_type;
     std::array<field_value_type, 2> coordinates;
 
+    int p = 0;
     for (auto &point : test_set.second.get_child("point_coordinates")) {
         auto i = 0;
         for (auto &coordinate : point.second) {
             coordinates[i++] = field_value_type(typename field_value_type::integral_type(coordinate.second.data()));
         }
         typename group_affine_type::value_type curve_element(coordinates[0], coordinates[1]);
-        BOOST_CHECK(curve_element.is_well_formed());
+        BOOST_CHECK_MESSAGE(curve_element.is_well_formed(), "point " << p << " is not well-formed");
         points.emplace_back(curve_element.to_extended_with_a_minus_1());
+        ++p;
     }
 
     for (auto &constant : test_set.second.get_child("constants")) {
@@ -371,6 +377,7 @@ void fp2_curve_test_init(std::vector<typename Fp2CurveGroup::value_type> &points
     using integral_type = typename fp2_value_type::underlying_type::integral_type;
     std::array<integral_type, 6> coordinates;
 
+    int p = 0;
     for (auto &point : test_set.second.get_child("point_coordinates")) {
         auto i = 0;
         for (auto &coordinate_pairs : point.second) {
@@ -382,8 +389,9 @@ void fp2_curve_test_init(std::vector<typename Fp2CurveGroup::value_type> &points
                     fp2_value_type(coordinates[0], coordinates[1]),
                     fp2_value_type(coordinates[2], coordinates[3]),
                     fp2_value_type(coordinates[4], coordinates[5]));
-        BOOST_CHECK(curve_element.is_well_formed());
+        BOOST_CHECK_MESSAGE(curve_element.is_well_formed(), "point " << p << " is not well-formed");
         points.emplace_back(curve_element);
+        ++p;
     }
 
     for (auto &constant : test_set.second.get_child("constants")) {
@@ -400,6 +408,7 @@ void fp3_curve_test_init(std::vector<typename Fp3CurveGroup::value_type> &points
 
     std::array<integral_type, 9> coordinates;
 
+    int p = 0;
     for (auto &point : test_set.second.get_child("point_coordinates")) {
         auto i = 0;
         for (auto &coordinate_pairs : point.second) {
@@ -411,8 +420,9 @@ void fp3_curve_test_init(std::vector<typename Fp3CurveGroup::value_type> &points
                     fp3_value_type(coordinates[0], coordinates[1], coordinates[2]),
                     fp3_value_type(coordinates[3], coordinates[4], coordinates[5]),
                     fp3_value_type(coordinates[6], coordinates[7], coordinates[8]));
-        BOOST_CHECK(curve_element.is_well_formed());
+        BOOST_CHECK_MESSAGE(curve_element.is_well_formed(), "point " << p << " is not well-formed");
         points.emplace_back(curve_element);
+        ++p;
     }
 
     for (auto &constant : test_set.second.get_child("constants")) {
