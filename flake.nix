@@ -134,6 +134,7 @@
             hash = "hash_.*_test";
             math = "math_.*_test";
             block = "block_.*_test";
+            multiprecision = "multiprecision_.*_test";
           };
           makeTestDerivation = { name, compiler, targets ? [ ], buildTargets ? targets, testTargets ? targets }:
             (makeCrypto3Derivation { inherit system; }).overrideAttrs (oldAttrs: {
