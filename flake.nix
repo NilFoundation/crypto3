@@ -64,6 +64,7 @@
             clang
             gcc
             boost183
+            git
           ];
 
           shellHook = ''
