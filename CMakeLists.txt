@@ -163,3 +163,23 @@ endif()
 if(BUILD_EXAMPLES)
     add_subdirectory(example)
 endif()
+
+# Workaround config file with crypto3::all as a dependency
+# TODO: remove after resolving dependency issues in crypto3
+include(CMakePackageConfigHelpers)
+include(GNUInstallDirs)
+# We cannot use "blueprint" name for workaround package since the original one still exists
+set(package_name "blueprint_crypto3")
+set(config_dir ${CMAKE_INSTALL_LIBDIR}/cmake/${package_name})
+
+configure_package_config_file(
+    cmake/Config.cmake.in
+    ${package_name}-config.cmake
+    INSTALL_DESTINATION ${config_dir}
+)
+
+install(
+    FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/${package_name}-config.cmake
+    DESTINATION ${config_dir}
+)

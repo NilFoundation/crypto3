@@ -1,0 +1,17 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+find_dependency(Boost COMPONENTS REQUIRED
+                    container json filesystem log log_setup program_options thread system unit_test_framework)
+find_dependency(crypto3 REQUIRED)
+
+# Protect against multiple inclusion
+if (TARGET blueprint)
+  return()
+endif()
+
+add_library(blueprint INTERFACE IMPORTED)
+
+set_target_properties(blueprint PROPERTIES
+                        INTERFACE_INCLUDE_DIRECTORIES "@CMAKE_INSTALL_FULL_INCLUDEDIR@"
+                        INTERFACE_LINK_LIBRARIES "crypto3::all;${Boost_LIBRARIES}")
