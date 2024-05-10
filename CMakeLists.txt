@@ -33,14 +33,6 @@ include(CMSetupVersion)
 option(BUILD_TESTS "Build unit tests" TRUE)
 option(BUILD_WITH_NO_WARNINGS "Build threading warnings as errors" FALSE)
 
-if((UNIX) AND (NOT CC_NO_CCACHE))
-    find_program(CCACHE_FOUND ccache)
-    if(CCACHE_FOUND)
-        set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
-        set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache)
-    endif(CCACHE_FOUND)
-endif()
-
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
      include/nil/marshalling/accumulators/parameters/buffer_length.hpp
      include/nil/marshalling/accumulators/parameters/expected_status.hpp
