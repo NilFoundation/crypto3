@@ -46,16 +46,7 @@ include(PlatformConfiguration)
 include(CheckSSE)
 include(CheckAVX)
 
-option(BUILD_WITH_CCACHE "Build with ccache usage" TRUE)
 option(BUILD_TESTS "Build unit tests" FALSE)
-
-if(UNIX AND BUILD_WITH_CCACHE)
-    find_program(CCACHE_FOUND ccache)
-    if(CCACHE_FOUND)
-        set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
-        set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache)
-    endif(CCACHE_FOUND)
-endif()
 
 option(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_AES
        "Build with AES block encryption support" TRUE)
