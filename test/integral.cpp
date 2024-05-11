@@ -45,35 +45,24 @@
 #include <nil/crypto3/marshalling/multiprecision/types/integral.hpp>
 
 template<class T>
-struct unchecked_type {
-    typedef T type;
-};
-
-template<unsigned Bits, boost::multiprecision::expression_template_option ExpressionTemplates>
-struct unchecked_type<boost::multiprecision::number<
-    boost::multiprecision::cpp_int_modular_backend<Bits>, ExpressionTemplates>> {
-    typedef boost::multiprecision::number<
-        boost::multiprecision::cpp_int_modular_backend<Bits>,
-        ExpressionTemplates>
-        type;
-};
-
-template<class T>
 T generate_random() {
-    typedef typename unchecked_type<T>::type unchecked_T;
-
     static const unsigned limbs = std::numeric_limits<T>::is_specialized && std::numeric_limits<T>::is_bounded ?
                                       std::numeric_limits<T>::digits / std::numeric_limits<unsigned>::digits + 3 :
                                       20;
 
     static boost::random::uniform_int_distribution<unsigned> ui(0, limbs);
     static boost::random::mt19937 gen;
-    unchecked_T val = gen();
+    T val = gen();
     unsigned lim = ui(gen); 
     for (unsigned i = 0; i < lim; ++i) {
         val *= (gen.max)();
         val += gen();
     }
+    // If we overflow the number, like it was 23 bits, but we filled 1 limb of 64 bits,
+    // or it was 254 bits but we filled the upper 2 bits, the number will not complain.
+    // Nothing will be thrown, but errors will happen. The caller is responsible to not do so.
+    val.backend().normalize();
+
     return val;
 }
 
