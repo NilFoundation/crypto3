@@ -113,9 +113,9 @@ namespace nil {
                             assert(!sign);
                             return group_affine_value_type(base_field_value_type::zero(), y);
                         }
-                        base_field_value_type x = x2.pow((base_field_type::modulus + 3) / 8);
+                        base_field_value_type x = x2.pow((base_field_type::modulus + 3u) / 8);
                         if (!(x * x - x2).is_zero()) {
-                            x = x * base_field_value_type(2).pow((base_field_type::modulus - 1) / 4);
+                            x = x * base_field_value_type(2u).pow((base_field_type::modulus - 1u) / 4);
                             // TODO: throw catchable error, for example return status
                             assert((x * x - x2).is_zero());
                         }
