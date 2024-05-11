@@ -112,8 +112,8 @@ namespace nil {
                          */
                         constexpr static element_edwards_g2 one() {
                             return element_edwards_g2(policy_type::g2_one_fill[0],
-                                                      policy_type::g2_one_fill[1]);    // it's better to precompute also
-                            // policy_type::g2_one_fill[2]
+                                                      policy_type::g2_one_fill[1],
+                                                      policy_type::g2_one_fill[2]);    // it's better to precompute also
                         }
 
                         /** @brief

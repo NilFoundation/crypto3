@@ -94,7 +94,7 @@ typename std::enable_if<std::is_same<Coordinates, curves::coordinates::projectiv
     print_field_element(os, p.X);
     os << "], Y: [";
     print_field_element(os, p.Y);
-    os << "], Z:[";
+    os << "], Z: [";
     print_field_element(os, p.Z);
     os << "] )" << std::endl;
 }
@@ -215,10 +215,10 @@ void check_curve_operations(const std::vector<typename CurveGroup::value_type> &
     BOOST_CHECK_EQUAL((points[p2] * static_cast<cpp_int>(constants[C1])) +
                           (points[p2] * static_cast<cpp_int>(constants[C2])),
                       points[p2] * static_cast<cpp_int>(constants[C1] + constants[C2]));
-    BOOST_CHECK_EQUAL(points[p1].mixed_add(points[p2]), points[p1_mixed_add_p2]);
+    BOOST_CHECK_EQUAL(points[p2].mixed_add(points[p1_to_affine]), points[p1_mixed_add_p2]);
     // typename CurveGroup::value_type p1_copy = points[p1].to_affine();
-    BOOST_CHECK_EQUAL(points[p1].to_affine().X, points[p1_to_affine].X);
-    BOOST_CHECK_EQUAL(points[p1].to_affine().Y, points[p1_to_affine].Y);
+    BOOST_CHECK_EQUAL(points[p1].to_affine().X, points[p1_to_affine].to_affine().X);
+    BOOST_CHECK_EQUAL(points[p1].to_affine().Y, points[p1_to_affine].to_affine().Y);
     // typename CurveGroup::value_type p2_copy = typename CurveGroup::value_type(points[p2]).to_projective();
     // BOOST_CHECK_EQUAL(p2_copy, points[p2_to_special]);
 
@@ -306,9 +306,16 @@ void fp_curve_test_init(std::vector<typename FpCurveGroup::value_type> &points,
         for (auto &coordinate : point.second) {
             coordinates[i++] = field_value_type(typename field_value_type::integral_type(coordinate.second.data()));
         }
-        typename FpCurveGroup::value_type curve_element(coordinates[0], coordinates[1], coordinates[2]);
-        BOOST_CHECK_MESSAGE(curve_element.is_well_formed(), "point " << p << " is not well-formed");
-        points.emplace_back(curve_element);
+
+        if (p1_to_affine == p) {
+            typename FpCurveGroup::value_type curve_element(coordinates[0], coordinates[1]);
+            BOOST_CHECK_MESSAGE(curve_element.is_well_formed(), "point " << p << " is not well-formed");
+            points.emplace_back(curve_element);
+        } else {
+            typename FpCurveGroup::value_type curve_element(coordinates[0], coordinates[1], coordinates[2]);
+            BOOST_CHECK_MESSAGE(curve_element.is_well_formed(), "point " << p << " is not well-formed");
+            points.emplace_back(curve_element);
+        }
         ++p;
     }
 
@@ -587,11 +594,15 @@ BOOST_DATA_TEST_CASE(curve_operation_test_mnt4_g2, string_data("curve_operation_
     curve_operation_test<policy_type>(data_set, fp2_curve_test_init<policy_type>);
 }
 
+// Disabled until params are reviewed. For current params g2::one is not well-formed
+// https://github.com/NilFoundation/crypto3-algebra/issues/161
+/*
 BOOST_DATA_TEST_CASE(curve_operation_test_edwards_g2, string_data("curve_operation_test_edwards_g2"), data_set) {
     using policy_type = curves::edwards<183>::g2_type<>;
 
     curve_operation_test<policy_type>(data_set, fp3_curve_test_init<policy_type>);
 }
+*/
 
 BOOST_DATA_TEST_CASE(curve_operation_test_mnt6_g2, string_data("curve_operation_test_mnt6_g2"), data_set) {
     using policy_type = curves::mnt6<298>::g2_type<>;

@@ -92,9 +92,17 @@ namespace nil {
                          *    @return the selected point (X:Y:Z)
                          *
                          */
-                        constexpr curve_element(const field_value_type& X, const field_value_type& Y, const field_value_type& Z) 
-                            : X(X), Y(Y), Z(Z) 
+                        constexpr curve_element(const field_value_type& X, const field_value_type& Y, const field_value_type& Z)
+                            : X(X), Y(Y), Z(Z)
                         { }
+
+                        /** @brief constructor from affine coordinates
+                         *
+                         */
+                        constexpr curve_element(const field_value_type& X, const field_value_type& Y)
+                            : X(X.inversed()), Y(Y.inversed()), Z(field_value_type::one())
+                        { }
+
 
                         template<typename Backend,
                                  multiprecision::expression_template_option ExpressionTemplates>

@@ -47,7 +47,7 @@ namespace nil {
                             using field_value_type = typename ElementType::field_type::value_type;
 
                             // Because for some reasons it's not so
-                            // assert(second.Z == field_value_type::one());
+                            assert(second.Z == field_value_type::one());
 
                             field_value_type A = first.Z;                                      // A = Z1
                             field_value_type B = ElementType::params_type::d * A.squared();    // B = d*A^2

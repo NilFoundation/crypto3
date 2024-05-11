@@ -93,7 +93,7 @@ namespace nil {
                          *    @return the selected point (X:Y:Z)
                          *
                          */
-                        constexpr curve_element(const field_value_type& X, const field_value_type& Y, const field_value_type& Z) 
+                        constexpr curve_element(const field_value_type& X, const field_value_type& Y, const field_value_type& Z = field_value_type::one())
                             : X(X), Y(Y), Z(Z)
                         {
                         };

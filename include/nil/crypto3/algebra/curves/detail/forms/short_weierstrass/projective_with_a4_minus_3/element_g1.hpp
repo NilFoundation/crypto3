@@ -92,11 +92,9 @@ namespace nil {
                          *    @return the selected point (X:Y:Z)
                          *
                          */
-                        constexpr curve_element(field_value_type X, field_value_type Y, field_value_type Z) {
-                            this->X = X;
-                            this->Y = Y;
-                            this->Z = Z;
-                        };
+                        constexpr curve_element(field_value_type const& X, field_value_type const& Y, field_value_type const& Z = field_value_type::one())
+                            : X(X), Y(Y), Z(Z)
+                        { }
 
                         /** @brief Get the point at infinity
                          *
