@@ -474,7 +474,7 @@ $GATE_ARG_PREPARE$
 
     // Commitment scheme
     std::array<pallas::base_field_type::value_type, singles_amount> singles = fill_singles(challenges.xi, challenges.eta);
-    std::array<pallas::base_field_type::value_type, unique_points+1> U;
+    std::array<pallas::base_field_type::value_type, unique_points+1> U{pallas::base_field_type::value_type(0)};
 
 $PREPARE_U_AND_V$
 
