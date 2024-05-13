@@ -32,7 +32,6 @@ endmacro()
 cm_setup_version(VERSION 0.3.0 PREFIX ${CMAKE_WORKSPACE_NAME})
 
 option(BUILD_SHARED_LIBS "Build shared library" TRUE)
-option(BUILD_WITH_CCACHE "Build with ccache usage" TRUE)
 option(BUILD_TESTS "Build unit tests" FALSE)
 option(BUILD_BENCH_TESTS "Build performance benchmark tests" FALSE)
 option(BUILD_DOCS "Build with configuring Doxygen documentation compiler" TRUE)
@@ -41,14 +40,6 @@ set(BUILD_WITH_TARGET_ARCHITECTURE "" CACHE STRING "Target build architecture")
 set(DOXYGEN_OUTPUT_DIR "${CMAKE_CURRENT_LIST_DIR}/docs" CACHE STRING "Specify doxygen output directory")
 
 include(TargetArchitecture)
-
-if(UNIX AND BUILD_WITH_CCACHE)
-    find_program(CCACHE_FOUND ccache)
-    if(CCACHE_FOUND)
-        set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
-        set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache)
-    endif(CCACHE_FOUND)
-endif()
 
 if(BUILD_WITH_TARGET_ARCHITECTURE)
     set(CMAKE_TARGET_ARCHITECTURE ${BUILD_WITH_TARGET_ARCHITECTURE})
