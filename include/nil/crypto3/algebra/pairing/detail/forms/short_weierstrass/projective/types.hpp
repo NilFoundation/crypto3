@@ -27,6 +27,7 @@
 #define CRYPTO3_ALGEBRA_PAIRING_SHORT_WEIERSTRASS_PROJECTIVE_TYPES_POLICY_HPP
 
 #include <vector>
+#include <iostream>
 
 namespace nil {
     namespace crypto3 {
@@ -127,8 +128,44 @@ namespace nil {
                         };
 
                         typedef ate_g2_precomputed_type g2_precomputed_type;
-                    };
 
+                        friend std::ostream& operator<<(std::ostream& os, ate_g1_precomputed_type const& p)
+                        {
+                            os << "{" << std::endl
+                                << "\"PX\":" << p.PX << "," << std::endl
+                                << "\"PY\":" << p.PY << "," << std::endl
+                                << "\"PX_twist\":" << p.PX_twist << "," << std::endl
+                                << "\"PY_twist\":" << p.PY_twist << "}";
+                            return os;
+                        }
+
+                        friend std::ostream& operator<<(std::ostream& os, ate_g2_precomputed_type const& p)
+                        {
+                            os << "{" << std::endl
+                                << "\"QX\":" << p.QX << "," << std::endl
+                                << "\"QY\":" << p.QY << "," << std::endl
+                                << "\"QY2\":" << p.QY2 << "," << std::endl
+                                << "\"QX_over_twist\":" << p.QX_over_twist << "," << std::endl
+                                << "\"QY_over_twist\":" << p.QY_over_twist << "," << std::endl
+                                << "\"dbl_coeffs\":[" << std::endl;
+                            for(auto d = p.dbl_coeffs.begin(); d != p.dbl_coeffs.end(); ++d) {
+                                os << "[" << d->c_H << "," << d->c_4C << "," << d->c_J << "," << d->c_L << "]";
+                                if (d != p.dbl_coeffs.end()) {
+                                    os << "," << std::endl;
+                                }
+                            }
+                            os << "]," << std::endl << "\"add_coeffs\":[" << std::endl;
+                            for(auto a = p.add_coeffs.begin(); a != p.add_coeffs.end(); ++a) {
+                                os << "[" << a->c_L1 << "," << a->c_RZ << "]";
+                                if (a != p.add_coeffs.end()) {
+                                    os << "," << std::endl;;
+                                }
+                            }
+                            os << "]" << std::endl;
+                            os << "}";
+                            return os;
+                        }
+                     };
                 }    // namespace detail
             }        // namespace pairing
         }            // namespace algebra

@@ -67,72 +67,19 @@
 
 using namespace nil::crypto3::algebra;
 
-template<typename FieldParams>
-void print_field_element(typename fields::detail::element_fp<FieldParams> e) {
-    std::cout << "fp: " << e.data << std::endl;
-}
-
-template<typename FieldParams>
-void print_field_element(typename fields::detail::element_fp2<FieldParams> e) {
-    std::cout << "fp2: " << e.data[0].data << " " << e.data[1].data << std::endl;
-}
-
-template<typename FieldParams>
-void print_field_element(typename fields::detail::element_fp3<FieldParams> e) {
-    std::cout << "fp3: " << e.data[0].data << " " << e.data[1].data << " " << e.data[2].data << std::endl;
-}
-
-template<typename FieldParams>
-void print_field_element(typename fields::detail::element_fp4<FieldParams> e) {
-    std::cout << "fp4: \n";
-    print_field_element(e.data[0]);
-    print_field_element(e.data[1]);
-}
-
-template<typename FieldParams>
-void print_field_element(typename fields::detail::element_fp6_2over3<FieldParams> e) {
-    std::cout << "fp6_2over3: \n";
-    print_field_element(e.data[0]);
-    print_field_element(e.data[1]);
-}
-
-template<typename FieldParams>
-void print_field_element(typename fields::detail::element_fp6_3over2<FieldParams> e) {
-    std::cout << "fp6_3over2: \n";
-    print_field_element(e.data[0]);
-    print_field_element(e.data[1]);
-    print_field_element(e.data[2]);
-}
-
-template<typename FieldParams>
-void print_field_element(typename fields::detail::element_fp12_2over3over2<FieldParams> e) {
-    std::cout << "fp12_2over3over2: \n";;
-    print_field_element(e.data[0]);
-    print_field_element(e.data[1]);
-}
-
-template<typename CurveGroupValueType>
-void print_curve_group_element(CurveGroupValueType e) {
-    std::cout << "Group element: \n";;
-    print_field_element(e.X);
-    print_field_element(e.Y);
-    print_field_element(e.Z);
-}
 
 template<typename FieldType>
 void random_field_element_example(){
     typename FieldType::value_type v = random_element<FieldType>();
 
-    std::cout << "Gotten random value:" << std::endl;
-    print_field_element(v);
+    std::cout << "Got random value:" << v << std::endl;
 }
 
 template<typename CurveGroupType>
 void random_group_element_example(){
     typename CurveGroupType::value_type v = random_element<CurveGroupType>();
 
-    std::cout << "Gotten random value:" << std::endl;
-    print_curve_group_element(v);
+    std::cout << "Got random value:" << v << std::endl;
 }
 
 int main() {

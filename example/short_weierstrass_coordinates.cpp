@@ -32,11 +32,6 @@
 
 using namespace nil::crypto3::algebra;
 
-template<typename FpCurveGroupElement>
-void print_fp_curve_group_element(FpCurveGroupElement e) {
-    std::cout << e.X.data << " " << e.Y.data << " " << e.Z.data << std::endl;
-}
-
 template<typename FpCurveGroup>
 void coordinates_examples() {
     typedef typename FpCurveGroup::value_type group_value_type;
@@ -52,16 +47,11 @@ void coordinates_examples() {
     group_value_type c1(e1, e2, e3), c2(e4, e5, e6);//, c3(e7,e8,e9),c4(e10,e11,e12);
 
     std::cout << "Curve element values: " << std::endl;
-    std::cout << "c1 value: ";
-    print_fp_curve_group_element(c1);
-    std::cout << "c2 value: ";
-    print_fp_curve_group_element(c2);
-    std::cout << "c1 + c2 value: ";
-    print_fp_curve_group_element(c1 + c2);
-    std::cout << "c1 - c2 value: ";
-    print_fp_curve_group_element(c1-c2);
-    std::cout << "Doubled c1 value: ";
-    print_fp_curve_group_element(c1.doubled());
+    std::cout << "c1 value: " << (c1) << std::endl;
+    std::cout << "c2 value: " << (c2) << std::endl;
+    std::cout << "c1 + c2 value: " << (c1 + c2) << std::endl;
+    std::cout << "c1 - c2 value: " << (c1 - c2) << std::endl;
+    std::cout << "Doubled c1 value: " << (c1.doubled()) << std::endl;
   }
 
 int main() {

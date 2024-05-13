@@ -26,6 +26,9 @@
 #ifndef CRYPTO3_ALGEBRA_PAIRING_SHORT_WEIERSTRASS_JACOBIAN_WITH_A4_0_TYPES_POLICY_HPP
 #define CRYPTO3_ALGEBRA_PAIRING_SHORT_WEIERSTRASS_JACOBIAN_WITH_A4_0_TYPES_POLICY_HPP
 
+#include <vector>
+#include <iostream>
+
 namespace nil {
     namespace crypto3 {
         namespace algebra {
@@ -79,6 +82,31 @@ namespace nil {
 
                         typedef ate_g1_precomputed_type g1_precomputed_type;
                         typedef ate_g2_precomputed_type g2_precomputed_type;
+
+                        friend std::ostream& operator<<(std::ostream& os, ate_g1_precomputed_type const& p)
+                        {
+                            os << "{" << std::endl
+                                << "\"PX\":" << p.PX << "," << std::endl
+                                << "\"PY\":" << p.PY << "}";
+                            return os;
+                        }
+
+                        friend std::ostream& operator<<(std::ostream& os, ate_g2_precomputed_type const& p)
+                        {
+                            os << "{" << std::endl
+                                << "\"QX\":" << p.QX << "," << std::endl
+                                << "\"QY\":" << p.QY << "," << std::endl
+                                << "\"coeffs\":[" << std::endl;
+                            for(auto d = p.coeffs.begin(); d != p.coeffs.end(); ++d) {
+                                os << "[" << d->ell_0 << "," << d->ell_VW << "," << d->ell_VV << "]";
+                                if (d != p.coeffs.end()) {
+                                    os << "," << std::endl;
+                                }
+                            }
+                            os << "]" << std::endl;
+                            os << "}";
+                            return os;
+                        }
                     };
 
                 }    // namespace detail

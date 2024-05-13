@@ -45,56 +45,13 @@
 
 using namespace nil::crypto3::algebra;
 
-template<typename FieldParams>
-void print_field_element(std::ostream &os, const typename fields::detail::element_fp<FieldParams> &e) {
-    std::cout << e.data << std::endl;
-}
-
-template<typename CurveParams, typename Form>
-void print_curve_point(std::ostream &os,
-                       const curves::detail::curve_element<CurveParams, Form, curves::coordinates::affine> &p) {
-    os << "( X: [";
-    print_field_element(os, p.X);
-    os << "], Y: [";
-    print_field_element(os, p.Y);
-    os << "] )" << std::endl;
-}
-
-template<typename CurveParams, typename Form, typename Coordinates>
-typename std::enable_if<std::is_same<Coordinates, curves::coordinates::jacobian_with_a4_minus_3>::value||
-                        std::is_same<Coordinates, curves::coordinates::jacobian>::value||
-                        std::is_same<Coordinates, curves::coordinates::projective_with_a4_minus_3>::value>::type
-    print_curve_point(std::ostream &os, const curves::detail::curve_element<CurveParams, Form, Coordinates> &p) {
-    os << "( X: [";
-    print_field_element(os, p.X);
-    os << "], Y: [";
-    print_field_element(os, p.Y);
-    os << "], Z:[";
-    print_field_element(os, p.Z);
-    os << "] )" << std::endl;
-}
 
 namespace boost {
     namespace test_tools {
         namespace tt_detail {
-            template<typename CurveParams, typename Form, typename Coordinates>
-            struct print_log_value<curves::detail::curve_element<CurveParams, Form, Coordinates>> {
-                void operator()(std::ostream &os,
-                                curves::detail::curve_element<CurveParams, Form, Coordinates> const &p) {
-                    print_curve_point(os, p);
-                }
-            };
-
             template<template<typename, typename> class P, typename K, typename V>
             struct print_log_value<P<K, V>> {
                 void operator()(std::ostream &, P<K, V> const &) {
-                }
-            };
-
-            template<typename FieldParams>
-            struct print_log_value<typename fields::detail::element_fp<FieldParams>> {
-                void operator()(std::ostream &os, typename fields::detail::element_fp<FieldParams> const &e) {
-                    print_field_element(os, e);
                 }
             };
         }    // namespace tt_detail

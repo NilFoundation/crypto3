@@ -264,6 +264,11 @@ namespace nil {
                         return element_fp4_details::one_instance<FieldParams>;
                     }
 
+                    template<typename FieldParams>
+                    std::ostream& operator<<(std::ostream& os, const element_fp4<FieldParams>& elem) {
+                        os << "[" << elem.data[0] << "," << elem.data[1] << "]";
+                        return os;
+                    }
                 }    // namespace detail
             }        // namespace fields
         }            // namespace algebra

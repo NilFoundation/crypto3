@@ -288,8 +288,13 @@ namespace nil {
 
                             return mixed_addition_processor::process(*this, other);
                         }
-                    };
 
+                        friend std::ostream& operator<<(std::ostream& os, curve_element const& e)
+                        {
+                            os << "{\"X\":" << e.X << ",\"Y\":" << e.Y << ",\"Z\":" << e.Z << "}";
+                            return os;
+                        }
+                    };
                 }    // namespace detail
             }        // namespace curves
         }            // namespace algebra

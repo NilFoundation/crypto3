@@ -60,110 +60,12 @@
 
 using namespace nil::crypto3::algebra;
 
-template<typename FieldParams>
-void print_field_element(std::ostream &os, const typename fields::detail::element_fp<FieldParams> &e) {
-    std::cout << e.data << std::endl;
-}
-
-template<typename FieldParams>
-void print_field_element(std::ostream &os, const typename fields::detail::element_fp2<FieldParams> &e) {
-    std::cout << e.data[0].data << ", " << e.data[1].data << std::endl;
-}
-
-template<typename FieldParams>
-void print_field_element(std::ostream &os, const typename fields::detail::element_fp3<FieldParams> &e) {
-    std::cout << e.data[0].data << ", " << e.data[1].data << ", " << e.data[2].data << std::endl;
-}
-
-template<typename CurveParams, typename Form>
-void print_curve_point(std::ostream &os,
-                       const curves::detail::curve_element<CurveParams, Form, curves::coordinates::affine> &p) {
-    os << "( X: [";
-    print_field_element(os, p.X);
-    os << "], Y: [";
-    print_field_element(os, p.Y);
-    os << "] )" << std::endl;
-}
-
-template<typename CurveParams, typename Form, typename Coordinates>
-typename std::enable_if<std::is_same<Coordinates, curves::coordinates::projective>::value ||
-                        std::is_same<Coordinates, curves::coordinates::jacobian_with_a4_0>::value ||
-                        std::is_same<Coordinates, curves::coordinates::inverted>::value>::type
-    print_curve_point(std::ostream &os, const curves::detail::curve_element<CurveParams, Form, Coordinates> &p) {
-    os << "( X: [";
-    print_field_element(os, p.X);
-    os << "], Y: [";
-    print_field_element(os, p.Y);
-    os << "], Z: [";
-    print_field_element(os, p.Z);
-    os << "] )" << std::endl;
-}
-
-template<typename CurveParams, typename Form, typename Coordinates>
-typename std::enable_if<std::is_same<Coordinates, curves::coordinates::extended_with_a_minus_1>::value>::type
-    print_curve_point(std::ostream &os, const curves::detail::curve_element<CurveParams, Form, Coordinates> &p) {
-    os << "( X: [";
-    print_field_element(os, p.X);
-    os << "], Y: [";
-    print_field_element(os, p.Y);
-    os << "], T:[";
-    print_field_element(os, p.T);
-    os << "], Z:[";
-    print_field_element(os, p.Z);
-    os << "] )" << std::endl;
-}
-
-// TODO: remove
-template<typename Fp3CurveGroupElement>
-void print_fp3_curve_group_element(std::ostream &os, const Fp3CurveGroupElement &e) {
-    os << "(" << e.X.data[0].data << " , " << e.X.data[1].data << " , " << e.X.data[2].data << ") : ("
-       << e.Y.data[0].data << " , " << e.Y.data[1].data << " , " << e.Y.data[2].data << ") : (" << e.Z.data[0].data
-       << " , " << e.Z.data[1].data << " , " << e.Z.data[2].data << ")" << std::endl;
-}
-
 namespace boost {
     namespace test_tools {
         namespace tt_detail {
-            template<typename CurveParams, typename Form, typename Coordinates>
-            struct print_log_value<curves::detail::curve_element<CurveParams, Form, Coordinates>> {
-                void operator()(std::ostream &os,
-                                curves::detail::curve_element<CurveParams, Form, Coordinates> const &p) {
-                    print_curve_point(os, p);
-                }
-            };
-
             template<template<typename, typename> class P, typename K, typename V>
             struct print_log_value<P<K, V>> {
                 void operator()(std::ostream &, P<K, V> const &) {
-                }
-            };
-
-            template<typename FieldParams>
-            struct print_log_value<typename fields::detail::element_fp<FieldParams>> {
-                void operator()(std::ostream &os, typename fields::detail::element_fp<FieldParams> const &e) {
-                    print_field_element(os, e);
-                }
-            };
-
-            template<typename FieldParams>
-            struct print_log_value<typename fields::detail::element_fp2<FieldParams>> {
-                void operator()(std::ostream &os, typename fields::detail::element_fp2<FieldParams> const &e) {
-                    print_field_element(os, e);
-                }
-            };
-
-            template<typename FieldParams>
-            struct print_log_value<typename fields::detail::element_fp3<FieldParams>> {
-                void operator()(std::ostream &os, typename fields::detail::element_fp3<FieldParams> const &e) {
-                    print_field_element(os, e);
-                }
-            };
-
-            // TODO: remove
-            template<>
-            struct print_log_value<typename curves::edwards<183>::g2_type<>::value_type> {
-                void operator()(std::ostream &os, typename curves::edwards<183>::g2_type<>::value_type const &e) {
-                    print_fp3_curve_group_element(os, e);
                 }
             };
         }    // namespace tt_detail
@@ -509,7 +411,7 @@ BOOST_AUTO_TEST_CASE(curve_operation_test_babyjubjub_g1) {
 
     typename policy_type::value_type P1pP2 = P1 + P2;
 
-    BOOST_CHECK(P1 + P2 == P3);
+    BOOST_CHECK_EQUAL(P1 + P2, P3);
 
     typename policy_type::value_type P4(
         typename policy_type::field_type::value_type(
@@ -517,7 +419,7 @@ BOOST_AUTO_TEST_CASE(curve_operation_test_babyjubjub_g1) {
         typename policy_type::field_type::value_type(
             0x9979273078B5C735585107619130E62E315C5CAFE683A064F79DFED17EB14E1_cppui252));
 
-    BOOST_CHECK(P1.doubled() == P4);
+    BOOST_CHECK_EQUAL(P1.doubled(), P4);
 
     typename policy_type::value_type P5(
         typename policy_type::field_type::value_type(
@@ -541,11 +443,11 @@ BOOST_AUTO_TEST_CASE(curve_operation_test_babyjubjub_g1) {
                 typename policy_type::field_type::value_type(
                     0x12aa55c3cc7ff986c520ddcae3927877e682f01bed87628f643f34905692880e_cppui252));
 
-    BOOST_CHECK(et_s1P5 == static_cast<nil::crypto3::multiprecision::cpp_int>(3) * P5);
-    BOOST_CHECK(et_s2P5 == nil::crypto3::multiprecision::cpp_int(
+    BOOST_CHECK_EQUAL(et_s1P5, static_cast<nil::crypto3::multiprecision::cpp_int>(3) * P5);
+    BOOST_CHECK_EQUAL(et_s2P5, nil::crypto3::multiprecision::cpp_int(
                                "14035240266687799601661095864649209771790948434046947201833777492504781204499") *
                                P5);
-    BOOST_CHECK(et_s1P6 == nil::crypto3::multiprecision::cpp_int(
+    BOOST_CHECK_EQUAL(et_s1P6, nil::crypto3::multiprecision::cpp_int(
                                "20819045374670962167435360035096875258406992893633759881276124905556507972311") *
                                P6);
     BOOST_CHECK(P5.is_well_formed());

@@ -56,64 +56,14 @@ using namespace nil::crypto3::algebra;
 using namespace nil::crypto3::algebra::curves::detail;
 using namespace nil::crypto3::algebra::curves;
 
-template<typename FieldParams>
-void print_field_element(std::ostream &os, const typename fields::detail::element_fp<FieldParams> &e) {
-    os << e.data << std::endl;
-}
-
-template<typename FieldParams>
-void print_field_element(std::ostream &os, const typename fields::detail::element_fp2<FieldParams> &e) {
-    os << e.data[0].data << " " << e.data[1].data << std::endl;
-}
-
-template<typename FpCurveGroupElement>
-void print_fp_curve_group_element(std::ostream &os, const FpCurveGroupElement &e) {
-    os << "( " << e.X.data << " : " << e.Y.data << " : " << e.Z.data << " )";
-}
-
-template<typename Fp2CurveGroupElement>
-void print_fp2_curve_group_element(std::ostream &os, const Fp2CurveGroupElement &e) {
-    os << "(" << e.X.data[0].data << " , " << e.X.data[1].data << ") : (" << e.Y.data[0].data << " , "
-       << e.Y.data[1].data << ") : (" << e.Z.data[0].data << " , " << e.Z.data[1].data << ")" << std::endl;
-}
-
 namespace boost {
     namespace test_tools {
         namespace tt_detail {
-            template<typename FieldParams>
-            struct print_log_value<typename fields::detail::element_fp<FieldParams>> {
-                void operator()(std::ostream &os, typename fields::detail::element_fp<FieldParams> const &e) {
-                    print_field_element(os, e);
-                }
-            };
-
-            template<typename FieldParams>
-            struct print_log_value<typename fields::detail::element_fp2<FieldParams>> {
-                void operator()(std::ostream &os, typename fields::detail::element_fp2<FieldParams> const &e) {
-                    print_field_element(os, e);
-                }
-            };
-
-            template<>
-            struct print_log_value<typename curves::bls12<381>::g1_type<>::value_type> {
-                void operator()(std::ostream &os, typename curves::bls12<381>::g1_type<>::value_type const &e) {
-                    print_fp_curve_group_element(os, e);
-                }
-            };
-
-            template<>
-            struct print_log_value<typename curves::bls12<381>::g2_type<>::value_type> {
-                void operator()(std::ostream &os, typename curves::bls12<381>::g2_type<>::value_type const &e) {
-                    print_fp2_curve_group_element(os, e);
-                }
-            };
-
             template<template<typename, typename> class P, typename K, typename V>
             struct print_log_value<P<K, V>> {
                 void operator()(std::ostream &, P<K, V> const &) {
                 }
             };
-
         }    // namespace tt_detail
     }        // namespace test_tools
 }    // namespace boost

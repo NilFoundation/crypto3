@@ -520,6 +520,12 @@ namespace nil {
                     constexpr const element_fp12_2over3over2<FieldParams>& element_fp12_2over3over2<FieldParams>::one() {
                         return element_fp12_2over3over2_details::one_instance<FieldParams>;
                     }
+
+                    template<typename FieldParams>
+                    std::ostream& operator<<(std::ostream& os, const element_fp12_2over3over2<FieldParams>& elem) {
+                        os << "[" << elem.data[0] << "," << elem.data[1] << "]";
+                        return os;
+                    }
                 }    // namespace detail
             }        // namespace fields
         }            // namespace algebra

@@ -391,6 +391,12 @@ namespace nil {
                                                (this->X - field_value_type::one()) /
                                                    (this->X + field_value_type::one()));
                         }
+
+                        friend std::ostream& operator<<(std::ostream& os, curve_element const& e)
+                        {
+                            os << "{\"X\":" << e.X << ",\"Y\":" << e.Y << "}";
+                            return os;
+                        }
                     };
                 }    // namespace detail
             }        // namespace curves

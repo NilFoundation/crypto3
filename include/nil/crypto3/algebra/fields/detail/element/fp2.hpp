@@ -336,7 +336,7 @@ namespace nil {
 
                     template<typename FieldParams>
                     std::ostream& operator<<(std::ostream& os, const element_fp2<FieldParams>& elem) {
-                        os << elem.data[0] << " " << elem.data[1];
+                        os << "[" << elem.data[0] << "," << elem.data[1] << "]";
                         return os;
                     }
                 }    // namespace detail

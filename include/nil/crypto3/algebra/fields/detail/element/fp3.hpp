@@ -269,6 +269,12 @@ namespace nil {
                     constexpr const element_fp3<FieldParams>& element_fp3<FieldParams>::one() {
                         return element_fp3_details::one_instance<FieldParams>;
                     }
+
+                    template<typename FieldParams>
+                    std::ostream& operator<<(std::ostream& os, const element_fp3<FieldParams>& elem) {
+                        os << "[" << elem.data[0] << "," << elem.data[1] << "," << elem.data[2] << "]";
+                        return os;
+                    }
                 }    // namespace detail
             }        // namespace fields
         }            // namespace algebra

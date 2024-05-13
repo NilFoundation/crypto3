@@ -45,24 +45,6 @@
 
 using namespace nil::crypto3::algebra;
 
-template<typename FpCurveGroupElement>
-void print_fp_curve_group_element(FpCurveGroupElement e) {
-    std::cout << e.X.data << " " << e.Y.data << " " << e.Z.data << std::endl;
-}
-
-template<typename Fp2CurveGroupElement>
-void print_fp2_curve_group_element(Fp2CurveGroupElement e) {
-    std::cout << "(" << e.X.data[0].data << " " << e.X.data[1].data << ") (" << e.Y.data[0].data << " "
-              << e.Y.data[1].data << ") (" << e.Z.data[0].data << " " << e.Z.data[1].data << ")" << std::endl;
-}
-
-template<typename Fp3CurveGroupElement>
-void print_fp3_curve_group_element(Fp3CurveGroupElement e) {
-    std::cout << "(" << e.X.data[0].data << " " << e.X.data[1].data << e.X.data[2].data << ") (" << e.Y.data[0].data
-              << " " << e.Y.data[1].data << e.Y.data[2].data << ") (" << e.Z.data[0].data << " " << e.Z.data[1].data
-              << e.Z.data[2].data << ")" << std::endl;
-}
-
 // print dunctions can be made using arity in fields
 
 template<typename FpCurveGroup>
@@ -74,27 +56,20 @@ void fp_curve_group_basic_math_examples() {
     group_value_type c1(e1, e2, e3), c2(e4, e5, e6);
 
     std::cout << "Curve element values: " << std::endl;
-    std::cout << "c1 value: ";
-    print_fp_curve_group_element(c1);
+    std::cout << "c1 value: " << (c1) << std::endl;
 
-    std::cout << "c2 value: ";
-    print_fp_curve_group_element(c2);
+    std::cout << "c2 value: " << (c2) << std::endl;
 
-    std::cout << "c1 + c2 value: ";
-    print_fp_curve_group_element(c1 + c2);
+    std::cout << "c1 + c2 value: " << (c1 + c2) << std::endl;
 
-    std::cout << "c1 - c2 value: ";
-    print_fp_curve_group_element(c1 - c2);
+    std::cout << "c1 - c2 value: " << (c1 - c2) << std::endl;
 
-    std::cout << "Doubled c1 value: ";
-    print_fp_curve_group_element(c1.doubled());
+    std::cout << "Doubled c1 value: " << (c1.doubled()) << std::endl;
 
     group_value_type cd = c1.doubled();
 
     // group_value_type cn = c1.normalize();
-
-    // std::cout << "c1 normalized value: ";
-    // print_fp_curve_group_element(cn);
+    // std::cout << "c1 normalized value: " << (cn) << std::endl;
 }
 
 
@@ -107,27 +82,20 @@ void fp2_curve_group_basic_math_examples() {
     group_value_type c1 = group_value_type::one(), c2 = group_value_type::one().doubled();
 
     std::cout << "Curve element values: " << std::endl;
-    std::cout << "c1 value: ";
-    print_fp2_curve_group_element(c1);
+    std::cout << "c1 value: " << (c1) << std::endl;
 
-    std::cout << "c2 value: ";
-    print_fp2_curve_group_element(c2);
+    std::cout << "c2 value: " << (c2) << std::endl;
 
-    std::cout << "c1 + c2 value: ";
-    print_fp2_curve_group_element(c1 + c2);
+    std::cout << "c1 + c2 value: " << (c1 + c2) << std::endl;
 
-    std::cout << "c1 - c2 value: ";
-    print_fp2_curve_group_element(c1 - c2);
+    std::cout << "c1 - c2 value: " << (c1 - c2) << std::endl;
 
-    std::cout << "Doubled c1 value: ";
-    print_fp2_curve_group_element(c1.doubled());
+    std::cout << "Doubled c1 value: " << (c1.doubled()) << std::endl;
 
     group_value_type cd = c1.doubled();
 
     // group_value_type cn = c1.normalize();
-
-    // std::cout << "c1 normalized value: ";
-    // print_fp2_curve_group_element(cn);
+    // std::cout << "c1 normalized value: " << (cn) << std::endl;
 }
 
 template<typename Fp3CurveGroup>
@@ -138,27 +106,20 @@ void fp3_curve_group_basic_math_examples() {
     group_value_type c1 = group_value_type::one(), c2 = group_value_type::one().doubled();
 
     std::cout << "Curve element values: " << std::endl;
-    std::cout << "c1 value: ";
-    print_fp3_curve_group_element(c1);
+    std::cout << "c1 value: " << (c1) << std::endl;
 
-    std::cout << "c2 value: ";
-    print_fp3_curve_group_element(c2);
+    std::cout << "c2 value: " << (c2) << std::endl;
 
-    std::cout << "c1 + c2 value: ";
-    print_fp3_curve_group_element(c1 + c2);
+    std::cout << "c1 + c2 value: " << (c1 + c2) << std::endl;
 
-    std::cout << "c1 - c2 value: ";
-    print_fp3_curve_group_element(c1 - c2);
+    std::cout << "c1 - c2 value: " << (c1 - c2) << std::endl;
 
-    std::cout << "Doubled c1 value: ";
-    print_fp3_curve_group_element(c1.doubled());
+    std::cout << "Doubled c1 value: " << (c1.doubled()) << std::endl;
 
     group_value_type cd = c1.doubled();
 
     // group_value_type cn = c1.normalize();
-
-    // std::cout << "c1 normalized value: ";
-    // print_fp3_curve_group_element(cn);
+    // std::cout << "c1 normalized value: " << (cn) << std::endl;
 }
 
 int main() {
