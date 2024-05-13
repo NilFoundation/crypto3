@@ -636,24 +636,21 @@ namespace nil {
                 }
 
                 polynomial_dfs pow(size_t power) const {
+                    polynomial_dfs result = *this;
+
                     if (power == 1) {
-                        return *this;
+                        return result;
                     }
 
-                    polynomial_dfs power_of_2 = *this;
                     size_t expected_size = detail::power_of_two(
                         std::max({this->size(), this->degree() * power + 1}));
-                    power_of_2.resize(expected_size);
-                    polynomial_dfs result(0, expected_size, FieldValueType::one());
-                    while (power) {
-                        if (power % 2 == 1) {
-                            result *= power_of_2;
-                        }
-                        power /= 2;
-                        if (power == 0)
-                            break;
-                        power_of_2 *= power_of_2;
+                    result.resize(expected_size);
+                    result._d = _d * power;
+
+                    for (std::size_t i = 0; i < result.size(); ++i) {
+                        result[i] = result[i].pow(power);
                     }
+
                     return result;
                 }
 
@@ -753,10 +750,14 @@ namespace nil {
                 } else {
                     os << "[Polynomial DFS, size " << poly.size()
                        << " degree " << poly.degree() << " values ";
-                    for( auto it = poly.begin(); it != poly.end(); it++ ){
-                        os << "0x" << std::hex << it->data << ", ";
+                    os << std::hex;
+                    for(auto it = poly.begin(); it != poly.end(); ++it) {
+                        os << "0x" << it->data;
+                        if (it != std::prev(poly.end())) {
+                            os << ", ";
+                        }
                     }
-                    os << "]";
+                    os << std::dec << "]";
                 }
                 return os;
             }
@@ -784,7 +785,7 @@ namespace nil {
                     needed_domain_sizes.push_back(i);
                     // On the next line I want to create the tree structure, then create the evaluation domains.
                     // This way filling of this structure can be done in parallel.
-                    domain_cache[i] = nullptr; 
+                    domain_cache[i] = nullptr;
                 }
 
                 // This loop will run in parallel.
