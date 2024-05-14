@@ -1,0 +1,20 @@
+name: PR Testing
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+
+jobs:
+  run-pull-request-actions:
+    name: Reusable Crypto3 Testing
+    uses: ./.github/workflows/pull-request-action.yml
+
+    secrets: inherit
+    with:
+      targets: |
+        pubkey_bls_test
+        pubkey_ecdsa_test
+        pubkey_eddsa_test
+        pubkey_secret_sharing_test
