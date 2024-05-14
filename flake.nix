@@ -40,6 +40,8 @@
             "-B build"
             "-G Ninja"
             "-DBUILD_TESTS=FALSE"
+            "-DBUILD_EXAMPLES=FALSE"
+            "-DBUILD_BENCH_TESTS=FALSE"
             "-DCMAKE_INSTALL_PREFIX=${placeholder "out"}"
             "-DBUILD_SHARED_LIBS=FALSE"
           ];
@@ -150,6 +152,8 @@
                 "-G Ninja"
                 "-DCMAKE_CXX_COMPILER=${if compiler == "gcc" then "g++" else "clang++"}"
                 "-DBUILD_TESTS=TRUE"
+                "-DBUILD_EXAMPLES=TRUE"
+                "-DBUILD_BENCH_TESTS=TRUE"
                 "-DCMAKE_BUILD_TYPE=Release" # TODO: change to Debug after build fix
                 "-DBUILD_SHARED_LIBS=FALSE"
                 "-DCMAKE_ENABLE_TESTS=1" # For some reason TRUE does not work here
