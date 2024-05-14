@@ -87,6 +87,7 @@ set(TESTS_NAMES
     "static_digest"
     "tiger"
     "poseidon"
+    "hash_to_curve"
     )
     # "reinforced_concrete")  # fails
 
