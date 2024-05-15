@@ -22,7 +22,7 @@ jobs:
     steps:
       # https://github.com/actions/checkout/issues/1552
       - name: Clean up after previous checkout
-        run: chmod +w -R ${GITHUB_WORKSPACE}; rm -rf ${GITHUB_WORKSPACE}/*;
+        run: ls -la && sudo chmod +w -R ${GITHUB_WORKSPACE}; sudo rm -rf ${GITHUB_WORKSPACE}/*;
 
       - name: Checkout Crypto3 repository
         # We need full history, because during CMake config stage we are finding the nearest tag
