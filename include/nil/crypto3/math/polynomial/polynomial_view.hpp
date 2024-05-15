@@ -315,7 +315,7 @@ namespace nil {
                  */
                 bool is_zero() const {
                     return std::all_of(this->begin(), this->end(),
-                                       [](FieldValueType i) { return i == FieldValueType(0); });
+                                       [](FieldValueType i) { return i == FieldValueType::zero(); });
                 }
 
                 /**

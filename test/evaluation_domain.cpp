@@ -76,7 +76,7 @@ void test_fft() {
     typedef typename FieldType::value_type value_type;
 
     const std::size_t m = 4;
-    std::vector<value_type> f = {2, 5, 3, 8};
+    std::vector<value_type> f = {2u, 5u, 3u, 8u};
 
     std::shared_ptr<evaluation_domain<FieldType>> domain = make_evaluation_domain<FieldType>(m);
 
@@ -139,7 +139,7 @@ template<typename FieldType>
 void test_inverse_fft_of_fft() {
     typedef typename FieldType::value_type value_type;
     const std::size_t m = 4;
-    std::vector<value_type> f = {2, 5, 3, 8};
+    std::vector<value_type> f = {2u, 5u, 3u, 8u};
 
     std::shared_ptr<evaluation_domain<FieldType>> domain = make_evaluation_domain<FieldType>(m);
 
@@ -158,7 +158,7 @@ template<typename FieldType>
 void test_inverse_coset_ftt_of_coset_fft() {
     typedef typename FieldType::value_type value_type;
     const std::size_t m = 4;
-    std::vector<value_type> f = {2, 5, 3, 8};
+    std::vector<value_type> f = {2u, 5u, 3u, 8u};
 
     value_type coset = value_type(fields::arithmetic_params<FieldType>::multiplicative_generator);
 
@@ -182,7 +182,7 @@ void test_lagrange_coefficients() {
     typedef typename FieldType::value_type value_type;
 
     const std::size_t m = 8;
-    value_type t = value_type(10);
+    value_type t = value_type(10u);
 
     std::shared_ptr<evaluation_domain<FieldType>> domain;
 
@@ -210,7 +210,7 @@ void test_compute_z() {
     typedef typename FieldType::value_type value_type;
 
     const std::size_t m = 8;
-    value_type t = value_type(10);
+    value_type t = value_type(10u);
 
     std::shared_ptr<evaluation_domain<FieldType>> domain;
     domain = make_evaluation_domain<FieldType>(m);
@@ -238,7 +238,9 @@ void test_fft_curve_elements() {
     // Make sure the results are reproducible.
     std::srand(0);
     std::vector<field_value_type> f(m);
-    std::generate(f.begin(), f.end(), std::rand);
+    for(std::size_t i = 0; i < m; ++i) {
+        f[i] = unsigned(std::rand());
+    }
     std::vector<value_type> g(m);
     for(std::size_t i = 0; i < m; ++i) {
         g[i] = value_type::one() * f[i];
@@ -274,7 +276,9 @@ void test_inverse_fft_curve_elements() {
     // Make sure the results are reproducible.
     std::srand(0);
     std::vector<field_value_type> f(m);
-    std::generate(f.begin(), f.end(), std::rand);
+    for(std::size_t i = 0; i < m; ++i) {
+        f[i] = unsigned(std::rand());
+    }
     std::vector<value_type> g(m);
     for(std::size_t i = 0; i < m; ++i) {
         g[i] = value_type::one() * f[i];
@@ -306,7 +310,7 @@ void test_lagrange_coefficients_from_powers(std::size_t m) {
 
     // Make sure the results are reproducible.
     std::srand(0);
-    field_value_type t = std::rand();
+    field_value_type t = unsigned(std::rand());
     std::vector<field_value_type> t_powers(m);
     t_powers[0] = field_value_type::one();
     for(std::size_t i = 1; i < m; ++i) {
@@ -336,7 +340,7 @@ void test_lagrange_coefficients_curve_elements(std::size_t m) {
 
     // Make sure the results are reproducible.
     std::srand(0);
-    field_value_type t = std::rand();
+    field_value_type t = unsigned(std::rand());
     std::vector<value_type> t_powers(m);
     t_powers[0] = value_type::one();
     for(std::size_t i = 1; i < m; ++i) {
@@ -367,7 +371,7 @@ void test_get_vanishing_polynomial(std::size_t m) {
 
     // Make sure the results are reproducible.
     std::srand(0);
-    field_value_type t = std::rand();
+    field_value_type t = unsigned(std::rand());
 
     std::shared_ptr<evaluation_domain<FieldType>> domain;
 

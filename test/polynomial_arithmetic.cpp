@@ -48,13 +48,13 @@ typedef fields::bls12_fr<381> ScalarFieldType;
 BOOST_AUTO_TEST_SUITE(polynomial_addition_test_suite)
 
 BOOST_AUTO_TEST_CASE(polynomial_addition_equal) {
-    std::vector<typename FieldType::value_type> a = {1, 3, 4, 25, 6, 7, 7, 2};
-    std::vector<typename FieldType::value_type> b = {9, 3, 11, 14, 7, 1, 5, 8};
+    std::vector<typename FieldType::value_type> a = {1u, 3u, 4u, 25u, 6u, 7u, 7u, 2u};
+    std::vector<typename FieldType::value_type> b = {9u, 3u, 11u, 14u, 7u, 1u, 5u, 8u};
     std::vector<typename FieldType::value_type> c(1, FieldType::value_type::zero());
 
     nil::crypto3::math::addition(c, a, b);
 
-    std::vector<typename FieldType::value_type> c_ans = {10, 6, 15, 39, 13, 8, 12, 10};
+    std::vector<typename FieldType::value_type> c_ans = {10u, 6u, 15u, 39u, 13u, 8u, 12u, 10u};
 
     for (std::size_t i = 0; i < c.size(); ++i) {
         BOOST_CHECK_EQUAL(c_ans[i].data, c[i].data);
@@ -63,13 +63,13 @@ BOOST_AUTO_TEST_CASE(polynomial_addition_equal) {
 
 BOOST_AUTO_TEST_CASE(polynomial_addition_long_a) {
 
-    std::vector<typename FieldType::value_type> a = {1, 3, 4, 25, 6, 7, 7, 2};
-    std::vector<typename FieldType::value_type> b = {9, 3, 11, 14, 7};
+    std::vector<typename FieldType::value_type> a = {1u, 3u, 4u, 25u, 6u, 7u, 7u, 2u};
+    std::vector<typename FieldType::value_type> b = {9u, 3u, 11u, 14u, 7u};
     std::vector<typename FieldType::value_type> c(1, FieldType::value_type::zero());
 
     nil::crypto3::math::addition(c, a, b);
 
-    std::vector<typename FieldType::value_type> c_ans = {10, 6, 15, 39, 13, 7, 7, 2};
+    std::vector<typename FieldType::value_type> c_ans = {10u, 6u, 15u, 39u, 13u, 7u, 7u, 2u};
 
     for (std::size_t i = 0; i < c.size(); i++) {
         BOOST_CHECK_EQUAL(c_ans[i].data, c[i].data);
@@ -78,13 +78,13 @@ BOOST_AUTO_TEST_CASE(polynomial_addition_long_a) {
 
 BOOST_AUTO_TEST_CASE(polynomial_addition_long_b) {
 
-    std::vector<typename FieldType::value_type> a = {1, 3, 4, 25, 6};
-    std::vector<typename FieldType::value_type> b = {9, 3, 11, 14, 7, 1, 5, 8};
+    std::vector<typename FieldType::value_type> a = {1u, 3u, 4u, 25u, 6u};
+    std::vector<typename FieldType::value_type> b = {9u, 3u, 11u, 14u, 7u, 1u, 5u, 8u};
     std::vector<typename FieldType::value_type> c(1, FieldType::value_type::zero());
 
     nil::crypto3::math::addition(c, a, b);
 
-    std::vector<typename FieldType::value_type> c_ans = {10, 6, 15, 39, 13, 1, 5, 8};
+    std::vector<typename FieldType::value_type> c_ans = {10u, 6u, 15u, 39u, 13u, 1u, 5u, 8u};
 
     for (std::size_t i = 0; i < c.size(); i++) {
         BOOST_CHECK_EQUAL(c_ans[i].data, c[i].data);
@@ -93,13 +93,13 @@ BOOST_AUTO_TEST_CASE(polynomial_addition_long_b) {
 
 BOOST_AUTO_TEST_CASE(polynomial_addition_zero_a) {
 
-    std::vector<typename FieldType::value_type> a = {0, 0, 0};
-    std::vector<typename FieldType::value_type> b = {1, 3, 4, 25, 6, 7, 7, 2};
+    std::vector<typename FieldType::value_type> a = {0u, 0u, 0u};
+    std::vector<typename FieldType::value_type> b = {1u, 3u, 4u, 25u, 6u, 7u, 7u, 2u};
     std::vector<typename FieldType::value_type> c(1, FieldType::value_type::zero());
 
     nil::crypto3::math::addition(c, a, b);
 
-    std::vector<typename FieldType::value_type> c_ans = {1, 3, 4, 25, 6, 7, 7, 2};
+    std::vector<typename FieldType::value_type> c_ans = {1u, 3u, 4u, 25u, 6u, 7u, 7u, 2u};
 
     for (std::size_t i = 0; i < c.size(); i++) {
         BOOST_CHECK_EQUAL(c_ans[i].data, c[i].data);
@@ -108,13 +108,13 @@ BOOST_AUTO_TEST_CASE(polynomial_addition_zero_a) {
 
 BOOST_AUTO_TEST_CASE(polynomial_addition_zero_b) {
 
-    std::vector<typename FieldType::value_type> a = {1, 3, 4, 25, 6, 7, 7, 2};
-    std::vector<typename FieldType::value_type> b = {0, 0, 0};
+    std::vector<typename FieldType::value_type> a = {1u, 3u, 4u, 25u, 6u, 7u, 7u, 2u};
+    std::vector<typename FieldType::value_type> b = {0u, 0u, 0u};
     std::vector<typename FieldType::value_type> c(1, FieldType::value_type::zero());
 
     nil::crypto3::math::addition(c, a, b);
 
-    std::vector<typename FieldType::value_type> c_ans = {1, 3, 4, 25, 6, 7, 7, 2};
+    std::vector<typename FieldType::value_type> c_ans = {1u, 3u, 4u, 25u, 6u, 7u, 7u, 2u};
 
     for (std::size_t i = 0; i < c.size(); i++) {
         BOOST_CHECK_EQUAL(c_ans[i].data, c[i].data);
@@ -127,13 +127,15 @@ BOOST_AUTO_TEST_SUITE(polynomial_subtraction_test_suite)
 
 BOOST_AUTO_TEST_CASE(polynomial_subtraction_equal) {
 
-    std::vector<typename FieldType::value_type> a = {1, 3, 4, 25, 6, 7, 7, 2};
-    std::vector<typename FieldType::value_type> b = {9, 3, 11, 14, 7, 1, 5, 8};
+    std::vector<typename FieldType::value_type> a = {1u, 3u, 4u, 25u, 6u, 7u, 7u, 2u};
+    std::vector<typename FieldType::value_type> b = {9u, 3u, 11u, 14u, 7u, 1u, 5u, 8u};
     std::vector<typename FieldType::value_type> c(1, FieldType::value_type::zero());
 
     nil::crypto3::math::subtraction(c, a, b);
 
-    std::vector<typename FieldType::value_type> c_ans = {-8, 0, -7, 11, -1, 6, 2, -6};
+    std::vector<typename FieldType::value_type> c_ans = {
+        FieldType::modulus - 8u, 0u, FieldType::modulus - 7u, 11u, FieldType::modulus - 1u, 
+        6u, 2u, FieldType::modulus - 6u};
 
     for (std::size_t i = 0; i < c.size(); i++) {
         BOOST_CHECK_EQUAL(c_ans[i].data, c[i].data);
@@ -142,13 +144,15 @@ BOOST_AUTO_TEST_CASE(polynomial_subtraction_equal) {
 
 BOOST_AUTO_TEST_CASE(polynomial_subtraction_long_a) {
 
-    std::vector<typename FieldType::value_type> a = {1, 3, 4, 25, 6, 7, 7, 2};
-    std::vector<typename FieldType::value_type> b = {9, 3, 11, 14, 7};
+    std::vector<typename FieldType::value_type> a = {1u, 3u, 4u, 25u, 6u, 7u, 7u, 2u};
+    std::vector<typename FieldType::value_type> b = {9u, 3u, 11u, 14u, 7u};
     std::vector<typename FieldType::value_type> c(1, FieldType::value_type::zero());
 
     nil::crypto3::math::subtraction(c, a, b);
 
-    std::vector<typename FieldType::value_type> c_ans = {-8, 0, -7, 11, -1, 7, 7, 2};
+    std::vector<typename FieldType::value_type> c_ans = {
+        FieldType::modulus - 8u, 0u, FieldType::modulus - 7u, 11u,
+        FieldType::modulus - 1u, 7u, 7u, 2u};
 
     for (std::size_t i = 0; i < c.size(); i++) {
         BOOST_CHECK_EQUAL(c_ans[i].data, c[i].data);
@@ -157,13 +161,15 @@ BOOST_AUTO_TEST_CASE(polynomial_subtraction_long_a) {
 
 BOOST_AUTO_TEST_CASE(polynomial_subtraction_long_b) {
 
-    std::vector<typename FieldType::value_type> a = {1, 3, 4, 25, 6};
-    std::vector<typename FieldType::value_type> b = {9, 3, 11, 14, 7, 1, 5, 8};
+    std::vector<typename FieldType::value_type> a = {1u, 3u, 4u, 25u, 6u};
+    std::vector<typename FieldType::value_type> b = {9u, 3u, 11u, 14u, 7u, 1u, 5u, 8u};
     std::vector<typename FieldType::value_type> c(1, FieldType::value_type::zero());
 
     nil::crypto3::math::subtraction(c, a, b);
 
-    std::vector<typename FieldType::value_type> c_ans = {-8, 0, -7, 11, -1, -1, -5, -8};
+    std::vector<typename FieldType::value_type> c_ans = {
+        FieldType::modulus - 8u, 0u, FieldType::modulus - 7u, 11u, FieldType::modulus - 1u,
+        FieldType::modulus - 1u, FieldType::modulus - 5u, FieldType::modulus - 8u};
 
     for (std::size_t i = 0; i < c.size(); i++) {
         BOOST_CHECK_EQUAL(c_ans[i].data, c[i].data);
@@ -172,13 +178,16 @@ BOOST_AUTO_TEST_CASE(polynomial_subtraction_long_b) {
 
 BOOST_AUTO_TEST_CASE(polynomial_subtraction_zero_a) {
 
-    std::vector<typename FieldType::value_type> a = {0, 0, 0};
-    std::vector<typename FieldType::value_type> b = {1, 3, 4, 25, 6, 7, 7, 2};
+    std::vector<typename FieldType::value_type> a = {0u, 0u, 0u};
+    std::vector<typename FieldType::value_type> b = {1u, 3u, 4u, 25u, 6u, 7u, 7u, 2u};
     std::vector<typename FieldType::value_type> c(1, FieldType::value_type::zero());
 
     nil::crypto3::math::subtraction(c, a, b);
 
-    std::vector<typename FieldType::value_type> c_ans = {-1, -3, -4, -25, -6, -7, -7, -2};
+    std::vector<typename FieldType::value_type> c_ans = {
+        FieldType::modulus - 1u, FieldType::modulus - 3u, FieldType::modulus - 4u, 
+        FieldType::modulus - 25u, FieldType::modulus - 6u, FieldType::modulus - 7u,
+        FieldType::modulus - 7u, FieldType::modulus - 2u};
 
     for (std::size_t i = 0; i < c.size(); i++) {
         BOOST_CHECK_EQUAL(c_ans[i].data, c[i].data);
@@ -187,13 +196,13 @@ BOOST_AUTO_TEST_CASE(polynomial_subtraction_zero_a) {
 
 BOOST_AUTO_TEST_CASE(polynomial_subtraction_zero_b) {
 
-    std::vector<typename FieldType::value_type> a = {1, 3, 4, 25, 6, 7, 7, 2};
-    std::vector<typename FieldType::value_type> b = {0, 0, 0};
+    std::vector<typename FieldType::value_type> a = {1u, 3u, 4u, 25u, 6u, 7u, 7u, 2u};
+    std::vector<typename FieldType::value_type> b = {0u, 0u, 0u};
     std::vector<typename FieldType::value_type> c(1, FieldType::value_type::zero());
 
     nil::crypto3::math::subtraction(c, a, b);
 
-    std::vector<typename FieldType::value_type> c_ans = {1, 3, 4, 25, 6, 7, 7, 2};
+    std::vector<typename FieldType::value_type> c_ans = {1u, 3u, 4u, 25u, 6u, 7u, 7u, 2u};
 
     for (std::size_t i = 0; i < c.size(); i++) {
         BOOST_CHECK_EQUAL(c_ans[i].data, c[i].data);
@@ -206,13 +215,13 @@ BOOST_AUTO_TEST_SUITE(polynomial_multiplication_test_suite)
 
 BOOST_AUTO_TEST_CASE(polynomial_multiplication_long_a) {
 
-    std::vector<typename ScalarFieldType::value_type> a = {5, 0, 0, 13, 0, 1};
-    std::vector<typename ScalarFieldType::value_type> b = {13, 0, 1};
+    std::vector<typename ScalarFieldType::value_type> a = {5u, 0u, 0u, 13u, 0u, 1u};
+    std::vector<typename ScalarFieldType::value_type> b = {13u, 0u, 1u};
     std::vector<typename ScalarFieldType::value_type> c(1, ScalarFieldType::value_type::zero());
 
     nil::crypto3::math::multiplication(c, a, b);
 
-    std::vector<typename ScalarFieldType::value_type> c_ans = {65, 0, 5, 169, 0, 26, 0, 1};
+    std::vector<typename ScalarFieldType::value_type> c_ans = {65u, 0u, 5u, 169u, 0u, 26u, 0u, 1u};
 
     for (std::size_t i = 0; i < c.size(); i++) {
         BOOST_CHECK_EQUAL(c_ans[i].data, c[i].data);
@@ -221,13 +230,13 @@ BOOST_AUTO_TEST_CASE(polynomial_multiplication_long_a) {
 
 BOOST_AUTO_TEST_CASE(polynomial_multiplication_long_b) {
 
-    std::vector<typename ScalarFieldType::value_type> a = {13, 0, 1};
-    std::vector<typename ScalarFieldType::value_type> b = {5, 0, 0, 13, 0, 1};
+    std::vector<typename ScalarFieldType::value_type> a = {13u, 0u, 1u};
+    std::vector<typename ScalarFieldType::value_type> b = {5u, 0u, 0u, 13u, 0u, 1u};
     std::vector<typename ScalarFieldType::value_type> c(1, ScalarFieldType::value_type::zero());
 
     nil::crypto3::math::multiplication(c, a, b);
 
-    std::vector<typename ScalarFieldType::value_type> c_ans = {65, 0, 5, 169, 0, 26, 0, 1};
+    std::vector<typename ScalarFieldType::value_type> c_ans = {65u, 0u, 5u, 169u, 0u, 26u, 0u, 1u};
 
     for (std::size_t i = 0; i < c.size(); i++) {
         BOOST_CHECK_EQUAL(c_ans[i].data, c[i].data);
@@ -236,13 +245,13 @@ BOOST_AUTO_TEST_CASE(polynomial_multiplication_long_b) {
 
 BOOST_AUTO_TEST_CASE(polynomial_multiplication_zero_a) {
 
-    std::vector<typename ScalarFieldType::value_type> a = {0};
-    std::vector<typename ScalarFieldType::value_type> b = {5, 0, 0, 13, 0, 1};
+    std::vector<typename ScalarFieldType::value_type> a = {0u};
+    std::vector<typename ScalarFieldType::value_type> b = {5u, 0u, 0u, 13u, 0u, 1u};
     std::vector<typename ScalarFieldType::value_type> c(1, ScalarFieldType::value_type::zero());
 
     nil::crypto3::math::multiplication(c, a, b);
 
-    std::vector<typename ScalarFieldType::value_type> c_ans = {0};
+    std::vector<typename ScalarFieldType::value_type> c_ans = {0u};
 
     for (std::size_t i = 0; i < c.size(); i++) {
         BOOST_CHECK_EQUAL(c_ans[i].data, c[i].data);
@@ -251,13 +260,13 @@ BOOST_AUTO_TEST_CASE(polynomial_multiplication_zero_a) {
 
 BOOST_AUTO_TEST_CASE(polynomial_multiplication_zero_b) {
 
-    std::vector<typename ScalarFieldType::value_type> a = {5, 0, 0, 13, 0, 1};
-    std::vector<typename ScalarFieldType::value_type> b = {0};
+    std::vector<typename ScalarFieldType::value_type> a = {5u, 0u, 0u, 13u, 0u, 1u};
+    std::vector<typename ScalarFieldType::value_type> b = {0u};
     std::vector<typename ScalarFieldType::value_type> c(1, ScalarFieldType::value_type::zero());
 
     nil::crypto3::math::multiplication(c, a, b);
 
-    std::vector<typename ScalarFieldType::value_type> c_ans = {0};
+    std::vector<typename ScalarFieldType::value_type> c_ans = {0u};
 
     for (std::size_t i = 0; i < c.size(); i++) {
         BOOST_CHECK_EQUAL(c_ans[i].data, c[i].data);
@@ -266,18 +275,20 @@ BOOST_AUTO_TEST_CASE(polynomial_multiplication_zero_b) {
 
 BOOST_AUTO_TEST_SUITE_END()
 
+BOOST_AUTO_TEST_SUITE(polynomial_division_test_suite)
+
 BOOST_AUTO_TEST_CASE(polynomial_division1) {
 
-    std::vector<typename FieldType::value_type> a = {5, 0, 0, 13, 0, 1};
-    std::vector<typename FieldType::value_type> b = {13, 0, 1};
+    std::vector<typename FieldType::value_type> a = {5u, 0u, 0u, 13u, 0u, 1u};
+    std::vector<typename FieldType::value_type> b = {13u, 0u, 1u};
 
     std::vector<typename FieldType::value_type> Q(1, FieldType::value_type::zero());
     std::vector<typename FieldType::value_type> R(1, FieldType::value_type::zero());
 
     nil::crypto3::math::division(Q, R, a, b);
 
-    std::vector<typename FieldType::value_type> Q_ans = {0, 0, 0, 1};
-    std::vector<typename FieldType::value_type> R_ans = {5};
+    std::vector<typename FieldType::value_type> Q_ans = {0u, 0u, 0u, 1u};
+    std::vector<typename FieldType::value_type> R_ans = {5u};
 
     for (std::size_t i = 0; i < Q.size(); i++) {
         BOOST_CHECK_EQUAL(Q_ans[i].data, Q[i].data);
@@ -342,8 +353,9 @@ BOOST_AUTO_TEST_CASE(polynomial_division2) {
 
 BOOST_AUTO_TEST_CASE(extended_gcd) {
 
-    std::vector<typename ScalarFieldType::value_type> a = {0, 0, 0, 0, 1};
-    std::vector<typename ScalarFieldType::value_type> b = {1, -6, 11, -6};
+    std::vector<typename ScalarFieldType::value_type> a = {0u, 0u, 0u, 0u, 1u};
+    std::vector<typename ScalarFieldType::value_type> b = {
+        1u, ScalarFieldType::modulus - 6u, 11u, ScalarFieldType::modulus - 6u};
 
     std::vector<typename ScalarFieldType::value_type> pg(1, ScalarFieldType::value_type::zero());
     std::vector<typename ScalarFieldType::value_type> pu(1, ScalarFieldType::value_type::zero());
@@ -351,9 +363,11 @@ BOOST_AUTO_TEST_CASE(extended_gcd) {
 
     extended_euclidean(a, b, pg, pu, pv);
 
-    std::vector<typename ScalarFieldType::value_type> pv_ans = {1, 6, 25, 90};
+    std::vector<typename ScalarFieldType::value_type> pv_ans = {1u, 6u, 25u, 90u};
 
     for (std::size_t i = 0; i < pv.size(); i++) {
         BOOST_CHECK_EQUAL(pv_ans[i].data, pv[i].data);
     }
 }
+
+BOOST_AUTO_TEST_SUITE_END()

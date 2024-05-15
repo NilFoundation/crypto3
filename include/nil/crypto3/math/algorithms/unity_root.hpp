@@ -88,10 +88,10 @@ namespace nil {
              * @return a root of unity.
              */
             template<typename Backend,
-                    multiprecision::expression_template_option ExpressionTemplates>
-            multiprecision::number<Backend, ExpressionTemplates>
-            unity_root(uint32_t m, const multiprecision::number<Backend, ExpressionTemplates> &modulo) {
-                using namespace multiprecision;
+                    boost::multiprecision::expression_template_option ExpressionTemplates>
+            boost::multiprecision::number<Backend, ExpressionTemplates>
+            unity_root(uint32_t m, const boost::multiprecision::number<Backend, ExpressionTemplates> &modulo) {
+                using namespace boost::multiprecision;
 
                 number<Backend, ExpressionTemplates> M(m);
 
@@ -99,9 +99,9 @@ namespace nil {
                     return {};
                 }
 
-                number<modular_adaptor<Backend, backends::modular_params_rt<Backend>>, ExpressionTemplates>
-                        gen(find_generator(modulo), modulo), result = multiprecision::pow(gen, (modulo - 1) / M);
-                if (result == 1) {
+                number<backends::modular_adaptor<Backend, backends::modular_params_rt<Backend>>, ExpressionTemplates>
+                        gen(find_generator(modulo), modulo), result = boost::multiprecision::pow(gen, (modulo - 1) / M);
+                if (result == 1u) {
                     result = unity_root(m, modulo);
                 }
 
@@ -120,20 +120,20 @@ namespace nil {
                  *
                  */
 
-                multiprecision::number<Backend, ExpressionTemplates> mu = modulo.ComputeMu();
-                multiprecision::number<Backend, ExpressionTemplates> x(1);
+                boost::multiprecision::number<Backend, ExpressionTemplates> mu = modulo.ComputeMu();
+                boost::multiprecision::number<Backend, ExpressionTemplates> x(1);
                 x.ModMulEq(result, modulo, mu);
-                multiprecision::number<Backend, ExpressionTemplates> minRU(x);
-                multiprecision::number<Backend, ExpressionTemplates> curPowIdx(1);
-                std::vector<multiprecision::number<Backend, ExpressionTemplates>> coprimes = algebra::totient_list<multiprecision::number<Backend, ExpressionTemplates>>(
+                boost::multiprecision::number<Backend, ExpressionTemplates> minRU(x);
+                boost::multiprecision::number<Backend, ExpressionTemplates> curPowIdx(1);
+                std::vector<boost::multiprecision::number<Backend, ExpressionTemplates>> coprimes = algebra::totient_list<boost::multiprecision::number<Backend, ExpressionTemplates>>(
                         m);
                 for (uint32_t i = 0; i < coprimes.size(); i++) {
                     auto nextPowIdx = coprimes[i];
-                    multiprecision::number<Backend, ExpressionTemplates> diffPow(nextPowIdx - curPowIdx);
+                    boost::multiprecision::number<Backend, ExpressionTemplates> diffPow(nextPowIdx - curPowIdx);
                     for (std::size_t j = 0; j < diffPow; j++) {
                         x.ModMulEq(result, modulo, mu);
                     }
-                    if (x < minRU && x != multiprecision::number<Backend, ExpressionTemplates>(1)) {
+                    if (x < minRU && x != boost::multiprecision::number<Backend, ExpressionTemplates>(1)) {
                         minRU = x;
                     }
                     curPowIdx = nextPowIdx;

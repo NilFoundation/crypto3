@@ -45,13 +45,13 @@ typedef fields::bls12_fr<381> FieldType;
 BOOST_AUTO_TEST_SUITE(field_utils_test_suite)
 
     BOOST_DATA_TEST_CASE(is_power_of_two,
-                         boost::unit_test::data::make({1, 2, 4, 8, 16, 32, 512, 1024, 2048, 4096, 16384, 32768}),
+                         boost::unit_test::data::make({1u, 2u, 4u, 8u, 16u, 32u, 512u, 1024u, 2048u, 4096u, 16384u, 32768u}),
                          iterator) {
         BOOST_CHECK(nil::crypto3::math::detail::is_power_of_two(iterator));
     }
 
     BOOST_DATA_TEST_CASE(is_not_power_of_two,
-                         boost::unit_test::data::make({0, 3, 5, 7, 9, 31, 33, 1025, 4095}),
+                         boost::unit_test::data::make({0u, 3u, 5u, 7u, 9u, 31u, 33u, 1025u, 4095u}),
                          iterator) {
         BOOST_CHECK(!nil::crypto3::math::detail::is_power_of_two(iterator));
     }
@@ -63,7 +63,7 @@ BOOST_AUTO_TEST_SUITE(polynomial_constructor_test_suite)
     BOOST_AUTO_TEST_CASE(polynomial_constructor) {
 
         polynomial<typename FieldType::value_type> a(FieldType::value_type::one(), 5);
-        polynomial<typename FieldType::value_type> a_expected = {0, 0, 0, 0, 0, 1};
+        polynomial<typename FieldType::value_type> a_expected = {0u, 0u, 0u, 0u, 0u, 1u};
 
         BOOST_CHECK_EQUAL(a_expected, a);
     }
@@ -83,23 +83,23 @@ BOOST_AUTO_TEST_SUITE(polynomial_addition_test_suite)
     }
 
     BOOST_AUTO_TEST_CASE(polynomial_addition_equal) {
-        test_addition({1, 3, 4, 25, 6, 7, 7, 2}, {9, 3, 11, 14, 7, 1, 5, 8}, {10, 6, 15, 39, 13, 8, 12, 10});
+        test_addition({1u, 3u, 4u, 25u, 6u, 7u, 7u, 2u}, {9u, 3u, 11u, 14u, 7u, 1u, 5u, 8u}, {10u, 6u, 15u, 39u, 13u, 8u, 12u, 10u});
     }
 
     BOOST_AUTO_TEST_CASE(polynomial_addition_long_a) {
-        test_addition({1, 3, 4, 25, 6, 7, 7, 2}, {9, 3, 11, 14, 7}, {10, 6, 15, 39, 13, 7, 7, 2});
+        test_addition({1u, 3u, 4u, 25u, 6u, 7u, 7u, 2u}, {9u, 3u, 11u, 14u, 7u}, {10u, 6u, 15u, 39u, 13u, 7u, 7u, 2u});
     }
 
     BOOST_AUTO_TEST_CASE(polynomial_addition_long_b) {
-        test_addition({1, 3, 4, 25, 6}, {9, 3, 11, 14, 7, 1, 5, 8}, {10, 6, 15, 39, 13, 1, 5, 8});
+        test_addition({1u, 3u, 4u, 25u, 6u}, {9u, 3u, 11u, 14u, 7u, 1u, 5u, 8u}, {10u, 6u, 15u, 39u, 13u, 1u, 5u, 8u});
     }
 
     BOOST_AUTO_TEST_CASE(polynomial_addition_zero_a) {
-        test_addition({0, 0, 0}, {1, 3, 4, 25, 6, 7, 7, 2}, {1, 3, 4, 25, 6, 7, 7, 2});
+        test_addition({0u, 0u, 0u}, {1u, 3u, 4u, 25u, 6u, 7u, 7u, 2u}, {1u, 3u, 4u, 25u, 6u, 7u, 7u, 2u});
     }
 
     BOOST_AUTO_TEST_CASE(polynomial_addition_zero_b) {
-        test_addition({1, 3, 4, 25, 6, 7, 7, 2}, {0, 0, 0}, {1, 3, 4, 25, 6, 7, 7, 2});
+        test_addition({1u, 3u, 4u, 25u, 6u, 7u, 7u, 2u}, {0u, 0u, 0u}, {1u, 3u, 4u, 25u, 6u, 7u, 7u, 2u});
     }
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -117,23 +117,29 @@ BOOST_AUTO_TEST_SUITE(polynomial_subtraction_test_suite)
     }
 
     BOOST_AUTO_TEST_CASE(polynomial_subtraction_equal) {
-        test_substraction({1, 3, 4, 25, 6, 7, 7, 2}, {9, 3, 11, 14, 7, 1, 5, 8}, {-8, 0, -7, 11, -1, 6, 2, -6});
+        test_substraction({1u, 3u, 4u, 25u, 6u, 7u, 7u, 2u}, {9u, 3u, 11u, 14u, 7u, 1u, 5u, 8u}, 
+            {FieldType::modulus - 8u, 0u, FieldType::modulus - 7u, 11u, FieldType::modulus - 1u, 6u, 2u, FieldType::modulus - 6u});
     }
 
     BOOST_AUTO_TEST_CASE(polynomial_subtraction_long_a) {
-        test_substraction({1, 3, 4, 25, 6, 7, 7, 2}, {9, 3, 11, 14, 7}, {-8, 0, -7, 11, -1, 7, 7, 2});
+        test_substraction({1u, 3u, 4u, 25u, 6u, 7u, 7u, 2u}, {9u, 3u, 11u, 14u, 7u},
+            {FieldType::modulus - 8u, 0u, FieldType::modulus - 7u, 11u, FieldType::modulus - 1u, 7u, 7u, 2u});
     }
 
     BOOST_AUTO_TEST_CASE(polynomial_subtraction_long_b) {
-        test_substraction({1, 3, 4, 25, 6}, {9, 3, 11, 14, 7, 1, 5, 8}, {-8, 0, -7, 11, -1, -1, -5, -8});
+        test_substraction({1u, 3u, 4u, 25u, 6u}, {9u, 3u, 11u, 14u, 7u, 1u, 5u, 8u}, 
+            {FieldType::modulus - 8u, 0u, FieldType::modulus - 7u, 11u, FieldType::modulus - 1u, FieldType::modulus - 1u,
+             FieldType::modulus - 5u, FieldType::modulus - 8u});
     }
 
     BOOST_AUTO_TEST_CASE(polynomial_subtraction_zero_a) {
-        test_substraction({0, 0, 0}, {1, 3, 4, 25, 6, 7, 7, 2}, {-1, -3, -4, -25, -6, -7, -7, -2});
+        test_substraction({0u, 0u, 0u}, {1u, 3u, 4u, 25u, 6u, 7u, 7u, 2u}, 
+            {FieldType::modulus - 1, FieldType::modulus - 3, FieldType::modulus - 4, FieldType::modulus - 25, 
+             FieldType::modulus - 6, FieldType::modulus - 7, FieldType::modulus - 7, FieldType::modulus - 2});
     }
 
     BOOST_AUTO_TEST_CASE(polynomial_subtraction_zero_b) {
-        test_substraction({1, 3, 4, 25, 6, 7, 7, 2}, {0, 0, 0}, {1, 3, 4, 25, 6, 7, 7, 2});
+        test_substraction({1u, 3u, 4u, 25u, 6u, 7u, 7u, 2u}, {0u, 0u, 0u}, {1u, 3u, 4u, 25u, 6u, 7u, 7u, 2u});
     }
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -151,19 +157,19 @@ BOOST_AUTO_TEST_SUITE(polynomial_multiplication_test_suite)
     }
 
     BOOST_AUTO_TEST_CASE(polynomial_multiplication_long_a) {
-        test_multiplication({5, 0, 0, 13, 0, 1}, {13, 0, 1}, {65, 0, 5, 169, 0, 26, 0, 1});
+        test_multiplication({5u, 0u, 0u, 13u, 0u, 1u}, {13u, 0u, 1u}, {65u, 0u, 5u, 169u, 0u, 26u, 0u, 1u});
     }
 
     BOOST_AUTO_TEST_CASE(polynomial_multiplication_long_b) {
-        test_multiplication({13, 0, 1}, {5, 0, 0, 13, 0, 1}, {65, 0, 5, 169, 0, 26, 0, 1});
+        test_multiplication({13u, 0u, 1u}, {5u, 0u, 0u, 13u, 0u, 1u}, {65u, 0u, 5u, 169u, 0u, 26u, 0u, 1u});
     }
 
     BOOST_AUTO_TEST_CASE(polynomial_multiplication_zero_a) {
-        test_multiplication({0}, {5, 0, 0, 13, 0, 1}, {0});
+        test_multiplication({0u}, {5u, 0u, 0u, 13u, 0u, 1u}, {0u});
     }
 
     BOOST_AUTO_TEST_CASE(polynomial_multiplication_zero_b) {
-        test_multiplication({5, 0, 0, 13, 0, 1}, {0}, {0});
+        test_multiplication({5u, 0u, 0u, 13u, 0u, 1u}, {0u}, {0u});
     }
 
 /* this should throw an assertion
@@ -199,26 +205,27 @@ BOOST_AUTO_TEST_SUITE(polynomial_division_test_suite)
     }
 
     BOOST_AUTO_TEST_CASE(polynomial_division) {
-        test_division({5, 0, 0, 13, 0, 1}, {13, 2, 1}, {18, 4, -2, 1}, {-229, -88});
+        test_division({5u, 0u, 0u, 13u, 0u, 1u}, {13u, 2u, 1u}, {18u, 4u, FieldType::modulus - 2u, 1u}, 
+            {FieldType::modulus - 229u, FieldType::modulus - 88u});
     }
 
     BOOST_AUTO_TEST_CASE(polynomial_division_horner_binomial) {
-        test_division({2, 0, 3, 2, 1}, {-2, 1}, {22, 11, 4, 1}, {46});
+        test_division({2u, 0u, 3u, 2u, 1u}, {FieldType::modulus - 2u, 1u}, {22u, 11u, 4u, 1u}, {46u});
     }
 
     BOOST_AUTO_TEST_CASE(polynomial_division_horner_long_second) {
-        test_division({2, 0, 3, 2, 1}, {-2, 0, 0, 1}, {2, 1}, {6, 2, 3});
+        test_division({2u, 0u, 3u, 2u, 1u}, {FieldType::modulus - 2u, 0u, 0u, 1u}, {2u, 1u}, {6u, 2u, 3u});
     }
 
     BOOST_AUTO_TEST_CASE(polynomial_division_horner_long_equal) {
-        test_division({2, 0, 3, 2, 2}, {-2, 0, 0, 0, 1}, {2}, {6, 0, 3, 2});
+        test_division({2u, 0u, 3u, 2u, 2u}, {FieldType::modulus - 2u, 0u, 0u, 0u, 1u}, {2u}, {6u, 0u, 3u, 2u});
     }
 
     BOOST_AUTO_TEST_CASE(polynomial_division_on_zero_degree_polys) {
-        test_division({0, 1}, {1}, {0, 1}, {0});
-        test_division({0, 4}, {2}, {0, 2}, {0});
-        test_division({2, 0, 3, 2, 2}, {1}, {2, 0, 3, 2, 2}, {0});
-        test_division({4, 0, 4, 2, 2}, {2}, {2, 0, 2, 1, 1}, {0});
+        test_division({0u, 1u}, {1u}, {0u, 1u}, {0u});
+        test_division({0u, 4u}, {2u}, {0u, 2u}, {0u});
+        test_division({2u, 0u, 3u, 2u, 2u}, {1u}, {2u, 0u, 3u, 2u, 2u}, {0u});
+        test_division({4u, 0u, 4u, 2u, 2u}, {2u}, {2u, 0u, 2u, 1u, 1u}, {0u});
     }
 
 BOOST_AUTO_TEST_SUITE_END()

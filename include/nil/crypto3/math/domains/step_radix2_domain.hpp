@@ -177,7 +177,7 @@ namespace nil {
                     }
 
                     // compute A_prefix
-                    const field_value_type over_two = field_value_type(2).inversed();
+                    const field_value_type over_two = field_value_type(2u).inversed();
                     for (std::size_t i = 0; i < small_m; ++i) {
                         a[i] = (U0[i] + U1[i]) * over_two;
                     }

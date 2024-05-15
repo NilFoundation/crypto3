@@ -495,7 +495,7 @@ namespace nil {
                                    tmp.begin(),
                                    std::bind(std::multiplies<value_type>(), sconst, std::placeholders::_1));
                     size_t r_size = tmp.size();
-                    while (r_size > 0 && tmp[r_size - 1] == FieldValueType(0)) {
+                    while (r_size > 0 && tmp[r_size - 1] == FieldValueType::zero()) {
                         --r_size;
                     }
                     tmp.resize(r_size);

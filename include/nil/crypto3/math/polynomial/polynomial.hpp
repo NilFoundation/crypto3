@@ -55,24 +55,24 @@ namespace nil {
                 typedef typename container_type::reverse_iterator reverse_iterator;
                 typedef typename container_type::const_reverse_iterator const_reverse_iterator;
 
-                polynomial() : val(1, 0) {
+                polynomial() : val(1, FieldValueType::zero()) {
                 }
 
-                explicit polynomial(size_type n) : val(n) {
+                explicit polynomial(size_type n) : val(n, FieldValueType::zero()) {
                     if (val.empty()) {
-                        val.push_back(0);
+                        val.push_back(FieldValueType::zero());
                     }
                 }
 
-                explicit polynomial(size_type n, const allocator_type& a) : val(n, a) {
+                explicit polynomial(size_type n, const allocator_type& a) : val(n, FieldValueType::zero(), a) {
                     if (val.empty()) {
-                        val.push_back(0);
+                        val.push_back(FieldValueType::zero());
                     }
                 }
 
                 polynomial(size_type n, const value_type& x) : val(n, x) {
                     if (val.empty()) {
-                        val.push_back(0);
+                        val.push_back(FieldValueType::zero());
                     }
                 }
 
@@ -81,14 +81,14 @@ namespace nil {
                 template<typename InputIterator>
                 polynomial(InputIterator first, InputIterator last) : val(first, last) {
                     if (val.empty()) {
-                        val.push_back(0);
+                        val.push_back(FieldValueType::zero());
                     }
                 }
 
                 template<typename InputIterator>
                 polynomial(InputIterator first, InputIterator last, const allocator_type& a) : val(first, last, a) {
                     if (val.empty()) {
-                        val.push_back(0);
+                        val.push_back(FieldValueType::zero());
                     }
                 }
 
@@ -113,19 +113,19 @@ namespace nil {
                 polynomial(polynomial&& x, const allocator_type& a) : val(x.val, a) {
                 }
 
-                polynomial(const FieldValueType& value, std::size_t power = 0) : val(power + 1, FieldValueType(0)) {
+                polynomial(const FieldValueType& value, std::size_t power = 0) : val(power + 1, FieldValueType::zero()) {
                     this->operator[](power) = value;
                 }
 
                 explicit polynomial(const container_type &c) : val(c) {
                     if (val.empty()) {
-                        val.push_back(0);
+                        val.push_back(FieldValueType::zero());
                     }
                 }
 
                 explicit polynomial(container_type &&c) : val(c) {
                     if (val.empty()) {
-                        val.push_back(0);
+                        val.push_back(FieldValueType::zero());
                     }
                 }
 
@@ -363,7 +363,7 @@ namespace nil {
                 }
 
                 FieldValueType evaluate(const FieldValueType& value) const {
-                    FieldValueType result = 0;
+                    FieldValueType result = FieldValueType::zero();
                     auto end = this->end();
                     while (end != this->begin()) {
                         result = result * value + *--end;
@@ -376,7 +376,7 @@ namespace nil {
                  */
                 bool is_zero() const {
                     return std::all_of(this->begin(), this->end(),
-                                       [](FieldValueType i) { return i == FieldValueType(0); });
+                                       [](FieldValueType i) { return i == FieldValueType::zero(); });
                 }
 
                 /**
@@ -385,7 +385,7 @@ namespace nil {
                 bool is_one() const {
                     return (*this->begin() == FieldValueType(1)) && 
                         std::all_of(++this->begin(), this->end(),
-                            [](FieldValueType i) { return i == FieldValueType(0); });
+                            [](FieldValueType i) { return i == FieldValueType::zero(); });
                 }
 
                 inline static polynomial zero() {
