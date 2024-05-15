@@ -29,8 +29,7 @@
 #include <type_traits>
 
 #include <boost/type_traits/is_integral.hpp>
-
-#include <nil/crypto3/multiprecision/traits/max_digits10.hpp>
+#include <boost/multiprecision/traits/max_digits10.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -38,8 +37,8 @@ namespace nil {
             namespace types {
                 namespace detail {
                     template<typename TTypeBase, typename Backend,
-                             multiprecision::expression_template_option ExpressionTemplates,
-                             bool IsFixedPrecision = multiprecision::backends::is_fixed_precision<Backend>::value>
+                             boost::multiprecision::expression_template_option ExpressionTemplates,
+                             bool IsFixedPrecision = boost::multiprecision::backends::is_fixed_precision<Backend>::value>
                     class basic_integral { };
 
                 }    // namespace detail
