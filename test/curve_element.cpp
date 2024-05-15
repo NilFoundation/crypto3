@@ -32,7 +32,7 @@
 #include <boost/random/uniform_int.hpp>
 #include <iostream>
 #include <iomanip>
-#include <nil/crypto3/multiprecision/number.hpp>
+#include <boost/multiprecision/number.hpp>
 
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/field_type.hpp>
