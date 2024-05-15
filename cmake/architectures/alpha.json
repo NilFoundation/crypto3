@@ -1,8 +1,0 @@
-{
-  "endian": "little",
-  "word_size": 64,
-  "aliases": [
-    "axp",
-    "alphaaxp"
-  ]
-}
