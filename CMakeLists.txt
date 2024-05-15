@@ -66,7 +66,7 @@ include(GNUInstallDirs)
 set(CONFIG_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/crypto3)
 
 configure_package_config_file(
-    cmake/Config.cmake.in
+    Config.cmake.in
     crypto3Config.cmake
     INSTALL_DESTINATION ${CONFIG_DIR}
 )
