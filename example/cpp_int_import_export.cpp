@@ -3,7 +3,7 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
 #include <iostream>
 #include <iomanip>
 #include <vector>
@@ -16,7 +16,7 @@ In this simple example, we'll import/export the bits of a cpp_int
 to a vector of 8-bit unsigned values:
 */
 /*=
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
 #include <iostream>
 #include <iomanip>
 #include <vector>

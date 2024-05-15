@@ -3,21 +3,21 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
 
 struct E {
-    E(nil::crypto3::multiprecision::cpp_rational const&) {
+    E(boost::multiprecision::cpp_rational const&) {
     }
 };
 
-void g(nil::crypto3::multiprecision::cpp_rational const& r) {
+void g(boost::multiprecision::cpp_rational const& r) {
     std::cout << r << std::endl;
 }
 
 int main() {
 #if !defined(BOOST_MP_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS) && !BOOST_WORKAROUND(BOOST_MSVC, < 1900) && \
     !(defined(__APPLE_CC__) && defined(CI_SUPPRESS_KNOWN_ISSUES))
-    nil::crypto3::multiprecision::cpp_int r = 3;
+    boost::multiprecision::cpp_int r = 3;
     g(r);
     E x1(r);    // triggers explicit conversion operator.
 #endif

@@ -8,23 +8,25 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef BOOST_MULTIPRECISION_MODULAR_PARAMS_FIXED_PRECISION_HPP
-#define BOOST_MULTIPRECISION_MODULAR_PARAMS_FIXED_PRECISION_HPP
+#ifndef CRYPTO3_MULTIPRECISION_MODULAR_PARAMS_FIXED_PRECISION_HPP
+#define CRYPTO3_MULTIPRECISION_MODULAR_PARAMS_FIXED_PRECISION_HPP
 
 #include <nil/crypto3/multiprecision/modular/modular_functions_fixed.hpp>
 
-namespace nil {
-    namespace crypto3 {
-        namespace multiprecision {
+namespace boost {   
+    namespace multiprecision {
+        namespace backends {
 
-            using backends::modular_fixed_cpp_int_backend;
-            using default_ops::eval_bit_test;
+            using backends::cpp_int_modular_backend;
+
+            template<typename Backend>
+            class modular_params;
 
             // fixed precision modular params type which supports compile-time execution
-            template<unsigned MinBits, cpp_integer_type SignType, cpp_int_check_type Checked>
-            class modular_params<modular_fixed_cpp_int_backend<MinBits, SignType, Checked>> {
+            template<unsigned Bits>
+            class modular_params<cpp_int_modular_backend<Bits>> {
             protected:
-                typedef modular_fixed_cpp_int_backend<MinBits, SignType, Checked> Backend;
+                typedef cpp_int_modular_backend<Bits> Backend;
                 typedef backends::modular_functions_fixed<Backend> modular_logic;
 
             public:
@@ -33,46 +35,41 @@ namespace nil {
             public:
                 typedef typename policy_type::internal_limb_type internal_limb_type;
                 typedef typename policy_type::Backend_doubled_limbs Backend_doubled_limbs;
-                typedef typename policy_type::number_type number_type;
-                typedef typename policy_type::number_type_u number_type_u;
+                // typedef typename policy_type::Backend Backend;
 
-                constexpr auto &get_mod_obj() {
+                BOOST_MP_CXX14_CONSTEXPR auto &get_mod_obj() {
                     return m_mod_obj;
                 }
-                constexpr const auto &get_mod_obj() const {
+                BOOST_MP_CXX14_CONSTEXPR const auto &get_mod_obj() const {
                     return m_mod_obj;
                 }
 
-                constexpr auto &get_is_odd_mod() {
+                BOOST_MP_CXX14_CONSTEXPR auto &get_is_odd_mod() {
                     return is_odd_mod;
                 }
-                constexpr const auto &get_is_odd_mod() const {
+                BOOST_MP_CXX14_CONSTEXPR const auto &get_is_odd_mod() const {
                     return is_odd_mod;
                 }
 
             public:
-                constexpr auto get_mod() const {
+                BOOST_MP_CXX14_CONSTEXPR auto get_mod() const {
                     return m_mod_obj.get_mod();
                 }
 
-                // TODO: add universal ref constructor
-                constexpr modular_params() {
+                BOOST_MP_CXX14_CONSTEXPR modular_params() {
                 }
 
-                constexpr modular_params(const number_type_u &m) : m_mod_obj(m) {
-                    is_odd_mod = eval_bit_test(m.backend(), 0);
+                BOOST_MP_CXX14_CONSTEXPR modular_params(const Backend &m) : m_mod_obj(m) {
+                    using boost::multiprecision::default_ops::eval_bit_test;
+                    is_odd_mod = eval_bit_test(m, 0);
                 }
 
-                constexpr modular_params(const number_type &m) : m_mod_obj(m) {
-                    is_odd_mod = eval_bit_test(m.backend(), 0);
-                }
-
-                constexpr modular_params(const modular_params &o) : m_mod_obj(o.get_mod_obj()) {
+                BOOST_MP_CXX14_CONSTEXPR modular_params(const modular_params &o) : m_mod_obj(o.get_mod_obj()) {
                     is_odd_mod = o.get_is_odd_mod();
                 }
 
-                template<typename Backend1>
-                constexpr void reduce(Backend1 &result) const {
+                template<unsigned Bits1>
+                BOOST_MP_CXX14_CONSTEXPR void reduce(cpp_int_modular_backend<Bits1> &result) const {
                     if (is_odd_mod) {
                         m_mod_obj.montgomery_reduce(result);
                     } else {
@@ -80,15 +77,12 @@ namespace nil {
                     }
                 }
 
-                template<typename Backend1>
-                constexpr typename boost::enable_if_c<boost::is_same<Backend1, Backend>::value>::type
-                    adjust_modular(Backend1 &result) const {
+                BOOST_MP_CXX14_CONSTEXPR void adjust_modular(Backend &result) const {
                     adjust_modular(result, result);
                 }
 
-                template<typename Backend1, typename Backend2>
-                constexpr typename boost::enable_if_c<boost::is_same<Backend1, Backend>::value>::type
-                    adjust_modular(Backend1 &result, Backend2 input) const {
+                template<unsigned Bits2>
+                BOOST_MP_CXX14_CONSTEXPR void adjust_modular(Backend &result, const cpp_int_modular_backend<Bits2>& input) const {
                     Backend_doubled_limbs tmp;
                     m_mod_obj.barrett_reduce(tmp, input);
                     if (is_odd_mod) {
@@ -103,12 +97,11 @@ namespace nil {
                     result = tmp;
                 }
 
-                template<
-                    typename Backend1, typename Backend2,
-                    typename = typename boost::enable_if_c<
-                        /// input number should fit in result
-                        backends::max_precision<Backend1>::value >= backends::max_precision<Backend2>::value>::type>
-                constexpr void adjust_regular(Backend1 &result, const Backend2 &input) const {
+                template<unsigned Bits1, unsigned Bits2,
+                    /// input number should fit in result
+                    typename = typename boost::enable_if_c<Bits1 >= Bits2>::type>
+                BOOST_MP_CXX14_CONSTEXPR void adjust_regular(cpp_int_modular_backend<Bits1>& result,
+                                              const cpp_int_modular_backend<Bits2>& input) const {
                     result = input;
                     if (is_odd_mod) {
                         m_mod_obj.montgomery_reduce(result);
@@ -116,12 +109,12 @@ namespace nil {
                 }
 
                 template<typename Backend1, typename T>
-                constexpr void mod_exp(Backend1 &result, const T &exp) const {
+                BOOST_MP_CXX14_CONSTEXPR void mod_exp(Backend1 &result, const T &exp) const {
                     mod_exp(result, result, exp);
                 }
 
                 template<typename Backend1, typename Backend2, typename T>
-                constexpr void mod_exp(Backend1 &result, const Backend2 &a, const T &exp) const {
+                BOOST_MP_CXX14_CONSTEXPR void mod_exp(Backend1 &result, const Backend2 &a, const T &exp) const {
                     if (is_odd_mod) {
                         m_mod_obj.montgomery_exp(result, a, exp);
                     } else {
@@ -130,7 +123,7 @@ namespace nil {
                 }
 
                 template<typename Backend1, typename Backend2>
-                constexpr void mod_mul(Backend1 &result, const Backend2 &y) const {
+                BOOST_MP_CXX14_CONSTEXPR void mod_mul(Backend1 &result, const Backend2 &y) const {
                     if (is_odd_mod) {
                         m_mod_obj.montgomery_mul(result, y);
                     } else {
@@ -139,41 +132,41 @@ namespace nil {
                 }
 
                 template<typename Backend1, typename Backend2>
-                constexpr void mod_add(Backend1 &result, const Backend2 &y) const {
+                BOOST_MP_CXX14_CONSTEXPR void mod_add(Backend1 &result, const Backend2 &y) const {
                     m_mod_obj.regular_add(result, y);
                 }
 
-                template<typename Backend1, expression_template_option ExpressionTemplates>
-                constexpr operator number<Backend1, ExpressionTemplates>() {
+                template<typename Backend1>
+                BOOST_MP_CXX14_CONSTEXPR operator Backend1() {
                     return get_mod();
                 };
 
-                constexpr int compare(const modular_params &o) const {
+                BOOST_MP_CXX14_CONSTEXPR int compare(const modular_params &o) const {
                     // They are either equal or not:
                     return get_mod().compare(o.get_mod());
                 }
 
-                constexpr void swap(modular_params &o) {
+                BOOST_MP_CXX14_CONSTEXPR void swap(modular_params &o) {
                     m_mod_obj.swap(o.get_mod_obj());
                     bool t = is_odd_mod;
                     is_odd_mod = o.get_is_odd_mod();
                     o.get_is_odd_mod() = t;
                 }
 
-                constexpr modular_params &operator=(const modular_params &o) {
+                BOOST_MP_CXX14_CONSTEXPR modular_params &operator=(const modular_params &o) {
                     m_mod_obj = o.get_mod_obj();
                     is_odd_mod = o.get_is_odd_mod();
                     return *this;
                 }
 
-                constexpr modular_params &operator=(const number_type &m) {
+                BOOST_MP_CXX14_CONSTEXPR modular_params &operator=(const Backend &m) {
                     m_mod_obj = m;
-                    is_odd_mod = eval_bit_test(m.backend(), 0);
+                    is_odd_mod = boost::multiprecision::default_ops::eval_bit_test(m, 0);
                     return *this;
                 }
 
                 // TODO: check function correctness
-                constexpr friend std::ostream &operator<<(std::ostream &o, const modular_params &a) {
+                BOOST_MP_CXX14_CONSTEXPR friend std::ostream &operator<<(std::ostream &o, const modular_params &a) {
                     o << a.get_mod();
                     return o;
                 }
@@ -182,9 +175,8 @@ namespace nil {
                 modular_logic m_mod_obj;
                 bool is_odd_mod = false;
             };
+        }  // namespace backends
+    }   // namespace multiprecision
+}   // namespace boost
 
-        }    // namespace multiprecision
-    }        // namespace crypto3
-}    // namespace nil
-
-#endif    // BOOST_MULTIPRECISION_MODULAR_PARAMS_FIXED_PRECISION_HPP
+#endif    // CRYPTO3_MULTIPRECISION_MODULAR_PARAMS_FIXED_PRECISION_HPP

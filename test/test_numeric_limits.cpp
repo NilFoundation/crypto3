@@ -9,10 +9,10 @@
 
 #include "test.hpp"
 
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
 
 template<class Number>
-void test_specific(const std::integral_constant<int, nil::crypto3::multiprecision::number_kind_integer>&) {
+void test_specific(const std::integral_constant<int, boost::multiprecision::number_kind_integer>&) {
     if (std::numeric_limits<Number>::is_modulo) {
         if (!std::numeric_limits<Number>::is_signed) {
             BOOST_TEST(1 + (std::numeric_limits<Number>::max)() == 0);
@@ -28,7 +28,7 @@ void test_specific(const T&) {
 template<class Number>
 void test() {
     typedef typename std::conditional<std::numeric_limits<Number>::is_specialized,
-                                      typename nil::crypto3::multiprecision::number_category<Number>::type,
+                                      typename boost::multiprecision::number_category<Number>::type,
                                       std::integral_constant<int, 500>    // not a number type
                                       >::type fp_test_type;
 
@@ -88,12 +88,12 @@ void test() {
 }
 
 int main() {
-    test<nil::crypto3::multiprecision::cpp_int>();
-    test<nil::crypto3::multiprecision::int256_t>();
-    test<nil::crypto3::multiprecision::uint512_t>();
-    test<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_int_backend<
-        200, 200, nil::crypto3::multiprecision::unsigned_magnitude, nil::crypto3::multiprecision::checked, void>>>();
-    test<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_int_backend<
-        70, 70, nil::crypto3::multiprecision::signed_magnitude, nil::crypto3::multiprecision::unchecked, void>>>();
+    test<boost::multiprecision::cpp_int>();
+    test<boost::multiprecision::int256_t>();
+    test<boost::multiprecision::uint512_t>();
+    test<boost::multiprecision::number<boost::multiprecision::cpp_int_modular_backend<
+        200, 200, boost::multiprecision::unsigned_magnitude, boost::multiprecision::checked, void>>>();
+    test<boost::multiprecision::number<boost::multiprecision::cpp_int_modular_backend<
+        70, 70, boost::multiprecision::signed_magnitude, boost::multiprecision::unchecked, void>>>();
     return boost::report_errors();
 }

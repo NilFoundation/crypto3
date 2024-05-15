@@ -3,13 +3,13 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
 #include "test.hpp"
 
 #if !(BOOST_WORKAROUND(BOOST_MSVC, <= 1900) && defined(CI_SUPPRESS_KNOWN_ISSUES)) && \
     defined(BOOST_MP_USER_DEFINED_LITERALS)
 
-using namespace nil::crypto3::multiprecision;
+using namespace boost::multiprecision;
 
 template<class T>
 void test_literal(T val, const char* p) {
@@ -20,8 +20,8 @@ void test_literal(T val, const char* p) {
     {                                                          \
         constexpr auto val1 = BOOST_JOIN(x, _cppi);            \
         constexpr int1024_t val2 = BOOST_JOIN(x, _cppi1024);   \
-        constexpr auto val3 = BOOST_JOIN(x, _cppui);           \
-        constexpr uint1024_t val4 = BOOST_JOIN(x, _cppui1024); \
+        constexpr auto val3 = BOOST_JOIN(x, _cppui_modular);           \
+        constexpr uint1024_t val4 = BOOST_JOIN(x, _cppui_modular1024); \
         test_literal(val1, BOOST_STRINGIZE(x));                \
         test_literal(val2, BOOST_STRINGIZE(x));                \
         test_literal(val3, BOOST_STRINGIZE(x));                \
@@ -38,7 +38,7 @@ void test_literal(T val, const char* p) {
     }
 
 int main() {
-    using namespace nil::crypto3::multiprecision::literals;
+    using namespace boost::multiprecision::literals;
     TEST_LITERAL(0x0);
     TEST_LITERAL(0x00000);
     TEST_LITERAL(0x10000000);

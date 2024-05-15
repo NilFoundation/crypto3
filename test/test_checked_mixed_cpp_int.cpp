@@ -7,7 +7,7 @@
 #define _SCL_SECURE_NO_WARNINGS
 #endif
 
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
 #include "test.hpp"
 
 template<class T, class U>
@@ -15,20 +15,20 @@ void check_result_type(const T&, const U&) {
     BOOST_CHECK(0);
 }
 
-void check_result_type(const nil::crypto3::multiprecision::checked_int1024_t&,
-                       const nil::crypto3::multiprecision::checked_int1024_t&) {
+void check_result_type(const boost::multiprecision::checked_int1024_t&,
+                       const boost::multiprecision::checked_int1024_t&) {
 }
 
 int main() {
 #ifndef BOOST_NO_EXCEPTIONS
     try {
 #endif
-        typedef nil::crypto3::multiprecision::checked_int1024_t big_type;
-        typedef nil::crypto3::multiprecision::checked_int512_t small_type;
-        typedef nil::crypto3::multiprecision::number<
-            nil::crypto3::multiprecision::cpp_int_backend<32, 32, nil::crypto3::multiprecision::signed_magnitude,
-                                                          nil::crypto3::multiprecision::checked, void>,
-            nil::crypto3::multiprecision::et_off>
+        typedef boost::multiprecision::checked_int1024_t big_type;
+        typedef boost::multiprecision::checked_int512_t small_type;
+        typedef boost::multiprecision::number<
+            boost::multiprecision::cpp_int_modular_backend<32, 32, boost::multiprecision::signed_magnitude,
+                                                          boost::multiprecision::checked, void>,
+            boost::multiprecision::et_off>
             little_type;
 
         big_type big_val = (big_type(1) << 1000) + 1;

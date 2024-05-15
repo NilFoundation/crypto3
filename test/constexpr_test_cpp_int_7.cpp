@@ -10,7 +10,7 @@
 // https://en.wikipedia.org/wiki/KISS_(algorithm) for cpp_int integers. b2 --abbreviate-paths toolset=clang-9.0.0
 // address-model=64 cxxstd=2a release misc > multiprecision_clang_misc.log
 
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
 
 #include <iostream>
 
@@ -119,7 +119,7 @@ constexpr UnsignedInteger nth_random_value(unsigned count = 0) {
 }
 
 int main() {
-    using namespace nil::crypto3::multiprecision;
+    using namespace boost::multiprecision;
 
     //[random_constexpr_cppint
     constexpr uint1024_t rand = nth_random_value<uint1024_t>(1000);

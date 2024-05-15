@@ -9,7 +9,7 @@
 #define _SCL_SECURE_NO_WARNINGS
 #endif
 
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
 
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/random/mersenne_twister.hpp>
@@ -26,15 +26,15 @@ struct unchecked_type {
     typedef T type;
 };
 
-template<unsigned MinBits, unsigned MaxBits, nil::crypto3::multiprecision::cpp_integer_type SignType,
-         nil::crypto3::multiprecision::cpp_int_check_type Checked, class Allocator,
-         nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-struct unchecked_type<nil::crypto3::multiprecision::number<
-    nil::crypto3::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, Checked, Allocator>,
+template<unsigned MinBits, unsigned MaxBits, boost::multiprecision::cpp_integer_type SignType,
+         boost::multiprecision::cpp_int_check_type Checked, class Allocator,
+         boost::multiprecision::expression_template_option ExpressionTemplates>
+struct unchecked_type<boost::multiprecision::number<
+    boost::multiprecision::cpp_int_modular_backend<MinBits, MaxBits, SignType, Checked, Allocator>,
     ExpressionTemplates>> {
-    typedef nil::crypto3::multiprecision::number<
-        nil::crypto3::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType,
-                                                      nil::crypto3::multiprecision::unchecked, Allocator>,
+    typedef boost::multiprecision::number<
+        boost::multiprecision::cpp_int_modular_backend<MinBits, MaxBits, SignType,
+                                                      boost::multiprecision::unchecked, Allocator>,
         ExpressionTemplates>
         type;
 };
@@ -161,12 +161,12 @@ void test_round_trip() {
 }
 
 int main() {
-    test_round_trip<nil::crypto3::multiprecision::cpp_int>();
-    test_round_trip<nil::crypto3::multiprecision::checked_int1024_t>();
-    test_round_trip<nil::crypto3::multiprecision::checked_uint512_t>();
-    test_round_trip<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_int_backend<
-        64, 64, nil::crypto3::multiprecision::unsigned_magnitude, nil::crypto3::multiprecision::checked, void>>>();
-    test_round_trip<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_int_backend<
-        23, 23, nil::crypto3::multiprecision::unsigned_magnitude, nil::crypto3::multiprecision::checked, void>>>();
+    test_round_trip<boost::multiprecision::cpp_int>();
+    test_round_trip<boost::multiprecision::checked_int1024_t>();
+    test_round_trip<boost::multiprecision::checked_uint512_t>();
+    test_round_trip<boost::multiprecision::number<boost::multiprecision::cpp_int_modular_backend<
+        64, 64, boost::multiprecision::unsigned_magnitude, boost::multiprecision::checked, void>>>();
+    test_round_trip<boost::multiprecision::number<boost::multiprecision::cpp_int_modular_backend<
+        23, 23, boost::multiprecision::unsigned_magnitude, boost::multiprecision::checked, void>>>();
     return boost::report_errors();
 }

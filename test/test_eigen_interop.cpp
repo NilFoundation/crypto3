@@ -2,7 +2,7 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
 #include <nil/crypto3/multiprecision/cpp_dec_float.hpp>
 #include <nil/crypto3/multiprecision/cpp_bin_float.hpp>
 #include <iostream>
@@ -18,18 +18,18 @@
 using namespace Eigen;
 
 namespace Eigen {
-    template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    struct NumTraits<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>> {
-        typedef nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> self_type;
-        typedef typename nil::crypto3::multiprecision::scalar_result_from_possible_complex<self_type>::type Real;
+    template<class Backend, boost::multiprecision::expression_template_option ExpressionTemplates>
+    struct NumTraits<boost::multiprecision::number<Backend, ExpressionTemplates>> {
+        typedef boost::multiprecision::number<Backend, ExpressionTemplates> self_type;
+        typedef typename boost::multiprecision::scalar_result_from_possible_complex<self_type>::type Real;
         typedef self_type NonInteger;    // Not correct but we can't do much better??
         typedef double Literal;
         typedef self_type Nested;
         enum {
-            IsComplex = nil::crypto3::multiprecision::number_category<self_type>::value ==
-                        nil::crypto3::multiprecision::number_kind_complex,
-            IsInteger = nil::crypto3::multiprecision::number_category<self_type>::value ==
-                        nil::crypto3::multiprecision::number_kind_integer,
+            IsComplex = boost::multiprecision::number_category<self_type>::value ==
+                        boost::multiprecision::number_kind_complex,
+            IsInteger = boost::multiprecision::number_category<self_type>::value ==
+                        boost::multiprecision::number_kind_integer,
             ReadCost = 1,
             AddCost = 4,
             MulCost = 8,
@@ -65,21 +65,21 @@ namespace Eigen {
     };
 
 #define BOOST_MP_EIGEN_SCALAR_TRAITS_DECL(A)                                                                       \
-    template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates,          \
+    template<class Backend, boost::multiprecision::expression_template_option ExpressionTemplates,          \
              typename BinaryOp>                                                                                    \
-    struct ScalarBinaryOpTraits<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>, A, BinaryOp> { \
-        static_assert(nil::crypto3::multiprecision::is_compatible_arithmetic_type<                                 \
-                          A, nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>::value,           \
+    struct ScalarBinaryOpTraits<boost::multiprecision::number<Backend, ExpressionTemplates>, A, BinaryOp> { \
+        static_assert(boost::multiprecision::is_compatible_arithmetic_type<                                 \
+                          A, boost::multiprecision::number<Backend, ExpressionTemplates>>::value,           \
                       "Interoperability with this arithmetic type is not supported.");                             \
-        typedef nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> ReturnType;                     \
+        typedef boost::multiprecision::number<Backend, ExpressionTemplates> ReturnType;                     \
     };                                                                                                             \
-    template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates,          \
+    template<class Backend, boost::multiprecision::expression_template_option ExpressionTemplates,          \
              typename BinaryOp>                                                                                    \
-    struct ScalarBinaryOpTraits<A, nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>, BinaryOp> { \
-        static_assert(nil::crypto3::multiprecision::is_compatible_arithmetic_type<                                 \
-                          A, nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>::value,           \
+    struct ScalarBinaryOpTraits<A, boost::multiprecision::number<Backend, ExpressionTemplates>, BinaryOp> { \
+        static_assert(boost::multiprecision::is_compatible_arithmetic_type<                                 \
+                          A, boost::multiprecision::number<Backend, ExpressionTemplates>>::value,           \
                       "Interoperability with this arithmetic type is not supported.");                             \
-        typedef nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> ReturnType;                     \
+        typedef boost::multiprecision::number<Backend, ExpressionTemplates> ReturnType;                     \
     };
 
     BOOST_MP_EIGEN_SCALAR_TRAITS_DECL(float)
@@ -95,57 +95,57 @@ namespace Eigen {
     BOOST_MP_EIGEN_SCALAR_TRAITS_DECL(long)
     BOOST_MP_EIGEN_SCALAR_TRAITS_DECL(unsigned long)
 #if 0
-   template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates, class Backend2, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates2, typename BinaryOp>
-   struct ScalarBinaryOpTraits<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>, nil::crypto3::multiprecision::number<Backend2, ExpressionTemplates2>, BinaryOp>
+   template<class Backend, boost::multiprecision::expression_template_option ExpressionTemplates, class Backend2, boost::multiprecision::expression_template_option ExpressionTemplates2, typename BinaryOp>
+   struct ScalarBinaryOpTraits<boost::multiprecision::number<Backend, ExpressionTemplates>, boost::multiprecision::number<Backend2, ExpressionTemplates2>, BinaryOp>
    {
       static_assert(
-         nil::crypto3::multiprecision::is_compatible_arithmetic_type<nil::crypto3::multiprecision::number<Backend2, ExpressionTemplates2>, nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> >::value
-         || nil::crypto3::multiprecision::is_compatible_arithmetic_type<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>, nil::crypto3::multiprecision::number<Backend2, ExpressionTemplates2> >::value, "Interoperability with this arithmetic type is not supported.");
-      typedef typename std::conditional<boost::is_convertible<nil::crypto3::multiprecision::number<Backend2, ExpressionTemplates2>, nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> >::value,
-         nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>, nil::crypto3::multiprecision::number<Backend2, ExpressionTemplates2> >::type ReturnType;
+         boost::multiprecision::is_compatible_arithmetic_type<boost::multiprecision::number<Backend2, ExpressionTemplates2>, boost::multiprecision::number<Backend, ExpressionTemplates> >::value
+         || boost::multiprecision::is_compatible_arithmetic_type<boost::multiprecision::number<Backend, ExpressionTemplates>, boost::multiprecision::number<Backend2, ExpressionTemplates2> >::value, "Interoperability with this arithmetic type is not supported.");
+      typedef typename std::conditional<boost::is_convertible<boost::multiprecision::number<Backend2, ExpressionTemplates2>, boost::multiprecision::number<Backend, ExpressionTemplates> >::value,
+         boost::multiprecision::number<Backend, ExpressionTemplates>, boost::multiprecision::number<Backend2, ExpressionTemplates2> >::type ReturnType;
    };
 
    template<unsigned D, typename BinaryOp>
-   struct ScalarBinaryOpTraits<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::backends::mpc_complex_backend<D>, nil::crypto3::multiprecision::et_on>, nil::crypto3::multiprecision::mpfr_float, BinaryOp>
+   struct ScalarBinaryOpTraits<boost::multiprecision::number<boost::multiprecision::backends::mpc_complex_backend<D>, boost::multiprecision::et_on>, boost::multiprecision::mpfr_float, BinaryOp>
    {
-      typedef nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::backends::mpc_complex_backend<D>, nil::crypto3::multiprecision::et_on> ReturnType;
+      typedef boost::multiprecision::number<boost::multiprecision::backends::mpc_complex_backend<D>, boost::multiprecision::et_on> ReturnType;
    };
 
    template<typename BinaryOp>
-   struct ScalarBinaryOpTraits<nil::crypto3::multiprecision::mpfr_float, nil::crypto3::multiprecision::mpc_complex, BinaryOp>
+   struct ScalarBinaryOpTraits<boost::multiprecision::mpfr_float, boost::multiprecision::mpc_complex, BinaryOp>
    {
-      typedef nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::backends::mpc_complex_backend<0>, nil::crypto3::multiprecision::et_on> ReturnType;
+      typedef boost::multiprecision::number<boost::multiprecision::backends::mpc_complex_backend<0>, boost::multiprecision::et_on> ReturnType;
    };
 
-   template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates, typename BinaryOp>
-   struct ScalarBinaryOpTraits<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>, nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>, BinaryOp>
+   template<class Backend, boost::multiprecision::expression_template_option ExpressionTemplates, typename BinaryOp>
+   struct ScalarBinaryOpTraits<boost::multiprecision::number<Backend, ExpressionTemplates>, boost::multiprecision::number<Backend, ExpressionTemplates>, BinaryOp>
    {
-      typedef nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> ReturnType;
+      typedef boost::multiprecision::number<Backend, ExpressionTemplates> ReturnType;
    };
 #endif
-    template<class Backend, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates, class tag,
+    template<class Backend, boost::multiprecision::expression_template_option ExpressionTemplates, class tag,
              class Arg1, class Arg2, class Arg3, class Arg4, typename BinaryOp>
-    struct ScalarBinaryOpTraits<nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>,
-                                nil::crypto3::multiprecision::detail::expression<tag, Arg1, Arg2, Arg3, Arg4>,
+    struct ScalarBinaryOpTraits<boost::multiprecision::number<Backend, ExpressionTemplates>,
+                                boost::multiprecision::detail::expression<tag, Arg1, Arg2, Arg3, Arg4>,
                                 BinaryOp> {
         static_assert(
             boost::is_convertible<
-                typename nil::crypto3::multiprecision::detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type,
-                nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>::value,
+                typename boost::multiprecision::detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type,
+                boost::multiprecision::number<Backend, ExpressionTemplates>>::value,
             "Interoperability with this arithmetic type is not supported.");
-        typedef nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> ReturnType;
+        typedef boost::multiprecision::number<Backend, ExpressionTemplates> ReturnType;
     };
 
     template<class tag, class Arg1, class Arg2, class Arg3, class Arg4, class Backend,
-             nil::crypto3::multiprecision::expression_template_option ExpressionTemplates, typename BinaryOp>
-    struct ScalarBinaryOpTraits<nil::crypto3::multiprecision::detail::expression<tag, Arg1, Arg2, Arg3, Arg4>,
-                                nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>, BinaryOp> {
+             boost::multiprecision::expression_template_option ExpressionTemplates, typename BinaryOp>
+    struct ScalarBinaryOpTraits<boost::multiprecision::detail::expression<tag, Arg1, Arg2, Arg3, Arg4>,
+                                boost::multiprecision::number<Backend, ExpressionTemplates>, BinaryOp> {
         static_assert(
             boost::is_convertible<
-                typename nil::crypto3::multiprecision::detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type,
-                nil::crypto3::multiprecision::number<Backend, ExpressionTemplates>>::value,
+                typename boost::multiprecision::detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type,
+                boost::multiprecision::number<Backend, ExpressionTemplates>>::value,
             "Interoperability with this arithmetic type is not supported.");
-        typedef nil::crypto3::multiprecision::number<Backend, ExpressionTemplates> ReturnType;
+        typedef boost::multiprecision::number<Backend, ExpressionTemplates> ReturnType;
     };
 
 }    // namespace Eigen
@@ -156,14 +156,14 @@ struct related_number {
 };
 /*
 template <>
-struct related_number<nil::crypto3::multiprecision::cpp_bin_float_50>
+struct related_number<boost::multiprecision::cpp_bin_float_50>
 {
-   typedef nil::crypto3::multiprecision::cpp_bin_float_quad type;
+   typedef boost::multiprecision::cpp_bin_float_quad type;
 };
 template <>
-struct related_number<nil::crypto3::multiprecision::cpp_dec_float_100>
+struct related_number<boost::multiprecision::cpp_dec_float_100>
 {
-   typedef nil::crypto3::multiprecision::cpp_dec_float_50 type;
+   typedef boost::multiprecision::cpp_dec_float_50 type;
 };*/
 
 template<class Num>
@@ -628,7 +628,7 @@ namespace boost {
 }    // namespace boost
 
 int main() {
-    using namespace nil::crypto3::multiprecision;
+    using namespace boost::multiprecision;
     test_complex_type<mpc_complex>();
 #if 0
    test_integer_type<int>();
@@ -636,15 +636,15 @@ int main() {
    test_float_type<double>();
    test_complex_type<std::complex<double> >();
 
-   test_float_type<nil::crypto3::multiprecision::cpp_dec_float_100>();
-   test_float_type<nil::crypto3::multiprecision::cpp_bin_float_50>();
-   test_float_type<nil::crypto3::multiprecision::mpfr_float>();
+   test_float_type<boost::multiprecision::cpp_dec_float_100>();
+   test_float_type<boost::multiprecision::cpp_bin_float_50>();
+   test_float_type<boost::multiprecision::mpfr_float>();
 
-   test_integer_type<nil::crypto3::multiprecision::int256_t>();
-   test_integer_type<nil::crypto3::multiprecision::cpp_int>();
-   test_integer_type<nil::crypto3::multiprecision::cpp_rational>();
-   test_integer_type<nil::crypto3::multiprecision::mpz_int>();
-   test_integer_type<nil::crypto3::multiprecision::mpq_rational>();
+   test_integer_type<boost::multiprecision::int256_t>();
+   test_integer_type<boost::multiprecision::cpp_int>();
+   test_integer_type<boost::multiprecision::cpp_rational>();
+   test_integer_type<boost::multiprecision::mpz_int>();
+   test_integer_type<boost::multiprecision::mpq_rational>();
 
 #endif
     return 0;

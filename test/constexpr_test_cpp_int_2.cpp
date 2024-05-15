@@ -6,7 +6,7 @@
 #include <boost/config.hpp>
 #undef BOOST_HAS_INT128
 #include "constexpr_arithmetric_test.hpp"
-#include "nil/crypto3/multiprecision/cpp_int.hpp"
+#include "nil/crypto3/multiprecision/cpp_int_modular.hpp"
 #include "test.hpp"
 
 #if !defined(BOOST_MP_NO_CONSTEXPR_DETECTION) && !defined(DISABLE_TESTS)
@@ -17,8 +17,8 @@ decltype(std::declval<F>()(std::declval<V>())) non_constexpr_invoke(F f, V v) {
 }
 
 int main() {
-    typedef nil::crypto3::multiprecision::int128_t int_backend;
-    typedef nil::crypto3::multiprecision::uint128_t unsigned_backend;
+    typedef boost::multiprecision::int128_t int_backend;
+    typedef boost::multiprecision::uint128_t unsigned_backend;
 
     {
         constexpr int_backend a(22);

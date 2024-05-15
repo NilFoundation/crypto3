@@ -12,7 +12,7 @@
 #include "test_arithmetic.hpp"
 
 int main() {
-    test<nil::crypto3::multiprecision::number<
-        nil::crypto3::multiprecision::logged_adaptor<nil::crypto3::multiprecision::cpp_dec_float<50>>>>();
+    test<boost::multiprecision::number<
+        boost::multiprecision::logged_adaptor<boost::multiprecision::cpp_dec_float<50>>>>();
     return boost::report_errors();
 }

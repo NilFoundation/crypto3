@@ -11,7 +11,7 @@
 #define _SCL_SECURE_NO_WARNINGS
 #endif
 
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
 #include "test.hpp"
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int.hpp>
@@ -48,7 +48,7 @@ T generate_random(unsigned bits_wanted) {
 
 template<class Number>
 void test() {
-    using namespace nil::crypto3::multiprecision;
+    using namespace boost::multiprecision;
     typedef Number test_type;
 
     for (unsigned i = 30; i < std::numeric_limits<test_type>::digits; ++i) {
@@ -71,7 +71,7 @@ void test() {
 }
 
 int main() {
-    using namespace nil::crypto3::multiprecision;
+    using namespace boost::multiprecision;
 
     test<int512_t>();
     test<uint512_t>();
@@ -79,9 +79,9 @@ int main() {
     //
     // We also need to test type with "odd" bit counts in order to ensure full code coverage:
     //
-    test<number<cpp_int_backend<528, 528, signed_magnitude, unchecked, void>>>();
-    test<number<cpp_int_backend<528, 528, unsigned_magnitude, unchecked, void>>>();
-    test<number<cpp_int_backend<48, 48, signed_magnitude, unchecked, void>>>();
-    test<number<cpp_int_backend<48, 48, unsigned_magnitude, unchecked, void>>>();
+    test<number<cpp_int_modular_backend<528, 528, signed_magnitude, unchecked, void>>>();
+    test<number<cpp_int_modular_backend<528, 528, unsigned_magnitude, unchecked, void>>>();
+    test<number<cpp_int_modular_backend<48, 48, signed_magnitude, unchecked, void>>>();
+    test<number<cpp_int_modular_backend<48, 48, unsigned_magnitude, unchecked, void>>>();
     return boost::report_errors();
 }

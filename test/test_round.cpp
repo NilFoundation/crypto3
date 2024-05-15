@@ -84,7 +84,7 @@ T get_random() {
 }
 
 template<class T, class U>
-typename boost::disable_if_c<nil::crypto3::multiprecision::is_interval_number<T>::value>::type check_within_half(T a,
+typename boost::disable_if_c<boost::multiprecision::is_interval_number<T>::value>::type check_within_half(T a,
                                                                                                                  U u) {
     BOOST_MATH_STD_USING
     if (fabs(a - u) > 0.5f) {
@@ -97,7 +97,7 @@ typename boost::disable_if_c<nil::crypto3::multiprecision::is_interval_number<T>
     }
 }
 template<class T, class U>
-typename boost::enable_if_c<nil::crypto3::multiprecision::is_interval_number<T>::value>::type check_within_half(T a,
+typename boost::enable_if_c<boost::multiprecision::is_interval_number<T>::value>::type check_within_half(T a,
                                                                                                                 U u) {
     BOOST_MATH_STD_USING
     if (upper(T(fabs(a - u))) > 0.5f) {
@@ -323,7 +323,7 @@ void test() {
 #endif
     }
     if (std::numeric_limits<T>::has_quiet_NaN) {
-        BOOST_CHECK((nil::crypto3::multiprecision::isnan)(round(std::numeric_limits<T>::quiet_NaN())));
+        BOOST_CHECK((boost::multiprecision::isnan)(round(std::numeric_limits<T>::quiet_NaN())));
         BOOST_CHECK_THROW(result = static_cast<T>(iround(std::numeric_limits<T>::quiet_NaN())),
                           boost::math::rounding_error);
         BOOST_CHECK_THROW(result = static_cast<T>(lround(std::numeric_limits<T>::quiet_NaN())),
@@ -362,7 +362,7 @@ void test() {
 #endif
     }
     if (std::numeric_limits<T>::has_quiet_NaN) {
-        BOOST_CHECK((nil::crypto3::multiprecision::isnan)(trunc(std::numeric_limits<T>::quiet_NaN())));
+        BOOST_CHECK((boost::multiprecision::isnan)(trunc(std::numeric_limits<T>::quiet_NaN())));
         BOOST_CHECK_THROW(result = static_cast<T>(itrunc(std::numeric_limits<T>::quiet_NaN())),
                           boost::math::rounding_error);
         BOOST_CHECK_THROW(result = static_cast<T>(ltrunc(std::numeric_limits<T>::quiet_NaN())),
@@ -421,46 +421,46 @@ void test() {
 
 int main() {
 #ifdef TEST_MPF_50
-    test<nil::crypto3::multiprecision::mpf_float_50>();
-    test<nil::crypto3::multiprecision::mpf_float_100>();
+    test<boost::multiprecision::mpf_float_50>();
+    test<boost::multiprecision::mpf_float_100>();
 #endif
 #ifdef TEST_MPFR_50
-    test<nil::crypto3::multiprecision::mpfr_float_50>();
-    test<nil::crypto3::multiprecision::mpfr_float_100>();
+    test<boost::multiprecision::mpfr_float_50>();
+    test<boost::multiprecision::mpfr_float_100>();
 #endif
 #ifdef TEST_MPFI_50
-    test<nil::crypto3::multiprecision::mpfi_float_50>();
-    test<nil::crypto3::multiprecision::mpfi_float_100>();
+    test<boost::multiprecision::mpfi_float_50>();
+    test<boost::multiprecision::mpfi_float_100>();
 #endif
 #ifdef TEST_CPP_DEC_FLOAT
-    test<nil::crypto3::multiprecision::cpp_dec_float_50>();
-    test<nil::crypto3::multiprecision::cpp_dec_float_100>();
+    test<boost::multiprecision::cpp_dec_float_50>();
+    test<boost::multiprecision::cpp_dec_float_100>();
 #ifndef SLOW_COMPLER
     // Some "peculiar" digit counts which stress our code:
-    test<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_dec_float<65>>>();
-    test<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_dec_float<64>>>();
-    test<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_dec_float<63>>>();
-    test<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_dec_float<62>>>();
-    test<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_dec_float<61, long long>>>();
-    test<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_dec_float<60, long long>>>();
-    test<nil::crypto3::multiprecision::number<
-        nil::crypto3::multiprecision::cpp_dec_float<59, long long, std::allocator<char>>>>();
-    test<nil::crypto3::multiprecision::number<
-        nil::crypto3::multiprecision::cpp_dec_float<58, long long, std::allocator<char>>>>();
+    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<65>>>();
+    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<64>>>();
+    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<63>>>();
+    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<62>>>();
+    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<61, long long>>>();
+    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<60, long long>>>();
+    test<boost::multiprecision::number<
+        boost::multiprecision::cpp_dec_float<59, long long, std::allocator<char>>>>();
+    test<boost::multiprecision::number<
+        boost::multiprecision::cpp_dec_float<58, long long, std::allocator<char>>>>();
 #endif
 #endif
 #ifdef TEST_CPP_BIN_FLOAT
-    test<nil::crypto3::multiprecision::cpp_bin_float_50>();
-    test<nil::crypto3::multiprecision::cpp_bin_float_100>();
-    test<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_bin_float<
-        35, nil::crypto3::multiprecision::digit_base_10, std::allocator<char>, boost::long_long_type>>>();
+    test<boost::multiprecision::cpp_bin_float_50>();
+    test<boost::multiprecision::cpp_bin_float_100>();
+    test<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<
+        35, boost::multiprecision::digit_base_10, std::allocator<char>, boost::long_long_type>>>();
 #endif
 #ifdef TEST_BACKEND
     test<
-        nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::concepts::number_backend_float_architype>>();
+        boost::multiprecision::number<boost::multiprecision::concepts::number_backend_float_architype>>();
 #endif
 #ifdef TEST_FLOAT128
-    test<nil::crypto3::multiprecision::float128>();
+    test<boost::multiprecision::float128>();
 #endif
     return boost::report_errors();
 }

@@ -7,20 +7,20 @@
 #include "../performance/arithmetic_backend.hpp"
 
 int main() {
-    typedef nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::backends::arithmetic_backend<long long>,
-                                                 nil::crypto3::multiprecision::et_off>
+    typedef boost::multiprecision::number<boost::multiprecision::backends::arithmetic_backend<long long>,
+                                                 boost::multiprecision::et_off>
         int_backend;
-    typedef nil::crypto3::multiprecision::number<
-        nil::crypto3::multiprecision::backends::arithmetic_backend<unsigned long long>,
-        nil::crypto3::multiprecision::et_off>
+    typedef boost::multiprecision::number<
+        boost::multiprecision::backends::arithmetic_backend<unsigned long long>,
+        boost::multiprecision::et_off>
         unsigned_backend;
 
-    typedef nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::backends::arithmetic_backend<long long>,
-                                                 nil::crypto3::multiprecision::et_on>
+    typedef boost::multiprecision::number<boost::multiprecision::backends::arithmetic_backend<long long>,
+                                                 boost::multiprecision::et_on>
         int_backend_et;
-    typedef nil::crypto3::multiprecision::number<
-        nil::crypto3::multiprecision::backends::arithmetic_backend<unsigned long long>,
-        nil::crypto3::multiprecision::et_on>
+    typedef boost::multiprecision::number<
+        boost::multiprecision::backends::arithmetic_backend<unsigned long long>,
+        boost::multiprecision::et_on>
         unsigned_backend_et;
 
     {

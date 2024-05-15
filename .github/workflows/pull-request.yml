@@ -26,7 +26,7 @@ jobs:
     name: Linux Reusable Crypto3 Testing
     needs:
       - handle-syncwith
-    uses: NilFoundation/crypto3/.github/workflows/reusable-submodule-testing-linux.yml@075a52fae616b187aafd4e981452a780cf18b2d0
+    uses: NilFoundation/crypto3/.github/workflows/reusable-submodule-testing-linux.yml@664bc9ec8d098cfd8551aa0b4d2c152c8e832401
 
     secrets: inherit
     with:
@@ -38,7 +38,7 @@ jobs:
   #   name: Mac Reusable Crypto3 Testing
   #   needs:
   #     - handle-syncwith
-  #   uses: NilFoundation/crypto3/.github/workflows/reusable-submodule-testing-mac.yml@14b2aac2501c57fd1ee8174cc43cfbfc87b40ecc
+  #   uses: NilFoundation/crypto3/.github/workflows/reusable-submodule-testing-mac.yml@664bc9ec8d098cfd8551aa0b4d2c152c8e832401
 
   #   secrets: inherit
   #   with:
@@ -50,4 +50,4 @@ jobs:
     name: Publish JUnit results
     needs:
       - test-linux
-    uses: NilFoundation/crypto3/.github/workflows/reusable-publish-result.yml@14b2aac2501c57fd1ee8174cc43cfbfc87b40ecc
+    uses: NilFoundation/crypto3/.github/workflows/reusable-publish-result.yml@664bc9ec8d098cfd8551aa0b4d2c152c8e832401

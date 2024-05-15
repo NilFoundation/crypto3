@@ -12,17 +12,17 @@
 #include <boost/array.hpp>
 #include "test.hpp"
 
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
 
 int main() {
-    using namespace nil::crypto3::multiprecision;
+    using namespace boost::multiprecision;
     //
     // Test interconversions between different precisions:
     //
     cpp_int i1(2);
     int128_t i2(3);
     int256_t i3(4);
-    number<cpp_int_backend<32, 32, signed_magnitude, checked, void>> i4(5);
+    number<cpp_int_modular_backend<32, 32, signed_magnitude, checked, void>> i4(5);
 
     i1 = i3;
     BOOST_TEST(i1 == 4);
@@ -47,7 +47,7 @@ int main() {
     int128_t i6(i4);
     BOOST_TEST(i6 == -5677334);
 
-    number<cpp_int_backend<32, 32, signed_magnitude, unchecked, void>, et_off> i7(i3);
+    number<cpp_int_modular_backend<32, 32, signed_magnitude, unchecked, void>, et_off> i7(i3);
     BOOST_TEST(i7 == -1234567);
 
     int256_t i8(i6);
@@ -56,13 +56,13 @@ int main() {
     i7.assign(4.0);
     BOOST_TEST(i7 == 4);
 
-    number<cpp_int_backend<30, 30, signed_magnitude, checked, void>, et_off> i9(-5677334);
+    number<cpp_int_modular_backend<30, 30, signed_magnitude, checked, void>, et_off> i9(-5677334);
     i7 = i9;
     BOOST_TEST(i7 == -5677334);
-    i7 = number<cpp_int_backend<32, 32, signed_magnitude, checked, void>, et_off>(i9);
+    i7 = number<cpp_int_modular_backend<32, 32, signed_magnitude, checked, void>, et_off>(i9);
     BOOST_TEST(i7 == -5677334);
 
-    i9 = static_cast<number<cpp_int_backend<30, 30, signed_magnitude, checked, void>, et_off>>(i7);
+    i9 = static_cast<number<cpp_int_modular_backend<30, 30, signed_magnitude, checked, void>, et_off>>(i7);
     BOOST_TEST(i9 == -5677334);
 
     ++i9;

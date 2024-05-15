@@ -6,8 +6,8 @@
 #include <nil/crypto3/multiprecision/cpp_bin_float.hpp>
 
 int main() {
-    typedef nil::crypto3::multiprecision::number<
-        nil::crypto3::multiprecision::cpp_bin_float<8, nil::crypto3::multiprecision::backends::digit_base_2>>
+    typedef boost::multiprecision::number<
+        boost::multiprecision::cpp_bin_float<8, boost::multiprecision::backends::digit_base_2>>
         quarter_float;
 
     quarter_float qf(256);
@@ -64,11 +64,11 @@ int main() {
 
     // Now try conversion to cpp_int:
     qf = 256;
-    nil::crypto3::multiprecision::cpp_int i = qf.convert_to<nil::crypto3::multiprecision::cpp_int>(), j;
+    boost::multiprecision::cpp_int i = qf.convert_to<boost::multiprecision::cpp_int>(), j;
     if (i != 256)
         return 10;
     qf = ldexp(qf, 126);
-    i = qf.convert_to<nil::crypto3::multiprecision::cpp_int>();
+    i = qf.convert_to<boost::multiprecision::cpp_int>();
     j = 256;
     j <<= 126;
     if (i != j)

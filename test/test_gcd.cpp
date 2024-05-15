@@ -10,7 +10,7 @@
 #define BOOST_MP_GCD_DEBUG
 
 #include "test.hpp"
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
 #include <boost/random.hpp>
 #include <map>
 #include <tuple>
@@ -22,7 +22,7 @@
 //
 #if !(defined(__clang__) && (__cplusplus > 201300) && (__cplusplus < 201700))
 
-using nil::crypto3::multiprecision::cpp_int;
+using boost::multiprecision::cpp_int;
 
 std::tuple<std::vector<cpp_int>, std::vector<cpp_int>, std::vector<cpp_int>>& get_test_vector(std::size_t bits) {
     static std::map<std::size_t, std::tuple<std::vector<cpp_int>, std::vector<cpp_int>, std::vector<cpp_int>>> data;
@@ -80,9 +80,9 @@ namespace boost {
 }    // namespace boost
 
 int main() {
-    using nil::crypto3::multiprecision::backends::total_lehmer_gcd_bits_saved;
-    using nil::crypto3::multiprecision::backends::total_lehmer_gcd_calls;
-    using nil::crypto3::multiprecision::backends::total_lehmer_gcd_cycles;
+    using boost::multiprecision::backends::total_lehmer_gcd_bits_saved;
+    using boost::multiprecision::backends::total_lehmer_gcd_calls;
+    using boost::multiprecision::backends::total_lehmer_gcd_cycles;
 
     unsigned bits = 2048;
 

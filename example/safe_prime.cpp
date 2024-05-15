@@ -5,7 +5,7 @@
 
 //[safe_prime
 
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
 #include <nil/crypto3/multiprecision/miller_rabin.hpp>
 #include <iostream>
 #include <iomanip>

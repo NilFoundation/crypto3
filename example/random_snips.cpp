@@ -3,7 +3,7 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
 #include <nil/crypto3/multiprecision/cpp_bin_float.hpp>
 #include <boost/random.hpp>
 #include <boost/scoped_ptr.hpp>
@@ -12,7 +12,7 @@
 
 void t1() {
     //[random_eg1
-    //=#include <nil/crypto3/multiprecision/cpp_int.hpp>
+    //=#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
     //=#include <boost/random.hpp>
     //=
     //=int main()
@@ -83,7 +83,7 @@ void t1() {
 void t2() {
     std::cout << std::dec;
     //[random_eg2
-    //=#include <nil/crypto3/multiprecision/cpp_int.hpp>
+    //=#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
     //=#include <boost/random.hpp>
     //=
     //=int main()
@@ -183,7 +183,7 @@ void t4() {
     std::cout << std::endl;
     //[random_eg4
     //=#include <nil/crypto3/multiprecision/cpp_bin_float.hpp>
-    //=#include <nil/crypto3/multiprecision/cpp_int.hpp>
+    //=#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
     //=#include <boost/random.hpp>
     //=
     //=int main()

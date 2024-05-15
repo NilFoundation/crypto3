@@ -12,6 +12,6 @@
 #include "test_arithmetic.hpp"
 
 int main() {
-    test<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::arithmetic_backend<int>>>();
+    test<boost::multiprecision::number<boost::multiprecision::arithmetic_backend<int>>>();
     return boost::report_errors();
 }

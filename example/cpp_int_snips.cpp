@@ -3,12 +3,12 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
 #include <iostream>
 
 void t1() {
     //[cpp_int_eg
-    //=#include <nil/crypto3/multiprecision/cpp_int.hpp>
+    //=#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
     //=#include <iostream>
     //=
     //=int main()
@@ -40,7 +40,7 @@ void t1() {
 
 void t3() {
     //[cpp_rational_eg
-    //=#include <nil/crypto3/multiprecision/cpp_int.hpp>
+    //=#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
     //=#include <iostream>
     //=
     //=int main()

@@ -7,7 +7,7 @@
 #include <boost/static_assert.hpp>
 #include "test.hpp"
 
-using namespace nil::crypto3::multiprecision;
+using namespace boost::multiprecision;
 
 int main() {
     BOOST_CHECK_EQUAL(std::numeric_limits<cpp_bin_float_single>::digits10, 6);

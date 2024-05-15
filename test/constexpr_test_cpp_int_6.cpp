@@ -3,7 +3,7 @@
 //  Boost Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include "nil/crypto3/multiprecision/cpp_int.hpp"
+#include "nil/crypto3/multiprecision/cpp_int_modular.hpp"
 #include "test.hpp"
 
 template<class T, unsigned Order>
@@ -199,9 +199,9 @@ public:
 };
 
 int main() {
-    using namespace nil::crypto3::multiprecision::literals;
+    using namespace boost::multiprecision::literals;
 
-    typedef nil::crypto3::multiprecision::checked_int1024_t int_backend;
+    typedef boost::multiprecision::checked_int1024_t int_backend;
 
     // 8192 x^13 - 319488 x^11 + 4392960 x^9 - 26357760 x^7 + 69189120 x^5 - 69189120 x^3 + 17297280 x
     constexpr hermite_polynomial<int_backend, 13> h;

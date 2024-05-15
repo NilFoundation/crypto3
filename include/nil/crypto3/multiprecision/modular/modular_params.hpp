@@ -14,23 +14,21 @@
 #include <nil/crypto3/multiprecision/modular/montgomery_params.hpp>
 #include <nil/crypto3/multiprecision/modular/barrett_params.hpp>
 
-namespace nil {
-    namespace crypto3 {
-        namespace multiprecision {
+namespace boost {   
+    namespace multiprecision {
+        namespace backends {
 
             template<typename Backend>
             class modular_params : public backends::montgomery_params<Backend>,
                                    public backends::barrett_params<Backend> {
-                typedef number<Backend> number_type;
-
             public:
                 modular_params() : backends::montgomery_params<Backend>(), backends::barrett_params<Backend>() {
                 }
 
                 template<typename Number>
-                explicit modular_params(const Number& p) :
-                    backends::montgomery_params<Backend>(number_type(p)), backends::barrett_params<Backend>(
-                                                                              number_type(p)) {
+                explicit modular_params(const Backend& p)
+                    : backends::montgomery_params<Backend>(p),
+                      backends::barrett_params<Backend>(p) {
                 }
 
                 modular_params& operator=(const modular_params<Backend>& v) {
@@ -47,7 +45,7 @@ namespace nil {
 
                 template<typename Number>
                 modular_params& operator=(const Number& v) {
-                    number_type tmp(v);
+                    Backend tmp(v);
                     this->initialize_barrett_params(tmp);
                     this->initialize_montgomery_params(tmp);
                     return *this;
@@ -71,7 +69,7 @@ namespace nil {
                 void adjust_modular(Backend& result) {
                     this->barrett_reduce(result);
                     if (get_mod() % 2 != 0) {
-                        eval_multiply(result, this->r2().backend());
+                        eval_multiply(result, this->r2());
                         this->montgomery_reduce(result);
                     }
                 }
@@ -86,12 +84,12 @@ namespace nil {
                     }
                 }
 
-                number_type get_mod() const {
+                Backend get_mod() const {
                     return this->m_mod;
                 }
 
-                template<typename BackendT, expression_template_option ExpressionTemplates>
-                operator number<BackendT, ExpressionTemplates>() {
+                template<typename BackendT, boost::multiprecision::expression_template_option ExpressionTemplates>
+                operator boost::multiprecision::number<BackendT, ExpressionTemplates>() {
                     return get_mod();
                 };
 
@@ -105,8 +103,8 @@ namespace nil {
                     return o;
                 }
             };
-        }    // namespace multiprecision
-    }        // namespace crypto3
-}    // namespace nil
+        }  // namespace backends
+    }   // namespace multiprecision
+}   // namespace boost
 
 #endif    //_MULTIPRECISION_MODULAR_PARAMS_HPP

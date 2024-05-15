@@ -158,9 +158,9 @@ inline bool is_mpfr(const T&) {
     return false;
 }
 #if defined(TEST_MPFR_50)
-template<unsigned N, nil::crypto3::multiprecision::expression_template_option ET>
+template<unsigned N, boost::multiprecision::expression_template_option ET>
 inline bool
-    is_mpfr(const nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfr_float_backend<N>, ET>&) {
+    is_mpfr(const boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<N>, ET>&) {
     return true;
 }
 #endif
@@ -169,26 +169,26 @@ template<class T>
 void test() {
     typedef typename T::backend_type backend_type;
     T num, expect;
-    num.backend() = nil::crypto3::multiprecision::default_ops::get_constant_pi<backend_type>();
+    num.backend() = boost::multiprecision::default_ops::get_constant_pi<backend_type>();
     expect = static_cast<T>(pi);
     BOOST_CHECK_CLOSE_FRACTION(num, expect, std::numeric_limits<T>::epsilon() * (is_mpfr(num) ? 1200 : 2));
-    num.backend() = nil::crypto3::multiprecision::default_ops::get_constant_ln2<backend_type>();
+    num.backend() = boost::multiprecision::default_ops::get_constant_ln2<backend_type>();
     expect = static_cast<T>(ln2);
     BOOST_CHECK_CLOSE_FRACTION(num, expect, std::numeric_limits<T>::epsilon() * (is_mpfr(num) ? 30 : 1));
-    num.backend() = nil::crypto3::multiprecision::default_ops::get_constant_e<backend_type>();
+    num.backend() = boost::multiprecision::default_ops::get_constant_e<backend_type>();
     expect = static_cast<T>(e);
     BOOST_CHECK_CLOSE_FRACTION(num, expect, std::numeric_limits<T>::epsilon() * (is_mpfr(num) ? 2 : 1));
 }
 
 int main() {
 #ifdef TEST_MPFR_50
-    test<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfr_float_backend<2000>>>();
+    test<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<2000>>>();
 #endif
 #ifdef TEST_CPP_DEC_FLOAT
-    test<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_dec_float<2000>>>();
+    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<2000>>>();
 #endif
 #ifdef TEST_MPF_50
-    test<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::gmp_float<2000>>>();
+    test<boost::multiprecision::number<boost::multiprecision::gmp_float<2000>>>();
 #endif
     return boost::report_errors();
 }

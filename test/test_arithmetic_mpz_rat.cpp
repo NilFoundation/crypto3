@@ -13,7 +13,7 @@
 #include "test_arithmetic.hpp"
 
 int main() {
-    test<nil::crypto3::multiprecision::number<
-        nil::crypto3::multiprecision::rational_adaptor<nil::crypto3::multiprecision::gmp_int>>>();
+    test<boost::multiprecision::number<
+        boost::multiprecision::rational_adaptor<boost::multiprecision::gmp_int>>>();
     return boost::report_errors();
 }

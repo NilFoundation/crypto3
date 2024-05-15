@@ -3,22 +3,22 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
 
 #include "test_arithmetic.hpp"
 
-template <unsigned MinBits, unsigned MaxBits, nil::crypto3::multiprecision::cpp_integer_type SignType, class Allocator, nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-struct is_twos_complement_integer<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_int_backend<MinBits, MaxBits, SignType, nil::crypto3::multiprecision::checked, Allocator>, ExpressionTemplates> > : public std::integral_constant<bool, false>
+template <unsigned MinBits, unsigned MaxBits, boost::multiprecision::cpp_integer_type SignType, class Allocator, boost::multiprecision::expression_template_option ExpressionTemplates>
+struct is_twos_complement_integer<boost::multiprecision::number<boost::multiprecision::cpp_int_modular_backend<MinBits, MaxBits, SignType, boost::multiprecision::checked, Allocator>, ExpressionTemplates> > : public std::integral_constant<bool, false>
 {};
 
 template <>
-struct related_type<nil::crypto3::multiprecision::cpp_int>
+struct related_type<boost::multiprecision::cpp_int>
 {
-   typedef nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_int_backend<4096> > type;
+   typedef boost::multiprecision::number<boost::multiprecision::cpp_int_modular_backend<4096> > type;
 };
 
 int main()
 {
-   test<nil::crypto3::multiprecision::cpp_int>();
+   test<boost::multiprecision::cpp_int>();
    return boost::report_errors();
 }

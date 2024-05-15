@@ -11,6 +11,6 @@
 #include "test_arithmetic.hpp"
 
 int main() {
-    test<nil::crypto3::multiprecision::skeleton_number>();
+    test<boost::multiprecision::skeleton_number>();
     return boost::report_errors();
 }

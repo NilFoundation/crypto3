@@ -13,7 +13,7 @@
 #endif
 
 #include <nil/crypto3/multiprecision/gmp.hpp>
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int.hpp>
 #include "test.hpp"
@@ -56,12 +56,12 @@ T generate_random(unsigned bits_wanted) {
 
 template<class T>
 void test_value(const T& val) {
-    nil::crypto3::multiprecision::mpz_int z(val.str()), mask(1);
+    boost::multiprecision::mpz_int z(val.str()), mask(1);
     mask <<= std::numeric_limits<T>::digits;
     --mask;
 
     for (unsigned i = 0; i <= std::numeric_limits<T>::digits + 2; ++i) {
-        BOOST_CHECK_EQUAL((val << i).str(), nil::crypto3::multiprecision::mpz_int(((z << i) & mask)).str());
+        BOOST_CHECK_EQUAL((val << i).str(), boost::multiprecision::mpz_int(((z << i) & mask)).str());
     }
 }
 
@@ -72,9 +72,9 @@ template<int N>
 void test(std::integral_constant<int, N> const&) {
     test(std::integral_constant<int, N + 4>());
 
-    typedef nil::crypto3::multiprecision::number<
-        nil::crypto3::multiprecision::cpp_int_backend<N, N, nil::crypto3::multiprecision::unsigned_magnitude>,
-        nil::crypto3::multiprecision::et_off>
+    typedef boost::multiprecision::number<
+        boost::multiprecision::cpp_int_modular_backend<N, N, boost::multiprecision::unsigned_magnitude>,
+        boost::multiprecision::et_off>
         mp_type;
 
     std::cout << "Running tests for precision: " << N << std::endl;

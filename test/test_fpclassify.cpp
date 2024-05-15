@@ -361,32 +361,32 @@ int main() {
     std::cout << "FP_SUBNORMAL: " << (int)FP_SUBNORMAL << std::endl;
 
 #ifdef TEST_MPF_50
-    test<nil::crypto3::multiprecision::mpf_float_50>();
-    test<nil::crypto3::multiprecision::mpf_float_100>();
+    test<boost::multiprecision::mpf_float_50>();
+    test<boost::multiprecision::mpf_float_100>();
 #endif
 #ifdef TEST_MPFR_50
-    test<nil::crypto3::multiprecision::mpfr_float_50>();
-    test<nil::crypto3::multiprecision::mpfr_float_100>();
+    test<boost::multiprecision::mpfr_float_50>();
+    test<boost::multiprecision::mpfr_float_100>();
 #endif
 #ifdef TEST_MPFI_50
-    test<nil::crypto3::multiprecision::mpfi_float_50>();
-    test<nil::crypto3::multiprecision::mpfi_float_100>();
+    test<boost::multiprecision::mpfi_float_50>();
+    test<boost::multiprecision::mpfi_float_100>();
 #endif
 #ifdef TEST_CPP_DEC_FLOAT
-    test<nil::crypto3::multiprecision::cpp_dec_float_50>();
-    test<nil::crypto3::multiprecision::cpp_dec_float_100>();
+    test<boost::multiprecision::cpp_dec_float_50>();
+    test<boost::multiprecision::cpp_dec_float_100>();
 #endif
 #ifdef TEST_BACKEND
     test<
-        nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::concepts::number_backend_float_architype>>();
+        boost::multiprecision::number<boost::multiprecision::concepts::number_backend_float_architype>>();
 #endif
 #ifdef TEST_FLOAT128
-    test<nil::crypto3::multiprecision::float128>();
+    test<boost::multiprecision::float128>();
 #endif
 #ifdef TEST_CPP_BIN_FLOAT
-    test<nil::crypto3::multiprecision::cpp_bin_float_50>();
-    test<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_bin_float<
-        35, nil::crypto3::multiprecision::digit_base_10, std::allocator<char>, boost::long_long_type>>>();
+    test<boost::multiprecision::cpp_bin_float_50>();
+    test<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<
+        35, boost::multiprecision::digit_base_10, std::allocator<char>, boost::long_long_type>>>();
 #endif
     return boost::report_errors();
 }

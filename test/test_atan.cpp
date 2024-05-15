@@ -65,7 +65,7 @@
 template<class T>
 T atan2_def(T y, T x) {
     T t;
-    t.backend() = nil::crypto3::multiprecision::default_ops::get_constant_pi<typename T::backend_type>();
+    t.backend() = boost::multiprecision::default_ops::get_constant_pi<typename T::backend_type>();
     T t2;
     if (x)
         t2 = atan(y / x);
@@ -79,7 +79,7 @@ struct is_mpfr_type : public std::integral_constant<bool, false> { };
 
 #ifdef TEST_MPFR_50
 template<unsigned Digits10>
-struct is_mpfr_type<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfr_float_backend<Digits10>>>
+struct is_mpfr_type<boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10>>>
     : public std::integral_constant<bool, true> { };
 #endif
 
@@ -403,7 +403,7 @@ void test() {
     err = relative_error(T(atan2(T(0), T(1))), atan2_def(T(0), T(1))).template convert_to<unsigned>();
     if (err > max_err)
         max_err = err;
-    if (!nil::crypto3::multiprecision::is_interval_number<T>::value) {
+    if (!boost::multiprecision::is_interval_number<T>::value) {
         // We don't test this with intervals as [-0,0] leads to strange behaviour in atan2...
         err = relative_error(T(atan2(T(0), T(-1))), atan2_def(T(0), T(-1))).template convert_to<unsigned>();
         if (err > max_err)
@@ -411,7 +411,7 @@ void test() {
     }
 
     T pi;
-    pi.backend() = nil::crypto3::multiprecision::default_ops::get_constant_pi<typename T::backend_type>();
+    pi.backend() = boost::multiprecision::default_ops::get_constant_pi<typename T::backend_type>();
 
     err = relative_error(T(atan2(T(1), T(0))), T(pi / 2)).template convert_to<unsigned>();
     if (err > max_err)
@@ -446,47 +446,47 @@ void test() {
 int main() {
 #ifdef TEST_BACKEND
     test<
-        nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::concepts::number_backend_float_architype>>();
+        boost::multiprecision::number<boost::multiprecision::concepts::number_backend_float_architype>>();
 #endif
 #ifdef TEST_MPF_50
-    test<nil::crypto3::multiprecision::mpf_float_50>();
-    test<nil::crypto3::multiprecision::mpf_float_100>();
+    test<boost::multiprecision::mpf_float_50>();
+    test<boost::multiprecision::mpf_float_100>();
 #endif
 #ifdef TEST_MPFR_50
-    test<nil::crypto3::multiprecision::mpfr_float_50>();
-    test<nil::crypto3::multiprecision::mpfr_float_100>();
+    test<boost::multiprecision::mpfr_float_50>();
+    test<boost::multiprecision::mpfr_float_100>();
 #endif
 #ifdef TEST_MPFI_50
-    test<nil::crypto3::multiprecision::mpfi_float_50>();
-    test<nil::crypto3::multiprecision::mpfi_float_100>();
+    test<boost::multiprecision::mpfi_float_50>();
+    test<boost::multiprecision::mpfi_float_100>();
 #endif
 #ifdef TEST_CPP_DEC_FLOAT
-    test<nil::crypto3::multiprecision::cpp_dec_float_50>();
-    test<nil::crypto3::multiprecision::cpp_dec_float_100>();
+    test<boost::multiprecision::cpp_dec_float_50>();
+    test<boost::multiprecision::cpp_dec_float_100>();
 #ifndef SLOW_COMPLER
     // Some "peculiar" digit counts which stress our code:
-    test<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_dec_float<65>>>();
-    test<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_dec_float<64>>>();
-    test<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_dec_float<63>>>();
-    test<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_dec_float<62>>>();
-    test<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_dec_float<61, long long>>>();
-    test<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_dec_float<60, long long>>>();
-    test<nil::crypto3::multiprecision::number<
-        nil::crypto3::multiprecision::cpp_dec_float<59, long long, std::allocator<char>>>>();
-    test<nil::crypto3::multiprecision::number<
-        nil::crypto3::multiprecision::cpp_dec_float<58, long long, std::allocator<char>>>>();
+    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<65>>>();
+    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<64>>>();
+    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<63>>>();
+    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<62>>>();
+    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<61, long long>>>();
+    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<60, long long>>>();
+    test<boost::multiprecision::number<
+        boost::multiprecision::cpp_dec_float<59, long long, std::allocator<char>>>>();
+    test<boost::multiprecision::number<
+        boost::multiprecision::cpp_dec_float<58, long long, std::allocator<char>>>>();
     // Check low multiprecision digit counts.
-    test<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_dec_float<9>>>();
-    test<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_dec_float<18>>>();
+    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<9>>>();
+    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<18>>>();
 #endif
 #endif
 #ifdef TEST_FLOAT128
-    test<nil::crypto3::multiprecision::float128>();
+    test<boost::multiprecision::float128>();
 #endif
 #ifdef TEST_CPP_BIN_FLOAT
-    test<nil::crypto3::multiprecision::cpp_bin_float_50>();
-    test<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_bin_float<
-        35, nil::crypto3::multiprecision::digit_base_10, std::allocator<char>, boost::long_long_type>>>();
+    test<boost::multiprecision::cpp_bin_float_50>();
+    test<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<
+        35, boost::multiprecision::digit_base_10, std::allocator<char>, boost::long_long_type>>>();
 #endif
     return boost::report_errors();
 }

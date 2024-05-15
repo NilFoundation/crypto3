@@ -3,7 +3,7 @@
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
 #include <iostream>
 #include <iomanip>
 #include <vector>
@@ -18,7 +18,7 @@ which will fit into a 128-bit integer.  At the end of the routine we do some
 fancy iostream formatting of the results:
 */
 /*=
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
 #include <iostream>
 #include <iomanip>
 #include <vector>

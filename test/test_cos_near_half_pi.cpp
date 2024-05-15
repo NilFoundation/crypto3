@@ -50,7 +50,7 @@
 
 template<class T>
 void test() {
-    typedef nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfr_float_backend<1000>>
+    typedef boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<1000>>
         mpfr_float_1000;
 
     for (int n = -20; n <= 20; ++n) {
@@ -83,41 +83,41 @@ void test() {
 
 int main() {
 #ifdef TEST_MPF_50
-    test<nil::crypto3::multiprecision::mpf_float_50>();
-    test<nil::crypto3::multiprecision::mpf_float_100>();
-    nil::crypto3::multiprecision::mpfr_float::default_precision(50);
-    test<nil::crypto3::multiprecision::mpf_float>();
-    nil::crypto3::multiprecision::mpfr_float::default_precision(100);
-    test<nil::crypto3::multiprecision::mpf_float>();
+    test<boost::multiprecision::mpf_float_50>();
+    test<boost::multiprecision::mpf_float_100>();
+    boost::multiprecision::mpfr_float::default_precision(50);
+    test<boost::multiprecision::mpf_float>();
+    boost::multiprecision::mpfr_float::default_precision(100);
+    test<boost::multiprecision::mpf_float>();
 #endif
 #ifdef TEST_CPP_DEC_FLOAT
-    test<nil::crypto3::multiprecision::cpp_dec_float_50>();
-    test<nil::crypto3::multiprecision::cpp_dec_float_100>();
+    test<boost::multiprecision::cpp_dec_float_50>();
+    test<boost::multiprecision::cpp_dec_float_100>();
 #ifndef SLOW_COMPLER
     // Some "peculiar" digit counts which stress our code:
-    test<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_dec_float<65>>>();
-    test<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_dec_float<64>>>();
-    test<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_dec_float<63>>>();
-    test<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_dec_float<62>>>();
-    test<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_dec_float<61, long long>>>();
-    test<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_dec_float<60, long long>>>();
-    test<nil::crypto3::multiprecision::number<
-        nil::crypto3::multiprecision::cpp_dec_float<59, long long, std::allocator<char>>>>();
-    test<nil::crypto3::multiprecision::number<
-        nil::crypto3::multiprecision::cpp_dec_float<58, long long, std::allocator<char>>>>();
+    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<65>>>();
+    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<64>>>();
+    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<63>>>();
+    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<62>>>();
+    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<61, long long>>>();
+    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<60, long long>>>();
+    test<boost::multiprecision::number<
+        boost::multiprecision::cpp_dec_float<59, long long, std::allocator<char>>>>();
+    test<boost::multiprecision::number<
+        boost::multiprecision::cpp_dec_float<58, long long, std::allocator<char>>>>();
     // Check low multiprecision digit counts.
-    test<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_dec_float<9>>>();
-    test<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_dec_float<18>>>();
+    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<9>>>();
+    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<18>>>();
 #endif
 #endif
 #ifdef TEST_FLOAT128
-    test<nil::crypto3::multiprecision::float128>();
+    test<boost::multiprecision::float128>();
 #endif
 #ifdef TEST_CPP_BIN_FLOAT
-    test<nil::crypto3::multiprecision::cpp_bin_float_50>();
-    test<nil::crypto3::multiprecision::cpp_bin_float_quad>();
-    test<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_bin_float<
-        35, nil::crypto3::multiprecision::digit_base_10, std::allocator<char>, boost::long_long_type>>>();
+    test<boost::multiprecision::cpp_bin_float_50>();
+    test<boost::multiprecision::cpp_bin_float_quad>();
+    test<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<
+        35, boost::multiprecision::digit_base_10, std::allocator<char>, boost::long_long_type>>>();
 #endif
     return boost::report_errors();
 }

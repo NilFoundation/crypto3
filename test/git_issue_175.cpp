@@ -4,10 +4,10 @@
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <nil/crypto3/multiprecision/cpp_dec_float.hpp>
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
 #include "test.hpp"
 
-using namespace nil::crypto3::multiprecision;
+using namespace boost::multiprecision;
 
 template<class B, expression_template_option ET, class T>
 void check_type_is_number(const number<B, ET>& v, T t) {

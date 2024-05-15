@@ -7,7 +7,7 @@
 #include <boost/math/special_functions/next.hpp>
 #include "test.hpp"
 
-using namespace nil::crypto3::multiprecision;
+using namespace boost::multiprecision;
 
 int main() {
     mpfr_float_50 half = 0.5;

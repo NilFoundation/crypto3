@@ -23,7 +23,7 @@ T make_rvalue_copy(const T a) {
 }
 
 int main() {
-    using namespace nil::crypto3::multiprecision;
+    using namespace boost::multiprecision;
     //
     // Test change of default precision:
     //

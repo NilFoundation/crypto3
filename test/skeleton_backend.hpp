@@ -6,7 +6,7 @@
 #ifndef BOOST_MATH_SKELETON_BACKEND_HPP
 #define BOOST_MATH_SKELETON_BACKEND_HPP
 
-#include <nil/crypto3/multiprecision/number.hpp>
+#include <boost/multiprecision/number.hpp>
 #include <boost/container_hash/hash.hpp>
 
 namespace boost {
@@ -1078,7 +1078,7 @@ void eval_log2(skeleton_backend& result, const skeleton_backend& arg);
         //
         // Import the backend into this namespace:
         //
-        using nil::crypto3::multiprecision::backends::skeleton_backend;
+        using boost::multiprecision::backends::skeleton_backend;
         //
         // Typedef whatever number's make use of this backend:
         //
@@ -1120,38 +1120,38 @@ void eval_log2(skeleton_backend& result, const skeleton_backend& arg);
 
 #if 0
 
-template <nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+template <boost::multiprecision::expression_template_option ExpressionTemplates>
 int sign(const number<skeleton_backend, ExpressionTemplates>& arg);
-template <nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+template <boost::multiprecision::expression_template_option ExpressionTemplates>
 int signbit(const number<skeleton_backend, ExpressionTemplates>& arg);
-template <nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+template <boost::multiprecision::expression_template_option ExpressionTemplates>
 number<skeleton_backend, ExpressionTemplates> changesign(const number<skeleton_backend, ExpressionTemplates>& arg);
-template <nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+template <boost::multiprecision::expression_template_option ExpressionTemplates>
 number<skeleton_backend, ExpressionTemplates> copysign(const number<skeleton_backend, ExpressionTemplates>& a, const number<skeleton_backend, ExpressionTemplates>& b);
 
-template <nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+template <boost::multiprecision::expression_template_option ExpressionTemplates>
 number<skeleton_backend, ExpressionTemplates> cbrt(const number<skeleton_backend, ExpressionTemplates>& arg);
-template <nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+template <boost::multiprecision::expression_template_option ExpressionTemplates>
 number<skeleton_backend, ExpressionTemplates> erf(const number<skeleton_backend, ExpressionTemplates>& arg);
-template <nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+template <boost::multiprecision::expression_template_option ExpressionTemplates>
 number<skeleton_backend, ExpressionTemplates> erfc(const number<skeleton_backend, ExpressionTemplates>& arg);
-template <nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+template <boost::multiprecision::expression_template_option ExpressionTemplates>
 number<skeleton_backend, ExpressionTemplates> expm1(const number<skeleton_backend, ExpressionTemplates>& arg);
-template <nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+template <boost::multiprecision::expression_template_option ExpressionTemplates>
 number<skeleton_backend, ExpressionTemplates> log1p(const number<skeleton_backend, ExpressionTemplates>& arg);
-template <nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+template <boost::multiprecision::expression_template_option ExpressionTemplates>
 number<skeleton_backend, ExpressionTemplates> tgamma(const number<skeleton_backend, ExpressionTemplates>& arg);
-template <nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+template <boost::multiprecision::expression_template_option ExpressionTemplates>
 number<skeleton_backend, ExpressionTemplates> lgamma(const number<skeleton_backend, ExpressionTemplates>& arg);
 
-template <nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+template <boost::multiprecision::expression_template_option ExpressionTemplates>
 long lrint(const number<skeleton_backend, ExpressionTemplates>& arg);
-template <nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+template <boost::multiprecision::expression_template_option ExpressionTemplates>
 long long llrint(const number<skeleton_backend, ExpressionTemplates>& arg);
 
-template <nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+template <boost::multiprecision::expression_template_option ExpressionTemplates>
 number<skeleton_backend, ExpressionTemplates> nextafter(const number<skeleton_backend, ExpressionTemplates>& a, const number<skeleton_backend, ExpressionTemplates>& b);
-template <nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+template <boost::multiprecision::expression_template_option ExpressionTemplates>
 number<skeleton_backend, ExpressionTemplates> nexttoward(const number<skeleton_backend, ExpressionTemplates>& a, const number<skeleton_backend, ExpressionTemplates>& b);
 
 #endif
@@ -1173,13 +1173,13 @@ namespace boost {
 #if 0
 
 template <>
-int digits<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::skeleton_number> >();
+int digits<boost::multiprecision::number<boost::multiprecision::skeleton_number> >();
 
 template <>
-nil::crypto3::multiprecision::mpfr_float max_value<nil::crypto3::multiprecision::skeleton_number>();
+boost::multiprecision::mpfr_float max_value<boost::multiprecision::skeleton_number>();
 
 template <>
-nil::crypto3::multiprecision::mpfr_float min_value<nil::crypto3::multiprecision::skeleton_number>();
+boost::multiprecision::mpfr_float min_value<boost::multiprecision::skeleton_number>();
 
 #endif
 
@@ -1189,10 +1189,10 @@ nil::crypto3::multiprecision::mpfr_float min_value<nil::crypto3::multiprecision:
             namespace detail {
 
 #if 0
-template <nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-struct constant_pi<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::skeleton_backend, ExpressionTemplates> >
+template <boost::multiprecision::expression_template_option ExpressionTemplates>
+struct constant_pi<boost::multiprecision::number<boost::multiprecision::skeleton_backend, ExpressionTemplates> >
 {
-   typedef nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::skeleton_backend, ExpressionTemplates> result_type;
+   typedef boost::multiprecision::number<boost::multiprecision::skeleton_backend, ExpressionTemplates> result_type;
    //
    // Fixed N-digit precision, return reference to internal/cached object:
    //
@@ -1216,10 +1216,10 @@ struct constant_pi<nil::crypto3::multiprecision::number<nil::crypto3::multipreci
 
 namespace std {
 
-    template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+    template<boost::multiprecision::expression_template_option ExpressionTemplates>
     class numeric_limits<
-        nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::skeleton_backend, ExpressionTemplates>> {
-        typedef nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::skeleton_backend,
+        boost::multiprecision::number<boost::multiprecision::skeleton_backend, ExpressionTemplates>> {
+        typedef boost::multiprecision::number<boost::multiprecision::skeleton_backend,
                                                      ExpressionTemplates>
             number_type;
 
@@ -1260,72 +1260,72 @@ namespace std {
 
 #ifndef BOOST_NO_INCLASS_MEMBER_INITIALIZATION
 
-    template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST int numeric_limits<nil::crypto3::multiprecision::number<
-        nil::crypto3::multiprecision::skeleton_backend, ExpressionTemplates>>::digits;
-    template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST int numeric_limits<nil::crypto3::multiprecision::number<
-        nil::crypto3::multiprecision::skeleton_backend, ExpressionTemplates>>::digits10;
-    template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST int numeric_limits<nil::crypto3::multiprecision::number<
-        nil::crypto3::multiprecision::skeleton_backend, ExpressionTemplates>>::max_digits10;
-    template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<nil::crypto3::multiprecision::number<
-        nil::crypto3::multiprecision::skeleton_backend, ExpressionTemplates>>::is_signed;
-    template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<nil::crypto3::multiprecision::number<
-        nil::crypto3::multiprecision::skeleton_backend, ExpressionTemplates>>::is_integer;
-    template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<nil::crypto3::multiprecision::number<
-        nil::crypto3::multiprecision::skeleton_backend, ExpressionTemplates>>::is_exact;
-    template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST int numeric_limits<nil::crypto3::multiprecision::number<
-        nil::crypto3::multiprecision::skeleton_backend, ExpressionTemplates>>::radix;
-    template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST int numeric_limits<nil::crypto3::multiprecision::number<
-        nil::crypto3::multiprecision::skeleton_backend, ExpressionTemplates>>::min_exponent;
-    template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST int numeric_limits<nil::crypto3::multiprecision::number<
-        nil::crypto3::multiprecision::skeleton_backend, ExpressionTemplates>>::min_exponent10;
-    template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST int numeric_limits<nil::crypto3::multiprecision::number<
-        nil::crypto3::multiprecision::skeleton_backend, ExpressionTemplates>>::max_exponent;
-    template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST int numeric_limits<nil::crypto3::multiprecision::number<
-        nil::crypto3::multiprecision::skeleton_backend, ExpressionTemplates>>::max_exponent10;
-    template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<nil::crypto3::multiprecision::number<
-        nil::crypto3::multiprecision::skeleton_backend, ExpressionTemplates>>::has_infinity;
-    template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<nil::crypto3::multiprecision::number<
-        nil::crypto3::multiprecision::skeleton_backend, ExpressionTemplates>>::has_quiet_NaN;
-    template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<nil::crypto3::multiprecision::number<
-        nil::crypto3::multiprecision::skeleton_backend, ExpressionTemplates>>::has_signaling_NaN;
-    template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST float_denorm_style numeric_limits<nil::crypto3::multiprecision::number<
-        nil::crypto3::multiprecision::skeleton_backend, ExpressionTemplates>>::has_denorm;
-    template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<nil::crypto3::multiprecision::number<
-        nil::crypto3::multiprecision::skeleton_backend, ExpressionTemplates>>::has_denorm_loss;
-    template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<nil::crypto3::multiprecision::number<
-        nil::crypto3::multiprecision::skeleton_backend, ExpressionTemplates>>::is_iec559;
-    template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<nil::crypto3::multiprecision::number<
-        nil::crypto3::multiprecision::skeleton_backend, ExpressionTemplates>>::is_bounded;
-    template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<nil::crypto3::multiprecision::number<
-        nil::crypto3::multiprecision::skeleton_backend, ExpressionTemplates>>::is_modulo;
-    template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<nil::crypto3::multiprecision::number<
-        nil::crypto3::multiprecision::skeleton_backend, ExpressionTemplates>>::traps;
-    template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<nil::crypto3::multiprecision::number<
-        nil::crypto3::multiprecision::skeleton_backend, ExpressionTemplates>>::tinyness_before;
-    template<nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
-    BOOST_CONSTEXPR_OR_CONST float_round_style numeric_limits<nil::crypto3::multiprecision::number<
-        nil::crypto3::multiprecision::skeleton_backend, ExpressionTemplates>>::round_style;
+    template<boost::multiprecision::expression_template_option ExpressionTemplates>
+    BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<
+        boost::multiprecision::skeleton_backend, ExpressionTemplates>>::digits;
+    template<boost::multiprecision::expression_template_option ExpressionTemplates>
+    BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<
+        boost::multiprecision::skeleton_backend, ExpressionTemplates>>::digits10;
+    template<boost::multiprecision::expression_template_option ExpressionTemplates>
+    BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<
+        boost::multiprecision::skeleton_backend, ExpressionTemplates>>::max_digits10;
+    template<boost::multiprecision::expression_template_option ExpressionTemplates>
+    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<
+        boost::multiprecision::skeleton_backend, ExpressionTemplates>>::is_signed;
+    template<boost::multiprecision::expression_template_option ExpressionTemplates>
+    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<
+        boost::multiprecision::skeleton_backend, ExpressionTemplates>>::is_integer;
+    template<boost::multiprecision::expression_template_option ExpressionTemplates>
+    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<
+        boost::multiprecision::skeleton_backend, ExpressionTemplates>>::is_exact;
+    template<boost::multiprecision::expression_template_option ExpressionTemplates>
+    BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<
+        boost::multiprecision::skeleton_backend, ExpressionTemplates>>::radix;
+    template<boost::multiprecision::expression_template_option ExpressionTemplates>
+    BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<
+        boost::multiprecision::skeleton_backend, ExpressionTemplates>>::min_exponent;
+    template<boost::multiprecision::expression_template_option ExpressionTemplates>
+    BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<
+        boost::multiprecision::skeleton_backend, ExpressionTemplates>>::min_exponent10;
+    template<boost::multiprecision::expression_template_option ExpressionTemplates>
+    BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<
+        boost::multiprecision::skeleton_backend, ExpressionTemplates>>::max_exponent;
+    template<boost::multiprecision::expression_template_option ExpressionTemplates>
+    BOOST_CONSTEXPR_OR_CONST int numeric_limits<boost::multiprecision::number<
+        boost::multiprecision::skeleton_backend, ExpressionTemplates>>::max_exponent10;
+    template<boost::multiprecision::expression_template_option ExpressionTemplates>
+    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<
+        boost::multiprecision::skeleton_backend, ExpressionTemplates>>::has_infinity;
+    template<boost::multiprecision::expression_template_option ExpressionTemplates>
+    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<
+        boost::multiprecision::skeleton_backend, ExpressionTemplates>>::has_quiet_NaN;
+    template<boost::multiprecision::expression_template_option ExpressionTemplates>
+    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<
+        boost::multiprecision::skeleton_backend, ExpressionTemplates>>::has_signaling_NaN;
+    template<boost::multiprecision::expression_template_option ExpressionTemplates>
+    BOOST_CONSTEXPR_OR_CONST float_denorm_style numeric_limits<boost::multiprecision::number<
+        boost::multiprecision::skeleton_backend, ExpressionTemplates>>::has_denorm;
+    template<boost::multiprecision::expression_template_option ExpressionTemplates>
+    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<
+        boost::multiprecision::skeleton_backend, ExpressionTemplates>>::has_denorm_loss;
+    template<boost::multiprecision::expression_template_option ExpressionTemplates>
+    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<
+        boost::multiprecision::skeleton_backend, ExpressionTemplates>>::is_iec559;
+    template<boost::multiprecision::expression_template_option ExpressionTemplates>
+    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<
+        boost::multiprecision::skeleton_backend, ExpressionTemplates>>::is_bounded;
+    template<boost::multiprecision::expression_template_option ExpressionTemplates>
+    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<
+        boost::multiprecision::skeleton_backend, ExpressionTemplates>>::is_modulo;
+    template<boost::multiprecision::expression_template_option ExpressionTemplates>
+    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<
+        boost::multiprecision::skeleton_backend, ExpressionTemplates>>::traps;
+    template<boost::multiprecision::expression_template_option ExpressionTemplates>
+    BOOST_CONSTEXPR_OR_CONST bool numeric_limits<boost::multiprecision::number<
+        boost::multiprecision::skeleton_backend, ExpressionTemplates>>::tinyness_before;
+    template<boost::multiprecision::expression_template_option ExpressionTemplates>
+    BOOST_CONSTEXPR_OR_CONST float_round_style numeric_limits<boost::multiprecision::number<
+        boost::multiprecision::skeleton_backend, ExpressionTemplates>>::round_style;
 
 #endif
 

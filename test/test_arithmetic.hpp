@@ -53,10 +53,10 @@ bool isfloat(T) { return false; }
 namespace detail {
 
 template <class tag, class Arg1, class Arg2, class Arg3, class Arg4>
-typename nil::crypto3::multiprecision::detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type
-abs(nil::crypto3::multiprecision::detail::expression<tag, Arg1, Arg2, Arg3, Arg4> const& v)
+typename boost::multiprecision::detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type
+abs(boost::multiprecision::detail::expression<tag, Arg1, Arg2, Arg3, Arg4> const& v)
 {
-   typedef typename nil::crypto3::multiprecision::detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type result_type;
+   typedef typename boost::multiprecision::detail::expression<tag, Arg1, Arg2, Arg3, Arg4>::result_type result_type;
    return v < 0 ? result_type(-v) : result_type(v);
 }
 
@@ -82,7 +82,7 @@ int normalize_compare_result(int r)
 }
 
 template <class Real, class Val>
-typename std::enable_if<nil::crypto3::multiprecision::number_category<Real>::value != nil::crypto3::multiprecision::number_kind_complex>::type
+typename std::enable_if<boost::multiprecision::number_category<Real>::value != boost::multiprecision::number_kind_complex>::type
 test_comparisons(Val a, Val b, const std::integral_constant<bool, true>&)
 {
    Real r1(a);
@@ -154,7 +154,7 @@ test_comparisons(Val a, Val b, const std::integral_constant<bool, true>&)
 }
 
 template <class Real, class Val>
-typename std::enable_if<nil::crypto3::multiprecision::number_category<Real>::value == nil::crypto3::multiprecision::number_kind_complex>::type
+typename std::enable_if<boost::multiprecision::number_category<Real>::value == boost::multiprecision::number_kind_complex>::type
 test_comparisons(Val a, Val b, const std::integral_constant<bool, true>&)
 {
    Real r1(a);
@@ -303,7 +303,7 @@ void test_rational(const std::integral_constant<bool, false>&)
 }
 
 template <class Real>
-void test_integer_ops(const std::integral_constant<int, nil::crypto3::multiprecision::number_kind_rational>&)
+void test_integer_ops(const std::integral_constant<int, boost::multiprecision::number_kind_rational>&)
 {
    test_rational<Real>(is_boost_rational<Real>());
 }
@@ -461,7 +461,7 @@ void test_integer_overflow()
       {
          BOOST_CHECK_THROW(m.template convert_to<Int>(), std::overflow_error);
       }
-      else if (nil::crypto3::multiprecision::detail::is_signed<Int>::value)
+      else if (boost::multiprecision::detail::is_signed<Int>::value)
       {
          r = m.template convert_to<Int>();
          BOOST_CHECK_EQUAL(r, (std::numeric_limits<Int>::max)());
@@ -478,7 +478,7 @@ void test_integer_overflow()
       {
          BOOST_CHECK_THROW(m.template convert_to<Int>(), std::overflow_error);
       }
-      else if (nil::crypto3::multiprecision::detail::is_signed<Int>::value && nil::crypto3::multiprecision::detail::is_integral<Int>::value)
+      else if (boost::multiprecision::detail::is_signed<Int>::value && boost::multiprecision::detail::is_integral<Int>::value)
       {
          r = m.template convert_to<Int>();
          BOOST_CHECK_EQUAL(r, (std::numeric_limits<Int>::max)());
@@ -489,7 +489,7 @@ void test_integer_overflow()
          BOOST_CHECK_EQUAL(r, 0);
       }
 
-      if (std::numeric_limits<Real>::is_signed && (nil::crypto3::multiprecision::detail::is_signed<Int>::value))
+      if (std::numeric_limits<Real>::is_signed && (boost::multiprecision::detail::is_signed<Int>::value))
       {
          m = (std::numeric_limits<Int>::min)();
          --m;
@@ -517,7 +517,7 @@ void test_integer_overflow()
             BOOST_CHECK_EQUAL(r, (std::numeric_limits<Int>::min)());
          }
       }
-      else if (std::numeric_limits<Real>::is_signed && !nil::crypto3::multiprecision::detail::is_signed<Int>::value)
+      else if (std::numeric_limits<Real>::is_signed && !boost::multiprecision::detail::is_signed<Int>::value)
       {
          // signed to unsigned converison with overflow, it's really not clear what should happen here!
          m = (std::numeric_limits<Int>::max)();
@@ -552,7 +552,7 @@ void test_integer_round_trip()
 }
 
 template <class Real>
-void test_integer_ops(const std::integral_constant<int, nil::crypto3::multiprecision::number_kind_integer>&)
+void test_integer_ops(const std::integral_constant<int, boost::multiprecision::number_kind_integer>&)
 {
    test_signed_integer_ops<Real>(std::integral_constant<bool, std::numeric_limits<Real>::is_signed>());
 
@@ -960,7 +960,7 @@ void test_float_funcs(const T&) {}
 template <class Real>
 void test_float_funcs(const std::integral_constant<bool, true>&)
 {
-   if (nil::crypto3::multiprecision::is_interval_number<Real>::value)
+   if (boost::multiprecision::is_interval_number<Real>::value)
       return;
    //
    // Test variable reuse in function calls, see https://svn.boost.org/trac/boost/ticket/8326
@@ -1198,7 +1198,7 @@ template <class Real, class T>
 void test_float_ops(const T&) {}
 
 template <class Real>
-void test_float_ops(const std::integral_constant<int, nil::crypto3::multiprecision::number_kind_floating_point>&)
+void test_float_ops(const std::integral_constant<int, boost::multiprecision::number_kind_floating_point>&)
 {
    BOOST_CHECK_EQUAL(abs(Real(2)), 2);
    BOOST_CHECK_EQUAL(abs(Real(-2)), 2);
@@ -1411,7 +1411,7 @@ void test_float_ops(const std::integral_constant<int, nil::crypto3::multiprecisi
          v = 0;
          r = std::numeric_limits<Real>::infinity();
          t = v * r;
-         if (!nil::crypto3::multiprecision::is_interval_number<Real>::value)
+         if (!boost::multiprecision::is_interval_number<Real>::value)
          {
             BOOST_CHECK((boost::math::isnan)(t));
             t = r * 0;
@@ -1430,10 +1430,10 @@ template <class T>
 struct lexical_cast_target_type
 {
    typedef typename std::conditional<
-       nil::crypto3::multiprecision::detail::is_signed<T>::value && nil::crypto3::multiprecision::detail::is_integral<T>::value,
+       boost::multiprecision::detail::is_signed<T>::value && boost::multiprecision::detail::is_integral<T>::value,
        std::intmax_t,
        typename std::conditional<
-           nil::crypto3::multiprecision::detail::is_unsigned<T>::value,
+           boost::multiprecision::detail::is_unsigned<T>::value,
            std::uintmax_t,
            T>::type>::type type;
 };
@@ -1505,7 +1505,7 @@ void test_negative_mixed(std::integral_constant<bool, true> const&)
 {
    typedef typename std::conditional<
        std::is_convertible<Num, Real>::value,
-       typename std::conditional<nil::crypto3::multiprecision::detail::is_integral<Num>::value && (sizeof(Num) < sizeof(int)), int, Num>::type,
+       typename std::conditional<boost::multiprecision::detail::is_integral<Num>::value && (sizeof(Num) < sizeof(int)), int, Num>::type,
        Real>::type cast_type;
    typedef typename std::conditional<
        std::is_convertible<Num, Real>::value,
@@ -1878,7 +1878,7 @@ void test_mixed(const std::integral_constant<bool, true>&)
 {
    typedef typename std::conditional<
        std::is_convertible<Num, Real>::value,
-       typename std::conditional<nil::crypto3::multiprecision::detail::is_integral<Num>::value && (sizeof(Num) < sizeof(int)), int, Num>::type,
+       typename std::conditional<boost::multiprecision::detail::is_integral<Num>::value && (sizeof(Num) < sizeof(int)), int, Num>::type,
        Real>::type cast_type;
    typedef typename std::conditional<
        std::is_convertible<Num, Real>::value,
@@ -2057,7 +2057,7 @@ void test_mixed(const std::integral_constant<bool, true>&)
 }
 
 template <class Real>
-typename std::enable_if<nil::crypto3::multiprecision::number_category<Real>::value == nil::crypto3::multiprecision::number_kind_complex>::type test_members(Real)
+typename std::enable_if<boost::multiprecision::number_category<Real>::value == boost::multiprecision::number_kind_complex>::type test_members(Real)
 {
    //
    // Test sign and zero functions:
@@ -2220,7 +2220,7 @@ typename std::enable_if<nil::crypto3::multiprecision::number_category<Real>::val
    BOOST_CHECK_EQUAL(real(a), 2);
    BOOST_CHECK_EQUAL(imag(a), 3);
 
-   typedef typename nil::crypto3::multiprecision::component_type<Real>::type real_type;
+   typedef typename boost::multiprecision::component_type<Real>::type real_type;
 
    real_type r(3);
    real_type tol = std::numeric_limits<real_type>::epsilon() * 30;
@@ -2486,7 +2486,7 @@ typename std::enable_if<nil::crypto3::multiprecision::number_category<Real>::val
 }
 
 template <class Real>
-typename std::enable_if<nil::crypto3::multiprecision::number_category<Real>::value != nil::crypto3::multiprecision::number_kind_complex>::type test_members(Real)
+typename std::enable_if<boost::multiprecision::number_category<Real>::value != boost::multiprecision::number_kind_complex>::type test_members(Real)
 {
    //
    // Test sign and zero functions:
@@ -2691,7 +2691,7 @@ void test_basic_conditionals(Real a, Real b)
 }
 
 template <class T>
-typename std::enable_if<nil::crypto3::multiprecision::number_category<T>::value == nil::crypto3::multiprecision::number_kind_complex>::type
+typename std::enable_if<boost::multiprecision::number_category<T>::value == boost::multiprecision::number_kind_complex>::type
 test_relationals(T a, T b)
 {
    BOOST_CHECK_EQUAL((a == b), false);
@@ -2722,7 +2722,7 @@ test_relationals(T a, T b)
 }
 
 template <class T>
-typename std::enable_if<nil::crypto3::multiprecision::number_category<T>::value != nil::crypto3::multiprecision::number_kind_complex>::type
+typename std::enable_if<boost::multiprecision::number_category<T>::value != boost::multiprecision::number_kind_complex>::type
 test_relationals(T a, T b)
 {
    BOOST_CHECK_EQUAL((a == b), false);
@@ -2838,7 +2838,7 @@ template <class Real>
 void test()
 {
 #if !defined(NO_MIXED_OPS) && !defined(SLOW_COMPILER)
-   nil::crypto3::multiprecision::is_number<Real> tag;
+   boost::multiprecision::is_number<Real> tag;
    test_mixed<Real, unsigned char>(tag);
    test_mixed<Real, signed char>(tag);
    test_mixed<Real, char>(tag);
@@ -2857,11 +2857,11 @@ void test()
    test_mixed<Real, long double>(tag);
 
    typedef typename related_type<Real>::type                                                                      related_type;
-   std::integral_constant<bool, nil::crypto3::multiprecision::is_number<Real>::value && !std::is_same<related_type, Real>::value> tag2;
+   std::integral_constant<bool, boost::multiprecision::is_number<Real>::value && !std::is_same<related_type, Real>::value> tag2;
 
    test_mixed<Real, related_type>(tag2);
 
-   std::integral_constant<bool, nil::crypto3::multiprecision::is_number<Real>::value && (nil::crypto3::multiprecision::number_category<Real>::value == nil::crypto3::multiprecision::number_kind_complex)> complex_tag;
+   std::integral_constant<bool, boost::multiprecision::is_number<Real>::value && (boost::multiprecision::number_category<Real>::value == boost::multiprecision::number_kind_complex)> complex_tag;
    test_mixed<Real, std::complex<float> >(complex_tag);
    test_mixed<Real, std::complex<double> >(complex_tag);
    test_mixed<Real, std::complex<long double> >(complex_tag);
@@ -2871,11 +2871,11 @@ void test()
    //
    // Integer only functions:
    //
-   test_integer_ops<Real>(typename nil::crypto3::multiprecision::number_category<Real>::type());
+   test_integer_ops<Real>(typename boost::multiprecision::number_category<Real>::type());
    //
    // Real number only functions:
    //
-   test_float_ops<Real>(typename nil::crypto3::multiprecision::number_category<Real>::type());
+   test_float_ops<Real>(typename boost::multiprecision::number_category<Real>::type());
    //
    // Test basic arithmetic:
    //

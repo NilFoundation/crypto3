@@ -7,7 +7,7 @@
 // on factorials.
 
 #include "constexpr_arithmetric_test.hpp"
-#include "nil/crypto3/multiprecision/cpp_int.hpp"
+#include "nil/crypto3/multiprecision/cpp_int_modular.hpp"
 #include "nil/crypto3/multiprecision/integer.hpp"
 #include "test.hpp"
 
@@ -25,28 +25,28 @@ constexpr T factorial(const T& a) {
 
 template<class T, class U>
 constexpr T big_mul(const U& a, const U& b) {
-    using nil::crypto3::multiprecision::multiply;
+    using boost::multiprecision::multiply;
     T result = T();
     multiply(result, a, b);
     return result;
 }
 template<class T, class U>
 constexpr T big_add(const U& a, const U& b) {
-    using nil::crypto3::multiprecision::add;
+    using boost::multiprecision::add;
     T result = T();
     add(result, a, b);
     return result;
 }
 template<class T, class U>
 constexpr T big_sub(const U& a, const U& b) {
-    using nil::crypto3::multiprecision::subtract;
+    using boost::multiprecision::subtract;
     T result = T();
     subtract(result, a, b);
     return result;
 }
 template<class U>
 constexpr U div_qr_d(const U& a, const U& b) {
-    using nil::crypto3::multiprecision::divide_qr;
+    using boost::multiprecision::divide_qr;
     U result = U();
     U r = U();
     divide_qr(a, b, result, r);
@@ -54,7 +54,7 @@ constexpr U div_qr_d(const U& a, const U& b) {
 }
 template<class U>
 constexpr U div_qr_r(const U& a, const U& b) {
-    using nil::crypto3::multiprecision::divide_qr;
+    using boost::multiprecision::divide_qr;
     U result = U();
     U r = U();
     divide_qr(a, b, result, r);
@@ -62,19 +62,19 @@ constexpr U div_qr_r(const U& a, const U& b) {
 }
 template<class T>
 constexpr T do_bit_set(T val, unsigned pos) {
-    using nil::crypto3::multiprecision::bit_set;
+    using boost::multiprecision::bit_set;
     bit_set(val, pos);
     return val;
 }
 template<class T>
 constexpr T do_bit_unset(T val, unsigned pos) {
-    using nil::crypto3::multiprecision::bit_unset;
+    using boost::multiprecision::bit_unset;
     bit_unset(val, pos);
     return val;
 }
 template<class T>
 constexpr T do_bit_flip(T val, unsigned pos) {
-    using nil::crypto3::multiprecision::bit_flip;
+    using boost::multiprecision::bit_flip;
     bit_flip(val, pos);
     return val;
 }
@@ -86,16 +86,16 @@ constexpr T test_swap(T a, T b) {
 }
 
 int main() {
-    using namespace nil::crypto3::multiprecision::literals;
+    using namespace boost::multiprecision::literals;
 
-    typedef nil::crypto3::multiprecision::checked_int1024_t int_backend;
-    typedef nil::crypto3::multiprecision::checked_int512_t small_int_backend;
-    typedef nil::crypto3::multiprecision::checked_uint1024_t unsigned_backend;
+    typedef boost::multiprecision::checked_int1024_t int_backend;
+    typedef boost::multiprecision::checked_int512_t small_int_backend;
+    typedef boost::multiprecision::checked_uint1024_t unsigned_backend;
 
     constexpr int_backend f1 = factorial(int_backend(31));
     static_assert(f1 == 0x1956ad0aae33a4560c5cd2c000000_cppi);
     constexpr unsigned_backend f2 = factorial(unsigned_backend(31));
-    static_assert(f2 == 0x1956ad0aae33a4560c5cd2c000000_cppui);
+    static_assert(f2 == 0x1956ad0aae33a4560c5cd2c000000_cppui_modular);
 
     //
     // Test integer non-member functions:
@@ -113,7 +113,7 @@ int main() {
 
         constexpr std::int64_t k = big_mul<std::int64_t>(i, j);
         std::int64_t ii;
-        nil::crypto3::multiprecision::multiply(ii, i, j);
+        boost::multiprecision::multiply(ii, i, j);
         BOOST_CHECK_EQUAL(ii, k);
     }
     // Add:
@@ -125,7 +125,7 @@ int main() {
 
         constexpr std::int64_t k = big_add<std::int64_t>(i, j);
         std::int64_t ii;
-        nil::crypto3::multiprecision::add(ii, i, j);
+        boost::multiprecision::add(ii, i, j);
         BOOST_CHECK_EQUAL(ii, k);
     }
     // Subtract:
@@ -137,7 +137,7 @@ int main() {
 
         constexpr std::int64_t k = big_sub<std::int64_t>(i, -j);
         std::int64_t ii;
-        nil::crypto3::multiprecision::subtract(ii, i, -j);
+        boost::multiprecision::subtract(ii, i, -j);
         BOOST_CHECK_EQUAL(ii, k);
     }
     // divide_qr:
@@ -149,7 +149,7 @@ int main() {
 
         constexpr std::int64_t k = div_qr_d(i, j);
         std::int32_t ii, ij;
-        nil::crypto3::multiprecision::divide_qr(i, j, ii, ij);
+        boost::multiprecision::divide_qr(i, j, ii, ij);
         BOOST_CHECK_EQUAL(ii, k);
     }
     // divide_qr:
@@ -161,7 +161,7 @@ int main() {
 
         constexpr std::int64_t k = div_qr_r(i, j);
         std::int32_t ii, ij;
-        nil::crypto3::multiprecision::divide_qr(i, j, ii, ij);
+        boost::multiprecision::divide_qr(i, j, ii, ij);
         BOOST_CHECK_EQUAL(ij, k);
     }
     // integer_modulus:
@@ -171,9 +171,9 @@ int main() {
         int r = integer_modulus(nc, 67);
         BOOST_CHECK_EQUAL(r, i1);
 
-        constexpr std::int32_t k = nil::crypto3::multiprecision::integer_modulus(i, j);
+        constexpr std::int32_t k = boost::multiprecision::integer_modulus(i, j);
         std::int32_t ii(i);
-        r = nil::crypto3::multiprecision::integer_modulus(ii, j);
+        r = boost::multiprecision::integer_modulus(ii, j);
         BOOST_CHECK_EQUAL(r, k);
     }
     // powm:
@@ -183,9 +183,9 @@ int main() {
         nc = powm(nc, si2, si2);
         BOOST_CHECK_EQUAL(nc, i1);
 
-        constexpr std::int32_t k = nil::crypto3::multiprecision::powm(i, j, j);
+        constexpr std::int32_t k = boost::multiprecision::powm(i, j, j);
         std::int32_t ii(i);
-        ii = nil::crypto3::multiprecision::powm(ii, j, j);
+        ii = boost::multiprecision::powm(ii, j, j);
         BOOST_CHECK_EQUAL(ii, k);
     }
     // lsb:
@@ -195,9 +195,9 @@ int main() {
         int nci = lsb(nc);
         BOOST_CHECK_EQUAL(nci, i1);
 
-        constexpr std::int32_t k = nil::crypto3::multiprecision::lsb(i);
+        constexpr std::int32_t k = boost::multiprecision::lsb(i);
         std::int32_t ii(i);
-        ii = nil::crypto3::multiprecision::lsb(ii);
+        ii = boost::multiprecision::lsb(ii);
         BOOST_CHECK_EQUAL(ii, k);
     }
     // msb:
@@ -207,9 +207,9 @@ int main() {
         int nci = msb(nc);
         BOOST_CHECK_EQUAL(nci, i1);
 
-        constexpr std::int32_t k = nil::crypto3::multiprecision::msb(i);
+        constexpr std::int32_t k = boost::multiprecision::msb(i);
         std::int32_t ii(i);
-        ii = nil::crypto3::multiprecision::msb(ii);
+        ii = boost::multiprecision::msb(ii);
         BOOST_CHECK_EQUAL(ii, k);
     }
     // bit_test:
@@ -217,7 +217,7 @@ int main() {
         constexpr bool b = bit_test(si1, 1);
         static_assert(b);
 
-        constexpr bool k = nil::crypto3::multiprecision::bit_test(i, 1);
+        constexpr bool k = boost::multiprecision::bit_test(i, 1);
         static_assert(k);
     }
     // bit_set:
@@ -228,7 +228,7 @@ int main() {
 
         constexpr int ii(0);
         constexpr int jj = do_bit_set(ii, 20);
-        static_assert(nil::crypto3::multiprecision::bit_test(jj, 20));
+        static_assert(boost::multiprecision::bit_test(jj, 20));
     }
     // bit_unset:
     {
@@ -236,7 +236,7 @@ int main() {
         static_assert(bit_test(r, 20) == false);
 
         constexpr int jj = do_bit_unset(i, 20);
-        static_assert(nil::crypto3::multiprecision::bit_test(jj, 20) == false);
+        static_assert(boost::multiprecision::bit_test(jj, 20) == false);
     }
     // bit_unset:
     {
@@ -244,7 +244,7 @@ int main() {
         static_assert(bit_test(r, 20) == false);
 
         constexpr int jj = do_bit_flip(i, 20);
-        static_assert(nil::crypto3::multiprecision::bit_test(jj, 20) == false);
+        static_assert(boost::multiprecision::bit_test(jj, 20) == false);
     }
     // sqrt:
     {
@@ -255,9 +255,9 @@ int main() {
         constexpr int_backend r2 = sqrt(si1 * 1);
         BOOST_CHECK_EQUAL(nc, r);
 
-        constexpr int jj = nil::crypto3::multiprecision::sqrt(i);
+        constexpr int jj = boost::multiprecision::sqrt(i);
         int k = i;
-        k = nil::crypto3::multiprecision::sqrt(k);
+        k = boost::multiprecision::sqrt(k);
         BOOST_CHECK_EQUAL(jj, k);
     }
     {

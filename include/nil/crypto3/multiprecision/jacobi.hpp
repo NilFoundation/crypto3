@@ -7,31 +7,29 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef BOOST_MULTIPRECISION_JACOBI_HPP
-#define BOOST_MULTIPRECISION_JACOBI_HPP
+#ifndef CRYPTO3_MULTIPRECISION_JACOBI_HPP
+#define CRYPTO3_MULTIPRECISION_JACOBI_HPP
 
-#include <nil/crypto3/multiprecision/detail/default_ops.hpp>
+#include <boost/multiprecision/detail/default_ops.hpp>
 
 
-namespace nil {
-    namespace crypto3 {
-        namespace multiprecision {
-            /**
-             * Compute the Jacobi symbol. If n is prime, this is equivalent
-             * to the Legendre symbol.
-             * @see http://mathworld.wolfram.com/JacobiSymbol.html
-             *
-             * @param a is a non-negative integer
-             * @param n is an odd integer > 1
-             * @return (n / m)
-             */
-            template<typename Backend, expression_template_option ExpressionTemplates>
-            constexpr typename boost::enable_if_c<number_category<Backend>::value == number_kind_integer, int>::type
-                jacobi(const number<Backend, ExpressionTemplates>& a, const number<Backend, ExpressionTemplates>& n) {
-                return backends::eval_jacobi(a.backend(), n.backend());
-            }
-        }    // namespace multiprecision
-    }        // namespace crypto3
-}    // namespace nil
+namespace boost {
+    namespace multiprecision {
+        /**
+         * Compute the Jacobi symbol. If n is prime, this is equivalent
+         * to the Legendre symbol.
+         * @see http://mathworld.wolfram.com/JacobiSymbol.html
+         *
+         * @param a is a non-negative integer
+         * @param n is an odd integer > 1
+         * @return (n / m)
+         */
+        template<typename Backend, expression_template_option ExpressionTemplates>
+        BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<number_category<Backend>::value == number_kind_integer, int>::type
+            jacobi(const number<Backend, ExpressionTemplates>& a, const number<Backend, ExpressionTemplates>& n) {
+            return backends::eval_jacobi(a.backend(), n.backend());
+        }
+    }    // namespace multiprecision
+} // namespace boost
 
-#endif    // BOOST_MULTIPRECISION_JACOBI_HPP
+#endif    // CRYPTO3_MULTIPRECISION_JACOBI_HPP

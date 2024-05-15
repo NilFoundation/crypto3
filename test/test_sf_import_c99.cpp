@@ -210,7 +210,7 @@ void test() {
     T neg_zero_test = -(std::numeric_limits<T>::min)();
     neg_zero_test /= (std::numeric_limits<T>::max)();
     T one(1);
-    bool test_signed_zero = !nil::crypto3::multiprecision::is_interval_number<T>::value &&
+    bool test_signed_zero = !boost::multiprecision::is_interval_number<T>::value &&
                             std::numeric_limits<T>::has_infinity && (one / neg_zero_test < 0);
     if (test_signed_zero) {
         BOOST_CHECK(signbit(changesign(val)));
@@ -363,7 +363,7 @@ void test() {
                                  "1684796572794981207674247240249653198692487974232760640156433614261895764156709178183"
                                  "13417529572608229017809069355688606687557031643655896118"),
                                s);
-    if (!nil::crypto3::multiprecision::is_interval_number<T>::value) {
+    if (!boost::multiprecision::is_interval_number<T>::value) {
         val = 2.75;
         BOOST_CHECK_CLOSE_FRACTION(erf(val),
                                    T("0."
@@ -666,7 +666,7 @@ void test_poison() {
     // don't do anything nasty to the std:: overloads for built in types:
     //
     using namespace std;
-    using namespace nil::crypto3::multiprecision;
+    using namespace boost::multiprecision;
     // using namespace boost::math;
 
     T a(2), b(0.3f), c(4), result(0);
@@ -746,16 +746,16 @@ bool type_sets_errno(const T&) {
 }
 #ifdef TEST_MPFR_50
 template<unsigned Digits10,
-         nil::crypto3::multiprecision::mpfr_allocation_type AllocateType,
-         nil::crypto3::multiprecision::expression_template_option ExpressionTemplates>
+         boost::multiprecision::mpfr_allocation_type AllocateType,
+         boost::multiprecision::expression_template_option ExpressionTemplates>
 bool type_sets_errno(
-    const nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::mpfr_float_backend<Digits10, AllocateType>,
+    const boost::multiprecision::number<boost::multiprecision::mpfr_float_backend<Digits10, AllocateType>,
                                                ExpressionTemplates>&) {
     return false;
 }
 #endif
 #ifdef TEST_FLOAT128
-bool type_sets_errno(const nil::crypto3::multiprecision::float128&) {
+bool type_sets_errno(const boost::multiprecision::float128&) {
     return false;
 }
 #endif
@@ -2153,74 +2153,74 @@ int main() {
     test_poison<float>();
     test_poison<double>();
 #ifdef TEST_MPF_50
-    test<nil::crypto3::multiprecision::mpf_float_50>();
-    test<nil::crypto3::multiprecision::mpf_float_100>();
+    test<boost::multiprecision::mpf_float_50>();
+    test<boost::multiprecision::mpf_float_100>();
 #endif
 #ifdef TEST_MPFR_50
     std::cout << "Testing MPFR: " << MPFR_VERSION_STRING << std::endl;
-    test<nil::crypto3::multiprecision::mpfr_float_50>();
-    test<nil::crypto3::multiprecision::mpfr_float_100>();
-    test_c99_appendix_F<nil::crypto3::multiprecision::mpfr_float_50>();
+    test<boost::multiprecision::mpfr_float_50>();
+    test<boost::multiprecision::mpfr_float_100>();
+    test_c99_appendix_F<boost::multiprecision::mpfr_float_50>();
 #endif
 #ifdef TEST_MPFI_50
-    test<nil::crypto3::multiprecision::mpfi_float_50>();
-    test<nil::crypto3::multiprecision::mpfi_float_100>();
+    test<boost::multiprecision::mpfi_float_50>();
+    test<boost::multiprecision::mpfi_float_100>();
 #endif
 #ifdef TEST_CPP_DEC_FLOAT
-    test<nil::crypto3::multiprecision::cpp_dec_float_50>();
+    test<boost::multiprecision::cpp_dec_float_50>();
 #if !(defined(__GNUC__) && defined(_WIN32))    // Object file too large otherwise
-    test<nil::crypto3::multiprecision::cpp_dec_float_100>();
+    test<boost::multiprecision::cpp_dec_float_100>();
 #endif
-    test_c99_appendix_F<nil::crypto3::multiprecision::cpp_dec_float_50>();
+    test_c99_appendix_F<boost::multiprecision::cpp_dec_float_50>();
 #endif
 #ifdef TEST_CPP_DEC_FLOAT_2
     // Some "peculiar" digit counts which stress our code:
-    test<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_dec_float<65>>>();
+    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<65>>>();
 #if !(defined(__GNUC__) && defined(_WIN32))    // Object file too large otherwise
-    test<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_dec_float<64>>>();
+    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<64>>>();
 #endif
 #endif
 #ifdef TEST_CPP_DEC_FLOAT_3
-    test<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_dec_float<63>>>();
+    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<63>>>();
 #if !(defined(__GNUC__) && defined(_WIN32))    // Object file too large otherwise
-    test<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_dec_float<62>>>();
+    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<62>>>();
 #endif
 #endif
 #ifdef TEST_CPP_DEC_FLOAT_4
-    test<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_dec_float<61, long long>>>();
+    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<61, long long>>>();
 #if !(defined(__GNUC__) && defined(_WIN32))    // Object file too large otherwise
-    test<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_dec_float<60, long long>>>();
+    test<boost::multiprecision::number<boost::multiprecision::cpp_dec_float<60, long long>>>();
 #endif
 #endif
 #ifdef TEST_CPP_DEC_FLOAT_5
-    test<nil::crypto3::multiprecision::number<
-        nil::crypto3::multiprecision::cpp_dec_float<59, long long, std::allocator<char>>>>();
+    test<boost::multiprecision::number<
+        boost::multiprecision::cpp_dec_float<59, long long, std::allocator<char>>>>();
 #endif
 #ifdef TEST_CPP_DEC_FLOAT_6
-    test<nil::crypto3::multiprecision::number<
-        nil::crypto3::multiprecision::cpp_dec_float<58, long long, std::allocator<char>>>>();
+    test<boost::multiprecision::number<
+        boost::multiprecision::cpp_dec_float<58, long long, std::allocator<char>>>>();
 #endif
 #ifdef TEST_CPP_BIN_FLOAT
-    test<nil::crypto3::multiprecision::cpp_bin_float_50>();
-    test<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_bin_float<100>,
-                                              nil::crypto3::multiprecision::et_on>>();
+    test<boost::multiprecision::cpp_bin_float_50>();
+    test<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<100>,
+                                              boost::multiprecision::et_on>>();
 #endif
 #ifdef TEST_CPP_BIN_FLOAT_2
-    test<nil::crypto3::multiprecision::number<
-        nil::crypto3::multiprecision::cpp_bin_float<35,
-                                                    nil::crypto3::multiprecision::digit_base_10,
+    test<boost::multiprecision::number<
+        boost::multiprecision::cpp_bin_float<35,
+                                                    boost::multiprecision::digit_base_10,
                                                     std::allocator<char>,
                                                     boost::long_long_type>>>();
 #endif
 #ifdef TEST_CPP_BIN_FLOAT_3
-    test_c99_appendix_F<nil::crypto3::multiprecision::cpp_bin_float_50>();
-    test_c99_appendix_F<nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::cpp_bin_float<100>,
-                                                             nil::crypto3::multiprecision::et_on>>();
+    test_c99_appendix_F<boost::multiprecision::cpp_bin_float_50>();
+    test_c99_appendix_F<boost::multiprecision::number<boost::multiprecision::cpp_bin_float<100>,
+                                                             boost::multiprecision::et_on>>();
 #endif
 #ifdef TEST_FLOAT128
-    test<nil::crypto3::multiprecision::float128>();
-    test_c99_appendix_F<nil::crypto3::multiprecision::float128>();
-    test_c99_appendix_F_tgammaq_addon_for_float128<nil::crypto3::multiprecision::float128>();
+    test<boost::multiprecision::float128>();
+    test_c99_appendix_F<boost::multiprecision::float128>();
+    test_c99_appendix_F_tgammaq_addon_for_float128<boost::multiprecision::float128>();
 #endif
 
     return boost::report_errors();

@@ -12,16 +12,16 @@
  * https://github.com/boostorg/integer/pull/11
  */
 
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
 #include <boost/optional/optional.hpp>
 #include <boost/core/lightweight_test.hpp>
 
-inline boost::optional<nil::crypto3::multiprecision::int128_t> foo() {
-    return boost::optional<nil::crypto3::multiprecision::int128_t>(10);
+inline boost::optional<boost::multiprecision::int128_t> foo() {
+    return boost::optional<boost::multiprecision::int128_t>(10);
 }
 
 int main() {
-    boost::optional<nil::crypto3::multiprecision::int128_t> num = foo();
+    boost::optional<boost::multiprecision::int128_t> num = foo();
     BOOST_TEST(!!num);
     BOOST_TEST(*num == 10);
 

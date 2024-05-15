@@ -14,7 +14,7 @@
 
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
 
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
 
 #include "test.hpp"
 
@@ -83,7 +83,7 @@ void test_move_and_assign() {
 }
 
 int main() {
-    using namespace nil::crypto3::multiprecision;
+    using namespace boost::multiprecision;
 
     test_std_lib<cpp_int>();
     cpp_int a = 2;

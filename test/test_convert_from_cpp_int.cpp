@@ -7,11 +7,11 @@
 #define _SCL_SECURE_NO_WARNINGS
 #endif
 
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include "test.hpp"
 
-using namespace nil::crypto3::multiprecision;
+using namespace boost::multiprecision;
 
 #ifdef BOOST_MSVC
 #pragma warning(disable : 4127)

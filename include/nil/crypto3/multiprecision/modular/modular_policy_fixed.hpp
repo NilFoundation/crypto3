@@ -7,107 +7,90 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef BOOST_MULTIPRECISION_MODULAR_POLICY_FIXED_HPP
-#define BOOST_MULTIPRECISION_MODULAR_POLICY_FIXED_HPP
+#ifndef CRYPTO3_MULTIPRECISION_MODULAR_POLICY_FIXED_HPP
+#define CRYPTO3_MULTIPRECISION_MODULAR_POLICY_FIXED_HPP
 
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
 
 #include <boost/utility/enable_if.hpp>
 
-namespace nil {
-    namespace crypto3 {
-        namespace multiprecision {
-            namespace backends {
+namespace boost {   
+    namespace multiprecision {
+        namespace backends {
 
-                // TODO: replace cpp_int_backend on this type everywhere in fixed modular_adaptor
-                template<unsigned MinBits, cpp_integer_type SignType, cpp_int_check_type Checked>
-                using modular_fixed_cpp_int_backend = cpp_int_backend<MinBits, MinBits, SignType, Checked, void>;
+            template<typename Backend>
+            BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<is_trivial_cpp_int_modular<Backend>::value, std::size_t>::type
+                get_limbs_count() {
+                return 1u;
+            }
 
-                template<typename Backend>
-                constexpr typename boost::enable_if_c<is_trivial_cpp_int<Backend>::value, std::size_t>::type
-                    get_limbs_count() {
-                    return 1u;
-                }
+            template<typename Backend>
+            BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<!is_trivial_cpp_int_modular<Backend>::value, std::size_t>::type
+                get_limbs_count() {
+                return Backend::internal_limb_count;
+            }
 
-                template<typename Backend>
-                constexpr typename boost::enable_if_c<!is_trivial_cpp_int<Backend>::value, std::size_t>::type
-                    get_limbs_count() {
-                    return Backend::internal_limb_count;
-                }
+            template<typename Backend>
+            BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<is_trivial_cpp_int_modular<Backend>::value, std::size_t>::type
+                get_limb_bits() {
+                return sizeof(typename trivial_limb_type<boost::multiprecision::backends::max_precision<Backend>::value>::type) * CHAR_BIT;
+            }
 
-                template<typename Backend>
-                constexpr typename boost::enable_if_c<is_trivial_cpp_int<Backend>::value, std::size_t>::type
-                    get_limb_bits() {
-                    return sizeof(typename trivial_limb_type<max_precision<Backend>::value>::type) * CHAR_BIT;
-                }
+            template<typename Backend>
+            BOOST_MP_CXX14_CONSTEXPR typename boost::enable_if_c<!is_trivial_cpp_int_modular<Backend>::value, std::size_t>::type
+                get_limb_bits() {
+                return Backend::limb_bits;
+            }
 
-                template<typename Backend>
-                constexpr typename boost::enable_if_c<!is_trivial_cpp_int<Backend>::value, std::size_t>::type
-                    get_limb_bits() {
-                    return Backend::limb_bits;
-                }
+            template<typename Backend>
+            struct modular_policy;
 
-                template<typename Backend>
-                struct modular_policy;
+            template<unsigned Bits>
+            struct modular_policy<cpp_int_modular_backend<Bits>> {
+                typedef cpp_int_modular_backend<Bits> Backend;
 
-                template<unsigned MinBits, cpp_integer_type SignType, cpp_int_check_type Checked>
-                struct modular_policy<modular_fixed_cpp_int_backend<MinBits, SignType, Checked>> {
-                    typedef modular_fixed_cpp_int_backend<MinBits, SignType, Checked> Backend;
-                    typedef modular_fixed_cpp_int_backend<MinBits, cpp_integer_type::unsigned_magnitude, Checked>
-                        Backend_u;
+                BOOST_MP_CXX14_CONSTEXPR static auto limbs_count = get_limbs_count<Backend>();
+                BOOST_MP_CXX14_CONSTEXPR static auto limb_bits = get_limb_bits<Backend>();
 
-                    static_assert(MinBits, "number of bits should be defined");
-                    static_assert(is_fixed_precision<Backend>::value, "fixed precision backend should be used");
-                    static_assert(!is_unsigned_number<Backend>::value, "number should be signed");
-                    static_assert(is_non_throwing_cpp_int<Backend>::value, "backend should be unchecked");
+                /// real limb_type depending on is_trivial_cpp_int_modular property
+                /// such logic is necessary due to local_limb_type could be uint128
+                typedef typename std::conditional<is_trivial_cpp_int_modular<Backend>::value,
+                                                  typename trivial_limb_type<Bits>::type,
+                                                  limb_type>::type
+                    internal_limb_type;
 
-                    constexpr static auto limbs_count = get_limbs_count<Backend>();
-                    constexpr static auto limb_bits = get_limb_bits<Backend>();
+                typedef typename std::conditional<is_trivial_cpp_int_modular<Backend>::value,
+                                                  typename trivial_limb_type<2u * limb_bits>::type,
+                                                  double_limb_type>::type
+                    internal_double_limb_type;
 
-                    /// real limb_type depending on is_trivial_cpp_int property
-                    /// such logic is necessary due to local_limb_type could be uint128
-                    typedef typename std::conditional<is_trivial_cpp_int<Backend>::value,
-                                                      typename trivial_limb_type<MinBits>::type,
-                                                      limb_type>::type
-                        internal_limb_type;
-                    typedef typename std::conditional<
-                        is_trivial_cpp_int<Backend>::value,
-                        number<cpp_int_backend<2u * limb_bits, 2u * limb_bits, cpp_integer_type::unsigned_magnitude,
-                                               cpp_int_check_type::unchecked, void>>,
-                        double_limb_type>::type internal_double_limb_type;
+                // Delete this if everything works.
+                //typedef typename std::conditional<
+                //    is_trivial_cpp_int_modular<Backend>::value,
+                //    boost::multiprecision::number<cpp_int_modular_backend<2u * limb_bits>>,
+                //    double_limb_type>::type internal_double_limb_type;
 
-                    constexpr static auto BitsCount_doubled = 2u * MinBits;
-                    constexpr static auto BitsCount_doubled_1 = BitsCount_doubled + 1;
-                    constexpr static auto BitsCount_quadruple_1 = 2u * BitsCount_doubled + 1;
-                    constexpr static auto BitsCount_padded_limbs = limbs_count * limb_bits + limb_bits;
-                    constexpr static auto BitsCount_doubled_limbs = 2u * limbs_count * limb_bits;
-                    constexpr static auto BitsCount_doubled_padded_limbs = BitsCount_doubled_limbs + limb_bits;
+                BOOST_MP_CXX14_CONSTEXPR static auto BitsCount_doubled = 2u * Bits;
+                BOOST_MP_CXX14_CONSTEXPR static auto BitsCount_doubled_1 = BitsCount_doubled + 1;
+                BOOST_MP_CXX14_CONSTEXPR static auto BitsCount_quadruple_1 = 2u * BitsCount_doubled + 1;
+                BOOST_MP_CXX14_CONSTEXPR static auto BitsCount_padded_limbs = limbs_count * limb_bits + limb_bits;
+                BOOST_MP_CXX14_CONSTEXPR static auto BitsCount_doubled_limbs = 2u * limbs_count * limb_bits;
+                BOOST_MP_CXX14_CONSTEXPR static auto BitsCount_doubled_padded_limbs = BitsCount_doubled_limbs + limb_bits;
 
-                    typedef modular_fixed_cpp_int_backend<BitsCount_doubled, SignType, Checked> Backend_doubled;
-                    typedef modular_fixed_cpp_int_backend<BitsCount_doubled_1, SignType, Checked> Backend_doubled_1;
-                    typedef modular_fixed_cpp_int_backend<BitsCount_quadruple_1, SignType, Checked> Backend_quadruple_1;
-                    typedef modular_fixed_cpp_int_backend<BitsCount_padded_limbs, SignType, Checked>
-                        Backend_padded_limbs;
-                    typedef modular_fixed_cpp_int_backend<BitsCount_padded_limbs, cpp_integer_type::unsigned_magnitude,
-                                                          Checked>
-                        Backend_padded_limbs_u;
-                    typedef modular_fixed_cpp_int_backend<BitsCount_doubled_limbs, SignType, Checked>
-                        Backend_doubled_limbs;
-                    typedef modular_fixed_cpp_int_backend<BitsCount_doubled_limbs, cpp_integer_type::unsigned_magnitude,
-                                                          Checked>
-                        Backend_doubled_limbs_u;
-                    typedef modular_fixed_cpp_int_backend<BitsCount_doubled_padded_limbs, SignType, Checked>
-                        Backend_doubled_padded_limbs;
+                typedef cpp_int_modular_backend<BitsCount_doubled> Backend_doubled;
+                typedef cpp_int_modular_backend<BitsCount_doubled_1> Backend_doubled_1;
+                typedef cpp_int_modular_backend<BitsCount_quadruple_1> Backend_quadruple_1;
+                typedef cpp_int_modular_backend<BitsCount_padded_limbs> Backend_padded_limbs;
+                typedef cpp_int_modular_backend<BitsCount_doubled_limbs> Backend_doubled_limbs;
+                typedef cpp_int_modular_backend<BitsCount_doubled_padded_limbs> Backend_doubled_padded_limbs;
 
-                    typedef number<Backend> number_type;
-                    typedef number<Backend_u> number_type_u;
-                    typedef number<Backend_doubled> dbl_number_type;
-                    typedef number<Backend_doubled_limbs> dbl_lmb_number_type;
-                };
+                // Modular adaptor must not know about the existance of class boost::mp::number.
+                //typedef boost::multiprecision::number<Backend> number_type;
+                //typedef boost::multiprecision::number<Backend_doubled> dbl_number_type;
+                //typedef boost::multiprecision::number<Backend_doubled_limbs> dbl_lmb_number_type;
+            };
+        }    // namespace backends
+    }   // namespace multiprecision
+}   // namespace boost
 
-            }    // namespace backends
-        }        // namespace multiprecision
-    }            // namespace crypto3
-}    // namespace nil
-
-#endif    // BOOST_MULTIPRECISION_MODULAR_POLICY_FIXED_HPP
+#endif    // CRYPTO3_MULTIPRECISION_MODULAR_POLICY_FIXED_HPP
