@@ -171,7 +171,7 @@ namespace nil {
                                                                    base_integral_type>
                     marshalling_base_integral_type;
                 typedef nil::crypto3::marshalling::types::integral<nil::marshalling::field_type<endianness>,
-                                                                   nil::crypto3::multiprecision::uint512_t>
+                                                                   boost::multiprecision::uint512_t>
                     marshalling_uint512_t_type;
 
                 constexpr static const std::size_t public_key_bits = base_field_type::modulus_bits;
@@ -244,8 +244,14 @@ namespace nil {
                         nil::marshalling::status_type::success) {
                         return false;
                     }
-                    multiprecision::uint512_t k = marshalling_uint512_t_2.value();
-                    scalar_field_value_type k_reduced(k);
+                    boost::multiprecision::uint512_t k = marshalling_uint512_t_2.value();
+
+                    // Reduce the size of r to the needed number of bits.
+                    // This can be done more effective later. Also we can make it easier to convert, but we want the conversion
+                    // to be explicit.
+                    boost::multiprecision::uint512_modular_t k_modular = boost::multiprecision::uint512_modular_t::backend_type(
+                        k.backend());
+                    scalar_field_value_type k_reduced(k_modular);
 
                     // 3.
                     return (S * group_value_type::one()) == (R + k_reduced * this->pubkey_point);
@@ -370,8 +376,14 @@ namespace nil {
                         nil::marshalling::status_type::success) {
                         return {};
                     }
-                    nil::crypto3::multiprecision::uint512_t r = marshalling_uint512_t_2.value();
-                    scalar_field_value_type r_reduced(r);
+                    boost::multiprecision::uint512_t r = marshalling_uint512_t_2.value();
+
+                    // Reduce the size of r to the needed number of bits.
+                    // This can be done more effective later. Also we can make it easier to convert, but we want the conversion
+                    // to be explicit.
+                    boost::multiprecision::uint512_modular_t r_modular = boost::multiprecision::uint512_modular_t::backend_type(
+                        r.backend());
+                    scalar_field_value_type r_reduced(r_modular);
 
                     // 3.
                     group_value_type rB = r_reduced * group_value_type::one();
@@ -402,8 +414,14 @@ namespace nil {
                         nil::marshalling::status_type::success) {
                         return {};
                     }
-                    nil::crypto3::multiprecision::uint512_t k = marshalling_uint512_t_4.value();
-                    scalar_field_value_type k_reduced(k);
+                    boost::multiprecision::uint512_t k = marshalling_uint512_t_4.value();
+
+                    // Reduce the size of r to the needed number of bits.
+                    // This can be done more effective later. Also we can make it easier to convert, but we want the conversion
+                    // to be explicit.
+                    boost::multiprecision::uint512_modular_t k_modular = boost::multiprecision::uint512_modular_t::backend_type(
+                        k.backend());
+                    scalar_field_value_type k_reduced(k_modular);
 
                     // 5.
                     scalar_field_value_type S = r_reduced + k_reduced * s_reduced;
