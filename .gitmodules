@@ -67,3 +67,6 @@
 [submodule "crypto3-multiprecision-marshalling"]
 	path = libs/marshalling/multiprecision
 	url = ../../NilFoundation/crypto3-multiprecision-marshalling.git
+[submodule "cmake"]
+	path = cmake
+	url = git@github.com:NilFoundation/cmake-shared-tools.git
