@@ -42,8 +42,8 @@
 #include <nil/marshalling/field_type.hpp>
 #include <nil/marshalling/endianness.hpp>
 
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
-#include <nil/crypto3/multiprecision/number.hpp>
+#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
+#include <boost/multiprecision/number.hpp>
 
 #include <nil/crypto3/algebra/random_element.hpp>
 #include <nil/crypto3/algebra/curves/bls12.hpp>
@@ -483,11 +483,11 @@ BOOST_FIXTURE_TEST_CASE(batches_num_3_test, zk::test_tools::random_test_initiali
     lpc_scheme_type lpc_scheme_verifier(fri_params);
 
     // Generate polynomials
-    lpc_scheme_prover.append_to_batch(0, {1, 13, 4, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1});
-    lpc_scheme_prover.append_to_batch(2, {0, 1});
-    lpc_scheme_prover.append_to_batch(2, {0, 1, 2});
-    lpc_scheme_prover.append_to_batch(2, {0, 1, 3});
-    lpc_scheme_prover.append_to_batch(3, {0});
+    lpc_scheme_prover.append_to_batch(0, {1u, 13u, 4u, 1u, 5u, 6u, 7u, 2u, 8u, 7u, 5u, 6u, 1u, 2u, 1u, 1u});
+    lpc_scheme_prover.append_to_batch(2, {0u, 1u});
+    lpc_scheme_prover.append_to_batch(2, {0u, 1u, 2u});
+    lpc_scheme_prover.append_to_batch(2, {0u, 1u, 3u});
+    lpc_scheme_prover.append_to_batch(3, {0u});
 
     // Commit
     std::map<std::size_t, typename lpc_type::commitment_type> commitments;

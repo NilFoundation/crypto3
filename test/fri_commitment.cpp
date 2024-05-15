@@ -40,8 +40,8 @@
 #include <nil/marshalling/field_type.hpp>
 #include <nil/marshalling/endianness.hpp>
 
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
-#include <nil/crypto3/multiprecision/number.hpp>
+#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
+#include <boost/multiprecision/number.hpp>
 
 #include <nil/crypto3/algebra/random_element.hpp>
 #include <nil/crypto3/algebra/curves/bls12.hpp>
@@ -331,7 +331,7 @@ BOOST_FIXTURE_TEST_SUITE(marshalling_fri_proof_elements, zk::test_tools::random_
 
     BOOST_AUTO_TEST_CASE(polynomial_test) {
         using polynomial_type = math::polynomial<typename field_type::value_type>;
-        polynomial_type f = {1, 3, 4, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1};
+        polynomial_type f = {{1u, 3u, 4u, 1u, 5u, 6u, 7u, 2u, 8u, 7u, 5u, 6u, 1u, 2u, 1u, 1u}};
         auto filled_polynomial = nil::crypto3::marshalling::types::fill_fri_math_polynomial<Endianness, polynomial_type>(f);
 
         auto _f = nil::crypto3::marshalling::types::make_fri_math_polynomial<Endianness, polynomial_type>(filled_polynomial);
@@ -460,7 +460,7 @@ BOOST_AUTO_TEST_CASE(marshalling_fri_basic_test) {
     BOOST_CHECK(D[1]->get_domain_element(1) == D[0]->get_domain_element(1).squared());
 
     // commit
-    math::polynomial<typename field_type::value_type> f = {1, 3, 4, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1};
+    math::polynomial<typename field_type::value_type> f = {{1u, 3u, 4u, 1u, 5u, 6u, 7u, 2u, 8u, 7u, 5u, 6u, 1u, 2u, 1u, 1u}};
     std::array<std::vector<math::polynomial<typename field_type::value_type>>, 1> fs;
     fs[0].resize(1);
     fs[0][0] = f;

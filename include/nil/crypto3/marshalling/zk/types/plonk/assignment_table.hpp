@@ -157,22 +157,22 @@ namespace nil {
                         fill_field_element_vector_from_columns_with_padding<value_type, Endianness>(
                             assignments.witnesses(),
                             assignments.rows_amount(),
-                            0
+                            0u
                         ),
                         fill_field_element_vector_from_columns_with_padding<value_type, Endianness>(
                             assignments.public_inputs(),
                             assignments.rows_amount(),
-                            0
+                            0u
                         ),
                         fill_field_element_vector_from_columns_with_padding<value_type, Endianness>(
                             assignments.constants(),
                             assignments.rows_amount(),
-                            0
+                            0u
                         ),
                         fill_field_element_vector_from_columns_with_padding<value_type, Endianness>(
                             assignments.selectors(),
                             assignments.rows_amount(),
-                            0
+                            0u
                         )
                     )));
                 }

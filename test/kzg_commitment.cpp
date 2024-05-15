@@ -38,8 +38,8 @@
 #include <nil/marshalling/field_type.hpp>
 #include <nil/marshalling/endianness.hpp>
 
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
-#include <nil/crypto3/multiprecision/number.hpp>
+#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
+#include <boost/multiprecision/number.hpp>
 
 #include <nil/crypto3/algebra/curves/pallas.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/pallas.hpp>
@@ -53,7 +53,7 @@
 #include <nil/crypto3/algebra/fields/arithmetic_params/mnt6.hpp>
 
 #include <nil/crypto3/algebra/curves/bls12.hpp>
-#include <nil/crypto3/algebra/pairing/bls12.hpp>
+#include <nil/crypto3/algebra/pairing/bls12.hpp> 
 
 /*
 #include <nil/crypto3/algebra/curves/alt_bn128.hpp>
@@ -98,16 +98,16 @@ struct placeholder_class_test_initializer {
         using kzg_scheme_type = typename zk::commitments::kzg_commitment_scheme_v2<kzg_type>;
         using endianness = nil::marshalling::option::big_endian;
 
-        scalar_value_type alpha = 7;
+        scalar_value_type alpha = 7u;
         auto params = kzg_scheme_type::create_params(8, alpha);
         kzg_scheme_type kzg(params);
 
         typename kzg_type::batch_of_polynomials_type polys(4);
 
-        polys[0].template from_coefficients<std::vector<scalar_value_type>>({{ 1,  2,  3,  4,  5,  6,  7,  8}});
-        polys[1].template from_coefficients<std::vector<scalar_value_type>>({{11, 12, 13, 14, 15, 16, 17, 18}});
-        polys[2].template from_coefficients<std::vector<scalar_value_type>>({{21, 22, 23, 24, 25, 26, 27, 28}});
-        polys[3].template from_coefficients<std::vector<scalar_value_type>>({{31, 32, 33, 34, 35, 36, 37, 38}});
+        polys[0].template from_coefficients<std::vector<scalar_value_type>>({{ 1u,  2u,  3u,  4u,  5u,  6u,  7u,  8u}});
+        polys[1].template from_coefficients<std::vector<scalar_value_type>>({{11u, 12u, 13u, 14u, 15u, 16u, 17u, 18u}});
+        polys[2].template from_coefficients<std::vector<scalar_value_type>>({{21u, 22u, 23u, 24u, 25u, 26u, 27u, 28u}});
+        polys[3].template from_coefficients<std::vector<scalar_value_type>>({{31u, 32u, 33u, 34u, 35u, 36u, 37u, 38u}});
 
 
         std::size_t batch_id = 0;
@@ -116,10 +116,10 @@ struct placeholder_class_test_initializer {
         std::map<std::size_t, typename kzg_scheme_type::commitment_type> commitments;
         commitments[batch_id] = kzg.commit(batch_id);
 
-        std::set<scalar_value_type> points_0 = {101, 2, 3};
-        std::set<scalar_value_type> points_1 = {102, 2, 3};
-        std::set<scalar_value_type> points_2 = {  1, 2, 3};
-        std::set<scalar_value_type> points_3 = {104, 2, 3};
+        std::set<scalar_value_type> points_0 = {101u, 2u, 3u};
+        std::set<scalar_value_type> points_1 = {102u, 2u, 3u};
+        std::set<scalar_value_type> points_2 = {  1u, 2u, 3u};
+        std::set<scalar_value_type> points_3 = {104u, 2u, 3u};
         kzg.append_eval_points(batch_id, 0, points_0);
         kzg.append_eval_points(batch_id, 1, points_1);
         kzg.append_eval_points(batch_id, 2, points_2);
@@ -153,7 +153,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(placeholder_class_test, F, TestFixtures) {
     F fixture;
     BOOST_CHECK(fixture.run_test());
 }
-
 
 BOOST_AUTO_TEST_SUITE_END()
 
