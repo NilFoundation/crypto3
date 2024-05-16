@@ -14,7 +14,7 @@
 #include <nil/crypto3/multiprecision/modular/modular_params_fixed.hpp>
 #include <nil/crypto3/multiprecision/traits/is_backend.hpp>
 
-namespace boost {   
+namespace boost {
     namespace multiprecision {
         namespace backends {
             template<typename Backend, typename StorageType>
@@ -52,6 +52,15 @@ namespace boost {
                 }
 
                 typedef typename Backend::unsigned_types unsigned_types;
+                // We will allow signed types to be assigned to number<modular_adaptor<>> ...
+#ifdef TVM
+                using signed_types = std::tuple<int, signed_limb_type, signed_double_limb_type>;
+#else
+                using signed_types = typename std::conditional<
+                    is_trivial_cpp_int_modular<Backend>::value,
+                    std::tuple<signed char, short, int, long, boost::long_long_type, signed_double_limb_type>,
+                    std::tuple<signed_limb_type, signed_double_limb_type>>::type;
+#endif
 
                 BOOST_MP_CXX14_CONSTEXPR modular_adaptor() {
                 }
@@ -80,9 +89,15 @@ namespace boost {
                 template<typename SI,
                          typename std::enable_if_t<std::is_integral<SI>::value && std::is_signed<SI>::value> const * = nullptr>
                 BOOST_MP_CXX14_CONSTEXPR modular_adaptor(SI b)
-                        : m_base(b >= 0 ? 
-                                 static_cast<typename std::tuple_element<0, unsigned_types>::type>(b) : 
-                                 this->mod_data().get_mod() - static_cast<typename std::tuple_element<0, unsigned_types>::type>(-b) ) {
+                        : m_base(static_cast<typename std::tuple_element<0, unsigned_types>::type>(0)) {
+
+                    if (b >= 0) {
+                        m_base = static_cast<typename std::tuple_element<0, unsigned_types>::type>(b);
+                    } else {
+                        m_base = this->mod_data().get_mod();
+                        eval_subtract(m_base, static_cast<typename std::tuple_element<0, unsigned_types>::type>(-b) );
+                    }
+
                     // This method must be called only for compile time modular params.
                     // this->set_modular_params(m);
                     this->mod_data().adjust_modular(m_base);
@@ -94,6 +109,22 @@ namespace boost {
                         : m_base(static_cast<typename std::tuple_element<0, unsigned_types>::type>(b)) {
                     // This method must be called only for compile time modular params.
                     // this->set_modular_params(m);
+                    this->mod_data().adjust_modular(m_base);
+                }
+
+                template<typename SI,
+                         typename std::enable_if_t<std::is_integral<SI>::value && std::is_signed<SI>::value> const * = nullptr>
+                BOOST_MP_CXX14_CONSTEXPR modular_adaptor(SI b, const modular_type &m)
+                        : m_base(static_cast<typename std::tuple_element<0, unsigned_types>::type>(0)) {
+
+                    if (b >= 0) {
+                        m_base = static_cast<typename std::tuple_element<0, unsigned_types>::type>(b);
+                    } else {
+                        m_base = this->mod_data().get_mod();
+                        eval_subtract(m_base, static_cast<typename std::tuple_element<0, unsigned_types>::type>(-b));
+                    }
+
+                    this->set_modular_params(m);
                     this->mod_data().adjust_modular(m_base);
                 }
 

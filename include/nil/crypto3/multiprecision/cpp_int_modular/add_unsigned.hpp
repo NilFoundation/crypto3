@@ -66,6 +66,8 @@ namespace boost {
                     cpp_int_modular_backend<Bits>& result,
                     const cpp_int_modular_backend<Bits>& a,
                     const cpp_int_modular_backend<Bits>& b) noexcept {
+                BOOST_ASSERT(!eval_lt(a, b));
+
                 //
                 // This is the generic, C++ only version of subtraction.
                 // It's also used for all BOOST_MP_CXX14_CONSTEXPR branches, hence the name.
@@ -178,6 +180,7 @@ namespace boost {
                     cpp_int_modular_backend<Bits>& result,
                     const cpp_int_modular_backend<Bits>& a,
                     const cpp_int_modular_backend<Bits>& b) noexcept {
+                BOOST_ASSERT(!eval_lt(a, b));
 
 #ifndef TO3_MP_NO_CONSTEXPR_DETECTION
                 if (BOOST_MP_IS_CONST_EVALUATED(a.size())) {
