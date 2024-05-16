@@ -72,6 +72,13 @@ macro(define_storage_test test)
     elseif(target_type STREQUAL "STATIC_LIB")
 
     endif()
+
+     if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+        target_compile_options(${target_name} PRIVATE "-fconstexpr-steps=2147483647" "-ftemplate-backtrace-limit=0")
+    elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        target_compile_options(${target_name} PRIVATE "-fconstexpr-ops-limit=4294967295" "-ftemplate-backtrace-limit=0")
+    endif()
+
 endmacro()
 
 set(TESTS_NAMES
