@@ -34,8 +34,6 @@
 
 #include <boost/iterator/zip_iterator.hpp>
 
-#include <nil/crypto3/detail/pack_numeric.hpp>
-
 #include <nil/crypto3/hash/algorithm/hash.hpp>
 #include <nil/crypto3/hash/sha2.hpp>
 

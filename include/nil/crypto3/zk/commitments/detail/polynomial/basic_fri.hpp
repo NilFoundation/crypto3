@@ -1006,7 +1006,7 @@ namespace nil {
                         }
 
                         //Calculate combinedQ values
-                        typename FRI::field_type::value_type theta_acc(1);
+                        typename FRI::field_type::value_type theta_acc = FRI::field_type::value_type::one();
                         typename FRI::polynomial_values_type y;
                         typename FRI::polynomial_values_type combined_eval_values;
                         y.resize(coset_size / FRI::m);

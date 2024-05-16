@@ -172,7 +172,7 @@ inline std::vector<std::size_t> generate_random_step_list(const std::size_t r, c
 template<typename kzg_type>
 typename kzg_type::params_type create_kzg_params(std::size_t degree_log) {
     // TODO: what cases t != d?
-    typename kzg_type::field_type::value_type alpha (7);
+    typename kzg_type::field_type::value_type alpha(7u);
     std::size_t d = 1 << degree_log;
 
     typename kzg_type::params_type params(d, d, alpha);
@@ -182,7 +182,7 @@ typename kzg_type::params_type create_kzg_params(std::size_t degree_log) {
 template<typename kzg_type>
 typename kzg_type::params_type create_kzg_v2_params(std::size_t degree_log) {
     // TODO: what cases t != d?
-    typename kzg_type::field_type::value_type alpha (7);
+    typename kzg_type::field_type::value_type alpha (7u);
     std::size_t d = 1 << degree_log;
 
     typename kzg_type::params_type params(d, 1, alpha);
@@ -358,21 +358,21 @@ BOOST_FIXTURE_TEST_CASE(prover_test, test_tools::random_test_initializer<field_t
     // Public inputs checks
     // Completely correct public input
     typename placeholder_params_type::public_input_type public_input(1);
-    public_input[0] = {pi0, 0, 1};
+    public_input[0] = {pi0, 0u, 1u};
     verifier_res = placeholder_verifier<field_type, placeholder_params_type>::process(
         preprocessed_public_data.common_data, proof, desc, constraint_system, commitment_scheme, public_input
     );
     BOOST_CHECK(verifier_res);
 
     // Completely correct zeroes after it are not important
-    public_input[0] = {pi0, 0, 1, 0};
+    public_input[0] = {pi0, 0u, 1u, 0u};
     verifier_res = placeholder_verifier<field_type, placeholder_params_type>::process(
         preprocessed_public_data.common_data, proof, desc, constraint_system, commitment_scheme, public_input
     );
     BOOST_CHECK(verifier_res);
 
     // Incorrect public input
-    public_input[0] = {pi0, 1};
+    public_input[0] = {pi0, 1u};
     verifier_res = placeholder_verifier<field_type, placeholder_params_type>::process(
         preprocessed_public_data.common_data, proof, desc, constraint_system, commitment_scheme, public_input
     );
@@ -511,7 +511,7 @@ BOOST_FIXTURE_TEST_CASE(permutation_polynomials_test, test_tools::random_test_in
 }
 
 BOOST_FIXTURE_TEST_CASE(placeholder_split_polynomial_test, test_tools::random_test_initializer<field_type>) {
-    math::polynomial<typename field_type::value_type> f = {1, 3, 4, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1};
+    math::polynomial<typename field_type::value_type> f = {{1u, 3u, 4u, 1u, 5u, 6u, 7u, 2u, 8u, 7u, 5u, 6u, 1u, 2u, 1u, 1u}};
     std::size_t expected_size = 4;
     std::size_t max_degree = 3;
 
@@ -677,7 +677,7 @@ BOOST_FIXTURE_TEST_CASE(placeholder_gate_argument_test, test_tools::random_test_
 
     math::polynomial_dfs<typename field_type::value_type> mask_polynomial(
         0, preprocessed_public_data.common_data.basic_domain->m,
-        typename field_type::value_type(1)
+        typename field_type::value_type(1u)
     );
     mask_polynomial -= preprocessed_public_data.q_last;
     mask_polynomial -= preprocessed_public_data.q_blind;

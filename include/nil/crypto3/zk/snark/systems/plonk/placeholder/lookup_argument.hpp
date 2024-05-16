@@ -596,11 +596,12 @@ namespace nil {
                         std::vector<math::polynomial_dfs<typename FieldType::value_type>> sorted(
                             reduced_input.size() + reduced_value.size(), zero_poly
                         );
-                        std::size_t i1=0;
-                        std::size_t j1=0;
-                        typename FieldType::value_type prev(0);
-                        prev = typename FieldType::value_type(0);
-                        auto append_to_sorted = [usable_rows_amount, &sorted, &i1, &j1] (const typename FieldType::value_type& value) {
+                        std::size_t i1 = 0;
+                        std::size_t j1 = 0;
+                        typename FieldType::value_type prev = FieldType::value_type::zero();
+
+                        auto append_to_sorted = [usable_rows_amount, &sorted, &i1, &j1] (
+                                const typename FieldType::value_type& value) {
                             sorted[i1][j1] = value;
                             j1++;
                             if (j1 >= usable_rows_amount){
@@ -760,7 +761,7 @@ namespace nil {
 
                         std::size_t current_part = 0;
                         std::size_t current_size = 0;
-                        typename FieldType::value_type g(1);
+                        typename FieldType::value_type g = FieldType::value_type::one();
                         for( std::size_t i = 0; i < lookup_input.size(); i++){
                             g *= (one+beta)*(gamma + lookup_input[i]);
                             current_size++;
@@ -783,7 +784,7 @@ namespace nil {
                         }
                         BOOST_ASSERT(current_size == 0);
 
-                        typename FieldType::value_type h(1);
+                        typename FieldType::value_type h = FieldType::value_type::one();
                         current_part = 0;
                         current_size = 0;
                         for( std::size_t i = 0; i < sorted.size(); i++){
@@ -827,7 +828,7 @@ namespace nil {
                             F[2] += (previous_value * g - V_L_shifted * h);
                             F[2] *= (special_selector_values[1] + special_selector_values[2]) - one;
                         }
-                        F[3] = 0;
+                        F[3] = 0u;
                         for( std::size_t i = 1; i < sorted.size(); i++ ){
                             typename FieldType::value_type alpha = transcript.template challenge<FieldType>();
                             F[3] += (sorted[i][0] - sorted[i-1][2]) * alpha * special_selector_values[0];

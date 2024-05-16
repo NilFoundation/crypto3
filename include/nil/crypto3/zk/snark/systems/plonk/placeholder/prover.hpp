@@ -175,7 +175,7 @@ namespace nil {
 
                         polynomial_dfs_type mask_polynomial(
                             0, preprocessed_public_data.common_data.basic_domain->m,
-                            typename FieldType::value_type(1)
+                            typename FieldType::value_type(1u)
                         );
                         mask_polynomial -= preprocessed_public_data.q_last;
                         mask_polynomial -= preprocessed_public_data.q_blind;

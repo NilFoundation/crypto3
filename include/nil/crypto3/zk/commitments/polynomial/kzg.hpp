@@ -156,12 +156,14 @@ namespace nil {
                                             const typename math::polynomial<typename KZG::scalar_value_type> &f,
                                             typename KZG::scalar_value_type z) {
 
-                    const typename math::polynomial<typename KZG::scalar_value_type> denominator_polynom = {-z, 1};
+                    // We need two scopes on the next line to force it to use the initializer list version,
+                    // not another constructor with 2 params.
+                    const typename math::polynomial<typename KZG::scalar_value_type> denominator_polynom = {{-z, KZG::scalar_value_type::one()}};
 
-                    typename math::polynomial<typename KZG::scalar_value_type> q = f;
+                    typename math::polynomial<typename KZG::scalar_value_type> q(f);
                     q[0] -= f.evaluate(z);
                     auto r = q % denominator_polynom;
-                    if (r != typename KZG::scalar_value_type(0)) {
+                    if (!r.is_zero()) {
                         throw std::runtime_error("incorrect eval or point z");
                     }
                     q /= denominator_polynom;
@@ -516,9 +518,9 @@ namespace nil {
                 static typename math::polynomial<typename KZG::scalar_value_type>
                     create_polynom_by_zeros(const std::vector<typename KZG::scalar_value_type> S) {
                     assert(S.size() > 0);
-                    typename math::polynomial<typename KZG::scalar_value_type> Z = {-S[0], 1};
+                    typename math::polynomial<typename KZG::scalar_value_type> Z = {{-S[0], KZG::scalar_value_type::one()}};
                     for (std::size_t i = 1; i < S.size(); ++i) {
-                        Z *= typename math::polynomial<typename KZG::scalar_value_type>({-S[i], 1});
+                        Z *= typename math::polynomial<typename KZG::scalar_value_type>({-S[i], KZG::scalar_value_type::one()});
                     }
                     return Z;
                 }
@@ -538,7 +540,8 @@ namespace nil {
                     std::vector<typename KZG::scalar_value_type> result;
                     std::set_difference(T.begin(), T.end(), S.begin(), S.end(), std::back_inserter(result));
                     if (result.size() == 0) {
-                        return typename math::polynomial<typename KZG::scalar_value_type>({{1}});
+                        return typename math::polynomial<typename KZG::scalar_value_type>(
+                            {{KZG::scalar_value_type::one()}});
                     }
                     return create_polynom_by_zeros<KZG>(result);
                 }
@@ -566,10 +569,11 @@ namespace nil {
                         auto spare_poly = polys[i] - public_key.r[i];
                         auto denom = create_polynom_by_zeros<KZG>(public_key.S[i]);
                         for (auto s : public_key.S[i]) {
-                            assert(spare_poly.evaluate(s) == 0);
-                            assert(denom.evaluate(s) == 0);
+                            assert(spare_poly.evaluate(s).is_zero());
+                            assert(denom.evaluate(s).is_zero());
                         }
-                        assert(spare_poly % denom == typename math::polynomial<typename KZG::scalar_value_type>({{0}}));
+                        assert(spare_poly % denom == typename math::polynomial<typename KZG::scalar_value_type>(
+                            {{KZG::scalar_value_type::zero()}}));
                         spare_poly /= denom;
                         accum += spare_poly * factor;
                         factor *= gamma;
@@ -681,7 +685,8 @@ namespace nil {
                         std::vector<typename KZGScheme::scalar_value_type> result;
                         std::set_difference(merged_points.begin(), merged_points.end(), points.begin(), points.end(), std::back_inserter(result));
                         if (result.size() == 0) {
-                            return typename math::polynomial<typename KZGScheme::scalar_value_type>({{1}});
+                            return typename math::polynomial<typename KZGScheme::scalar_value_type>(
+                                {{KZGScheme::scalar_value_type::one()}});
                         }
                         BOOST_ASSERT(this->get_V(result) * this->get_V(points) == this->get_V(merged_points));
                         return this->get_V(result);
@@ -700,8 +705,8 @@ namespace nil {
                         );
 
                         // Push evaluation points to transcript
-                        for( std::size_t i = 0; i < this->_z.get_batch_size(batch_ind); i++){
-                            for( std::size_t j = 0; j < this->_z.get_poly_points_number(batch_ind, i); j++  ) {
+                        for(std::size_t i = 0; i < this->_z.get_batch_size(batch_ind); i++) {
+                            for(std::size_t j = 0; j < this->_z.get_poly_points_number(batch_ind, i); j++) {
                                 nil::marshalling::status_type status;
                                 std::vector<uint8_t> byteblob =
                                     nil::marshalling::pack<endianness>(this->_z.get(batch_ind, i, j), status);
@@ -744,7 +749,7 @@ namespace nil {
                         this->_ind_commitments[index] = {};
                         this->state_commited(index);
 
-                        std::vector<std::uint8_t> result = {};
+                        std::vector<std::uint8_t> result;
                         for (std::size_t i = 0; i < this->_polys[index].size(); ++i) {
                             BOOST_ASSERT(this->_polys[index][i].degree() <= _params.commitment_key.size());
                             auto single_commitment = nil::crypto3::zk::algorithms::commit_one<KZGScheme>(_params, this->_polys[index][i]);
@@ -779,7 +784,8 @@ namespace nil {
 
                         auto gamma = transcript.template challenge<typename KZGScheme::curve_type::scalar_field_type>();
                         auto factor = KZGScheme::scalar_value_type::one();
-                        typename math::polynomial<typename KZGScheme::scalar_value_type> accum = {0};
+                        typename math::polynomial<typename KZGScheme::scalar_value_type> accum = 
+                            {{KZGScheme::scalar_value_type::zero()}};
 
                         for( auto const &it: this->_polys ){
                             auto k = it.first;

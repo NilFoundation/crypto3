@@ -56,13 +56,13 @@ void test_fold_polynomial() {
 
     constexpr static const std::size_t d = 4;
 
-    math::polynomial<typename FieldType::value_type> q = {0, 0, 1};
+    math::polynomial<typename FieldType::value_type> q = {{0u, 0u, 1u}};
 
     std::size_t d_log = boost::static_log2<d>::value;
     std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
         math::calculate_domain_set<FieldType>(d_log, 1);
 
-    math::polynomial<typename FieldType::value_type> f = {1, 3, 4, 3};
+    math::polynomial<typename FieldType::value_type> f = {{1u, 3u, 4u, 3u}};
 
     typename FieldType::value_type omega = D[0]->get_domain_element(1);
 
@@ -90,20 +90,20 @@ void test_fold_polynomial_dfs() {
 
     constexpr static const std::size_t d = 4;
 
-    math::polynomial<typename FieldType::value_type> q = {0, 0, 1};
+    math::polynomial<typename FieldType::value_type> q = {{0u, 0u, 1u}};
 
     std::size_t d_log = boost::static_log2<d>::value;
     std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
         math::calculate_domain_set<FieldType>(d_log, 2);
 
-    math::polynomial<typename FieldType::value_type> f = {1, 3, 4, 3};
+    math::polynomial<typename FieldType::value_type> f = {{1u, 3u, 4u, 3u}};
 
     typename FieldType::value_type omega = D[0]->get_domain_element(1);
 
     typename FieldType::value_type x_next = q.evaluate(omega);
     typename FieldType::value_type alpha = algebra::random_element<FieldType>();
 
-    math::polynomial_dfs<typename FieldType::value_type> f_dfs(3, D[0]->size(), 0);
+    math::polynomial_dfs<typename FieldType::value_type> f_dfs(3, D[0]->size(), FieldType::value_type::zero());
     std::vector<typename FieldType::value_type> f_vector(f.size());
     for (std::size_t i = 0; i < f.size(); i++) {
         f_vector[i] = f[i];

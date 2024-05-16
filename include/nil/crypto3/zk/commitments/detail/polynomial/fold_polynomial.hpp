@@ -53,7 +53,7 @@ namespace nil {
 
                         std::size_t d = f.degree();
                         if (d % 2 == 0) {
-                            f.push_back(0);
+                            f.push_back(FieldType::value_type::zero());
                             d++;
                         }
                         math::polynomial<typename FieldType::value_type> f_folded(d / 2 + 1);
@@ -78,14 +78,14 @@ namespace nil {
                         math::polynomial_dfs<typename FieldType::value_type> f_folded(
                                 domain->size() / 2 - 1, domain->size() / 2, FieldType::value_type::zero());
 
-                        typename FieldType::value_type two_inversed = 2;
+                        typename FieldType::value_type two_inversed = 2u;
                         two_inversed = two_inversed.inversed();
                         typename FieldType::value_type omega_inversed = domain->get_domain_element(domain->size() - 1);
 
                         typename FieldType::value_type acc = alpha;
 
                         for (std::size_t i = 0; i <= f_folded.degree(); i++) {
-                            f_folded[i] = two_inversed * ((1 + acc) * f[i] + (1 - acc) * f[domain->size() / 2 + i]);
+                            f_folded[i] = two_inversed * ((1u + acc) * f[i] + (1u - acc) * f[domain->size() / 2 + i]);
                             acc *= omega_inversed;
                         }
 

@@ -42,8 +42,6 @@
 #include <nil/crypto3/algebra/fields/arithmetic_params/pallas.hpp>
 #include <nil/crypto3/algebra/type_traits.hpp>
 
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
-
 namespace nil {
     namespace crypto3 {
         namespace zk {
@@ -136,6 +134,7 @@ namespace nil {
                 struct fiat_shamir_heuristic_sequential
                 {
                     typedef Hash hash_type;
+                    typedef typename boost::multiprecision::cpp_int_modular_backend<hash_type::digest_bits> modular_backend_of_hash_size;
 
                     fiat_shamir_heuristic_sequential() : state(hash<hash_type>({0})) {
                     }
@@ -167,20 +166,36 @@ namespace nil {
                     // typename std::enable_if<(Hash::digest_bits >= Field::modulus_bits),
                     //                         typename Field::value_type>::type
                     typename Field::value_type challenge() {
+                        using digest_value_type = typename hash_type::digest_type::value_type;
+                        const std::size_t digest_value_bits = sizeof(digest_value_type) * CHAR_BIT;
+                        const std::size_t element_size = Field::number_bits / digest_value_bits +
+                            (Field::number_bits % digest_value_bits == 0 ? 0 : 1);
 
+                        std::array<digest_value_type, element_size> data;
                         state = hash<hash_type>(state);
+                        // TODO(martun): for now we copy 256 bits into a larger group element. For example for 
+                        // mnt6_base_field<298ul> the first 42 bits will be zero.
+                        // Use something like hash to field(h2f.hpp) for this.
+                        std::size_t count = std::min(data.size(), state.size());
+                        std::copy(state.begin(), state.begin() + count, data.begin() + data.size() - count);
+                        
                         nil::marshalling::status_type status;
-                        nil::crypto3::multiprecision::cpp_int raw_result = nil::marshalling::pack(state, status);
+                        boost::multiprecision::number<modular_backend_of_hash_size> raw_result = 
+                            nil::marshalling::pack(state, status);
+                        BOOST_ASSERT(status == nil::marshalling::status_type::success);
+
                         return raw_result;
                     }
 
                     template<typename Integral>
                     Integral int_challenge() {
-
                         state = hash<hash_type>(state);
                         nil::marshalling::status_type status;
-                        Integral raw_result = nil::marshalling::pack(state, status);
-                        return raw_result;
+                        boost::multiprecision::number<modular_backend_of_hash_size> raw_result = nil::marshalling::pack(state, status);
+                        // If we remove the next line, raw_result is a much larger number, conversion to 'Integral' will overflow
+                        // and in debug mode an assert will fire. In release mode nothing will change.
+                        raw_result &= ~Integral(0);
+                        return static_cast<Integral>(raw_result);
                     }
 
                     template<typename Field, std::size_t N>
@@ -266,15 +281,18 @@ namespace nil {
                     Integral int_challenge() {
                         auto c = challenge<field_type>();
 
-                        nil::crypto3::multiprecision::cpp_int intermediate_result =
-                            c.data.template convert_to<nil::crypto3::multiprecision::cpp_int>();
-                        Integral result = 0;
-                        Integral factor = 1;
+                        typename field_type::integral_type intermediate_result =
+                            static_cast<typename field_type::integral_type>(c.data);
+                        Integral result = 0u;
+                        Integral factor = 1u;
                         size_t bytes_to_fill = sizeof(Integral);
-                        while (intermediate_result > 0 && bytes_to_fill != 0) {
-                            result += factor * (Integral)(intermediate_result % 0x100);
-                            factor *= 0x100;
-                            intermediate_result = intermediate_result / 0x100;
+                        // TODO(martun): consider using export_bits here, or nil::marshalling::pack, instead of this.
+                        while (intermediate_result > 0u && bytes_to_fill != 0u) {
+                            auto last_byte = intermediate_result % 0x100u;
+                            Integral last_byte_integral = static_cast<Integral>(last_byte);
+                            result += factor * last_byte_integral;
+                            factor *= 0x100u;
+                            intermediate_result = intermediate_result / 0x100u;
                             bytes_to_fill -= 2;
                         }
                         return result;

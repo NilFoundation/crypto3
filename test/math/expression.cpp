@@ -85,15 +85,15 @@ BOOST_AUTO_TEST_CASE(expression_evaluation_test) {
     expression_evaluator<variable_type> evaluator(
         expr,
         [&w0, &w1, &w2, &w3](const variable_type& var) {
-            if (var == w0) return variable_type::assignment_type(1);
-            if (var == w1) return variable_type::assignment_type(2);
-            if (var == w2) return variable_type::assignment_type(3);
-            if (var == w3) return variable_type::assignment_type(4);
+            if (var == w0) return variable_type::assignment_type(1u);
+            if (var == w1) return variable_type::assignment_type(2u);
+            if (var == w2) return variable_type::assignment_type(3u);
+            if (var == w3) return variable_type::assignment_type(4u);
             return variable_type::assignment_type::zero();
         }
     );
  
-    BOOST_CHECK(evaluator.evaluate() == variable_type::assignment_type((1 + 2) * (3 + 4)));
+    BOOST_CHECK(evaluator.evaluate() == variable_type::assignment_type((1u + 2u) * (3u + 4u)));
 }
 
 BOOST_AUTO_TEST_CASE(expression_max_degree_visitor_test) {

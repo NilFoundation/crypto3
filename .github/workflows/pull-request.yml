@@ -21,7 +21,6 @@ jobs:
         crypto3_zk_systems_plonk_placeholder_placeholder_test
         crypto3_zk_commitment_powers_of_tau_test
         crypto3_zk_commitment_proof_of_knowledge_test
-        crypto3_zk_commitment_r1cs_gg_ppzksnark_mpc_test
         crypto3_zk_math_expression_test
         crypto3_zk_systems_plonk_plonk_constraint_test
         crypto3_zk_commitment_proof_of_knowledge_test

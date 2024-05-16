@@ -230,7 +230,7 @@ namespace nil {
                         typename FieldType::value_type theta_acc = FieldType::value_type::one();
 
                         for (const auto& gate: gates) {
-                            typename FieldType::value_type gate_result = {0};
+                            typename FieldType::value_type gate_result = FieldType::value_type::zero();
 
                             for (const auto& constraint : gate.constraints) {
                                 gate_result += constraint.evaluate(evaluations) * theta_acc;

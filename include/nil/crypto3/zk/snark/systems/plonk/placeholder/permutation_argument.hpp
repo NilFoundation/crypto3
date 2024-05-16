@@ -68,14 +68,11 @@ namespace nil {
                     };
 
                     static inline prover_result_type prove_eval(
-                        const plonk_constraint_system<FieldType>
-                            &constraint_system,
+                        const plonk_constraint_system<FieldType> &constraint_system,
                         const typename placeholder_public_preprocessor<FieldType, ParamsType>::preprocessed_data_type
                             preprocessed_data,
-                        const plonk_table_description<FieldType>
-                            &table_description,
-                        const plonk_polynomial_dfs_table<FieldType>
-                            &column_polynomials,
+                        const plonk_table_description<FieldType> &table_description,
+                        const plonk_polynomial_dfs_table<FieldType> &column_polynomials,
                         typename ParamsType::commitment_scheme_type& commitment_scheme,
                         transcript_type& transcript
                     ) {

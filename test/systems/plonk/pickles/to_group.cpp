@@ -22,10 +22,10 @@ BOOST_AUTO_TEST_CASE(pickles_kimchi_to_field_test_case_1){
 
     zk::snark::group_map<curve_type> map;
 
-    field_type::value_type value = field_type::value_type(0x2060BAF54AE1E0CE2BA2AA4B7629A41FE5768E1BAB024882BAC729FF5747F100_cppui256);
+    field_type::value_type value = field_type::value_type(0x2060BAF54AE1E0CE2BA2AA4B7629A41FE5768E1BAB024882BAC729FF5747F100_cppui_modular256);
     auto result = map.to_group(value);
-    BOOST_CHECK(result.X == field_type::value_type(0x344483C5EC8A0B6619CD78B13B20A32E68064ACC43DA911EF5FDD8DF8EB15CA9_cppui256));
-    BOOST_CHECK(result.Y == field_type::value_type(0x184C418DCCDD4751FF8F2FA1ADC1E617F8BAC4FDA7C177B42F3863A957B7EAA8_cppui256));
+    BOOST_CHECK(result.X == field_type::value_type(0x344483C5EC8A0B6619CD78B13B20A32E68064ACC43DA911EF5FDD8DF8EB15CA9_cppui_modular256));
+    BOOST_CHECK(result.Y == field_type::value_type(0x184C418DCCDD4751FF8F2FA1ADC1E617F8BAC4FDA7C177B42F3863A957B7EAA8_cppui_modular256));
 
 }
 

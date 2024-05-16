@@ -231,7 +231,7 @@ namespace nil {
                 template<typename FieldType>
                 circuit_description<FieldType, placeholder_circuit_params<FieldType>, usable_rows_t>
                 circuit_test_t(
-                    typename FieldType::value_type pi0 = 0,
+                    typename FieldType::value_type pi0 = 0u,
                     typename nil::crypto3::random::algebraic_engine<FieldType> alg_rnd = nil::crypto3::random::algebraic_engine<FieldType>(),
                     boost::random::mt11213b rnd = boost::random::mt11213b()
                 ) {
@@ -386,13 +386,13 @@ namespace nil {
                     }
 
                     // lookup inputs
-                    table[0] = {1, 0, 0, 0}; // Witness 1
-                    table[1] = {0, 0, 0, 0};
-                    table[2] = {0, 0, 0, 0};
+                    table[0] = {1u, 0u, 0u, 0u}; // Witness 1
+                    table[1] = {0u, 0u, 0u, 0u};
+                    table[2] = {0u, 0u, 0u, 0u};
 
-                    table[3] = {0, 1,  0, 1};  //Lookup values
-                    table[4] = {0, 0,  1, 0}; //Lookup values
-                    table[5] = {0, 1,  0, 0}; //Lookup values
+                    table[3] = {0u, 1u,  0u, 1u};  //Lookup values
+                    table[4] = {0u, 0u,  1u, 0u}; //Lookup values
+                    table[5] = {0u, 1u,  0u, 0u}; //Lookup values
 
                     std::vector<plonk_column<FieldType>> private_assignment(witness_columns);
                     for (std::size_t i = 0; i < witness_columns; i++) {
@@ -404,11 +404,11 @@ namespace nil {
                     std::vector<plonk_column<FieldType>> constant_assignment(constant_columns);
 
                     std::vector<typename FieldType::value_type> sel_lookup(test_circuit.table_rows);
-                    sel_lookup = {1, 0, 0, 0};
+                    sel_lookup = {1u, 0u, 0u, 0u};
                     selectors_assignment[0] = sel_lookup;
 
                     std::vector<typename FieldType::value_type> sel_lookup_table(test_circuit.table_rows);
-                    sel_lookup_table = {0, 1, 1, 1};
+                    sel_lookup_table = {0u, 1u, 1u, 1u};
                     selectors_assignment[1] = sel_lookup_table;
 
                     for (std::size_t i = 0; i < constant_columns; i++) {
@@ -493,16 +493,16 @@ namespace nil {
                     }
 
                     // lookup inputs
-                    table[0] = {rnd() % 2, rnd() % 2, rnd(), rnd() % 2, rnd() % 2, 0, 0, 0};
-                    table[1] = {rnd() % 2, rnd() % 2, rnd(), rnd() % 2, rnd() % 2, 0, 0, 0};;
-                    table[2] = {table[0][0] * table[1][0], table[0][1] * table[1][1], table[0][2] * table[1][2], table[0][3] * table[1][3], table[0][4] * table[1][4], 0, 0, 0};
+                    table[0] = {rnd() % 2, rnd() % 2, rnd(), rnd() % 2, rnd() % 2, 0u, 0u, 0u};
+                    table[1] = {rnd() % 2, rnd() % 2, rnd(), rnd() % 2, rnd() % 2, 0u, 0u, 0u};;
+                    table[2] = {table[0][0] * table[1][0], table[0][1] * table[1][1], table[0][2] * table[1][2], table[0][3] * table[1][3], table[0][4] * table[1][4], 0u, 0u, 0u};
 
 
                     //lookup values
                     // Reserved zero row for unselected lookup input rows
-                    table[3] = {0, 0, 0, 1, 1, 0, 0, 0};
-                    table[4] = {0, 0, 1, 0, 1, 0, 0, 0};
-                    table[5] = {0, 0, 0, 0, 1, 0, 0, 0};
+                    table[3] = {0u, 0u, 0u, 1u, 1u, 0u, 0u, 0u};
+                    table[4] = {0u, 0u, 1u, 0u, 1u, 0u, 0u, 0u};
+                    table[5] = {0u, 0u, 0u, 0u, 1u, 0u, 0u, 0u};
 
                     std::vector<plonk_column<FieldType>> private_assignment(witness_columns);
                     for (std::size_t i = 0; i < witness_columns; i++) {
@@ -513,9 +513,9 @@ namespace nil {
                     std::vector<plonk_column<FieldType>> public_input_assignment(public_columns);
                     std::vector<plonk_column<FieldType>> constant_assignment(constant_columns);
 
-                    selectors_assignment[0] = {1, 1, 0, 1, 1, 0, 0, 0};
-                    selectors_assignment[1] = {1, 1, 1, 1, 1, 0, 0, 0};
-                    selectors_assignment[2] = {0, 1, 1, 1, 1, 0, 0, 0};
+                    selectors_assignment[0] = {1u, 1u, 0u, 1u, 1u, 0u, 0u, 0u};
+                    selectors_assignment[1] = {1u, 1u, 1u, 1u, 1u, 0u, 0u, 0u};
+                    selectors_assignment[2] = {0u, 1u, 1u, 1u, 1u, 0u, 0u, 0u};
 
                     for (std::size_t i = 0; i < constant_columns; i++) {
                         constant_assignment[i] = table[witness_columns + i];
@@ -608,13 +608,16 @@ namespace nil {
                     selectors_assignment[0].resize(test_circuit.usable_rows);
                     for(std::size_t i = 0; i < witness_columns; i++) {
                         private_assignment[i].resize(test_circuit.usable_rows);
-                        private_assignment[i][0] = private_assignment[i][2] = public_input_assignment[0][i] = typename FieldType::value_type(rnd() % witness_columns);
-                        private_assignment[i][1] = 1;
-                        plonk_variable<typename FieldType::value_type> pi(0, i, false, plonk_variable<typename FieldType::value_type>::column_type::public_input);
-                        plonk_variable<typename FieldType::value_type> wi(i, 0, false, plonk_variable<typename FieldType::value_type>::column_type::witness);
+                        private_assignment[i][0] = private_assignment[i][2] = public_input_assignment[0][i] = 
+                            typename FieldType::value_type(rnd() % witness_columns);
+                        private_assignment[i][1] = 1u;
+                        plonk_variable<typename FieldType::value_type> pi(
+                            0, i, false, plonk_variable<typename FieldType::value_type>::column_type::public_input);
+                        plonk_variable<typename FieldType::value_type> wi(
+                            i, 0, false, plonk_variable<typename FieldType::value_type>::column_type::witness);
                         test_circuit.copy_constraints.push_back(plonk_copy_constraint<FieldType>({pi, wi}));
                     }
-                    selectors_assignment[0][1] = 1;
+                    selectors_assignment[0][1] = 1u;
 
                     test_circuit.table = plonk_assignment_table<FieldType>(
                         plonk_private_assignment_table<FieldType>(private_assignment),
@@ -795,19 +798,18 @@ namespace nil {
 
                     // lookup inputs
                     table[0] = {rnd() % 5 + 2, rnd() % 5 + 2, rnd() % 5 + 2, rnd() % 5 + 2, rnd() % 5 + 2, rnd() % 5 + 2};
-                    table[1] = {7, table[0][0] + table[0][1],  table[0][1] + table[0][2],  table[0][2] + table[0][3],  table[0][3] + table[0][4],  table[0][4] + table[0][5]};
-
+                    table[1] = {7u, table[0][0] + table[0][1],  table[0][1] + table[0][2],  table[0][2] + table[0][3],  table[0][3] + table[0][4],  table[0][4] + table[0][5]};
 
                     // selectors
                     // Reserved zero row for unselected lookup input rows
-                    table[2] = {0, 1, 1, 1, 1, 1}; // LT1
-                    table[3] = {1, 1, 1, 1, 1, 1}; // For the first lookup gate
-                    table[4] = {0, 1, 1, 1, 1, 1}; // For the second lookup gate
+                    table[2] = {0u, 1u, 1u, 1u, 1u, 1u}; // LT1
+                    table[3] = {1u, 1u, 1u, 1u, 1u, 1u}; // For the first lookup gate
+                    table[4] = {0u, 1u, 1u, 1u, 1u, 1u}; // For the second lookup gate
 
                     // Lookup values
-                    table[5] = {0,  2,  3,  4,  5,  6}; // L1
-                    table[6] = {0,  7,  8,  9, 10, 11}; // L2
-                    table[7] = {0, 12, 12, 12, 12, 12}; // L3
+                    table[5] = {0u,  2u,  3u,  4u,  5u,  6u}; // L1
+                    table[6] = {0u,  7u,  8u,  9u, 10u, 11u}; // L2
+                    table[7] = {0u, 12u, 12u, 12u, 12u, 12u}; // L3
 
                     std::vector<plonk_column<FieldType>> private_assignment(witness_columns);
                     for (std::size_t i = 0; i < witness_columns; i++) {
@@ -941,7 +943,7 @@ namespace nil {
                     for( std::size_t i = 0; i < 7; i++){
                         if( j == r ) j++;
                         table[0][i] = j;
-                        table[1][i] = (typename FieldType::value_type(2)).pow(j);
+                        table[1][i] = (typename FieldType::value_type(2u)).pow(j);
                         j++;
                     }
                     for( std::size_t i = 7; i < 14; i++){
@@ -952,22 +954,22 @@ namespace nil {
                     // selectors
                     // Reserved zero row for unselected lookup input rows
                     std::vector<plonk_column<FieldType>> selectors_assignment(selector_columns);
-                    selectors_assignment[0] = {0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1 }; // Selector for single gate
-                    selectors_assignment[1] = {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 }; // Selector lookup gate with multiple rotations
-                    selectors_assignment[2] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }; // Selector for gate w1 = 2^w0
-                    selectors_assignment[3] = {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }; // Selector for gate w1_{-1} * w1 \in Table 3
-                    selectors_assignment[4] = {0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1 }; // Selector for lookup tables 2, 3
-                    selectors_assignment[5] = {0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0 }; // Selector for lookup table with 7 columns
+                    selectors_assignment[0] = {0u, 0u, 0u, 0u, 0u, 0u, 0u, 1u, 1u, 1u, 1u, 1u, 1u, 1u }; // Selector for single gate
+                    selectors_assignment[1] = {0u, 0u, 0u, 1u, 0u, 0u, 0u, 0u, 0u, 0u, 1u, 0u, 0u, 0u }; // Selector lookup gate with multiple rotations
+                    selectors_assignment[2] = {1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u }; // Selector for gate w1 = 2^w0
+                    selectors_assignment[3] = {0u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u }; // Selector for gate w1_{-1} * w1 \in Table 3
+                    selectors_assignment[4] = {0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 1u, 1u, 1u, 1u, 1u, 1u }; // Selector for lookup tables 2, 3
+                    selectors_assignment[5] = {0u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 0u, 0u, 0u, 0u, 0u, 0u }; // Selector for lookup table with 7 columns
 
                     // Lookup values
                     std::vector<plonk_column<FieldType>> constant_assignment(constant_columns);
-                    constant_assignment[0] = {0, 1, 0, 0, 0, 0, 0, 0,   0,   1,    2,    3,    4,    5 }; // Lookup tables
-                    constant_assignment[1] = {0, 2, 2, 1, 1, 1, 1, 1,   1,   2,    4,    8,   16,   32 }; // Lookup tables
-                    constant_assignment[2] = {0, 3, 3, 3, 2, 2, 2, 2,   6,   7,    7,    7,    7,    7 }; // Lookup tables
-                    constant_assignment[3] = {0, 4, 4, 4, 4, 3, 3, 3,  64, 128,  128,  128,  128,  128 }; // Lookup tables
-                    constant_assignment[4] = {0, 5, 5, 5, 5, 5, 4, 4,   1,   2,    4,    8,   16,   32 }; // Lookup tables
-                    constant_assignment[5] = {0, 6, 6, 6, 6, 6, 6, 5,  64, 128,  256,  512, 1024, 2048 }; // Lookup tables
-                    constant_assignment[6] = {0, 7, 7, 7, 7, 7, 7, 7,4096,8192,16384,16384,16384,16384 }; // Lookup tables
+                    constant_assignment[0] = {0u, 1u, 0u, 0u, 0u, 0u, 0u, 0u,   0u,   1u,    2u,    3u,    4u,    5u }; // Lookup tables
+                    constant_assignment[1] = {0u, 2u, 2u, 1u, 1u, 1u, 1u, 1u,   1u,   2u,    4u,    8u,   16u,   32u }; // Lookup tables
+                    constant_assignment[2] = {0u, 3u, 3u, 3u, 2u, 2u, 2u, 2u,   6u,   7u,    7u,    7u,    7u,    7u }; // Lookup tables
+                    constant_assignment[3] = {0u, 4u, 4u, 4u, 4u, 3u, 3u, 3u,  64u, 128u,  128u,  128u,  128u,  128u }; // Lookup tables
+                    constant_assignment[4] = {0u, 5u, 5u, 5u, 5u, 5u, 4u, 4u,   1u,   2u,    4u,    8u,   16u,   32u }; // Lookup tables
+                    constant_assignment[5] = {0u, 6u, 6u, 6u, 6u, 6u, 6u, 5u,  64u, 128u,  256u,  512u, 1024u, 2048u }; // Lookup tables
+                    constant_assignment[6] = {0u, 7u, 7u, 7u, 7u, 7u, 7u, 7u,4096u,8192u,16384u,16384u,16384u,16384u }; // Lookup tables
 
                     std::vector<plonk_column<FieldType>> private_assignment(witness_columns);
                     for (std::size_t i = 0; i < witness_columns; i++) {

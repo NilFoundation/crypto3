@@ -52,10 +52,10 @@ BOOST_AUTO_TEST_CASE(pickles_kimchi_to_field_vesta_test) {
     using curve_type = algebra::curves::vesta;
     using field_type = curve_type::scalar_field_type;
 
-    typename field_type::value_type endo_r = 0x12CCCA834ACDBA712CAAD5DC57AAB1B01D1F8BD237AD31491DAD5EBDFDFE4AB9_cppui256;
-    std::vector<field_type::value_type> inputs = {0, 0x00000000000000000000000000000000347936BC4A445B92516BE8A8EAB7D2B9_cppui256};
-    std::vector<field_type::value_type> expected_results = {0x1955ABB8AF556360261C069D1C8AEB8444BD73BE7B3163ADBE2E2610A9922C78_cppui256,
-        0x01FD131CD87BB2DDCF0D446F7E0EEBCDCE145EE5CA5C7851FC5D22AC186BDDBB_cppui256};
+    typename field_type::value_type endo_r = 0x12CCCA834ACDBA712CAAD5DC57AAB1B01D1F8BD237AD31491DAD5EBDFDFE4AB9_cppui_modular256;
+    std::vector<field_type::value_type> inputs = {0, 0x00000000000000000000000000000000347936BC4A445B92516BE8A8EAB7D2B9_cppui_modular256};
+    std::vector<field_type::value_type> expected_results = {0x1955ABB8AF556360261C069D1C8AEB8444BD73BE7B3163ADBE2E2610A9922C78_cppui_modular256,
+        0x01FD131CD87BB2DDCF0D446F7E0EEBCDCE145EE5CA5C7851FC5D22AC186BDDBB_cppui_modular256};
     for (std::size_t i = 0; i < inputs.size(); i++) {
         typename field_type::value_type res = to_field<field_type>(endo_r, inputs[i]);
         BOOST_CHECK(res == expected_results[i]);

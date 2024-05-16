@@ -123,13 +123,13 @@ BOOST_AUTO_TEST_CASE(fri_basic_test) {
     BOOST_CHECK(D[1]->get_domain_element(1) == D[0]->get_domain_element(1).squared());
 
     // commit
-    math::polynomial<typename FieldType::value_type> f = {1, 3, 4, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1};
+    math::polynomial<typename FieldType::value_type> f = {{1u, 3u, 4u, 1u, 5u, 6u, 7u, 2u, 8u, 7u, 5u, 6u, 1u, 2u, 1u, 1u}};
 
     typename fri_type::merkle_tree_type tree = zk::algorithms::precommit<fri_type>(f, params.D[0], params.step_list[0]);
     auto root = zk::algorithms::commit<fri_type>(tree);
 
     // eval
-    std::vector<std::uint8_t> init_blob {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    std::vector<std::uint8_t> init_blob {0u, 1u, 2u, 3u, 4u, 5u, 6u, 7u, 8u, 9u};
     zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(init_blob);
 
     proof_type proof = zk::algorithms::proof_eval<fri_type>(f, tree, params, transcript);

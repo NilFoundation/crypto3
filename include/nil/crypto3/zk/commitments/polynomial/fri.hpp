@@ -137,10 +137,11 @@ namespace nil {
                     typename FRI::basic_fri::transcript_type &transcript = typename FRI::basic_fri::transcript_type()
                 ) {
                     std::map<std::size_t, typename FRI::basic_fri::commitment_type> t_roots; t_roots[0] = {t_root};
-                    std::vector<std::vector<std::tuple<std::size_t, std::size_t>>> evals_map(1); evals_map[0] = {{0,0}};
+                    std::vector<std::vector<std::tuple<std::size_t, std::size_t>>> evals_map(1);
+                    evals_map[0] = {{0u,0u}};
 
-                    std::vector<typename FRI::field_type::value_type> combined_U = {0};
-                    std::vector<math::polynomial<typename FRI::field_type::value_type>> combined_V = {{1}};
+                    std::vector<typename FRI::field_type::value_type> combined_U = {{FRI::field_type::value_type::zero()}};
+                    std::vector<math::polynomial<typename FRI::field_type::value_type>> combined_V = {{FRI::field_type::value_type::one()}};
 
                     return verify_eval<typename FRI::basic_fri>(
                             proof, fri_params, t_roots,

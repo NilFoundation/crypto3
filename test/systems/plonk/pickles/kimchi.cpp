@@ -64,7 +64,7 @@ using vesta_verifier_index_type = zk::snark::verifier_index<
 >;
 
 template<typename Iterator>
-nil::crypto3::multiprecision::cpp_int get_cppui256(Iterator it) {
+nil::crypto3::multiprecision::cpp_int get_cppui_modular256(Iterator it) {
     BOOST_ASSERT(it->second.template get_value<std::string>() != "");
     return nil::crypto3::multiprecision::cpp_int(it->second.template get_value<std::string>());
 }
@@ -80,14 +80,14 @@ zk::snark::proof_type<curve_type> make_proof(boost::property_tree::ptree root) {
     i = 0;
     for (auto &row : best_chain.second.get_child(base_path + "messages.w_comm")) {
         auto it = row.second.get_child("").begin()->second.get_child("").begin();
-        proof.commitments.w_comm[i].unshifted.emplace_back(get_cppui256(it++), get_cppui256(it));
+        proof.commitments.w_comm[i].unshifted.emplace_back(get_cppui_modular256(it++), get_cppui_modular256(it));
         ++i;
     }
     auto it = best_chain.second.get_child(base_path + "messages.z_comm").begin()->second.get_child("").begin();
-    proof.commitments.z_comm.unshifted.emplace_back(get_cppui256(it++), get_cppui256(it));
+    proof.commitments.z_comm.unshifted.emplace_back(get_cppui_modular256(it++), get_cppui_modular256(it));
 
     it = best_chain.second.get_child(base_path + "messages.t_comm").begin()->second.get_child("").begin();
-    proof.commitments.t_comm.unshifted.emplace_back(get_cppui256(it++), get_cppui256(it));
+    proof.commitments.t_comm.unshifted.emplace_back(get_cppui_modular256(it++), get_cppui_modular256(it));
     //    proof.commitments.lookup;    // TODO: where it is?
 
     i = 0;
@@ -96,13 +96,13 @@ zk::snark::proof_type<curve_type> make_proof(boost::property_tree::ptree root) {
         auto it1 = row.second.begin();
         it1++;
         it1 = it1->second.begin();
-        proof.proof.lr.push_back({{get_cppui256(it0++), get_cppui256(it0)}, {get_cppui256(it1++), get_cppui256(it1)}});
+        proof.proof.lr.push_back({{get_cppui_modular256(it0++), get_cppui_modular256(it0)}, {get_cppui_modular256(it1++), get_cppui_modular256(it1)}});
         ++i;
     }
     it = best_chain.second.get_child(base_path + "openings.proof.delta").begin();
-    proof.proof.delta = {get_cppui256(it++), get_cppui256(it)};
+    proof.proof.delta = {get_cppui_modular256(it++), get_cppui_modular256(it)};
     it = best_chain.second.get_child(base_path + "openings.proof.sg").begin();
-    proof.proof.sg = {get_cppui256(it++), get_cppui256(it)};
+    proof.proof.sg = {get_cppui_modular256(it++), get_cppui_modular256(it)};
 
     proof.proof.z1 = multiprecision::cpp_int(best_chain.second.get<std::string>(base_path + "openings.proof.z_1"));
     proof.proof.z2 = multiprecision::cpp_int(best_chain.second.get<std::string>(base_path + "openings.proof.z_2"));
@@ -113,32 +113,32 @@ zk::snark::proof_type<curve_type> make_proof(boost::property_tree::ptree root) {
         i = 0;
         for (auto &row : evals_it.second.get_child("w")) {
             for (auto &cell : row.second) {
-                proof.evals[ev_i].w[i].push_back(get_cppui256(&cell));
+                proof.evals[ev_i].w[i].push_back(get_cppui_modular256(&cell));
             }
             i++;
         }
 
-        //proof.evals[ev_i].z.size();= get_cppui256(evals_it.second.get_child("z").begin());
+        //proof.evals[ev_i].z.size();= get_cppui_modular256(evals_it.second.get_child("z").begin());
         for( auto z_it : evals_it.second.get_child("z") ){
-            proof.evals[ev_i].z.push_back(get_cppui256(&z_it));
+            proof.evals[ev_i].z.push_back(get_cppui_modular256(&z_it));
         }
        
         i = 0;
         for (auto &row : evals_it.second.get_child("s")) {
             for (auto &cell : row.second) {
-                proof.evals[ev_i].s[i].push_back(get_cppui256(&cell));
+                proof.evals[ev_i].s[i].push_back(get_cppui_modular256(&cell));
             }
             i++;
         }
 
-//        proof.evals[ev_i].generic_selector = get_cppui256(evals_it.second.get_child("generic_selector").begin());
+//        proof.evals[ev_i].generic_selector = get_cppui_modular256(evals_it.second.get_child("generic_selector").begin());
         for( auto s_it : evals_it.second.get_child("generic_selector") ){
-            proof.evals[ev_i].generic_selector.push_back(get_cppui256(&s_it));
+            proof.evals[ev_i].generic_selector.push_back(get_cppui_modular256(&s_it));
         }
 
-//        proof.evals[ev_i].poseidon_selector = get_cppui256(evals_it.second.get_child("poseidon_selector").begin());
+//        proof.evals[ev_i].poseidon_selector = get_cppui_modular256(evals_it.second.get_child("poseidon_selector").begin());
         for( auto p_it : evals_it.second.get_child("poseidon_selector") ){
-            proof.evals[ev_i].poseidon_selector.push_back(get_cppui256(&p_it));
+            proof.evals[ev_i].poseidon_selector.push_back(get_cppui_modular256(&p_it));
         }
         ev_i++;
     }
@@ -177,35 +177,35 @@ vesta_verifier_index_type make_verify_index(boost::property_tree::ptree root, bo
     i = 0;
     for (auto &row : root.get_child("data.blockchainVerificationKey.commitments.sigma_comm")) {
         auto it = row.second.begin();
-        ver_index.sigma_comm[i].unshifted.emplace_back(get_cppui256(it++), get_cppui256(it));
+        ver_index.sigma_comm[i].unshifted.emplace_back(get_cppui_modular256(it++), get_cppui_modular256(it));
         ++i;
     }
 
     i = 0;
     for (auto &row : root.get_child("data.blockchainVerificationKey.commitments.coefficients_comm")) {
         auto it = row.second.begin();
-        ver_index.coefficients_comm[i].unshifted.emplace_back(get_cppui256(it++), get_cppui256(it));
+        ver_index.coefficients_comm[i].unshifted.emplace_back(get_cppui_modular256(it++), get_cppui_modular256(it));
         ++i;
     }
     auto it = root.get_child("data.blockchainVerificationKey.commitments.generic_comm").begin();
-    ver_index.generic_comm.unshifted.emplace_back(get_cppui256(it++), get_cppui256(it));
+    ver_index.generic_comm.unshifted.emplace_back(get_cppui_modular256(it++), get_cppui_modular256(it));
 
     it = root.get_child("data.blockchainVerificationKey.commitments.psm_comm").begin();
-    ver_index.psm_comm.unshifted.emplace_back(get_cppui256(it++), get_cppui256(it));
+    ver_index.psm_comm.unshifted.emplace_back(get_cppui_modular256(it++), get_cppui_modular256(it));
     it = root.get_child("data.blockchainVerificationKey.commitments.complete_add_comm").begin();
-    ver_index.complete_add_comm.unshifted.emplace_back(get_cppui256(it++), get_cppui256(it));
+    ver_index.complete_add_comm.unshifted.emplace_back(get_cppui_modular256(it++), get_cppui_modular256(it));
     it = root.get_child("data.blockchainVerificationKey.commitments.mul_comm").begin();
-    ver_index.mul_comm.unshifted.emplace_back(get_cppui256(it++), get_cppui256(it));
+    ver_index.mul_comm.unshifted.emplace_back(get_cppui_modular256(it++), get_cppui_modular256(it));
     it = root.get_child("data.blockchainVerificationKey.commitments.emul_comm").begin();
-    ver_index.emul_comm.unshifted.emplace_back(get_cppui256(it++), get_cppui256(it));
+    ver_index.emul_comm.unshifted.emplace_back(get_cppui_modular256(it++), get_cppui_modular256(it));
     it = root.get_child("data.blockchainVerificationKey.commitments.endomul_scalar_comm").begin();
-    ver_index.endomul_scalar_comm.unshifted.emplace_back(get_cppui256(it++), get_cppui256(it));
+    ver_index.endomul_scalar_comm.unshifted.emplace_back(get_cppui_modular256(it++), get_cppui_modular256(it));
 
     // TODO: null in example
     //    i = 0;
     //    for (auto &row : root.get_child("data.blockchainVerificationKey.commitments.chacha_comm")) {
     //        auto it = row.second.begin();
-    //        ver_index.chacha_comm[i].unshifted.emplace_back(get_cppui256(it++), get_cppui256(it));
+    //        ver_index.chacha_comm[i].unshifted.emplace_back(get_cppui_modular256(it++), get_cppui_modular256(it));
     //        ++i;
     //    }
     //i = 0; 
@@ -217,10 +217,10 @@ vesta_verifier_index_type make_verify_index(boost::property_tree::ptree root, bo
 
     // Polynomial in coefficients form
     // Const
-    ver_index.zkpm = {0x2C46205451F6C3BBEA4BABACBEE609ECF1039A903C42BFF639EDC5BA33356332_cppui256,
-                      0x1764D9CB4C64EBA9A150920807637D458919CB6948821F4D15EB1994EADF9CE3_cppui256,
-                      0x0140117C8BBC4CE4644A58F7007148577782213065BB9699BF5C391FBE1B3E6D_cppui256,
-                      0x0000000000000000000000000000000000000000000000000000000000000001_cppui256};
+    ver_index.zkpm = {0x2C46205451F6C3BBEA4BABACBEE609ECF1039A903C42BFF639EDC5BA33356332_cppui_modular256,
+                      0x1764D9CB4C64EBA9A150920807637D458919CB6948821F4D15EB1994EADF9CE3_cppui_modular256,
+                      0x0140117C8BBC4CE4644A58F7007148577782213065BB9699BF5C391FBE1B3E6D_cppui_modular256,
+                      0x0000000000000000000000000000000000000000000000000000000000000001_cppui_modular256};
     ver_index.w = multiprecision::cpp_int(const_root.get<std::string>("verify_index.w"));
     ver_index.endo = multiprecision::cpp_int(const_root.get<std::string>("verify_index.endo"));
 
@@ -233,7 +233,7 @@ vesta_verifier_index_type make_verify_index(boost::property_tree::ptree root, bo
     for (auto &row : const_root.get_child("verify_index.fr_sponge_params.round_constants")) {
         size_t j = 0;
         for (auto cell : row.second){
-            ver_index.fr_sponge_params.round_constants[i].push_back(get_cppui256(&cell));
+            ver_index.fr_sponge_params.round_constants[i].push_back(get_cppui_modular256(&cell));
             j++;
         }
         i++;
@@ -243,7 +243,7 @@ vesta_verifier_index_type make_verify_index(boost::property_tree::ptree root, bo
     for (auto &row : const_root.get_child("verify_index.fr_sponge_params.mds")) {
         size_t j = 0;
         for (auto cell : row.second){
-            ver_index.fr_sponge_params.mds[i][j] = get_cppui256(&cell);
+            ver_index.fr_sponge_params.mds[i][j] = get_cppui_modular256(&cell);
             j++;
         }
         i++;
@@ -254,7 +254,7 @@ vesta_verifier_index_type make_verify_index(boost::property_tree::ptree root, bo
     for (auto &row : const_root.get_child("verify_index.fq_sponge_params.round_constants")) {
         size_t j = 0;
         for (auto cell : row.second){
-            ver_index.fq_sponge_params.round_constants[i].push_back(get_cppui256(&cell));
+            ver_index.fq_sponge_params.round_constants[i].push_back(get_cppui_modular256(&cell));
             j++;
         }
         i++;
@@ -264,7 +264,7 @@ vesta_verifier_index_type make_verify_index(boost::property_tree::ptree root, bo
     for (auto &row : const_root.get_child("verify_index.fq_sponge_params.mds")) {
         size_t j = 0;
         for (auto cell : row.second){
-            ver_index.fr_sponge_params.mds[i][j] = get_cppui256(&cell);
+            ver_index.fr_sponge_params.mds[i][j] = get_cppui_modular256(&cell);
             j++;
         }
         i++;

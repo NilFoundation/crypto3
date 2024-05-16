@@ -76,9 +76,9 @@ namespace nil {
                     math::polynomial<typename field_type::value_type> get_V(
                         const std::vector<typename field_type::value_type> &points) const {
 
-                        math::polynomial<typename field_type::value_type> V = {1};
+                        math::polynomial<typename field_type::value_type> V = {{field_type::value_type::one()}};
                         for( std::size_t xi_index = 0; xi_index < points.size(); xi_index++ ){
-                            V *= math::polynomial<typename field_type::value_type>({-points[xi_index], 1});
+                            V *= math::polynomial<typename field_type::value_type>({-points[xi_index], field_type::value_type::one()});
                         }
                         return V;
                     }

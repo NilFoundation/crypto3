@@ -28,7 +28,7 @@
 
 #include <nil/crypto3/algebra/type_traits.hpp>
 
-#include <nil/crypto3/multiprecision/number.hpp>
+#include <boost/multiprecision/number.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -173,8 +173,8 @@ namespace nil {
                     template<typename Type1,
                             typename Type2,
                             typename Backend,
-                            multiprecision::expression_template_option ExpressionTemplates>
-                    element_kc<Type1, Type2> operator*(const multiprecision::number <Backend, ExpressionTemplates> &lhs,
+                            boost::multiprecision::expression_template_option ExpressionTemplates>
+                    element_kc<Type1, Type2> operator*(const boost::multiprecision::number <Backend, ExpressionTemplates> &lhs,
                                                        const element_kc<Type1, Type2> &rhs) {
                         return element_kc<Type1, Type2>(lhs * rhs.g, lhs * rhs.h);
                     }
@@ -182,10 +182,10 @@ namespace nil {
                     template<typename Type1,
                             typename Type2,
                             typename Backend,
-                            multiprecision::expression_template_option ExpressionTemplates>
+                            boost::multiprecision::expression_template_option ExpressionTemplates>
                     element_kc<Type1, Type2>
                     operator*(const element_kc<Type1, Type2> &lhs,
-                              const multiprecision::number <Backend, ExpressionTemplates> &rhs) {
+                              const boost::multiprecision::number <Backend, ExpressionTemplates> &rhs) {
                         return element_kc<Type1, Type2>(rhs * lhs.g, rhs * lhs.h);
                     }
 

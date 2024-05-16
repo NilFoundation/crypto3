@@ -215,11 +215,11 @@ BOOST_FIXTURE_TEST_CASE(lpc_basic_test, test_fixture) {
     lpc_scheme_type lpc_scheme_verifier(fri_params);
 
     // Generate polynomials
-    lpc_scheme_prover.append_to_batch(0, {1, 13, 4, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1});
-    lpc_scheme_prover.append_to_batch(1, {0, 1});
-    lpc_scheme_prover.append_to_batch(1, {0, 1, 2});
-    lpc_scheme_prover.append_to_batch(1, {0, 1, 3});
-    lpc_scheme_prover.append_to_batch(2, {0});
+    lpc_scheme_prover.append_to_batch(0, {1u, 13u, 4u, 1u, 5u, 6u, 7u, 2u, 8u, 7u, 5u, 6u, 1u, 2u, 1u, 1u});
+    lpc_scheme_prover.append_to_batch(1, {0u, 1u});
+    lpc_scheme_prover.append_to_batch(1, {0u, 1u, 2u});
+    lpc_scheme_prover.append_to_batch(1, {0u, 1u, 3u});
+    lpc_scheme_prover.append_to_batch(2, {0u});
     lpc_scheme_prover.append_to_batch(3, generate_random_polynomial(4, test_global_alg_rnd_engine<FieldType>));
     lpc_scheme_prover.append_to_batch(3, generate_random_polynomial(9, test_global_alg_rnd_engine<FieldType>));
 
@@ -505,11 +505,11 @@ BOOST_FIXTURE_TEST_CASE(lpc_batches_num_3_test, test_fixture){
     lpc_scheme_type lpc_scheme_verifier(fri_params);
 
     // Generate polynomials
-    lpc_scheme_prover.append_to_batch(0, {1, 13, 4, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1});
-    lpc_scheme_prover.append_to_batch(2, {0, 1});
-    lpc_scheme_prover.append_to_batch(2, {0, 1, 2});
-    lpc_scheme_prover.append_to_batch(2, {0, 1, 3});
-    lpc_scheme_prover.append_to_batch(3, {0});
+    lpc_scheme_prover.append_to_batch(0, {1u, 13u, 4u, 1u, 5u, 6u, 7u, 2u, 8u, 7u, 5u, 6u, 1u, 2u, 1u, 1u});
+    lpc_scheme_prover.append_to_batch(2, {0u, 1u});
+    lpc_scheme_prover.append_to_batch(2, {0u, 1u, 2u});
+    lpc_scheme_prover.append_to_batch(2, {0u, 1u, 3u});
+    lpc_scheme_prover.append_to_batch(3, {0u});
 
     // Commit
     std::map<std::size_t, typename lpc_type::commitment_type> commitments;
@@ -595,11 +595,11 @@ BOOST_FIXTURE_TEST_CASE(lpc_different_hash_types_test, test_fixture) {
     lpc_scheme_type lpc_scheme_verifier(fri_params);
 
     // Generate polynomials
-    lpc_scheme_prover.append_to_batch(0, {1, 13, 4, 1, 5, 6, 7, 2, 8, 7, 5, 6, 1, 2, 1, 1});
-    lpc_scheme_prover.append_to_batch(1, {0, 1});
-    lpc_scheme_prover.append_to_batch(1, {0, 1, 2});
-    lpc_scheme_prover.append_to_batch(1, {0, 1, 3});
-    lpc_scheme_prover.append_to_batch(2, {0});
+    lpc_scheme_prover.append_to_batch(0, {1u, 13u, 4u, 1u, 5u, 6u, 7u, 2u, 8u, 7u, 5u, 6u, 1u, 2u, 1u, 1u});
+    lpc_scheme_prover.append_to_batch(1, {0u, 1u});
+    lpc_scheme_prover.append_to_batch(1, {0u, 1u, 2u});
+    lpc_scheme_prover.append_to_batch(1, {0u, 1u, 3u});
+    lpc_scheme_prover.append_to_batch(2, {0u});
     lpc_scheme_prover.append_to_batch(3, generate_random_polynomial(4, test_global_alg_rnd_engine<FieldType>));
     lpc_scheme_prover.append_to_batch(3, generate_random_polynomial(9, test_global_alg_rnd_engine<FieldType>));
 
