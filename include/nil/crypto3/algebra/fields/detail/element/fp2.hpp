@@ -59,7 +59,7 @@ namespace nil {
                         constexpr element_fp2() = default;
 
                         template<typename Number1, typename Number2,
-                            typename std::enable_if<std::is_unsigned<Number1>::value && std::is_unsigned<Number2>::value, bool>::type* = true>
+                            typename std::enable_if<std::is_integral<Number1>::value && std::is_integral<Number2>::value, bool>::type* = true>
                         constexpr element_fp2(const Number1 &in_data0, const Number2 &in_data1)
                             : data({underlying_type(in_data0), underlying_type(in_data1)}) {}
 

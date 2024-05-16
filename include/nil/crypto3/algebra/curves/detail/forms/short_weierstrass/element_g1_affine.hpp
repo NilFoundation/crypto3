@@ -252,12 +252,12 @@ namespace nil {
                             if (this->is_zero()) {
                                 return (*this);
                             } else {
-                                field_value_type Xsquared3pa = 3 * X.squared() + params_type::a;
+                                field_value_type Xsquared3pa = 3u * X.squared() + params_type::a;
                                 field_value_type Y2squared = Y.doubled().squared();
 
                                 field_value_type X3 = Xsquared3pa.squared() / Y2squared - X - X;
                                 field_value_type Y3 = (X.doubled() + X) * Xsquared3pa / Y.doubled() -
-                                                      Xsquared3pa.pow(3) / (Y.doubled()).pow(3) - Y;
+                                                      Xsquared3pa.pow(3u) / (Y.doubled()).pow(3u) - Y;
 
                                 return curve_element(X3, Y3);
                             }
@@ -283,8 +283,8 @@ namespace nil {
                             field_value_type X2mX1 = other.X - X;
 
                             field_value_type X3 = Y2mY1.squared() / X2mX1.squared() - X - other.X;
-                            field_value_type Y3 = (2 * X + other.X) * Y2mY1 / X2mX1 -
-                                                  (Y2mY1.pow(3)) / (X2mX1.pow(3)) - Y;
+                            field_value_type Y3 = (2u * X + other.X) * Y2mY1 / X2mX1 -
+                                                  (Y2mY1.pow(3u)) / (X2mX1.pow(3u)) - Y;
 
                             return curve_element(X3, Y3);
                         }

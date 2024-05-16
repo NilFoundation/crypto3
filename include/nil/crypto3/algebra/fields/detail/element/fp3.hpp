@@ -57,7 +57,8 @@ namespace nil {
 
                         constexpr element_fp3() = default;
 
-                        template<typename Number1, typename Number2, typename Number3>
+                        template<typename Number1, typename Number2, typename Number3,
+                            typename std::enable_if<std::is_integral<Number1>::value && std::is_integral<Number2>::value && std::is_integral<Number3>::value, bool>::type* = true>
                         constexpr element_fp3(const Number1 &in_data0,
                                               const Number2 &in_data1,
                                               const Number3 &in_data2)

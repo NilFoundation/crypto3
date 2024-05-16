@@ -74,7 +74,7 @@ namespace nil {
                             : data(typename modular_type::backend_type(data.backend(), modulus_params)) {}
 
                         template<typename Number, typename std::enable_if<
-                            std::is_integral<Number>::value && std::is_unsigned<Number>::value, bool>::type = true>
+                            std::is_integral<Number>::value, bool>::type = true>
                         constexpr element_fp(const Number &data)
                             : data(typename modular_type::backend_type(data, modulus_params)) {}
 
