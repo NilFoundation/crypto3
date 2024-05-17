@@ -38,4 +38,4 @@ jobs:
         uses: EnricoMi/publish-unit-test-result-action/linux@v2
         with:
           files: "test-results-*/**/*.xml"
-          comment_mode: "off" # PRs from forks will fail with insufficient permission otherwise
+          comment_mode: ${{ github.event.pull_request.head.repo.fork && 'off' || 'always' }}
