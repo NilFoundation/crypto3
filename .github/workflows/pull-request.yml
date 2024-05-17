@@ -45,10 +45,3 @@ jobs:
   #     always() && !cancelled() &&
   #     (needs.handle-syncwith.result == 'success' || needs.handle-syncwith.result == 'skipped')
   #   secrets: inherit
-
-  publish-results:
-    name: Publish JUnit results
-    needs:
-      - test-linux
-      # - test-mac
-    uses: ./.github/workflows/reusable-publish-result.yml

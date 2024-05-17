@@ -64,11 +64,9 @@ jobs:
             rm result
           done
 
-      - name: Upload tests JUnit results
-        # TODO: update to v4 when runner will support node20, for now it raises `GLIBC_2.27 ... GLIBC_2.28 not found`
-        # Don't forget to update download action, v3 and v4 are incompatible
-        uses: actions/upload-artifact@v3
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action/linux@v2
         with:
-          name: ${{ env.TESTS_ARTIFACT_NAME }}
-          if-no-files-found: error
-          path: results
+          check_name: "Mac Test Results"
+          files: "results/**/*.xml"
+          comment_mode: ${{ github.event.pull_request.head.repo.fork && 'off' || 'always' }}
