@@ -29,16 +29,8 @@ endif()
 
 cm_project(hash WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME} LANGUAGES C CXX)
 
-macro(cm_find_package NAME)
-    if(NOT "${NAME}" MATCHES "^${CMAKE_WORKSPACE_NAME}_.*$" AND NOT "${NAME}" STREQUAL CM)
-        find_package(${ARGV})
-    else()
-        set(${ARGV0}_FOUND ON CACHE BOOL "")
-    endif()
-endmacro()
-
 if(NOT Boost_FOUND AND NOT CMAKE_CROSSCOMPILING)
-    cm_find_package(Boost COMPONENTS REQUIRED container)
+    find_package(Boost COMPONENTS REQUIRED container)
 endif()
 
 include(TargetArchitecture)
@@ -47,8 +39,8 @@ include(PlatformConfiguration)
 
 include(CheckSSE)
 include(CheckAVX)
-
-option(BUILD_TESTS "Build unit tests" FALSE)
+include(CMTest)
+cm_add_test_subdirectory(test)
 
 option(CRYPTO3_HASH_BLAKE2B "Build with Blake2 hash support" TRUE)
 option(CRYPTO3_HASH_CHECKSUM_ADLER "Build with Adler checksum support" TRUE)
@@ -279,4 +271,3 @@ elseif(${CMAKE_TARGET_ARCHITECTURE} STREQUAL "ppc64")
             "${CMAKE_UPPER_WORKSPACE_NAME}_HAS_POWER8")
 endif()
 
-cm_add_test_subdirectory(test)
