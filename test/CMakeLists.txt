@@ -9,21 +9,21 @@
 
 include(CMTest)
 
-find_package(Eigen3)
+cm_find_package(Eigen3)
 
 if(BOOST_CMAKE)
-    find_package(${CMAKE_WORKSPACE_NAME}_algorithm)
-    find_package(${CMAKE_WORKSPACE_NAME}_chrono)
-    find_package(${CMAKE_WORKSPACE_NAME}_exception)
-    find_package(${CMAKE_WORKSPACE_NAME}_timer)
-    find_package(${CMAKE_WORKSPACE_NAME}_filesystem)
-    find_package(${CMAKE_WORKSPACE_NAME}_test)
-    find_package(${CMAKE_WORKSPACE_NAME}_serialization)
-    find_package(${CMAKE_WORKSPACE_NAME}_numeric_interval)
-    find_package(${CMAKE_WORKSPACE_NAME}_detail)
-    find_package(${CMAKE_WORKSPACE_NAME}_throw_exception)
-    find_package(${CMAKE_WORKSPACE_NAME}_math)
-    find_package(${CMAKE_WORKSPACE_NAME}_regexp)
+    cm_find_package(${CMAKE_WORKSPACE_NAME}_algorithm)
+    cm_find_package(${CMAKE_WORKSPACE_NAME}_chrono)
+    cm_find_package(${CMAKE_WORKSPACE_NAME}_exception)
+    cm_find_package(${CMAKE_WORKSPACE_NAME}_timer)
+    cm_find_package(${CMAKE_WORKSPACE_NAME}_filesystem)
+    cm_find_package(${CMAKE_WORKSPACE_NAME}_test)
+    cm_find_package(${CMAKE_WORKSPACE_NAME}_serialization)
+    cm_find_package(${CMAKE_WORKSPACE_NAME}_numeric_interval)
+    cm_find_package(${CMAKE_WORKSPACE_NAME}_detail)
+    cm_find_package(${CMAKE_WORKSPACE_NAME}_throw_exception)
+    cm_find_package(${CMAKE_WORKSPACE_NAME}_math)
+    cm_find_package(${CMAKE_WORKSPACE_NAME}_regexp)
 
     cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
                            ${CMAKE_WORKSPACE_NAME}::algorithm

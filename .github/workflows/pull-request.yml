@@ -26,7 +26,7 @@ jobs:
     name: Linux Reusable Crypto3 Testing
     needs:
       - handle-syncwith
-    uses: NilFoundation/crypto3/.github/workflows/reusable-submodule-testing-linux.yml@664bc9ec8d098cfd8551aa0b4d2c152c8e832401
+    uses: NilFoundation/crypto3/.github/workflows/reusable-submodule-testing-linux.yml@1bd56b12f410f3f1a4891076705a9261a6b1efaa
 
     secrets: inherit
     with:
