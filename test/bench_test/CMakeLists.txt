@@ -9,7 +9,7 @@
 include(CMTest)
 
 if(NOT Boost_UNIT_TEST_FRAMEWORK_FOUND)
-    cm_find_package(Boost REQUIRED COMPONENTS unit_test_framework)
+    find_package(Boost REQUIRED COMPONENTS unit_test_framework)
 endif()
 
 add_custom_target(algebra_runtime_bench_tests)
