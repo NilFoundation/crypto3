@@ -13,24 +13,13 @@ include(CMConfig)
 include(CMSetupVersion)
 
 cm_workspace(marshalling)
-
-macro(cm_find_package NAME)
-    if(NOT "${NAME}" MATCHES "^${CMAKE_WORKSPACE_NAME}_.*$" AND NOT "${NAME}" STREQUAL CM)
-        find_package(${ARGV})
-    else()
-        set(${ARGV0}_FOUND ON CACHE BOOL "")
-    endif()
-endmacro()
-
 cm_project(core WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME} LANGUAGES C CXX)
 
-cm_find_package(CM)
 include(CMDeploy)
 include(FindPkgConfig)
 
 include(CMSetupVersion)
 
-option(BUILD_TESTS "Build unit tests" TRUE)
 option(BUILD_WITH_NO_WARNINGS "Build threading warnings as errors" FALSE)
 
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
@@ -182,9 +171,8 @@ cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
           INCLUDE include
           NAMESPACE ${CMAKE_WORKSPACE_NAME}::)
 
-if(BUILD_TESTS)
-    add_subdirectory(test)
-endif()
+include(CMTest)
+cm_add_test_subdirectory(test)
 
 if(BUILD_EXAMPLES)
     add_subdirectory(example)
