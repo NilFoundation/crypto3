@@ -58,8 +58,13 @@ namespace nil {
                         template<typename Coordinates>
                         using group_type = edwards_types<183>::g1_type<forms::edwards, Coordinates>;
 
+#ifdef STANDARD_EC_INF_POINTS_ENABLED
                         constexpr static const std::array<typename field_type::value_type, 2> zero_fill = {
                             field_type::value_type::zero(), field_type::value_type::one()};
+#else
+                        constexpr static const std::array<typename field_type::value_type, 2> zero_fill = {
+                            field_type::value_type::zero(), field_type::value_type::zero()};
+#endif
 
                     private:
                         constexpr static const std::array<typename field_type::value_type, 3> inverted_one_fill = {
@@ -94,8 +99,14 @@ namespace nil {
                         constexpr static const typename field_type::value_type c = g1_c * twist;
                         constexpr static const typename field_type::value_type d = g1_d * twist;
 
+#ifdef STANDARD_EC_INF_POINTS_ENABLED
                         constexpr static const std::array<typename field_type::value_type, 2> zero_fill = {
                             field_type::value_type::zero(), field_type::value_type::one()};
+#else
+                        constexpr static const std::array<typename field_type::value_type, 2> zero_fill = {
+                            field_type::value_type::zero(), field_type::value_type::zero()};
+#endif
+
 
                     private:
                         constexpr static const std::array<typename field_type::value_type, 3> inverted_one_fill = {

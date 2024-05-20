@@ -60,8 +60,13 @@ namespace nil {
                         template<typename Coordinates>
                         using group_type = alt_bn128_types<254>::g1_type<forms::short_weierstrass, Coordinates>;
 
+#ifdef STANDARD_EC_INF_POINTS_ENABLED
                         constexpr static const std::array<typename field_type::value_type, 2> zero_fill = {
                             field_type::value_type::zero(), field_type::value_type::one()};
+#else
+                        constexpr static const std::array<typename field_type::value_type, 2> zero_fill = {
+                            field_type::value_type::zero(), field_type::value_type::zero()};
+#endif
 
                         constexpr static const std::array<typename field_type::value_type, 2> one_fill = {
                             field_type::value_type::one(), typename field_type::value_type(0x02u)};
@@ -82,8 +87,13 @@ namespace nil {
                             typename field_type::value_type::underlying_type(b);
                         constexpr static const typename field_type::value_type b = g1_b * twist.inversed();
 
+#ifdef STANDARD_EC_INF_POINTS_ENABLED
                         constexpr static const std::array<typename field_type::value_type, 2> zero_fill = {
                             field_type::value_type::zero(), field_type::value_type::one()};
+#else
+                        constexpr static const std::array<typename field_type::value_type, 2> zero_fill = {
+                            field_type::value_type::zero(), field_type::value_type::zero()};
+#endif
 
                         constexpr static const std::array<typename field_type::value_type, 2> one_fill = {
                             typename field_type::value_type(

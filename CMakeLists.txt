@@ -49,6 +49,15 @@ option(BUILD_TESTS "Build unit tests" FALSE)
 option(BUILD_BENCH_TESTS "Build performance benchmark tests" FALSE)
 option(BUILD_EXAMPLES "Build examples" FALSE)
 
+# Blurprint components are using point {0, 0} as a point in infinity, while the stadard is {0, 1}
+# for most curves. We will use compatibility mode with blueprint as default. Setting this flag to 
+# TRUE will change the value of inf point for all curves to the standard value.
+option(STANDARD_EC_INF_POINTS "Use standard zero points for Eliptic Curves" FALSE)
+
+if(STANDARD_EC_INF_POINTS)
+    add_definitions(-DSTANDARD_EC_INF_POINTS_ENABLED)
+endif()
+
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS)
 
 list(APPEND ${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES)

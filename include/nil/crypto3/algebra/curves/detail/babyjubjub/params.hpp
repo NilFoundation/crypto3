@@ -80,8 +80,13 @@ namespace nil {
                         template<typename Coordinates>
                         using group_type = babyjubjub_types::g1_type<forms::twisted_edwards, Coordinates>;
 
+#ifdef STANDARD_EC_INF_POINTS_ENABLED
                         constexpr static const std::array<typename base_field_type::value_type, 2> zero_fill = {
                             base_field_type::value_type::zero(), base_field_type::value_type::one()};
+#else
+                        constexpr static const std::array<typename base_field_type::value_type, 2> zero_fill = {
+                            base_field_type::value_type::zero(), base_field_type::value_type::zero()};
+#endif
 
                         constexpr static const std::array<typename base_field_type::value_type, 2> one_fill = {
                             typename base_field_type::value_type(

@@ -62,8 +62,14 @@ namespace nil {
                         using group_type = curve25519_types::g1_type<forms::montgomery, Coordinates>;
 #ifdef __ZKLLVM__
 #else
+
+#ifdef STANDARD_EC_INF_POINTS_ENABLED
                         constexpr static std::array<typename field_type::value_type, 2> zero_fill = {
                             field_type::value_type::zero(), field_type::value_type::one()};
+#else
+                        constexpr static std::array<typename field_type::value_type, 2> zero_fill = {
+                            field_type::value_type::zero(), field_type::value_type::zero()};
+#endif
 
                         constexpr static std::array<typename field_type::value_type, 2> one_fill = {
                             typename field_type::value_type(0x09u),
@@ -109,8 +115,14 @@ namespace nil {
                         using group_type = curve25519_types::g1_type<forms::twisted_edwards, Coordinates>;
 #ifdef __ZKLLVM__
 #else
+
+#ifdef STANDARD_EC_INF_POINTS_ENABLED
                         constexpr static std::array<typename field_type::value_type, 2> zero_fill = {
                             field_type::value_type::zero(), field_type::value_type::one()};
+#else
+                        constexpr static std::array<typename field_type::value_type, 2> zero_fill = {
+                            field_type::value_type::zero(), field_type::value_type::zero()};
+#endif
 
                         constexpr static std::array<typename field_type::value_type, 2> one_fill = {
                             typename field_type::value_type(

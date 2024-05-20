@@ -59,8 +59,13 @@ namespace nil {
                         template<typename Coordinates>
                         using group_type = secp_k1_types<160>::g1_type<forms::short_weierstrass, Coordinates>;
 
+#ifdef STANDARD_EC_INF_POINTS_ENABLED
                         constexpr static const std::array<typename field_type::value_type, 2> zero_fill = {
                             field_type::value_type::zero(), field_type::value_type::one()};
+#else
+                        constexpr static const std::array<typename field_type::value_type, 2> zero_fill = {
+                            field_type::value_type::zero(), field_type::value_type::zero()};
+#endif
 
                         constexpr static const std::array<typename field_type::value_type, 2> one_fill = {
                             typename field_type::value_type(0x3b4c382ce37aa192a4019e763036f4f5dd4d7ebb_cppui_modular160),
@@ -102,8 +107,15 @@ namespace nil {
                         template<typename Coordinates>
                         using group_type = secp_k1_types<192>::g1_type<forms::short_weierstrass, Coordinates>;
 
+#ifdef STANDARD_EC_INF_POINTS_ENABLED
                         constexpr static const std::array<typename field_type::value_type, 2> zero_fill = {
                             field_type::value_type::zero(), field_type::value_type::one()};
+#else
+                        constexpr static const std::array<typename field_type::value_type, 2> zero_fill = {
+                            field_type::value_type::zero(), field_type::value_type::zero()};
+#endif
+
+
 
                         constexpr static const std::array<typename field_type::value_type, 2> one_fill = {
                             typename field_type::value_type(
@@ -147,8 +159,13 @@ namespace nil {
                         template<typename Coordinates>
                         using group_type = secp_k1_types<224>::g1_type<forms::short_weierstrass, Coordinates>;
 
+#ifdef STANDARD_EC_INF_POINTS_ENABLED
                         constexpr static const std::array<typename field_type::value_type, 2> zero_fill = {
                             field_type::value_type::zero(), field_type::value_type::one()};
+#else
+                        constexpr static const std::array<typename field_type::value_type, 2> zero_fill = {
+                            field_type::value_type::zero(), field_type::value_type::one()};
+#endif
 
                         constexpr static const std::array<typename field_type::value_type, 2> one_fill = {
                             typename field_type::value_type(
@@ -192,8 +209,13 @@ namespace nil {
                         template<typename Coordinates>
                         using group_type = secp_k1_types<256>::g1_type<forms::short_weierstrass, Coordinates>;
 
+#ifdef STANDARD_EC_INF_POINTS_ENABLED
                         constexpr static const std::array<typename field_type::value_type, 2> zero_fill = {
                             field_type::value_type::zero(), field_type::value_type::one()};
+#else
+                        constexpr static const std::array<typename field_type::value_type, 2> zero_fill = {
+                            field_type::value_type::zero(), field_type::value_type::zero()};
+#endif
 
                         constexpr static const std::array<typename field_type::value_type, 2> one_fill = {
                             typename field_type::value_type(
