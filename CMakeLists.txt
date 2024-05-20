@@ -29,8 +29,8 @@ endif()
 
 cm_project(pbkdf WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME})
 
-find_package(${CMAKE_WORKSPACE_NAME}_hash)
-find_package(${CMAKE_WORKSPACE_NAME}_mac)
+cm_find_package(${CMAKE_WORKSPACE_NAME}_hash)
+cm_find_package(${CMAKE_WORKSPACE_NAME}_mac)
 
 find_package(Boost REQUIRED)
 
