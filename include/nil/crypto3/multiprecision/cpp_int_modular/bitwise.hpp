@@ -203,7 +203,7 @@ namespace boost {
                     if ((s & limb_shift_mask) == 0) {
                         left_shift_limb(result, s);
                     }
-#ifdef CRYPTO3_MP_NO_CONSTEXPR_DETECTION
+#ifdef BOOST_MP_NO_CONSTEXPR_DETECTION
                     else if ((s & byte_shift_mask) == 0)
 #else
                     else if (((s & byte_shift_mask) == 0) && !BOOST_MP_IS_CONST_EVALUATED(s))
@@ -214,7 +214,7 @@ namespace boost {
 #elif BOOST_ENDIAN_LITTLE_BYTE
                     BOOST_MP_CXX14_CONSTEXPR const limb_type byte_shift_mask = CHAR_BIT - 1;
 
-#ifdef CRYPTO3_MP_NO_CONSTEXPR_DETECTION
+#ifdef BOOST_MP_NO_CONSTEXPR_DETECTION
                     if ((s & byte_shift_mask) == 0)
 #else
                     BOOST_MP_CXX14_CONSTEXPR limb_type limb_shift_mask =
@@ -339,7 +339,7 @@ namespace boost {
 
                     if ((s & limb_shift_mask) == 0)
                         right_shift_limb(result, s);
-#ifdef CRYPTO3_MP_NO_CONSTEXPR_DETECTION
+#ifdef BOOST_MP_NO_CONSTEXPR_DETECTION
                     else if ((s & byte_shift_mask) == 0)
 #else
                     else if (((s & byte_shift_mask) == 0) && !BOOST_MP_IS_CONST_EVALUATED(s))
@@ -348,7 +348,7 @@ namespace boost {
 #elif BOOST_ENDIAN_LITTLE_BYTE && !defined(TVM)
                     BOOST_MP_CXX14_CONSTEXPR const limb_type byte_shift_mask = CHAR_BIT - 1;
 
-#ifdef CRYPTO3_MP_NO_CONSTEXPR_DETECTION
+#ifdef BOOST_MP_NO_CONSTEXPR_DETECTION
                     if ((s & byte_shift_mask) == 0)
 #else
                     BOOST_MP_CXX14_CONSTEXPR limb_type limb_shift_mask =

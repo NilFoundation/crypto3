@@ -59,14 +59,14 @@ namespace boost {
 
             //
             // Core subtraction routine for all non-trivial cpp_int's:
-            // It is the caller's responsibility to make sure that a > b.
+            // It is the caller's responsibility to make sure that a >= b.
             //
             template<unsigned Bits>
             inline BOOST_MP_CXX14_CONSTEXPR void subtract_unsigned_constexpr(
                     cpp_int_modular_backend<Bits>& result,
                     const cpp_int_modular_backend<Bits>& a,
                     const cpp_int_modular_backend<Bits>& b) noexcept {
-                BOOST_ASSERT(!eval_lt(a, b));
+                BOOST_MP_ASSERT(!eval_lt(a, b));
 
                 //
                 // This is the generic, C++ only version of subtraction.
@@ -90,7 +90,7 @@ namespace boost {
                     borrow = (borrow >> cpp_int_modular_backend<Bits>::limb_bits) & 1u;
                 }
                 // if a > b, then borrow must be 0 at the end.
-                // BOOST_ASSERT(0 == borrow);
+                BOOST_MP_ASSERT(0 == borrow);
             }
 
 #ifdef CO3_MP_HAS_IMMINTRIN_H
@@ -116,7 +116,7 @@ namespace boost {
                     const cpp_int_modular_backend<Bits>& a,
                     const cpp_int_modular_backend<Bits>& b) noexcept {
 
-#ifndef CRYPTO3_MP_NO_CONSTEXPR_DETECTION
+#ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
                 if (BOOST_MP_IS_CONST_EVALUATED(a.size())) {
                     add_unsigned_constexpr(result, a, b);
                 } else
@@ -180,7 +180,7 @@ namespace boost {
                     cpp_int_modular_backend<Bits>& result,
                     const cpp_int_modular_backend<Bits>& a,
                     const cpp_int_modular_backend<Bits>& b) noexcept {
-                BOOST_ASSERT(!eval_lt(a, b));
+                BOOST_MP_ASSERT(!eval_lt(a, b));
 
 #ifndef TO3_MP_NO_CONSTEXPR_DETECTION
                 if (BOOST_MP_IS_CONST_EVALUATED(a.size())) {
@@ -241,7 +241,7 @@ namespace boost {
                     for (; i < m; ++i)
                         borrow = boost::multiprecision::detail::subborrow_limb(borrow, pa[i], pb[i], pr + i);
 
-                    BOOST_ASSERT(0 == borrow);
+                    BOOST_MP_ASSERT(0 == borrow);
 
                 }    // constepxr.
             }

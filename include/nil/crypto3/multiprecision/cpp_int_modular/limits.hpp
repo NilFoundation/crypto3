@@ -31,7 +31,7 @@ namespace std {
             using ui_type = boost::multiprecision::number<
                 boost::multiprecision::backends::cpp_int_modular_backend<Bits>,
                 ExpressionTemplates>;
-#ifdef CRYPTO3_MP_NO_CONSTEXPR_DETECTION
+#ifdef BOOST_MP_NO_CONSTEXPR_DETECTION
             static
 #else
             constexpr
@@ -63,7 +63,7 @@ namespace std {
             ExpressionTemplates>
             get_min() {
             // Bounded, unsigned, no allocator (can be constexpr):
-#ifdef CRYPTO3_MP_NO_CONSTEXPR_DETECTION
+#ifdef BOOST_MP_NO_CONSTEXPR_DETECTION
             static
 #else
             constexpr
@@ -88,7 +88,7 @@ namespace std {
             using ui_type = boost::multiprecision::number<
                 boost::multiprecision::backends::cpp_int_modular_backend<Bits>,
                 ExpressionTemplates>;
-#ifdef CRYPTO3_MP_NO_CONSTEXPR_DETECTION
+#ifdef BOOST_MP_NO_CONSTEXPR_DETECTION
             static
 #else
             constexpr
