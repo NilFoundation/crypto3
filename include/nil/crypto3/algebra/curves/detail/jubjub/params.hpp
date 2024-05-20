@@ -91,13 +91,8 @@ namespace nil {
                         template<typename Coordinates>
                         using group_type = jubjub_types::g1_type<forms::twisted_edwards, Coordinates>;
 
-#ifdef STANDARD_EC_INF_POINTS_ENABLED
                         constexpr static const std::array<typename field_type::value_type, 2> zero_fill = {
                             field_type::value_type::zero(), field_type::value_type::one()};
-#else
-                        constexpr static const std::array<typename field_type::value_type, 2> zero_fill = {
-                            field_type::value_type::zero(), field_type::value_type::zero()};
-#endif
 
                         // according to https://neuromancer.sk/std/other/JubJub
                         constexpr static const std::array<typename field_type::value_type, 2> one_fill = {

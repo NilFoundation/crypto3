@@ -45,9 +45,10 @@ namespace nil {
                 template<std::size_t Version>
                 struct secp_r1_scalar_field;
 
+                // We need to derive from field<161> here, since the modulus is actually 161 bits long.
                 template<>
-                struct secp_r1_scalar_field<160> : public field<160> {
-                    typedef field<160> policy_type;
+                struct secp_r1_scalar_field<160> : public field<161> {
+                    typedef field<161> policy_type;
 
                     constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                     typedef typename policy_type::integral_type integral_type;
@@ -57,7 +58,7 @@ namespace nil {
                     constexpr static const std::size_t number_bits = policy_type::number_bits;
 
                     constexpr static const integral_type modulus =
-                        0x0100000000000000000001f4c8f927aed3ca752257_cppui_modular160;
+                        0x0100000000000000000001f4c8f927aed3ca752257_cppui_modular161;
 
                     typedef typename policy_type::modular_backend modular_backend;
                     constexpr static const modular_params_type modulus_params = modulus.backend();
@@ -67,7 +68,7 @@ namespace nil {
                             boost::multiprecision::backends::modular_params_ct<modular_backend, modulus_params>>>
                         modular_type;
 
-                    typedef typename detail::element_fp<params<secp_r1_scalar_field<160>>> value_type;
+                    typedef typename detail::element_fp<params<secp_r1_scalar_field<161>>> value_type;
 
                     constexpr static const std::size_t value_bits = modulus_bits;
                     constexpr static const std::size_t arity = 1;
