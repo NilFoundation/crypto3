@@ -39,20 +39,11 @@ include(CMSetupVersion)
 
 cm_workspace(crypto3)
 
-macro(cm_find_package NAME)
-    if (NOT "${NAME}" MATCHES "^${CMAKE_WORKSPACE_NAME}_.*$" AND NOT "${NAME}" STREQUAL CM)
-        find_package(${ARGV})
-    else ()
-        set(${ARGV0}_FOUND ON CACHE BOOL "")
-    endif ()
-endmacro()
-
-cm_find_package(CM)
 include(CMDeploy)
 include(CMSetupVersion)
 
 if (NOT Boost_FOUND AND NOT CMAKE_CROSSCOMPILING)
-    cm_find_package(Boost COMPONENTS REQUIRED filesystem)
+    find_package(Boost COMPONENTS REQUIRED filesystem)
 endif ()
 
 cm_project(containers WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME})
