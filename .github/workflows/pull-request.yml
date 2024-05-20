@@ -2,27 +2,47 @@ name: PR Testing
 
 on:
   pull_request:
-    types:
-      - opened
-      - synchronize
+  push:
+    branches:
+      - master
+
+concurrency:
+  # In master we want to run for every commit, in other branches — only for the last one
+  group: ${{
+    ( github.ref == 'refs/heads/master' && format('{0}/{1}/{2}', github.workflow, github.ref, github.sha) )
+    ||
+    format('{0}/{1}', github.workflow, github.ref) }}
+  cancel-in-progress: true
 
 jobs:
-  run-pull-request-actions:
-    name: Reusable Crypto3 Testing
-    uses: ./.github/workflows/pull-request-action.yml
+  handle-syncwith:
+    name: Call Reusable SyncWith Handler
+    uses: NilFoundation/ci-cd/.github/workflows/reusable-handle-syncwith.yml@v1.2.1
+    with:
+      ci-cd-ref: 'v1.2.1'
+    secrets: inherit
+
+  test-linux:
+    name: Linux Reusable Crypto3 Testing
+    needs:
+      - handle-syncwith
+    uses: NilFoundation/crypto3/.github/workflows/reusable-submodule-testing-linux.yml@1bd56b12f410f3f1a4891076705a9261a6b1efaa
 
     secrets: inherit
     with:
-      targets: |
-        crypto3_zk_commitment_fold_polynomial_test
-        crypto3_zk_commitment_fri_test
-        crypto3_zk_commitment_lpc_test
-        crypto3_zk_commitment_kzg_test
-        crypto3_zk_systems_plonk_placeholder_placeholder_test
-        crypto3_zk_commitment_powers_of_tau_test
-        crypto3_zk_commitment_proof_of_knowledge_test
-        crypto3_zk_math_expression_test
-        crypto3_zk_systems_plonk_plonk_constraint_test
-        crypto3_zk_commitment_proof_of_knowledge_test
-        crypto3_zk_transcript_transcript_test
-        crypto3_zk_commitment_proof_of_work_test
+      submodules-refs: ${{ needs.handle-syncwith.outputs.prs-refs }}
+      check-names: |
+        zk-clang
+
+  # test-mac:
+  #   name: Mac Reusable Crypto3 Testing
+  #   needs:
+  #     - handle-syncwith
+  #   uses: NilFoundation/crypto3/.github/workflows/reusable-submodule-testing-mac.yml@ede1d6b903078a0aa48a6864ba465b66af4fda8b
+
+  #   secrets: inherit
+  #   with:
+  #     submodules-refs: ${{ needs.handle-syncwith.outputs.prs-refs }}
+  #     check-names: |
+  #       algebra-clang
+

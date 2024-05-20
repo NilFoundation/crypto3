@@ -30,27 +30,14 @@ if(ZK_PLACEHOLDER_DEBUG)
     add_definitions(-DZK_PLACEHOLDER_DEBUG_ENABLED)
 endif()
 
-macro(cm_find_package NAME)
-    foreach(ITERATOR ${CMAKE_WORKSPACE_LIST})
-        if(NOT "${NAME}" MATCHES "^${ITERATOR}_.*$" AND NOT "${NAME}" STREQUAL CM)
-            find_package(${ARGV})
-        else()
-            set(${ARGV0}_FOUND ON CACHE BOOL "")
-        endif()
-    endforeach()
-endmacro()
-
 cm_project(zk WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME} LANGUAGES C CXX)
 
 if(NOT Boost_FOUND AND NOT CMAKE_CROSSCOMPILING)
-    cm_find_package(Boost)
+    find_package(Boost)
 endif()
 
-cm_find_package(CM)
 include(CMDeploy)
 include(FindPkgConfig)
-
-option(BUILD_TESTS "Build unit tests" FALSE)
 
 cm_setup_version(VERSION 0.1.0 PREFIX ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME})
 
@@ -80,7 +67,5 @@ cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
           INCLUDE include
           NAMESPACE ${CMAKE_WORKSPACE_NAME}::)
 
-
-if(BUILD_TESTS)
-    add_subdirectory(test)
-endif()
+include(CMTest)
+cm_add_test_subdirectory(test)
