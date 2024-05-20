@@ -30,16 +30,11 @@ endif()
 cm_project(passhash WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME})
 
 if(NOT Boost_FOUND)
-    cm_find_package(Boost)
+    find_package(Boost)
 endif()
 
-
-
-cm_find_package(CM)
-
-
-cm_find_package(${CMAKE_WORKSPACE_NAME}_codec)
-cm_find_package(${CMAKE_WORKSPACE_NAME}_mac)
+find_package(${CMAKE_WORKSPACE_NAME}_codec)
+find_package(${CMAKE_WORKSPACE_NAME}_mac)
 
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
      include/nil/crypto3/passhash/bcrypt.hpp
@@ -76,7 +71,6 @@ cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
           INCLUDE include
           NAMESPACE ${CMAKE_WORKSPACE_NAME}::)
 
-if(BUILD_TESTS)
-    add_subdirectory(test)
-endif()
+include(CMTest)
+cm_add_test_subdirectory(test)
 

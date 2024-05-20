@@ -8,12 +8,12 @@
 
 include(CMTest)
 
-cm_find_package(${CMAKE_WORKSPACE_NAME}_block)
-cm_find_package(${CMAKE_WORKSPACE_NAME}_codec)
-cm_find_package(${CMAKE_WORKSPACE_NAME}_kdf)
+find_package(${CMAKE_WORKSPACE_NAME}_block)
+find_package(${CMAKE_WORKSPACE_NAME}_codec)
+find_package(${CMAKE_WORKSPACE_NAME}_kdf)
 
 if(NOT Boost_UNIT_TEST_FRAMEWORK_FOUND)
-    cm_find_package(Boost REQUIRED COMPONENTS unit_test_framework)
+    find_package(Boost REQUIRED COMPONENTS unit_test_framework)
 endif()
 
 cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
