@@ -29,12 +29,10 @@ endif()
 
 cm_project(pbkdf WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME})
 
-cm_find_package(CM)
+find_package(${CMAKE_WORKSPACE_NAME}_hash)
+find_package(${CMAKE_WORKSPACE_NAME}_mac)
 
-cm_find_package(${CMAKE_WORKSPACE_NAME}_hash)
-cm_find_package(${CMAKE_WORKSPACE_NAME}_mac)
-
-cm_find_package(Boost REQUIRED)
+find_package(Boost REQUIRED)
 
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
      include/nil/crypto3/pbkdf/pbkdf.hpp)
@@ -97,6 +95,5 @@ cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
           INCLUDE include
           NAMESPACE ${CMAKE_WORKSPACE_NAME}::)
 
-if(BUILD_TESTS)
-    add_subdirectory(test)
-endif()
+include(CMTest)
+cm_add_test_subdirectory(test)
