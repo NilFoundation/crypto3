@@ -28,20 +28,10 @@ endif()
 
 cm_project(codec WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME} LANGUAGES C CXX)
 
-macro(cm_find_package NAME)
-    if(NOT "${NAME}" MATCHES "^${CMAKE_WORKSPACE_NAME}_.*$" AND NOT "${NAME}" STREQUAL CM)
-        find_package(${ARGV})
-    else()
-        set(${ARGV0}_FOUND ON CACHE BOOL "")
-    endif()
-endmacro()
-
 if((NOT Boost_CONTAINER_FOUND OR NOT Boost_FOUND) AND NOT CMAKE_CROSSCOMPILING)
-    cm_find_package(Boost COMPONENTS REQUIRED container)
+    find_package(Boost COMPONENTS REQUIRED container)
 endif()
 
-option(BUILD_WITH_CCACHE "Build with ccache usage" TRUE)
-option(BUILD_TESTS "Build unit tests" FALSE)
 option(CRYPTO3_CODEC_BASE58 "Build unit tests" TRUE)
 
 set(BUILD_WITH_CONFIGURATION_FILE_DIR "${CMAKE_CURRENT_LIST_DIR}/cmake" CACHE STRING "Directory for build.hpp lookup")
@@ -100,6 +90,5 @@ cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
           INCLUDE include
           NAMESPACE ${CMAKE_WORKSPACE_NAME}::)
 
-if(BUILD_TESTS)
-    add_subdirectory(test)
-endif()
+include(CMTest)
+cm_add_test_subdirectory(test)
