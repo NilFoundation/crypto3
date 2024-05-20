@@ -30,14 +30,6 @@ endif()
 
 cm_project(stream WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME} LANGUAGES C CXX)
 
-macro(cm_find_package NAME)
-    if(NOT "${NAME}" MATCHES "^${CMAKE_WORKSPACE_NAME}_.*$" AND NOT "${NAME}" STREQUAL CM)
-        find_package(${ARGV})
-    else()
-        set(${ARGV0}_FOUND ON CACHE BOOL "")
-    endif()
-endmacro()
-
 include(TargetArchitecture)
 include(TargetConfiguration)
 include(PlatformConfiguration)
@@ -48,7 +40,6 @@ include(CheckAVX)
 check_sse()
 check_avx()
 
-option(BUILD_TESTS "Build unit tests" FALSE)
 option(CRYPTO3_STREAM_CHACHA "Build with CHACHA stream encryption support" TRUE)
 option(CRYPTO3_STREAM_SALSA20 "Build with SALSA20 stream encryption support" TRUE)
 option(CRYPTO3_STREAM_RC4 "Build with RC4 stream encryption support" TRUE)
@@ -62,7 +53,7 @@ else()
 endif()
 
 if((NOT Boost_CONTAINER_FOUND OR NOT Boost_FOUND) AND NOT CMAKE_CROSSCOMPILING)
-    cm_find_package(Boost COMPONENTS REQUIRED container)
+    find_package(Boost COMPONENTS REQUIRED container)
 endif()
 
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS)
@@ -146,6 +137,5 @@ cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
           INCLUDE include
           NAMESPACE ${CMAKE_WORKSPACE_NAME}::)
 
-if(BUILD_TESTS)
-    add_subdirectory(test)
-endif()
+include(CMTest)
+cm_add_test_subdirectory(test)
