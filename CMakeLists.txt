@@ -29,14 +29,12 @@ endif()
 
 cm_project(kdf WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME} LANGUAGES C CXX)
 
-cm_find_package(CM)
-
-cm_find_package(${CMAKE_WORKSPACE_NAME}_block)
-cm_find_package(${CMAKE_WORKSPACE_NAME}_hash)
-cm_find_package(${CMAKE_WORKSPACE_NAME}_mac)
+find_package(${CMAKE_WORKSPACE_NAME}_block)
+find_package(${CMAKE_WORKSPACE_NAME}_hash)
+find_package(${CMAKE_WORKSPACE_NAME}_mac)
 
 if(NOT Boost)
-    cm_find_package(Boost REQUIRED)
+    find_package(Boost REQUIRED)
 endif()
 
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
@@ -236,6 +234,5 @@ cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
           INCLUDE include
           NAMESPACE ${CMAKE_WORKSPACE_NAME}::)
 
-if(BUILD_TESTS)
-    add_subdirectory(test)
-endif()
+include(CMTest)
+cm_add_test_subdirectory(test)
