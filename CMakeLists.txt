@@ -23,18 +23,15 @@ endif()
 cm_project(modes WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME})
 
 if(NOT Boost_FOUND AND NOT CMAKE_CROSSCOMPILING)
-    cm_find_package(Boost REQUIRED)
+    find_package(Boost REQUIRED)
 endif()
 
-cm_find_package(CM)
 include(CMConfig)
 include(CMSetupVersion)
 
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS)
 
 list(APPEND ${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES)
-
-option(BUILD_TESTS "Build unit tests" FALSE)
 
 option(CRYPTO3_MODE_ECB "Build with ECB cipher mode support" TRUE)
 option(CRYPTO3_MODE_CBC "Build with CBC cipher mode support" TRUE)
@@ -152,6 +149,5 @@ cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
           INCLUDE include
           NAMESPACE ${CMAKE_WORKSPACE_NAME}::)
 
-if(BUILD_TESTS)
-    add_subdirectory(test)
-endif()
+include(CMTest)
+cm_add_test_subdirectory(test)
