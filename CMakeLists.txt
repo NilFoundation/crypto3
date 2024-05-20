@@ -23,16 +23,15 @@ endif()
 cm_project(mac WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME})
 
 if(NOT Boost_FOUND AND NOT CMAKE_CROSSCOMPILING)
-    cm_find_package(Boost)
+    find_package(Boost)
 endif()
 
-cm_find_package(CM)
 include(CMDeploy)
 include(CMSetupVersion)
 
-cm_find_package(${CMAKE_WORKSPACE_NAME}_block)
-cm_find_package(${CMAKE_WORKSPACE_NAME}_hash)
-cm_find_package(${CMAKE_WORKSPACE_NAME}_modes)
+find_package(${CMAKE_WORKSPACE_NAME}_block)
+find_package(${CMAKE_WORKSPACE_NAME}_hash)
+find_package(${CMAKE_WORKSPACE_NAME}_modes)
 
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
      include/nil/crypto3/mac/algorithm/compute.hpp
@@ -182,6 +181,5 @@ cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
           INCLUDE include
           NAMESPACE ${CMAKE_WORKSPACE_NAME}::)
 
-if(BUILD_TESTS)
-    add_subdirectory(test)
-endif()
+include(CMTest)
+cm_add_test_subdirectory(test)
