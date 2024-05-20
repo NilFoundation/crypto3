@@ -30,9 +30,6 @@ endif()
 
 cm_project(vdf WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME} LANGUAGES ASM C CXX)
 
-cm_find_package(CM)
-
-
 include(CheckSSE)
 include(CheckAVX)
 
@@ -50,8 +47,6 @@ if(NOT SSE2_FOUND OR NOT SSE3_FOUND OR NOT SSSE3_FOUND OR NOT SSE4_1_FOUND OR NO
    HAVE_AVX2_EXTENSIONS OR HAVE_AVX_EXTENSIONS)
     option(CRYPTO3_VDF_USE_SIMD "Build Crypto3.VDF with SIMD instructions usage." TRUE)
 endif()
-
-option(BUILD_TESTS "Build unit tests" FALSE)
 
 option(CRYPTO3_VDF_BOOST "Build Crypto3.VDF with Boost.Multiprecision backend usage" TRUE)
 option(CRYPTO3_VDF_GMP "Build Crypto3.VDF with GMP backend usage" FALSE)
@@ -88,7 +83,7 @@ elseif(CRYPTO3_VDF_BOOST)
     endif()
 
     if(NOT Boost_FOUND)
-        cm_find_package(Boost REQUIRED)
+        find_package(Boost REQUIRED)
     endif()
 
     if(Boost_FOUND)
@@ -251,6 +246,5 @@ cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
           INCLUDE include
           NAMESPACE ${CMAKE_WORKSPACE_NAME}::)
 
-if(BUILD_TESTS)
-    add_subdirectory(test)
-endif()
+include(CMTest)
+cm_add_test_subdirectory(test)
