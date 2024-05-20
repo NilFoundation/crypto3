@@ -19,7 +19,6 @@ include(CMConfig)
 include(CMSetupVersion)
 
 option(BUILD_EXAMPLES "Build examples" FALSE)
-option(BUILD_TESTS "Build unit tests" FALSE)
 
 cm_workspace(crypto3 SOURCES_DIR "${CMAKE_CURRENT_LIST_DIR}")
 
@@ -53,9 +52,8 @@ cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
           INCLUDE ${CURRENT_SOURCES_DIR}/include
           NAMESPACE ${CMAKE_WORKSPACE_NAME}::)
 
-if(BUILD_TESTS)
-    add_subdirectory(test)
-endif()
+include(CMTest)
+cm_add_test_subdirectory(test)
 
 if(BUILD_EXAMPLES)
     add_subdirectory(example)
