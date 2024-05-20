@@ -16,12 +16,11 @@ endif()
 
 cm_project(pkpad WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME})
 
-cm_find_package(CM)
 include(CMDeploy)
 include(CMSetupVersion)
 
 if(NOT Boost_FOUND AND NOT CMAKE_CROSSCOMPILING)
-    cm_find_package(Boost COMPONENTS)
+    find_package(Boost COMPONENTS)
 endif()
 
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
@@ -245,6 +244,5 @@ cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
           INCLUDE include
           NAMESPACE ${CMAKE_WORKSPACE_NAME}::)
 
-if(BUILD_TESTS)
-    add_subdirectory(test)
-endif()
+include(CMTest)
+cm_add_test_subdirectory(test)
