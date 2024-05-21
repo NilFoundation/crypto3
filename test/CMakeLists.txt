@@ -8,8 +8,8 @@
 
 include(CMTest)
 
-find_package(${CMAKE_WORKSPACE_NAME}_block)
-find_package(${CMAKE_WORKSPACE_NAME}_hash)
+cm_find_package(${CMAKE_WORKSPACE_NAME}_block)
+cm_find_package(${CMAKE_WORKSPACE_NAME}_hash)
 
 if(NOT Boost_UNIT_TEST_FRAMEWORK_FOUND)
     find_package(Boost REQUIRED COMPONENTS unit_test_framework)

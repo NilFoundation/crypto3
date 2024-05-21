@@ -29,9 +29,9 @@ endif()
 
 cm_project(kdf WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME} LANGUAGES C CXX)
 
-find_package(${CMAKE_WORKSPACE_NAME}_block)
-find_package(${CMAKE_WORKSPACE_NAME}_hash)
-find_package(${CMAKE_WORKSPACE_NAME}_mac)
+cm_find_package(${CMAKE_WORKSPACE_NAME}_block)
+cm_find_package(${CMAKE_WORKSPACE_NAME}_hash)
+cm_find_package(${CMAKE_WORKSPACE_NAME}_mac)
 
 if(NOT Boost)
     find_package(Boost REQUIRED)
