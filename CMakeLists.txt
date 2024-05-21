@@ -33,8 +33,8 @@ if(NOT Boost_FOUND)
     find_package(Boost)
 endif()
 
-find_package(${CMAKE_WORKSPACE_NAME}_codec)
-find_package(${CMAKE_WORKSPACE_NAME}_mac)
+cm_find_package(${CMAKE_WORKSPACE_NAME}_codec)
+cm_find_package(${CMAKE_WORKSPACE_NAME}_mac)
 
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
      include/nil/crypto3/passhash/bcrypt.hpp

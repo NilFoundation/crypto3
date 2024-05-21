@@ -8,9 +8,9 @@
 
 include(CMTest)
 
-find_package(${CMAKE_WORKSPACE_NAME}_block)
-find_package(${CMAKE_WORKSPACE_NAME}_codec)
-find_package(${CMAKE_WORKSPACE_NAME}_kdf)
+cm_find_package(${CMAKE_WORKSPACE_NAME}_block)
+cm_find_package(${CMAKE_WORKSPACE_NAME}_codec)
+cm_find_package(${CMAKE_WORKSPACE_NAME}_kdf)
 
 if(NOT Boost_UNIT_TEST_FRAMEWORK_FOUND)
     find_package(Boost REQUIRED COMPONENTS unit_test_framework)
