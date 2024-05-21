@@ -29,9 +29,9 @@ endif()
 include(CMDeploy)
 include(CMSetupVersion)
 
-find_package(${CMAKE_WORKSPACE_NAME}_block)
-find_package(${CMAKE_WORKSPACE_NAME}_hash)
-find_package(${CMAKE_WORKSPACE_NAME}_modes)
+cm_find_package(${CMAKE_WORKSPACE_NAME}_block)
+cm_find_package(${CMAKE_WORKSPACE_NAME}_hash)
+cm_find_package(${CMAKE_WORKSPACE_NAME}_modes)
 
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
      include/nil/crypto3/mac/algorithm/compute.hpp
