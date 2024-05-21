@@ -20,15 +20,6 @@ include(CMConfig)
 include(CMSetupVersion)
 
 cm_workspace(crypto3)
-
-macro(cm_find_package NAME)
-    if(NOT "${NAME}" MATCHES "^${CMAKE_WORKSPACE_NAME}_.*$" AND NOT "${NAME}" STREQUAL CM)
-        find_package(${ARGV})
-    else()
-        set(${ARGV0}_FOUND ON CACHE BOOL "")
-    endif()
-endmacro()
-
 cm_setup_version(VERSION 0.3.0 PREFIX ${CMAKE_WORKSPACE_NAME})
 
 option(BUILD_SHARED_LIBS "Build shared library" TRUE)
@@ -48,10 +39,10 @@ else()
 endif()
 
 if(BUILD_TESTS)
-    cm_find_package(Boost COMPONENTS REQUIRED unit_test_framework)
+    find_package(Boost COMPONENTS REQUIRED unit_test_framework)
 endif()
 
-cm_find_package(Boost REQUIRED COMPONENTS container random system unit_test_framework)
+find_package(Boost REQUIRED COMPONENTS container random system unit_test_framework)
 
 add_subdirectories("${CMAKE_CURRENT_LIST_DIR}/libs/")
 add_subdirectories("${CMAKE_CURRENT_LIST_DIR}/libs/marshalling")
