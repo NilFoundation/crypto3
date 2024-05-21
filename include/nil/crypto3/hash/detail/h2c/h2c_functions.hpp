@@ -178,7 +178,7 @@ namespace nil {
                             y_num += field_value_type(k_y_num[i]) * xi_powers[i];
                         }
 
-                        return group_value_type(x_num / x_den, ci.Y * y_num / y_den, field_value_type::one());
+                        return group_value_type(x_num * x_den.inversed(), ci.Y * y_num * y_den.inversed(), field_value_type::one());
                     }
                 };
 
@@ -265,7 +265,7 @@ namespace nil {
                             y_num += field_value_type(k_y_num[i][0], k_y_num[i][1]) * xi_powers[i];
                         }
 
-                        return group_value_type(x_num / x_den, ci.Y * y_num / y_den, field_value_type::one());
+                        return group_value_type(x_num * x_den.inversed(), ci.Y * y_num * y_den.inversed(), field_value_type::one());
                     }
                 };
 
@@ -288,9 +288,9 @@ namespace nil {
                         static const field_value_type one = field_value_type::one();
 
                         field_value_type tv1 = (suite_type::Z.pow(2u) * u.pow(4u) + suite_type::Z * u.pow(2u)).inversed();
-                        field_value_type x1 = (-suite_type::Bi / suite_type::Ai) * (one + tv1);
+                        field_value_type x1 = (-suite_type::Bi * suite_type::Ai.inversed()) * (one + tv1);
                         if (tv1.is_zero()) {
-                            x1 = suite_type::Bi / (suite_type::Z * suite_type::Ai);
+                            x1 = suite_type::Bi * (suite_type::Z * suite_type::Ai).inversed();
                         }
                         field_value_type gx1 = x1.pow(3u) + suite_type::Ai * x1 + suite_type::Bi;
                         field_value_type x2 = suite_type::Z * u.pow(2u) * x1;
