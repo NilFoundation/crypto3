@@ -50,11 +50,7 @@ namespace nil {
                                             bool>::type
                         sign_gf_p(const typename G1FieldType::value_type &v) {
 
-                        constexpr static const typename G1FieldType::integral_type half_p =
-                            (G1FieldType::modulus - typename G1FieldType::integral_type(1)) /
-                            typename G1FieldType::integral_type(2);
-
-                        if (v > half_p) {
+                        if (v > G1FieldType::group_order_minus_one_half) {
                             return true;
                         }
                         return false;
@@ -107,7 +103,7 @@ namespace nil {
                         base_field_value_type y(y_int);
                         base_field_value_type y2 = y * y;
                         base_field_value_type x2 =
-                            (y2 - base_integral_type(1)) / (y2 * group_type::params_type::d + base_integral_type(1));
+                            (y2 - base_integral_type(1)) * (y2 * group_type::params_type::d + base_integral_type(1)).inversed();
                         if (x2.is_zero()) {
                             // TODO: throw catchable error, for example return status
                             assert(!sign);

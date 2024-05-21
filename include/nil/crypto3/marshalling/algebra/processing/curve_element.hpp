@@ -1239,22 +1239,19 @@ namespace nil {
                         if (denominator.is_zero()) {
                             return nil::marshalling::status_type::invalid_msg_data;
                         }
-                        field_type::value_type fraction = (field_type::value_type::one() - vv) / denominator;
+                        field_type::value_type fraction = (field_type::value_type::one() - vv) * denominator.inversed();
 
-                        // TODO: change logic of sqrt error handling
                         field_type::value_type u;
                         if (fraction.is_one()) {
                             u = field_type::modulus - 1;
                         } else if (fraction.is_zero()) {
                             u = field_type::value_type::zero();
                         } else {
-                            u = fraction.sqrt();
-                            // Sqrt now returns 0 on error. We will change this when proper error handling is implemented.
-                            if (u == field_type::value_type::zero()) {
+                            if ( !fraction.is_square() ) {
                                 return nil::marshalling::status_type::invalid_msg_data;
                             }
+                            u = fraction.sqrt();
                         }
-                        // TODO: above logic should be handled in sqrt
 
                         if ((*(iter + chunk_number - 1) >> 7) == (static_cast<integral_type>(u.data) & 1)) {
                             point = group_value_type(u, field_v);
