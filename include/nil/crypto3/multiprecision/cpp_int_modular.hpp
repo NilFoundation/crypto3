@@ -17,24 +17,26 @@
 #define BOOST_MP_DETAIL_ASSERT_HPP
     // Using BOOST_STATIC_ASSERT_MSG on the next line results to compilation issues on older compilers like clang-12,
     // so commenting it for now. In case we decide to use only fresher compilers, it can be uncommented.
-    #define BOOST_MP_ASSERT_MSG(expr, msg)      \
-    #ifndef BOOST_MP_NO_CONSTEXPR_DETECTION   \
-        if (BOOST_MP_IS_CONST_EVALUATED()) {    \
-            /* BOOST_STATIC_ASSERT_MSG(expr, msg); */ \
-        } else {                                \
-            BOOST_ASSERT_MSG(expr, msg);        \
-        }                                       \
-    #else                                       \
+    #ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
+        #define BOOST_MP_ASSERT_MSG(expr, msg)      \
+            if (BOOST_MP_IS_CONST_EVALUATED()) {    \
+                /* BOOST_STATIC_ASSERT_MSG(expr, msg); */ \
+            } else {                                \
+                BOOST_ASSERT_MSG(expr, msg);        \
+            }
+    #else
+        #define BOOST_MP_ASSERT_MSG(expr, msg)
     #endif
 
-    #define BOOST_MP_ASSERT(expr)               \
-    #ifndef BOOST_MP_NO_CONSTEXPR_DETECTION   \
-        if (BOOST_MP_IS_CONST_EVALUATED()) {    \
-            /* BOOST_STATIC_ASSERT(expr);*/     \
-        } else {                                \
-            BOOST_ASSERT(expr);                 \
-        }                                       \
-    #else                                       \
+    #ifndef BOOST_MP_NO_CONSTEXPR_DETECTION
+        #define BOOST_MP_ASSERT(expr)               \
+            if (BOOST_MP_IS_CONST_EVALUATED()) {    \
+                /* BOOST_STATIC_ASSERT(expr);*/     \
+            } else {                                \
+                BOOST_ASSERT(expr);                 \
+            }
+    #else
+        #define BOOST_MP_ASSERT(expr)
     #endif
 
 #endif
