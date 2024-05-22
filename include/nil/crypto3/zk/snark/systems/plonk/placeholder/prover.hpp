@@ -265,14 +265,14 @@ namespace nil {
                             transcript.template challenges<FieldType, f_parts>();
 
                         // 7.2. Compute F_consolidated
-                        polynomial_dfs_type F_consolidated_dfs(
-                            0, _F_dfs[0].size(), FieldType::value_type::zero());
-                        for (std::size_t i = 0; i < f_parts; i++) {
+                        std::vector<polynomial_dfs_type> F_consolidated_dfs_parts(_F_dfs.begin(), _F_dfs.end());
+                        for (std::size_t i = 0; i < F_consolidated_dfs_parts.size(); ++i) {
                             if (_F_dfs[i].is_zero()) {
                                 continue;
                             }
-                            F_consolidated_dfs += alphas[i] * _F_dfs[i];
+                            F_consolidated_dfs_parts[i] *= alphas[i];
                         }
+                        polynomial_dfs_type F_consolidated_dfs = polynomial_sum<FieldType>(std::move(F_consolidated_dfs_parts));
 
                         polynomial_type F_consolidated_normal(F_consolidated_dfs.coefficients());
 

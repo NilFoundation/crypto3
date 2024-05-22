@@ -278,18 +278,14 @@ namespace nil {
 
                         F_dfs[3] = zero_polynomial;
 
-                        for (std::size_t i = 1; i < sorted.size(); i++) {
-                            typename FieldType::value_type alpha =  transcript.template challenge<FieldType>();
-                            math::polynomial_dfs sorted_shifted = math::polynomial_shift(sorted[i-1], preprocessed_data.common_data.desc.usable_rows_amount , basic_domain->m);
-                            F_dfs[3] += alpha * preprocessed_data.common_data.lagrange_0 * (sorted[i] - sorted_shifted);
+                        std::vector<math::polynomial_dfs<typename FieldType::value_type>> F_dfs_3_parts(std::next(sorted.begin(), 1), sorted.end());
+                        for (std::size_t i = 0; i < F_dfs_3_parts.size(); i++) {
+                            typename FieldType::value_type alpha = transcript.template challenge<FieldType>();
+                            math::polynomial_dfs sorted_shifted = math::polynomial_shift(sorted[i], preprocessed_data.common_data.desc.usable_rows_amount , basic_domain->m);
+                            F_dfs_3_parts[i] -= sorted_shifted;
+                            F_dfs_3_parts[i] *= alpha * preprocessed_data.common_data.lagrange_0;
                         }
-
-/*                        for( std::size_t i = 0; i < basic_domain->m; i++){
-                            BOOST_CHECK( F_dfs[0].evaluate(basic_domain->get_domain_element(i)) == FieldType::value_type::zero() );
-                            BOOST_CHECK( F_dfs[1].evaluate(basic_domain->get_domain_element(i)) == FieldType::value_type::zero() );
-                            BOOST_CHECK( F_dfs[2].evaluate(basic_domain->get_domain_element(i)) == FieldType::value_type::zero() );
-                            BOOST_CHECK( F_dfs[3].evaluate(basic_domain->get_domain_element(i)) == FieldType::value_type::zero() );
-                        }*/
+                        F_dfs[3] = polynomial_sum<FieldType>(std::move(F_dfs_3_parts));
 
                         return {
                             std::move(F_dfs),
