@@ -262,7 +262,7 @@ namespace nil {
                                 auto reduced_g = reduce_dfs_polynomial_domain(g, basic_domain->m);
                                 auto reduced_h = reduce_dfs_polynomial_domain(h, basic_domain->m);
                                 for( std::size_t j = 0; j < preprocessed_data.common_data.desc.usable_rows_amount; j++){
-                                    current_poly[j] = (previous_poly[j] * reduced_g[j]) / reduced_h[j];
+                                    current_poly[j] = (previous_poly[j] * reduced_g[j]) * reduced_h[j].inversed();
                                 }
                                 commitment_scheme.append_to_batch(PERMUTATION_BATCH, current_poly);
                                 auto par = lookup_alphas[i] * (previous_poly * g - current_poly * h);

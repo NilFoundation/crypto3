@@ -151,7 +151,7 @@ namespace nil {
                         auto omega = common_data.basic_domain->get_domain_element(1);
                         auto challenge = proof.eval_proof.challenge;
                         auto numerator = challenge.pow(table_description.rows_amount) - FieldType::value_type::one();
-                        numerator /= typename FieldType::value_type(table_description.rows_amount);
+                        numerator *= typename FieldType::value_type(table_description.rows_amount).inversed();
 
                         // If public input sizes are set, all of them should be set.
                         if(constraint_system.public_input_sizes_num() != 0 && constraint_system.public_input_sizes_num() != table_description.public_input_columns){
@@ -165,7 +165,7 @@ namespace nil {
                                 max_size = std::min(max_size, constraint_system.public_input_size(i));
                             auto omega_pow = FieldType::value_type::one();
                             for( std::size_t j = 0; j < max_size; ++j ){
-                                value += (public_input[i][j] * omega_pow) / (challenge - omega_pow);
+                                value += (public_input[i][j] * omega_pow) * (challenge - omega_pow).inversed();
                                 omega_pow = omega_pow * omega;
                             }
                             value *= numerator;

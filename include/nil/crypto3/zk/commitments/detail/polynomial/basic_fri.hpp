@@ -1030,8 +1030,8 @@ namespace nil {
                                 std::size_t id1 = s_indices[j][0] < s_indices[j][1] ? 1 : 0;
                                 Q[j][0] -= combined_U[p];
                                 Q[j][1] -= combined_U[p];
-                                Q[j][0] /= denominators[p].evaluate(s[j][id0]);
-                                Q[j][1] /= denominators[p].evaluate(s[j][id1]);
+                                Q[j][0] *= denominators[p].evaluate(s[j][id0]).inversed();
+                                Q[j][1] *= denominators[p].evaluate(s[j][id1]).inversed();
                                 y[j][0] += Q[j][0];
                                 y[j][1] += Q[j][1];
                             }

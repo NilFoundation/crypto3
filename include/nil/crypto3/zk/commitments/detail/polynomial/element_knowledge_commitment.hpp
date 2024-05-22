@@ -84,6 +84,21 @@ namespace nil {
                             return element_kc(this->g.doubled(), this->h.doubled());
                         }
 
+                        void mixed_add(const element_kc &other) {
+                            g.mixed_add(other.g);
+                            h.mixed_add(other.h);
+                        }
+
+                        void double_inplace() {
+                            g.double_inplace();
+                            h.double_inplace();
+                        }
+                        element_kc& operator+=(const element_kc &other) {
+                            g += other.g;
+                            h += other.h;
+                            return *this;
+                        }
+
                         element_kc to_projective() {
                             return element_kc(this->g.to_projective(), this->h.to_projective());
                         }
