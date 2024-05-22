@@ -27,10 +27,15 @@
 #define CRYPTO3_BLUEPRINT_ASSIGNMENT_PLONK_HPP
 
 #include <algorithm>
+#include <cstdint>
 #include <functional>
+#include <iomanip>
 #include <limits>
+#include <optional>
+#include <ostream>
 #include <unordered_map>
 #include <unordered_set>
+#include <vector>
 
 #include <boost/type_erasure/any.hpp>
 #include <boost/type_erasure/same_type.hpp>
@@ -144,6 +149,10 @@ namespace nil {
             shared_container_type shared_storage; // results of the previously prover
             std::set<std::uint32_t> lookup_constant_cols;
             std::set<std::uint32_t> lookup_selector_cols;
+
+            /// Used to specify ranges of indexes for columns or rows
+            using ranges = std::vector<std::pair<std::size_t, std::size_t>>;
+
         public:
             static constexpr const std::size_t private_storage_index = std::numeric_limits<std::size_t>::max();
             static constexpr const std::size_t batch_private_storage_index = std::numeric_limits<std::size_t>::max() - 1;
@@ -581,72 +590,156 @@ namespace nil {
                 }
             }
 
-            virtual void export_table(std::ostream& os, bool wide_export = false) const {
-                // wide_export is for e.g. potentiall fuzzer: does fixed width elements
-                std::ios_base::fmtflags os_flags(os.flags());
+            /// @brief Max size of witness columns.
+            std::uint32_t max_witnesses_size() const {
+                std::uint32_t size = 0;
+                std::size_t ammount = this->_private_table.witnesses_amount();
+                for (std::uint32_t i = 0; i < ammount; i++) {
+                    size = std::max(size, this->_private_table.witness_column_size(i));
+                }
+                return size;
+            }
+
+            /// @brief Max size of public input columns.
+            std::uint32_t max_public_inputs_size() const {
+                std::uint32_t size = 0;
+                std::size_t ammount = this->_public_table.public_inputs_amount();
+                for (std::uint32_t i = 0; i < ammount; i++) {
+                    size = std::max(size, this->_public_table.public_input_column_size(i));
+                }
+                return size;
+            }
+
+            /// @brief Max size of constant columns.
+            std::uint32_t max_constants_size() const {
+                std::uint32_t size = 0;
+                std::size_t ammount = this->_public_table.constants_amount();
+                for (std::uint32_t i = 0; i < ammount; i++) {
+                    size = std::max(size, this->_public_table.constant_column_size(i));
+                }
+                return size;
+            }
+
+            /// @brief Max size of selector columns.
+            std::uint32_t max_selectors_size() const {
+                std::uint32_t size = 0;
+                std::size_t ammount = this->_public_table.selectors_amount();
+                for (std::uint32_t i = 0; i < ammount; i++) {
+                    size = std::max(size, this->_public_table.selector_column_size(i));
+                }
+                return size;
+            }
+
+            /// @brief Max size of all columns.
+            std::uint32_t max_size() const {
+                return std::max(
+                    {max_witnesses_size(), max_public_inputs_size(), max_constants_size(), max_selectors_size()});
+            }
+
+            virtual void export_table(std::ostream &os, bool wide_export = false) const {
                 std::size_t witnesses_size = this->_private_table.witnesses_amount(),
                             public_size = this->_public_table.public_inputs_amount(),
                             constants_size = this->_public_table.constants_amount(),
                             selectors_size = this->_public_table.selectors_amount();
-                std::uint32_t max_size = 0,
-                              max_witnesses_size = 0,
-                              max_public_inputs_size = 0,
-                              max_constants_size = 0,
-                              max_selectors_size = 0;
-                for (std::uint32_t i = 0; i < witnesses_size; i++) {
-                    max_witnesses_size = std::max(max_witnesses_size, this->_private_table.witness_column_size(i));
+                std::uint32_t size = this->max_size();
+
+                ranges rows;
+                if (size) {
+                    rows.push_back({0, size});
                 }
-                for (std::uint32_t i = 0; i < public_size; i++) {
-                    max_public_inputs_size = std::max(max_public_inputs_size,
-                                                      this->_public_table.public_input_column_size(i));
+                ranges witnesses;
+                if (witnesses_size) {
+                    witnesses.push_back({0, witnesses_size});
                 }
-                for (std::uint32_t i = 0; i < constants_size; i++) {
-                    max_constants_size = std::max(max_constants_size, this->_public_table.constant_column_size(i));
+                ranges public_inputs;
+                if (public_size) {
+                    public_inputs.push_back({0, public_size});
                 }
-                for (std::uint32_t i = 0; i < selectors_size; i++) {
-                    max_selectors_size = std::max(max_selectors_size, this->_public_table.selector_column_size(i));
+                ranges constants;
+                if (constants_size) {
+                    constants.push_back({0, constants_size});
                 }
+                ranges selectors;
+                if (selectors_size) {
+                    selectors.push_back({0, selectors_size});
+                }
+                return export_table(os, witnesses, public_inputs, constants, selectors, rows, wide_export);
+            }
+
+            /**
+             * @brief Partial export of the table with specifies columns and rows.
+             * Headers are still will describe the whole table.
+             */
+            virtual void export_table(std::ostream &os, ranges witnesses, ranges public_inputs, ranges constants,
+                                      ranges selectors, ranges rows, bool wide_export = false) const {
+                // wide_export is for e.g. potentiall fuzzer: does fixed width elements
+                std::ios_base::fmtflags os_flags(os.flags());
+                std::size_t total_witnesses_size = this->_private_table.witnesses_amount(),
+                            total_public_size = this->_public_table.public_inputs_amount(),
+                            total_constants_size = this->_public_table.constants_amount(),
+                            total_selectors_size = this->_public_table.selectors_amount();
+                std::uint32_t total_size = this->max_size();
+
                 os << std::dec;
-                max_size = std::max({max_witnesses_size,
-                                    max_public_inputs_size,
-                                    max_constants_size,
-                                    max_selectors_size});
-                os << "witnesses_size: " << witnesses_size << " "
-                   << "public_inputs_size: " << public_size << " "
-                   << "constants_size: " << constants_size << " "
-                   << "selectors_size: " << selectors_size << " "
-                   << "max_size: " << max_size << "\n";
+
+                os << "witnesses_size: " << total_witnesses_size << " "
+                   << "public_inputs_size: " << total_public_size << " "
+                   << "constants_size: " << total_constants_size << " "
+                   << "selectors_size: " << total_selectors_size << " "
+                   << "max_size: " << total_size << "\n";
 
                 os << std::hex << std::setfill('0');
                 std::uint32_t width = wide_export ? (BlueprintFieldType::modulus_bits + 4 - 1) / 4 : 0;
-                for (std::uint32_t i = 0; i < max_size; i++) {
-                    for (std::uint32_t j = 0; j < witnesses_size; j++) {
-                        os << std::setw(width)
-                            << (i < this->_private_table.witness_column_size(j) ?
-                                    this->_private_table.witness(j)[i] : 0).data << " ";
+
+                for (auto [lower_row, upper_row] : rows) {
+                    for (std::uint32_t i = lower_row; i <= upper_row; i++) {
+                        for (auto [lower_witness, upper_witness] : witnesses) {
+                            for (std::uint32_t j = lower_witness; j <= upper_witness; j++) {
+                                os << std::setw(width)
+                                   << (i < this->_private_table.witness_column_size(j) ?
+                                           this->_private_table.witness(j)[i] :
+                                           0)
+                                          .data
+                                   << " ";
+                            }
+                        }
+                        os << "| ";
+                        for (auto [lower_public_input, upper_public_input] : public_inputs) {
+                            for (std::uint32_t j = lower_public_input; j <= upper_public_input; j++) {
+                                os << std::setw(width)
+                                   << (i < this->_public_table.public_input_column_size(j) ?
+                                           this->_public_table.public_input(j)[i] :
+                                           0)
+                                          .data
+                                   << " ";
+                            }
+                        }
+                        os << "| ";
+                        for (auto [lower_constant, upper_constant] : constants) {
+                            for (std::uint32_t j = lower_constant; j <= upper_constant; j++) {
+                                os << std::setw(width)
+                                   << (i < this->_public_table.constant_column_size(j) ?
+                                           this->_public_table.constant(j)[i] :
+                                           0)
+                                          .data
+                                   << " ";
+                            }
+                        }
+                        os << "| ";
+                        for (auto [lower_selector, upper_selector] : selectors) {
+                            // Selectors only need a single bit, so we do not renew the size here
+                            for (std::uint32_t j = lower_selector; j <= upper_selector; j++) {
+                                os << (i < this->_public_table.selector_column_size(j) ?
+                                           this->_public_table.selector(j)[i] :
+                                           0)
+                                          .data
+                                   << " ";
+                            }
+                        }
+                        os << "\n";
                     }
-                    os << "| ";
-                    for (std::uint32_t j = 0; j < public_size; j++) {
-                        os << std::setw(width)
-                            << (i < this->_public_table.public_input_column_size(j) ?
-                                    this->_public_table.public_input(j)[i] : 0).data << " ";
-                    }
-                    os << "| ";
-                    for (std::uint32_t j = 0; j < constants_size; j++) {
-                        os << std::setw(width)
-                            << (i < this->_public_table.constant_column_size(j) ?
-                                    this->_public_table.constant(j)[i] : 0).data << " ";
-                    }
-                    os << "| ";
-                    // Selectors only need a single bit, so we do not renew the size here
-                    for (std::uint32_t j = 0; j < selectors_size - 1; j++) {
-                        os << (i < this->_public_table.selector_column_size(j) ?
-                                    this->_public_table.selector(j)[i] : 0).data << " ";
-                    }
-                    os << (i < this->_public_table.selector_column_size(selectors_size - 1) ?
-                                this->_public_table.selector(selectors_size - 1)[i] : 0).data;
-                    os << "\n";
                 }
+
                 os.flush();
                 os.flags(os_flags);
             }
