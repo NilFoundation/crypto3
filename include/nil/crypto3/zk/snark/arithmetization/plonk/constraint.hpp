@@ -37,6 +37,8 @@
 #include <nil/crypto3/zk/math/expression_visitors.hpp>
 #include <nil/crypto3/zk/math/expression_evaluator.hpp>
 
+#include <map>
+
 namespace nil {
     namespace crypto3 {
         namespace zk {
