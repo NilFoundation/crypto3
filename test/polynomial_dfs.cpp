@@ -234,6 +234,42 @@ BOOST_AUTO_TEST_CASE(polynomial_dfs_addition_less_a) {
          0x5a8fa2a6cb26338cef1cd76f6106a8baa60293c9c1c0d2c31e813ed413279c47_cppui_modular253}};
     BOOST_CHECK_EQUAL(c_res, c);
 }
+
+BOOST_AUTO_TEST_CASE(polynomial_dfs_sum) {
+    std::vector<polynomial_dfs<typename FieldType::value_type>> polynomials = {
+        {
+            7,
+            {
+                0x37_cppui_modular253,
+                0x6C17ABF513DFFC886A7F49F970801792C825CFDD829870DC60E8DA51F53633_cppui_modular253,
+                0x73EDA753299D7D3ED0CB3E52336E8625A78AA3D929CB5BFEFFEEFFFEFFFFFFFD_cppui_modular253,
+                0x53B09574717196328488C7990499B10ABA0C038C321BF5B1C0D1C5A4E10C7330_cppui_modular253,
+                0x73EDA753299D7D483339D80809A1D80553BDA402FFFE5BFEFFFFFFFEFFFFFFEE_cppui_modular253,
+                0x73818FA734899D485AE48BE74C1F3B0838E37E245E69C38E23991724AE0AC9C4_cppui_modular253,
+                0x9626E99B5D63351DFAC330029D63300000010FFFFFFFFFFFC_cppui_modular253,
+                0x203D11DEB82BE718FE9BDD45C91A43E021C3A08591F4664D3F343A5A1EF38CC7_cppui_modular253
+            }
+        },
+        {
+            6,
+            {
+                0x4e_cppui_modular253,
+                0x2984a53ad76597710bc6e589547653b47dcce72f84e0617332e6e0761851f4a9_cppui_modular253,
+                0x73eda753299d7d4078c0a4bd957794986b93a3e08bd45bfefff1fffefffffffb_cppui_modular253,
+                0x195e04ac5e7749b26f0033b1486ae23bed8b1011de0d893be16ec12aecd863c2_cppui_modular253,
+                0x73eda753299d7d483339d80809a1d80553bda402fffe5bfefffffffeffffffff_cppui_modular253,
+                0x4a6902185237e5dffc8fbf66155bd15f9620bcfadb4dfa8bcd291f88e7ae0b60_cppui_modular253,
+                0x7ba79334a742a436ce82a0022742a0000000dfffffffffffa_cppui_modular253,
+                0x5a8fa2a6cb26338cef1cd76f6106a8baa60293c9c1c0d2c31e813ed413279c47_cppui_modular253
+            }
+        }
+    };
+    auto native_sum = polynomial_dfs<typename FieldType::value_type>::zero();
+    for (const auto& p : polynomials) {
+        native_sum += p;
+    }
+    BOOST_CHECK_EQUAL(native_sum, polynomial_sum<FieldType>(polynomials));
+}
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(polynomial_dfs_addition_eq_test_suite)

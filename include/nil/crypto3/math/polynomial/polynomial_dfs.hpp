@@ -35,9 +35,10 @@
 #include <iterator>
 #include <unordered_map>
 
-#include <nil/crypto3/math/polynomial/basic_operations.hpp>
-#include <nil/crypto3/math/domains/evaluation_domain.hpp>
 #include <nil/crypto3/math/algorithms/make_evaluation_domain.hpp>
+#include <nil/crypto3/math/domains/evaluation_domain.hpp>
+#include <nil/crypto3/math/polynomial/basic_operations.hpp>
+#include <nil/crypto3/math/polynomial/polynomial.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -162,6 +163,10 @@ namespace nil {
 
                 allocator_type get_allocator() const BOOST_NOEXCEPT {
                     return this->val.__alloc();
+                }
+
+                container_type& get_storage() {
+                    return val;
                 }
 
                 iterator begin() BOOST_NOEXCEPT {
@@ -759,6 +764,35 @@ namespace nil {
                     os << std::dec << "]";
                 }
                 return os;
+            }
+
+            template<typename FieldType>
+            static inline polynomial_dfs<typename FieldType::value_type> polynomial_sum(
+                    std::vector<math::polynomial_dfs<typename FieldType::value_type>> addends) {
+                using FieldValueType = typename FieldType::value_type;
+                std::size_t max_size = 0;
+                std::unordered_map<std::size_t, polynomial_dfs<FieldValueType>> size_to_part_sum;
+                for (auto& addend : addends) {
+                    max_size = std::max(max_size, addend.size());
+                    auto it = size_to_part_sum.find(addend.size());
+                    if (it == size_to_part_sum.end()) {
+                        size_to_part_sum[addend.size()] = std::move(addend);
+                    } else {
+                        it->second += addend;
+                        // Free the memory we are not going to use anymore.
+                        addend = math::polynomial_dfs<FieldValueType>();
+                    }
+                }
+
+                auto coef_result = polynomial<FieldValueType>(max_size, FieldValueType::zero());
+                for (auto& [_, partial_sum] : size_to_part_sum) {
+                    coef_result += polynomial<FieldValueType>(std::move(partial_sum.coefficients()));
+                }
+
+                polynomial_dfs<FieldValueType> dfs_result;
+                dfs_result.from_coefficients(coef_result.get_storage());
+
+                return dfs_result;
             }
 
             template<typename FieldType>

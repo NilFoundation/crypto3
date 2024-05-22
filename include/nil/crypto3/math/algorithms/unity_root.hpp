@@ -30,6 +30,7 @@
 #include <complex>
 
 #include <boost/math/constants/constants.hpp>
+#include <boost/multiprecision/number.hpp>
 
 #include <nil/crypto3/algebra/totient.hpp>
 #include <nil/crypto3/algebra/type_traits.hpp>

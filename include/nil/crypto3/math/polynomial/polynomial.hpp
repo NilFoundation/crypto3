@@ -96,6 +96,7 @@ namespace nil {
 
                 polynomial(const polynomial& x) : val(x.val) {
                 }
+
                 polynomial(const polynomial& x, const allocator_type& a) : val(x.val, a) {
                 }
 
@@ -117,13 +118,8 @@ namespace nil {
                     this->operator[](power) = value;
                 }
 
-                explicit polynomial(const container_type &c) : val(c) {
-                    if (val.empty()) {
-                        val.push_back(FieldValueType::zero());
-                    }
-                }
-
-                explicit polynomial(container_type &&c) : val(c) {
+                template<typename T>
+                explicit polynomial(T&& c) : val(std::forward<T>(c)) {
                     if (val.empty()) {
                         val.push_back(FieldValueType::zero());
                     }
@@ -177,6 +173,10 @@ namespace nil {
 
                 allocator_type get_allocator() const BOOST_NOEXCEPT {
                     return this->val.__alloc();
+                }
+
+                container_type& get_storage() {
+                    return val;
                 }
 
                 iterator begin() BOOST_NOEXCEPT {
@@ -383,7 +383,7 @@ namespace nil {
                  * Returns true if polynomial is a one polynomial.
                  */
                 bool is_one() const {
-                    return (*this->begin() == FieldValueType(1)) && 
+                    return (*this->begin() == FieldValueType(1)) &&
                         std::all_of(++this->begin(), this->end(),
                             [](FieldValueType i) { return i == FieldValueType::zero(); });
                 }
