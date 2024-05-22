@@ -156,9 +156,9 @@ namespace nil {
 
                                 if (bucket_nonzero[id]) {
 #ifdef USE_MIXED_ADDITION
-                                    buckets[id] = buckets[id].mixed_add(bases[i]);
+                                    buckets[id].mixed_add(bases[i]);
 #else
-                                    buckets[id] = buckets[id] + bases[i];
+                                    buckets[id] += bases[i];
 #endif
                                 } else {
                                     buckets[id] = bases[i];
@@ -177,9 +177,9 @@ namespace nil {
                                 if (bucket_nonzero[i]) {
                                     if (running_sum_nonzero) {
 #ifdef USE_MIXED_ADDITION
-                                        running_sum = running_sum.mixed_add(buckets[i]);
+                                        running_sum.mixed_add(buckets[i]);
 #else
-                                        running_sum = running_sum + buckets[i];
+                                        running_sum += buckets[i];
 #endif
                                     } else {
                                         running_sum = buckets[i];
