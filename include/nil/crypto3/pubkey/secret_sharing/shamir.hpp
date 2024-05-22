@@ -74,8 +74,8 @@ namespace nil {
 
                     for (auto j : indexes) {
                         if (j != i) {
-                            result = result * (typename basic_policy::private_element_type(j) /
-                                               (typename basic_policy::private_element_type(j) - e_i));
+                            result = result * (typename basic_policy::private_element_type(j) *
+                                               (typename basic_policy::private_element_type(j) - e_i).inversed());
                         }
                     }
                     return result;

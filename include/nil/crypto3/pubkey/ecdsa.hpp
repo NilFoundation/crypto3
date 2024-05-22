@@ -292,7 +292,7 @@ namespace nil {
                         r = scalar_field_value_type(scalar_modular_type(typename scalar_modular_type::backend_type(
                             static_cast<base_integral_type>((k * g1_value_type::one()).to_affine().X.data),
                             scalar_field_value_type::modulus)));
-                        s = (privkey * r + encoded_m) / k;
+                        s = (privkey * r + encoded_m) * k.inversed();
                     } while (r.is_zero() || s.is_zero());
 
                     return signature_type(r, s);
