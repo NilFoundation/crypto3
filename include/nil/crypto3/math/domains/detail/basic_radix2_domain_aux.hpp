@@ -88,7 +88,7 @@ namespace nil {
                         for (std::size_t k = 0; k < n; k += 2 * m) {
                             for (std::size_t j = 0, idx = 0; j < m; ++j, idx += inc) {
                                 t = a[k + j + m];
-                                t *= omega_cache[idx].data;
+                                t *= omega_cache[idx];
                                 a[k + j + m] = a[k + j];
                                 a[k + j + m] -= t;
                                 a[k + j] += t;
