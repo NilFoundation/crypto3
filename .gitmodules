@@ -28,9 +28,6 @@
 [submodule "crypto3-modes"]
 	path = libs/modes
 	url = ../../NilFoundation/crypto3-modes.git
-[submodule "crypto3-multiprecision"]
-	path = libs/multiprecision
-	url = ../../NilFoundation/crypto3-multiprecision.git
 [submodule "crypto3-passhash"]
 	path = libs/passhash
 	url = ../../NilFoundation/crypto3-passhash.git
