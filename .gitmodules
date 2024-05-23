@@ -31,9 +31,6 @@
 [submodule "crypto3-pbkdf"]
 	path = libs/pbkdf
 	url = ../../NilFoundation/crypto3-pbkdf.git
-[submodule "crypto3-pkmodes"]
-	path = libs/threshold
-	url = ../../NilFoundation/crypto3-pkmodes.git
 [submodule "crypto3-pubkey"]
 	path = libs/pubkey
 	url = ../../NilFoundation/crypto3-pubkey.git
