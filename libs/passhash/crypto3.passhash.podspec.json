@@ -1,0 +1,92 @@
+{
+  "name": "crypto3.passhash",
+  "version": "0.1.0",
+  "summary": "=nil; Crypto3 C++ Cryptography Suite Cipher Passhash",
+  "description": "Crypto3.Passhash library extends the =nil; Foundation's cryptography suite and provides a set of password hashing techniques implemented in way C++ standard library implies: concepts, algorithms, predictable behavior, latest standard features support and clean architecture without compromising security and performance.",
+  "homepage": "http://crypto3.nil.foundation/projects/crypto3",
+  "license": "Boost Software License",
+  "authors": {
+    "Mikhail Komarov": "nemo@nil.foundation"
+  },
+  "platforms": {
+    "ios": "5.0",
+    "osx": "10.7"
+  },
+  "source": {
+    "git": "https://github.com/nilfoundation/passhash.git",
+    "branch": "master"
+  },
+  "xcconfig": {
+    "CLANG_CXX_LANGUAGE_STANDARD": "c++14",
+    "CLANG_CXX_LIBRARY": "libc++",
+    "HEADER_SEARCH_PATHS": "\"${PODS_ROOT}/include/\""
+  },
+  "subspecs": [
+    {
+      "name": "include",
+      "subspecs": [
+        {
+          "name": "nil",
+          "subspecs": [
+            {
+              "name": "crypto3",
+              "subspecs": [
+                {
+                  "name": "detail",
+                  "source_files": [
+                    "include/nil/crypto3/detail/*.{hpp}"
+                  ]
+                },
+                {
+                  "name": "passhash",
+                  "source_files": [
+                    "include/nil/crypto3/passhash/*.{hpp}"
+                  ],
+                  "subspecs": [
+                    {
+                      "name": "algorithm",
+                      "source_files": [
+                        "include/nil/crypto3/passhash/algorithm/*.{hpp}"
+                      ]
+                    },
+                    {
+                      "name": "accumulators",
+                      "source_files": [
+                        "include/nil/crypto3/passhash/accumulators/*.{hpp}"
+                      ],
+                      "subspecs": [
+                        {
+                          "name": "parameters",
+                          "source_files": [
+                            "include/nil/crypto3/passhash/accumulators/parameters/*.{hpp}"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "name": "detail",
+                      "subspecs": [
+                        {
+                          "name": "bcrypt",
+                          "source_files": [
+                            "include/nil/crypto3/passhash/detail/bcrypt/*.{hpp}"
+                          ]
+                        },
+                        {
+                          "name": "passhash9",
+                          "source_files": [
+                            "include/nil/crypto3/passhash/detail/passhash9/*.{hpp}"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
