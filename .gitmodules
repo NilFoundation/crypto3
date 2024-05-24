@@ -22,9 +22,6 @@
 [submodule "crypto3-modes"]
 	path = libs/modes
 	url = ../../NilFoundation/crypto3-modes.git
-[submodule "crypto3-pubkey"]
-	path = libs/pubkey
-	url = ../../NilFoundation/crypto3-pubkey.git
 [submodule "crypto3-random"]
 	path = libs/random
 	url = ../../NilFoundation/crypto3-random.git
