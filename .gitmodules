@@ -25,9 +25,6 @@
 [submodule "crypto3-stream"]
 	path = libs/stream
 	url = ../../NilFoundation/crypto3-stream.git
-[submodule "crypto3-vdf"]
-	path = libs/vdf
-	url = ../../NilFoundation/crypto3-vdf.git
 [submodule "crypto3-zk"]
 	path = libs/zk
     url = ../../NilFoundation/crypto3-zk.git
