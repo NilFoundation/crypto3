@@ -4,12 +4,6 @@
 [submodule "crypto3-algebra"]
 	path = libs/algebra
 	url = ../../NilFoundation/crypto3-algebra.git
-[submodule "crypto3-block"]
-	path = libs/block
-	url = ../../NilFoundation/crypto3-block.git
-[submodule "crypto3-codec"]
-	path = libs/codec
-	url = ../../NilFoundation/crypto3-codec.git
 [submodule "crypto3-containers"]
 	path = libs/containers
 	url = ../../NilFoundation/crypto3-containers.git
