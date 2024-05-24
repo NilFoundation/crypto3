@@ -85,14 +85,14 @@ namespace nil {
                                 tmp[i] = state[i * policy_type::word_bytes + row];
                             }
 
-                            for (std::size_t i = 0; i < policy_type::block_words - 1; ++i) {
+                            for (std::size_t i = 0; i < policy_type::block_words - off; ++i) {
                                 state[i * policy_type::word_bytes + row] =
                                     state[(i + off) * policy_type::word_bytes + row];
                             }
 
                             for (std::size_t i = 0; i < off; ++i) {
-                                state[(policy_type::block_words - 1 - i) * policy_type::word_bytes + row] =
-                                    tmp[off - 1 - i];
+                                state[(policy_type::block_words - off + i) * policy_type::word_bytes + row] =
+                                    tmp[i];
                             }
                         }
                     }

@@ -194,7 +194,7 @@ std::basic_ostream<charT, traits> &operator<<(std::basic_ostream<charT, traits> 
     byte_string::size_type bufsize = s.size() * 2 + 1;
     char buf[bufsize];
     for (byte_string::size_type i = 0; i < s.size(); ++i) {
-        std::sprintf(buf + i * 2, "%02x", s[i]);
+        std::snprintf(buf + i * 2, 3, "%02x", static_cast<unsigned char>(s[i]));
     }
     buf[bufsize - 1] = '\0';
     out << buf;
