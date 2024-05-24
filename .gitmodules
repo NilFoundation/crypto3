@@ -13,9 +13,6 @@
 [submodule "crypto3-math"]
 	path = libs/math
 	url = ../../NilFoundation/crypto3-math.git
-[submodule "crypto3-modes"]
-	path = libs/modes
-	url = ../../NilFoundation/crypto3-modes.git
 [submodule "crypto3-zk"]
 	path = libs/zk
     url = ../../NilFoundation/crypto3-zk.git
