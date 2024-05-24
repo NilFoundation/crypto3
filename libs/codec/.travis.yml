@@ -1,0 +1,589 @@
+#//---------------------------------------------------------------------------//
+#//
+#// Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+#// Copyright (c) 2019 Moskvin Aleksey <zerg1996@yandex.ru>
+#//---------------------------------------------------------------------------//
+
+language: cpp
+
+sudo: true
+
+python: "2.7"
+
+jobs:
+    include:
+
+        -   os: osx
+            osx_image: xcode8.3
+            compiler: clang
+            env: CXXSTD=c++11
+
+
+        -   os: osx
+            osx_image: xcode8.3
+            compiler: gcc
+            env: CXXSTD=c++11
+
+
+
+        -   os: osx
+            osx_image: xcode9.1
+            compiler: clang
+            env: CXXSTD=c++11
+
+
+        -   os: osx
+            osx_image: xcode9.1
+            compiler: gcc
+            env: CXXSTD=c++11
+
+
+
+        -   os: osx
+            osx_image: xcode9.2
+            compiler: clang
+            env: CXXSTD=c++11
+
+
+        -   os: osx
+            osx_image: xcode9.2
+            compiler: gcc
+            env: CXXSTD=c++11
+
+
+
+        -   os: osx
+            osx_image: xcode9.3
+            compiler: clang
+            env: CXXSTD=c++11
+
+
+        -   os: osx
+            osx_image: xcode9.3
+            compiler: gcc
+            env: CXXSTD=c++11
+
+
+
+        -   os: osx
+            osx_image: xcode9.4
+            compiler: clang
+            env: CXXSTD=c++11
+
+
+        -   os: osx
+            osx_image: xcode9.4
+            compiler: gcc
+            env: CXXSTD=c++11
+
+
+
+        -   os: osx
+            osx_image: xcode10
+            compiler: clang
+            env: CXXSTD=c++11
+
+
+        -   os: osx
+            osx_image: xcode10
+            compiler: gcc
+            env: CXXSTD=c++11
+
+
+
+        -   os: osx
+            osx_image: xcode10.1
+            compiler: clang
+            env: CXXSTD=c++11
+
+
+        -   os: osx
+            osx_image: xcode10.1
+            compiler: gcc
+            env: CXXSTD=c++11
+
+
+
+        -   os: osx
+            osx_image: xcode10.2
+            compiler: clang
+            env: CXXSTD=c++11
+
+
+        -   os: osx
+            osx_image: xcode10.2
+            compiler: gcc
+            env: CXXSTD=c++11
+
+
+
+        -   os: osx
+            osx_image: xcode11
+            compiler: clang
+            env: CXXSTD=c++11
+
+
+        -   os: osx
+            osx_image: xcode11
+            compiler: gcc
+            env: CXXSTD=c++11
+
+
+
+        -   os: osx
+            osx_image: xcode8.3
+            compiler: clang
+            env: CXXSTD=c++14
+
+
+        -   os: osx
+            osx_image: xcode8.3
+            compiler: gcc
+            env: CXXSTD=c++14
+
+
+
+        -   os: osx
+            osx_image: xcode9.1
+            compiler: clang
+            env: CXXSTD=c++14
+
+
+        -   os: osx
+            osx_image: xcode9.1
+            compiler: gcc
+            env: CXXSTD=c++14
+
+
+
+        -   os: osx
+            osx_image: xcode9.2
+            compiler: clang
+            env: CXXSTD=c++14
+
+
+        -   os: osx
+            osx_image: xcode9.2
+            compiler: gcc
+            env: CXXSTD=c++14
+
+
+
+        -   os: osx
+            osx_image: xcode9.3
+            compiler: clang
+            env: CXXSTD=c++14
+
+
+        -   os: osx
+            osx_image: xcode9.3
+            compiler: gcc
+            env: CXXSTD=c++14
+
+
+
+        -   os: osx
+            osx_image: xcode9.4
+            compiler: clang
+            env: CXXSTD=c++14
+
+
+        -   os: osx
+            osx_image: xcode9.4
+            compiler: gcc
+            env: CXXSTD=c++14
+
+
+
+        -   os: osx
+            osx_image: xcode10
+            compiler: clang
+            env: CXXSTD=c++14
+
+
+        -   os: osx
+            osx_image: xcode10
+            compiler: gcc
+            env: CXXSTD=c++14
+
+
+
+        -   os: osx
+            osx_image: xcode10.1
+            compiler: clang
+            env: CXXSTD=c++14
+
+
+        -   os: osx
+            osx_image: xcode10.1
+            compiler: gcc
+            env: CXXSTD=c++14
+
+
+
+        -   os: osx
+            osx_image: xcode10.2
+            compiler: clang
+            env: CXXSTD=c++14
+
+
+        -   os: osx
+            osx_image: xcode10.2
+            compiler: gcc
+            env: CXXSTD=c++14
+
+
+
+        -   os: osx
+            osx_image: xcode11
+            compiler: clang
+            env: CXXSTD=c++14
+
+
+        -   os: osx
+            osx_image: xcode11
+            compiler: gcc
+            env: CXXSTD=c++14
+
+
+
+        -   os: osx
+            osx_image: xcode8.3
+            compiler: clang
+            env: CXXSTD=c++17
+
+
+        -   os: osx
+            osx_image: xcode8.3
+            compiler: gcc
+            env: CXXSTD=c++17
+
+
+
+        -   os: osx
+            osx_image: xcode9.1
+            compiler: clang
+            env: CXXSTD=c++17
+
+
+        -   os: osx
+            osx_image: xcode9.1
+            compiler: gcc
+            env: CXXSTD=c++17
+
+
+
+        -   os: osx
+            osx_image: xcode9.2
+            compiler: clang
+            env: CXXSTD=c++17
+
+
+        -   os: osx
+            osx_image: xcode9.2
+            compiler: gcc
+            env: CXXSTD=c++17
+
+
+
+        -   os: osx
+            osx_image: xcode9.3
+            compiler: clang
+            env: CXXSTD=c++17
+
+
+        -   os: osx
+            osx_image: xcode9.3
+            compiler: gcc
+            env: CXXSTD=c++17
+
+
+
+        -   os: osx
+            osx_image: xcode9.4
+            compiler: clang
+            env: CXXSTD=c++17
+
+
+        -   os: osx
+            osx_image: xcode9.4
+            compiler: gcc
+            env: CXXSTD=c++17
+
+
+
+        -   os: osx
+            osx_image: xcode10
+            compiler: clang
+            env: CXXSTD=c++17
+
+
+        -   os: osx
+            osx_image: xcode10
+            compiler: gcc
+            env: CXXSTD=c++17
+
+
+
+        -   os: osx
+            osx_image: xcode10.1
+            compiler: clang
+            env: CXXSTD=c++17
+
+
+        -   os: osx
+            osx_image: xcode10.1
+            compiler: gcc
+            env: CXXSTD=c++17
+
+
+
+        -   os: osx
+            osx_image: xcode10.2
+            compiler: clang
+            env: CXXSTD=c++17
+
+
+        -   os: osx
+            osx_image: xcode10.2
+            compiler: gcc
+            env: CXXSTD=c++17
+
+
+
+        -   os: osx
+            osx_image: xcode11
+            compiler: clang
+            env: CXXSTD=c++17
+
+
+        -   os: osx
+            osx_image: xcode11
+            compiler: gcc
+            env: CXXSTD=c++17
+
+
+
+        -   os: linux
+            dist: xenial
+            env: COMPILER_VERSION=5 CXXSTD=c++11
+            compiler: gcc
+
+
+        -   os: linux
+            dist: xenial
+            env: COMPILER_VERSION=6 CXXSTD=c++11
+            compiler: gcc
+
+
+        -   os: linux
+            dist: xenial
+            env: COMPILER_VERSION=7 CXXSTD=c++11
+            compiler: gcc
+
+
+        -   os: linux
+            dist: xenial
+            env: COMPILER_VERSION=8 CXXSTD=c++11
+            compiler: gcc
+
+
+        -   os: linux
+            dist: xenial
+            env: COMPILER_VERSION=9 CXXSTD=c++11
+            compiler: gcc
+
+
+        -   os: linux
+            dist: xenial
+            env: COMPILER_VERSION=5 CXXSTD=c++14
+            compiler: gcc
+
+
+        -   os: linux
+            dist: xenial
+            env: COMPILER_VERSION=6 CXXSTD=c++14
+            compiler: gcc
+
+
+        -   os: linux
+            dist: xenial
+            env: COMPILER_VERSION=7 CXXSTD=c++14
+            compiler: gcc
+
+
+        -   os: linux
+            dist: xenial
+            env: COMPILER_VERSION=8 CXXSTD=c++14
+            compiler: gcc
+
+
+        -   os: linux
+            dist: xenial
+            env: COMPILER_VERSION=9 CXXSTD=c++14
+            compiler: gcc
+
+
+        -   os: linux
+            dist: xenial
+            env: COMPILER_VERSION=7 CXXSTD=c++17
+            compiler: gcc
+
+
+        -   os: linux
+            dist: xenial
+            env: COMPILER_VERSION=8 CXXSTD=c++17
+            compiler: gcc
+
+
+        -   os: linux
+            dist: xenial
+            env: COMPILER_VERSION=9 CXXSTD=c++17
+            compiler: gcc
+
+
+        -   os: linux
+            dist: xenial
+            env: COMPILER_VERSION=5.0 CXXSTD=c++11
+            compiler: clang
+
+
+        -   os: linux
+            dist: xenial
+            env: COMPILER_VERSION=6.0 CXXSTD=c++11
+            compiler: clang
+
+
+        -   os: linux
+            dist: xenial
+            env: COMPILER_VERSION=7 CXXSTD=c++11
+            compiler: clang
+
+
+        -   os: linux
+            dist: xenial
+            env: COMPILER_VERSION=8 CXXSTD=c++11
+            compiler: clang
+
+
+        -   os: linux
+            dist: xenial
+            env: COMPILER_VERSION=9 CXXSTD=c++11
+            compiler: clang
+
+
+        -   os: linux
+            dist: xenial
+            env: COMPILER_VERSION=5.0 CXXSTD=c++14
+            compiler: clang
+
+
+        -   os: linux
+            dist: xenial
+            env: COMPILER_VERSION=6.0 CXXSTD=c++14
+            compiler: clang
+
+
+        -   os: linux
+            dist: xenial
+            env: COMPILER_VERSION=7 CXXSTD=c++14
+            compiler: clang
+
+
+        -   os: linux
+            dist: xenial
+            env: COMPILER_VERSION=8 CXXSTD=c++14
+            compiler: clang
+
+
+        -   os: linux
+            dist: xenial
+            env: COMPILER_VERSION=9 CXXSTD=c++14
+            compiler: clang
+
+
+        -   os: linux
+            dist: xenial
+            env: COMPILER_VERSION=6.0 CXXSTD=c++17
+            compiler: clang
+
+
+        -   os: linux
+            dist: xenial
+            env: COMPILER_VERSION=7 CXXSTD=c++17
+            compiler: clang
+
+
+        -   os: linux
+            dist: xenial
+            env: COMPILER_VERSION=8 CXXSTD=c++17
+            compiler: clang
+
+
+        -   os: linux
+            dist: xenial
+            env: COMPILER_VERSION=9 CXXSTD=c++17
+            compiler: clang
+
+
+before_install:
+    - if [[ $TRAVIS_OS_NAME == linux && $TRAVIS_COMPILER == clang ]]; then
+        wget -O - http://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -;
+        sudo apt-add-repository "deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-${COMPILER_VERSION} main";
+        sudo apt-get update && sudo apt-get install clang-${COMPILER_VERSION};
+        export CC=/usr/bin/clang-${COMPILER_VERSION};
+        export CXX=/usr/bin/clang++-${COMPILER_VERSION};
+        fi
+    - if [[ $TRAVIS_OS_NAME == linux && $TRAVIS_COMPILER == gcc ]]; then
+        sudo apt-add-repository -y ppa:ubuntu-toolchain-r/test;
+        sudo apt-get update;
+        sudo apt-get install gcc-${COMPILER_VERSION} g++-${COMPILER_VERSION};
+        export CC=/usr/bin/gcc-${COMPILER_VERSION};
+        export CXX=/usr/bin/g++-${COMPILER_VERSION};
+        fi
+    - if [[ $TRAVIS_OS_NAME == osx ]]; then
+        brew update;
+        brew upgrade cmake;
+      fi
+
+install:
+    - cd ..
+    - git clone --depth 1 https://github.com/boostorg/boost.git boost-root;
+    - git clone -b 3-current-predefs https://github.com/nilfoundation/predef.git predef
+    - git clone -b 2-malloc-function-attribute https://github.com/nilfoundation/config.git config
+    - cd boost-root
+    - git submodule update --init tools/build
+    - git submodule update --init libs/config
+    - git submodule update --init tools/boost_install
+    - git submodule update --init libs/headers
+    - git submodule update --init tools/boostdep
+    - git submodule update --init libs/multiprecision
+    - git submodule update --init libs/container
+    - git submodule update --init libs/accumulators
+    - python tools/boostdep/depinst/depinst.py multiprecision
+    - python tools/boostdep/depinst/depinst.py container
+    - python tools/boostdep/depinst/depinst.py accumulators
+    - python tools/boostdep/depinst/depinst.py predef
+    - python tools/boostdep/depinst/depinst.py config
+    - rm -rf libs/predef
+    - cp -r ../predef libs/predef
+    - rm -rf libs/config
+    - cp -r ../config libs/config
+    - ./bootstrap.sh
+
+script:
+    - if [[ $TRAVIS_OS_NAME == linux ]]; then
+        proc=$(($(nproc) + 1));
+        elif [[ $TRAVIS_OS_NAME == osx ]]; then
+        proc=$(($(sysctl -n hw.ncpu) + 1));
+        fi;
+    - sudo ./b2 -j$proc install || true;
+    - cd $TRAVIS_BUILD_DIR && mkdir cmake-build && cd cmake-build;
+    - echo $CXXSTD
+    - cmake -DBUILD_SHARED_LIBS=TRUE -DBUILD_TESTS=TRUE -DCMAKE_CXX_STANDARD=$(echo $CXXSTD | sed 's/[^0-9z]*//g') ..;
+    - make -j$proc tests-codec;
+    - ctest .
+
+notifications:
+    email:
+        on_success: always
