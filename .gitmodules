@@ -10,9 +10,6 @@
 [submodule "crypto3-hash"]
 	path = libs/hash
 	url = ../../NilFoundation/crypto3-hash.git
-[submodule "crypto3-mac"]
-	path = libs/mac
-	url = ../../NilFoundation/crypto3-mac.git
 [submodule "crypto3-math"]
 	path = libs/math
 	url = ../../NilFoundation/crypto3-math.git
