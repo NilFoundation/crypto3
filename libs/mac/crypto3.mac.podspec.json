@@ -1,0 +1,117 @@
+{
+  "name": "crypto3.mac",
+  "version": "0.1.0",
+  "summary": "=nil; Crypto3 C++ Cryptography Suite MAC",
+  "description": "Crypto3.MAC library extends the =nil; Foundation's cryptography suite and provides a set of message authentication codes implemented in way C++ standard library implies: concepts, algorithms, predictable behavior, latest standard features support and clean architecture without compromising security and performance.",
+  "homepage": "http://crypto3.nil.foundation/projects/crypto3",
+  "license": "Boost Software License",
+  "authors": {
+    "Mikhail Komarov": "nemo@nil.foundation"
+  },
+  "platforms": {
+    "ios": "5.0",
+    "osx": "10.7"
+  },
+  "source": {
+    "git": "https://github.com/nilfoundation/mac.git",
+    "branch": "master"
+  },
+  "xcconfig": {
+    "CLANG_CXX_LANGUAGE_STANDARD": "c++14",
+    "CLANG_CXX_LIBRARY": "libc++",
+    "HEADER_SEARCH_PATHS": "\"${PODS_ROOT}/include/\""
+  },
+  "subspecs": [
+    {
+      "name": "include",
+      "subspecs": [
+        {
+          "name": "nil",
+          "subspecs": [
+            {
+              "name": "crypto3",
+              "subspecs": [
+                {
+                  "name": "detail",
+                  "source_files": [
+                    "include/nil/crypto3/detail/*.{hpp}"
+                  ]
+                },
+                {
+                  "name": "mac",
+                  "source_files": [
+                    "include/nil/crypto3/mac/*.{hpp}"
+                  ],
+                  "subspecs": [
+                    {
+                      "name": "algorithm",
+                      "source_files": [
+                        "include/nil/crypto3/mac/algorithm/*.{hpp}"
+                      ]
+                    },
+                    {
+                      "name": "accumulators",
+                      "source_files": [
+                        "include/nil/crypto3/mac/accumulators/*.{hpp}"
+                      ]
+                    },
+                    {
+                      "name": "detail",
+                      "source_files": [
+                        "include/nil/crypto3/mac/detail/*.{hpp}"
+                      ],
+                      "subspecs": [
+                        {
+                          "name": "cbc_mac",
+                          "source_files": [
+                            "include/nil/crypto3/mac/detail/cbc_mac/*.{hpp}"
+                          ]
+                        },
+                        {
+                          "name": "cmac",
+                          "source_files": [
+                            "include/nil/crypto3/mac/detail/cmac/*.{hpp}"
+                          ]
+                        },
+                        {
+                          "name": "gmac",
+                          "source_files": [
+                            "include/nil/crypto3/mac/detail/gmac/*.{hpp}"
+                          ]
+                        },
+                        {
+                          "name": "hmac",
+                          "source_files": [
+                            "include/nil/crypto3/mac/detail/hmac/*.{hpp}"
+                          ]
+                        },
+                        {
+                          "name": "poly1305",
+                          "source_files": [
+                            "include/nil/crypto3/mac/detail/poly1305/*.{hpp}"
+                          ]
+                        },
+                        {
+                          "name": "siphash",
+                          "source_files": [
+                            "include/nil/crypto3/mac/detail/siphash/*.{hpp}"
+                          ]
+                        },
+                        {
+                          "name": "x919_mac",
+                          "source_files": [
+                            "include/nil/crypto3/mac/detail/x919_mac/*.{hpp}"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
