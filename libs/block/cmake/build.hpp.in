@@ -1,0 +1,305 @@
+//---------------------------------------------------------------------------//
+//
+// Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+//
+// MIT License
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+//---------------------------------------------------------------------------//
+
+#ifndef CRYPTO3_BUILD_CONFIG_HPP
+#define CRYPTO3_BUILD_CONFIG_HPP
+
+#define CRYPTO3_VERSION_MAJOR @PROJECT_VERSION_MAJOR@
+#define CRYPTO3_VERSION_MINOR @PROJECT_VERSION_MINOR@
+#define CRYPTO3_VERSION_PATCH @PROJECT_VERSION_PATCH@
+#cmakedefine CRYPTO3_VERSION_DATESTAMP @CRYPTO3_VERSION_DATESTAMP@
+
+#define CRYPTO3_VERSION_RELEASE_TYPE "@CMAKE_BUILD_TYPE@"
+
+#cmakedefine CRYPTO3_INSTALL_PREFIX "@CMAKE_INSTALL_PREFIX@"
+
+/*
+ * Things you can edit (but probably shouldn't)
+ */
+
+#if !defined(CRYPTO3_DEPRECATED_PUBLIC_MEMBER_VARIABLES)
+
+#if defined(CRYPTO3_NO_DEPRECATED)
+#define CRYPTO3_DEPRECATED_PUBLIC_MEMBER_VARIABLES private
+#else
+#define CRYPTO3_DEPRECATED_PUBLIC_MEMBER_VARIABLES public
+#endif
+
+#endif
+
+/* How much to allocate for a buffer of no particular size */
+#define CRYPTO3_DEFAULT_BUFFER_SIZE 1024
+
+/* Minimum and maximum sizes to allocate out of the mlock pool (bytes)
+   Default min is 16 as smaller values are easily bruteforceable and thus
+   likely not cryptographic keys.
+*/
+#define CRYPTO3_MLOCK_ALLOCATOR_MIN_ALLOCATION 16
+#define CRYPTO3_MLOCK_ALLOCATOR_MAX_ALLOCATION 128
+
+/*
+* Total maximum amount of RAM (in KiB) we will lock into memory, even
+* if the OS would let us lock more
+*/
+#define CRYPTO3_MLOCK_ALLOCATOR_MAX_LOCKED_KB 512
+
+/* Multiplier on a block cipher's native parallelism */
+#define CRYPTO3_BLOCK_CIPHER_PAR_MULT 4
+
+/*
+* If enabled uses memset via volatile function pointer to zero memory,
+* otherwise does a byte at a time write via a volatile pointer.
+*/
+#define CRYPTO3_USE_VOLATILE_MEMSET_FOR_ZERO 1
+
+/*
+* Set number of bits used to generate mask for blinding the
+* representation of an ECC point. Set to zero to disable this
+* side-channel countermeasure.
+*/
+#define CRYPTO3_POINTGFP_RANDOMIZE_BLINDING_BITS 80
+
+/*
+* Normally blinding is performed by choosing a random starting point (plus
+* its inverse, of a form appropriate to the algorithm being blinded), and
+* then choosing new blinding operands by successive squaring of both
+* values. This is much faster than computing a new starting point but
+* introduces some possible corelation
+*
+* To avoid possible leakage problems in long-running processes, the blinder
+* periodically reinitializes the sequence. This value specifies how often
+* a new sequence should be started.
+*/
+#define CRYPTO3_BLINDING_REINIT_INTERVAL 32
+
+/*
+* Userspace RNGs like hmac_drbg will reseed after a specified number
+* of outputs are generated. Set to zero to disable automatic reseeding.
+*/
+#define CRYPTO3_RNG_DEFAULT_RESEED_INTERVAL 1024
+#define CRYPTO3_RNG_RESEED_POLL_BITS 256
+
+#define CRYPTO3_RNG_AUTO_RESEED_TIMEOUT std::chrono::milliseconds(10)
+#define CRYPTO3_RNG_RESEED_DEFAULT_TIMEOUT std::chrono::milliseconds(50)
+
+/*
+* Specifies (in order) the list of entropy sources that will be used
+* to seed an in-memory RNG. The first in the default list: "rdseed"
+* and "rdrand" do not count as contributing any entropy but are
+* included as they are fast and help protect against a seriously
+* broken system RNG.
+*/
+#define CRYPTO3_ENTROPY_DEFAULT_SOURCES \
+   { "rdseed", "rdrand", "darwin_secrandom", "getentropy", \
+     "dev_random", "system_rng", "proc_walk", "system_stats" }
+
+/* Multiplier on a block cipher's native parallelism */
+#define CRYPTO3_BLOCK_CIPHER_PAR_MULT 4
+
+/*
+* These control the RNG used by the system RNG interface
+*/
+#define CRYPTO3_SYSTEM_RNG_DEVICE "/dev/urandom"
+#define CRYPTO3_SYSTEM_RNG_POLL_DEVICES { "/dev/urandom", "/dev/random", "/dev/srandom" }
+
+/*
+* This directory will be monitored by proc_walking_entropy_source and
+* the contents provided as entropy inputs to the RNG. May also be
+* usefully set to something like "/sys", depending on the system being
+* deployed to. Set to an empty string to disable.
+*/
+#define CRYPTO3_ENTROPY_PROC_FS_PATH "/proc"
+
+/*
+* These paramaters control how many bytes to read from the system
+* PRNG, and how long to block if applicable. The timeout only applies
+* to reading /dev/urandom and company.
+*/
+#define CRYPTO3_SYSTEM_RNG_POLL_REQUEST 64
+#define CRYPTO3_SYSTEM_RNG_POLL_TIMEOUT_MS 20
+
+/*
+How many times to read from the RDRAND/RDSEED RNGs.
+Each read generates 32 bits of output
+*/
+#define CRYPTO3_ENTROPY_INTEL_RNG_POLLS 32
+
+// According to Intel, RDRAND is guaranteed to generate a random number within 10 retries on a working CPU
+#define CRYPTO3_ENTROPY_RDRAND_RETRIES 10
+
+/*
+* RdSeed is not guaranteed to generate a random number within a specific number of retries
+* Define the number of retries here
+*/
+#define CRYPTO3_ENTROPY_RDSEED_RETRIES 20
+
+/*
+* Compiler and target specific flags
+*/
+
+/* Should we use GCC-style inline assembler? */
+#if !defined(CRYPTO3_USE_GCC_INLINE_ASM) && defined(__GNUG__)
+#define CRYPTO3_USE_GCC_INLINE_ASM 1
+#endif
+
+// Check for a common build problem:
+
+#if defined(_MSC_VER)
+#define CRYPTO3_CURRENT_FUNCTION __FUNCTION__
+#else
+#define CRYPTO3_CURRENT_FUNCTION __func__
+#endif
+
+#if defined(_MSC_VER) && (_MSC_VER < 1900)
+// noexcept is not supported in VS 2013
+#include <yvals.h>
+#define BOOST_NOEXCEPT _NOEXCEPT
+#else
+#define BOOST_NOEXCEPT noexcept
+#endif
+
+/*
+* Module availability definitions
+*/
+
+/*
+* Local configuration options (if any) follow
+*/
+
+/* Should we use GCC-style inline assembler? */
+#if !defined(CRYPTO3_USE_GCC_INLINE_ASM) && (defined(__GNUC__) || defined(__xlc__) || defined(__SUNPRO_CC))
+#define CRYPTO3_USE_GCC_INLINE_ASM 1
+#endif
+
+/**
+* Used to annotate API exports which are public and supported.
+* These APIs will not be broken/removed unless strictly required for
+* functionality or security, and only in new major versions.
+* @param maj The major version this public API was released in
+* @param min The minor version this public API was released in
+*/
+//#define CRYPTO3_PUBLIC_API(maj, min) CRYPTO3_DLL
+#define CRYPTO3_PUBLIC_API(maj, min) CRYPTO3_DLL
+
+/**
+* Used to annotate API exports which are public and can be used by
+* applications if needed, but which are intentionally not documented,
+* and which may change incompatibly in a future major version.
+*/
+#define CRYPTO3_UNSTABLE_API CRYPTO3_DLL
+
+/**
+* Used to annotate API exports which are exported but only for the
+* purposes of testing. They should not be used by applications and
+* may be removed or changed without notice.
+*/
+#define CRYPTO3_TEST_API CRYPTO3_DLL
+
+/*
+* Define CRYPTO3_WARN_UNUSED_RESULT
+*/
+#if defined(__GNUG__) || defined(__clang__)
+#define CRYPTO3_WARN_UNUSED_RESULT __attribute__ ((warn_unused_result))
+#else
+#define CRYPTO3_WARN_UNUSED_RESULT
+#endif
+
+/*
+* Define CRYPTO3_DEPRECATED
+*/
+#if !defined(CRYPTO3_NO_DEPRECATED_WARNINGS)
+
+#if defined(__clang__)
+#define CRYPTO3_DEPRECATED(msg) __attribute__ ((deprecated))
+
+#elif defined(_MSC_VER)
+#define CRYPTO3_DEPRECATED(msg) __declspec(deprecated(msg))
+
+#elif defined(__GNUG__)
+// msg supported since GCC 4.5, earliest we support is 4.8
+#define CRYPTO3_DEPRECATED(msg) __attribute__ ((deprecated(msg)))
+#endif
+
+#endif
+
+#if !defined(CRYPTO3_DEPRECATED)
+#define CRYPTO3_DEPRECATED(msg)
+#endif
+
+/*
+* Define CRYPTO3_NORETURN
+*/
+#if !defined(CRYPTO3_NORETURN)
+
+#if defined (__clang__) || defined (__GNUG__)
+#define CRYPTO3_NORETURN __attribute__ ((__noreturn__))
+
+#elif defined (_MSC_VER)
+#define CRYPTO3_NORETURN __declspec(noreturn)
+
+#else
+#define CRYPTO3_NORETURN
+#endif
+
+#endif
+
+/*
+* Define CRYPTO3_CURRENT_FUNCTION
+*/
+#if defined(_MSC_VER)
+#define CRYPTO3_CURRENT_FUNCTION __FUNCTION__
+#else
+#define CRYPTO3_CURRENT_FUNCTION __func__
+#endif
+
+/*
+* Define CRYPTO3_PARALLEL_FOR
+*/
+#if !defined(CRYPTO3_PARALLEL_FOR)
+
+#if defined(CRYPTO3_TARGET_HAS_OPENMP)
+#define CRYPTO3_PARALLEL_FOR _Pragma("omp parallel for") for
+#else
+#define CRYPTO3_PARALLEL_FOR for
+#endif
+
+#endif
+
+/*
+* Define CRYPTO3_PARALLEL_SIMD_FOR
+*/
+#if !defined(CRYPTO3_PARALLEL_SIMD_FOR)
+
+#if defined(CRYPTO3_TARGET_HAS_OPENMP)
+#define CRYPTO3_PARALLEL_SIMD_FOR _Pragma("omp simd") for
+#elif defined(CRYPTO3_BUILD_COMPILER_IS_GCC) && (CRYPTO3_GCC_VERSION >= 490)
+#define CRYPTO3_PARALLEL_SIMD_FOR _Pragma("GCC ivdep") for
+#else
+#define CRYPTO3_PARALLEL_SIMD_FOR for
+#endif
+
+#endif
+
+#endif
