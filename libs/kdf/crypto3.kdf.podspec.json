@@ -1,0 +1,132 @@
+{
+  "name": "crypto3.kdf",
+  "version": "0.1.0",
+  "summary": "=nil; Crypto3 C++ Cryptography Suite KDF",
+  "description": "Crypto3.KDF library extends the =nil; Foundation's cryptography suite and provides a set of key derivation functions implemented in way C++ standard library implies: concepts, algorithms, predictable behavior, latest standard features support and clean architecture without compromising security and performance.",
+  "homepage": "http://crypto3.nil.foundation/projects/crypto3",
+  "license": "Boost Software License",
+  "authors": {
+    "Mikhail Komarov": "nemo@nil.foundation"
+  },
+  "platforms": {
+    "ios": "5.0",
+    "osx": "10.7"
+  },
+  "source": {
+    "git": "https://github.com/nilfoundation/kdf.git",
+    "branch": "master"
+  },
+  "xcconfig": {
+    "CLANG_CXX_LANGUAGE_STANDARD": "c++14",
+    "CLANG_CXX_LIBRARY": "libc++",
+    "HEADER_SEARCH_PATHS": "\"${PODS_ROOT}/include/\""
+  },
+  "subspecs": [
+    {
+      "name": "include",
+      "subspecs": [
+        {
+          "name": "nil",
+          "subspecs": [
+            {
+              "name": "crypto3",
+              "subspecs": [
+                {
+                  "name": "detail",
+                  "source_files": [
+                    "include/nil/crypto3/detail/*.{hpp}"
+                  ]
+                },
+                {
+                  "name": "kdf",
+                  "source_files": [
+                    "include/nil/crypto3/kdf/*.{hpp}"
+                  ],
+                  "subspecs": [
+                    {
+                      "name": "algorithm",
+                      "source_files": [
+                        "include/nil/crypto3/kdf/algorithm/*.{hpp}"
+                      ]
+                    },
+                    {
+                      "name": "adaptor",
+                      "source_files": [
+                        "include/nil/crypto3/kdf/adaptor/*.{hpp}"
+                      ]
+                    },
+                    {
+                      "name": "accumulators",
+                      "source_files": [
+                        "include/nil/crypto3/kdf/accumulators/*.{hpp}"
+                      ]
+                    },
+                    {
+                      "name": "detail",
+                      "subspecs": [
+                        {
+                          "name": "hkdf",
+                          "source_files": [
+                            "include/nil/crypto3/kdf/detail/hkdf/*.{hpp}"
+                          ]
+                        },
+                        {
+                          "name": "kdf1",
+                          "source_files": [
+                            "include/nil/crypto3/kdf/detail/kdf1/*.{hpp}"
+                          ]
+                        },
+                        {
+                          "name": "kdf2",
+                          "source_files": [
+                            "include/nil/crypto3/kdf/detail/kdf2/*.{hpp}"
+                          ]
+                        },
+                        {
+                          "name": "kdf_iso18033",
+                          "source_files": [
+                            "include/nil/crypto3/kdf/detail/kdf_iso18033/*.{hpp}"
+                          ]
+                        },
+                        {
+                          "name": "prf_tls",
+                          "source_files": [
+                            "include/nil/crypto3/kdf/detail/prf_tls/*.{hpp}"
+                          ]
+                        },
+                        {
+                          "name": "prf_x942",
+                          "source_files": [
+                            "include/nil/crypto3/kdf/detail/prf_x942/*.{hpp}"
+                          ]
+                        },
+                        {
+                          "name": "sp800_56a",
+                          "source_files": [
+                            "include/nil/crypto3/kdf/detail/sp800_56a/*.{hpp}"
+                          ]
+                        },
+                        {
+                          "name": "sp800_56c",
+                          "source_files": [
+                            "include/nil/crypto3/kdf/detail/sp800_56c/*.{hpp}"
+                          ]
+                        },
+                        {
+                          "name": "sp800_108",
+                          "source_files": [
+                            "include/nil/crypto3/kdf/detail/sp800_108/*.{hpp}"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
