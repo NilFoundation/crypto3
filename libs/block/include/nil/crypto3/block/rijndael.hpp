@@ -43,9 +43,9 @@
 
 #include <nil/crypto3/block/detail/rijndael/rijndael_ssse3_impl.hpp>
 
-#elif defined(CRYPTO3_HAS_RIJNDAEL_ARMV8) || BOOST_ARCH_ARM
+// #elif defined(CRYPTO3_HAS_RIJNDAEL_ARMV8) || BOOST_ARCH_ARM
 
-#include <nil/crypto3/block/detail/rijndael/rijndael_armv8_impl.hpp>
+// #include <nil/crypto3/block/detail/rijndael/rijndael_armv8_impl.hpp>
 
 #elif defined(CRYPTO3_HAS_RIJNDAEL_POWER8)
 
@@ -128,8 +128,8 @@ namespace nil {
 #elif defined(CRYPTO3_HAS_RIJNDAEL_SSSE3) && \
     ((BOOST_ARCH_X86_32 || BOOST_ARCH_X86_64) && BOOST_HW_SIMD_X86 >= BOOST_HW_SIMD_X86_SSSE3_VERSION)
                                               detail::rijndael_ssse3_impl<KeyBits, BlockBits>,
-#elif defined(CRYPTO3_HAS_RIJNDAEL_ARMV8) || BOOST_ARCH_ARM >= BOOST_VERSION_NUMBER(8, 0, 0)
-                                              detail::rijndael_armv8_impl<KeyBits, BlockBits>,
+// #elif defined(CRYPTO3_HAS_RIJNDAEL_ARMV8) || BOOST_ARCH_ARM >= BOOST_VERSION_NUMBER(8, 0, 0)
+//                                               detail::rijndael_armv8_impl<KeyBits, BlockBits>,
 #elif defined(CRYPTO3_HAS_RIJNDAEL_POWER8) || (BOOST_ARCH_PPC >= BOOST_VERSION_NUMBER(8, 0, 0) || BOOST_ARCH_PPC_64)
                                               detail::rijndael_power8_impl<KeyBits, BlockBits>,
 #else
