@@ -1,9 +1,6 @@
 [submodule "cmake-modules"]
 	path = cmake/modules
 	url = ../../BoostCMake/cmake_modules.git
-[submodule "crypto3-algebra"]
-	path = libs/algebra
-	url = ../../NilFoundation/crypto3-algebra.git
 [submodule "crypto3-containers"]
 	path = libs/containers
 	url = ../../NilFoundation/crypto3-containers.git
