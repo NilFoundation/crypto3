@@ -35,13 +35,14 @@ jobs:
     with:
       submodules-refs: ${{ needs.handle-syncwith.outputs.prs-refs }}
 
-  # TODO(martun): fix this sometime soon. All the targets must work on mac.
-  # test-mac:
-  #   name: macOS Crypto3 Testing
-  #   uses: ./.github/workflows/crypto3-testing-mac.yml
-  #   needs:
-  #     - handle-syncwith
-  #   if: |
-  #     always() && !cancelled() &&
-  #     (needs.handle-syncwith.result == 'success' || needs.handle-syncwith.result == 'skipped')
-  #   secrets: inherit
+  test-mac:
+    name: macOS Crypto3 Testing
+    uses: ./.github/workflows/crypto3-testing-mac.yml
+    needs:
+      - handle-syncwith
+    if: |
+      always() && !cancelled() &&
+      (needs.handle-syncwith.result == 'success' || needs.handle-syncwith.result == 'skipped')
+    secrets: inherit
+    with:
+      submodules-refs: ${{ needs.handle-syncwith.outputs.prs-refs }}

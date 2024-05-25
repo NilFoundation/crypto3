@@ -14,7 +14,7 @@ env:
 jobs:
   build-and-test:
     name: "Build and test macOS"
-    runs-on: [macos-12]
+    runs-on: [macos-14]
     steps:
       - name: Checkout Crypto3
         uses: actions/checkout@v4
@@ -39,6 +39,10 @@ jobs:
 
       - name: Run checks
         run: nix flake -L check .?submodules=1#
+        env:
+          NIX_CONFIG: |
+            cores = 2
+            max-jobs = 1
 
       - name: Copy test results
         run: |
@@ -59,7 +63,7 @@ jobs:
 
           for check_name in "${check_names[@]}"; do
             # This completes immediately since results are in cache
-            nix build -L .?submodules=1#checks.x86_64-linux.$check_name
+            nix build -L .?submodules=1#checks.aarch64-darwin.$check_name
             cp -r ./result/* "$results_dir/$check_name"
             rm result
           done
