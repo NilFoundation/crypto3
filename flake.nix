@@ -34,14 +34,10 @@
             boost183
           ];
 
-          # If we put BUILD_TESTS in cmakeFlags, tests would be built with install target. Without it they wouldn't be built at all.
-          # We use BUILD_TEST inappropriately, for more info: https://github.com/NilFoundation/crypto3/issues/146
           cmakeFlags = [
             "-B build"
             "-G Ninja"
-            "-DBUILD_TESTS=FALSE"
             "-DCMAKE_INSTALL_PREFIX=${placeholder "out"}"
-            "-DBUILD_SHARED_LIBS=FALSE"
           ];
 
           dontBuild = true; # nothing to build, header-only lib
@@ -63,10 +59,16 @@
             ninja
             clang
             gcc
-            boost183
+            (boost183.override {
+              enableShared = true;
+              enableStatic = true;
+              enableRelease = true;
+              enableDebug = true;
+            })
           ];
 
           shellHook = ''
+            PS1="\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ "
             echo "Welcome to Crypto3 development environment!"
           '';
         };
@@ -74,10 +76,11 @@
       makeCrypto3Tests = { system }:
         let
           pkgs = nixpkgs.legacyPackages.${system};
+          isDarwin = builtins.match ".*-darwin" system != null; # Used only to exclude gcc from macOS.
           testCompilers = [
-            # "gcc" # TODO: uncomment `gcc` after build fix
             "clang"
-          ];
+            # TODO: fix gcc linkage on macOS, remove optional condition
+          ] ++ nixpkgs.lib.optional (!isDarwin) "gcc";
           # We have lots of failing tests. Modules with such tests are kept here. Built as separate targets.
           brokenModuleToTestsNames = {
             pubkey = [
@@ -149,10 +152,9 @@
               cmakeFlags = [
                 "-G Ninja"
                 "-DCMAKE_CXX_COMPILER=${if compiler == "gcc" then "g++" else "clang++"}"
-                "-DBUILD_TESTS=TRUE"
+                "-DBUILD_TESTS=TRUE" # TODO: remove after https://github.com/NilFoundation/crypto3/issues/146
                 "-DCMAKE_BUILD_TYPE=Release" # TODO: change to Debug after build fix
-                "-DBUILD_SHARED_LIBS=FALSE"
-                "-DCMAKE_ENABLE_TESTS=1" # For some reason TRUE does not work here
+                "-DCMAKE_ENABLE_TESTS=TRUE"
               ];
 
               dontBuild = false;

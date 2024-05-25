@@ -19,70 +19,25 @@ include(CMDeploy)
 include(CMConfig)
 include(CMSetupVersion)
 
-option(BUILD_WITH_CI_KNOWN_ISSUES_SUPPRESS "Build for CI suppressing known issues" FALSE)
+find_package(Boost REQUIRED)
 
-if(BUILD_WITH_CI_KNOWN_ISSUES_SUPPRESS)
-    add_definitions(-DCI_SUPPRESS_KNOWN_ISSUES)
+if(NOT CMAKE_WORKSPACE_NAME OR NOT ("${CMAKE_WORKSPACE_NAME}" STREQUAL "crypto3"))
+    cm_workspace(crypto3)
 endif()
 
-if("${CMAKE_WORKSPACE_NAME}" STREQUAL "boost")
-    set(BOOST_CMAKE TRUE)
-else()
-    cm_workspace(crypto3 SOURCES_DIR "${CMAKE_CURRENT_LIST_DIR}")
+cm_project(multiprecision WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME} LANGUAGES CXX)
 
-    if(NOT Boost_FOUND AND NOT CMAKE_CROSSCOMPILING)
-        find_package(Boost COMPONENTS REQUIRED random)
-    endif()
-endif()
-
-cm_project(multiprecision WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME})
-
-cm_setup_version(VERSION 1.76.0 PREFIX ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME})
+cm_setup_version(VERSION 0.1.0 PREFIX ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME})
 
 add_library(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE)
 
+set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
+                      EXPORT_NAME ${CURRENT_PROJECT_NAME})
+
 target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
-                           $<$<BOOL:${Boost_FOUND}>:${Boost_INCLUDE_DIRS}>)
-
-if("${CMAKE_WORKSPACE_NAME}" STREQUAL "boost")
-    cm_find_package(${CMAKE_WORKSPACE_NAME}_core)
-    cm_find_package(${CMAKE_WORKSPACE_NAME}_static_assert)
-    cm_find_package(${CMAKE_WORKSPACE_NAME}_predef)
-    cm_find_package(${CMAKE_WORKSPACE_NAME}_mpl)
-    cm_find_package(${CMAKE_WORKSPACE_NAME}_random)
-    cm_find_package(${CMAKE_WORKSPACE_NAME}_functional)
-    cm_find_package(${CMAKE_WORKSPACE_NAME}_assert)
-    cm_find_package(${CMAKE_WORKSPACE_NAME}_type_traits)
-    cm_find_package(${CMAKE_WORKSPACE_NAME}_smart_ptr)
-    cm_find_package(${CMAKE_WORKSPACE_NAME}_rational)
-    cm_find_package(${CMAKE_WORKSPACE_NAME}_lexical_cast)
-    cm_find_package(${CMAKE_WORKSPACE_NAME}_integer)
-    cm_find_package(${CMAKE_WORKSPACE_NAME}_array)
-    cm_find_package(${CMAKE_WORKSPACE_NAME}_config)
-    cm_find_package(${CMAKE_WORKSPACE_NAME}_throw_exception)
-    cm_find_package(${CMAKE_WORKSPACE_NAME}_math)
-
-    target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE ${CMAKE_WORKSPACE_NAME}::core)
-    target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE ${CMAKE_WORKSPACE_NAME}::static_assert)
-    target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE ${CMAKE_WORKSPACE_NAME}::predef)
-    target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE ${CMAKE_WORKSPACE_NAME}::mpl)
-    target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE ${CMAKE_WORKSPACE_NAME}::random)
-    target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE ${CMAKE_WORKSPACE_NAME}::functional)
-    target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE ${CMAKE_WORKSPACE_NAME}::assert)
-    target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE ${CMAKE_WORKSPACE_NAME}::type_traits)
-    target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE ${CMAKE_WORKSPACE_NAME}::smart_ptr)
-    target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE ${CMAKE_WORKSPACE_NAME}::rational)
-    target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE ${CMAKE_WORKSPACE_NAME}::lexical_cast)
-    target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE ${CMAKE_WORKSPACE_NAME}::integer)
-    target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE ${CMAKE_WORKSPACE_NAME}::array)
-    target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE ${CMAKE_WORKSPACE_NAME}::config)
-    target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE ${CMAKE_WORKSPACE_NAME}::throw_exception)
-    target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE ${CMAKE_WORKSPACE_NAME}::math)
-
-else()
-    target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
-                          ${Boost_LIBRARIES})
-endif()
+                           $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+                           $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
+                           ${Boost_INCLUDE_DIRS})
 
 set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
                       EXPORT_NAME ${CURRENT_PROJECT_NAME})
