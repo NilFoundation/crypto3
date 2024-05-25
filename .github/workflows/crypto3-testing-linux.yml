@@ -38,6 +38,10 @@ jobs:
 
       - name: Run checks
         run: nix flake -L check .?submodules=1#
+        env:
+          NIX_CONFIG: |
+            cores = 2
+            max-jobs = 1
 
       - name: Copy test results
         run: |
@@ -51,6 +55,15 @@ jobs:
             "math-clang"
             "pubkey-clang"
             "zk-clang"
+            "algebra-gcc"
+            "containers-gcc"
+            "hash-gcc"
+            "marshalling-algebra-gcc"
+            "marshalling-core-gcc"
+            "marshalling-zk-gcc"
+            "math-gcc"
+            "pubkey-gcc"
+            "zk-gcc"
           )
 
           results_dir="./results"
