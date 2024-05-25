@@ -30,7 +30,7 @@
 #include <cstdint>
 #include <string>
 
-#include <boost/test/included/unit_test.hpp>
+#include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
@@ -103,7 +103,7 @@ constexpr bool check_field_operations_static(const ElementsRange &elements, cons
     static_assert(elements[e1] * elements[e2] == elements[e1_mul_e2], "mul error");
     static_assert(elements[e1].doubled() == elements[e1_dbl], "dbl error");
     static_assert(elements[e2].inversed() == elements[e2_inv], "inv error");
-    
+
     static_assert(elements[e1].pow(constants[C1]) == elements[e1_pow_C1], "pow error");
     static_assert(elements[e2].squared() == elements[e2_pow_2], "sqr error");
     static_assert((elements[e2].squared()).sqrt() == elements[e2_pow_2_sqrt], "sqrt error");

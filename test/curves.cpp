@@ -30,7 +30,7 @@
 #include <chrono>
 #include <type_traits>
 
-#include <boost/test/included/unit_test.hpp>
+#include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
@@ -72,10 +72,9 @@ namespace boost {
     }        // namespace test_tools
 }    // namespace boost
 
-// if target == check-algebra just data/curves.json
-std::string test_data = std::string(TEST_DATA_DIR) + R"(curves.json)";
-
 boost::property_tree::ptree string_data(std::string test_name) {
+    // if target == check-algebra just data/curves.json
+    static std::string test_data = std::string(TEST_DATA_DIR) + R"(curves.json)";
     boost::property_tree::ptree string_data;
     boost::property_tree::read_json(test_data, string_data);
 

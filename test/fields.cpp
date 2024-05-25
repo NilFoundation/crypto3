@@ -31,7 +31,7 @@
 #include <cstdint>
 #include <string>
 
-#include <boost/test/included/unit_test.hpp>
+#include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
@@ -99,10 +99,10 @@ enum field_operation_test_elements : std::size_t {
     elements_set_size
 };
 
-// if target == check-algebra just data/fields.json
-std::string test_data = std::string(TEST_DATA_DIR) + R"(fields.json)";
 
 boost::property_tree::ptree string_data(std::string test_name) {
+    // if target == check-algebra just data/fields.json
+    static std::string test_data = std::string(TEST_DATA_DIR) + R"(fields.json)";
     boost::property_tree::ptree string_data;
     boost::property_tree::read_json(test_data, string_data);
 
