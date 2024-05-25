@@ -1,0 +1,19 @@
+# These owners will be the default owners for everything in
+# the repo. Unless a later match takes precedence,
+# @nkaskov will be requested for review when someone 
+# opens a pull request.
+*       @nkaskov
+
+# Order is important; the last matching pattern takes the most
+# precedence. When someone opens a pull request that only
+# these files, only @ilyas675 and not the global
+# owner(s) will be requested for a review.
+
+test/*	@nkaskov @ilyas675
+
+
+include/nil/crypto3/algebra/matrix*	@ilyas675
+include/nil/crypto3/algebra/vector*	@ilyas675
+include/nil/crypto3/algebra/scalar*	@ilyas675
+include/nil/crypto3/algebra/curves/secp*	@ilyas675
+include/nil/crypto3/algebra/curves/detail/secp*	@ilyas675
