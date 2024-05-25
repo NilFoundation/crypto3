@@ -22,12 +22,14 @@ include(CMSetupVersion)
 cm_workspace(crypto3)
 cm_setup_version(VERSION 0.3.0 PREFIX ${CMAKE_WORKSPACE_NAME})
 
-option(BUILD_SHARED_LIBS "Build shared library" TRUE)
-option(BUILD_TESTS "Build unit tests" FALSE)
+option(BUILD_SHARED_LIBS "Build shared library" FALSE) # TODO: it makes no sense for header-only lib, remove
+option(USE_STATIC_BOOST "Use static libraries for Boost" FALSE)
+option(BUILD_TESTS "Include tests to `all` target" FALSE) # used by CMTest module
+option(CMAKE_ENABLE_TESTS "Enable tests" FALSE) # used by CMTest module
 option(BUILD_BENCH_TESTS "Build performance benchmark tests" FALSE)
-option(BUILD_DOCS "Build with configuring Doxygen documentation compiler" TRUE)
+option(BUILD_DOCS "Build with configuring Doxygen documentation compiler" FALSE)
 
-set(BUILD_WITH_TARGET_ARCHITECTURE "" CACHE STRING "Target build architecture")
+set(BUILD_WITH_TARGET_ARCHITECTURE "" CACHE STRING "Target build architecture") # TODO: check if we can do cross-compilation
 set(DOXYGEN_OUTPUT_DIR "${CMAKE_CURRENT_LIST_DIR}/docs" CACHE STRING "Specify doxygen output directory")
 
 include(TargetArchitecture)
@@ -38,11 +40,18 @@ else()
     target_architecture(CMAKE_TARGET_ARCHITECTURE)
 endif()
 
-if(BUILD_TESTS)
-    find_package(Boost COMPONENTS REQUIRED unit_test_framework)
+if(USE_STATIC_BOOST)
+    set(Boost_USE_STATIC_LIBS ON)
+else()
+    set(Boost_USE_STATIC_LIBS OFF)
 endif()
 
-find_package(Boost REQUIRED COMPONENTS container random system unit_test_framework)
+# TODO: in subdirs use Boost::lib_name instead of wide ${Boost_LIBRARIES}, split next lines into 2 find_package calls
+set(BOOST_COMPONENTS "container;random;system")
+if(CMAKE_ENABLE_TESTS)
+    list(APPEND BOOST_COMPONENTS "unit_test_framework")
+endif()
+find_package(Boost REQUIRED COMPONENTS ${BOOST_COMPONENTS})
 
 add_subdirectories("${CMAKE_CURRENT_LIST_DIR}/libs/")
 add_subdirectories("${CMAKE_CURRENT_LIST_DIR}/libs/marshalling")
