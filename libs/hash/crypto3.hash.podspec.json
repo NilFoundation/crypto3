@@ -1,0 +1,161 @@
+{
+  "name": "crypto3.hash",
+  "version": "0.1.0",
+  "summary": "=nil; Crypto3 C++ Cryptography Suite Hashes",
+  "description": "Crypto3.Hash library extends the =nil; Foundation's cryptography suite and provides a set of hashes implemented in way C++ standard library implies: concepts, algorithms, predictable behavior, latest standard features support and clean architecture without compromising security and performance.",
+  "homepage": "http://crypto3.nil.foundation/projects/crypto3",
+  "license": "Boost Software License",
+  "authors": {
+    "Mikhail Komarov": "nemo@nil.foundation"
+  },
+  "platforms": {
+    "ios": "5.0",
+    "osx": "10.7"
+  },
+  "source": {
+    "git": "https://github.com/nilfoundation/hash.git",
+    "branch": "master"
+  },
+  "xcconfig": {
+    "CLANG_CXX_LANGUAGE_STANDARD": "c++14",
+    "CLANG_CXX_LIBRARY": "libc++",
+    "HEADER_SEARCH_PATHS": "\"${PODS_ROOT}/include/\""
+  },
+  "subspecs": [
+    {
+      "name": "include",
+      "subspecs": [
+        {
+          "name": "nil",
+          "subspecs": [
+            {
+              "name": "crypto3",
+              "subspecs": [
+                {
+                  "name": "detail",
+                  "source_files": [
+                    "include/nil/crypto3/detail/*.{hpp}"
+                  ]
+                },
+                {
+                  "name": "hash",
+                  "source_files": [
+                    "include/nil/crypto3/hash/*.{hpp}"
+                  ],
+                  "subspecs": [
+                    {
+                      "name": "algorithm",
+                      "source_files": [
+                        "include/nil/crypto3/hash/algorithm/*.{hpp}"
+                      ]
+                    },
+                    {
+                      "name": "adaptor",
+                      "source_files": [
+                        "include/nil/crypto3/hash/adaptor/*.{hpp}"
+                      ]
+                    },
+                    {
+                      "name": "accumulators",
+                      "source_files": [
+                        "include/nil/crypto3/hash/accumulators/*.{hpp}"
+                      ],
+                      "subspecs": [
+                        {
+                          "name": "parameters",
+                          "source_files": [
+                            "include/nil/crypto3/hash/accumulators/parameters/*.{hpp}"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "name": "detail",
+                      "source_files": [
+                        "include/nil/crypto3/hash/detail/*.{hpp}"
+                      ],
+                      "subspecs": [
+                        {
+                          "name": "adler",
+                          "source_files": [
+                            "include/nil/crypto3/hash/detail/adler/*.{hpp}"
+                          ]
+                        },
+                        {
+                          "name": "blake2b",
+                          "source_files": [
+                            "include/nil/crypto3/hash/detail/blake2b/*.{hpp}"
+                          ]
+                        },
+                        {
+                          "name": "crc",
+                          "source_files": [
+                            "include/nil/crypto3/hash/detail/crc/*.{hpp}"
+                          ]
+                        },
+                        {
+                          "name": "ghash",
+                          "source_files": [
+                            "include/nil/crypto3/hash/detail/ghash/*.{hpp}"
+                          ]
+                        },
+                        {
+                          "name": "keccak",
+                          "source_files": [
+                            "include/nil/crypto3/hash/detail/keccak/*.{hpp}"
+                          ]
+                        },
+                        {
+                          "name": "ripemd",
+                          "source_files": [
+                            "include/nil/crypto3/hash/detail/ripemd/*.{hpp}"
+                          ]
+                        },
+                        {
+                          "name": "sha3",
+                          "source_files": [
+                            "include/nil/crypto3/hash/detail/sha3/*.{hpp}"
+                          ]
+                        },
+                        {
+                          "name": "skein",
+                          "source_files": [
+                            "include/nil/crypto3/hash/detail/skein/*.{hpp}"
+                          ]
+                        },
+                        {
+                          "name": "sm3",
+                          "source_files": [
+                            "include/nil/crypto3/hash/detail/sm3/*.{hpp}"
+                          ]
+                        },
+                        {
+                          "name": "streebog",
+                          "source_files": [
+                            "include/nil/crypto3/hash/detail/streebog/*.{hpp}"
+                          ]
+                        },
+                        {
+                          "name": "tiger",
+                          "source_files": [
+                            "include/nil/crypto3/hash/detail/tiger/*.{hpp}"
+                          ]
+                        },
+                        {
+                          "name": "whirlpool",
+                          "source_files": [
+                            "include/nil/crypto3/hash/detail/whirlpool/*.{hpp}"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
