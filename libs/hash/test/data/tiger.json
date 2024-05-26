@@ -1,0 +1,11 @@
+{
+  "data_192": {
+    "a": "77befbef2e7ef8ab2ec8f93bf587a7fc613e247f5f247809",
+    "abc": "2aab1484e8c158f2bfb8c5ff41b57a525129131c957b5f93",
+    "message digest": "d981f8cb78201a950dcf3048751e441c517fca1aa55a29f6",
+    "abcdefghijklmnopqrstuvwxyz": "1714a472eee57d30040412bfcc55032a0b11602ff37beee9",
+    "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq": "0f7bf9a19b9c58f2b7610df7e84f0ac3a71c631e7b53f78e",
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789": "8dcea680a17583ee502ba38a3c368651890ffbccdc49a8cc",
+    "12345678901234567890123456789012345678901234567890123456789012345678901234567890": "1c14795529fd9f207a958f84c52f11e887fa0cabdfd91bfd"
+  }
+}
