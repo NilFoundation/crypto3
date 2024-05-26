@@ -4,6 +4,3 @@
 [submodule "marshalling"]
 	path = libs/marshalling/core
 	url = ../../NilFoundation/marshalling.git
-[submodule "crypto3-multiprecision-marshalling"]
-	path = libs/marshalling/multiprecision
-	url = ../../NilFoundation/crypto3-multiprecision-marshalling.git
