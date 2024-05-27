@@ -40,8 +40,8 @@ jobs:
         run: nix flake -L check .?submodules=1#
         env:
           NIX_CONFIG: |
-            cores = 2
-            max-jobs = 1
+            cores = 6
+            max-jobs = 4
 
       - name: Copy test results
         run: |
