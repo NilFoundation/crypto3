@@ -14,15 +14,6 @@ include(CMDeploy)
 include(CMSetupVersion)
 
 cm_workspace(marshalling)
-
-macro(cm_find_package NAME)
-    if(NOT "${NAME}" MATCHES "^${CMAKE_WORKSPACE_NAME}_.*$" AND NOT "${NAME}" STREQUAL CM)
-        find_package(${ARGV})
-    else()
-        set(${ARGV0}_FOUND ON CACHE BOOL "")
-    endif()
-endmacro()
-
 cm_project(crypto3_multiprecision WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME} LANGUAGES C CXX)
 
 cm_find_package(CM)

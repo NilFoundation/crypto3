@@ -7,7 +7,7 @@
 # http://www.boost.org/LICENSE_1_0.txt
 #---------------------------------------------------------------------------#
 
-cm_find_package(Eigen3)
+find_package(Eigen3)
 
 #add_custom_target(${CURRENT_PROJECT_NAME}_test_suite_arithmetic_tests)
 #add_custom_target(${CURRENT_PROJECT_NAME}_test_suite_functions_and_limits)

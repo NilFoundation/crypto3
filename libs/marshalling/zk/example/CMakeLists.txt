@@ -11,9 +11,7 @@ cm_find_package(CM)
 include(CMDeploy)
 include(CMSetupVersion)
 
-
-    cm_find_package(Boost REQUIRED COMPONENTS filesystem log log_setup program_options thread system)
-
+find_package(Boost REQUIRED COMPONENTS filesystem log log_setup program_options thread system)
 
 macro(define_marshalling_example name)
     add_executable(marshalling_${name}_example ${name}.cpp)
