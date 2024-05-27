@@ -57,6 +57,7 @@ namespace nil {
 
                     constexpr static const integral_type modulus =
                         0x40000000000000000000000000000000224698fc0994a8dd8c46eb2100000001_cppui_modular255;
+                    constexpr static const integral_type group_order_minus_one_half = (modulus - 1u) / 2;
 
                     typedef typename policy_type::modular_backend modular_backend;
                     constexpr static const modular_params_type modulus_params = modulus.backend();
