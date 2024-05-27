@@ -102,17 +102,16 @@ namespace boost {
             BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR
                 typename std::enable_if<!boost::multiprecision::backends::is_trivial_cpp_int_modular<cpp_int_modular_backend<Bits>>::value,
                                         bool>::type
-                eval_gt(const cpp_int_modular_backend<Bits>& a,
-                        limb_type b) noexcept {
+                eval_gt(const cpp_int_modular_backend<Bits>& a, limb_type b) noexcept {
                 auto* limbs = a.limbs();
-                if (limbs[0] <= b)
-                    return false;
+                if (limbs[0] > b)
+                    return true;
                 // std::all_of is not constexpr, so writing manually.
                 for (std::size_t i = 1; i < a.size(); ++i) {
                     if (limbs[i] != 0)
                         return true;
                 }
-                return true;
+                return false;
             }
             
             template<unsigned Bits>
