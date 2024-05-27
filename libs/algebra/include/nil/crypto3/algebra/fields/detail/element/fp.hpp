@@ -166,8 +166,7 @@ namespace nil {
                         }
 
                         constexpr element_fp &operator++() {
-                            // TODO(martun): fix this.
-                            data = data + one().data;
+                            data += one().data;
                             return *this;
                         }
 
@@ -192,13 +191,13 @@ namespace nil {
                             return element_fp(data + data);
                         }
 
+                        // If the element does not have a square root, this function must not be called.
+                        // Call is_square() before using this function.
                         constexpr element_fp sqrt() const {
                             if (this->is_zero())
                                 return zero();
                             element_fp result = ressol(data);
-                            // If the element does not have a square root, this function must not be called.
                             assert(!result.is_zero());
-
                             return result;
                         }
 
