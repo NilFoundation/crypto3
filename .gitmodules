@@ -1,6 +1,3 @@
 [submodule "cmake-modules"]
 	path = cmake/modules
 	url = ../../BoostCMake/cmake_modules.git
-[submodule "marshalling"]
-	path = libs/marshalling/core
-	url = ../../NilFoundation/marshalling.git

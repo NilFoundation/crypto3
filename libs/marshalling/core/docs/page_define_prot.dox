@@ -1,0 +1,1217 @@
+/// @page page_define_prot How to Define New Custom Protocol
+/// @tableofcontents
+/// The protocol definition is mostly about defining messages and their fields.
+/// As the first stage please read @ref page_field_tutorial in order to understand
+/// what types of fields are available and how to define them.
+///
+/// @section page_define_prot_headers Headers and Libraries
+/// Marshalling is a headers only library without any object files to link against.
+/// In order to include the whole functionality of the library please use
+/// single include statement:
+/// @code
+/// #include <nil/marshalling/marshalling.hpp>
+/// @endcode
+///
+/// If the protocol grows and the compilation takes a significant amount of time,
+/// more fine-grained include statements may be used:
+/// @code
+/// #include <nil/marshalling/fields.hpp> // Provides all definitions from nil::marshalling::field namespace
+/// #include <nil/marshalling/protocols.hpp> // Provides all definitions from nil::marshalling::protocol namespace
+/// #include <nil/marshalling/units.hpp> // Provides all definitions from nil::marshalling::units namespace
+/// #include <nil/marshalling/Message.hpp> // Definition of nil::marshalling::Message class to define interface
+/// #include <nil/marshalling/message_base.hpp> // Definition of nil::marshalling::MessageBase class to define message impl
+/// #include <nil/marshalling/generic_handler.hpp> // Definition of nil::marshalling::generic_handler class
+/// #include <nil/marshalling/MsgFactory.hpp> // Definition of nil::marshalling::MessageFactory class
+/// @endcode
+///
+/// @section page_define_prot_conditions Checking pre- and post- Conditions
+/// The Marshalling library is intended to be used in embedded systems (including
+/// bare metal), which may have standard library excluded from the compilation.
+/// In order to check pre- and post- conditions as well as inner assumptions, please
+/// use @ref MARSHALLING_ASSERT macro (instead of standard @b assert()).
+/// It gives and ability to the application being developed
+/// in the future to choose and use its own means to report assertion failures.
+///
+/// @section page_define_prot_interface Common Interface Class
+/// Protocol definition needs to be started by defining all the available 
+/// numeric IDs of the messages as separate enum. For example in file @b msg_id.h
+/// @code
+/// // file msg_id.h
+/// #pragma once
+/// #include <cstdint>
+///
+/// namespace my_protocol
+/// {
+///     enum msg_id : std::uint8_t
+///     {
+///         MsgId_Message1,
+///         MsgId_Message2,
+///         MsgId_Message3,
+///         ...
+///     };
+/// } // namespace my_protocol
+/// @endcode
+/// @b NOTE, that most probably the same enum will be used to define a field that
+/// responsible to read / write message ID information in the transport framing. That's
+/// the reason why the underlying type of the enum needs to be specified (please
+/// see @ref sec_field_tutorial_enum_value for more detail).
+///
+/// After the numeric IDs are specified, there is a need to define common
+/// message interface class by extending @ref nil::marshalling::Message.
+/// The defined class / type needs to pin the type used for message IDs 
+/// with @ref nil::marshalling::option::msg_id_type and defined
+/// earlier enum. It also should specify the serialization endian with either
+/// @ref nil::marshalling::option::big_endian or @ref nil::marshalling::option::little_endian options.
+/// However it must also
+/// allow extension with other options by the application. 
+/// @code
+/// // file Message.h
+/// #pragma once
+/// namespace my_protocol
+/// {
+/// 
+/// template <typename... TOptions>
+/// using Message = 
+///     nil::marshalling::Message<
+///         nil::marshalling::option::big_endian,
+///         nil::marshalling::option::msg_id_type<msg_id>,
+///         TOptions...
+///     >;
+///
+/// } // namespace my_protocol
+/// @endcode
+/// The application, that is going to use protocol definition later, will use
+/// extra options to specify polymorphic behaviour it needs.
+///
+/// @subsection page_define_prot_interface_extra_transport Extra Transport Values
+/// Some protocols may use extra values in their transport information, which
+/// may influence the way how message payload is being read and/or message 
+/// object being handled. Good example would be having a protocol version, which
+/// defines what message payload fields were serialized and which were not (because
+/// they were introduced in later version of the protocol). Another example is
+/// having some kind of flags relevant to all the messages.
+/// Such extra information needs to be stored in the message object itself.
+/// The most straightforward way of achieving this is to define appropriate API
+/// functions and member fields in common message interface class:
+/// @code
+/// // file Message.h
+/// #pragma once
+/// namespace my_protocol
+/// {
+/// 
+/// template <typename... TOptions>
+/// class MyMessage : public 
+///     nil::marshalling::Message<
+///         nil::marshalling::option::big_endian,
+///         nil::marshalling::option::msg_id_type<msg_id>,
+///         TOptions...
+///     >
+/// {
+/// public:
+///     unsigned get_version() const { return m_version; }
+///     void set_version(unsigned value) { m_version = value; }
+///     std::uint8_t getFlags() const { return m_flags; }
+///     void setFlags(std::uint8_t value) { m_flags = value; }
+/// private:
+///     unsigned m_version = 0;
+///     std::uint8_t m_flags = 0;
+/// };
+///
+/// } // namespace my_protocol
+/// @endcode
+/// @b HOWEVER, it will require implementation of a custom protocol transport layer
+/// (See @ref page_prot_stack_tutorial_new_layers) that read the required values
+/// and re-assign them to the message object using appropriate API function. The
+/// Marshalling library has a built-in way to automate such assignments (see
+/// @ref page_prot_stack_tutorial_transport_value section in @ref page_prot_stack_tutorial). 
+/// In order to support usage
+/// of @ref nil::marshalling::protocol::TransportValueLayer the message interface class must
+/// define "extra transport fields".
+///
+/// First, such extra transport field(s) must be defined using a field abstraction
+/// (see @ref page_field_tutorial) and bundled in @b std::tuple:
+/// @code
+/// namespace my_protocol
+/// {
+/// 
+/// // Base class of all the fields
+/// using MyFieldBase = nil::marshalling::field_type<nil::marshalling::option::big_endian>;
+///
+/// // field_type describing protocol version.
+/// using MyVersionField = nil::marshalling::types::IntValue<MyFieldBase, std::uint16_t>;
+///
+/// // field_type describing protocol version.
+/// using MyFlagsField = nil::marshalling::types::BitmaskValue<MyFieldBase, nil::marshalling::option::fixed_length<1> >;
+///
+/// // Relevant extra transport fields, bundled in std::tuple
+/// using MyExtraTransportFields =
+///     std::tuple<
+///         MyVersionField,
+///         MyFlagsField
+///     >;
+///
+/// } // namespace my_protocol
+/// @endcode
+/// Second, provide the defined tuple to message interface class using 
+/// @ref nil::marshalling::option::extra_transport_fields option.
+/// @code
+/// namespace my_protocol
+/// {
+/// 
+/// template <typename... TOptions>
+/// class Message : public
+///     nil::marshalling::Message<
+///         nil::marshalling::option::big_endian,
+///         nil::marshalling::option::msg_id_type<msg_id>,
+///         nil::marshalling::option::extra_transport_fields<MyExtraTransportFields>,
+///         TOptions...
+///     >
+/// {
+/// };
+///
+/// } // namespace my_protocol
+/// @endcode
+/// It is equivalent to having the following public interface defined:
+/// @code
+/// namespace my_protocol
+/// {
+/// 
+/// template <typename... TOptions>
+/// class MyMessage : public 
+///     nil::marshalling::Message<
+///         nil::marshalling::option::big_endian,
+///         nil::marshalling::option::msg_id_type<msg_id>,
+///         TOptions...
+///     >
+/// {
+/// public:
+///     // type of extra fields
+///     using transport_fields_type = MyExtraTransportFields;
+///
+///     // Accessors for defined transport fields
+///     transport_fields_type& transport_fields() { return m_transportFields; }
+///     const transport_fields_type& transport_fields() const { return m_transportFields; }
+///
+/// private:
+///     transport_fields_type m_transportFields;
+/// };
+///
+/// } // namespace my_protocol
+/// @endcode
+/// An access to the version and flags information, given a reference to the message object
+/// will look like this:
+/// @code
+/// void handle(my_protocol::Message<>& msg)
+/// {
+///     // Access to tuple of extra transport fields
+///     auto& extraTransportFields = msg.transport_fields();
+///
+///     // Access the version field
+///     auto& versionField = std::get<0>(extraTransportFields);
+///
+///     // Retrieve the version numeric value
+///     auto versionValue = versionField.value();
+///
+///     // Access the flags field
+///     auto& flagsField = std::get<1>(extraTransportFields);
+///
+///     ... // do something with version and flags information
+/// }
+/// @endcode
+/// The version and/or flags information may be accessed in the same way when implementing
+/// @ref page_define_prot_message_base_custom_read and acted accordingly.
+///
+/// @b NOTE, that example above accesses the index of the field within the holding
+/// tuple. For convenience, the Marshalling library defines
+/// @ref MARSHALLING_MSG_TRANSPORT_FIELDS_ACCESS() macro which allows providing meaningful
+/// names to the extra transport fields:
+/// @code
+/// template <typename... TOptions>
+/// class Message : public
+///     nil::marshalling::Message<
+///         nil::marshalling::option::big_endian,
+///         nil::marshalling::option::msg_id_type<msg_id>,
+///         nil::marshalling::option::extra_transport_fields<MyExtraTransportFields>,
+///         TOptions...
+///     >
+/// {
+/// public:
+///     MARSHALLING_MSG_TRANSPORT_FIELDS_ACCESS(version, flags)
+/// };
+/// @endcode
+/// Using such macro is equivalent to manually defining the following public
+/// interface:
+/// @code
+/// template <typename... TOptions>
+/// class Message : public
+///     nil::marshalling::Message<
+///         nil::marshalling::option::big_endian,
+///         nil::marshalling::option::msg_id_type<msg_id>,
+///         nil::marshalling::option::extra_transport_fields<MyExtraTransportFields>,
+///         TOptions...
+///     >
+/// {
+/// public:
+///     enum TransportFieldIdx
+///     {
+///         TransportFieldIdx_version,
+///         TransportFieldIdx_flags,
+///         TransportFieldIdx_numOfValues
+///     };
+///
+///     auto transportField_version() -> decltype(std::get<TransportFieldIdx_version>(transport_fields()))
+///     {
+///         return std::get<TransportFieldIdx_version>(transport_fields());
+///     }
+///
+///     auto transportField_version() const -> decltype(std::get<TransportFieldIdx_version>(transport_fields()))
+///     {
+///         return std::get<TransportFieldIdx_version>(transport_fields());
+///     }
+///
+///     auto transportField_flags() -> decltype(std::get<TransportFieldIdx_flags>(transport_fields()))
+///     {
+///         return std::get<TransportFieldIdx_flags>(transport_fields());
+///     }
+///
+///     auto transportField_flags() const -> decltype(std::get<TransportFieldIdx_flags>(transport_fields()))
+///     {
+///         return std::get<TransportFieldIdx_flags>(transport_fields());
+///     }
+/// };
+/// @endcode
+/// @b NOTE, that the defined "extra transport fields" are there to attach 
+/// some extra information, delivered as part of transport framing, to message 
+/// object itself. These fields are @b NOT getting serialized / deserialized when message
+/// object being read / written.
+///
+/// @subsection page_define_prot_interface_version Version in Extra Transport Values
+/// As was described in previous section, the extra transport values may contain
+/// protocol version information. The Marshalling library contains extra functionality
+/// to help with protocol versioning. If extra transport values contain version,
+/// then it is recommended to let the library know which field in the provided
+/// ones is the version. To do so @ref nil::marshalling::option::version_in_extra_transport_fields,
+/// with index of the field as a template argument needs to be used.
+/// @code
+/// template <typename... TOptions>
+/// class Message : public
+///     nil::marshalling::Message<
+///         nil::marshalling::option::big_endian,
+///         nil::marshalling::option::msg_id_type<msg_id>,
+///         nil::marshalling::option::extra_transport_fields<MyExtraTransportFields>,
+///         nil::marshalling::option::version_in_extra_transport_fields<0>,
+///         TOptions...
+///     >
+/// {
+/// public:
+///     ...
+/// };
+/// @endcode
+/// This option adds the following type and convenience access member functions.
+/// @code
+/// template <typename... TOptions>
+/// class Message : public
+///     nil::marshalling::Message<...>
+/// {
+/// public:
+///     ...
+///     // type used for version storage
+///     using version_type = ...;
+/// 
+///     // Convenience access to the version value
+///     version_type& version();
+///     const version_type& version() const;
+/// };
+/// @endcode
+/// If message contents depend on the version of the protocol, this information
+/// will be used inside @ref page_define_prot_message_base (described below) to
+/// properly implement various functionalities. More detail in @ref
+/// page_define_prot_message_version section below. 
+///
+/// @section page_define_prot_message_base Message Implementation Class
+/// The next stage is to define protocol messages with their fields.
+/// 
+/// <b>Recommended Practice</b>
+/// @li Use separate header file for every message class.
+/// @li Use separate folder and/or namespace for all the messages (for example @b message)
+/// @li Define all the relevant to the message fields in the same file, but 
+///     in separate scope (struct), that has the same name as the message, but 
+///     has extra suffix (@b *fields_type).
+/// @li Define inner type (for example @b All) that bundles all the defined fields
+///     in single @b std::tuple.
+///
+/// For example, let's assume there is a protocol message called "Message1". Then,
+/// define it in separate header filed (@b Message1.h)
+/// @code
+/// #pragma once
+/// #include <nil/marshalling/marshalling.hpp>
+///
+/// #include "MyFieldBase.h> // Defines MyFieldBase common base class for all the fields
+///
+/// namespace my_protocol
+/// {
+/// 
+/// namespace message
+/// {
+///
+/// struct Message1Fields
+/// {
+///     using field1 = nil::marshalling::types::IntValue<MyFieldBase, std::uint16_t>;
+///     using field2 = ...
+///     using field3 = ...
+///
+///     // bunding type
+///     using All = 
+///         std::tuple<
+///             field1,
+///             field2,
+///             field3
+///         >;
+/// };
+///
+/// // Definition of the message itself, described and explained later
+/// template <typename TBase>
+/// class Message1 : public nil::marshalling::MessageBase<TBase, ...>
+/// {
+///     ...
+/// };
+///
+/// } // namespace message
+///
+/// } // namespace my_protocol
+/// @endcode
+///
+/// The message definition class has to extend @ref nil::marshalling::MessageBase and receive
+/// at least one template parameter, that is passed as first one to @ref nil::marshalling::MessageBase.
+/// @code
+/// template <typename TBase>
+/// class Message1 : nil::marshalling::MessageBase<TBase, ...>
+/// {
+///     ...
+/// };
+/// @endcode
+/// The @b TBase template parameter is chosen by the application being developed. 
+/// It is expected to be a variant of @ref page_define_prot_interface (@b my_protocol::Message),
+/// which specifies polymorphic interface that needs to be implemented. 
+/// The @ref nil::marshalling::MessageBase class in turn will publicly inherit
+/// from the provided common interface class. As the result the full class inheritance graph may look
+/// like this:
+/// @diafile message_class_hierarchy.dia
+/// @n
+///
+/// There are <b>at least</b> 3 additional options that should be passed to
+/// @ref nil::marshalling::MessageBase.
+/// @li @ref nil::marshalling::option::static_num_id_impl with numeric ID of the message.
+/// @li @ref nil::marshalling::option::fields_impl with @b std::tuple of message fields (
+///     defined earlier @b my_protocol::Message1Fields::All)
+/// @li @ref nil::marshalling::option::msg_type with actual message type (@b Message1).
+///
+/// For example
+/// @code
+/// ...
+///
+/// template <typename TBase>
+/// class Message1 : public 
+///     nil::marshalling::MessageBase<
+///         TBase, 
+///         nil::marshalling::option::static_num_id_impl<MsgId_Message1>,
+///         nil::marshalling::option::fields_impl<Message1Fields::All>,
+///         nil::marshalling::option::msg_type<Message1<TBase> > // type of the message being defined
+/// {
+///     ...
+/// };
+///
+/// } // namespace message
+///
+/// } // namespace my_protocol
+/// @endcode
+///
+/// It is equivalent to having the following types and @b NON-virtual functions defined
+/// @code
+/// template <typename TBase>
+/// class Message1 : public TBase
+/// {
+/// public:
+///     // Redefining the provided std::tuple of fields as internal type
+///     typedef ... all_fields_type;
+///     
+///     // Access the stored std::tuple of fields
+///     all_fields_type& fields()
+///     {
+///         return fields_;
+///     }
+///
+///     // Access the stored std::tuple of fields
+///     const all_fields_type& fields() const
+///     {
+///         return fields_;
+///     }
+///
+///     // Default implementation of read functionality
+///     template <typename TIter>
+///     nil::marshalling::ErrorStatus do_read(TIter& iter, std::size_t len)
+///     {
+///         // Read all the fields one by one by invoking
+///         // read() member function of all the fields.
+///     }
+///
+///     // Default implementation of write functionality
+///     template <typename TIter>
+///     nil::marshalling::ErrorStatus do_write(TIter& iter, std::size_t len) const
+///     {
+///         // Write all the fields one by one by invoking
+///         // write() member function of all the fields.
+///     }
+///
+///     // Default implementation of validity check functionality
+///     bool do_valid() const
+///     {
+///         // Call to valid() member function of all the fields one by one.
+///         // The message is valid if all the fields are valid.
+///     }
+///
+///     // Default implementation of length calculation functionality
+///     std::size_t do_length() const
+///     {
+///         // Invoke the length() member function of every field and
+///         // report sum of the values
+///     }
+///
+///     // Defalut implementation of the refreshing functionality
+///     bool do_refresh()
+///     {
+///         // Invokes refresh() member function of every field and returns
+///         // true if at least one of the fields has been updated (returned true).
+///     }
+///
+/// private:
+///     all_fields_type fields_; // fields_type stored as tuple.
+/// };
+/// @endcode
+/// See also relevant API documentation:
+/// @li @ref nil::marshalling::MessageBase::fields()
+/// @li @ref nil::marshalling::MessageBase::do_read()
+/// @li @ref nil::marshalling::MessageBase::do_write()
+/// @li @ref nil::marshalling::MessageBase::do_length()
+/// @li @ref nil::marshalling::MessageBase::do_valid()
+/// @li @ref nil::marshalling::MessageBase::do_refresh()
+///
+/// In case the passed message interface class as template parameter (@b TBase)
+/// defines some polymorphic interface functions, their implementation is automatically
+/// generated by the @ref nil::marshalling::MessageBase. For example if passed interface
+/// class required polymorphic read operation, the following member function will
+/// also be automatically implemented:
+/// @code
+/// template <typename TBase>
+/// class Message1 : public TBase
+/// {
+///     ...
+/// protected:
+///     virtual nil::marshalling::ErrorStatus readImpl(read_iterator& iter, std::size_t len)
+///     {
+///         return do_read(iter, len);
+///     }
+/// };
+/// @endcode
+///
+/// @subsection page_define_prot_message_base_field_names Providing Names to the fields_type
+/// When preparing message object to send or when handling received message, the
+/// fields it contains need to be accessed to set or get their values. The default
+/// (build-in) way of achieving that is to get access to the fields tuple 
+/// using inherited nil::marshalling::MessageBase::fields() member function and then using
+/// @b std::get() function to access the fields inside the tuple.
+/// @code
+/// Message1<SomeInterface> msg;
+/// auto& allFields = msg.fields();
+/// auto& field1 = std::get<0>(allFields);
+/// auto& field2 = std::get<1>(allFields);
+///
+/// field1.value() = 100;
+/// field2.value() = 32;
+/// sendMessage(msg);
+/// @endcode
+/// Although it works, it is not very convenient way to access and operate the fields.
+/// There is MARSHALLING_MSG_FIELDS_ACCESS() macro that allows to provide meaningful names
+/// for the fields:
+/// @code
+/// template <typename TMessage>
+/// class Message1 : public
+///     nil::marshalling::MessageBase<...>
+/// {
+/// public:
+///     // Provide names for the fields
+///     MARSHALLING_MSG_FIELDS_ACCESS(value1, value2, value3);
+/// };
+/// @endcode
+/// The said macro creates the following definitions of inner enum @b FieldIdx
+/// type as well as @b field_* accessor functions.
+/// @code
+/// template <typename TMessage>
+/// class Message1 : public
+///     nil::marshalling::MessageBase<...>
+/// {
+/// public:
+///     enum FieldIdx
+///     {
+///         FieldIdx_value1,
+///         FieldIdx_value2,
+///         FieldIdx_value3,
+///         FieldIdx_numOfValues
+///     }
+///
+///     // Access the "value1" field
+///     auto field_value1() -> decltype(std::get<FieldIdx_value1>(fields()))
+///     {
+///         return std::get<FieldIdx_value1>(fields());
+///     }
+///
+///     // Access the "value1" field (const variant)
+///     auto field_value1() const -> decltype(std::get<FieldIdx_value1>(fields()))
+///     {
+///         return std::get<FieldIdx_value1>(fields());
+///     }
+///
+///     // Access the "value2" field
+///     auto field_value2() -> decltype(std::get<FieldIdx_value2>(fields()))
+///     {
+///         return std::get<FieldIdx_value2>(fields());
+///     }
+///
+///     // Access the "value2" field (const variant)
+///     auto field_value2() const -> decltype(std::get<FieldIdx_value2>(fields()))
+///     {
+///         return std::get<FieldIdx_value2>(fields());
+///     }
+///
+///     // Access the "value3" field
+///     auto field_value3() -> decltype(std::get<FieldIdx_value3>(fields()))
+///     {
+///         return std::get<FieldIdx_value3>(fields());
+///     }
+///
+///     // Access the "value3" field (const variant)
+///     auto field_value3() const -> decltype(std::get<FieldIdx_value3>(fields()))
+///     {
+///         return std::get<FieldIdx_value3>(fields());
+///     }
+/// };
+/// @endcode
+/// As the result, accessing to the fields becomes much easier and clearer:
+/// @code
+/// Message1<SomeInterface> msg;
+/// msg.field_value1().value() = 100;
+/// msg.field_value2().value() = 32;
+/// sendMessage(msg);
+/// @endcode
+/// <b style="color:red">WARNING:</b> Some compilers, such as @b clang or earlier
+/// versions of @b gcc (v4.9 and earlier) may have problems compiling the 
+/// @ref MARSHALLING_MSG_FIELDS_ACCESS() macro
+/// even though it contains valid C++11 code to help in identification the 
+/// actual base class type. If the compilation failure 
+/// happens try to specify the exact base class type using inner @b Base
+/// type definition. For example:
+/// @code
+/// template <typename TMessage>
+/// class Message1 : public
+///     nil::marshalling::MessageBase<...>
+/// {
+///     // Duplicate the base class definition
+///     using Base = nil::marshalling::MessageBase<...>;
+/// public:
+///     // Provide names for the fields
+///     MARSHALLING_MSG_FIELDS_ACCESS(value1, value2, value3);
+/// };
+/// @endcode
+/// @b NOTE, that @b Marshalling library also defines @b MARSHALLING_MUST_DEFINE_BASE in
+/// case the base class definition is needed (going to be used). If the developed
+/// application is going to be multi-platform and compiled with various compilers
+/// (some of which may warn about unused private type) it is possible to use 
+/// the defined symbol to add / remove the definition of the @b Base member type.
+/// @code
+/// template <typename TMessage>
+/// class Message1 : public nil::marshalling::MessageBase<...>
+/// {
+/// #ifdef MARSHALLING_MUST_DEFINE_BASE
+///     using Base = nil::marshalling::MessageBase<...>;
+/// #endif
+/// public:
+///     // Provide names for the fields
+///     MARSHALLING_MSG_FIELDS_ACCESS(value1, value2, value3);
+/// };
+/// @endcode
+///
+/// @subsection page_define_prot_message_base_custom_read Custom Read Functionality
+/// The default read functionality implemented by @ref nil::marshalling::MessageBase::do_read()
+/// is to invoke @b read() member function of every field and return @b success
+/// if all the invocations returned @b success.
+/// Sometimes such default implementation may be incomplete or incorrect and may require
+/// additional or different implementation. It is very easy to fix by defining
+/// new @b do_read() public member function with updated functionality. The
+/// @ref nil::marshalling::MessageBase class contains inner "magic" to call the provided @b do_read()
+/// instead of default one when implementing virtual @ref nil::marshalling::MessageBase::readImpl().
+/// As an example let's define new message
+/// type (@b Message2), which has two fields. The first one is a 1 byte bitmask,
+/// the least significant bit of which defines whether the second field exists.
+/// The second field is optional 2 byte unsigned integer one.
+/// @code
+/// // file Message2.h
+///
+/// #include <nil/marshalling/marshalling.hpp>
+/// 
+/// #include "MyFieldBase.h> // Defines MyFieldBase common base class for all the fields
+///
+/// namespace my_protocol
+/// {
+/// 
+/// namespace message
+/// {
+///
+/// class Message2Fields
+/// {
+///     using field1 =     
+///         nil::marshalling::types::BitmaskValue<
+///             MyFieldBase, 
+///             nil::marshalling::option::fixed_length<1>,
+///             nil::marshalling::option::bitmask_reserved_bits<0xfe, 0>
+///         >;
+///
+///     using field2 = 
+///         nil::marshalling::types::Optional<
+///             nil::marshalling::types::IntValue<MyFieldBase, std::uint16_t>,
+///             nil::marshalling::option::missing_by_default
+///         >;
+///
+///     // bundle all the fields
+///     using All = std::tuple<
+///         field1,
+///         field2
+///     >;
+/// };
+///
+/// template <typename TBase>
+/// class Message2 : public
+///     nil::marshalling::MessageBase<
+///         TBase, 
+///         nil::marshalling::option::static_num_id_impl<MsgId_Message2>,
+///         nil::marshalling::option::fields_impl<Message2Fields::All>,
+///         nil::marshalling::option::msg_type<Message2<TBase> >
+///     >
+/// {
+/// public:
+///     MARSHALLING_MSG_FIELDS_ACCESS(flags, data);
+///     
+///     template <typename TIter>
+///     nil::marshalling::ErrorStatus do_read(TIter& iter, std::size_t len)
+///     {
+///         // Get type of the base class
+///         using Base = typename std::decay<decltype(nil::marshalling::to_message_base(*this))>::type;
+///
+///         // Read only the flags value
+///         auto es = Base::template do_read_fields_until<FieldIdx_data>(iter, len);
+///         if (es != nil::marshalling::ErrorStatus::success) {
+///             return es;
+///         }
+///
+///         // Update mode (exists/missing) of the optional value to follow
+///         if (field_flags().value() != 0) {
+///             field_data().set_exists();
+///         else {
+///             field_data().set_missing();
+///         }
+///     
+///         // Read the rest of the fields
+///         return Base::template do_read_fields_from<FieldIdx_data>(iter, len - field_flags().length());
+///     }
+/// };
+/// @endcode
+/// Please @b note, that due to the fact that defined message class is a template one, the member
+/// functions defined in @ref nil::marshalling::MessageBase are not accessible directly, there
+/// is a need to specify the base class scope. If there is no inner @b Base
+/// type defined in the class scope (required to support clang and earlier versions of gcc), 
+/// it is possible to use @ref nil::marshalling::to_message_base()
+/// function to detect it.
+///
+/// Also @b note, that nil::marshalling::MessageBase provides the following member functions
+/// in order to allow read / write of the selected fields.
+/// @li @ref nil::marshalling::MessageBase::do_read_fields_from()
+/// @li @ref nil::marshalling::MessageBase::do_read_fields_until()
+/// @li @ref nil::marshalling::MessageBase::do_read_fields_from_until()
+/// @li @ref nil::marshalling::MessageBase::do_write_fields_from()
+/// @li @ref nil::marshalling::MessageBase::do_write_fields_until()
+/// @li @ref nil::marshalling::MessageBase::do_write_fields_from_until()
+///
+/// @subsection page_define_prot_message_base_custom_refresh Custom Refresh Functionality
+/// The default refresh functionality implemented by @ref nil::marshalling::MessageBase::do_refresh()
+/// is to invoke @b refresh() member function of every field. The function will
+/// return @b true (indicating that at message contents have been updated) if
+/// at least one of the fields returns @b true. 
+/// Let's take a look again at the definition of @b Message2 mentioned earlier, where
+/// the existence of second field (@b data) depends on the value of the least
+/// significant bit in the first field (@b flags). During read operation the
+/// mode of the @b data is updated after value of the @b flags is read. However,
+/// when preparing the same message for write, there is a chance that message 
+/// contents are going to be put in invalid state:
+/// @code
+/// Message2<SomeInterface> msg;
+/// msg.field_flags().value() = 0x1;
+/// msg.field_data().field().value() = 10U;
+/// msg.field_data().set_missing(); // Bug, the field should exist
+/// sendMessage(msg);
+/// @endcode
+/// If message is sent, the @b flags will indicate that the @b data field follows,
+/// but it won't be serialized, due to being marked as "missing" by mistake. Please note,
+/// that all the "write" functions are marked as @b const and are not allowed
+/// to update the message fields during write operation. It may be useful to have
+/// member function that brings message contents into the valid and consistent
+/// state. It should be called @b do_refresh() and return boolean value (@b true
+/// in case the message contents were updated, and @b false if they remain
+/// intact.
+/// @code
+/// template <typename TBase>
+/// class Message2 : public nil::marshalling::MessageBase<...>
+/// {
+/// public:
+///     MARSHALLING_MSG_FIELDS_ACCESS(flags, data);
+///     
+///     bool do_refresh()
+///     {
+///         auto expectedDataMode = nil::marshalling::types::OptionalMode::missing;
+///         if ((field_flags().value() & 0x1) != 0U) {
+///             expectedDataMode = nil::marshalling::types::OptionalMode::exists;
+///         }
+///
+///         if (field_data().get_mode() == expectedDataMode) {
+///             // No need to change anything
+///             return false;
+///         }
+///
+///         field_data().set_mode(expectedDataMode);
+///         return true;
+///     }
+/// };
+/// @endcode
+/// As the result the code preparing message for sending may look like this:
+/// @code
+/// Message2<SomeInterface> msg;
+/// msg.field_flags().value() = 0x1;
+/// msg.field_data().field().value() = 10U;
+/// msg.do_refresh(); // Bring message contents into a valid state
+/// sendMessage(msg);
+/// @endcode
+/// In order to support polymorphic refresh functionality when required (see
+/// @ref page_use_prot_interface_refresh), the actual message class
+/// implementation must also pass @ref nil::marshalling::option::has_custom_refresh option to
+/// @ref nil::marshalling::MessageBase class. Failure to do so @b may result in missing
+/// implementation of @ref nil::marshalling::MessageBase::refresh_impl(). In this case,
+/// the default implementation of @ref nil::marshalling::Message::refresh_impl() will be
+/// used instead, always
+/// returning @b false (reporting that message fields weren't updated) without proper execution
+/// of refresh functionality.
+/// @code
+/// template <typename TBase>
+/// class Message2 : public
+///     nil::marshalling::MessageBase<
+///         TBase, 
+///         nil::marshalling::option::static_num_id_impl<MyMsgId_Message2>,
+///         nil::marshalling::option::msg_type<Message2<TMessage> >,
+///         nil::marshalling::option::fields_impl<Message2Fields> ,
+///         nil::marshalling::option::has_custom_refresh // Support polymorphic refresh when needed
+///     >
+/// {
+/// public:
+///     MARSHALLING_MSG_FIELDS_ACCESS(flags, data);
+///     
+///     template <typename TIter>
+///     nil::marshalling::ErrorStatus do_read(TIter& iter, std::size_t len)
+///     {
+///         ... // see implementation above
+///     }
+///
+///     bool do_refresh()
+///     {
+///         ... // see implementation above
+///     }
+/// };
+/// @endcode
+///
+/// @subsection page_define_prot_message_base_custom_write Custom Write Functionality
+/// Usually there is no need to provide custom write functionality for the messages
+/// in consistent state (see @ref page_define_prot_message_base_custom_refresh).
+/// The default one implemented by @ref nil::marshalling::MessageBase::do_write(), which invokes
+/// @b write() member function of every field, is correct. However, if 
+/// the need arises it is enough just to provide custom @b do_write() member
+/// function.
+/// @code
+/// template <typename TBase>
+/// class SomeMessage : public nil::marshalling::MessageBase<...>
+/// {
+/// public:
+///     MARSHALLING_MSG_FIELDS_ACCESS(...);
+///     
+///     template <typename TIter>
+///     nil::marshalling::ErrorStatus do_write(TIter& iter, std::size_t len) const
+///     {
+///         ... 
+///     }
+/// };
+/// @endcode
+///
+/// @subsection page_define_prot_message_base_custom_length Custom length Calculation
+/// Just like with @ref page_define_prot_message_base_custom_write providing
+/// custom length calculation is usually not required, but if need arises, just
+/// provide your own variant of @b do_length() member function.
+/// @code
+/// template <typename TBase>
+/// class SomeMessage : public nil::marshalling::MessageBase<...>
+/// {
+/// public:
+///     std::size_t do_length() const
+///     {
+///         ... 
+///     }
+/// };
+/// @endcode
+///
+/// @subsection page_define_prot_message_base_custom_valid Custom Validity Check
+/// The default implementation of @ref nil::marshalling::MessageBase::do_valid() calls
+/// @b valid() member function of every message field and returns @b true if
+/// all the calls returned @b true. However, there may be a need to provide extra
+/// checks in case specific value of one field may require tighter constrains on
+/// the value of another. In order to provide custom validity check, just implement
+/// custom @b do_valid() member function.
+/// @code
+/// template <typename TBase>
+/// class SomeMessage : public nil::marshalling::MessageBase<...>
+/// {
+/// public:
+///     bool do_valid() const
+///     {
+///         // Get type of the base class
+///         using Base = typename std::decay<decltype(nil::marshalling::to_message_base(*this))>::type;
+///         
+///         // Check that all fields are valid by themselves
+///         if (!Base::do_valid()) {
+///             return false;
+///         }
+/// 
+///         ... // do custom validation logic
+///         return true;
+///     }
+/// };
+/// @endcode
+///
+/// @subsection page_define_prot_message_base_name Reporting Message Name
+/// Some application may require printing (or reporting by other means) human
+/// readable name of the message. The @ref nil::marshalling::MessageBase cannot automatically
+/// generate appropriate function. As the result, the message definition class is
+/// expected to define @b do_name() member function with the following signature.
+/// @code
+/// template <typename TBase>
+/// class SomeMessage : public nil::marshalling::MessageBase<...>
+/// {
+/// public:
+///     static const char* do_name()
+///     {
+///         return "Some Message";
+///     }
+/// };
+/// @endcode
+/// In order to support @ref page_use_prot_interface_name there is a need
+/// to pass @ref nil::marshalling::option::has_name option to @ref nil::marshalling::MessageBase to notify
+/// the latter about existence of @b do_name() member function.
+/// @code
+/// template <typename TBase>
+/// class SomeMessage : public 
+///     nil::marshalling::MessageBase<
+///         ...,
+///         nil::marshalling::option::has_name
+///     >
+/// {
+/// public:
+///     static const char* do_name()
+///     {
+///         return "Some Message";
+///     }
+/// };
+/// @endcode
+/// When @ref nil::marshalling::option::has_name is used, the @b nil::marshalling::MessageBase
+/// creates overriding @b name_impl() (see @ref nil::marshalling::MessageBase::name_impl()), which
+/// invokes provided @b do_name() member function.
+///
+/// @subsection page_define_prot_message_version Protocol Version Support
+/// As was described earlier in @ref page_define_prot_interface_version, some 
+/// protocols may include version information in either message transport framing
+/// or in one of the messages used to establish a connection. Every field
+/// defines @b set_version() member function in its public interface. The
+/// nil::marshalling::MessageBase class will automatically call this function for every
+/// field before performing its @b read operation (inside @ref nil::marshalling::MessageBase::do_read()).
+/// However, if @ref page_define_prot_message_base_custom_read is implemented,
+/// the latter is expected to call provided @ref nil::marshalling::MessageBase::do_fields_version_update()
+/// member function explicitly before attempting actual read operations. 
+/// @b NOTE, that the @ref nil::marshalling::MessageBase::do_fields_version_update() function
+/// exists only if @ref nil::marshalling::option::version_in_extra_transport_fields has been
+/// provided to message interface.
+/// @code
+/// template <typename TBase>
+/// class Message2 : public
+///     nil::marshalling::MessageBase<...>
+/// {
+/// public:
+///     ...
+///     
+///     template <typename TIter>
+///     nil::marshalling::ErrorStatus do_read(TIter& iter, std::size_t len)
+///     {
+///         // Get type of the base class
+///         using Base = typename std::decay<decltype(nil::marshalling::to_message_base(*this))>::type;
+///         
+///         // Update version of the fields
+///         Base::do_fields_version_update();
+///
+///         // Do the actual read
+///         ...
+///     }
+/// };
+/// @endcode
+/// Similarly, the fields' version needs to be updated in case 
+/// @ref page_define_prot_message_base_custom_refresh is implemented.
+/// @code
+/// template <typename TBase>
+/// class Message2 : public
+///     nil::marshalling::MessageBase<...>
+/// {
+/// public:
+///     ...
+///     
+///     bool do_refresh()
+///     {
+///         // Get type of the base class
+///         using Base = typename std::decay<decltype(nil::marshalling::to_message_base(*this))>::type;
+///
+///         // Update version of the fields
+///         bool updated = Base::do_fields_version_update();
+///
+///         ... // Custom refresh functionality
+///
+///         return updated;
+///     }
+/// };
+/// @endcode
+///
+/// @section page_define_prot_lenth_verification Extra Compile Time Checks
+/// Quite often it is obvious from the protocol specification what minimal length
+/// of the serialized message contents is expected to be, and if there are not
+/// variable length fields, such as @b string or @b list, then maximum serialization
+/// length is also known. It would be wise to slip in compile time checks in
+/// message definition as well. There are several static constexpr member functions 
+/// inherited from @b nil::marshalling::MessageBase that can be used:
+/// 
+/// @li @ref nil::marshalling::MessageBase::do_min_length()
+/// @li @ref nil::marshalling::MessageBase::do_max_length()
+/// @li @ref nil::marshalling::MessageBase::do_min_length_from_until()
+/// @li @ref nil::marshalling::MessageBase::do_max_length_from_until()
+///
+/// For example, the implementation of @b Message2 may be updated as below:
+/// @code
+/// // file Message2.h
+///
+/// #include <nil/marshalling/marshalling.hpp>
+/// 
+/// #include "MyFieldBase.h> // Defines MyFieldBase common base class for all the fields
+///
+/// namespace my_protocol
+/// {
+/// 
+/// namespace message
+/// {
+///
+/// template <typename TBase>
+/// class Message2 : public nil::marshalling::MessageBase<...>
+///     >
+/// {
+///     using Base =  nil::marshalling::MessageBase<...>
+/// public:
+///     static_assert(Base::do_min_length() == 1U, "Unexpected min length");
+///     static_assert(Base::do_max_length() == 3U, "Unexpected max length");
+///     ...
+/// };
+/// @endcode
+///
+/// @section page_define_prot_customisation Application Specific Customisation
+/// As was mentioned in @ref page_field_tutorial, there may be a need to provide a way for
+/// extra application specific customisation for used fields, especially for fields like lists
+/// (@ref nil::marshalling::types::array_list) or strings (@ref nil::marshalling::types::String). By
+/// default they use @b std::vector and @b std::string respectively as
+/// their inner value storage types. They may be un-applicable to some aplications,
+/// especially bare-metal ones. In order to solve such problem the message classes
+/// are expected to receive extra template parameters, which will be propagated
+/// to fields definition.
+///
+/// <b>Recommended Practice</b>
+/// 
+/// It is recommended to have a separate class / struct called @b DefaultOptions
+/// wich defines relevant inner types to be @ref nil::marshalling::option::empty_option (option that
+/// does nothing). For example, let's assume that third field in @b Message1
+/// message is a string. Then the @b DefaultOptions struct may be defined as
+/// @code
+/// struct DefaultOptions
+/// {
+///     struct message
+///     {
+///         struct Message1Fields
+///         {
+///             using field3 = nil::marshalling::option::empty_option; // no extra functionality by default
+///         };
+///     };
+/// };
+/// @endcode
+/// @b NOTE, that inner structure of @b DefaultOptions in not important, but it
+/// is recommended to resemble the full scope of fields, options for which are
+/// being prepared. Then the message definition need to be changed to receive
+/// and use extra options struct.
+/// @code
+/// #pragma once
+/// #include <nil/marshalling/marshalling.hpp>
+///
+/// #include "MyFieldBase.h> // Defines MyFieldBase common base class for all the fields
+/// #include "DefaultOptions.h> // Defines DefaultOptions struct
+///
+/// namespace my_protocol
+/// {
+/// 
+/// namespace message
+/// {
+///
+/// template <typename TOpt = DefaultOptions>
+/// struct Message1Fields
+/// {
+///     using field1 = ...;
+///     using field2 = ...
+///     using field3 = 
+///         nil::marshalling::types::String<
+///             MyFieldBase,
+///             typename TOpt::message::Message1Fields::field3 // Extra option(s) 
+///         >
+///
+///     // bunding type
+///     using All = 
+///         std::tuple<
+///             field1,
+///             field2,
+///             field3
+///         >;
+/// };
+///
+/// // Definition of the message itself, described and explained later
+/// template <typename TBase, typename TOpt = DefaultOptions>
+/// class Message1 : public 
+///     nil::marshalling::MessageBase<
+///         TBase, 
+///         nil::marshalling::option::static_num_id_impl<MsgId_Message1>,
+///         nil::marshalling::option::fields_impl<Message1Fields<TOpt>::All>,
+///         nil::marshalling::option::msg_type<Message1<TBase, TOpt> >
+///     >
+/// {
+///     ...
+/// };
+///
+/// } // namespace message
+///
+/// } // namespace my_protocol
+/// @endcode
+/// It gives opportunity to the application to define its own single structure
+/// of options for all the messages by extending the provided @b DefaultOptions 
+/// and overriding selected number inner types with its own extension options.
+///
+/// @b NOTE, that allowing additional customisation for fields like @b list
+/// (@ref nil::marshalling::types::array_list) and @b string (@ref nil::marshalling::types::String) is
+/// a <b>must have</b> feature to allow usage of the same protocol definition in
+/// bare-metal applications. However, it would be wise to allow extra customisation
+/// for @b all the used fields, even for ones like <b>integral values</b> (@ref nil::marshalling::types::IntValue)
+/// or @b enum (@ref nil::marshalling::types::IntValue). The client application developer
+/// may want to change the default value of some field, maybe even add or
+/// change (override) provided ranges of valid values, force failing of read
+/// operation on invalid values, etc... @b NOTE, that when allowing such
+/// customisation of fields, make sure that passed options are listed before
+/// the default ones
+/// @code
+/// template <typename... TExtraOpts>
+/// using MyField = 
+///     nil::marshalling::types::IntValue<
+///         MyFieldBase,
+///         std::uint16_t,
+///         TExtraOpts..., // extra options
+///         nil::marshalling::option::default_num_value<10>, // default value
+///         nil::marshalling::option::valid_num_value_range<10, 20> // default range of valid values
+///     >;
+/// @endcode
+/// This is because earlier used options take priority over ones used later.
+///
+/// Depending on the protocol there may be a need to provide additional customisation
+/// for messages themselves. For example, when most messages are bi-directional
+/// (which will require both read and write operation for every message) except
+/// a only a few, that go only one direction (from client to server or the opposite).
+/// In this case the generated code will contain implementation for
+/// both polymorphic read (@ref nil::marshalling::MessageBase::readImpl()) and write
+/// (@ref nil::marshalling::MessageBase::write_impl()). For uni-directional messages some
+/// of these function may be redundant, which unnecessary increases the binary
+/// size. It may become a problem for bare-metal platforms with limited amount
+/// of ROM space. The @b Marshalling library provides options that may suppress automatic
+/// generation of some virtual functions by the @b nil::marshalling::MessageBase. The available
+/// options are:
+/// @li @ref nil::marshalling::option::no_read_impl
+/// @li @ref nil::marshalling::option::no_write_impl
+/// @li @ref nil::marshalling::option::no_valid_impl
+/// @li @ref nil::marshalling::option::no_length_impl
+///
+/// These options should not be used in the definition of protocol messages, but
+/// it would be wise to allow the client application use them when necessary. It
+/// can easily achieved using @b DefaultOptions structure described earlier.
+/// @code
+/// struct DefaultOptions
+/// {
+///     struct message
+///     {
+///         using Message1 = nil::marshalling::option::empty_option;
+///         using Message2 = nil::marshalling::option::empty_option;
+///         ...
+///     };
+/// };
+/// @endcode
+/// Add passing these options to message definition classes:
+/// @code
+/// namespace my_protocol
+/// {
+/// 
+/// namespace message
+/// {
+///
+/// template <typename TBase, typename TOpt = DefaultOptions>
+/// class Message1 : public 
+///     nil::marshalling::MessageBase<
+///         TBase, 
+///         nil::marshalling::option::static_num_id_impl<MsgId_Message1>,
+///         nil::marshalling::option::fields_impl<Message1Fields<TOpt>::All>,
+///         nil::marshalling::option::msg_type<Message1<TBase, TOpt> >,
+///         typename TOpt::message::Message1 // Extra options 
+///     >
+/// {
+///     ...
+/// };
+///
+/// } // namespace message
+///
+/// } // namespace my_protocol
+/// @endcode
+///
+/// @section page_define_prot_transport_framing Transport Framing Definition
+/// In addition to definition of the messages and their contents, every 
+/// communication protocol must ensure that the message is successfully 
+/// delivered over the I/O link to the other side and recognised (based on its ID). 
+/// The serialized message payload must be wrapped in some kind of transport
+/// framing prior to being sent and unwrapped on the other side when received. 
+/// The @ref page_prot_stack_tutorial page contains detailed information on
+/// how define such a frame and make it usable to the client application. Note,
+/// that the same protocol may be used over multiple I/O link, every one of 
+/// which may require different framing. There is no limit on amount of different
+/// frames that may be defined.

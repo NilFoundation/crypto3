@@ -1,0 +1,876 @@
+/// @page page_prot_stack_tutorial Protocol Stack Definition Tutorial
+/// @tableofcontents
+/// @section page_prot_stack_tutorial_intro Introduction
+/// In addition to definition of the messages and their contents, every 
+/// communication protocol must ensure that the message is successfully delivered
+/// over the I/O link to the other side. The serialized message payload must
+/// be wrapped in some kind of transport information prior to being sent and 
+/// unwrapped on the other side when received.
+///
+/// For example, let's define a custom protocol that wraps the message payload
+/// in the following way:
+/// @code
+/// SYNC | SIZE | ID | PAYLOAD | CHECKSUM 
+/// @endcode    
+/// where:
+/// @li SYNC - 2 bytes of synchronisation value to indicate beginning of the message, 
+///     must be "0xab 0xcd"
+/// @li SIZE - 2 bytes, length of remaining data including checksum and not 
+///     including SIZE field itself.
+/// @li ID - 1 byte, numeric ID of the message.
+/// @li PAYLOAD - any number of bytes, serialized message data
+/// @li CHECKSUM - 2 bytes, CRC-CCITT value of all bytes starting (and
+///     including) from SIZE field and ending after PAYLOAD field.
+/// 
+/// The processing of the raw bytes received over I/O link involves identifying
+/// the fields listed above and stripping them off <b>one by one</b> until the
+/// @b PAYLOAD is reached, where it can be read by the created proper message
+/// object (based on read message ID). If one of the elements is not as it is 
+/// expected to be, the processing should stop.
+///
+/// The sequential processing the the transport information values, and stripping
+/// them one by one before proceeding to the next one, may remind of 
+/// <a href="https://en.wikipedia.org/wiki/OSI_model">OSI Conceptual Model</a>, where
+/// a layer serves the layer above it and is served by the layer below it. 
+///
+/// The @b Marshalling library defines every such @b layer, that is handling a single
+/// value, as separate class. Every such layer class will use @b field abstraction
+/// (see @ref page_field_tutorial) to wrap the value it handles.
+/// The layer classes are stacked together by wrapping
+/// one another. When combined together they are called <b>Protocol Stack</b>.
+///
+/// The wrapping for the example above will look like this:
+/// @diafile protocol_stack.dia
+///
+/// When presented as actual stack, it may look like this:
+/// @diafile protocol_stack_layers.dia
+///
+/// Please note that @b CHECKSUM layer lays between @b SYNC and @b SIZE. This is
+/// a bit counter intuitive, because @b SIZE follows @b SYNC in the protocol
+/// description, while @b CHECKSUM appears last. The reason for such location
+/// of @b CHECKSUM layer is that it calculates and verifies checksum on the
+/// @b SIZE, @b ID, and @b PAYLOAD areas, i.e. it must wrap the all three.
+///
+/// The Marshalling library provides multiple classes to define various layers when
+/// assembling the full <b>protocol stack</b> of layers. All these classes reside in
+/// nil::marshalling::protocol namespace.
+/// The following sections will cover all the layer classes required to
+/// assemble the protocol stack described above.
+///
+/// @section page_prot_stack_tutorial_payload PAYLOAD Layer
+/// The top layer, that is responsible to read/write the payload of the message
+/// is called @b PAYLOAD. It is implemented by nil::marshalling::protocol::MsgDataLayer
+/// class in the Marshalling library.
+/// @code
+/// using MyMsgData = nil::marshalling::protocol::msg_data_layer<>;
+/// @endcode
+/// @b NOTE, that @ref nil::marshalling::protocol::MsgDataLayer receives a template parameter.
+/// In the normal operation, when transport frame fields are not stored anywhere,
+/// it is never used. However, there is way to perform @b read operation while
+/// caching transport fields (by using @ref nil::marshalling::protocol::MsgDataLayer::read_fields_cached())
+/// The payload field is defined to be @ref nil::marshalling::types::array_list of raw data
+/// (see @ref nil::marshalling::protocol::MsgDataLayer::field_type). It would be wise to provide
+/// a way to supply extra options to choose storage type for this field,
+/// when defining protocol stack. As the result the definition becomes:
+/// @code
+/// template <typename TPayloadOptions = nil::marshalling::option::empty_option>
+/// using MyMsgData = nil::marshalling::protocol::MsgDataLayer<TPayloadOptions>;
+/// @endcode
+///
+/// @section page_prot_stack_tutorial_id ID Layer
+/// The @b ID layer is responsible to process the ID of the message
+/// and based on this ID, create proper message object. The Marshalling library implements
+/// this functionality in nil::marshalling::protocol::MsgIdLayer class. It receives
+/// <b>at least</b> four template parameters. The first one is a type of the
+/// field that can be used to read/write the ID information. The @ref
+/// page_define_prot_interface section described @b my_protocol::msg_id enum
+/// type used to define message IDs, it can be reused to define a field responsible
+/// to read / write message ID value 
+/// @code
+/// namespace my_protocol
+/// {
+///
+/// enum msg_id : std::uint8_t {...} // enum described earlier
+///
+/// using MyFieldBase = nil::marshalling::field_type<nil::marshalling::option::big_endian>; // Use big endian for all fields serialization
+///
+/// using MsgIdField = 
+///     nil::marshalling::types::EnumValue<
+///         MyFieldBase, 
+///         msg_id // enum type
+///     >;
+///
+/// } // namespace my_protocol
+/// @endcode
+/// @b NOTE, that underlying enum type is defined to be @b std::uint8_t, which
+/// will result in 1 byte serialization length.
+///
+/// The second parameter is common interface class for all @b input messages
+/// that need to be recognised during @b read operation. This type will be defined
+/// by the application and is expected to be an alias (typedef) or extending 
+/// class to @b my_protocol::Message (described in @ref page_define_prot_interface)
+/// 
+/// The third parameter
+/// is all the types of all the custom messages, that need to be recognised in
+/// @b read operation, bundled in std::tuple. 
+/// @code
+/// template <typename TMessage>
+/// using all_messages_type =
+///     std::tuple<
+///         Message1<TMessage>,
+///         Message2<TMessage>,
+///         Message3<TMessage>,
+///         ...
+///     >;
+/// @endcode
+/// @b NOTE, that the interface class (@b TMessage) passed as
+/// the second parameter is expected to be the common base class for all the messages
+/// passed as third one.
+/// 
+/// The fourth template parameter is the upper layer it needs to wrap:
+/// @code
+/// template <
+///     typename TMessage, // common interface class defined by the application
+///     typename TInputMessages = all_messages_type<TMessage>, // Input messages that need to be recognised
+///     typename TPayloadOptions = nil::marshalling::option::empty_option // Extra options for payload storage
+/// >
+/// using MyMsgId = 
+///     nil::marshalling::protocol::MsgIdLayer<
+///         MsgIdField, 
+///         TMessage, 
+///         TInputMessages, 
+///         MyMsgData<TPayloadOptions>
+///     >;
+/// @endcode 
+/// @b NOTE, that all the input messages are passed as a template parameter with
+/// a default value (bundling all the available messages). It will give an opportunity
+/// to the application to use only messages it needs.
+///
+/// Also @b note, input messages in the bundle (@b TInputMessages) are expected
+/// to be defined in order of their numeric IDs. It is allowed to have separate
+/// message classes to report the same numeric ID. However, the @b read operation will
+/// try to read all the messages with the found ID one by one <b>in
+/// order</b> of their definition until success is reported.
+///
+/// The nil::marshalling::protocol::MsgIdLayer defines @b msg_ptr_type
+/// (see nil::marshalling::protocol::MsgIdLayer::msg_ptr_type) internal type, which is
+/// smart pointer (@b std::unique_ptr) to the input message interface
+/// class (@b TMessage) provided as second template parameter.
+///
+/// During the normal @b read operation, the nil::marshalling::protocol::MsgIdLayer will
+/// dynamically allocate the proper message object.
+///
+/// The nil::marshalling::protocol::MsgIdLayer can also be used in <b>bare metal</b> systems,
+/// that do NOT use dynamic memory allocation. In order to prevent this layer 
+/// from using dynamic memory allocation, the nil::marshalling::option::in_place_allocation
+/// option needs to be passed as fifth template parameter to the
+/// nil::marshalling::protocol::MsgIdLayer class. However, an ability to use this option
+/// needs to be provided to the application itself only if needed. In order to
+/// achive that additional template parameter needs to be used.
+/// @code
+/// template <
+///     typename TMessage, // common interface class defined by the application
+///     typename TInputMessages = all_messages_type<TMessage>, // Input messages that need to be recognised
+///     typename TAllocationOptions = nil::marshalling::option::empty_option, // Extra options for MsgIdLayer
+///     typename TPayloadOptions = nil::marshalling::option::empty_option // Extra options for payload storage
+/// >
+/// using MyMsgId = 
+///     nil::marshalling::protocol::MsgIdLayer<
+///         MsgIdField, 
+///         TMessage, 
+///         TInputMessages, 
+///         MyMsgData<TPayloadOptions>,
+///         TAllocationOptions
+///     >;
+/// @endcode 
+/// In this case, the nil::marshalling::protocol::MsgIdLayer will statically allocate
+/// internal buffer in its private data members, big enough to hold any message object
+/// of any type listed in @b all_messages_type bundle. It means that only one message
+/// object can be allocated and used at a time, i.e. the previous object must
+/// be deleted prior to new one being allocated. @n
+/// Also, the nil::marshalling::protocol::MsgIdLayer::msg_ptr_type will still be a variant of
+/// @b std::unique_ptr, but with custom deleter (defined by Marshalling library itself),
+/// which will make sure the proper destruction of the message object and
+/// release of the internal buffer for next allocation. In case new allocation
+/// is attempted when internal buffer is NOT released, the new message will NOT be allocated
+/// and read operation will fail with @ref nil::marshalling::ErrorStatus::msg_alloc_failure
+/// error.
+///
+/// By default, if the received data contains unknown message ID (the message
+/// type is not in @b all_messages_type bundle), the @b read operation returns
+/// @ref nil::marshalling::ErrorStatus::invalid_msg_id and no message object is allocated.
+/// However, there are @b bridge / @b gateway / @b firewall type of applications
+/// which are interested to decode only limited number of messages, but still
+/// forward the received data (sometimes changing the transport wrapping) 
+/// without actually decoding the contents. In this case the default behaviour 
+/// cannot be used. The @b Marshalling library provides @ref nil::marshalling::generic_message
+/// message definition which has a single variable length data field 
+/// (defined using @ref nil::marshalling::types::array_list class). The @ref
+/// nil::marshalling::protocol::MsgIdLayer may also receive @ref nil::marshalling::option::support_generic_message
+/// option specifying type of the generic_message.
+/// In this case, if the appropriate message type hasn't been found in 
+/// @b all_messages_type bundle, the appropriate @ref nil::marshalling::generic_message object
+/// will be created instead. However, just like with
+/// @ref nil::marshalling::option::in_place_allocation, this option should be used by the application
+/// if needed.
+///
+/// Note, that nil::marshalling::option::support_generic_message and nil::marshalling::option::in_place_allocation
+/// options can be used together. In this case the @ref nil::marshalling::generic_message
+/// message object will be allocated in the same allocation area. The client
+/// application will be able to combine these option together in single tuple
+/// and use pass as @b TAllocationOptions parameter.
+/// @code
+/// using MyAllocOptions = 
+///     std::tuple<
+///         nil::marshalling::option::support_generic_message<nil::marshalling::generic_message<MyInterfaceMessage> >,
+///         nil::marshalling::option::in_place_allocation
+///     >;
+/// @endcode
+/// When constructed, the nil::marshalling::protocol::MsgIdLayer creates an array of
+/// statically allocated factory methods, which are responsible to allocate
+/// right message objects. This array is used as a map of message ID to the
+/// factory method. The Marshalling library contains inner logic that analyses a tuple of all @b input message
+/// types provided to @ref nil::marshalling::protocol::MsgIdLayer. If the IDs of the messages
+/// are sequential ones starting from a low number such as 0 or 1, and the highest
+/// ID value do not significantly exceed the total number of message types in the tuple,
+/// then the one-to-one mapping is generated, i.e. to access the right factory 
+/// method is just accessing the right cell in the mapping array (O(1) time complexity).
+/// In all other cases the factory methods are compacted together and binary search
+/// is executed to get appropriate factory method having the numeric message ID 
+/// value (O(log(n))).
+///
+/// @b NOTE, that nil::marshalling::protocol::MsgIdLayer doesn't use any dynamic memory
+/// allocation to store internal factory methods, that create proper message
+/// object given the ID of the message, which makes it possible and safe to
+/// use in bare-metal environment without any HEAP.
+///
+/// It may happen that @b nil::marshalling::protocol::MsgIdLayer class as-is is not really
+/// suitable for implementing message identification and creation of message
+/// object when implementing custom protocol. 
+/// It is possible to implement a new custom layer (see @ref
+/// page_prot_stack_tutorial_new_layers section below) with the required
+/// functionality. However, it is recommended
+/// to use @ref nil::marshalling::MsgFactory object internally. It will help in creation the proper
+/// message object once the ID value is known.
+///
+/// @section page_prot_stack_tutorial_size SIZE Layer
+/// The @b SIZE layer is responsible to process information on the remaining
+/// message length, and forward the @b read/write operations to the upper layer
+/// in case it is safe to do so. The Marshalling library provides
+/// @ref nil::marshalling::protocol::MsgSizeLayer class for that purpose.
+/// @code
+/// namespace my_protocol
+/// {
+///
+/// using RemSizeField =
+///     nil::marshalling::types::IntValue<
+///         MyFieldBase, 
+///         std::uint16_t, 
+///         nil::marshalling::option::num_value_ser_offset<sizeof(std::uint16_t)>
+///     >;
+///
+/// template <
+///     typename TMessage, // common interface class defined by the application
+///     typename TInputMessages = all_messages_type<TMessage>, // Input messages that need to be recognised
+///     typename TAllocationOptions = nil::marshalling::option::empty_option, // Extra options for MsgIdLayer
+///     typename TPayloadOptions = nil::marshalling::option::empty_option // Extra options for payload storage
+/// >
+/// using MyMsgSize = 
+///     nil::marshalling::protocol::MsgSizeLayer<
+///         RemSizeField, 
+///         MyMsgId<TMessage, TInputMessages, TAllocationOptions, TPayloadOptions> 
+///     >;
+/// 
+/// } // namespace my_protocol
+/// @endcode
+/// The @ref nil::marshalling::protocol::MsgSizeLayer receives two template parameters. The first
+/// one is the definition of the @b field (see @ref page_field_tutorial for detail)
+/// that is responsible to read/write the remaining length information. The
+/// second template parameter is an upper layer that is being wrapped. @n
+/// Please note the usage of @b nil::marshalling::option::num_value_ser_offset option when
+/// defining the @b field type. If it is NOT used, the serialized length value
+/// will cover only @b ID and @b PAYLOAD (layers it wraps). However, according to the protocol
+/// specification, the @b SIZE value must also include @b CHECKSUM. Usage of
+/// nil::marshalling::option::num_value_ser_offset <sizeof(std::uint16_t)> will add 2
+/// (@b sizeof(std::uint16_t)) when serialising the length of wrapped fields.
+/// See also @ref sec_field_tutorial_int_value_ser_offset for more detail.
+///
+/// @section page_prot_stack_tutorial_checksum CHECKSUM Layer
+/// The @b CHECKSUM layer is responsible to calculate and verify the checksum
+/// on the data read and/or written by the upper layers it wraps.
+/// The Marshalling library provides nil::marshalling::protocol::ChecksumLayer and
+/// nil::marshalling::protocol::ChecksumPrefixLayer for this purpose. They are very similar.
+/// The only difference is that nil::marshalling::protocol::ChecksumLayer appends the
+/// checksum value, while nil::marshalling::protocol::ChecksumPrefixLayer prepends it.
+/// @code
+/// namespace my_protocol
+/// {
+///
+/// using ChecksumField = nil::marshalling::types::IntValue<MyFieldBase, std::uint16_t>;
+///
+/// template <
+///     typename TMessage, // common interface class defined by the application
+///     typename TInputMessages = all_messages_type<TMessage>, // Input messages that need to be recognised
+///     typename TAllocationOptions = nil::marshalling::option::empty_option, // Extra options for MsgIdLayer
+///     typename TPayloadOptions = nil::marshalling::option::empty_option // Extra options for payload storage
+/// >
+/// using MyChecksum =
+///     nil::marshalling::protocol::ChecksumLayer<
+///         ChecksumField,
+///         nil::marshalling::protocol::checksum::crc_ccitt
+///         MyMsgSize<TMessage, TInputMessages, TAllocationOptions, TPayloadOptions>
+///     >;
+/// 
+/// } // my_protocol
+/// @endcode
+/// The both layer classes receives three template parameters. The
+/// first one is a @b field that is responsible to read/write the checksum value.
+///
+/// The second template parameter is a checksum calculator class which is used
+/// to calculate a checksum value. Please refer to the documentation of
+/// @ref nil::marshalling::protocol::ChecksumLayer or @ref nil::marshalling::protocol::ChecksumPrefixLayer class
+/// for the detail on the interface this
+/// checksum calculator class must provide. The example above uses 
+/// @ref nil::marshalling::protocol::checksum::crc_ccitt, which calculates the the standard
+/// CRC-CCITT value. All the checksum calculators the Marshalling library provides reside
+/// in nil::marshalling::protocol::checksum namespace.
+///
+/// The third template parameter is an upper layer that is being wrapped.
+///
+/// By default both @ref nil::marshalling::protocol::ChecksumLayer and
+/// @ref nil::marshalling::protocol::ChecksumPrefixLayer allow inner (upper) layers to
+/// complete their read operation before calculating and verifying checksum on
+/// read data. However, there may be protocols that may allow checksum verification
+/// before attempting to read message contents. In this case 
+/// @ref nil::marshalling::option::checksum_layer_verify_before_read option may be used as
+/// fourth template parameter.
+/// @code
+/// namespace my_protocol
+/// {
+/// template <
+///     typename TMessage, // common interface class defined by the application
+///     typename TInputMessages = all_messages_type<TMessage>, // Input messages that need to be recognised
+///     typename TAllocationOptions = nil::marshalling::option::empty_option, // Extra options for MsgIdLayer
+///     typename TPayloadOptions = nil::marshalling::option::empty_option // Extra options for payload storage
+/// >
+/// using MyChecksum =
+///     nil::marshalling::protocol::ChecksumLayer<
+///         ChecksumField,
+///         nil::marshalling::protocol::checksum::crc_ccitt
+///         MyMsgSize<TMessage, TInputMessages, TAllocationOptions, TPayloadOptions>,
+///         nil::marshalling::option::checksum_layer_verify_before_read
+///     >;
+/// 
+/// @endcode
+///
+/// @section page_prot_stack_tutorial_sync SYNC Layer
+/// The @b SYNC layer is responsible to recognise the synchronisation byte(s)
+/// in the input stream as well as write appropriate value when the write
+/// operation takes place. The Marshalling library provides @ref nil::marshalling::protocol::SyncPrefixLayer
+/// class that helps with this task.
+/// @code
+/// namespace my_protocol
+/// {
+///
+/// using SyncField =
+///     nil::marshalling::types::IntValue<
+///         MyFieldBase, 
+///         std::uint16_t, 
+///         nil::marshalling::option::default_num_value<0xabcd>,
+///         nil::marshalling::option::ValidNumValue<0xabcd>,
+///         nil::marshalling::option::fail_on_invalid // fail read operation if read value is invalid
+///     >;
+///
+/// template <
+///     typename TMessage, // common interface class defined by the application
+///     typename TInputMessages = all_messages_type<TMessage>, // Input messages that need to be recognised
+///     typename TAllocationOptions = nil::marshalling::option::empty_option, // Extra options for MsgIdLayer
+///     typename TPayloadOptions = nil::marshalling::option::empty_option // Extra options for payload storage
+/// >
+/// using MySyncPrefix = 
+///     nil::marshalling::protocol::SyncPrefixLayer<
+///         SyncField, 
+///         MyChecksum<TMessage, TInputMessages, TAllocationOptions, TPayloadOptions> 
+///     >;
+/// 
+/// } // namespace my_protocol
+/// @endcode
+/// The nil::marshalling::protocol::SyncPrefixLayer class receives two template parameters.
+/// The first one is the type of the @b field, that is responsible to read/write
+/// the synchronisation byte(s). Please note the usage of nil::marshalling::option::default_num_value
+/// option when defining the @b field type. It insures that the default constructed
+/// field will have the required value. @n
+/// The second template parameter is the upper layer being wrapped.
+///
+/// @section page_prot_stack_tutorial_transport_value Extra Transport Values
+/// Some protocol may use extra values as part of the transport information. Such
+/// values may have an influence on how the message payload is read and/or on
+/// how the message object is handled. As an example let's define the following
+/// transport wrapping:
+/// @code
+/// SIZE | ID | VERSION | PAYLOAD
+/// @endcode
+/// The @b VERSION value is expected to influence the "read" operation. The message
+/// object may have some extra fields, which were introduced in later version of
+/// the protocol, and it needs to take into account the provided @b VERSION info.
+///
+/// The Marshalling library provides @ref nil::marshalling::protocol::TransportValueLayer to handle
+/// such fields. @b HOWEVER it requires extra support from common message interface class.
+/// The latter must use @ref nil::marshalling::option::extra_transport_fields option in order
+/// to define expected interface (please refer to @ref page_define_prot_interface_extra_transport
+/// for detail).
+///
+/// The @ref nil::marshalling::protocol::TransportValueLayer class receives three
+/// template parameters. The first one is the field used to read / write the
+/// value. The second parameter is index of the relevant extra transport field
+/// in the @ref nil::marshalling::Message::transport_fields_type tuple. And the third parameter
+/// is the next layer.
+///
+/// The whole protocol stack definition may look like this:
+/// @code
+/// // Base class of all the fields
+/// using MyFieldBase = nil::marshalling::field_type<nil::marshalling::option::big_endian>;
+///
+/// // field_type describing protocol version.
+/// using MyVersionField = nil::marshalling::types::IntValue<MyFieldBase, std::uint16_t>;
+///
+/// // Payload control layer
+/// template <
+///     typename TPayloadOptions = nil::marshalling::option::empty_option // Extra options for payload storage
+/// >
+/// using MyMsgData = nil::marshalling::protocol::MsgDataLayer<TPayloadOptions>;
+///
+/// // Version control layer
+/// template <
+///     typename TMessage, // common interface class defined by the application
+///     typename TPayloadOptions = nil::marshalling::option::empty_option // Extra options for payload storage
+/// >
+/// using MyVersion = 
+///     nil::marshalling::protocol::TransportValueLayer<
+///         MyVersionField, 
+///         TMessage::TransportFieldIdx_version, 
+///         MyMsgData<TPayloadOptions>
+///     >;
+///
+/// // Id handling layer
+/// template <
+///     typename TMessage, // common interface class defined by the application
+///     typename TInputMessages = all_messages_type<TMessage>, // Input messages that need to be recognised
+///     typename TAllocationOptions = nil::marshalling::option::empty_option, // Extra options for MsgIdLayer
+///     typename TPayloadOptions = nil::marshalling::option::empty_option // Extra options for payload storage
+/// >
+/// using MyMsgId = 
+///     nil::marshalling::protocol::MsgIdLayer<
+///         MsgIdField, 
+///         TMessage, 
+///         TInputMessages, 
+///         MyVersion<TMessage, TPayloadOptions>,
+///         TAllocationOptions
+///     >;
+///
+/// // Size handling layer
+/// template <
+///     typename TMessage, // common interface class defined by the application
+///     typename TInputMessages = all_messages_type<TMessage>, // Input messages that need to be recognised
+///     typename TAllocationOptions = nil::marshalling::option::empty_option, // Extra options for MsgIdLayer
+///     typename TPayloadOptions = nil::marshalling::option::empty_option // Extra options for payload storage
+/// >
+/// using MyMsgSize = 
+///     nil::marshalling::protocol::MsgSizeLayer<
+///         RemSizeField, 
+///         MyMsgId<TMessage, TInputMessages, TAllocationOptions, TPayloadOptions> 
+///     >;
+/// @endcode
+/// @b NOTE, that in the example above @b VERSION layer follows @b ID. In this case
+/// the message object is already created by the @b ID layer when @b VERSION
+/// one performs its read operation. The latter may update the version information
+/// inside the created message object. However, there may be cases when 
+/// extra transport value precedes ID layer:
+/// @code
+/// SIZE | VERSION | ID | PAYLOAD
+/// @endcode
+/// The Marshalling library is also capable of handling such case. It contains internal
+/// "magic", which forces some layers to complete their read operation and
+/// update created message object (if necessary) before
+/// the read operation is forwarded to the final (PAYLOAD) layer.
+///
+/// Unfortunatelly there are layers (@ref nil::marshalling::protocol::ChecksumLayer,
+/// @ref nil::marshalling::protocol::ChecksumPrefixLayer, and @ref nil::marshalling::protocol::MsgSizeLayer),
+/// that cannot complete their read operation, without read of the PAYLOAD data
+/// being complete as well. As the result these layers do not support being wrapped by 
+/// @ref nil::marshalling::protocol::TransportValueLayer and will fail compilation with
+/// static assert if such wrapping is attempted.
+///
+/// @section page_prot_stack_tutorial_pseudo_transport_value Pseudo Transport Values
+/// Some protocols may report one of the values (such as protocol version) in
+/// one of the messages used to establish connection. After that, the reported
+/// value may have influence on how other message contents are being read. Handling
+/// such case is very similar to @ref page_prot_stack_tutorial_transport_value.
+/// The only difference is passing @ref nil::marshalling::option::pseudo_value option to
+/// @ref nil::marshalling::protocol::TransportValueLayer layer class. It will cause the
+/// transport value not actually being (de)serialized during @b read / @b write
+/// operations. The pseudo field value is going to be stored as private member
+/// of @ref nil::marshalling::protocol::TransportValueLayer and can be accessed (and updated) using
+/// @ref nil::marshalling::protocol::TransportValueLayer::pseudo_field() member function(s).
+/// During the @b read operation the nil::marshalling::protocol::TransportValueLayer behaves
+/// as if the value stored in this field was actually read.
+/// @code
+/// // Version control layer
+/// template <
+///     typename TMessage, // common interface class defined by the application
+///     typename TPayloadOptions = nil::marshalling::option::empty_option // Extra options for payload storage
+/// >
+/// using MyVersion = 
+///     nil::marshalling::protocol::TransportValueLayer<
+///         MyVersionField, 
+///         TMessage::TransportFieldIdx_version, 
+///         MyMsgData<TPayloadOptions>,
+///         nil::marshalling::option::pseudo_value
+///     >;
+/// @endcode
+/// 
+/// @section page_prot_stack_tutorial_summary Layers Summary
+/// The earlier examples show that layer classes wrap one another, which creates
+/// the following picture:
+/// @diafile protocol_stack.dia
+///
+/// The outermost (or bottom) layer defines a full <b>protocol stack</b>. It 
+/// should be typedef-ed or extended to avoid any confusion:
+/// @code
+/// template <
+///     typename TMessage, // common interface class defined by the application
+///     typename TInputMessages = all_messages_type<TMessage>, // Input messages that need to be recognised
+///     typename TAllocationOptions = nil::marshalling::option::empty_option, // Extra options for MsgIdLayer
+///     typename TPayloadOptions = nil::marshalling::option::empty_option // Extra options for payload storage
+/// >
+/// using ProtocolStack = MySyncPrefix<TMessage, TInputMessages, TAllocationOptions, TPayloadOptions> ;
+/// @endcode
+/// Every protocol layer provides an ability to access the next one using
+/// @b next_layer() member function
+/// (see @ref nil::marshalling::protocol::ProtocolLayerBase::next_layer()). It is strongly
+/// recommended to generate convenience access functions using
+/// @ref MARSHALLING_PROTOCOL_LAYERS_ACCESS() macro.
+/// @code
+/// template <
+///     typename TMessage, // common interface class defined by the application
+///     typename TInputMessages = all_messages_type<TMessage>, // Input messages that need to be recognised
+///     typename TAllocationOptions = nil::marshalling::option::empty_option, // Extra options for MsgIdLayer
+///     typename TPayloadOptions = nil::marshalling::option::empty_option // Extra options for payload storage
+/// >
+/// struct ProtocolStack : public 
+///     MySyncPrefix<TMessage, TInputMessages, TAllocationOptions, TPayloadOptions> 
+/// {
+///     MARSHALLING_PROTOCOL_LAYERS_ACCESS(payload, id, size, checksum, sync);
+/// };
+/// @endcode
+/// It is equivalent to having the following member function being defined:
+/// @code
+/// template <
+///     typename TMessage, // common interface class defined by the application
+///     typename TInputMessages = all_messages_type<TMessage>, // Input messages that need to be recognised
+///     typename TAllocationOptions = nil::marshalling::option::empty_option, // Extra options for MsgIdLayer
+///     typename TPayloadOptions = nil::marshalling::option::empty_option // Extra options for payload storage
+/// >
+/// struct ProtocolStack : public 
+///     MySyncPrefix<TMessage, TInputMessages, TAllocationOptions, TPayloadOptions> 
+/// {
+///     // Access to PAYLOAD layer
+///     decltype(auto) layer_payload();
+///
+///     // Const access to PAYLOAD layer
+///     decltype(auto) layer_payload() const;
+///
+///     // Access to ID layer
+///     decltype(auto) layer_id();
+///
+///     // Const access to ID layer
+///     decltype(auto) layer_id() const;
+///
+///     // Access to SIZE layer
+///     decltype(auto) layer_size();
+///
+///     // Const access to SIZE layer
+///     decltype(auto) layer_size() const;
+///
+///     // Access to CHECKSUM layer
+///     decltype(auto) layer_checksum();
+///
+///     // Const access to CHECKSUM layer
+///     decltype(auto) layer_checksum() const;
+///
+///     // Access to SYNC layer
+///     decltype(auto) layer_sync();
+///
+///     // Const access to SYNC layer
+///     decltype(auto) layer_sync() const;
+/// };
+/// @endcode
+/// Please note the following:
+/// @li Every provided name is prefixed with @b layer_.
+/// @li The names inside the @ref MARSHALLING_PROTOCOL_LAYERS_ACCESS() macro specify
+/// innermost layer first and outermost one last. There is a convenience 
+/// wrapper macro @ref MARSHALLING_PROTOCOL_LAYERS_ACCESS_OUTER() which allows
+/// listing in the opposite order (outermost first and innermost last).
+///
+/// <b style="color:red">WARNING:</b> Some compilers, such as @b clang or earlier
+/// versions of @b gcc (v4.9 and earlier) may have problems compiling the 
+/// @ref MARSHALLING_PROTOCOL_LAYERS_ACCESS() macro
+/// even though it contains valid C++11 code. If the compilation failure 
+/// happens there is a need to define inner @b Base type which specifies exact type
+/// of the protocol stack base class.
+/// @code
+/// template <
+///     typename TMessage, // common interface class defined by the application
+///     typename TInputMessages = all_messages_type<TMessage>, // Input messages that need to be recognised
+///     typename TAllocationOptions = nil::marshalling::option::empty_option, // Extra options for MsgIdLayer
+///     typename TPayloadOptions = nil::marshalling::option::empty_option // Extra options for payload storage
+/// >
+/// class ProtocolStack : public 
+///     MySyncPrefix<TMessage, TInputMessages, TAllocationOptions, TPayloadOptions> 
+/// {
+///     using Base = MySyncPrefix<TMessage, TInputMessages, TAllocationOptions, TPayloadOptions>;
+/// public:
+///     MARSHALLING_PROTOCOL_LAYERS_ACCESS(payload, id, size, checksum, sync);
+/// };
+/// @endcode
+/// @b NOTE, that @b Marshalling library also defines @b MARSHALLING_MUST_DEFINE_BASE in
+/// case the base class definition is needed (going to be used). If the developed
+/// application is going to be multi-platform and compiled with various compilers
+/// (some of which may warn about unused private type) it is possible to use 
+/// the defined symbol to add / remove the definition of the @b Base member type.
+/// @code
+/// template <
+///     typename TMessage, // common interface class defined by the application
+///     typename TInputMessages = all_messages_type<TMessage>, // Input messages that need to be recognised
+///     typename TAllocationOptions = nil::marshalling::option::empty_option, // Extra options for MsgIdLayer
+///     typename TPayloadOptions = nil::marshalling::option::empty_option // Extra options for payload storage
+/// >
+/// class ProtocolStack : public 
+///     MySyncPrefix<TMessage, TInputMessages, TAllocationOptions, TPayloadOptions> 
+/// {
+/// #ifdef MARSHALLING_MUST_DEFINE_BASE
+///     using Base = ...
+/// #endif
+/// public:
+///     MARSHALLING_PROTOCOL_LAYERS_ACCESS(payload, id, size, checksum, sync);
+/// };
+/// @endcode
+///
+/// @section page_prot_stack_tutorial_new_layers Implementing New Layers
+/// Every protocol is unique, and there is a chance that Marshalling library doesn't
+/// provide all the necessary layer classes required to implement custom logic
+/// of the protocol. The Marshalling library allows implementation and usage of
+/// custom layers as long as it defines the required types and implements required
+/// functions. It is strongly recommended to inherit from nil::marshalling::protocol::ProtocolLayerBase
+/// and implement missing functionality
+/// @code
+/// // Must receive the next layer type as template parameter
+/// template <typename TField, typename TNextLayer>
+/// class MyLayer : public 
+///     nil::marshalling::protocol::ProtocolLayerBase<
+///         TField, 
+///         TNextLayer,
+///         MyLayer<TField, TNextLayer>
+///     >
+/// {
+/// public:
+///     // Implement read
+///     template <typename TMsg, typename TIter, typename TNextLayerReader>
+///     nil::marshalling::ErrorStatus do_read(
+///         field_type& field,
+///         TMsg& msg, // can be either smart pointer (ProtocolStack::msg_ptr_type) or message object itself
+///         TIter& iter,
+///         std::size_t size,
+///         std::size_t* missingSize,
+///         TNextLayerReader&& nextLayerReader)
+///     {
+///         // read the field's value
+///         auto es = field.read(iter, size);
+///         if (es != nil::marshalling::ErrorStatus::success) {
+///             return es;
+///         }
+///
+///         ... // do something with field's value
+///         
+///         // forward the read to the next layer.
+///         return nextLayerReader.read(msg, iter, size - field.length(), missingSize);
+///     }
+///
+///     // Implement write
+///     template <typename TMsg, typename TIter, typename TNextLayerWriter>
+///     nil::marshalling::ErrorStatus do_write(
+///         field_type& field,
+///         const TMsg& msg,
+///         TIter& iter,
+///         std::size_t size,
+///         TNextLayerWriter&& nextLayerWriter) const
+///     {
+///         // Update field with appropriate value
+///         field.value() = ...;
+///     
+///         // write the field
+///         auto es = field.write(iter, size);
+///         if (es != nil::marshalling::ErrorStatus::success) {
+///             return es;
+///         }
+///     
+///         // forward the write to the next layer
+///         return nextLayerWriter.write(msg, iter, size - field.length());
+///     }
+/// };
+/// @endcode
+/// Note that the third template parameter to the nil::marshalling::protocol::ProtocolLayerBase
+/// base class is the inheriting class itself.
+///
+/// The nil::marshalling::protocol::ProtocolLayerBase implements @ref
+/// nil::marshalling::protocol::ProtocolLayerBase::read() and @ref
+/// nil::marshalling::protocol::ProtocolLayerBase::read_fields_cached() member functions which
+/// are actual "read" interface, they invoke the @b do_read() member function implemented
+/// the derived layer class, while providing the "nextLayerReader" object to be
+/// used to forward the read operation to the next layer. The signature of the
+/// @b nextLayerReader.read() function is the same as @ref
+/// nil::marshalling::protocol::ProtocolLayerBase::read(). @b NOTE, that @b msg parameter
+/// to the @b do_read() member function can be either reference to a smart pointer
+/// (@b ref nil::marshalling::protocol::ProtocolLayerBase::msg_ptr_type) or a reference to the message
+/// object (one that extends @b nil::marshalling::MessageBase) itself. If the message object contents
+/// needs to be accessed, then it is necessary to know what exactly is passed as
+/// @b msg parameter to the @b do_read() function. The @ref
+/// nil::marshalling::protocol::ProtocolLayerBase::isMessageObjRef() can be used to help in such task
+/// and "tag dispatch idiom" can be used to perform right functionality.
+/// @code
+/// // Must receive the next layer type as template parameter
+/// template <typename TField, typename TNextLayer>
+/// class MyLayer : public nil::marshalling::protocol::ProtocolLayerBase<...>
+/// {
+///     using Base = nil::marshalling::protocol::ProtocolLayerBase<...>;
+/// public:
+///     // Implement read
+///     template <typename TMsg, typename TIter, typename TNextLayerReader>
+///     nil::marshalling::ErrorStatus do_read(
+///         field_type& field,
+///         TMsg& msg, // can be either smart pointer (ProtocolStack::msg_ptr_type) or message object itself
+///         TIter& iter,
+///         std::size_t size,
+///         std::size_t* missingSize,
+///         TNextLayerReader&& nextLayerReader)
+///     {
+///         // read the field's value
+///         auto es = field.read(iter, size);
+///         if (es != nil::marshalling::ErrorStatus::success) {
+///             return es;
+///         }
+///
+///         using tag_type = typename std::conditional<
+///             Base::template isMessageObjRef<typename std::decay<decltype(msg)>::type>(),
+///             DirectObjectAccessTag,
+///             SmartPointerTag
+///         >
+///
+///         doSomething(field, msg, tag_type()); // do something with field's value
+///
+///         // forward the read to the next layer.
+///         return nextLayerReader.read(msg, iter, size - field.length(), missingSize);
+///     }
+/// 
+/// private:
+///     struct SmartPointerTag {};
+///     struct DirectObjectAccessTag {};
+///
+///     template <typename TMsgPtr>
+///     void doSomething(field_type& field, TMsgPtr& msgPtr, SmartPointerTag)
+///     {
+///         msgPtr->someFunc(...) // access message object via pointer
+///     }
+///
+///     template <typename TMsg>
+///     void doSomething(field_type& field, TMsg& msg, DirectObjectAccessTag)
+///     {
+///         msg.someFunc(...); // access message object directly
+///     }
+///
+/// };
+/// @endcode
+///
+/// In similar way nil::marshalling::protocol::ProtocolLayerBase implements @ref
+/// nil::marshalling::protocol::ProtocolLayerBase::write() and @ref
+/// nil::marshalling::protocol::ProtocolLayerBase::write_fields_cached() member functions which
+/// are actual "write" interface, they invoke the @b do_write() member function implemented
+/// the derived layer class, while providing the "nextLayerWriter" object to be
+/// used to forward the read operation to the next layer. The signature of the
+/// @b nextLayerWriter.write() function is the same as @ref
+/// nil::marshalling::protocol::ProtocolLayerBase::write(). If the @b do_write() function
+/// requires modification to the used iterator (moving it back and force), it
+/// must determine type of the iterators (using @b std::iterator_traits). In case
+/// the used iterator is @b output one (not @b random-access), then such update
+/// may be impossible. In this case the @b do_write() function is expected to
+/// write some dummy value and return @ref nil::marshalling::ErrorStatus::update_required.
+/// It will indicate to the client application that invocation of @b update
+/// functionality with random access iterator needs to follow the @b write operation.
+///
+/// The nil::marshalling::protocol::ProtocolLayerBase base class defines also "update"
+/// interface functions @ref nil::marshalling::protocol::ProtocolLayerBase::update() and
+/// @ref nil::marshalling::protocol::ProtocolLayerBase::update_fields_cached(), which in the
+/// similar way invoke @b do_update(). However, @ref
+/// nil::marshalling::protocol::ProtocolLayerBase class provides a default implementation
+/// of @b do_update() (see @ref nil::marshalling::protocol::ProtocolLayerBase::do_update())
+/// member function, which does nothing, just advances the iterator. If there
+/// is a need for a custom update functionality, please provide it in you
+/// layer class by implementing the custom version of @b do_update() member function.
+/// @code
+/// // Must receive the next layer type as template parameter
+/// template <typename TField, typename TNextLayer>
+/// class MyLayer : public 
+///     nil::marshalling::protocol::ProtocolLayerBase<
+///         TField, 
+///         TNextLayer,
+///         MyLayer<TField, TNextLayer>
+///     >
+/// {
+/// public:
+///     ...
+///     template <typename TIter, typename TNextLayerUpdater>
+///     nil::marshalling::ErrorStatus do_update(
+///         field_type& field,
+///         TIter& iter,
+///         std::size_t size,
+///         TNextLayerUpdater&& nextLayerUpdater) const
+///     {
+///         // Update field with the new value and rewrite it to the output buffer
+///         field.value() = ...; 
+///         auto es = field.write(iter, size);
+///         if (es != nil::marshalling::ErrorStatus::success) {
+///             return es;
+///         }
+///
+///         // forward the update to the next layer
+///         return nextLayerUpdater.update(iter, size - field.length());
+///     }
+/// };
+/// @endcode
+/// The signature of the
+/// @b nextLayerUpdater.update() function is the same as @ref
+/// nil::marshalling::protocol::ProtocolLayerBase::update().
+/// 
+/// If the new layer being implemented is similar to @ref nil::marshalling::protocol::MsgIdLayer,
+/// i.e. creates message objects when id of the message is known, then it must
+/// also override (hide) the inherited @ref nil::marshalling::protocol::ProtocolLayerBase::create_msg()
+/// and implement its own version:
+/// @code
+/// template <typename TField, typename TNextLayer>
+/// class MyLayer : public 
+///     nil::marshalling::protocol::ProtocolLayerBase<
+///         TField, 
+///         TNextLayer,
+///         MyLayer<TField, TNextLayer>
+///     >
+/// {
+/// public:
+///     ...
+///     msg_ptr_type create_msg(msg_id_param_type id, unsigned idx = 0)
+///     {
+///         return someInternalFactor.create_msg(id, idx);
+///     }
+/// };
+/// @endcode
+///
+
