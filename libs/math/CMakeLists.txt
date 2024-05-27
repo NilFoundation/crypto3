@@ -26,16 +26,6 @@ if(NOT CMAKE_WORKSPACE_NAME OR NOT ("${CMAKE_WORKSPACE_NAME}" STREQUAL "crypto3"
     cm_workspace(crypto3)
 endif()
 
-macro(cm_find_package NAME)
-    foreach(ITERATOR ${CMAKE_WORKSPACE_LIST})
-        if(NOT "${NAME}" MATCHES "^${ITERATOR}_.*$" AND NOT "${NAME}" STREQUAL CM)
-            find_package(${ARGV})
-        else()
-            set(${ARGV0}_FOUND ON CACHE BOOL "")
-        endif()
-    endforeach()
-endmacro()
-
 cm_project(math WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME} LANGUAGES ASM C CXX)
 
 cm_find_package(CM)
