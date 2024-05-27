@@ -54,7 +54,7 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-                template<typename FieldType, typename ParamsType, std::size_t usable_rows_amount>
+                template<typename FieldType, typename ParamsType>
                 class circuit_description {
                     typedef zk::snark::detail::placeholder_policy<FieldType, ParamsType> policy_type;
 
@@ -63,7 +63,7 @@ namespace nil {
 
                 public:
                     std::size_t table_rows;
-                    std::size_t usable_rows = usable_rows_amount;
+                    std::size_t usable_rows;
 
                     typename policy_type::variable_assignment_type table;
 
@@ -96,13 +96,11 @@ namespace nil {
                 const std::size_t rows_amount_1 = 13;
 
                 template<typename FieldType>
-                circuit_description<FieldType, placeholder_circuit_params<FieldType>, rows_amount_1> circuit_test_1(
+                circuit_description<FieldType, placeholder_circuit_params<FieldType>> circuit_test_1(
                     typename nil::crypto3::random::algebraic_engine<FieldType> alg_rnd = nil::crypto3::random::algebraic_engine<FieldType>(),
                     boost::random::mt11213b rnd = boost::random::mt11213b()
                 ) {
                     using assignment_type  = typename FieldType::value_type;
-
-                    constexpr static const std::size_t usable_rows = rows_amount_1;
 
                     constexpr static const std::size_t witness_columns = witness_columns_1;
                     constexpr static const std::size_t public_columns = public_columns_1;
@@ -112,7 +110,8 @@ namespace nil {
                             witness_columns + public_columns + constant_columns;
 
                     typedef placeholder_circuit_params<FieldType> circuit_params;
-                    circuit_description<FieldType, circuit_params, usable_rows> test_circuit;
+                    circuit_description<FieldType, circuit_params> test_circuit;
+                    test_circuit.usable_rows = rows_amount_1;
                     std::vector<std::vector<typename FieldType::value_type>> table(table_columns);
 
                     std::vector<typename FieldType::value_type> q_add(test_circuit.usable_rows);
@@ -229,7 +228,7 @@ namespace nil {
                 constexpr static const std::size_t usable_rows_t = 5;
 
                 template<typename FieldType>
-                circuit_description<FieldType, placeholder_circuit_params<FieldType>, usable_rows_t>
+                circuit_description<FieldType, placeholder_circuit_params<FieldType>>
                 circuit_test_t(
                     typename FieldType::value_type pi0 = 0u,
                     typename nil::crypto3::random::algebraic_engine<FieldType> alg_rnd = nil::crypto3::random::algebraic_engine<FieldType>(),
@@ -237,7 +236,6 @@ namespace nil {
                 ) {
                     using assignment_type = typename FieldType::value_type;
 
-                    constexpr static const std::size_t usable_rows = usable_rows_t;
                     constexpr static const std::size_t witness_columns = witness_columns_t;
                     constexpr static const std::size_t public_columns = public_columns_t;
                     constexpr static const std::size_t constant_columns = constant_columns_t;
@@ -247,8 +245,9 @@ namespace nil {
 
                     typedef placeholder_circuit_params<FieldType> circuit_params;
 
-                    circuit_description<FieldType, circuit_params, usable_rows> test_circuit;
+                    circuit_description<FieldType, circuit_params> test_circuit;
                     test_circuit.public_input_sizes = {3};
+                    test_circuit.usable_rows = usable_rows_t;
 
                     std::vector<std::vector<typename FieldType::value_type>> table(table_columns);
 
@@ -362,7 +361,7 @@ namespace nil {
                 constexpr static const std::size_t usable_rows_3 = 4;
 
                 template<typename FieldType>
-                circuit_description<FieldType, placeholder_circuit_params<FieldType>, usable_rows_3> circuit_test_3(
+                circuit_description<FieldType, placeholder_circuit_params<FieldType>> circuit_test_3(
                     typename nil::crypto3::random::algebraic_engine<FieldType> alg_rnd = nil::crypto3::random::algebraic_engine<FieldType>(),
                     boost::random::mt11213b rnd = boost::random::mt11213b()
                 ) {
@@ -374,11 +373,11 @@ namespace nil {
                     constexpr static const std::size_t selector_columns = selector_columns_3;
                     constexpr static const std::size_t table_columns =
                             witness_columns + public_columns + constant_columns;
-                    constexpr static const std::size_t usable_rows = usable_rows_3;
 
                     typedef placeholder_circuit_params<FieldType> circuit_params;
 
-                    circuit_description<FieldType, circuit_params, usable_rows> test_circuit;
+                    circuit_description<FieldType, circuit_params> test_circuit;
+                    test_circuit.usable_rows = usable_rows_3;
 
                     std::vector<std::vector<typename FieldType::value_type>> table(table_columns);
                     for (std::size_t j = 0; j < table_columns; j++) {
@@ -467,7 +466,7 @@ namespace nil {
                 constexpr static const std::size_t selector_columns_4 = 3;
 
                 template<typename FieldType>
-                circuit_description<FieldType, placeholder_circuit_params<FieldType>, 5> circuit_test_4(
+                circuit_description<FieldType, placeholder_circuit_params<FieldType>> circuit_test_4(
                         typename nil::crypto3::random::algebraic_engine<FieldType> alg_rnd = nil::crypto3::random::algebraic_engine<FieldType>(),
                         boost::random::mt11213b rnd = boost::random::mt11213b()
                     ) {
@@ -484,8 +483,9 @@ namespace nil {
 
                     typedef placeholder_circuit_params<FieldType> circuit_params;
 
-                    circuit_description<FieldType, circuit_params, 5> test_circuit;
+                    circuit_description<FieldType, circuit_params> test_circuit;
                     test_circuit.table_rows = 1 << rows_log;
+                    test_circuit.usable_rows = 5;
 
                     std::vector<std::vector<typename FieldType::value_type>> table(table_columns);
                     for (std::size_t j = 0; j < table_columns; j++) {
@@ -579,25 +579,23 @@ namespace nil {
                 constexpr static const std::size_t usable_rows_5 = 30;
 
                 template<typename FieldType>
-                circuit_description<FieldType, placeholder_circuit_params<FieldType>, usable_rows_5>
+                circuit_description<FieldType, placeholder_circuit_params<FieldType>>
                 circuit_test_5(
                     typename nil::crypto3::random::algebraic_engine<FieldType> alg_rnd = nil::crypto3::random::algebraic_engine<FieldType>(),
                     boost::random::mt11213b rnd = boost::random::mt11213b()
                 ) {
                     using assignment_type = typename FieldType::value_type;
 
-                    constexpr static const std::size_t usable_rows = usable_rows_5;
                     constexpr static const std::size_t witness_columns = witness_columns_5;
                     constexpr static const std::size_t public_input_columns = public_columns_5;
                     constexpr static const std::size_t constant_columns = constant_columns_5;
                     constexpr static const std::size_t selector_columns = selector_columns_5;
-                    constexpr static const std::size_t table_columns =
-                            witness_columns + public_input_columns + constant_columns;
 
                     typedef placeholder_circuit_params<FieldType> circuit_params;
 
-                    circuit_description<FieldType, circuit_params, usable_rows> test_circuit;
+                    circuit_description<FieldType, circuit_params> test_circuit;
                     test_circuit.public_input_sizes = {witness_columns};
+                    test_circuit.usable_rows = usable_rows_5;
 
                     std::vector<std::vector<typename FieldType::value_type>> private_assignment(witness_columns);
                     std::vector<std::vector<typename FieldType::value_type>> public_input_assignment(public_input_columns);
@@ -657,7 +655,7 @@ namespace nil {
                 constexpr static const std::size_t selector_columns_fib = 1;
 
                 template<typename FieldType, std::size_t usable_rows>
-                circuit_description<FieldType, placeholder_circuit_params<FieldType>, usable_rows>
+                circuit_description<FieldType, placeholder_circuit_params<FieldType> >
                 circuit_test_fib(
                     typename nil::crypto3::random::algebraic_engine<FieldType> alg_rnd = nil::crypto3::random::algebraic_engine<FieldType>()
                 ) {
@@ -672,7 +670,8 @@ namespace nil {
 
                     typedef placeholder_circuit_params<FieldType> circuit_params;
 
-                    circuit_description<FieldType, circuit_params, usable_rows> test_circuit;
+                    circuit_description<FieldType, circuit_params> test_circuit;
+                    test_circuit.usable_rows = usable_rows;
                     std::vector<std::vector<typename FieldType::value_type>> table(table_columns);
 
                     std::vector<typename FieldType::value_type> q_add(test_circuit.usable_rows);
@@ -774,7 +773,7 @@ namespace nil {
                 constexpr static const std::size_t usable_rows_6 = 6;
 
                 template<typename FieldType>
-                circuit_description<FieldType, placeholder_circuit_params<FieldType>, usable_rows_6> circuit_test_6(
+                circuit_description<FieldType, placeholder_circuit_params<FieldType>> circuit_test_6(
                         typename nil::crypto3::random::algebraic_engine<FieldType> alg_rnd = nil::crypto3::random::algebraic_engine<FieldType>(),
                         boost::random::mt11213b rnd = boost::random::mt11213b()
                     ) {
@@ -789,7 +788,8 @@ namespace nil {
 
                     typedef placeholder_circuit_params<FieldType> circuit_params;
 
-                    circuit_description<FieldType, circuit_params, usable_rows_6> test_circuit;
+                    circuit_description<FieldType, circuit_params> test_circuit;
+                    test_circuit.usable_rows = usable_rows_6;
 
                     std::vector<std::vector<typename FieldType::value_type>> table(table_columns);
                     for (std::size_t j = 0; j < table_columns; j++) {
@@ -914,7 +914,7 @@ namespace nil {
                 constexpr static const std::size_t usable_rows_7 = 14;
 
                 template<typename FieldType>
-                circuit_description<FieldType, placeholder_circuit_params<FieldType>, usable_rows_7> circuit_test_7(
+                circuit_description<FieldType, placeholder_circuit_params<FieldType>> circuit_test_7(
                         typename nil::crypto3::random::algebraic_engine<FieldType> alg_rnd = nil::crypto3::random::algebraic_engine<FieldType>(),
                         boost::random::mt11213b rnd = boost::random::mt11213b()
                     ) {
@@ -929,7 +929,8 @@ namespace nil {
 
                     typedef placeholder_circuit_params<FieldType> circuit_params;
 
-                    circuit_description<FieldType, circuit_params, usable_rows_7> test_circuit;
+                    circuit_description<FieldType, circuit_params> test_circuit;
+                    test_circuit.usable_rows = usable_rows_7;
 
                     std::vector<std::vector<typename FieldType::value_type>> table(table_columns);
                     for (std::size_t j = 0; j < table_columns; j++) {

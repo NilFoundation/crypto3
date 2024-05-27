@@ -29,6 +29,9 @@
 #ifndef CRYPTO3_ZK_TEST_TOOLS_RANDOM_TEST_INITIALIZER_HPP
 #define CRYPTO3_ZK_TEST_TOOLS_RANDOM_TEST_INITIALIZER_HPP
 
+#include <boost/test/unit_test.hpp>
+#include <regex>
+
 #include <nil/crypto3/algebra/random_element.hpp>
 #include <nil/crypto3/random/algebraic_random_device.hpp>
 #include <nil/crypto3/random/algebraic_engine.hpp>

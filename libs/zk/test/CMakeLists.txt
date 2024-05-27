@@ -103,7 +103,15 @@ set(TESTS_NAMES
     "systems/plonk/pickles/to_field"
     "systems/plonk/pickles/to_group"
 
-    "systems/plonk/placeholder/placeholder"
+    "systems/plonk/placeholder/placeholder_circuits"
+    "systems/plonk/placeholder/placeholder_goldilocks"
+    "systems/plonk/placeholder/placeholder_lookup_argument"
+    "systems/plonk/placeholder/placeholder_gate_argument"
+    "systems/plonk/placeholder/placeholder_permutation_argument"
+    "systems/plonk/placeholder/placeholder_kzg"
+    "systems/plonk/placeholder/placeholder_hashes"
+    "systems/plonk/placeholder/placeholder_curves"
+    "systems/plonk/placeholder/placeholder_quotient_polynomial_chunks"
 
 #    "systems/pcd/r1cs_pcd/r1cs_mp_ppzkpcd/r1cs_mp_ppzkpcd"
 #    "systems/pcd/r1cs_pcd/r1cs_sp_ppzkpcd/r1cs_sp_ppzkpcd"
