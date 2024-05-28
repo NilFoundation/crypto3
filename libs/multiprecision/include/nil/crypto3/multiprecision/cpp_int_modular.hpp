@@ -338,8 +338,7 @@ namespace boost {
 
                 // Even though we have just 1 limb here, we still name this variable upper_limb_mask to be similar to non-trivial.
                 static BOOST_MP_CXX14_CONSTEXPR local_limb_type upper_limb_mask = limb_bits != Bits ?
-                    static_cast<local_limb_type>(static_cast<local_limb_type>(~local_limb_type(0)) >> (limb_bits - Bits)) :
-                    static_cast<local_limb_type>(~local_limb_type(0));
+                    (~local_limb_type(0) >> (limb_bits - Bits)) : ~local_limb_type(0);
 
             private:
                 local_limb_type m_data;

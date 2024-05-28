@@ -232,9 +232,10 @@ namespace boost {
                          const cpp_int_modular_backend<Bits>& o) noexcept {
                 double_limb_type sum = *result.limbs();
                 sum += *o.limbs();
-                if ((sum & ~cpp_int_modular_backend<Bits>::upper_limb_mask) != 0) {
+                double_limb_type mask = cpp_int_modular_backend<Bits>::upper_limb_mask;
+                if ((sum & ~mask) != 0) {
                     result.set_carry(true);
-                    *result.limbs() = sum & cpp_int_modular_backend<Bits>::upper_limb_mask;
+                    *result.limbs() = sum & mask;
                 } else {
                     *result.limbs() = sum;
                 }
