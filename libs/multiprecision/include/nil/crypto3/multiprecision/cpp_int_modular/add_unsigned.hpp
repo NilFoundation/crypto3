@@ -60,8 +60,8 @@ namespace boost {
                 else {
                     limb_type mask = cpp_int_modular_backend<Bits>::upper_limb_mask;
                     // If we have set any bit above "Bits", then we have a carry.
-                    if (pr[result.size() - 1] & ~mask) {
-                        pr[result.size() - 1] &= mask;
+                    if (result.limbs()[s - 1] & ~mask) {
+                        result.limbs()[s - 1] &= mask;
                         result.set_carry(true);
                     }
                 }
@@ -188,8 +188,8 @@ namespace boost {
                     else {
                         limb_type mask = cpp_int_modular_backend<Bits>::upper_limb_mask;
                         // If we have set any bit above "Bits", then we have a carry.
-                        if (pr[result.size() - 1] & ~mask) {
-                            pr[result.size() - 1] &= mask;
+                        if (result.limbs()[s - 1] & ~mask) {
+                            result.limbs()[s - 1] &= mask;
                             result.set_carry(true);
                         }
                     }
