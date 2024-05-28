@@ -15,7 +15,7 @@ namespace boost {
     namespace multiprecision {
         namespace backends {
             //
-            // As above, but for adding a single limb to a non-trivial cpp_int:
+            // Adding a single limb to a non-trivial cpp_int:
             //
             template<unsigned Bits>
             inline BOOST_MP_CXX14_CONSTEXPR void
@@ -39,7 +39,16 @@ namespace boost {
                 if (&a != &result) {
                     boost::multiprecision::std_constexpr::copy(pa + i, pa + a.size(), pr + i);
                 }
-                result.set_carry(carry);
+                if (Bits % cpp_int_modular_backend<Bits>::limb_bits == 0)
+                    result.set_carry(carry);
+                else {
+                    limb_type mask = cpp_int_modular_backend<Bits>::upper_limb_mask;
+                    // If we have set any bit above "Bits", then we have a carry.
+                    if (pr[result.size() - 1] & ~mask) {
+                        pr[result.size() - 1] &= mask;
+                        result.set_carry(true);
+                    }
+                }
             }
 
             //
@@ -223,9 +232,9 @@ namespace boost {
                          const cpp_int_modular_backend<Bits>& o) noexcept {
                 double_limb_type sum = *result.limbs();
                 sum += *o.limbs();
-                if (sum > cpp_int_modular_backend<Bits>::max_limb_value) {
+                if ((sum & ~cpp_int_modular_backend<Bits>::upper_limb_mask) != 0) {
                     result.set_carry(true);
-                    *result.limbs() = static_cast<limb_type>(sum);
+                    *result.limbs() = sum & cpp_int_modular_backend<Bits>::upper_limb_mask;
                 } else {
                     *result.limbs() = sum;
                 }

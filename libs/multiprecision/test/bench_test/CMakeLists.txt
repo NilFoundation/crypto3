@@ -9,9 +9,8 @@
 
 include(CMTest)
 
-cm_test(NAME ${CURRENT_PROJECT_NAME}_bench_test_modular_adaptor_fixed_cpp_int SOURCES ${CURRENT_TEST_SOURCES_DIR}/bench_test/bench_test_modular_adaptor_fixed.cpp)
+cm_test(NAME ${CURRENT_PROJECT_NAME}_bench_test_modular_adaptor_fixed_cpp_int SOURCES bench_test_modular_adaptor_fixed.cpp)
 target_compile_definitions(${CURRENT_PROJECT_NAME}_bench_test_modular_adaptor_fixed_cpp_int PUBLIC -DTEST_CPP_INT)
-target_link_libraries(${CURRENT_PROJECT_NAME}_bench_test_modular_adaptor_fixed_cpp_int no_eh_support)
 add_dependencies(${CURRENT_PROJECT_NAME}_test_suite_modular_cpp_int_tests ${CURRENT_PROJECT_NAME}_bench_test_modular_adaptor_fixed_cpp_int)
 set_target_properties(${CURRENT_PROJECT_NAME}_bench_test_modular_adaptor_fixed_cpp_int PROPERTIES CXX_STANDARD 17)
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
