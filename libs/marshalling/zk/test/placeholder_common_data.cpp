@@ -1,3 +1,31 @@
+//---------------------------------------------------------------------------//
+// Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2021 Ilias Khairullin <ilias@nil.foundation>
+// Copyright (c) 2022-2023 Elena Tatuzova <e.tatuzova@nil.foundation>
+// Copyright (c) 2024 Vasiliy Olekhov <vasiliy.olekhov@nil.foundation>
+//
+// MIT License
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+//---------------------------------------------------------------------------//
+
 #define BOOST_TEST_MODULE crypto3_marshalling_placeholder_common_data_test
 
 #include <boost/test/included/unit_test.hpp>
@@ -5,11 +33,9 @@
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int.hpp>
 #include <iostream>
-#include <filesystem>
 #include <iomanip>
 #include <fstream>
-#include <algorithm>
-#include <regex>
+#include <filesystem>
 
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/field_type.hpp>
@@ -19,14 +45,10 @@
 #include <boost/multiprecision/number.hpp>
 
 #include <nil/crypto3/algebra/random_element.hpp>
-#include <nil/crypto3/algebra/curves/pallas.hpp>
-#include <nil/crypto3/algebra/fields/arithmetic_params/pallas.hpp>
-#include <nil/crypto3/algebra/random_element.hpp>
 
-
-//#include <nil/crypto3/algebra/curves/alt_bn128.hpp>
-//#include <nil/crypto3/algebra/pairing/alt_bn128.hpp>
-//#include <nil/crypto3/algebra/fields/arithmetic_params/alt_bn128.hpp>
+#include <nil/crypto3/algebra/curves/bls12.hpp>
+#include <nil/crypto3/algebra/pairing/bls12.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/bls12.hpp>
 
 #include <nil/crypto3/algebra/curves/mnt4.hpp>
 #include <nil/crypto3/algebra/pairing/mnt4.hpp>
@@ -36,15 +58,17 @@
 #include <nil/crypto3/algebra/pairing/mnt6.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/mnt6.hpp>
 
-#include <nil/crypto3/algebra/curves/bls12.hpp>
-#include <nil/crypto3/algebra/pairing/bls12.hpp>
-#include <nil/crypto3/algebra/fields/arithmetic_params/bls12.hpp>
-
+#include <nil/crypto3/algebra/curves/pallas.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/pallas.hpp>
+#include <nil/crypto3/algebra/random_element.hpp>
 
 #include <nil/crypto3/hash/type_traits.hpp>
 #include <nil/crypto3/hash/sha2.hpp>
 #include <nil/crypto3/hash/keccak.hpp>
 #include <nil/crypto3/hash/poseidon.hpp>
+
+#include <nil/crypto3/random/algebraic_random_device.hpp>
+#include <nil/crypto3/random/algebraic_engine.hpp>
 
 #include <nil/crypto3/zk/commitments/type_traits.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/preprocessor.hpp>
@@ -53,19 +77,21 @@
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/params.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/params.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/detail/profiling.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/table_description.hpp>
 #include <nil/crypto3/zk/test_tools/random_test_initializer.hpp>
-
-#include <nil/crypto3/math/algorithms/unity_root.hpp>
-#include <nil/crypto3/math/polynomial/lagrange_interpolation.hpp>
-#include <nil/crypto3/math/algorithms/calculate_domain_set.hpp>
 
 #include <nil/crypto3/marshalling/zk/types/commitments/eval_storage.hpp>
 #include <nil/crypto3/marshalling/zk/types/commitments/kzg.hpp>
 #include <nil/crypto3/marshalling/zk/types/commitments/lpc.hpp>
 #include <nil/crypto3/marshalling/zk/types/placeholder/common_data.hpp>
+
+#include <nil/crypto3/math/algorithms/unity_root.hpp>
+#include <nil/crypto3/math/polynomial/lagrange_interpolation.hpp>
+#include <nil/crypto3/math/algorithms/calculate_domain_set.hpp>
+
 #include "./detail/circuits.hpp"
 
-
+using namespace nil;
 using namespace nil::crypto3;
 using namespace nil::crypto3::zk;
 using namespace nil::crypto3::zk::snark;
@@ -156,15 +182,11 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit1_poseidon)
     using curve_type = algebra::curves::pallas;
     using field_type = typename curve_type::base_field_type;
     using poseidon_type = hashes::poseidon<nil::crypto3::hashes::detail::mina_poseidon_policy<field_type>>;
+
     using merkle_hash_type = poseidon_type;
     using transcript_hash_type = poseidon_type;
 
     struct placeholder_test_params {
-        constexpr static const std::size_t witness_columns = witness_columns_1;
-        constexpr static const std::size_t public_input_columns = public_columns_1;
-        constexpr static const std::size_t constant_columns = constant_columns_1;
-        constexpr static const std::size_t selector_columns = selector_columns_1;
-
         constexpr static const std::size_t lambda = 40;
         constexpr static const std::size_t m = 2;
     };
@@ -182,25 +204,28 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit1_poseidon)
     using lpc_placeholder_params_type = nil::crypto3::zk::snark::placeholder_params<circuit_params, lpc_scheme_type>;
     using policy_type = zk::snark::detail::placeholder_policy<field_type, lpc_placeholder_params_type>;
 
-BOOST_AUTO_TEST_CASE(prover_test) {
+BOOST_AUTO_TEST_CASE(common_data_marshalling_test) {
     auto circuit = circuit_test_1<field_type>();
 
     plonk_table_description<field_type> desc(
-        placeholder_test_params::witness_columns,
-        placeholder_test_params::public_input_columns,
-        placeholder_test_params::constant_columns,
-        placeholder_test_params::selector_columns
+        circuit.table.witnesses().size(),
+        circuit.table.public_inputs().size(),
+        circuit.table.constants().size(),
+        circuit.table.selectors().size(),
+        circuit.usable_rows,
+        circuit.table_rows);
+
+    std::size_t table_rows_log = std::log2(desc.rows_amount);
+
+    typename policy_type::constraint_system_type constraint_system(
+        circuit.gates,
+        circuit.copy_constraints,
+        circuit.lookup_gates,
+        circuit.lookup_tables
     );
-
-    desc.rows_amount = circuit.table_rows;
-    desc.usable_rows_amount = circuit.usable_rows;
-    std::size_t table_rows_log = std::ceil(std::log2(circuit.table_rows));
-
-    typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints, circuit.lookup_gates);
     typename policy_type::variable_assignment_type assignments = circuit.table;
 
     std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
-
 
     typename lpc_type::fri_type::params_type fri_params(
         1, table_rows_log, placeholder_test_params::lambda, 4, true
@@ -226,15 +251,11 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit1)
 
     using curve_type = algebra::curves::pallas;
     using field_type = typename curve_type::base_field_type;
-    using merkle_hash_type = hashes::keccak_1600<512>;
-    using transcript_hash_type = hashes::keccak_1600<512>;
+
+    using merkle_hash_type = hashes::keccak_1600<256>;
+    using transcript_hash_type = hashes::keccak_1600<256>;
 
     struct placeholder_test_params {
-        constexpr static const std::size_t witness_columns = witness_columns_1;
-        constexpr static const std::size_t public_input_columns = public_columns_1;
-        constexpr static const std::size_t constant_columns = constant_columns_1;
-        constexpr static const std::size_t selector_columns = selector_columns_1;
-
         constexpr static const std::size_t lambda = 40;
         constexpr static const std::size_t m = 2;
     };
@@ -252,21 +273,25 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit1)
     using lpc_placeholder_params_type = nil::crypto3::zk::snark::placeholder_params<circuit_params, lpc_scheme_type>;
     using policy_type = zk::snark::detail::placeholder_policy<field_type, lpc_placeholder_params_type>;
 
-BOOST_AUTO_TEST_CASE(prover_test) {
+BOOST_AUTO_TEST_CASE(common_data_marshalling_test) {
     auto circuit = circuit_test_1<field_type>();
 
     plonk_table_description<field_type> desc(
-        placeholder_test_params::witness_columns,
-        placeholder_test_params::public_input_columns,
-        placeholder_test_params::constant_columns,
-        placeholder_test_params::selector_columns
+        circuit.table.witnesses().size(),
+        circuit.table.public_inputs().size(),
+        circuit.table.constants().size(),
+        circuit.table.selectors().size(),
+        circuit.usable_rows,
+        circuit.table_rows);
+
+    std::size_t table_rows_log = std::log2(desc.rows_amount);
+
+    typename policy_type::constraint_system_type constraint_system(
+        circuit.gates,
+        circuit.copy_constraints,
+        circuit.lookup_gates,
+        circuit.lookup_tables
     );
-
-    desc.rows_amount = circuit.table_rows;
-    desc.usable_rows_amount = circuit.usable_rows;
-    std::size_t table_rows_log = std::ceil(std::log2(circuit.table_rows));
-
-    typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints, circuit.lookup_gates);
     typename policy_type::variable_assignment_type assignments = circuit.table;
 
     std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
@@ -298,14 +323,8 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit2)
     using field_type = typename curve_type::scalar_field_type;
 
     struct placeholder_test_params {
-        using merkle_hash_type = hashes::keccak_1600<512>;
-        using transcript_hash_type = hashes::keccak_1600<512>;
-
-        constexpr static const std::size_t witness_columns = 3;
-        constexpr static const std::size_t public_input_columns = 1;
-        constexpr static const std::size_t constant_columns = 0;
-        constexpr static const std::size_t selector_columns = 2;
-
+        using merkle_hash_type = hashes::keccak_1600<256>;
+        using transcript_hash_type = hashes::keccak_1600<256>;
         constexpr static const std::size_t lambda = 1;
         constexpr static const std::size_t m = 2;
     };
@@ -334,16 +353,21 @@ BOOST_FIXTURE_TEST_CASE(common_data_marshalling_test, test_tools::random_test_in
     );
 
     plonk_table_description<field_type> desc(
-        placeholder_test_params::witness_columns,
-        placeholder_test_params::public_input_columns,
-        placeholder_test_params::constant_columns,
-        placeholder_test_params::selector_columns
-    );
-    desc.rows_amount = circuit.table_rows;
-    desc.usable_rows_amount = circuit.usable_rows;
-    std::size_t table_rows_log = std::ceil(std::log2(circuit.table_rows));
+        circuit.table.witnesses().size(),
+        circuit.table.public_inputs().size(),
+        circuit.table.constants().size(),
+        circuit.table.selectors().size(),
+        circuit.usable_rows,
+        circuit.table_rows);
 
-    typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints, circuit.lookup_gates);
+    std::size_t table_rows_log = std::log2(desc.rows_amount);
+
+    typename policy_type::constraint_system_type constraint_system(
+        circuit.gates,
+        circuit.copy_constraints,
+        circuit.lookup_gates,
+        circuit.lookup_tables
+    );
     typename policy_type::variable_assignment_type assignments = circuit.table;
 
     std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
@@ -367,7 +391,6 @@ BOOST_FIXTURE_TEST_CASE(common_data_marshalling_test, test_tools::random_test_in
 }
 BOOST_AUTO_TEST_SUITE_END()
 
-
 BOOST_AUTO_TEST_SUITE(placeholder_circuit3)
     using Endianness = nil::marshalling::option::big_endian;
     using TTypeBase = nil::marshalling::field_type<Endianness>;
@@ -375,14 +398,8 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit3)
     using field_type = typename curve_type::base_field_type;
 
     struct placeholder_test_params {
-        using merkle_hash_type = hashes::keccak_1600<512>;
-        using transcript_hash_type = hashes::keccak_1600<512>;
-
-        constexpr static const std::size_t witness_columns = witness_columns_3;
-        constexpr static const std::size_t public_input_columns = public_columns_3;
-        constexpr static const std::size_t constant_columns = constant_columns_3;
-        constexpr static const std::size_t selector_columns = selector_columns_3;
-
+        using merkle_hash_type = hashes::keccak_1600<256>;
+        using transcript_hash_type = hashes::keccak_1600<256>;
         constexpr static const std::size_t lambda = 40;
         constexpr static const std::size_t m = 2;
     };
@@ -400,22 +417,21 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit3)
     using lpc_placeholder_params_type = nil::crypto3::zk::snark::placeholder_params<circuit_params, lpc_scheme_type>;
     using policy_type = zk::snark::detail::placeholder_policy<field_type, circuit_params>;
 
-BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_tools::random_test_initializer<field_type>) {
+BOOST_FIXTURE_TEST_CASE(common_data_marshalling_test, test_tools::random_test_initializer<field_type>) {
     auto circuit = circuit_test_3<field_type>(
         alg_random_engines.template get_alg_engine<field_type>(),
         generic_random_engine
     );
 
     plonk_table_description<field_type> desc(
-        placeholder_test_params::witness_columns,
-        placeholder_test_params::public_input_columns,
-        placeholder_test_params::constant_columns,
-        placeholder_test_params::selector_columns
-    );
+        circuit.table.witnesses().size(),
+        circuit.table.public_inputs().size(),
+        circuit.table.constants().size(),
+        circuit.table.selectors().size(),
+        circuit.usable_rows,
+        circuit.table_rows);
 
-    desc.rows_amount = circuit.table_rows;
-    desc.usable_rows_amount = circuit.usable_rows;
-    std::size_t table_rows_log = std::ceil(std::log2(circuit.table_rows));
+    std::size_t table_rows_log = std::log2(desc.rows_amount);
 
     typename policy_type::constraint_system_type constraint_system(
         circuit.gates,
@@ -444,7 +460,6 @@ BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_tools::random_test_initiali
 }
 BOOST_AUTO_TEST_SUITE_END()
 
-
 BOOST_AUTO_TEST_SUITE(placeholder_circuit4)
     using Endianness = nil::marshalling::option::big_endian;
     using TTypeBase = nil::marshalling::field_type<Endianness>;
@@ -452,14 +467,8 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit4)
     using field_type = typename curve_type::base_field_type;
 
     struct placeholder_test_params {
-        using merkle_hash_type = hashes::keccak_1600<512>;
-        using transcript_hash_type = hashes::keccak_1600<512>;
-
-        constexpr static const std::size_t witness_columns = witness_columns_4;
-        constexpr static const std::size_t public_input_columns = public_columns_4;
-        constexpr static const std::size_t constant_columns = constant_columns_4;
-        constexpr static const std::size_t selector_columns = selector_columns_4;
-
+        using merkle_hash_type = hashes::keccak_1600<256>;
+        using transcript_hash_type = hashes::keccak_1600<256>;
         constexpr static const std::size_t lambda = 40;
         constexpr static const std::size_t m = 2;
     };
@@ -477,22 +486,21 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit4)
     using lpc_placeholder_params_type = nil::crypto3::zk::snark::placeholder_params<circuit_params, lpc_scheme_type>;
     using policy_type = zk::snark::detail::placeholder_policy<field_type, circuit_params>;
 
-BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_tools::random_test_initializer<field_type>) {
+BOOST_FIXTURE_TEST_CASE(common_data_marshalling_test, test_tools::random_test_initializer<field_type>) {
     auto circuit = circuit_test_4<field_type>(
         alg_random_engines.template get_alg_engine<field_type>(),
         generic_random_engine
     );
 
     plonk_table_description<field_type> desc(
-        placeholder_test_params::witness_columns,
-        placeholder_test_params::public_input_columns,
-        placeholder_test_params::constant_columns,
-        placeholder_test_params::selector_columns
-    );
+        circuit.table.witnesses().size(),
+        circuit.table.public_inputs().size(),
+        circuit.table.constants().size(),
+        circuit.table.selectors().size(),
+        circuit.usable_rows,
+        circuit.table_rows);
 
-    desc.rows_amount = circuit.table_rows;
-    desc.usable_rows_amount = circuit.usable_rows;
-    std::size_t table_rows_log = std::ceil(std::log2(circuit.table_rows));
+    std::size_t table_rows_log = std::log2(desc.rows_amount);
 
     typename policy_type::constraint_system_type constraint_system(
         circuit.gates,
@@ -529,21 +537,14 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit5)
     using field_type = typename curve_type::scalar_field_type;
 
     struct placeholder_test_params {
-        using merkle_hash_type = hashes::keccak_1600<512>;
-        using transcript_hash_type = hashes::keccak_1600<512>;
-
-        constexpr static const std::size_t witness_columns = witness_columns_5;
-        constexpr static const std::size_t public_input_columns = public_columns_5;
-        constexpr static const std::size_t constant_columns = constant_columns_5;
-        constexpr static const std::size_t selector_columns = selector_columns_5;
-
+        using merkle_hash_type = hashes::keccak_1600<256>;
+        using transcript_hash_type = hashes::keccak_1600<256>;
         constexpr static const std::size_t lambda = 1;
         constexpr static const std::size_t m = 2;
     };
+
     using circuit_t_params = placeholder_circuit_params<field_type>;
-
     using transcript_type = typename transcript::fiat_shamir_heuristic_sequential<typename placeholder_test_params::transcript_hash_type>;
-
     using lpc_params_type = commitments::list_polynomial_commitment_params<
         typename placeholder_test_params::merkle_hash_type,
         typename placeholder_test_params::transcript_hash_type,
@@ -553,7 +554,6 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit5)
     using lpc_type = commitments::list_polynomial_commitment<field_type, lpc_params_type>;
     using lpc_scheme_type = typename commitments::lpc_commitment_scheme<lpc_type>;
     using lpc_placeholder_params_type = nil::crypto3::zk::snark::placeholder_params<circuit_t_params, lpc_scheme_type>;
-
     using policy_type = zk::snark::detail::placeholder_policy<field_type, circuit_t_params>;
 
 BOOST_FIXTURE_TEST_CASE(common_data_marshalling_test, test_tools::random_test_initializer<field_type>) {
@@ -565,19 +565,22 @@ BOOST_FIXTURE_TEST_CASE(common_data_marshalling_test, test_tools::random_test_in
     );
 
     plonk_table_description<field_type> desc(
-        placeholder_test_params::witness_columns,
-        placeholder_test_params::public_input_columns,
-        placeholder_test_params::constant_columns,
-        placeholder_test_params::selector_columns
+        circuit.table.witnesses().size(),
+        circuit.table.public_inputs().size(),
+        circuit.table.constants().size(),
+        circuit.table.selectors().size(),
+        circuit.usable_rows,
+        circuit.table_rows);
+
+    std::size_t table_rows_log = std::log2(desc.rows_amount);
+
+    typename policy_type::constraint_system_type constraint_system(
+        circuit.gates,
+        circuit.copy_constraints,
+        circuit.lookup_gates,
+        circuit.lookup_tables
     );
-    desc.rows_amount = circuit.table_rows;
-    desc.usable_rows_amount = circuit.usable_rows;
-    std::size_t table_rows_log = std::ceil(std::log2(circuit.table_rows));
-
-    typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints, circuit.lookup_gates);
     typename policy_type::variable_assignment_type assignments = circuit.table;
-
-    bool verifier_res;
 
     // LPC commitment scheme
     typename lpc_type::fri_type::params_type fri_params(
@@ -605,14 +608,8 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit6)
     using field_type = typename curve_type::base_field_type;
 
     struct placeholder_test_params {
-        using merkle_hash_type = hashes::keccak_1600<512>;
-        using transcript_hash_type = hashes::keccak_1600<512>;
-
-        constexpr static const std::size_t witness_columns = witness_columns_6;
-        constexpr static const std::size_t public_input_columns = public_columns_6;
-        constexpr static const std::size_t constant_columns = constant_columns_6;
-        constexpr static const std::size_t selector_columns = selector_columns_6;
-
+        using merkle_hash_type = hashes::keccak_1600<256>;
+        using transcript_hash_type = hashes::keccak_1600<256>;
         constexpr static const std::size_t lambda = 40;
         constexpr static const std::size_t m = 2;
     };
@@ -630,22 +627,21 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit6)
     using lpc_placeholder_params_type = nil::crypto3::zk::snark::placeholder_params<circuit_params, lpc_scheme_type>;
     using policy_type = zk::snark::detail::placeholder_policy<field_type, circuit_params>;
 
-BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_tools::random_test_initializer<field_type>) {
+BOOST_FIXTURE_TEST_CASE(common_data_marshalling_test, test_tools::random_test_initializer<field_type>) {
     auto circuit = circuit_test_6<field_type>(
         alg_random_engines.template get_alg_engine<field_type>(),
         generic_random_engine
     );
 
     plonk_table_description<field_type> desc(
-        placeholder_test_params::witness_columns,
-        placeholder_test_params::public_input_columns,
-        placeholder_test_params::constant_columns,
-        placeholder_test_params::selector_columns
-    );
+        circuit.table.witnesses().size(),
+        circuit.table.public_inputs().size(),
+        circuit.table.constants().size(),
+        circuit.table.selectors().size(),
+        circuit.usable_rows,
+        circuit.table_rows);
 
-    desc.rows_amount = circuit.table_rows;
-    desc.usable_rows_amount = circuit.usable_rows;
-    std::size_t table_rows_log = std::ceil(std::log2(circuit.table_rows));
+    std::size_t table_rows_log = std::log2(desc.rows_amount);
 
     typename policy_type::constraint_system_type constraint_system(
         circuit.gates,
@@ -681,14 +677,8 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit7)
     using field_type = typename curve_type::base_field_type;
 
     struct placeholder_test_params {
-        using merkle_hash_type = hashes::keccak_1600<512>;
-        using transcript_hash_type = hashes::keccak_1600<512>;
-
-        constexpr static const std::size_t witness_columns = witness_columns_7;
-        constexpr static const std::size_t public_input_columns = public_columns_7;
-        constexpr static const std::size_t constant_columns = constant_columns_7;
-        constexpr static const std::size_t selector_columns = selector_columns_7;
-
+        using merkle_hash_type = hashes::keccak_1600<256>;
+        using transcript_hash_type = hashes::keccak_1600<256>;
         constexpr static const std::size_t lambda = 40;
         constexpr static const std::size_t m = 2;
     };
@@ -706,21 +696,21 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit7)
     using lpc_placeholder_params_type = nil::crypto3::zk::snark::placeholder_params<circuit_params, lpc_scheme_type>;
     using policy_type = zk::snark::detail::placeholder_policy<field_type, circuit_params>;
 
-BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_tools::random_test_initializer<field_type>) {
+BOOST_FIXTURE_TEST_CASE(common_data_marshalling_test, test_tools::random_test_initializer<field_type>) {
     auto circuit = circuit_test_7<field_type>(
         alg_random_engines.template get_alg_engine<field_type>(),
         generic_random_engine
     );
-    plonk_table_description<field_type> desc(
-        placeholder_test_params::witness_columns,
-        placeholder_test_params::public_input_columns,
-        placeholder_test_params::constant_columns,
-        placeholder_test_params::selector_columns
-    );
 
-    desc.rows_amount = circuit.table_rows;
-    desc.usable_rows_amount = circuit.usable_rows;
-    std::size_t table_rows_log = std::ceil(std::log2(circuit.table_rows));
+    plonk_table_description<field_type> desc(
+        circuit.table.witnesses().size(),
+        circuit.table.public_inputs().size(),
+        circuit.table.constants().size(),
+        circuit.table.selectors().size(),
+        circuit.usable_rows,
+        circuit.table_rows);
+
+    std::size_t table_rows_log = std::log2(desc.rows_amount);
 
     typename policy_type::constraint_system_type constraint_system(
         circuit.gates,
@@ -751,23 +741,12 @@ BOOST_AUTO_TEST_SUITE_END()
 
 template<
     typename curve_type,
-    typename merkle_hash_type,
     typename transcript_hash_type,
-    std::size_t WitnessColumns,
-    std::size_t PublicInputColumns,
-    std::size_t ConstantColumns,
-    std::size_t SelectorColumns,
-    std::size_t UsableRowsAmount,
     bool UseGrinding = false>
 struct placeholder_kzg_test_fixture_v2 : public test_tools::random_test_initializer<typename curve_type::scalar_field_type> {
     using field_type = typename curve_type::scalar_field_type;
 
     struct placeholder_test_params {
-        constexpr static const std::size_t witness_columns = WitnessColumns;
-        constexpr static const std::size_t public_input_columns = PublicInputColumns;
-        constexpr static const std::size_t constant_columns = ConstantColumns;
-        constexpr static const std::size_t selector_columns = SelectorColumns;
-
         constexpr static const std::size_t lambda = 40;
         constexpr static const std::size_t m = 2;
     };
@@ -784,23 +763,20 @@ struct placeholder_kzg_test_fixture_v2 : public test_tools::random_test_initiali
 
     using circuit_type =
         circuit_description<field_type,
-        placeholder_circuit_params<field_type>,
-        UsableRowsAmount>;
+        placeholder_circuit_params<field_type> >;
 
-    placeholder_kzg_test_fixture_v2()
-        : desc(WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns)
+    placeholder_kzg_test_fixture_v2(circuit_type const& circuit_in)
+        : circuit(circuit_in),
+        desc(circuit_in.table.witnesses().size(),
+                circuit_in.table.public_inputs().size(),
+                circuit_in.table.constants().size(),
+                circuit_in.table.selectors().size(),
+                circuit_in.usable_rows,
+                circuit_in.table_rows)
     {
     }
 
     bool run_test() {
-        typename field_type::value_type pi0 = this->alg_random_engines.template get_alg_engine<field_type>()();
-        circuit_type circuit = circuit_test_t<field_type>(
-            pi0,
-            this->alg_random_engines.template get_alg_engine<field_type>(),
-            this->generic_random_engine
-        );
-        desc.rows_amount = circuit.table_rows;
-        desc.usable_rows_amount = circuit.usable_rows;
         std::size_t table_rows_log = std::log2(circuit.table_rows);
 
         typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints, circuit.lookup_gates);
@@ -808,10 +784,8 @@ struct placeholder_kzg_test_fixture_v2 : public test_tools::random_test_initiali
 
         std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
 
-        bool verifier_res;
-
         // KZG commitment scheme
-        typename kzg_type::field_type::value_type alpha (7);
+        typename kzg_type::field_type::value_type alpha(7u);
         auto kzg_params = kzg_scheme_type::create_params(1 << table_rows_log, alpha);
         kzg_scheme_type kzg_scheme(kzg_params);
 
@@ -834,72 +808,30 @@ struct placeholder_kzg_test_fixture_v2 : public test_tools::random_test_initiali
         return true;
     }
 
+    circuit_type circuit;
     plonk_table_description<field_type> desc;
 };
 
-/*
+
 BOOST_AUTO_TEST_SUITE(placeholder_circuit2_kzg_v2)
 
     using TestFixtures = boost::mpl::list<
-    //    placeholder_kzg_test_fixture_v2<
-    //    algebra::curves::bls12_381,
-    //    hashes::keccak_1600<256>,
-    //    hashes::keccak_1600<256>,
-    //    witness_columns_t,
-    //    public_columns_t,
-    //    constant_columns_t,
-    //    selector_columns_t,
-    //    usable_rows_t,
-    //    permutation_t, true>,
-        placeholder_kzg_test_fixture_v2<
-        algebra::curves::alt_bn128_254,
-        hashes::keccak_1600<256>,
-        hashes::keccak_1600<256>,
-        witness_columns_t,
-        public_columns_t,
-        constant_columns_t,
-        selector_columns_t,
-        usable_rows_t,
-        4, true>
-//    , placeholder_kzg_test_fixture_v2<
-//    algebra::curves::mnt4_298,
-//    hashes::keccak_1600<256>,
-//    hashes::keccak_1600<256>,
-//    witness_columns_t,
-//    public_columns_t,
-//    constant_columns_t,
-//    selector_columns_t,
-//    usable_rows_t,
-//    permutation_t, true>
-//    , placeholder_kzg_test_fixture_v2<
-//    algebra::curves::mnt6_298,
-//    hashes::keccak_1600<256>,
-//    hashes::keccak_1600<256>,
-//    witness_columns_t,
-//    public_columns_t,
-//    constant_columns_t,
-//    selector_columns_t,
-//    usable_rows_t,
-//    permutation_t, true>
-    // *, -- Not yet implemented
-    //  placeholder_kzg_test_fixture<
-    //  algebra::curves::mnt6_298,
-    //  hashes::poseidon<nil::crypto3::hashes::detail::mina_poseidon_policy<algebra::curves::mnt6_298>>,
-    //  hashes::poseidon<nil::crypto3::hashes::detail::mina_poseidon_policy<algebra::curves::mnt6_298>>,
-    //  witness_columns_t,
-    //  public_columns_t,
-    //  constant_columns_t,
-    // selector_columns_t,
-    //usable_rows_t,
-    //  4,
-    //  true>
-    //
+    placeholder_kzg_test_fixture_v2< algebra::curves::bls12_381, hashes::keccak_1600<256>, true>,
+    placeholder_kzg_test_fixture_v2< algebra::curves::mnt4_298, hashes::keccak_1600<256>, true>,
+    placeholder_kzg_test_fixture_v2< algebra::curves::mnt6_298, hashes::keccak_1600<256>, true>
     >;
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(prover_test, F, TestFixtures) {
-    F fixture;
+BOOST_AUTO_TEST_CASE_TEMPLATE(common_data_marshalling_test, F, TestFixtures) {
+    using field_type = typename F::field_type;
+    test_tools::random_test_initializer<field_type> random_test_initializer;
+    typename field_type::value_type pi0 = random_test_initializer.alg_random_engines.template get_alg_engine<field_type>()();
+    auto circuit = circuit_test_t<field_type>(
+        pi0,
+        random_test_initializer.alg_random_engines.template get_alg_engine<field_type>(),
+        random_test_initializer.generic_random_engine
+    );
+    F fixture(circuit);
     BOOST_CHECK(fixture.run_test());
 }
 
 BOOST_AUTO_TEST_SUITE_END()
-*/
