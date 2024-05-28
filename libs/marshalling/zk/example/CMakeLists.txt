@@ -11,8 +11,6 @@ cm_find_package(CM)
 include(CMDeploy)
 include(CMSetupVersion)
 
-find_package(Boost REQUIRED COMPONENTS filesystem log log_setup program_options thread system)
-
 macro(define_marshalling_example name)
     add_executable(marshalling_${name}_example ${name}.cpp)
 
@@ -26,7 +24,7 @@ macro(define_marshalling_example name)
                           ${CMAKE_WORKSPACE_NAME}::crypto3_zk
                           ${CMAKE_WORKSPACE_NAME}::core
 
-                          ${Boost_LIBRARIES})
+                          Boost::container)
 
     target_include_directories(marshalling_${name}_example PRIVATE
                                "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"

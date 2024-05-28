@@ -33,10 +33,6 @@ cm_find_package(${CMAKE_WORKSPACE_NAME}_block)
 cm_find_package(${CMAKE_WORKSPACE_NAME}_hash)
 cm_find_package(${CMAKE_WORKSPACE_NAME}_mac)
 
-if(NOT Boost)
-    find_package(Boost REQUIRED)
-endif()
-
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
      include/nil/crypto3/kdf/algorithm/derive.hpp
 

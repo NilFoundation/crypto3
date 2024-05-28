@@ -29,10 +29,6 @@ endif()
 
 cm_project(passhash WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME})
 
-if(NOT Boost_FOUND)
-    find_package(Boost)
-endif()
-
 cm_find_package(${CMAKE_WORKSPACE_NAME}_codec)
 cm_find_package(${CMAKE_WORKSPACE_NAME}_mac)
 
@@ -59,7 +55,7 @@ target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
                       ${CMAKE_WORKSPACE_NAME}::codec
                       ${CMAKE_WORKSPACE_NAME}::mac
 
-                      ${Boost_LIBRARIES})
+                      Boost::container)
 
 target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
                            "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"

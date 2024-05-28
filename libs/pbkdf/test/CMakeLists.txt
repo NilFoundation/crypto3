@@ -8,16 +8,12 @@
 
 include(CMTest)
 
-if(NOT Boost_UNIT_TEST_FRAMEWORK_FOUND)
-    find_package(Boost REQUIRED COMPONENTS unit_test_framework)
-endif()
-
 cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
 
                        ${CMAKE_WORKSPACE_NAME}::hash
                        ${CMAKE_WORKSPACE_NAME}::mac
 
-                       ${Boost_LIBRARIES})
+                       Boost::unit_test_framework)
 
 macro(define_pbkdf_test name)
     cm_test(NAME ${name}_test SOURCES ${name}.cpp)
@@ -29,13 +25,7 @@ macro(define_pbkdf_test name)
                                ${Boost_INCLUDE_DIRS})
 
     set_target_properties(${name}_test PROPERTIES CXX_STANDARD 14)
-
-    get_target_property(target_type Boost::unit_test_framework TYPE)
-    if(target_type STREQUAL "SHARED_LIB")
-        target_compile_definitions(${name}_test PRIVATE BOOST_TEST_DYN_LINK)
-    elseif(target_type STREQUAL "STATIC_LIB")
-
-    endif()
+    
 endmacro()
 
 set(TESTS_NAMES

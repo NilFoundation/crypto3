@@ -6,12 +6,8 @@
 # http://www.boost.org/LICENSE_1_0.txt
 #---------------------------------------------------------------------------#
 
-if(NOT Boost_UNIT_TEST_FRAMEWORK_FOUND)
-    find_package(Boost REQUIRED COMPONENTS unit_test_framework)
-endif()
-
 cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
-                       ${Boost_LIBRARIES})
+                       Boost::unit_test_framework)
 
 macro(define_block_cipher_test name)
     set(test_name "block_${name}_test")
@@ -26,13 +22,6 @@ macro(define_block_cipher_test name)
 
     if(NOT CMAKE_CXX_STANDARD)
         set_target_properties(${test_name} PROPERTIES CXX_STANDARD 14)
-    endif()
-
-    get_target_property(target_type Boost::unit_test_framework TYPE)
-    if(target_type STREQUAL "SHARED_LIB")
-        target_compile_definitions(${test_name} PRIVATE BOOST_TEST_DYN_LINK)
-    elseif(target_type STREQUAL "STATIC_LIB")
-
     endif()
 
     string(CONCAT TEST_DATA ${CMAKE_CURRENT_SOURCE_DIR} "/data/" "${name}" ".json")

@@ -52,10 +52,6 @@ else()
     target_architecture(CMAKE_TARGET_ARCHITECTURE)
 endif()
 
-if((NOT Boost_CONTAINER_FOUND OR NOT Boost_FOUND) AND NOT CMAKE_CROSSCOMPILING)
-    find_package(Boost COMPONENTS REQUIRED container)
-endif()
-
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS)
 
 list(APPEND ${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES)
@@ -118,7 +114,7 @@ target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTER
 
 target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
                       ${CMAKE_WORKSPACE_NAME}::block
-                      ${Boost_LIBRARIES})
+                      Boost::container)
 
 if(${CMAKE_TARGET_ARCHITECTURE} STREQUAL "x86_64" OR
    ${CMAKE_TARGET_ARCHITECTURE} STREQUAL "x86")

@@ -19,7 +19,7 @@ macro(define_pubkey_example name)
                           ${CMAKE_WORKSPACE_NAME}::algebra
                           ${CMAKE_WORKSPACE_NAME}::multiprecision
 
-                          ${Boost_LIBRARIES})
+                          Boost::container)
     set_target_properties(pubkey_${name}_example PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED TRUE)
 endmacro()
 

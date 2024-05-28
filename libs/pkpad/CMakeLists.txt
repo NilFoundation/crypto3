@@ -19,10 +19,6 @@ cm_project(pkpad WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME})
 include(CMDeploy)
 include(CMSetupVersion)
 
-if(NOT Boost_FOUND AND NOT CMAKE_CROSSCOMPILING)
-    find_package(Boost COMPONENTS)
-endif()
-
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
         include/nil/crypto3/pkpad/algorithm/encode.hpp
         include/nil/crypto3/pkpad/algorithm/verify.hpp)
@@ -232,7 +228,7 @@ target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
                       ${CMAKE_WORKSPACE_NAME}::algebra
                       marshalling::crypto3_algebra
 
-                      ${Boost_LIBRARIES})
+                      Boost::container)
 
 target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

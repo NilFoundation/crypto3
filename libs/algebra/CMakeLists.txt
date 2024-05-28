@@ -54,8 +54,7 @@ target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTER
                            $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>)
 
 target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
-                      ${CMAKE_WORKSPACE_NAME}::multiprecision
-                      Boost::unit_test_framework)
+                      ${CMAKE_WORKSPACE_NAME}::multiprecision)
 
 cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
           INCLUDE include

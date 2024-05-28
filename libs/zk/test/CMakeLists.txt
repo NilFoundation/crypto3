@@ -8,8 +8,6 @@
 
 include(CMTest)
 
-find_package(Boost REQUIRED COMPONENTS unit_test_framework)
-
 target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
     "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>")
@@ -27,7 +25,7 @@ cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
                        marshalling::crypto3_algebra
                        marshalling::crypto3_zk
 
-                       ${Boost_LIBRARIES})
+                       Boost::unit_test_framework)
 
 option(ZK_PLACEHOLDER_PROFILING_ENABLED "Build with placeholder profiling" FALSE)
 
@@ -39,18 +37,7 @@ macro(define_zk_test test)
     get_filename_component(name ${test} NAME)
     string(REPLACE "/" "_" full_test_name ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}_${test}_test)
 
-    set(additional_args "")
-
-    if(ENABLE_JUNIT_TEST_OUTPUT)
-        set(TEST_RESULTS_DIR "${CMAKE_CURRENT_BINARY_DIR}/junit_results")
-        set(TEST_LOGS_DIR "${TEST_RESULTS_DIR}/logs")
-        file(MAKE_DIRECTORY ${TEST_LOGS_DIR})
-
-        set(additional_args "--log_format=JUNIT"
-                            "--log_sink=${TEST_LOGS_DIR}/${full_test_name}.xml")
-    endif()
-
-    cm_test(NAME ${full_test_name} SOURCES ${test}.cpp ARGS ${additional_args})
+    cm_test(NAME ${full_test_name} SOURCES ${test}.cpp)
 
     target_include_directories(${full_test_name} PRIVATE
                                "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
@@ -59,13 +46,6 @@ macro(define_zk_test test)
                                ${Boost_INCLUDE_DIRS})
 
     set_target_properties(${full_test_name} PROPERTIES CXX_STANDARD 17)
-
-    get_target_property(target_type Boost::unit_test_framework TYPE)
-    if(target_type STREQUAL "SHARED_LIB")
-        target_compile_definitions(${full_test_name} PRIVATE BOOST_TEST_DYN_LINK)
-    elseif(target_type STREQUAL "STATIC_LIB")
-
-    endif()
 
     if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         target_compile_options(${full_test_name} PRIVATE "-fconstexpr-steps=2147483647")

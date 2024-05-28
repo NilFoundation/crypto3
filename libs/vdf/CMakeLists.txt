@@ -77,8 +77,6 @@ elseif(CRYPTO3_VDF_BOOST)
     if(NOT TARGET ${CMAKE_WORKSPACE_NAME}::multiprecision)
         if(${CMAKE_WORKSPACE_NAME} STREQUAL boost)
             cm_find_package(${CMAKE_WORKSPACE_NAME}_multiprecision)
-        else()
-            find_package(Boost)
         endif()
     endif()
 
@@ -235,10 +233,10 @@ elseif(CRYPTO3_VDF_BOOST)
                               ${CMAKE_WORKSPACE_NAME}_block
                               ${CMAKE_WORKSPACE_NAME}_hash
 
-                              ${Boost_LIBRARIES})
+                              Boost::container)
     else()
         target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
-                              ${Boost_LIBRARIES})
+                              Boost::container)
     endif()
 endif()
 

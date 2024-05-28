@@ -36,7 +36,7 @@ macro(define_containers_example example)
     target_link_libraries(${target_name} PRIVATE
             ${CMAKE_WORKSPACE_NAME}::algebra
             ${CMAKE_WORKSPACE_NAME}::hash
-            ${Boost_LIBRARIES})
+            Boost::container)
     set_target_properties(${target_name} PROPERTIES CXX_STANDARD 17)
 endmacro()
 
