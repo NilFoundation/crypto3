@@ -59,9 +59,6 @@ namespace boost {
                     }
                 }
 
-                // Martun: This needs to be called when setting numbers to 0, which takes lots of time when creating
-                // empty vectors.
-
                 /* Conversion from the regular number A into Montgomery form r*A:
                    Montgomery_reduce((A mod N)*(r^2 mod N)) = Montgomery_reduce(A*r^2 mod N) = A*r mod N,
                    where result is A and get_mod() is N.

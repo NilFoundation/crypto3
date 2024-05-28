@@ -194,9 +194,7 @@ namespace boost {
                 }
 
                 BOOST_MP_CXX14_CONSTEXPR void initialize_montgomery_params() {
-                    if (check_montgomery_constraints(m_mod)) {
-                        find_const_variables();
-                    }
+                    find_const_variables();
                 }
 
                 /*
@@ -225,16 +223,18 @@ namespace boost {
                 }
 
                 BOOST_MP_CXX14_CONSTEXPR void find_const_variables() {
-                    m_montgomery_p_dash = monty_inverse(m_mod.limbs()[0]);
+                    if (check_montgomery_constraints(m_mod)) {
+                        m_montgomery_p_dash = monty_inverse(m_mod.limbs()[0]);
 
-                    Backend_doubled_padded_limbs r;
-                    eval_bit_set(r, 2 * m_mod.size() * limb_bits);
-                    barrett_reduce(r);
+                        Backend_doubled_padded_limbs r;
+                        eval_bit_set(r, 2 * m_mod.size() * limb_bits);
+                        barrett_reduce(r);
 
-                    // Here we are intentionally throwing away half of the bits of r, it's correct.
-                    m_montgomery_r2 = static_cast<Backend>(r);
+                        // Here we are intentionally throwing away half of the bits of r, it's correct.
+                        m_montgomery_r2 = static_cast<Backend>(r);
+                    }
 
-                    // Compute 2^Bits - Modulus.
+                    // Compute 2^Bits - Modulus, no matter if modulus is even or odd.
                     Backend_padded_limbs compliment = static_cast<limb_type>(1u), modulus = m_mod;
                     eval_left_shift(compliment, Bits);
                     eval_subtract(compliment, modulus);
