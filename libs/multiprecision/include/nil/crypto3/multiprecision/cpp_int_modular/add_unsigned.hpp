@@ -30,8 +30,9 @@ namespace boost {
                 std::size_t s = a.size();
                 if (s == 1) {
                     double_limb_type r = static_cast<double_limb_type>(*a.limbs()) + static_cast<double_limb_type>(*b.limbs());
-                    if (r & ~cpp_int_modular_backend<Bits>::upper_limb_mask) {
-                        result = r & cpp_int_modular_backend<Bits>::upper_limb_mask;
+                    double_limb_type mask = cpp_int_modular_backend<Bits>::upper_limb_mask;
+                    if (r & ~mask) {
+                        result = r & mask;
                         result.set_carry(true);
                     } else {
                         result = r;

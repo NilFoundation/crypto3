@@ -149,6 +149,7 @@ bool base_operations_test(std::array<Number, test_set_len> test_set) {
 
     // We cannot use convert_to here, because there's a bug inside boost, convert_to is constexpr,
     // but it calls function generic_interconvert which is not.
+std::cout << a << " + " << b << " is computed as " << a_add_b << " but must be " << a_add_b_s << " modulo " << e_cppint << std::endl;
     BOOST_ASSERT_MSG(standard_number(a_add_b.backend().convert_to_cpp_int()) == a_add_b_s, "addition error");
     BOOST_ASSERT_MSG(standard_number(a_sub_b.backend().convert_to_cpp_int()) == a_sub_b_s, "subtraction error");
     BOOST_ASSERT_MSG(standard_number(a_mul_b.backend().convert_to_cpp_int()) == a_mul_b_s, "multiplication error");
