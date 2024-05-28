@@ -31,8 +31,6 @@ cm_project(math WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME} LANGUAGES ASM C CXX)
 cm_find_package(CM)
 include(CMDeploy)
 
-option(BUILD_TESTS "Build unit tests" FALSE)
-
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS)
 
 list(APPEND ${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES)
@@ -59,12 +57,11 @@ target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
                       ${CMAKE_WORKSPACE_NAME}::algebra
                       ${CMAKE_WORKSPACE_NAME}::multiprecision
 
-                      ${Boost_LIBRARIES})
+                      Boost::random
+                  )
 
 cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
           INCLUDE include
           NAMESPACE ${CMAKE_WORKSPACE_NAME}::)
 
-if(BUILD_TESTS)
-    add_subdirectory(test)
-endif()
+cm_add_test_subdirectory(test)

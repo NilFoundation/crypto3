@@ -42,10 +42,6 @@ cm_workspace(crypto3)
 include(CMDeploy)
 include(CMSetupVersion)
 
-if (NOT Boost_FOUND AND NOT CMAKE_CROSSCOMPILING)
-    find_package(Boost COMPONENTS REQUIRED filesystem)
-endif ()
-
 cm_project(containers WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME})
 
 option(BUILD_DOXYGEN_DOCS "Build with configuring Doxygen documentation compiler" TRUE)
@@ -76,7 +72,7 @@ target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
         ${CMAKE_WORKSPACE_NAME}::algebra
         ${CMAKE_WORKSPACE_NAME}::hash
 
-        ${Boost_LIBRARIES})
+        Boost::container)
 
 target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
@@ -86,9 +82,8 @@ target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTER
 
 cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INCLUDE include NAMESPACE ${CMAKE_WORKSPACE_NAME}::)
 
-if (BUILD_TESTS)
-    add_subdirectory(test)
-endif ()
+include(CMTest)
+cm_add_test_subdirectory(test)
 
 if (BUILD_EXAMPLES)
     add_subdirectory(example)

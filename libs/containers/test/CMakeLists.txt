@@ -25,16 +25,14 @@
 
 include(CMTest)
 
-if(NOT Boost_UNIT_TEST_FRAMEWORK_FOUND)
-    find_package(Boost REQUIRED COMPONENTS unit_test_framework)
-endif()
-
 cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
 
                        ${CMAKE_WORKSPACE_NAME}::algebra
                        ${CMAKE_WORKSPACE_NAME}::hash
 
-                       ${Boost_LIBRARIES})
+                       Boost::unit_test_framework
+                       Boost::random
+                   )
 
 macro(define_storage_test test)
     get_filename_component(test_name ${test} NAME)
@@ -46,17 +44,7 @@ macro(define_storage_test test)
         set(target_name ${PARENT_DIR}_${target_name})
     endwhile()
 
-    set(additional_args "")
-    if(ENABLE_JUNIT_TEST_OUTPUT)
-        set(TEST_RESULTS_DIR "${CMAKE_CURRENT_BINARY_DIR}/junit_results")
-        set(TEST_LOGS_DIR "${TEST_RESULTS_DIR}/logs")
-        file(MAKE_DIRECTORY ${TEST_LOGS_DIR})
-
-        set(additional_args "--log_format=JUNIT"
-                            "--log_sink=${TEST_LOGS_DIR}/${target_name}.xml")
-    endif()
-
-    cm_test(NAME ${target_name} SOURCES ${test}.cpp ARGS ${additional_args})
+    cm_test(NAME ${target_name} SOURCES ${test}.cpp)
 
     target_include_directories(${target_name} PRIVATE
                                "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
@@ -65,13 +53,6 @@ macro(define_storage_test test)
                                ${Boost_INCLUDE_DIRS})
 
     set_target_properties(${target_name} PROPERTIES CXX_STANDARD 17)
-
-    get_target_property(target_type Boost::unit_test_framework TYPE)
-    if(target_type STREQUAL "SHARED_LIB")
-        target_compile_definitions(${target_name} PRIVATE BOOST_TEST_DYN_LINK)
-    elseif(target_type STREQUAL "STATIC_LIB")
-
-    endif()
 
      if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         target_compile_options(${target_name} PRIVATE "-fconstexpr-steps=2147483647" "-ftemplate-backtrace-limit=0")

@@ -9,8 +9,6 @@
 
 include(CMTest)
 
-find_package(Boost REQUIRED COMPONENTS filesystem unit_test_framework)
-
 cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
 
                        ${CMAKE_WORKSPACE_NAME}::algebra
@@ -21,7 +19,7 @@ cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
 
                        marshalling::crypto3_algebra
 
-                       ${Boost_LIBRARIES})
+                       Boost::unit_test_framework)
 
 #cm_test(NAME ${CURRENT_PROJECT_NAME}_chacha_test SOURCES ${CURRENT_TEST_SOURCES_DIR}/chacha.cpp)
 #set_target_properties(${CURRENT_PROJECT_NAME}_chacha_test PROPERTIES CXX_STANDARD 17)

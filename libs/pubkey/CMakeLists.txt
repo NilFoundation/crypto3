@@ -20,11 +20,6 @@ cm_find_package(CM)
 include(CMDeploy)
 include(CMSetupVersion)
 
-if(NOT Boost_FOUND AND NOT CMAKE_CROSSCOMPILING)
-    find_package(Boost REQUIRED)
-endif()
-
-option(BUILD_TESTS "Build unit tests" FALSE)
 option(BUILD_EXAMPLES "Build examples" FALSE)
 
 list(APPEND ${CURRENT_PROJECT_NAME}_LIBRARIES
@@ -107,7 +102,7 @@ set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
 
 target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
         ${${CURRENT_PROJECT_NAME}_LIBRARIES}
-        ${Boost_LIBRARIES})
+        Boost::container)
 
 target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -119,9 +114,7 @@ cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
         INCLUDE include
         NAMESPACE ${CMAKE_WORKSPACE_NAME}::)
 
-if(BUILD_TESTS)
-    add_subdirectory(test)
-endif()
+cm_add_test_subdirectory(test)
 
 if(BUILD_EXAMPLES)
     add_subdirectory(example)

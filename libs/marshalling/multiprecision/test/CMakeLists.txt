@@ -9,12 +9,8 @@
 
 include(CMTest)
 
-if(NOT Boost_UNIT_TEST_FRAMEWORK_FOUND)
-    find_package(Boost REQUIRED COMPONENTS unit_test_framework filesystem log log_setup program_options thread system)
-endif()
-
 cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
-                       ${Boost_LIBRARIES}
+                       Boost::unit_test_framework
 
                        crypto3::multiprecision
                        ${CMAKE_WORKSPACE_NAME}::core)
@@ -45,15 +41,6 @@ macro(define_marshalling_test name)
     set_target_properties(marshalling_${name}_test PROPERTIES
                           CXX_STANDARD 17
                           CXX_STANDARD_REQUIRED TRUE)
-
-    if(TARGET Boost::unit_test_framework)
-        get_target_property(target_type Boost::unit_test_framework TYPE)
-        if(target_type STREQUAL "SHARED_LIB")
-            target_compile_definitions(marshalling_${name}_test PRIVATE BOOST_TEST_DYN_LINK)
-        elseif(target_type STREQUAL "STATIC_LIB")
-
-        endif()
-    endif()
 
     if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         target_compile_options(marshalling_${name}_test PRIVATE "-fconstexpr-steps=2147483647")

@@ -32,8 +32,6 @@ cm_project(pbkdf WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME})
 cm_find_package(${CMAKE_WORKSPACE_NAME}_hash)
 cm_find_package(${CMAKE_WORKSPACE_NAME}_mac)
 
-find_package(Boost REQUIRED)
-
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
      include/nil/crypto3/pbkdf/pbkdf.hpp)
 
