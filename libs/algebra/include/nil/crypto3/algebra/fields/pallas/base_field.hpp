@@ -53,8 +53,9 @@ namespace nil {
 #else
 
                     constexpr static const integral_type modulus =
-
                         0x40000000000000000000000000000000224698fc094cf91b992d30ed00000001_cppui_modular255;
+
+                    constexpr static const integral_type group_order_minus_one_half = (modulus - 1u) / 2 ;
 
                     typedef typename policy_type::modular_backend modular_backend;
                     constexpr static const modular_params_type modulus_params = modulus.backend();
@@ -75,6 +76,7 @@ namespace nil {
 #ifdef __ZKLLVM__
 #else
                 constexpr typename pallas_base_field::integral_type const pallas_base_field::modulus;
+                constexpr typename pallas_base_field::integral_type const pallas_base_field::group_order_minus_one_half;
 #endif
 
                 using pallas_fq = pallas_base_field;

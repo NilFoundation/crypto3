@@ -51,10 +51,11 @@ namespace nil {
                     typedef typename policy_type::extended_integral_type extended_integral_type;
 #ifdef __ZKLLVM__
                     typedef __zkllvm_field_goldilocks64_base value_type;
-#else               
+#else
                     // 2^64 - 2^32 + 1
                     constexpr static const integral_type modulus =
                         0xFFFFFFFF00000001_cppui_modular64;
+                    constexpr static const integral_type group_order_minus_one_half = (modulus - 1u) / 2;
 
                     typedef typename policy_type::modular_backend modular_backend;
                     constexpr static const modular_params_type modulus_params = modulus.backend();
@@ -75,6 +76,7 @@ namespace nil {
 #ifdef __ZKLLVM__
 #else
                 constexpr typename goldilocks64_base_field::integral_type const goldilocks64_base_field::modulus;
+                constexpr typename goldilocks64_base_field::integral_type const goldilocks64_base_field::group_order_minus_one_half;
                 constexpr
                     typename goldilocks64_base_field::modular_params_type const goldilocks64_base_field::modulus_params;
 #endif
