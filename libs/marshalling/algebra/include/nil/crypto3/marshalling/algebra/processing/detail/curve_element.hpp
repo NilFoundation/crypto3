@@ -26,11 +26,7 @@
 #ifndef CRYPTO3_MARSHALLING_PROCESSING_CURVE_ELEMENT_DETAIL_HPP
 #define CRYPTO3_MARSHALLING_PROCESSING_CURVE_ELEMENT_DETAIL_HPP
 
-#include <cstddef>
-#include <cstdint>
 #include <type_traits>
-#include <limits>
-#include <iterator>
 
 #include <nil/marshalling/endianness.hpp>
 
@@ -99,22 +95,24 @@ namespace nil {
                         using group_affine_value_type = GroupAffineElement;
 
                         // TODO: throw catchable error, for example return status
-                        assert(y_int < base_field_type::modulus);
+                        if (y_int >= base_field_type::modulus) {
+                            throw std::domain_error("Bad y value");
+                        }
                         base_field_value_type y(y_int);
                         base_field_value_type y2 = y * y;
+                        base_field_value_type y2dp1 = y2 * group_type::params_type::d + base_integral_type(1);
+                        if (y2dp1.is_zero()) {
+                            throw std::domain_error("Bad y value");
+                        }
                         base_field_value_type x2 =
-                            (y2 - base_integral_type(1)) * (y2 * group_type::params_type::d + base_integral_type(1)).inversed();
+                            (y2 - base_integral_type(1)) * y2dp1.inversed();
                         if (x2.is_zero()) {
-                            // TODO: throw catchable error, for example return status
-                            assert(!sign);
                             return group_affine_value_type(base_field_value_type::zero(), y);
                         }
-                        base_field_value_type x = x2.pow((base_field_type::modulus + 3u) / 8);
-                        if (!(x * x - x2).is_zero()) {
-                            x = x * base_field_value_type(2u).pow((base_field_type::modulus - 1u) / 4);
-                            // TODO: throw catchable error, for example return status
-                            assert((x * x - x2).is_zero());
+                        if (!x2.is_square()) {
+                            throw std::domain_error("Point not on curve");
                         }
+                        base_field_value_type x = x2.sqrt();
                         auto x_int = static_cast<base_integral_type>(x.data);
                         if (static_cast<bool>(x_int & 1) != sign) {
                             x_int = base_field_type::modulus - x_int;
