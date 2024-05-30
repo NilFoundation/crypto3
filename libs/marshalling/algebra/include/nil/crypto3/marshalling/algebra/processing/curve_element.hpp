@@ -1188,17 +1188,19 @@ namespace nil {
                         base_integral_type y =
                             read_data<params_type::bit_length(), base_integral_type, endianness>(iter);
                         bool sign = *(iter + encoded_size - 1) & (1 << 7);
-                        try {
-                            group_affine_value_type decoded_point_affine =
+
+                        std::optional<group_affine_value_type> decoded_point_affine =
                                 detail::recover_x<group_affine_value_type>(y, sign);
-                            // TODO: remove hard-coded call for type conversion, implement type conversion between
-                            // coordinates
-                            //  through operator
-                            point = decoded_point_affine.to_extended_with_a_minus_1();
-                            return nil::marshalling::status_type::success;
-                        } catch (std::domain_error& e) {
+
+                        if (!decoded_point_affine) {
                             return nil::marshalling::status_type::invalid_msg_data;
                         }
+
+                        // TODO: remove hard-coded call for type conversion, implement type conversion between
+                        // coordinates
+                        //  through operator
+                        point = decoded_point_affine->to_extended_with_a_minus_1();
+                        return nil::marshalling::status_type::success;
                     }
                 };
 
