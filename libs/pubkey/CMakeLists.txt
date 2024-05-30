@@ -28,45 +28,6 @@ list(APPEND ${CURRENT_PROJECT_NAME}_LIBRARIES
         # TODO: add conditional link of zk depending on ElGamal
         ${CMAKE_WORKSPACE_NAME}::zk)
 
-list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-        include/nil/crypto3/pubkey/algorithm/sign.hpp
-        include/nil/crypto3/pubkey/algorithm/verify.hpp
-        include/nil/crypto3/pubkey/algorithm/aggregate.hpp
-        include/nil/crypto3/pubkey/algorithm/aggregate_verify.hpp
-        include/nil/crypto3/pubkey/algorithm/aggregate_verify_single_msg.hpp
-        include/nil/crypto3/pubkey/algorithm/deal_shares.hpp
-        include/nil/crypto3/pubkey/algorithm/deal_share.hpp
-        include/nil/crypto3/pubkey/algorithm/verify_share.hpp
-        include/nil/crypto3/pubkey/algorithm/reconstruct_secret.hpp
-        include/nil/crypto3/pubkey/algorithm/reconstruct_public_secret.hpp
-
-        include/nil/crypto3/pubkey/keys/private_key.hpp
-        include/nil/crypto3/pubkey/keys/public_key.hpp
-        include/nil/crypto3/pubkey/keys/share_sss.hpp
-        include/nil/crypto3/pubkey/keys/public_share_sss.hpp
-        include/nil/crypto3/pubkey/keys/secret_sss.hpp
-        include/nil/crypto3/pubkey/keys/public_secret_sss.hpp
-
-        include/nil/crypto3/pubkey/modes/isomorphic.hpp
-
-        include/nil/crypto3/pubkey/bls.hpp
-        include/nil/crypto3/pubkey/ecdsa.hpp
-        include/nil/crypto3/pubkey/eddsa.hpp
-
-        include/nil/crypto3/pubkey/type_traits.hpp)
-
-list(APPEND ${CURRENT_PROJECT_NAME}_PRIVATE_HEADERS
-        include/nil/crypto3/pubkey/operations/aggregate_op.hpp
-        include/nil/crypto3/pubkey/operations/aggregate_verify_op.hpp
-        include/nil/crypto3/pubkey/operations/aggregate_verify_single_msg_op.hpp
-        include/nil/crypto3/pubkey/operations/deal_share_op.hpp
-        include/nil/crypto3/pubkey/operations/deal_shares_op.hpp
-        include/nil/crypto3/pubkey/operations/reconstruct_public_secret_op.hpp
-        include/nil/crypto3/pubkey/operations/reconstruct_secret_op.hpp
-        include/nil/crypto3/pubkey/operations/verify_share_op.hpp)
-
-list(APPEND ${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES)
-
 option(CRYPTO3_PUBKEY_BLS "Build with BLS public key scheme support" TRUE)
 option(CRYPTO3_PUBKEY_ECDSA "Build with ECDSA public key scheme support" TRUE)
 option(CRYPTO3_PUBKEY_EDDSA "Build with EDDSA public key scheme support" TRUE)
@@ -86,12 +47,6 @@ endif()
 if(CRYPTO3_PUBKEY_EDDSA)
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_EDDSA)
 endif()
-
-list(APPEND ${CURRENT_PROJECT_NAME}_HEADERS
-        ${${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS})
-
-list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-        ${${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES})
 
 cm_setup_version(VERSION 0.1.0 PREFIX ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME})
 

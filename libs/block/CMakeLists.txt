@@ -94,373 +94,94 @@ check_avx()
 
 set(BUILD_WITH_CONFIGURATION_FILE_DIR "${CMAKE_CURRENT_LIST_DIR}/cmake" CACHE STRING "Directory for build.hpp lookup")
 
-list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-     include/nil/crypto3/block/algorithm/encrypt.hpp
-     include/nil/crypto3/block/algorithm/decrypt.hpp
-     include/nil/crypto3/block/algorithm/move.hpp
-     include/nil/crypto3/block/algorithm/copy_n_if.hpp
 
-     include/nil/crypto3/block/cipher.hpp
-     include/nil/crypto3/block/cipher_state.hpp
-     include/nil/crypto3/block/cipher_value.hpp
-
-     include/nil/crypto3/block/detail/stream_endian.hpp
-     include/nil/crypto3/block/detail/pack.hpp
-     include/nil/crypto3/block/detail/digest.hpp
-
-     include/nil/crypto3/block/detail/exploder.hpp
-     include/nil/crypto3/block/detail/imploder.hpp
-     include/nil/crypto3/block/detail/state_adder.hpp
-     include/nil/crypto3/block/detail/unbounded_shift.hpp)
-
-list(APPEND ${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES)
 
 if(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_AES)
-    list(APPEND ${CURRENT_PROJECT_NAME}_RIJNDAEL_HEADERS
-         include/nil/crypto3/block/rijndael.hpp
-         include/nil/crypto3/block/detail/rijndael/rijndael_functions.hpp
-         include/nil/crypto3/block/detail/rijndael/rijndael_impl.hpp
-         include/nil/crypto3/block/detail/rijndael/rijndael_policy.hpp)
-
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_RIJNDAEL)
 
-    if(${CMAKE_TARGET_ARCHITECTURE} STREQUAL "x86_64" OR ${CMAKE_TARGET_ARCHITECTURE} STREQUAL "x86")
-        if(SSE2_FOUND)
-            list(APPEND ${CURRENT_PROJECT_NAME}_RIJNDAEL_HEADERS
-                 include/nil/crypto3/block/detail/rijndael/rijndael_ni_impl.hpp)
-        elseif(SSSE3_FOUND)
-            list(APPEND ${CURRENT_PROJECT_NAME}_RIJNDAEL_HEADERS
-                 include/nil/crypto3/block/detail/rijndael/rijndael_ssse3_impl.hpp)
-        endif()
-    elseif(${CMAKE_TARGET_ARCHITECTURE} STREQUAL "armv8" OR ${CMAKE_TARGET_ARCHITECTURE} STREQUAL "arm64")
-        list(APPEND ${CURRENT_PROJECT_NAME}_RIJNDAEL_HEADERS
-             include/nil/crypto3/block/detail/rijndael/rijndael_armv8_impl.hpp)
+    if(${CMAKE_TARGET_ARCHITECTURE} STREQUAL "armv8" OR ${CMAKE_TARGET_ARCHITECTURE} STREQUAL "arm64")
         add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_RIJNDAEL_ARMV8)
     elseif(${CMAKE_TARGET_ARCHITECTURE} STREQUAL "ppc64")
         add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_RIJNDAEL_POWER8)
-        list(APPEND ${CURRENT_PROJECT_NAME}_RIJNDAEL_HEADERS
-             include/nil/crypto3/block/detail/rijndael/rijndael_power8_impl.hpp)
     endif()
-
-    list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_RIJNDAEL_HEADERS}
-         )
-    list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_RIJNDAEL_SOURCES})
 endif()
 
 if(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_ARIA)
-    list(APPEND ${CURRENT_PROJECT_NAME}_ARIA_HEADERS
-         include/nil/crypto3/block/aria.hpp
-         include/nil/crypto3/block/detail/aria/aria_functions.hpp
-         include/nil/crypto3/block/detail/aria/aria_policy.hpp)
-
-    list(APPEND ${CURRENT_PROJECT_NAME}_ARIA_SOURCES
-
-         )
-
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_ARIA)
-    list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_ARIA_HEADERS}
-         )
-    list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_ARIA_SOURCES}
-         )
 endif()
 
 if(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_BLOWFISH)
-    list(APPEND ${CURRENT_PROJECT_NAME}_BLOWFISH_HEADERS
-         include/nil/crypto3/block/blowfish.hpp
-         include/nil/crypto3/block/detail/blowfish/blowfish_functions.hpp
-         include/nil/crypto3/block/detail/blowfish/blowfish_policy.hpp
-         )
-
-
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_BLOWFISH)
-    list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_BLOWFISH_HEADERS}
-         )
-    list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_BLOWFISH_SOURCES}
-         )
 endif()
 
 if(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_CAMELLIA)
-    list(APPEND ${CURRENT_PROJECT_NAME}_CAMELLIA_HEADERS
-         include/nil/crypto3/block/camellia.hpp
-         include/nil/crypto3/block/detail/camellia/camellia_functions.hpp
-         include/nil/crypto3/block/detail/camellia/camellia_policy.hpp
-         include/nil/crypto3/block/detail/camellia/basic_camellia_policy.hpp
-         )
-
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_CAMELLIA)
-    list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_CAMELLIA_HEADERS}
-         )
-    list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_CAMELLIA_SOURCES}
-         )
 endif()
 
 if(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_CAST128)
-    list(APPEND ${CURRENT_PROJECT_NAME}_CAST_PUBLIC_HEADERS
-         include/nil/crypto3/block/cast.hpp
-         include/nil/crypto3/block/detail/cast/cast_functions.hpp
-         include/nil/crypto3/block/detail/cast/basic_cast_policy.hpp
-         include/nil/crypto3/block/detail/cast/cast_policy.hpp
-         )
-
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_CAST -D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_CAST_128
                     -D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_CAST_256)
-    list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_CAST_PUBLIC_HEADERS}
-         )
-    list(APPEND ${CURRENT_PROJECT_NAME}_PRIVATE_HEADERS
-         ${${CURRENT_PROJECT_NAME}_CAST_PRIVATE_HEADERS}
-         )
-
-    list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_CAST_SOURCES}
-         )
 endif()
 
 if(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_DES)
-    list(APPEND ${CURRENT_PROJECT_NAME}_DES_HEADERS
-         include/nil/crypto3/block/des.hpp
-         include/nil/crypto3/block/detail/des/des_functions.hpp
-         include/nil/crypto3/block/detail/des/basic_des_policy.hpp
-         include/nil/crypto3/block/detail/des/des_policy.hpp
-         )
-
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_DES)
-    list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_DES_HEADERS}
-         )
-    list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_DES_SOURCES}
-         )
 endif()
 
 if(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_GOST_28147_89)
-    list(APPEND ${CURRENT_PROJECT_NAME}_GOST_28147_89_HEADERS
-         include/nil/crypto3/block/gost28147.hpp
-         include/nil/crypto3/block/detail/gost_28147_89/gost_28147_89_functions.hpp
-         include/nil/crypto3/block/detail/gost_28147_89/gost_28147_89_policy.hpp
-         include/nil/crypto3/block/detail/gost_28147_89/gost_28147_89_parameters.hpp
-         )
-
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_GOST_28147_89)
-    list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_GOST_28147_89_HEADERS}
-         )
-    list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_GOST_28147_89_SOURCES}
-         )
 endif()
 
 if(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_IDEA)
-    list(APPEND ${CURRENT_PROJECT_NAME}_IDEA_HEADERS
-         include/nil/crypto3/block/idea.hpp
-         include/nil/crypto3/block/detail/idea/idea_functions.hpp
-         include/nil/crypto3/block/detail/idea/idea_policy.hpp
-         )
-
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_IDEA)
-    list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_IDEA_HEADERS}
-         )
-    list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_IDEA_SOURCES}
-         )
 endif()
 
 if(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_KASUMI)
-    list(APPEND ${CURRENT_PROJECT_NAME}_KASUMI_HEADERS
-         include/nil/crypto3/block/kasumi.hpp
-         include/nil/crypto3/block/detail/kasumi/kasumi_functions.hpp
-         include/nil/crypto3/block/detail/kasumi/kasumi_policy.hpp
-         )
-
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_KASUMI)
-    list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_KASUMI_HEADERS}
-         )
-    list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_KASUMI_SOURCES}
-         )
 endif()
 
 if(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_MISTY1)
-    list(APPEND ${CURRENT_PROJECT_NAME}_MISTY1_HEADERS
-         include/nil/crypto3/block/misty1.hpp
-         include/nil/crypto3/block/detail/misty1/misty1_functions.hpp
-         include/nil/crypto3/block/detail/misty1/misty1_policy.hpp
-         )
-
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_MISTY1)
-    list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_MISTY1_HEADERS}
-         )
-    list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_MISTY1_SOURCES}
-         )
 endif()
 
 if(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_MD4)
-    list(APPEND ${CURRENT_PROJECT_NAME}_MD4_HEADERS
-         include/nil/crypto3/block/md4.hpp
-         )
-
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_MD4)
-    list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_MD4_HEADERS}
-         )
 endif()
 
 if(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_MD5)
-    list(APPEND ${CURRENT_PROJECT_NAME}_MD5_HEADERS
-         include/nil/crypto3/block/md5.hpp
-         )
-
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_MD5)
-    list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_MD5_HEADERS}
-         )
 endif()
 
 if(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_NOEKEON)
-    list(APPEND ${CURRENT_PROJECT_NAME}_NOEKEON_HEADERS
-         include/nil/crypto3/block/noekeon.hpp
-         include/nil/crypto3/block/detail/noekeon/noekeon_functions.hpp
-         include/nil/crypto3/block/detail/noekeon/noekeon_policy.hpp
-         )
-
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_NOEKEON)
-    list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_NOEKEON_HEADERS}
-         )
-    list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_NOEKEON_SOURCES}
-         )
 endif()
 
 if(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_SEED)
-    list(APPEND ${CURRENT_PROJECT_NAME}_SEED_HEADERS
-         include/nil/crypto3/block/seed.hpp
-         include/nil/crypto3/block/detail/seed/seed_functions.hpp
-         include/nil/crypto3/block/detail/seed/seed_policy.hpp
-         )
-
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_SEED)
-    list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_SEED_HEADERS}
-         )
-    list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_SEED_SOURCES}
-         )
 endif()
 
 if(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_SERPENT)
-    list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_SERPENT_HEADERS
-         include/nil/crypto3/block/serpent.hpp
-         include/nil/crypto3/block/detail/serpent/serpent_policy.hpp
-         include/nil/crypto3/block/detail/serpent/serpent_functions.hpp
-         )
-
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_SERPENT)
-    list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_PUBLIC_SERPENT_HEADERS}
-         )
-
-    list(APPEND ${CURRENT_PROJECT_NAME}_PRIVATE_HEADERS
-         ${${CURRENT_PROJECT_NAME}_PRIVATE_SERPENT_HEADERS})
-
-    list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_SERPENT_SOURCES})
 endif()
 
 if(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_SHACAL2)
-    list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_SHACAL2_HEADERS
-         include/nil/crypto3/block/basic_shacal.hpp
-         include/nil/crypto3/block/shacal.hpp
-         include/nil/crypto3/block/shacal1.hpp
-         include/nil/crypto3/block/shacal2.hpp
-         include/nil/crypto3/block/detail/shacal/shacal_policy.hpp
-         include/nil/crypto3/block/detail/shacal/shacal_functions.hpp
-         include/nil/crypto3/block/detail/shacal/shacal1_policy.hpp
-         include/nil/crypto3/block/detail/shacal/shacal2_policy.hpp)
-
-    list(APPEND ${CURRENT_PROJECT_NAME}_SHACAL2_SOURCES)
-
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_SHACAL2)
-    list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_PUBLIC_SHACAL2_HEADERS})
-
-    list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_SHACAL2_SOURCES})
 endif()
 
 if(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_SM4)
-    list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_SM4_HEADERS
-         include/nil/crypto3/block/detail/sm4/sm4_functions.hpp
-         include/nil/crypto3/block/detail/sm4/sm4_policy.hpp
-         include/nil/crypto3/block/sm4.hpp)
-
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_SM4)
-    list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_PUBLIC_SM4_HEADERS})
-
-    list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_SM4_SOURCES})
 endif()
 
 if(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_THREEFISH)
-    list(APPEND ${CURRENT_PROJECT_NAME}_THREEFISH_HEADERS
-         include/nil/crypto3/block/threefish.hpp
-         include/nil/crypto3/block/detail/threefish/threefish_policy.hpp)
-
-    list(APPEND ${CURRENT_PROJECT_NAME}_THREEFISH_SOURCES)
-
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_THREEFISH)
-    list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_THREEFISH_HEADERS})
-    list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_THREEFISH_SOURCES})
 endif()
 
 if(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_TWOFISH)
-    list(APPEND ${CURRENT_PROJECT_NAME}_TWOFISH_HEADERS
-         include/nil/crypto3/block/twofish.hpp
-         include/nil/crypto3/block/detail/twofish/basic_twofish_policy.hpp
-         include/nil/crypto3/block/detail/twofish/twofish_policy.hpp
-         include/nil/crypto3/block/detail/twofish/twofish_functions.hpp)
-
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_TWOFISH)
-    list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_TWOFISH_HEADERS})
-    list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_TWOFISH_SOURCES})
 endif()
 
 if(${CMAKE_UPPER_WORKSPACE_NAME}_${CURRENT_UPPER_PROJECT_NAME}_XTEA)
-    list(APPEND ${CURRENT_PROJECT_NAME}_XTEA_HEADERS
-         include/nil/crypto3/block/xtea.hpp
-         include/nil/crypto3/block/detail/xtea/xtea_functions.hpp
-         include/nil/crypto3/block/detail/xtea/xtea_policy.hpp)
-
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_XTEA)
-    list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_XTEA_HEADERS})
-    list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_XTEA_SOURCES})
 endif()
-
-list(APPEND ${CURRENT_PROJECT_NAME}_HEADERS
-     ${${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS}
-     ${${CURRENT_PROJECT_NAME}_PRIVATE_HEADERS})
-
-list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-     ${${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES})
 
 cm_setup_version(VERSION 0.1.0 PREFIX ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME})
 

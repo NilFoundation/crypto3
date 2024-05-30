@@ -32,34 +32,6 @@ option(CRYPTO3_CODEC_BASE58 "Build unit tests" TRUE)
 
 set(BUILD_WITH_CONFIGURATION_FILE_DIR "${CMAKE_CURRENT_LIST_DIR}/cmake" CACHE STRING "Directory for build.hpp lookup")
 
-list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-     include/nil/crypto3/codec/detail/base_policy.hpp
-     include/nil/crypto3/codec/detail/hex_policy.hpp
-
-     include/nil/crypto3/detail/exploder.hpp
-     include/nil/crypto3/detail/unbounded_shift.hpp
-     include/nil/crypto3/detail/imploder.hpp
-     include/nil/crypto3/detail/stream_endian.hpp
-
-     include/nil/crypto3/codec/codec_value.hpp
-     include/nil/crypto3/codec/codec_state.hpp
-
-     include/nil/crypto3/codec/hex.hpp
-     include/nil/crypto3/codec/base.hpp
-
-     include/nil/crypto3/codec/algorithm/encode.hpp
-     include/nil/crypto3/codec/algorithm/decode.hpp
-
-     include/nil/crypto3/codec/adaptor/coded.hpp)
-
-list(APPEND ${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES)
-
-list(APPEND ${CURRENT_PROJECT_NAME}_HEADERS
-     ${${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS})
-
-list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-     ${${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES})
-
 cm_setup_version(VERSION 0.1.0 PREFIX ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME})
 
 add_library(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE)

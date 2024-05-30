@@ -100,55 +100,6 @@ else()
     option(CRYPTO3_VDF_CHIA "Build with Chia VDF support" TRUE)
 endif()
 
-if(CRYPTO3_VDF_PIETRZAK)
-    list(APPEND ${CURRENT_PROJECT_NAME}_PIETRZAK_HEADERS
-         include/nil/crypto3/vdf/pietrzak.hpp
-         )
-
-    list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_PIETRZAK_HEADERS}
-         )
-endif()
-
-if(CRYPTO3_VDF_WESOLOWSKI)
-    list(APPEND ${CURRENT_PROJECT_NAME}_WESOLOWSKI_HEADERS
-         include/nil/crypto3/vdf/wesolowski.hpp
-         )
-
-    list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_WESOLOWSKI_HEADERS}
-         )
-endif()
-
-if(CRYPTO3_VDF_CHIA)
-    list(APPEND ${CURRENT_PROJECT_NAME}_CHIA_HEADERS
-         include/nil/crypto3/vdf/chia.hpp
-         )
-
-    list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_CHIA_HEADERS}
-         )
-
-    list(APPEND ${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES
-
-         )
-endif()
-
-list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-
-     )
-
-list(APPEND ${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES
-     )
-
-list(APPEND ${CURRENT_PROJECT_NAME}_HEADERS
-     ${${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS}
-     )
-
-list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-     ${${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES}
-     )
-
 cm_setup_version(VERSION 0.1.0 PREFIX ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME})
 
 add_library(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE)
