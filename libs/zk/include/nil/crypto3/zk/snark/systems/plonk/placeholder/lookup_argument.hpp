@@ -214,9 +214,7 @@ namespace nil {
 
                         commitment_scheme.append_to_batch(PERMUTATION_BATCH, V_L);
 
-                        BOOST_CHECK(V_L[preprocessed_data.common_data.desc.usable_rows_amount] ==  FieldType::value_type::one());
-
-
+                        BOOST_ASSERT(V_L[preprocessed_data.common_data.desc.usable_rows_amount] ==  FieldType::value_type::one());
                         BOOST_ASSERT(std::accumulate(part_sizes.begin(), part_sizes.end(), 0) == sorted.size());
 
                         // Compute gs and hs products for each part
