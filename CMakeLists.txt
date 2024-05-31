@@ -58,7 +58,7 @@ include(FindPkgConfig)
 option(BUILD_TESTS "Build unit tests" FALSE)
 option(BUILD_EXAMPLES "Build examples" FALSE)
 
-#find_package(crypto3 REQUIRED)
+find_package(crypto3 REQUIRED)
 find_package(Boost REQUIRED COMPONENTS container random filesystem log log_setup program_options thread system)
 if(ENABLE_TESTS)
     find_package(Boost REQUIRED COMPONENTS unit_test_framework timer)
