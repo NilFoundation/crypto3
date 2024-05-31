@@ -160,7 +160,6 @@
               cmakeFlags = [
                 "-G Ninja"
                 "-DCMAKE_CXX_COMPILER=${if compiler == "gcc" then "g++" else "clang++"}"
-                "-DBUILD_TESTS=TRUE" # TODO: remove after https://github.com/NilFoundation/crypto3/issues/146
                 "-DCMAKE_BUILD_TYPE=Release" # TODO: change to Debug after build fix
                 "-DCMAKE_ENABLE_TESTS=TRUE"
               ];
