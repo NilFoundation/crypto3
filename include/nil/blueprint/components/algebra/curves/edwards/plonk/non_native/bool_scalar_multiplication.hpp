@@ -166,7 +166,7 @@ namespace nil {
                 using Ed25519Type = typename crypto3::algebra::curves::ed25519;
 
                 std::size_t row = start_row_index;
-                typename Ed25519Type::base_field_type::integral_type b = typename Ed25519Type::base_field_type::integral_type(var_value(assignment, instance_input.k).data);
+                typename BlueprintFieldType::value_type b = typename Ed25519Type::base_field_type::integral_type(var_value(assignment, instance_input.k).data);
                 std::array<typename BlueprintFieldType::value_type, 4> T_x_array = {var_value(assignment, instance_input.T.x[0]),
                 var_value(assignment, instance_input.T.x[1]), var_value(assignment, instance_input.T.x[2]), var_value(assignment, instance_input.T.x[3])};
                 std::array<typename BlueprintFieldType::value_type, 4> T_y_array = {var_value(assignment, instance_input.T.y[0]),
@@ -177,7 +177,7 @@ namespace nil {
                 assignment.witness(component.W(2), row) = T_y_array[2];
                 assignment.witness(component.W(3), row) = T_y_array[3];
                 assignment.witness(component.W(4), row) = b;
-                assignment.witness(component.W(5), row) = b * T_y_array[0] + (1 - b);
+                assignment.witness(component.W(5), row) = b * T_y_array[0] + (1u - b);
                 assignment.witness(component.W(6), row) = b * T_y_array[1];
                 assignment.witness(component.W(7), row) = b * T_y_array[2];
                 assignment.witness(component.W(8), row) = b * T_y_array[3];

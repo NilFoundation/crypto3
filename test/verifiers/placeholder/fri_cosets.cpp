@@ -135,8 +135,8 @@ void field_operations_test() {
     test_fri_cosets<FieldType,18>({46744073709551615}, 3, 2);
     test_fri_cosets<FieldType,18>({46744073709551615}, 5, 2);
 // more realistic data
-    test_fri_cosets<FieldType,9>({0xa53a16c34fb833b5_cppui255}, 4,
-        0x1ff2863fd35bfc59e51f3693bf37e2d841d1b5fbed4138f755a638bec8750abd_cppui255
+    test_fri_cosets<FieldType,9>({0xa53a16c34fb833b5_cppui_modular255}, 4,
+        0x1ff2863fd35bfc59e51f3693bf37e2d841d1b5fbed4138f755a638bec8750abd_cppui_modular255
     );
 }
 

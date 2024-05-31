@@ -30,7 +30,7 @@
 #include <cassert>
 #include <memory>
 
-#include <nil/crypto3/multiprecision/number.hpp>
+#include <boost/multiprecision/number.hpp>
 
 #include <nil/blueprint/components/component.hpp>
 #include <nil/blueprint/components/blueprint.hpp>

@@ -83,7 +83,7 @@ bool read_buffer_from_file(std::ifstream &ifile, std::vector<std::uint8_t> &v) {
     return true;
 }
 
-struct default_zkllvm_params{
+struct default_zkllvm_params {
     using field_type = typename crypto3::algebra::curves::pallas::base_field_type;
 
     using constraint_system_type =
@@ -100,7 +100,8 @@ struct default_zkllvm_params{
     using ColumnsRotationsType = std::vector<std::set<int>>;
     using poseidon_policy = nil::crypto3::hashes::detail::mina_poseidon_policy<field_type>;
     using Hash = nil::crypto3::hashes::poseidon<poseidon_policy>;
-    using circuit_params = nil::crypto3::zk::snark::placeholder_circuit_params<field_type>;
+    using transcript_hash_type = Hash;
+    using circuit_params_type = nil::crypto3::zk::snark::placeholder_circuit_params<field_type>;
 
     using lpc_params_type = nil::crypto3::zk::commitments::list_polynomial_commitment_params<
         Hash,
@@ -108,22 +109,15 @@ struct default_zkllvm_params{
         2
     >;
     using lpc_type = nil::crypto3::zk::commitments::list_polynomial_commitment<field_type, lpc_params_type>;
-    using lpc_scheme_type = typename nil::crypto3::zk::commitments::lpc_commitment_scheme<lpc_type>;
-    using fri_params_type = typename lpc_scheme_type::fri_type::params_type;
-    using placeholder_params = nil::crypto3::zk::snark::placeholder_params<circuit_params, lpc_scheme_type>;
+    using commitment_scheme_type = typename nil::crypto3::zk::commitments::lpc_commitment_scheme<lpc_type>;
+    using commitment_scheme_params_type = typename commitment_scheme_type::fri_type::params_type;
+    using placeholder_params = nil::crypto3::zk::snark::placeholder_params<circuit_params_type, commitment_scheme_type>;
     using policy_type = nil::crypto3::zk::snark::detail::placeholder_policy<field_type, placeholder_params>;
-    using proof_type = nil::crypto3::zk::snark::placeholder_proof<field_type, placeholder_params>;
-    using common_data_type = nil::crypto3::zk::snark::placeholder_public_preprocessor<field_type, placeholder_params>::preprocessed_data_type::common_data_type;
 
     using circuit_marshalling_type =
-        nil::crypto3::marshalling::types::plonk_constraint_system<TTypeBase, constraint_system_type>;
-    using common_data_marshalling_type =
-        nil::crypto3::marshalling::types::placeholder_common_data<TTypeBase, common_data_type>;
+        nil::crypto3::marshalling::types::plonk_constraint_system<default_zkllvm_params::TTypeBase, constraint_system_type>;
     using table_marshalling_type =
         nil::crypto3::marshalling::types::plonk_assignment_table<TTypeBase, assignment_table_type>;
-    using proof_marshalling_type =
-        nil::crypto3::marshalling::types::placeholder_proof<TTypeBase, proof_type>;
-
     static table_description_type load_table_description(std::string filename){
         std::ifstream iassignment;
         iassignment.open(filename, std::ios_base::binary | std::ios_base::in);
@@ -172,46 +166,58 @@ struct default_zkllvm_params{
             );
         }
         return constraint_system;
-    }
-
-    static common_data_type load_common_data(std::string filename){
-        std::ifstream ifile;
-        ifile.open(filename, std::ios_base::binary | std::ios_base::in);
-        BOOST_ASSERT(ifile.is_open());
-
-        std::vector<std::uint8_t> v;
-        ifile.seekg(0, std::ios_base::end);
-        const auto fsize = ifile.tellg();
-        v.resize(fsize);
-        ifile.seekg(0, std::ios_base::beg);
-        ifile.read(reinterpret_cast<char*>(v.data()), fsize);
-        BOOST_ASSERT(ifile);
-        ifile.close();
-
-        common_data_marshalling_type marshalled_data;
-        auto read_iter = v.begin();
-        auto status = marshalled_data.read(read_iter, v.size());
-        return nil::crypto3::marshalling::types::make_placeholder_common_data<Endianness, common_data_type>(
-            marshalled_data
-        );
-    }
-
-    static proof_type load_proof(std::string filename){
-        std::ifstream iproof;
-        iproof.open(filename);
-        BOOST_ASSERT(iproof.is_open());
-        std::vector<std::uint8_t> v;
-        BOOST_ASSERT(read_buffer_from_file(iproof, v));
-        iproof.close();
-
-        proof_marshalling_type marshalled_proof_data;
-        auto read_iter = v.begin();
-        auto status = marshalled_proof_data.read(read_iter, v.size());
-        return   nil::crypto3::marshalling::types::make_placeholder_proof<Endianness, proof_type>(
-            marshalled_proof_data
-        );
-    }
+    }    
 };
+
+// TODO(martun): consider moving these functions to some shared location so other tests can re-use them.
+template<typename SrcParams>
+    static nil::crypto3::zk::snark::placeholder_proof<typename SrcParams::field_type, SrcParams> load_proof(std::string filename) {
+    using Endianness = nil::marshalling::option::big_endian;
+    using TTypeBase = nil::marshalling::field_type<Endianness>;
+
+    std::ifstream iproof;
+    iproof.open(filename);
+    BOOST_ASSERT(iproof.is_open());
+    std::vector<std::uint8_t> v;
+    BOOST_ASSERT(read_buffer_from_file(iproof, v));
+    iproof.close();
+
+
+    using proof_type = nil::crypto3::zk::snark::placeholder_proof<typename SrcParams::field_type, SrcParams>;
+    using proof_marshalling_type =
+        nil::crypto3::marshalling::types::placeholder_proof<TTypeBase, proof_type>;
+
+    proof_marshalling_type marshalled_proof_data;
+    auto read_iter = v.begin();
+    auto status = marshalled_proof_data.read(read_iter, v.size());
+    return nil::crypto3::marshalling::types::make_placeholder_proof<Endianness, proof_type>(
+        marshalled_proof_data);
+}
+
+template<typename PlaceholderParams>
+static typename nil::crypto3::zk::snark::placeholder_public_preprocessor<typename PlaceholderParams::field_type, PlaceholderParams>::preprocessed_data_type::common_data_type load_common_data(std::string filename){
+    std::ifstream ifile;
+    ifile.open(filename, std::ios_base::binary | std::ios_base::in);
+    BOOST_ASSERT(ifile.is_open());
+
+    std::vector<std::uint8_t> v;
+    ifile.seekg(0, std::ios_base::end);
+    const auto fsize = ifile.tellg();
+    v.resize(fsize);
+    ifile.seekg(0, std::ios_base::beg);
+    ifile.read(reinterpret_cast<char*>(v.data()), fsize);
+    BOOST_ASSERT(ifile);
+    ifile.close();
+
+    using common_data_type = typename nil::crypto3::zk::snark::placeholder_public_preprocessor<typename PlaceholderParams::field_type, PlaceholderParams>::preprocessed_data_type::common_data_type;
+
+    nil::crypto3::marshalling::types::placeholder_common_data<default_zkllvm_params::TTypeBase, common_data_type> marshalled_data;
+    auto read_iter = v.begin();
+    auto status = marshalled_data.read(read_iter, v.size());
+    return nil::crypto3::marshalling::types::make_placeholder_common_data<nil::marshalling::option::big_endian, common_data_type>(
+        marshalled_data
+    );
+}
 
 template <std::size_t Witnesses>
 struct dst_params{
@@ -263,7 +269,7 @@ inline std::vector<std::size_t> generate_random_step_list(const std::size_t r, c
 }
 
 template<typename SrcParams>
-std::tuple<typename SrcParams::common_data_type, typename SrcParams::fri_params_type, typename SrcParams::proof_type>
+std::tuple<typename SrcParams::common_data_type, typename SrcParams::commitment_scheme_params_type, typename SrcParams::proof_type>
 gen_test_proof(
     typename SrcParams::constraint_system_type constraint_system,
     typename SrcParams::table_description_type table_description,
@@ -273,7 +279,7 @@ gen_test_proof(
     using field_type = typename SrcParams::field_type;
 
     auto fri_params = create_fri_params<typename SrcParams::lpc_type::fri_type, field_type>(std::ceil(std::log2(table_description.rows_amount)), 0);
-    typename SrcParams::lpc_scheme_type lpc_scheme(fri_params);
+    typename SrcParams::commitment_scheme_type lpc_scheme(fri_params);
 
     std::cout <<"Preprocess public data" << std::endl;
     typename nil::crypto3::zk::snark::placeholder_public_preprocessor<
@@ -308,9 +314,9 @@ gen_test_proof(
 template<typename SrcParams, typename DstParams>
 void test_flexible_verifier(
     const typename SrcParams::constraint_system_type &constraint_system,
-    const typename SrcParams::common_data_type &common_data,
-    const typename SrcParams::proof_type &proof,
-    const typename SrcParams::fri_params_type &fri_params
+    const typename nil::crypto3::zk::snark::placeholder_public_preprocessor<typename SrcParams::field_type, SrcParams>::preprocessed_data_type::common_data_type &common_data,
+    const typename nil::crypto3::zk::snark::placeholder_proof<typename SrcParams::field_type, SrcParams> &proof,
+    const typename SrcParams::commitment_scheme_params_type &fri_params
 ){
     std::cout << "****************** Test flexible verifier with " << DstParams::WitnessColumns <<" witness rows ******************" << std::endl;
     using src_placeholder_params = typename SrcParams::placeholder_params;
@@ -321,7 +327,7 @@ void test_flexible_verifier(
     for (std::uint32_t i = 0; i < DstParams::WitnessColumns; i++) {
         witnesses[i] = i;
     }
-    using component_type = nil::blueprint::components::plonk_flexible_verifier<typename DstParams::field_type>;
+    using component_type = nil::blueprint::components::plonk_flexible_verifier<typename DstParams::field_type, SrcParams>;
     using var = crypto3::zk::snark::plonk_variable<value_type>;
 
     bool expected_res = true;
@@ -331,8 +337,8 @@ void test_flexible_verifier(
             return true;
     };
 
-    nil::blueprint::components::detail::placeholder_proof_input_type<SrcParams>full_instance_input(common_data, constraint_system, fri_params);
-    nil::blueprint::components::detail::placeholder_proof_wrapper<typename SrcParams::placeholder_params>proof_ext(common_data, proof);
+    nil::blueprint::components::detail::placeholder_proof_input_type<SrcParams> full_instance_input(common_data, constraint_system, fri_params);
+    nil::blueprint::components::detail::placeholder_proof_wrapper<SrcParams> proof_ext(common_data, proof);
 
     std::size_t value_vector_size = proof_ext.vector().size();
     std::cout << "value vector size = " << value_vector_size << std::endl;
@@ -373,8 +379,8 @@ void test_multiple_arithmetizations(std::string folder_name){
     std::cout << "Start loading" << std::endl;
     auto constraint_system = SrcParams::load_circuit(folder_name + "/circuit.crct");
     std::cout << "Load constraint system" << std::endl;
-    auto common_data = SrcParams::load_common_data(folder_name + "/common.dat");
-    auto proof = SrcParams::load_proof(folder_name + "/proof.bin");
+    auto common_data = load_common_data<SrcParams>(folder_name + "/common.dat");
+    auto proof = load_proof<SrcParams>(folder_name + "/proof.bin");
     auto table_description = common_data.desc;
     auto fri_params = common_data.commitment_params;
 

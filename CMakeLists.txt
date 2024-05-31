@@ -51,15 +51,19 @@ endif()
 
 cm_project(blueprint WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME} LANGUAGES C CXX)
 
-cm_find_package(CM)
+find_package(CM)
 include(CMDeploy)
 include(FindPkgConfig)
 
-option(BUILD_WITH_CCACHE "Build with ccache usage" TRUE)
 option(BUILD_TESTS "Build unit tests" FALSE)
 option(BUILD_EXAMPLES "Build examples" FALSE)
 
-find_package(crypto3 REQUIRED)
+#find_package(crypto3 REQUIRED)
+find_package(Boost REQUIRED COMPONENTS container random filesystem log log_setup program_options thread system)
+if(ENABLE_TESTS)
+    find_package(Boost REQUIRED COMPONENTS unit_test_framework timer)
+endif()
+
 
 if(UNIX AND BUILD_WITH_PROCPS)
     find_package(Procps)
@@ -127,15 +131,14 @@ target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTER
 target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
 
                       ${Boost_LIBRARIES}
-
                       crypto3::all
-                      )
+                    )
 
 cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
           INCLUDE include
           NAMESPACE ${CMAKE_WORKSPACE_NAME}::)
 
-if(BUILD_TESTS)
+if(ENABLE_TESTS)
     add_subdirectory(test)
 endif()
 

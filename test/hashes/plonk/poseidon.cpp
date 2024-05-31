@@ -41,8 +41,6 @@
 #include <nil/blueprint/components/hashes/poseidon/plonk/poseidon.hpp>
 
 #include <nil/crypto3/hash/poseidon.hpp>
-#include <nil/crypto3/hash/detail/poseidon/poseidon_sponge.hpp>
-
 #include <nil/crypto3/random/algebraic_engine.hpp>
 
 #include "../../test_plonk_component.hpp"
@@ -128,7 +126,7 @@ void test_poseidon_specfic_data(){
     input = {-1,-1,-1};
     test_poseidon<FieldType>(input, calculate_expected_poseidon<FieldType>(input));
 
-    typename FieldType::value_type threeFFF = 0x3FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF_cppui256;
+    typename FieldType::value_type threeFFF = 0x3FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF_cppui_modular256;
     input = {threeFFF, threeFFF, threeFFF};
     test_poseidon<FieldType>(input, calculate_expected_poseidon<FieldType>(input));
 }

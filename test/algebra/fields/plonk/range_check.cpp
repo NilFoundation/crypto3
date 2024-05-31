@@ -143,7 +143,7 @@ void test_range_check_specific_inputs() {
     test_range_check<BlueprintFieldType, WitnessesAmount, R>(-1);
     test_range_check<BlueprintFieldType, WitnessesAmount, R>(value_type(2).pow(R));
     test_range_check<BlueprintFieldType, WitnessesAmount, R>(
-        0x4000000000000000000000000000000000000000000000000000000000000000_cppui256
+        0x4000000000000000000000000000000000000000000000000000000000000000_cppui_modular256
     );
 }
 
@@ -317,7 +317,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_fields_range_check_oops_first_chunk_overflo
     std::map<std::pair<std::size_t, std::size_t>, value_type> patches;
     value_type test_val = value_type(2).pow(253) + 11;
     patches[std::make_pair(1, 2)] = value_type(2);
-    value_type sum = 1 / (value_type(8));
+    value_type sum = value_type(8).inversed();
     for (std::size_t i = 1; i < 17; i++) {
         patches[std::make_pair(i, 0)] = sum = value_type(2).pow(16) * sum + (i != 16 ? 0 : 11);
     }

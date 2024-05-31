@@ -71,7 +71,7 @@ void test_fri_lin_inter(const std::vector<typename BlueprintFieldType::value_typ
                y0 = public_input[1],
                y1 = public_input[2],
                alpha = public_input[3];
-    value_type expected_res = y0 + (y1 - y0) * (s - alpha) / (2 * s);
+    value_type expected_res = y0 + (y1 - y0) * (s - alpha) * (2 * s).inversed();
 
     auto result_check = [&expected_res](AssignmentType &assignment,
 	    typename component_type::result_type &real_res) {

@@ -136,7 +136,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_oracles_test) {
     zk::snark::pickles_proof<curve_type> kimchi_proof = test_proof();
 
     typename BlueprintFieldType::value_type zeta_val =
-        0x0000000000000000000000000000000062F9AE3696EA8F0A85043221DE133E32_cppui256;
+        0x0000000000000000000000000000000062F9AE3696EA8F0A85043221DE133E32_cppui_modular256;
 
     zk::components::kimchi_proof_scalar<BlueprintFieldType, kimchi_params, eval_rounds> proof;
 

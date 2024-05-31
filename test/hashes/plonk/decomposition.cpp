@@ -135,46 +135,46 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_decomposition_test0) {
     using field_type = typename crypto3::algebra::curves::pallas::base_field_type;
 
     test_decomposition<field_type>(
-        {0x8d741211e928fdd4d33a13970d0ce7f3_cppui255, 0x92f209334030f9ec8fa8a025e987a5dd_cppui255},
-        calculate_decomposition<field_type>({0x8d741211e928fdd4d33a13970d0ce7f3_cppui255, 0x92f209334030f9ec8fa8a025e987a5dd_cppui255}),
+        {0x8d741211e928fdd4d33a13970d0ce7f3_cppui_modular255, 0x92f209334030f9ec8fa8a025e987a5dd_cppui_modular255},
+        calculate_decomposition<field_type>({0x8d741211e928fdd4d33a13970d0ce7f3_cppui_modular255, 0x92f209334030f9ec8fa8a025e987a5dd_cppui_modular255}),
         true);
 
     test_decomposition<field_type>(
-        {0, 0},
-        calculate_decomposition<field_type>({0, 0}),
+        {0u, 0u},
+        calculate_decomposition<field_type>({0u, 0u}),
         true);
 
     test_decomposition<field_type>(
-        {0xffffffffffffffffffffffffffffffff_cppui255, 0xffffffffffffffffffffffffffffffff_cppui255},
-        calculate_decomposition<field_type>({0xffffffffffffffffffffffffffffffff_cppui255, 0xffffffffffffffffffffffffffffffff_cppui255}),
+        {0xffffffffffffffffffffffffffffffff_cppui_modular255, 0xffffffffffffffffffffffffffffffff_cppui_modular255},
+        calculate_decomposition<field_type>({0xffffffffffffffffffffffffffffffff_cppui_modular255, 0xffffffffffffffffffffffffffffffff_cppui_modular255}),
         true);
 }
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_decomposition_must_fail) {
     using field_type = typename crypto3::algebra::curves::pallas::base_field_type;
 
-    typename field_type::value_type bad = 0x100000000000000000000000000000000_cppui255;
+    typename field_type::value_type bad = 0x100000000000000000000000000000000_cppui_modular255;
 
     test_decomposition<field_type>(
-        {0, bad},
+        {0u, bad},
         calculate_decomposition<field_type>({0, bad}),
         false);
 
     test_decomposition<field_type>(
-        {bad, 0},
-        calculate_decomposition<field_type>({bad, 0}),
+        {bad, 0u},
+        calculate_decomposition<field_type>({bad, 0u}),
         false);
 
-        bad = 0x4000000000000000000000000000000000000000000000000000000000000000_cppui255;
+        bad = 0x4000000000000000000000000000000000000000000000000000000000000000_cppui_modular255;
 
     test_decomposition<field_type>(
-        {0, bad},
-        calculate_decomposition<field_type>({0, bad}),
+        {0u, bad},
+        calculate_decomposition<field_type>({0u, bad}),
         false);
 
     test_decomposition<field_type>(
-        {bad, 0},
-        calculate_decomposition<field_type>({bad, 0}),
+        {bad, 0u},
+        calculate_decomposition<field_type>({bad, 0u}),
         false);
 }
 

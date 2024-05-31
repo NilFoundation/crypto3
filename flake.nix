@@ -5,7 +5,7 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.11";
     nil_crypto3 = {
       url =
-        "git+https://github.com/NilFoundation/crypto3?submodules=1&rev=a458a8b321576f3ac9c97bf0278f4f7b6401c9be";
+        "git+https://github.com/NilFoundation/crypto3?submodules=1&rev=66096ae733cabc99a763e00e803d710493318563";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     flake-utils.url = "github:numtide/flake-utils";
@@ -29,14 +29,22 @@
             env.NIX_CFLAGS_COMPILE =
               toString ([ "-Wno-unused-but-set-variable" ]);
 
-            buildInputs = with pkgs; [ cmake pkg-config clang_16 boost ];
+            buildInputs = with pkgs; [ cmake pkg-config clang_16
+              (boost183.override {
+                enableShared = true;
+                enableStatic = true;
+                enableRelease = true;
+                enableDebug = true;
+              }) 
+            ];
 
             # Because crypto3 is header-only, we must propagate it so users
             # of this flake must not specify crypto3 in their derivations manually
             propagatedBuildInputs = [ crypto3 ];
 
             cmakeFlags =
-              [ "-DCMAKE_BUILD_TYPE=Release" "-DCMAKE_CXX_STANDARD=17" ];
+              [ "-DCMAKE_BUILD_TYPE=Release"
+                "-DCMAKE_CXX_STANDARD=17" ];
 
             doCheck = false;
           };
@@ -58,14 +66,14 @@
               cmake
               pkg-config
               clang_16
-              boost
+              boost183
               packages.crypto3
             ];
 
             cmakeFlags = [
               "-DCMAKE_BUILD_TYPE=Release"
               "-DCMAKE_CXX_STANDARD=17"
-              "-DBUILD_TESTS=TRUE"
+              "-DENABLE_TESTS=TRUE"
             ];
 
             doCheck = true;
@@ -77,7 +85,7 @@
             buildInputs = with pkgs; [
               cmake
               pkg-config
-              boost
+              boost183
               clang_16
               clang-tools_16
               packages.crypto3
@@ -91,4 +99,10 @@
       }));
 }
 
-# nix develop --redirect .#crypto3 /home/username/nil/crypto3/result # to override crypto3 folder
+# 1 build crypto 3 locally with the command 'nix build -L .?submodules=1#'
+# 2 redirect to the local build of crypto3: 'nix develop --redirect .#crypto3 /your/path/to/crypto3/result/'
+# 3a to build all in blueprint: 'nix flake -L check .?submodules=1#'
+# 3b to build individual targets:
+# nix develop . -c cmake -B build -DCMAKE_CXX_STANDARD=17 -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=FALSE -DENABLE_TESTS=TRUE -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
+# cd build
+# nix develop ../ -c cmake --build . -t blueprint_verifiers_flexible_constant_pow_test

@@ -60,7 +60,7 @@ using namespace nil;
     constexpr std::size_t Lambda = 1;
 
 #define TEST_SMALL_UNSIGNED_GEN(FUNC_NAME, COMPONENT_NAME) \
-    template<typename BlueprintFieldType, std::size_t Size> \
+    template<typename BlueprintFieldType, unsigned Size> \
     void FUNC_NAME ( \
             const typename BlueprintFieldType::value_type &a, \
             const typename BlueprintFieldType::value_type &b, \
@@ -85,7 +85,7 @@ using namespace nil;
             BOOST_ASSERT(expected_result == var_value(assignment, real_res.a)); \
         }; \
     \
-        component_type component_instance({0, 1, 2}, {}, {}); \
+        component_type component_instance({0u, 1u, 2u}, {}, {}); \
         typename component_type::result_type(component_instance, 10); \
     \
         crypto3::test_component<component_type, BlueprintFieldType, hash_type, Lambda>( \
@@ -100,7 +100,7 @@ TEST_SMALL_UNSIGNED_GEN(test_small_unsigned_div, unsigned_division_component_sma
 TEST_SMALL_UNSIGNED_GEN(test_small_unsigned_rem, unsigned_remainder_component_small)
 
 #define TEST_SMALL_SIGNED_GEN(FUNC_NAME, COMPONENT_NAME) \
-    template<typename BlueprintFieldType, std::size_t Size> \
+    template<typename BlueprintFieldType, unsigned Size> \
     void FUNC_NAME ( \
             const typename BlueprintFieldType::value_type &a_sign, \
             const typename BlueprintFieldType::value_type &a_mod, \
@@ -131,8 +131,8 @@ TEST_SMALL_UNSIGNED_GEN(test_small_unsigned_rem, unsigned_remainder_component_sm
             BOOST_ASSERT(expected_result_mod == var_value(assignment, real_res.value[1])); \
         }; \
     \
-        component_type component_instance({0, 1, 2}, {}, {}); \
-        typename component_type::result_type(component_instance, 10); \
+        component_type component_instance({0u, 1u, 2u}, {}, {}); \
+        typename component_type::result_type(component_instance, 10u); \
     \
         crypto3::test_component<component_type, BlueprintFieldType, hash_type, Lambda>( \
             component_instance, desc, public_input, result_check, instance_input, \
@@ -160,16 +160,14 @@ BOOST_AUTO_TEST_SUITE(blueprint_plonk_mock_test_suite)
 #define OP_GREATER_EQ(a, b) (a >= b)
 
 #define OP_UNSIGNED_TEST_FUNC_GEN(NAME, TEST_NAME, OP, EX_1, EX_2, EX_3) \
-    template<typename BlueprintFieldType, std::size_t Size> \
+    template<typename BlueprintFieldType, unsigned Size> \
     void NAME() { \
         using uint_type = \
-            nil::crypto3::multiprecision::number< \
-                nil::crypto3::multiprecision::cpp_int_backend<Size, Size, \
-                nil::crypto3::multiprecision::unsigned_magnitude, \
-                nil::crypto3::multiprecision::unchecked, void>>; \
+            boost::multiprecision::number< \
+                boost::multiprecision::backends::cpp_int_modular_backend<Size>>; \
         boost::random::mt19937 seed_seq; \
         boost::random::uniform_int_distribution<uint_type> \
-            dist(0, nil::crypto3::multiprecision::pow(uint_type(2), Size) - 1); \
+            dist(0, boost::multiprecision::pow(uint_type(2), Size) - 1); \
         uint_type a = EX_1, b = EX_2; \
         TEST_NAME<BlueprintFieldType, Size>(a, b, EX_3); \
         for (std::size_t i = 0; i < random_tests_amount; i++) { \
@@ -180,41 +178,45 @@ BOOST_AUTO_TEST_SUITE(blueprint_plonk_mock_test_suite)
     }
 
 #define OP_SIGNED_TEST_FUNC_GEN(NAME, TEST_NAME, OP) \
-    template<typename BlueprintFieldType, std::size_t Size> \
+    template<typename BlueprintFieldType, unsigned Size> \
     void NAME() { \
-        using int_type = \
-            nil::crypto3::multiprecision::number< \
-                nil::crypto3::multiprecision::cpp_int_backend<Size, Size, \
-                nil::crypto3::multiprecision::signed_magnitude, \
-                nil::crypto3::multiprecision::unchecked, void>>; \
+        /* cpp_int_type is the one that exists in boost, it's not used by our code.*/ \
+        using cpp_int_type = \
+            boost::multiprecision::number< \
+                boost::multiprecision::cpp_int_backend<Size, Size, boost::multiprecision::signed_magnitude, boost::multiprecision::unchecked>>; \
+        using cpp_uint_type = \
+            boost::multiprecision::number< \
+                boost::multiprecision::cpp_int_backend<Size, Size, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked>>; \
         using uint_type = \
-            nil::crypto3::multiprecision::number< \
-                nil::crypto3::multiprecision::cpp_int_backend<Size, Size, \
-                nil::crypto3::multiprecision::unsigned_magnitude, \
-                nil::crypto3::multiprecision::unchecked, void>>; \
+            boost::multiprecision::number< \
+                boost::multiprecision::backends::cpp_int_modular_backend<Size>>; \
         boost::random::mt19937 seed_seq; \
-        boost::random::uniform_int_distribution<uint_type> \
-            dist(0, nil::crypto3::multiprecision::pow(uint_type(2), Size) - 1); \
+        boost::random::uniform_int_distribution<cpp_uint_type> \
+            dist(0, boost::multiprecision::pow(cpp_uint_type(2), Size) - 1); \
         boost::random::uniform_int_distribution<char> sign_dist(0, 1); \
         for (std::size_t i = 0; i < 4 * random_tests_amount; i++) { \
-            int_type a = dist(seed_seq) * (sign_dist(seed_seq) ? 1 : -1); \
-            int_type b = dist(seed_seq) * (sign_dist(seed_seq) ? 1 : -1); \
+            cpp_int_type a = dist(seed_seq) * (sign_dist(seed_seq) ? 1 : -1); \
+            cpp_int_type b = dist(seed_seq) * (sign_dist(seed_seq) ? 1 : -1); \
+            uint_type a_modular = typename uint_type::backend_type(cpp_uint_type(boost::multiprecision::abs(a)).backend()); \
+            uint_type b_modular = typename uint_type::backend_type(cpp_uint_type(boost::multiprecision::abs(b)).backend()); \
+            cpp_int_type result = OP(a, b); \
+            uint_type result_modular = typename uint_type::backend_type(cpp_uint_type(boost::multiprecision::abs(result)).backend()); \
             TEST_NAME<BlueprintFieldType, Size>( \
-                a >= 0 ? 0 : 1, nil::crypto3::multiprecision::abs(a), \
-                b >= 0 ? 0 : 1, nil::crypto3::multiprecision::abs(b), \
-                OP(a, b).sign() >= 0 ? 0 : 1, nil::crypto3::multiprecision::abs(OP(a, b))); \
+                a >= 0 ? 0 : 1, a_modular, \
+                b >= 0 ? 0 : 1, b_modular, \
+                result.sign() >= 0 ? 0 : 1, result_modular); \
         } \
     }
 
 OP_UNSIGNED_TEST_FUNC_GEN(
     test_small_unsigned_addition, test_small_unsigned_add, OP_ADDITION,
-    1, nil::crypto3::multiprecision::pow(uint_type(2), Size) - 1, 0)
+    1, boost::multiprecision::pow(uint_type(2), Size) - 1, 0)
 OP_UNSIGNED_TEST_FUNC_GEN(
     test_small_unsigned_multiplication, test_small_unsigned_mul, OP_MULTIPLICATION,
-    2, nil::crypto3::multiprecision::pow(uint_type(2), Size - 1), 0)
+    2, boost::multiprecision::pow(uint_type(2), Size - 1), 0)
 OP_UNSIGNED_TEST_FUNC_GEN(
     test_small_unsigned_subtraction, test_small_unsigned_sub, OP_SUBTRACTION,
-    0, nil::crypto3::multiprecision::pow(uint_type(2), Size) - 1, 1);
+    0, boost::multiprecision::pow(uint_type(2), Size) - 1, 1);
 OP_UNSIGNED_TEST_FUNC_GEN(
     test_small_unsigned_division, test_small_unsigned_div, OP_DIVISION, 1, 2, 0);
 OP_UNSIGNED_TEST_FUNC_GEN(
@@ -227,7 +229,7 @@ OP_SIGNED_TEST_FUNC_GEN(test_small_signed_division, test_small_signed_div, OP_DI
 OP_SIGNED_TEST_FUNC_GEN(test_small_signed_remainder, test_small_signed_rem, OP_REMAINDER)
 
 // seprate infrastructure for abs
-template<typename BlueprintFieldType, std::size_t Size>
+template<typename BlueprintFieldType, unsigned Size>
 void test_small_signed_abs(
         const typename BlueprintFieldType::value_type &a_sign,
         const typename BlueprintFieldType::value_type &a_mod,
@@ -262,27 +264,24 @@ void test_small_signed_abs(
         nil::blueprint::connectedness_check_type::type::NONE);
 }
 
-template<typename BlueprintFieldType, std::size_t Size>
+template<typename BlueprintFieldType, unsigned Size>
 void test_small_signed_absolute() {
-    using int_type =
-        nil::crypto3::multiprecision::number<
-            nil::crypto3::multiprecision::cpp_int_backend<Size, Size,
-            nil::crypto3::multiprecision::signed_magnitude,
-            nil::crypto3::multiprecision::unchecked, void>>;
-    using uint_type =
-        nil::crypto3::multiprecision::number<
-            nil::crypto3::multiprecision::cpp_int_backend<Size, Size,
-            nil::crypto3::multiprecision::unsigned_magnitude,
-            nil::crypto3::multiprecision::unchecked, void>>;
+    using cpp_int_type = boost::multiprecision::number<boost::multiprecision::cpp_int_backend<
+        Size, Size, boost::multiprecision::signed_magnitude, boost::multiprecision::unchecked>>;
+    using cpp_uint_type = boost::multiprecision::number<boost::multiprecision::cpp_int_backend<
+        Size, Size, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked>>;
+    using uint_type = boost::multiprecision::number<boost::multiprecision::backends::cpp_int_modular_backend<Size>>;
+
     boost::random::mt19937 seed_seq;
-    boost::random::uniform_int_distribution<uint_type>
-        dist(0, nil::crypto3::multiprecision::pow(uint_type(2), Size) - 1);
+    boost::random::uniform_int_distribution<cpp_uint_type>
+        dist(0, boost::multiprecision::pow(cpp_uint_type(2), Size) - 1);
     boost::random::uniform_int_distribution<char> sign_dist(0, 1);
     for (std::size_t i = 0; i < 4 * random_tests_amount; i++) {
-        int_type a = dist(seed_seq) * (sign_dist(seed_seq) ? 1 : -1);
+        cpp_int_type a = dist(seed_seq) * (sign_dist(seed_seq) ? 1 : -1);
+        uint_type a_modular = typename uint_type::backend_type(cpp_uint_type(boost::multiprecision::abs(a)).backend());
         test_small_signed_abs<BlueprintFieldType, Size>(
-            a >= 0 ? 0 : 1, nil::crypto3::multiprecision::abs(a),
-            0, nil::crypto3::multiprecision::abs(a));
+            a >= 0 ? 0 : 1, a_modular,
+            0, a_modular);
     }
 }
 
@@ -327,29 +326,28 @@ void test_big_signed_abs(
 
 template<typename BlueprintFieldType>
 void test_big_signed_absolute() {
-    using int_type =
-        nil::crypto3::multiprecision::number<
-            nil::crypto3::multiprecision::cpp_int_backend<256, 256,
-            nil::crypto3::multiprecision::signed_magnitude,
-            nil::crypto3::multiprecision::unchecked, void>>;
-    using uint_type =
-        nil::crypto3::multiprecision::number<
-            nil::crypto3::multiprecision::cpp_int_backend<256, 256,
-            nil::crypto3::multiprecision::unsigned_magnitude,
-            nil::crypto3::multiprecision::unchecked, void>>;
+    using cpp_int_type = boost::multiprecision::number<boost::multiprecision::cpp_int_backend<
+            256u, 256u, boost::multiprecision::signed_magnitude, boost::multiprecision::unchecked>>;
+    using cpp_uint_type = boost::multiprecision::number<boost::multiprecision::cpp_int_backend<
+            256u, 256u, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked>>;
+    using uint_type = boost::multiprecision::number<
+            boost::multiprecision::backends::cpp_int_modular_backend<256u>>;
+    
     boost::random::mt19937 seed_seq;
-    boost::random::uniform_int_distribution<uint_type>
-        dist(0, nil::crypto3::multiprecision::pow(uint_type(2), 256) - 1);
+    boost::random::uniform_int_distribution<cpp_uint_type>
+        dist(0, boost::multiprecision::pow(cpp_uint_type(2), 256) - 1);
     boost::random::uniform_int_distribution<char> sign_dist(0, 1);
-    static const int_type top_mask = ((uint_type(1) << 128) - 1) << 128;
-    static const int_type bottom_mask = (uint_type(1) << 128) - 1;
+    static const cpp_int_type top_mask = ((cpp_uint_type(1) << 128) - 1) << 128;
+    static const cpp_int_type bottom_mask = (cpp_uint_type(1) << 128) - 1;
     for (std::size_t i = 0; i < 4 * random_tests_amount; i++) {
-        int_type a = dist(seed_seq) * (sign_dist(seed_seq) ? 1 : -1);
-        int_type a_first = (a & top_mask) >> 128,
-                 a_second = a & bottom_mask;
+        cpp_int_type a = dist(seed_seq) * (sign_dist(seed_seq) ? 1 : -1);
+        cpp_int_type a_first = (a & top_mask) >> 128, 
+                     a_second = a & bottom_mask;
+        uint_type a_first_modular = typename uint_type::backend_type(cpp_uint_type(a_first).backend());
+        uint_type a_second_modular = typename uint_type::backend_type(cpp_uint_type(a_second).backend());
         test_big_signed_abs<BlueprintFieldType>(
-            a >= 0 ? 0 : 1, a_first, a_second,
-            0, a_first, a_second);
+            a >= 0 ? 0 : 1, a_first_modular, a_second_modular,
+            0, a_first_modular, a_second_modular);
     }
 }
 
@@ -541,17 +539,16 @@ TEST_BIG_BOOL_SIGNED_GEN(test_big_signed_less_eq, signed_less_equal_component_bi
 TEST_BIG_BOOL_SIGNED_GEN(test_big_signed_greater, signed_greater_component_big)
 TEST_BIG_BOOL_SIGNED_GEN(test_big_signed_greater_eq, signed_greater_equal_component_big)
 
+// TODO(martun): pallas is actually 255 bits, when moving 256-bit number into that field we are losing a bit. So far that does not result to an error, but better re-check.
 #define OP_UNSIGNED_BIG_TEST_FUNC_GEN(NAME, TEST_NAME, OP) \
     template<typename BlueprintFieldType> \
     void NAME() { \
         using uint_type = \
-            nil::crypto3::multiprecision::number< \
-                nil::crypto3::multiprecision::cpp_int_backend<256, 256, \
-                nil::crypto3::multiprecision::unsigned_magnitude, \
-                nil::crypto3::multiprecision::unchecked, void>>; \
+            boost::multiprecision::number< \
+                boost::multiprecision::backends::cpp_int_modular_backend<256u>>; \
         boost::random::mt19937 seed_seq; \
         boost::random::uniform_int_distribution<uint_type> \
-            dist(0, nil::crypto3::multiprecision::pow(uint_type(2), 256) - 1); \
+            dist(0, boost::multiprecision::pow(uint_type(2), 256) - 1); \
         static const uint_type top_mask = ((uint_type(1) << 128) - 1) << 128; \
         static const uint_type bottom_mask = (uint_type(1) << 128) - 1; \
         for (std::size_t i = 0; i < random_tests_amount; i++) { \
@@ -570,13 +567,11 @@ TEST_BIG_BOOL_SIGNED_GEN(test_big_signed_greater_eq, signed_greater_equal_compon
     template<typename BlueprintFieldType> \
     void NAME() { \
         using uint_type = \
-            nil::crypto3::multiprecision::number< \
-                nil::crypto3::multiprecision::cpp_int_backend<256, 256, \
-                nil::crypto3::multiprecision::unsigned_magnitude, \
-                nil::crypto3::multiprecision::unchecked, void>>; \
+            boost::multiprecision::number< \
+                boost::multiprecision::backends::cpp_int_modular_backend<256u>>; \
         boost::random::mt19937 seed_seq; \
         boost::random::uniform_int_distribution<uint_type> \
-            dist(0, nil::crypto3::multiprecision::pow(uint_type(2), 256) - 1); \
+            dist(0, boost::multiprecision::pow(uint_type(2), 256) - 1); \
         static const uint_type top_mask = ((uint_type(1) << 128) - 1) << 128; \
         static const uint_type bottom_mask = (uint_type(1) << 128) - 1; \
         for (std::size_t i = 0; i < random_tests_amount; i++) { \
@@ -604,32 +599,40 @@ OP_UNSIGNED_BIG_BOOL_TEST_FUNC_GEN(test_big_unsigned_greater_than_eq, test_big_u
 #define OP_SIGNED_BIG_TEST_FUNC_GEN(NAME, TEST_NAME, OP) \
     template<typename BlueprintFieldType> \
     void NAME() { \
-        using int_type = \
-            nil::crypto3::multiprecision::number< \
-                nil::crypto3::multiprecision::cpp_int_backend<256, 256, \
-                nil::crypto3::multiprecision::signed_magnitude, \
-                nil::crypto3::multiprecision::unchecked, void>>; \
-        using uint_type = \
-            nil::crypto3::multiprecision::number< \
-                nil::crypto3::multiprecision::cpp_int_backend<256, 256, \
-                nil::crypto3::multiprecision::unsigned_magnitude, \
-                nil::crypto3::multiprecision::unchecked, void>>; \
+        using cpp_int_type = boost::multiprecision::number<boost::multiprecision::cpp_int_backend< \
+            256u, 256u, boost::multiprecision::signed_magnitude, boost::multiprecision::unchecked>>; \
+        using cpp_uint_type = boost::multiprecision::number<boost::multiprecision::cpp_int_backend< \
+            256u, 256u, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked>>; \
+        using uint_type = boost::multiprecision::number< \
+            boost::multiprecision::backends::cpp_int_modular_backend<256u>>; \
+\
         boost::random::mt19937 seed_seq; \
-        boost::random::uniform_int_distribution<uint_type> \
-            dist(0, nil::crypto3::multiprecision::pow(uint_type(2), 256) - 1); \
+        boost::random::uniform_int_distribution<cpp_uint_type> \
+            dist(0, boost::multiprecision::pow(cpp_uint_type(2), 256) - 1); \
         boost::random::uniform_int_distribution<char> sign_dist(0, 1); \
-        static const int_type top_mask = ((int_type(1) << 128) - 1) << 128; \
-        static const int_type bottom_mask = (int_type(1) << 128) - 1; \
+        static const cpp_int_type top_mask = ((cpp_int_type(1) << 128) - 1) << 128; \
+        static const cpp_int_type bottom_mask = (cpp_int_type(1) << 128) - 1; \
         for (std::size_t i = 0; i < 4 * random_tests_amount; i++) { \
-            int_type a = dist(seed_seq) * (sign_dist(seed_seq) ? 1 : -1), \
+            cpp_int_type a = dist(seed_seq) * (sign_dist(seed_seq) ? 1 : -1), \
                      b = dist(seed_seq) * (sign_dist(seed_seq) ? 1 : -1); \
-            int_type expected_result = OP(a, b); \
-            int_type expected_first = (expected_result & top_mask) >> 128, \
-                     expected_second = expected_result & bottom_mask, \
-                     expected_sign = expected_result.sign() >= 0 ? 0 : 1; \
-            TEST_NAME<BlueprintFieldType>(a.sign() >= 0 ? 0 : 1, (a & top_mask) >> 128, a & bottom_mask, \
-                                          b.sign() >= 0 ? 0 : 1, (b & top_mask) >> 128, b & bottom_mask, \
-                                          expected_sign, expected_first, expected_second); \
+            cpp_int_type expected_result = OP(a, b); \
+            cpp_int_type expected_first = (expected_result & top_mask) >> 128, \
+                     expected_second = expected_result & bottom_mask; \
+            cpp_int_type a_top = (a & top_mask) >> 128; \
+            cpp_int_type a_bottom = a & bottom_mask; \
+            cpp_int_type b_top = (b & top_mask) >> 128; \
+            cpp_int_type b_bottom = b & bottom_mask; \
+\
+            uint_type expected_first_modular = typename uint_type::backend_type(cpp_uint_type(expected_first).backend()); \
+            uint_type expected_second_modular = typename uint_type::backend_type(cpp_uint_type(expected_second).backend()); \
+            uint_type a_top_modular = typename uint_type::backend_type(cpp_uint_type(a_top).backend()); \
+            uint_type a_bottom_modular = typename uint_type::backend_type(cpp_uint_type(a_bottom).backend()); \
+            uint_type b_top_modular = typename uint_type::backend_type(cpp_uint_type(b_top).backend()); \
+            uint_type b_bottom_modular = typename uint_type::backend_type(cpp_uint_type(b_bottom).backend()); \
+\
+            TEST_NAME<BlueprintFieldType>(a.sign() >= 0 ? 0 : 1, a_top_modular, a_bottom_modular, \
+                                          b.sign() >= 0 ? 0 : 1, b_top_modular, b_bottom_modular, \
+                                          expected_result.sign() >= 0 ? 0 : 1, expected_first_modular, expected_second_modular); \
         } \
     }
 
@@ -637,18 +640,14 @@ OP_UNSIGNED_BIG_BOOL_TEST_FUNC_GEN(test_big_unsigned_greater_than_eq, test_big_u
     template<typename BlueprintFieldType> \
     void NAME() { \
         using int_type = \
-            nil::crypto3::multiprecision::number< \
-                nil::crypto3::multiprecision::cpp_int_backend<256, 256, \
-                nil::crypto3::multiprecision::signed_magnitude, \
-                nil::crypto3::multiprecision::unchecked, void>>; \
+            boost::multiprecision::number< \
+                boost::multiprecision::backends::cpp_int_modular_backend<256u>>; \
         using uint_type = \
-            nil::crypto3::multiprecision::number< \
-                nil::crypto3::multiprecision::cpp_int_backend<256, 256, \
-                nil::crypto3::multiprecision::unsigned_magnitude, \
-                nil::crypto3::multiprecision::unchecked, void>>; \
+            boost::multiprecision::number< \
+                boost::multiprecision::backends::cpp_int_modular_backend<256u>>; \
         boost::random::mt19937 seed_seq; \
         boost::random::uniform_int_distribution<uint_type> \
-            dist(0, nil::crypto3::multiprecision::pow(uint_type(2), 256) - 1); \
+            dist(0, boost::multiprecision::pow(uint_type(2), 256) - 1); \
         boost::random::uniform_int_distribution<char> sign_dist(0, 1); \
         static const int_type top_mask = ((int_type(1) << 128) - 1) << 128; \
         static const int_type bottom_mask = (int_type(1) << 128) - 1; \
@@ -675,11 +674,11 @@ OP_SIGNED_BIG_BOOL_TEST_FUNC_GEN(test_big_signed_greater_than_eq, test_big_signe
 #define OP_TEST(TEST_NAME) \
     BOOST_AUTO_TEST_CASE(blueprint_ ## TEST_NAME ## _mock) { \
         using field_type = crypto3::algebra::curves::pallas::base_field_type; \
-        TEST_NAME<field_type, 8>(); \
-        TEST_NAME<field_type, 16>(); \
-        TEST_NAME<field_type, 32>(); \
-        TEST_NAME<field_type, 64>(); \
-        TEST_NAME<field_type, 128>(); \
+        TEST_NAME<field_type, 8u>(); \
+        TEST_NAME<field_type, 16u>(); \
+        TEST_NAME<field_type, 32u>(); \
+        TEST_NAME<field_type, 64u>(); \
+        TEST_NAME<field_type, 128u>(); \
     }
 
 #define OP_BIG_TEST(TEST_NAME) \

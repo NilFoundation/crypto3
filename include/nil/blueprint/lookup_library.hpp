@@ -75,9 +75,9 @@ namespace nil {
                 }
                 virtual void generate(){
                     this->_table = {
-                        {0, 0, 1, 1},
-                        {0, 1, 0, 1},
-                        {0, 1, 1, 0}
+                        {0u, 0u, 1u, 1u},
+                        {0u, 1u, 0u, 1u},
+                        {0u, 1u, 1u, 0u}
                     };
                 }
                 virtual std::size_t get_columns_number(){ return 3; }
@@ -91,9 +91,9 @@ namespace nil {
                 }
                 virtual void generate(){
                     this->_table = {
-                        {0, 0, 1, 1},
-                        {0, 1, 0, 1},
-                        {0, 0, 0, 1}
+                        {0u, 0u, 1u, 1u},
+                        {0u, 1u, 0u, 1u},
+                        {0u, 0u, 0u, 1u}
                     };
                 }
                 virtual std::size_t get_columns_number(){ return 3; }
@@ -111,13 +111,13 @@ namespace nil {
                     std::vector<std::size_t> value_sizes = {14};
 
                     // lookup table for sparse values with base = 4
-                    for (typename BlueprintFieldType::integral_type i = 0;
-                        i < typename BlueprintFieldType::integral_type(16384);
+                    for (typename BlueprintFieldType::integral_type i = 0u;
+                        i < typename BlueprintFieldType::integral_type(16384u);
                         i++
                     ) {
                         std::vector<bool> value(14);
                         for (std::size_t j = 0; j < 14; j++) {
-                            value[14 - j - 1] = crypto3::multiprecision::bit_test(i, j);
+                            value[14 - j - 1] = boost::multiprecision::bit_test(i, j);
                         }
                         std::array<std::vector<typename BlueprintFieldType::integral_type>, 2> value_chunks =
                             components::detail::split_and_sparse<BlueprintFieldType>(value, value_sizes, 4);
@@ -160,12 +160,12 @@ namespace nil {
                 virtual void generate(){
                     this->_table.resize(2);
                     std::vector<std::size_t> value_sizes = {14};
-                    for (typename BlueprintFieldType::integral_type i = 0;
-                        i < typename BlueprintFieldType::integral_type(16384);
+                    for (typename BlueprintFieldType::integral_type i = 0u;
+                        i < typename BlueprintFieldType::integral_type(16384u);
                         i++) {
                         std::vector<bool> value(14);
                         for (std::size_t j = 0; j < 14; j++) {
-                            value[14 - j - 1] = crypto3::multiprecision::bit_test(i, j);
+                            value[14 - j - 1] = boost::multiprecision::bit_test(i, j);
                         }
                         std::array<std::vector<typename BlueprintFieldType::integral_type>, 2> value_chunks =
                             components::detail::split_and_sparse<BlueprintFieldType>(value, value_sizes, 7);
@@ -206,8 +206,8 @@ namespace nil {
                 virtual void generate(){
                     this->_table.resize(2);
                     std::vector<std::size_t> value_sizes = {8};
-                    for (typename BlueprintFieldType::integral_type i = 0;
-                        i < typename BlueprintFieldType::integral_type(65536);
+                    for (typename BlueprintFieldType::integral_type i = 0u;
+                        i < typename BlueprintFieldType::integral_type(65536u);
                         i++
                     ) {
                         std::array<std::vector<typename BlueprintFieldType::integral_type>, 2>
@@ -230,8 +230,8 @@ namespace nil {
                 virtual void generate(){
                     this->_table.resize(2);
                     std::vector<std::size_t> value_sizes = {8};
-                    for (typename BlueprintFieldType::integral_type i = 0;
-                        i < typename BlueprintFieldType::integral_type(5764801);
+                    for (typename BlueprintFieldType::integral_type i = 0u;
+                        i < typename BlueprintFieldType::integral_type(5764801u);
                         i++
                     ) {
                         std::array<std::vector<typename BlueprintFieldType::integral_type>, 2>

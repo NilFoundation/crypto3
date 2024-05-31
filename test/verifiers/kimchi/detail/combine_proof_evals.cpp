@@ -150,7 +150,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_combine_proof_evals_test) {
     zk::snark::pickles_proof<curve_type> kimchi_proof = test_proof_chacha();
 
     typename BlueprintFieldType::value_type zeta_value =
-        0x3CE960ABCAC273BBEEBA92D1EF87514B51187BFE5E8797B5DE97B01FF7C64484_cppui256;
+        0x3CE960ABCAC273BBEEBA92D1EF87514B51187BFE5E8797B5DE97B01FF7C64484_cppui_modular256;
 
     std::vector<typename BlueprintFieldType::value_type> public_input = {zeta_value, 1, 0};
 

@@ -263,10 +263,14 @@ namespace nil {
                 using var = typename plonk_ed25519_range<BlueprintFieldType>::var;
 
                 std::size_t row = start_row_index;
-                if(var(component.W(0), static_cast<int>(row), false) != instance_input.input[0]) bp.add_copy_constraint({var(component.W(0), static_cast<int>(row), false), instance_input.input[0]});
-                if(var(component.W(1), static_cast<int>(row), false) != instance_input.input[1]) bp.add_copy_constraint({var(component.W(1), static_cast<int>(row), false), instance_input.input[1]});
-                if(var(component.W(2), static_cast<int>(row), false) != instance_input.input[2]) bp.add_copy_constraint({var(component.W(2), static_cast<int>(row), false), instance_input.input[2]});
-                if(var(component.W(3), static_cast<int>(row), false) != instance_input.input[3]) bp.add_copy_constraint({var(component.W(3), static_cast<int>(row), false), instance_input.input[3]});
+                if(var(component.W(0), static_cast<int>(row), false) != instance_input.input[0])
+                    bp.add_copy_constraint({var(component.W(0), static_cast<int>(row), false), instance_input.input[0]});
+                if(var(component.W(1), static_cast<int>(row), false) != instance_input.input[1])
+                    bp.add_copy_constraint({var(component.W(1), static_cast<int>(row), false), instance_input.input[1]});
+                if(var(component.W(2), static_cast<int>(row), false) != instance_input.input[2])
+                    bp.add_copy_constraint({var(component.W(2), static_cast<int>(row), false), instance_input.input[2]});
+                if(var(component.W(3), static_cast<int>(row), false) != instance_input.input[3])
+                    bp.add_copy_constraint({var(component.W(3), static_cast<int>(row), false), instance_input.input[3]});
             }
 
             template<typename BlueprintFieldType>

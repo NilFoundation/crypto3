@@ -9,13 +9,21 @@
 
 include(CMTest)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
-
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 
 find_package(Boost REQUIRED COMPONENTS random unit_test_framework)
 
 cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
-                       crypto3::all
+                       ${CMAKE_WORKSPACE_NAME}::algebra
+                       ${CMAKE_WORKSPACE_NAME}::math
+                       ${CMAKE_WORKSPACE_NAME}::hash
+                       ${CMAKE_WORKSPACE_NAME}::multiprecision
+                       ${CMAKE_WORKSPACE_NAME}::random
+                       ${CMAKE_WORKSPACE_NAME}::zk
+                       ${CMAKE_WORKSPACE_NAME}::containers 
+                       marshalling::crypto3_algebra
+                       marshalling::crypto3_multiprecision
+                       marshalling::crypto3_zk
                        ${Boost_LIBRARIES})
 
 macro(define_blueprint_test test)
@@ -32,9 +40,9 @@ macro(define_blueprint_test test)
     set_target_properties(${full_test_name} PROPERTIES CXX_STANDARD 17)
 
     if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-        target_compile_options(${full_test_name} PRIVATE "-fconstexpr-steps=2147483647")
+        target_compile_options(${full_test_name} PRIVATE "-fconstexpr-steps=2147483647" "-ftemplate-backtrace-limit=0")
     elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-        target_compile_options(${full_test_name} PRIVATE "-fconstexpr-ops-limit=4294967295")
+        target_compile_options(${full_test_name} PRIVATE "-fconstexpr-ops-limit=4294967295" "-ftemplate-backtrace-limit=0")
     endif()
 
     get_target_property(target_type Boost::unit_test_framework TYPE)

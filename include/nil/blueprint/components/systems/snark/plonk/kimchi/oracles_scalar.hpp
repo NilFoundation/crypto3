@@ -480,7 +480,7 @@ namespace nil {
                     std::size_t row = start_row_index;
 
                     typename BlueprintFieldType::value_type endo_factor =
-                        0x12CCCA834ACDBA712CAAD5DC57AAB1B01D1F8BD237AD31491DAD5EBDFDFE4AB9_cppui255;
+                        0x12CCCA834ACDBA712CAAD5DC57AAB1B01D1F8BD237AD31491DAD5EBDFDFE4AB9_cppui_modular255;
                     std::size_t num_bits = 128;
 
                     var fq_digest = params.fq_output.fq_digest;

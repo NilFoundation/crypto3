@@ -188,9 +188,9 @@ namespace nil {
                     typename ed25519_field_type::integral_type integral_eddsa_r =
                         typename ed25519_field_type::integral_type(eddsa_r.data);
                     typename ed25519_field_type::extended_integral_type integral_eddsa_q =
-                        (typename ed25519_field_type::extended_integral_type(eddsa_a.data) + eddsa_p -
-                        typename ed25519_field_type::extended_integral_type(eddsa_b.data) -
-                        typename ed25519_field_type::extended_integral_type(eddsa_r.data)) /
+                        (typename ed25519_field_type::extended_integral_type(ed25519_field_type::integral_type(eddsa_a.data)) + eddsa_p -
+                        typename ed25519_field_type::extended_integral_type(ed25519_field_type::integral_type(eddsa_b.data)) -
+                        typename ed25519_field_type::extended_integral_type(ed25519_field_type::integral_type(eddsa_r.data))) /
                         eddsa_p;
                     typename ed25519_field_type::extended_integral_type pow = extended_base << 257;
                     typename ed25519_field_type::extended_integral_type minus_eddsa_p = pow - eddsa_p;
@@ -198,14 +198,19 @@ namespace nil {
                     std::array<typename BlueprintFieldType::value_type, 4> r;
                     std::array<typename BlueprintFieldType::value_type, 4> q;
                     std::array<typename BlueprintFieldType::value_type, 4> p;
-                    typename BlueprintFieldType::integral_type mask = (pasta_base << 66) - 1;
+
+                    // We need to convert mask to ed25519_field_type::extended_integral_type,
+                    // because you cannot use operator& for numbers of different sizes.
+                    typename ed25519_field_type::integral_type mask = (pasta_base << 66) - 1;
+                    typename ed25519_field_type::extended_integral_type extended_mask = mask;
                     r[0] = (integral_eddsa_r) & (mask);
-                    q[0] = (integral_eddsa_q) & (mask);
-                    p[0] = (minus_eddsa_p) & (mask);
+                    q[0] = (integral_eddsa_q) & (extended_mask);
+                    p[0] = (minus_eddsa_p) & (extended_mask);
                     for (std::size_t i = 1; i < 4; i++) {
                         r[i] = (integral_eddsa_r >> (66 * i)) & (mask);
                     }
-                    typename ed25519_field_type::extended_integral_type eddsa_p0 = eddsa_p & mask;
+                    typename ed25519_field_type::extended_integral_type eddsa_p0 = 
+                        eddsa_p & extended_mask;
                     typename BlueprintFieldType::value_type t = a[0] + eddsa_p0 - b[0] + p[0] * q[0];
 
                     typename BlueprintFieldType::value_type u0 = t - r[0];
@@ -274,9 +279,9 @@ namespace nil {
                 typename ed25519_field_type::integral_type integral_eddsa_r =
                     typename ed25519_field_type::integral_type(eddsa_r.data);
                 typename ed25519_field_type::extended_integral_type integral_eddsa_q =
-                    (typename ed25519_field_type::extended_integral_type(eddsa_a.data) + eddsa_p -
-                     typename ed25519_field_type::extended_integral_type(eddsa_b.data) -
-                     typename ed25519_field_type::extended_integral_type(eddsa_r.data)) /
+                    (typename ed25519_field_type::extended_integral_type(typename ed25519_field_type::integral_type(eddsa_a.data)) + eddsa_p -
+                     typename ed25519_field_type::extended_integral_type(typename ed25519_field_type::integral_type(eddsa_b.data)) -
+                     typename ed25519_field_type::extended_integral_type(typename ed25519_field_type::integral_type(eddsa_r.data))) /
                     eddsa_p;
                 typename ed25519_field_type::extended_integral_type pow = extended_base << 257;
                 typename ed25519_field_type::extended_integral_type minus_eddsa_p = pow - eddsa_p;
@@ -284,14 +289,19 @@ namespace nil {
                 std::array<typename BlueprintFieldType::value_type, 4> r;
                 std::array<typename BlueprintFieldType::value_type, 4> q;
                 std::array<typename BlueprintFieldType::value_type, 4> p;
-                typename BlueprintFieldType::integral_type mask = (pasta_base << 66) - 1;
+
+                // We need to convert mask to ed25519_field_type::extended_integral_type,
+                // because you cannot use operator& for numbers of different sizes.
+                typename ed25519_field_type::integral_type mask = (pasta_base << 66) - 1;
+                typename ed25519_field_type::extended_integral_type extended_mask = mask;
                 r[0] = (integral_eddsa_r) & (mask);
-                q[0] = (integral_eddsa_q) & (mask);
-                p[0] = (minus_eddsa_p) & (mask);
+                q[0] = (integral_eddsa_q) & (extended_mask);
+                p[0] = (minus_eddsa_p) & (extended_mask);
                 for (std::size_t i = 1; i < 4; i++) {
                     r[i] = (integral_eddsa_r >> (66 * i)) & (mask);
                 }
-                typename ed25519_field_type::extended_integral_type eddsa_p0 = eddsa_p & mask;
+                typename ed25519_field_type::extended_integral_type eddsa_p0 = 
+                    eddsa_p & extended_mask;
                 typename BlueprintFieldType::value_type t = a[0] + eddsa_p0 - b[0] + p[0] * q[0];
 
                 typename BlueprintFieldType::value_type u0 = t - r[0];
@@ -392,7 +402,10 @@ namespace nil {
                 typename ed25519_field_type::extended_integral_type pow = extended_base << 257;
                 typename ed25519_field_type::extended_integral_type minus_eddsa_p = pow - eddsa_p;
                 std::array<typename BlueprintFieldType::value_type, 4> p;
-                typename BlueprintFieldType::integral_type mask = (base << 66) - 1;
+
+                // We need to convert mask to ed25519_field_type::extended_integral_type,
+                // because you cannot use operator& for numbers of different sizes.
+                typename ed25519_field_type::extended_integral_type mask = (base << 66) - 1;
                 typename ed25519_field_type::extended_integral_type eddsa_p0 = eddsa_p & mask;
                 p[0] = minus_eddsa_p & mask;
 

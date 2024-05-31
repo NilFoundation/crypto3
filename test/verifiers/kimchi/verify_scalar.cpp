@@ -158,7 +158,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_verify_scalar_field_test_suite) {
 
     zk::components::kimchi_verifier_index_scalar<BlueprintFieldType> verifier_index;
     typename BlueprintFieldType::value_type omega =
-        0x1B1A85952300603BBF8DD3068424B64608658ACBB72CA7D2BB9694ADFA504418_cppui256;
+        0x1B1A85952300603BBF8DD3068424B64608658ACBB72CA7D2BB9694ADFA504418_cppui_modular256;
     std::size_t domain_size = 128;
     verifier_index.domain_size = domain_size;
     verifier_index.omega = var(0, 0, false, var::column_type::public_input);
@@ -171,11 +171,11 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_verify_scalar_field_test_suite) {
     typename BlueprintFieldType::value_type beta = 0;
     typename BlueprintFieldType::value_type gamma = 0;
     typename BlueprintFieldType::value_type alpha =
-        0x0000000000000000000000000000000005321CB83A4BCD5C63F489B5BF95A8DC_cppui256;
+        0x0000000000000000000000000000000005321CB83A4BCD5C63F489B5BF95A8DC_cppui_modular256;
     typename BlueprintFieldType::value_type zeta =
-        0x0000000000000000000000000000000062F9AE3696EA8F0A85043221DE133E32_cppui256;
+        0x0000000000000000000000000000000062F9AE3696EA8F0A85043221DE133E32_cppui_modular256;
     typename BlueprintFieldType::value_type fq_digest =
-        0x01D4E77CCD66755BDDFDBB6E4E8D8D17A6708B9CB56654D12070BD7BF4A5B33B_cppui256;
+        0x01D4E77CCD66755BDDFDBB6E4E8D8D17A6708B9CB56654D12070BD7BF4A5B33B_cppui_modular256;
 
     std::vector<typename BlueprintFieldType::value_type> public_input = {omega};
 
@@ -199,13 +199,13 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_verify_scalar_field_test_suite) {
         fq_output.challenges = challenges;
 
         // joint_combiner
-        public_input.emplace_back(0x0000000000000000000000000000000005321CB83A4BCD5C63F489B5BF95A8DC_cppui256);
+        public_input.emplace_back(0x0000000000000000000000000000000005321CB83A4BCD5C63F489B5BF95A8DC_cppui_modular256);
         fq_output.joint_combiner = var(0, public_input.size() - 1, false, var::column_type::public_input);
         // beta
-        public_input.emplace_back(0x0000000000000000000000000000000005321CB83A4BCD5C63F489B5BF95A8DC_cppui256);
+        public_input.emplace_back(0x0000000000000000000000000000000005321CB83A4BCD5C63F489B5BF95A8DC_cppui_modular256);
         fq_output.beta = var(0, public_input.size() - 1, false, var::column_type::public_input);
         // gamma
-        public_input.emplace_back(0x0000000000000000000000000000000005321CB83A4BCD5C63F489B5BF95A8DC_cppui256);
+        public_input.emplace_back(0x0000000000000000000000000000000005321CB83A4BCD5C63F489B5BF95A8DC_cppui_modular256);
         fq_output.gamma = var(0, public_input.size() - 1, false, var::column_type::public_input);
         // alpha
         public_input.push_back(alpha);

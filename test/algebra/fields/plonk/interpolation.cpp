@@ -77,7 +77,7 @@ void test_linear_inter_coefs(const std::vector<typename BlueprintFieldType::valu
     std::array<value_type,2> expected_res;
 
     if (expected_to_pass) {
-        expected_res = { (x1*z0 - x0*z1)/(x1-x0), (z1-z0)/(x1-x0) };
+        expected_res = { (x1*z0 - x0*z1) * (x1-x0).inversed(), (z1-z0) * (x1-x0).inversed() };
     } else {
         expected_res = {0, 0};
     }
@@ -141,13 +141,13 @@ void test_quadratic_inter_coefs(const std::vector<typename BlueprintFieldType::v
     if (expected_to_pass) {
         expected_res = { det3(std::array<value_type,9>{ z0, x0, x0*x0,
                                                        z1, x1, x1*x1,
-                                                       z2, x2, x2*x2 }) / d,
+                                                       z2, x2, x2*x2 }) * d.inversed(),
                          det3(std::array<value_type,9>{ one, z0, x0*x0,
                                 one, z1, x1*x1,
-                                one, z2, x2*x2 }) / d,
+                                one, z2, x2*x2 }) * d.inversed(),
                          det3(std::array<value_type,9>{ one, x0, z0,
                                 one, x1, z1,
-                                one, x2, z2 }) / d
+                                one, x2, z2 }) * d.inversed()
                        };
     } else {
         expected_res = {0, 0, 0};

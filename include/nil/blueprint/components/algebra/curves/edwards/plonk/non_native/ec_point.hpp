@@ -116,10 +116,10 @@ namespace nil {
                     typename Ed25519Type::scalar_field_type::integral_type base = 1;
                     typename Ed25519Type::scalar_field_type::integral_type mask = (base << 66) - 1;
 
-                    typename Ed25519Type::base_field_type::integral_type a_coef_val = typename Ed25519Type::base_field_type::integral_type(0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffec_cppui255);
+                    typename Ed25519Type::base_field_type::integral_type a_coef_val = typename Ed25519Type::base_field_type::integral_type(0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffec_cppui_modular255);
                     std::array<typename Ed25519Type::base_field_type::integral_type, 4> a_coef = {a_coef_val & mask, (a_coef_val >>66) & mask, (a_coef_val >>132) & mask, (a_coef_val >>198) & mask};
 
-                    typename Ed25519Type::base_field_type::integral_type d_coef_val = typename Ed25519Type::base_field_type::integral_type(0x52036cee2b6ffe738cc740797779e89800700a4d4141d8ab75eb4dca135978a3_cppui255);
+                    typename Ed25519Type::base_field_type::integral_type d_coef_val = typename Ed25519Type::base_field_type::integral_type(0x52036cee2b6ffe738cc740797779e89800700a4d4141d8ab75eb4dca135978a3_cppui_modular255);
                     std::array<typename Ed25519Type::base_field_type::integral_type, 4> d_coef = {d_coef_val & mask, (d_coef_val >>66) & mask, (d_coef_val >>132) & mask, (d_coef_val >>198) & mask};
 
                     for (int i = 0; i < 4; i++) {

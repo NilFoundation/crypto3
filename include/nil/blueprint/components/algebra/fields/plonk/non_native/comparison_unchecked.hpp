@@ -354,10 +354,10 @@ namespace nil {
                     case comparison_mode::LESS_THAN:
                     case comparison_mode::GREATER_THAN:
                         if (!component.needs_bonus_row) {
-                            assignment.witness(component.W(3), row) = diff != 0 ? 1 / diff : 0;
+                            assignment.witness(component.W(3), row) = diff != 0 ? diff.inversed() : 0;
                         } else {
                             row++;
-                            assignment.witness(component.W(0), row) = diff != 0 ? 1 / diff : 0;
+                            assignment.witness(component.W(0), row) = diff != 0 ? diff.inversed() : 0;
                         }
                         break;
                     case comparison_mode::LESS_EQUAL:

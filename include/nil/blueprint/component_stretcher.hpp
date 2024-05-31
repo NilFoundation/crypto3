@@ -129,7 +129,7 @@ namespace nil {
                 zoning_info<BlueprintFieldType> zones(rows_amount, bp.num_gates());
                 for (std::size_t i = start_row_index; i < start_row_index + rows_amount; i++) {
                     for (const auto &[selector, connection] : gate_range_map) {
-                        if (i >= assignment.selector_column_size(selector) || assignment.selector(selector, i) == 0) {
+                        if (i >= assignment.selector_column_size(selector) || assignment.selector(selector, i) == 0u) {
                             continue;
                         }
                         std::size_t row_idx = i - start_row_index;

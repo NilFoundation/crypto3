@@ -114,8 +114,8 @@ void test_mul(typename CurveType::base_field_type::value_type b_val,
                 std::cerr << "Scalar(hex form):\n";
                 std::cerr << std::hex << b_val.data << std::dec << '\n'<< std::endl;
             }
-            assert(value_type((Px >> 66 * i) & mask) == var_value(assignment, real_res.output.x[i]));
-            assert(value_type((Py >> 66 * i) & mask) == var_value(assignment, real_res.output.y[i]));
+            BOOST_CHECK_EQUAL(value_type((Px >> 66 * i) & mask), var_value(assignment, real_res.output.x[i]));
+            BOOST_CHECK_EQUAL(value_type((Py >> 66 * i) & mask), var_value(assignment, real_res.output.y[i]));
         }
     };
 
@@ -428,11 +428,12 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_mul_1) {
     typename CurveType::base_field_type::integral_type scal_integral;
     typename CurveType::base_field_type::value_type scal_rand;
     typename CurveType::base_field_type::value_type scal_max =
-        0x1000000000000000000000000000000014def9dea2f79cd65812631a5cf5d3ed_cppui256;
+        0x1000000000000000000000000000000014def9dea2f79cd65812631a5cf5d3ed_cppui_modular256;
     typename CurveType::base_field_type::value_type scal_zero = 0;
 
     typename Ed25519Type::template g1_type<crypto3::algebra::curves::coordinates::affine>
-        ::value_type point_zero = {0, 1};
+        ::value_type point_zero = Ed25519Type::template g1_type<crypto3::algebra::curves::coordinates::affine>
+        ::value_type::zero();
 
 
     nil::crypto3::random::algebraic_engine<
@@ -445,7 +446,9 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_mul_1) {
     boost::random::mt19937 seed_seq_2;
     random_scalar_generator.seed(seed_seq_2);
 
-    scal_integral = typename CurveType::base_field_type::integral_type((random_scalar_generator()).data);
+    // We need 2 conversions here, first convert modular type to integral type of the same size, then convert and integral
+    // type of one size to integral type of another size.
+    scal_integral = typename CurveType::base_field_type::integral_type(Ed25519Type::scalar_field_type::integral_type(random_scalar_generator().data));
     scal_rand = typename CurveType::base_field_type::value_type (scal_integral);
 
     test_mul<CurveType, Ed25519Type, false>(scal_zero, point_zero);
@@ -460,8 +463,11 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_mul_1) {
     test_mul<CurveType, Ed25519Type, true>(scal_max, random_point_generator());
 
     for (std::size_t i = 0; i < random_tests_amount; i++) {
-        scal_integral = typename CurveType::base_field_type::integral_type((random_scalar_generator()).data);
+        // We need 2 conversions here, first convert modular type to integral type of the same size, then convert and integral
+        // type of one size to integral type of another size.
+        scal_integral = typename CurveType::base_field_type::integral_type(Ed25519Type::scalar_field_type::integral_type((random_scalar_generator()).data));
         scal_rand = typename CurveType::base_field_type::value_type (scal_integral);
+
         test_mul<CurveType, Ed25519Type, false>(scal_rand, random_point_generator());
         test_mul<CurveType, Ed25519Type, true>(scal_rand, random_point_generator());
     }

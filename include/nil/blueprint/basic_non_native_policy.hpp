@@ -30,6 +30,7 @@
 #include <nil/crypto3/algebra/curves/vesta.hpp>
 #include <nil/crypto3/algebra/curves/ed25519.hpp>
 
+#include <boost/multiprecision/cpp_int.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
 
 namespace nil {
@@ -59,7 +60,8 @@ namespace nil {
                 static native_field_type::value_type get_i_th_chunk(non_native_field_type::value_type input,
                                         std::size_t i_th) {
                     assert(i_th < ratio && "non-native type does not have that much chunks!");
-                    native_field_type::extended_integral_type result = native_field_type::extended_integral_type(input.data);
+                    native_field_type::extended_integral_type result = native_field_type::extended_integral_type(
+                        non_native_field_type::integral_type(input.data));
                     native_field_type::integral_type base = 1;
                     native_field_type::integral_type mask = (base << chunk_sizes[i_th]) - 1;
                     std::size_t shift = 0;
@@ -128,7 +130,8 @@ namespace nil {
                 static native_field_type::value_type get_i_th_chunk(non_native_field_type::value_type input,
                                         std::size_t i_th) {
                     assert(i_th < ratio && "non-native type does not have that much chunks!");
-                    native_field_type::extended_integral_type result = native_field_type::extended_integral_type(input.data);
+                    native_field_type::extended_integral_type result = native_field_type::extended_integral_type::backend_type(
+                        input.data.backend().base_data());
                     native_field_type::integral_type base = 1;
                     native_field_type::integral_type mask = (base << chunk_sizes[i_th]) - 1;
                     std::size_t shift = 0;
@@ -266,17 +269,13 @@ namespace nil {
             */
             template<typename BlueprintFieldType>
             struct basic_non_native_policy_field_type<BlueprintFieldType,
-                    nil::crypto3::multiprecision::number<
-                        nil::crypto3::multiprecision::cpp_int_backend<256, 256,
-                        nil::crypto3::multiprecision::unsigned_magnitude,
-                        nil::crypto3::multiprecision::unchecked, void>>> {
+                    boost::multiprecision::number<
+                        boost::multiprecision::backends::cpp_int_modular_backend<256>>> {
 
                 constexpr static const std::uint32_t ratio = 2; // 128, 128 bits
                 // not actually a field, but we preserve the interface
-                using non_native_field_type = typename nil::crypto3::multiprecision::number<
-                        nil::crypto3::multiprecision::cpp_int_backend<256, 256,
-                        nil::crypto3::multiprecision::unsigned_magnitude,
-                        nil::crypto3::multiprecision::unchecked, void>>;
+                using non_native_field_type = typename boost::multiprecision::number<
+                        boost::multiprecision::backends::cpp_int_modular_backend<256>>;
                 using native_field_type = typename crypto3::algebra::curves::pallas::base_field_type;
                 using var = crypto3::zk::snark::plonk_variable<typename native_field_type::value_type>;
 
@@ -289,7 +288,9 @@ namespace nil {
                 static native_field_type::value_type get_i_th_chunk(non_native_field_type::value_type input,
                                         std::size_t i_th) {
                     assert(i_th < ratio && "non-native type does not have that much chunks!");
-                    native_field_type::extended_integral_type result = native_field_type::extended_integral_type(input);
+                    native_field_type::extended_integral_type result = native_field_type::extended_integral_type::backend_type(
+                        input.backend());
+
                     native_field_type::integral_type base = 1;
                     native_field_type::integral_type mask = (base << chunk_sizes[i_th]) - 1;
                     std::size_t shift = 0;
@@ -324,14 +325,16 @@ namespace nil {
             };
 
             /*
-             * Small and big signed numbers
+             * Small and big signed numbers. This one is different from the others, it accepts 
+             * boost::multiprecision::cpp_int_backend, which is not supposed to be used in algebra, so 
+             * conversions need to happen before it can be used.
             */
-            template<typename BlueprintFieldType, std::size_t BitsAmount>
+            template<typename BlueprintFieldType, unsigned BitsAmount>
             struct basic_non_native_policy_field_type<BlueprintFieldType,
-                    nil::crypto3::multiprecision::number<
-                        nil::crypto3::multiprecision::cpp_int_backend<BitsAmount, BitsAmount,
-                        nil::crypto3::multiprecision::signed_magnitude,
-                        nil::crypto3::multiprecision::unchecked, void>>> {
+                    boost::multiprecision::number<
+                        boost::multiprecision::cpp_int_backend<BitsAmount, BitsAmount,
+                            boost::multiprecision::signed_magnitude,
+                            boost::multiprecision::unchecked, void>>> {
 
                 constexpr static const std::uint32_t ratio = BitsAmount < 256 ? 2 : 3; // sign and all other bits
                 static constexpr std::array<std::size_t, ratio> chunk_sizes_init() {
@@ -343,11 +346,19 @@ namespace nil {
                 }
 
                 // not actually a field, but we preserve the interface
-                using non_native_field_type = typename nil::crypto3::multiprecision::number<
-                        nil::crypto3::multiprecision::cpp_int_backend<BitsAmount, BitsAmount,
-                        nil::crypto3::multiprecision::signed_magnitude,
-                        nil::crypto3::multiprecision::unchecked, void>>;
+                using non_native_field_type = typename boost::multiprecision::number<
+                        boost::multiprecision::cpp_int_backend<BitsAmount, BitsAmount,
+                        boost::multiprecision::signed_magnitude,
+                        boost::multiprecision::unchecked, void>>;
+
+                using non_native_unsigned_integral_type = typename boost::multiprecision::number<
+                        boost::multiprecision::cpp_int_backend<BitsAmount, BitsAmount,
+                        boost::multiprecision::unsigned_magnitude,
+                        boost::multiprecision::unchecked, void>>;
+
                 using native_field_type = typename crypto3::algebra::curves::pallas::base_field_type;
+                using native_integral_type = typename native_field_type::integral_type;
+                using native_backend_type = typename native_integral_type::backend_type;
                 using var = crypto3::zk::snark::plonk_variable<typename native_field_type::value_type>;
 
                 typedef std::array<var, ratio> non_native_var_type;
@@ -363,7 +374,9 @@ namespace nil {
                         if (i_th == 0) {
                             return input.sign() == 0 ? 1 : -1;
                         } else {
-                            return native_field_type::value_type(input.sign() * native_field_type::integral_type(input.data));
+                            return native_field_type::value_type(input.sign() == 0 ? 1 : -1) * 
+                                native_integral_type(native_backend_type(
+                                    non_native_unsigned_integral_type(input).data.backend()));
                         }
                     } else {
                         static const non_native_field_type top_mask = ((non_native_field_type(1) << 128) - 1) << 128;
@@ -372,9 +385,11 @@ namespace nil {
                         if (i_th == 0) {
                             return input.sign() == 0 ? 1 : -1;
                         } else if (i_th == 1) {
-                            return top_mask & input;
+                            return native_integral_type(native_backend_type(
+                                    non_native_unsigned_integral_type(top_mask & input).data.backend()));
                         } else {
-                            return bottom_mask & input;
+                            return native_integral_type(native_backend_type(
+                                    non_native_unsigned_integral_type(bottom_mask & input).data.backend()));
                         }
                     }
                 }
@@ -395,7 +410,7 @@ namespace nil {
                             (non_native_field_type::value_type(native_field_type::integral_type(input[0].data)) == 0 ? 1 : -1) * non_native_field_type::value_type(native_field_type::integral_type(input[1].data));
                     } else {
                         static const non_native_field_type two_128 =
-                        nil::crypto3::multiprecision::pow(non_native_field_type(2), 128);
+                        boost::multiprecision::pow(non_native_field_type(2), 128);
                         result =
                             (non_native_field_type::value_type(native_field_type::integral_type(input[0].data)) == 0 ? 1 : -1) *
                             (non_native_field_type::value_type(native_field_type::integral_type(input[1].data) * two_128 +

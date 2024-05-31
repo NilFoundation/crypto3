@@ -195,7 +195,7 @@ namespace nil {
 
             // Note that constraits have to be sorted in order to enforce equality between differently ordered gates.
             #define GATE_ID_INIT_MACRO(constraints_container) \
-                value_1 = value_2 = 0; \
+                value_1 = value_2 = BlueprintFieldType::value_type::zero(); \
                 if (constraints_container.empty()) { \
                     return; \
                 } \
@@ -281,7 +281,7 @@ namespace nil {
             std::size_t tag_index;
         public:
             std::pair<value_type, value_type> eval_constraint(const constraint_type& constraint) const {
-                value_type value_1 = 0, value_2 = 0;
+                value_type value_1 = BlueprintFieldType::value_type::zero(), value_2 = BlueprintFieldType::value_type::zero();
                 for (std::size_t i = 0; i < constraint.lookup_input.size(); i++) {
                     nil::crypto3::math::expression_evaluator<var> evaluator_1(
                         constraint.lookup_input[i],
@@ -298,7 +298,7 @@ namespace nil {
 
             // Note that constraits have to be sorted in order to enforce equality between differently ordered gates.
             #define LOOKUP_GATE_ID_INIT_MACRO(constraints_container) \
-                value_1 = value_2 = 0; \
+                value_1 = value_2 = BlueprintFieldType::value_type::zero(); \
                 if (constraints_container.empty()) { \
                     return; \
                 } \

@@ -33,7 +33,7 @@
 #include <nil/blueprint/components/detail/r1cs/packing.hpp>
 #include <nil/blueprint/components/boolean/r1cs/disjunction.hpp>
 
-#include <nil/crypto3/multiprecision/number.hpp>
+#include <boost/multiprecision/number.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/constraint_satisfaction_problems/r1cs.hpp>
 
 namespace nil {

@@ -162,7 +162,7 @@ namespace nil {
                 if (x_val == y_val) {
                     assignment.witness(component.W(2), j) = 0;
                 } else {
-                    assignment.witness(component.W(2), j) = 1 / (x_val - y_val);
+                    assignment.witness(component.W(2), j) = (x_val - y_val).inversed();
                 }
                 assignment.witness(component.W(3), j) = x_val == y_val ? !component.inequality : component.inequality;
 

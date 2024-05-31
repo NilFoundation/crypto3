@@ -32,7 +32,7 @@
 #include <nil/blueprint/component.hpp>
 #include <nil/blueprint/blueprint/r1cs/detail/r1cs/blueprint_linear_combination.hpp>
 
-#include <nil/crypto3/multiprecision/number.hpp>
+#include <boost/multiprecision/number.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/constraint_satisfaction_problems/r1cs.hpp>
 
 namespace nil {

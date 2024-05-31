@@ -148,9 +148,10 @@ namespace nil {
                 assignment.witness(component.W(2), start_row_index) = x1;
                 assignment.witness(component.W(3), start_row_index) = z1;
                 if (x0 != x1) { // normal case
-                    assignment.witness(component.W(4), start_row_index) = (x1*z0 - x0*z1) / (x1-x0);
-                    assignment.witness(component.W(5), start_row_index) = (z1-z0) / (x1-x0);
-                    assignment.witness(component.W(6), start_row_index) = 1 / (x1-x0);
+                    auto diff_inversed = (x1-x0).inversed();
+                    assignment.witness(component.W(4), start_row_index) = (x1*z0 - x0*z1) * diff_inversed;
+                    assignment.witness(component.W(5), start_row_index) = (z1-z0) * diff_inversed;
+                    assignment.witness(component.W(6), start_row_index) = diff_inversed;
                 } else { // just make some assignments that will fail
                     assignment.witness(component.W(4), start_row_index) = 0;
                     assignment.witness(component.W(5), start_row_index) = 0;

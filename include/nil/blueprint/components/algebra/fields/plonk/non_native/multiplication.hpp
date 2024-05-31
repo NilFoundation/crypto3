@@ -192,9 +192,9 @@ namespace nil {
                         foreign_integral_type(eddsa_r.data);
                     foreign_extended_integral_type eddsa_p = ed25519_field_type::modulus;
                     foreign_extended_integral_type integral_eddsa_q =
-                        (foreign_extended_integral_type(eddsa_a.data) *
-                            foreign_extended_integral_type(eddsa_b.data) -
-                        foreign_extended_integral_type(eddsa_r.data)) /
+                        (foreign_extended_integral_type(foreign_integral_type(eddsa_a.data)) *
+                            foreign_extended_integral_type(foreign_integral_type(eddsa_b.data)) -
+                        foreign_extended_integral_type(foreign_integral_type(eddsa_r.data))) /
                         eddsa_p;
                     foreign_extended_integral_type pow = extended_base << 257;
                     foreign_extended_integral_type minus_eddsa_p = pow - eddsa_p;
@@ -202,16 +202,17 @@ namespace nil {
                     std::array<native_value_type, 4> r;
                     std::array<native_value_type, 4> q;
                     std::array<native_value_type, 4> p;
-                    native_integral_type mask = (pasta_base << 66) - 1;
-                    r[0] = (integral_eddsa_r) & (mask);
-                    q[0] = (integral_eddsa_q) & (mask);
-                    p[0] = (minus_eddsa_p) & (mask);
-                    p[1] = (minus_eddsa_p >> 66) & (mask);
-                    p[2] = (minus_eddsa_p >> 132) & (mask);
-                    p[3] = (minus_eddsa_p >> 198) & (mask);
+                    foreign_integral_type mask = (pasta_base << 66) - 1;
+                    foreign_extended_integral_type extended_mask = mask;
+                    r[0] = integral_eddsa_r & mask;
+                    q[0] = integral_eddsa_q & extended_mask;
+                    p[0] = minus_eddsa_p & extended_mask;
+                    p[1] = (minus_eddsa_p >> 66) & extended_mask;
+                    p[2] = (minus_eddsa_p >> 132) & extended_mask;
+                    p[3] = (minus_eddsa_p >> 198) & extended_mask;
                     for (std::size_t i = 1; i < 4; i++) {
-                        r[i] = (integral_eddsa_r >> (66 * i)) & (mask);
-                        q[i] = (integral_eddsa_q >> (66 * i)) & (mask);
+                        r[i] = (integral_eddsa_r >> (66 * i)) & extended_mask;
+                        q[i] = (integral_eddsa_q >> (66 * i)) & extended_mask;
                     }
                     std::array<native_value_type, 4> t;
                     t[0] = a[0] * b[0] + p[0] * q[0];
@@ -306,9 +307,9 @@ namespace nil {
                     foreign_integral_type(eddsa_r.data);
                 foreign_extended_integral_type eddsa_p = ed25519_field_type::modulus;
                 foreign_extended_integral_type integral_eddsa_q =
-                    (foreign_extended_integral_type(eddsa_a.data) *
-                         foreign_extended_integral_type(eddsa_b.data) -
-                     foreign_extended_integral_type(eddsa_r.data)) /
+                    (foreign_extended_integral_type(foreign_integral_type(eddsa_a.data)) *
+                         foreign_extended_integral_type(foreign_integral_type(eddsa_b.data)) -
+                     foreign_extended_integral_type(foreign_integral_type(eddsa_r.data))) /
                     eddsa_p;
                 foreign_extended_integral_type pow = extended_base << 257;
                 foreign_extended_integral_type minus_eddsa_p = pow - eddsa_p;
@@ -316,16 +317,17 @@ namespace nil {
                 std::array<native_value_type, 4> r;
                 std::array<native_value_type, 4> q;
                 std::array<native_value_type, 4> p;
-                native_integral_type mask = (pasta_base << 66) - 1;
-                r[0] = (integral_eddsa_r) & (mask);
-                q[0] = (integral_eddsa_q) & (mask);
-                p[0] = (minus_eddsa_p) & (mask);
-                p[1] = (minus_eddsa_p >> 66) & (mask);
-                p[2] = (minus_eddsa_p >> 132) & (mask);
-                p[3] = (minus_eddsa_p >> 198) & (mask);
+                foreign_integral_type mask = (pasta_base << 66) - 1;
+                foreign_extended_integral_type extended_mask = mask;
+                r[0] = integral_eddsa_r & mask;
+                q[0] = integral_eddsa_q & extended_mask;
+                p[0] = minus_eddsa_p & extended_mask;
+                p[1] = minus_eddsa_p >> 66 & extended_mask;
+                p[2] = minus_eddsa_p >> 132 & extended_mask;
+                p[3] = minus_eddsa_p >> 198 & extended_mask;
                 for (std::size_t i = 1; i < 4; i++) {
                     r[i] = (integral_eddsa_r >> (66 * i)) & (mask);
-                    q[i] = (integral_eddsa_q >> (66 * i)) & (mask);
+                    q[i] = (integral_eddsa_q >> (66 * i)) & (extended_mask);
                 }
                 std::array<native_value_type, 4> t;
                 t[0] = a[0] * b[0] + p[0] * q[0];
@@ -454,6 +456,7 @@ namespace nil {
 
                 using native_value_type = typename BlueprintFieldType::value_type;
                 using native_integral_type = typename BlueprintFieldType::integral_type;
+                using foreign_integral_type = typename ed25519_field_type::integral_type;
                 using foreign_extended_integral_type = typename ed25519_field_type::extended_integral_type;
 
                 native_integral_type base = 1;
@@ -463,11 +466,12 @@ namespace nil {
                 foreign_extended_integral_type pow = extended_base << 257;
                 foreign_extended_integral_type minus_eddsa_p = pow - eddsa_p;
                 std::array<native_value_type, 4> p;
-                native_integral_type mask = (base << 66) - 1;
-                p[0] = minus_eddsa_p & mask;
-                p[1] = (minus_eddsa_p >> 66) & (mask);
-                p[2] = (minus_eddsa_p >> 132) & (mask);
-                p[3] = (minus_eddsa_p >> 198) & (mask);
+                foreign_integral_type mask = (base << 66) - 1;
+                foreign_extended_integral_type extended_mask = mask;
+                p[0] = minus_eddsa_p & extended_mask;
+                p[1] = minus_eddsa_p >> 66 & extended_mask;
+                p[2] = minus_eddsa_p >> 132 & extended_mask;
+                p[3] = minus_eddsa_p >> 198 & extended_mask;
 
                 std::array<crypto3::zk::snark::plonk_constraint<BlueprintFieldType>, 5> t;
                 t[0] = var(component.W(0), -1) * var(component.W(4), -1) + p[0] * var(component.W(8), -1);

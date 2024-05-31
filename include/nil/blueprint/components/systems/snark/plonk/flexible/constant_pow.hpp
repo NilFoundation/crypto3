@@ -56,7 +56,7 @@ namespace nil {
             std::vector<std::size_t> integral_type_four_chunks(typename BlueprintFieldType::integral_type pow){
                 std::vector<std::size_t> result;
                 typename BlueprintFieldType::integral_type tmp = pow;
-                while( tmp > 0 ){
+                while( tmp > 0 ) {
                     result.push_back(std::size_t(tmp%4));
                     tmp /= 4;
                 }

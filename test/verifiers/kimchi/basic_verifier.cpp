@@ -153,7 +153,7 @@ BOOST_AUTO_TEST_CASE(blueprint_verifiers_kimchi_basic_verifier_test) {
     std::array<ScalarFieldType::value_type, bases_size> batch_scalars;
     std::array<ScalarFieldType::value_type, batch_size> cips_shifted;
     std::array<ScalarFieldType::value_type, public_input_size> pi;
-    ScalarFieldType::value_type zeta = 0x0000000000000000000000000000000062F9AE3696EA8F0A85043221DE133E32_cppui256;
+    ScalarFieldType::value_type zeta = 0x0000000000000000000000000000000062F9AE3696EA8F0A85043221DE133E32_cppui_modular256;
     std::array<ScalarFieldType::value_type, batch_size> zeta_to_srs_len;
     ScalarFieldType::value_type zeta_to_domain_size_minus_1 = zeta.pow(domain_size) - 1;
 
@@ -179,7 +179,7 @@ BOOST_AUTO_TEST_CASE(blueprint_verifiers_kimchi_basic_verifier_test) {
 
     zk::components::kimchi_verifier_index_scalar<ScalarFieldType> verifier_index_scalar;
     typename ScalarFieldType::value_type omega =
-        0x1B1A85952300603BBF8DD3068424B64608658ACBB72CA7D2BB9694ADFA504418_cppui256;
+        0x1B1A85952300603BBF8DD3068424B64608658ACBB72CA7D2BB9694ADFA504418_cppui_modular256;
     verifier_index_scalar.domain_size = domain_size;
     verifier_index_scalar.omega = var_scalar(0, 0, false, var_scalar::column_type::public_input);
 
@@ -191,9 +191,9 @@ BOOST_AUTO_TEST_CASE(blueprint_verifiers_kimchi_basic_verifier_test) {
     typename ScalarFieldType::value_type beta = 0;
     typename ScalarFieldType::value_type gamma = 0;
     typename ScalarFieldType::value_type alpha =
-        0x0000000000000000000000000000000005321CB83A4BCD5C63F489B5BF95A8DC_cppui256;
+        0x0000000000000000000000000000000005321CB83A4BCD5C63F489B5BF95A8DC_cppui_modular256;
     typename ScalarFieldType::value_type fq_digest =
-        0x01D4E77CCD66755BDDFDBB6E4E8D8D17A6708B9CB56654D12070BD7BF4A5B33B_cppui256;
+        0x01D4E77CCD66755BDDFDBB6E4E8D8D17A6708B9CB56654D12070BD7BF4A5B33B_cppui_modular256;
 
     std::vector<typename ScalarFieldType::value_type> public_input_scalar = {omega};
 

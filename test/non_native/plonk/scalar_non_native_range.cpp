@@ -96,8 +96,8 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_scalar_range_test1) {
     using field_type = typename crypto3::algebra::curves::pallas::base_field_type;
 
     typename field_type::integral_type ed25519_scalar_modulus =
-        0x1000000000000000000000000000000014def9dea2f79cd65812631a5cf5d3ed_cppui255;
-    typename field_type::value_type ones = 0x0fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff_cppui255;
+        0x1000000000000000000000000000000014def9dea2f79cd65812631a5cf5d3ed_cppui_modular255;
+    typename field_type::value_type ones = 0x0fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff_cppui_modular255;
 
     test_scalar_non_native_range<field_type>({typename field_type::value_type(ed25519_scalar_modulus - 1)}, true);
 
@@ -131,18 +131,21 @@ BOOST_AUTO_TEST_CASE(blueprint_non_native_scalar_range_test_must_fail) {
     rand.seed(seed_seq);
 
     typename field_type::integral_type ed25519_scalar_modulus =
-        0x1000000000000000000000000000000014def9dea2f79cd65812631a5cf5d3ed_cppui255;
-    typename field_type::integral_type zero = 0;
-    typename field_type::integral_type ed25519_scalar_overage = zero - ed25519_scalar_modulus - 1;
+        0x1000000000000000000000000000000014def9dea2f79cd65812631a5cf5d3ed_cppui_modular255;
+    typename field_type::extended_integral_type pow_bits = 1u;
+    pow_bits <<= field_type::modulus_bits;
+    typename field_type::integral_type ed25519_scalar_overage = pow_bits - field_type::extended_integral_type(
+        ed25519_scalar_modulus) - 1;
 
     typename field_type::integral_type overage;
 
     for (std::size_t i = 0; i < random_tests_amount; i++) {
         overage = (typename field_type::integral_type(rand().data)) % ed25519_scalar_overage;
+        // Test with numbers larger than modulus must fail.
         test_scalar_non_native_range<field_type>(
             {typename field_type::value_type(ed25519_scalar_modulus + overage)}, false);    // false positive
     }
-    test_scalar_non_native_range<field_type>({-1}, false);
+    test_scalar_non_native_range<field_type>({ed25519_scalar_modulus + 1u}, false);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

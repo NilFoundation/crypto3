@@ -65,9 +65,9 @@ namespace nil {
                     using scalar_field_type = typename curve_type::scalar_field_type;
                     using base_field_type = typename curve_type::base_field_type;
                     constexpr static const typename scalar_field_type::value_type endo_r =
-                        0x12CCCA834ACDBA712CAAD5DC57AAB1B01D1F8BD237AD31491DAD5EBDFDFE4AB9_cppui255;
+                        0x12CCCA834ACDBA712CAAD5DC57AAB1B01D1F8BD237AD31491DAD5EBDFDFE4AB9_cppui_modular255;
                     constexpr static const typename base_field_type::value_type endo_q =
-                        0x2D33357CB532458ED3552A23A8554E5005270D29D19FC7D27B7FD22F0201B547_cppui255;
+                        0x2D33357CB532458ED3552A23A8554E5005270D29D19FC7D27B7FD22F0201B547_cppui_modular255;
                 };
 
                 template<>
@@ -76,9 +76,9 @@ namespace nil {
                     using scalar_field_type = typename curve_type::scalar_field_type;
                     using base_field_type = typename curve_type::base_field_type;
                     constexpr static const typename scalar_field_type::value_type endo_r =
-                        0x397E65A7D7C1AD71AEE24B27E308F0A61259527EC1D4752E619D1840AF55F1B1_cppui255;
+                        0x397E65A7D7C1AD71AEE24B27E308F0A61259527EC1D4752E619D1840AF55F1B1_cppui_modular255;
                     constexpr static const typename base_field_type::value_type endo_q =
-                        0x2D33357CB532458ED3552A23A8554E5005270D29D19FC7D27B7FD22F0201B547_cppui255;
+                        0x2D33357CB532458ED3552A23A8554E5005270D29D19FC7D27B7FD22F0201B547_cppui_modular255;
                 };
 
                 template<typename BlueprintFieldType, typename CurveType>

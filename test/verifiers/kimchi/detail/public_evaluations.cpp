@@ -172,8 +172,8 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_real_data) {
     var one(0, 0, false, var::column_type::public_input);
     var zeta_pow_n(0, 1, false, var::column_type::public_input);
     var zeta_omega_pow_n(0, 2, false, var::column_type::public_input);
-    typename BlueprintFieldType::value_type zeta_value = 0x2F51244846217BCB9DE92C5903AC022FAD29555920E45344407B680D24D550F1_cppui256;
-    typename BlueprintFieldType::value_type omega_value = 0x0CC3380DC616F2E1DAF29AD1560833ED3BAEA3393ECEB7BC8FA36376929B78CC_cppui256;
+    typename BlueprintFieldType::value_type zeta_value = 0x2F51244846217BCB9DE92C5903AC022FAD29555920E45344407B680D24D550F1_cppui_modular256;
+    typename BlueprintFieldType::value_type omega_value = 0x0CC3380DC616F2E1DAF29AD1560833ED3BAEA3393ECEB7BC8FA36376929B78CC_cppui_modular256;
     typename BlueprintFieldType::value_type zeta_omega_value = zeta_value * omega_value;
     constexpr std::size_t domain = 32;
 
@@ -202,7 +202,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_real_data) {
     std::array<var, n> pi;
     std::array<typename BlueprintFieldType::value_type, n> pi_values;
     for (std::size_t i = 0; i < n; i++) {
-        pi_values[i] = 0x0000000000000000000000000000000000000000000000000000000000000003_cppui256;
+        pi_values[i] = 0x0000000000000000000000000000000000000000000000000000000000000003_cppui_modular256;
         public_input.push_back(pi_values[i]);
         pi[i] = var(0, public_input.size() - 1, false, var::column_type::public_input);
     }
@@ -222,8 +222,8 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_real_data) {
     // where l from lagrange, p from public, w from omega_powers for l from 0 to PulicInputSize
     // r[1] = (zeta_omega.pow(n) - 1) * index.domain.size_inv * SUM(-l * p * w)
     // where l from lagrange, p from public, w from omega_powers for l from PulicInputSize to 2 * PulicInputSize
-    std::array<typename BlueprintFieldType::value_type, 2> expected_result = {0x18D62B16440429CDC5B94B8D9DC8A550535487AA7B64822433AD5E762009BD7C_cppui256,
-                                                                                0x32B7DA94FAF98733D833AFE878FA7775452875BCBC8A953CEF1002C7B3D24033_cppui256};
+    std::array<typename BlueprintFieldType::value_type, 2> expected_result = {0x18D62B16440429CDC5B94B8D9DC8A550535487AA7B64822433AD5E762009BD7C_cppui_modular256,
+                                                                                0x32B7DA94FAF98733D833AFE878FA7775452875BCBC8A953CEF1002C7B3D24033_cppui_modular256};
 
 
     auto result_check = [&expected_result](AssignmentType &assignment, component_type::result_type &real_res) {
@@ -264,8 +264,8 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_no_public_input) {
     var one(0, 0, false, var::column_type::public_input);
     var zeta_pow_n(0, 1, false, var::column_type::public_input);
     var zeta_omega_pow_n(0, 2, false, var::column_type::public_input);
-    typename BlueprintFieldType::value_type zeta_value = 0x2F51244846217BCB9DE92C5903AC022FAD29555920E45344407B680D24D550F1_cppui256;
-    typename BlueprintFieldType::value_type omega_value = 0x0CC3380DC616F2E1DAF29AD1560833ED3BAEA3393ECEB7BC8FA36376929B78CC_cppui256;
+    typename BlueprintFieldType::value_type zeta_value = 0x2F51244846217BCB9DE92C5903AC022FAD29555920E45344407B680D24D550F1_cppui_modular256;
+    typename BlueprintFieldType::value_type omega_value = 0x0CC3380DC616F2E1DAF29AD1560833ED3BAEA3393ECEB7BC8FA36376929B78CC_cppui_modular256;
     typename BlueprintFieldType::value_type zeta_omega_value = zeta_value * omega_value;
     constexpr std::size_t domain = 32;
 
@@ -295,7 +295,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_no_public_input) {
     std::array<var, n> pi;
     std::array<typename BlueprintFieldType::value_type, n> pi_values;
     for (std::size_t i = 0; i < n; i++) {
-        pi_values[i] = 0x0_cppui256;
+        pi_values[i] = 0x0_cppui_modular256;
         public_input.push_back(pi_values[i]);
         pi[i] = var(0, public_input.size() - 1, false, var::column_type::public_input);
     }
@@ -315,7 +315,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_no_public_input) {
     // where l from lagrange, p from public, w from omega_powers for l from 0 to PulicInputSize
     // r[1] = (zeta_omega.pow(n) - 1) * index.domain.size_inv * SUM(-l * p * w)
     // where l from lagrange, p from public, w from omega_powers for l from PulicInputSize to 2 * PulicInputSize
-    std::array<typename BlueprintFieldType::value_type, 2> expected_result = {0x0_cppui256, 0x0_cppui256};
+    std::array<typename BlueprintFieldType::value_type, 2> expected_result = {0x0_cppui_modular256, 0x0_cppui_modular256};
 
 
     auto result_check = [&expected_result](AssignmentType &assignment, component_type::result_type &real_res) {

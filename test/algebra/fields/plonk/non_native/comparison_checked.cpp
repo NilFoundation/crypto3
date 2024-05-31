@@ -305,7 +305,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_non_native_comparison_checked_oops_chunk_ov
             }
         }
     };
-    sum = 3 / value_type(2).pow(28);
+    sum = 3 * value_type(2).pow(28).inversed();
     sum_diff = 0;
     for (std::size_t i = 2; i < 21; i += 2) {
         if (i != 2) {
