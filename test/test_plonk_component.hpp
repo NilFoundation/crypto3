@@ -102,11 +102,12 @@ namespace nil {
             return step_list;
         }
 
+        // TODO(martun): remove this from here, we have a constructor for FRI params.
         template<typename fri_type, typename FieldType>
         typename fri_type::params_type create_fri_params(
                 const std::size_t degree_log, const std::size_t lambda,
                 const std::size_t expand_factor = 4, const std::size_t max_step = 1) {
-            math::polynomial<typename FieldType::value_type> q = {0, 0, 1};
+            math::polynomial<typename FieldType::value_type> q = {0u, 0u, 1u};
 
             const std::size_t r = degree_log - 1;
 
@@ -202,7 +203,7 @@ namespace nil {
             std::size_t start_row = 0; // dist(gen);
             // resize to ensure that if the component is empty by default (e.g. a component which only uses batching)
             if (start_row != 0) {
-                assignment.witness(0, start_row - 1) = 0;
+                assignment.witness(0, start_row - 1) = 0u;
             }
 
             if constexpr (PrivateInput) {

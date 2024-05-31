@@ -167,16 +167,17 @@ namespace nil {
                 assignment.witness(component.W(4), start_row_index) = x2;
                 assignment.witness(component.W(5), start_row_index) = z2;
                 if (d != 0) { // normal case
+                    auto d_inversed = d.inversed();
                     assignment.witness(component.W(6), start_row_index) = det3(std::array<value_type,9>{ z0, x0, x0*x0,
                                                                                  z1, x1, x1*x1,
-                                                                                 z2, x2, x2*x2 }) / d;
+                                                                                 z2, x2, x2*x2 }) * d_inversed;
                     assignment.witness(component.W(7), start_row_index) = det3(std::array<value_type,9>{ one, z0, x0*x0,
                                                                                  one, z1, x1*x1,
-                                                                                 one, z2, x2*x2 }) / d;
+                                                                                 one, z2, x2*x2 }) * d_inversed;
                     assignment.witness(component.W(8), start_row_index) = det3(std::array<value_type,9>{ one, x0, z0,
                                                                                  one, x1, z1,
-                                                                                 one, x2, z2 }) / d;
-                    assignment.witness(component.W(9), start_row_index) = 1 / d;
+                                                                                 one, x2, z2 }) * d_inversed;
+                    assignment.witness(component.W(9), start_row_index) = d_inversed;
                 } else { // just make some assignments that will fail
                     assignment.witness(component.W(6), start_row_index) = 0;
                     assignment.witness(component.W(7), start_row_index) = 0;

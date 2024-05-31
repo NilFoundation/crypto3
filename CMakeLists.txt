@@ -49,33 +49,21 @@ if(BLUEPRINT_PLACEHOLDER_PROOF_GEN)
     add_definitions(-DBLUEPRINT_PLACEHOLDER_PROOF_GEN_ENABLED)
 endif()
 
-macro(cm_find_package NAME)
-    foreach(ITERATOR ${CMAKE_WORKSPACE_LIST})
-        if(NOT "${NAME}" MATCHES "^${ITERATOR}_.*$" AND NOT "${NAME}" STREQUAL CM)
-            find_package(${ARGV})
-        else()
-            set(${ARGV0}_FOUND ON CACHE BOOL "")
-        endif()
-    endforeach()
-endmacro()
-
 cm_project(blueprint WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME} LANGUAGES C CXX)
 
-cm_find_package(CM)
+find_package(CM)
 include(CMDeploy)
 include(FindPkgConfig)
 
-option(BUILD_WITH_CCACHE "Build with ccache usage" TRUE)
 option(BUILD_TESTS "Build unit tests" FALSE)
 option(BUILD_EXAMPLES "Build examples" FALSE)
 
-if(UNIX AND BUILD_WITH_CCACHE)
-    find_program(CCACHE_FOUND ccache)
-    if(CCACHE_FOUND)
-        set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
-        set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache)
-    endif(CCACHE_FOUND)
+find_package(crypto3 REQUIRED)
+find_package(Boost REQUIRED COMPONENTS container random filesystem log log_setup program_options thread system)
+if(ENABLE_TESTS)
+    find_package(Boost REQUIRED COMPONENTS unit_test_framework timer)
 endif()
+
 
 if(UNIX AND BUILD_WITH_PROCPS)
     find_package(Procps)
@@ -143,20 +131,14 @@ target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTER
 target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
 
                       ${Boost_LIBRARIES}
-
-                      ${CMAKE_WORKSPACE_NAME}::algebra
-                      ${CMAKE_WORKSPACE_NAME}::math
-                      ${CMAKE_WORKSPACE_NAME}::hash
-                      ${CMAKE_WORKSPACE_NAME}::multiprecision
-                      ${CMAKE_WORKSPACE_NAME}::random
-                      ${CMAKE_WORKSPACE_NAME}::zk
-                      ${CMAKE_WORKSPACE_NAME}::containers)
+                      crypto3::all
+                    )
 
 cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
           INCLUDE include
           NAMESPACE ${CMAKE_WORKSPACE_NAME}::)
 
-if(BUILD_TESTS)
+if(ENABLE_TESTS)
     add_subdirectory(test)
 endif()
 

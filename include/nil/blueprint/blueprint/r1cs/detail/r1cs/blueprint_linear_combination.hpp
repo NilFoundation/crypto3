@@ -29,8 +29,8 @@
 
 #include <vector>
 
-#include <nil/crypto3/multiprecision/integer.hpp>
-#include <nil/crypto3/multiprecision/number.hpp>
+#include <boost/multiprecision/integer.hpp>
+#include <boost/multiprecision/number.hpp>
 
 #include <nil/crypto3/zk/math/linear_combination.hpp>
 
@@ -193,7 +193,7 @@ namespace nil {
                     void fill_with_bits_of_field_element(blueprint<ArithmetizationType> &bp,
                                                          const field_value_type &r) const {
                         for (std::size_t i = 0; i < this->size(); ++i) {
-                            bp.lc_val((*this)[i]) = multiprecision::bit_test(r.data, i) ? field_value_type::one() :
+                            bp.lc_val((*this)[i]) = boost::multiprecision::bit_test(r.data, i) ? field_value_type::one() :
                                                                                           field_value_type::zero();
                         }
                     }

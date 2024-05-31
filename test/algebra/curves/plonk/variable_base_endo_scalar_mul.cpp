@@ -84,7 +84,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_base_endo_scalar_mul) {
     std::vector<typename BlueprintFieldType::value_type> public_input = {T.X, T.Y, b_scalar};
 
     constexpr static const typename BlueprintFieldType::value_type endo  = component_type::endo;
-    typename BlueprintFieldType::value_type endo_scalar = 0x244630A7EE5033DA383B3677B4C5CA94A3EBE4156FC4FA4E08B35974929CA2C5_cppui255;
+    typename BlueprintFieldType::value_type endo_scalar = 0x244630A7EE5033DA383B3677B4C5CA94A3EBE4156FC4FA4E08B35974929CA2C5_cppui_modular255;
 
     typename curve_type::template g1_type<algebra::curves::coordinates::affine>::value_type testResult = endo_scalar * T;
     std::cout<<"Expected result for endo_scalar * T: "<<testResult.X.data<<" "<< testResult.Y.data<<std::endl;

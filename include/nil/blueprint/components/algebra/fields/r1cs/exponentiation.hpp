@@ -31,7 +31,7 @@
 #include <memory>
 #include <vector>
 
-#include <nil/crypto3/multiprecision/wnaf.hpp>
+#include <boost/multiprecision/wnaf.hpp>
 
 #include <nil/blueprint/component.hpp>
 

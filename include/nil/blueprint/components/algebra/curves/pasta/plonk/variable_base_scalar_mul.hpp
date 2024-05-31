@@ -85,18 +85,18 @@ namespace nil {
             struct variable_base_scalar_mul_shifted_consts<typename nil::crypto3::algebra::curves::pallas> {
                 using FieldType = nil::crypto3::algebra::fields::pallas_base_field;
 
-                constexpr static const typename FieldType::value_type shifted_minus_one = 0x224698fc0994a8dd8c46eb2100000000_cppui255;
-                constexpr static const typename FieldType::value_type shifted_zero = 0x200000000000000000000000000000003369e57a0e5efd4c526a60b180000001_cppui255;
-                constexpr static const typename FieldType::value_type shifted_one = 0x224698fc0994a8dd8c46eb2100000001_cppui255;
+                constexpr static const typename FieldType::value_type shifted_minus_one = 0x224698fc0994a8dd8c46eb2100000000_cppui_modular255;
+                constexpr static const typename FieldType::value_type shifted_zero = 0x200000000000000000000000000000003369e57a0e5efd4c526a60b180000001_cppui_modular255;
+                constexpr static const typename FieldType::value_type shifted_one = 0x224698fc0994a8dd8c46eb2100000001_cppui_modular255;
             };
 
             template<>
             struct variable_base_scalar_mul_shifted_consts<typename nil::crypto3::algebra::curves::vesta> {
                 using FieldType = nil::crypto3::algebra::fields::vesta_base_field;
 
-                constexpr static const typename FieldType::value_type shifted_minus_one = 0x448d31f81299f237325a61da00000001_cppui255;
-                constexpr static const typename FieldType::value_type shifted_zero =      0x448d31f81299f237325a61da00000002_cppui255;
-                constexpr static const typename FieldType::value_type shifted_one =       0x448d31f81299f237325a61da00000003_cppui255;
+                constexpr static const typename FieldType::value_type shifted_minus_one = 0x448d31f81299f237325a61da00000001_cppui_modular255;
+                constexpr static const typename FieldType::value_type shifted_zero =      0x448d31f81299f237325a61da00000002_cppui_modular255;
+                constexpr static const typename FieldType::value_type shifted_one =       0x448d31f81299f237325a61da00000003_cppui_modular255;
             };
             ////////////////////////////////
 
@@ -156,8 +156,8 @@ namespace nil {
                 constexpr static const typename BlueprintFieldType::value_type shifted_zero = variable_base_scalar_mul_shifted_consts<CurveType>::shifted_zero;
                 constexpr static const typename BlueprintFieldType::value_type shifted_one = variable_base_scalar_mul_shifted_consts<CurveType>::shifted_one;
 
-                constexpr static const typename BlueprintFieldType::value_type t_q = 0x224698fc0994a8dd8c46eb2100000001_cppui255; // q = 0x40000000000000000000000000000000224698fc0994a8dd8c46eb2100000001_cppui255 = 2**254 + t_q
-                constexpr static const typename BlueprintFieldType::value_type t_p = 0x224698fc094cf91b992d30ed00000001_cppui255; // p = 0x40000000000000000000000000000000224698fc094cf91b992d30ed00000001_cppui255 = 2**254 + t_p (q > p)
+                constexpr static const typename BlueprintFieldType::value_type t_q = 0x224698fc0994a8dd8c46eb2100000001_cppui_modular255; // q = 0x40000000000000000000000000000000224698fc0994a8dd8c46eb2100000001_cppui_modular255 = 2**254 + t_q
+                constexpr static const typename BlueprintFieldType::value_type t_p = 0x224698fc094cf91b992d30ed00000001_cppui_modular255; // p = 0x40000000000000000000000000000000224698fc094cf91b992d30ed00000001_cppui_modular255 = 2**254 + t_p (q > p)
                 constexpr static const typename BlueprintFieldType::value_type two = 2;
 
                 struct input_type {
@@ -238,10 +238,9 @@ namespace nil {
                 typename CurveType::template g1_type<crypto3::algebra::curves::coordinates::affine>::value_type T(T_x,
                                                                                                             T_y);
 
-                std::array<
-                    typename CurveType::template g1_type<crypto3::algebra::curves::coordinates::affine>::value_type, 6>
-                    P;
-                typename CurveType::template g1_type<crypto3::algebra::curves::coordinates::affine>::value_type Q;
+                typedef typename CurveType::template g1_type<crypto3::algebra::curves::coordinates::affine>::value_type g1_value_type;
+                std::array<g1_value_type, 6> P;
+                g1_value_type Q;
 
                 typename CurveType::scalar_field_type::integral_type integral_b =
                     typename CurveType::scalar_field_type::integral_type(b.data);
@@ -284,8 +283,7 @@ namespace nil {
                     generate_assignments(unified_addition_instance, assignment, addition_input, start_row_index);
 
 
-                typename CurveType::template g1_type<crypto3::algebra::curves::coordinates::affine>::value_type
-                    T_doubled(var_value(assignment, addition_res.X), var_value(assignment, addition_res.Y));
+                g1_value_type T_doubled(var_value(assignment, addition_res.X), var_value(assignment, addition_res.Y));
 
                 std::size_t j = start_row_index + component.add_component_rows_amount;
 
@@ -307,30 +305,41 @@ namespace nil {
                     assignment.witness(component.W(5), i) = n_next;
                     Q.X = T.X;
                     Q.Y = (2 * bits[((i - j) / 2) * 5] - 1) * T.Y;
+
                     P[1] = (P[0] + Q) + P[0];
                     assignment.witness(component.W(7), i) = P[1].X;
                     assignment.witness(component.W(8), i) = P[1].Y;
-                    assignment.witness(component.W(7), i + 1) = (P[0].Y - Q.Y) * (P[0].X - Q.X).inversed();
+                    typename BlueprintFieldType::value_type diff0 = (P[0].X - Q.X);
+                    assignment.witness(component.W(7), i + 1) = (P[0].Y - Q.Y) * (diff0.is_zero() ? 0: diff0.inversed());
                     Q.Y = (2 * bits[((i - j) / 2) * 5 + 1] - 1) * T.Y;
+
                     P[2] = (P[1] + Q) + P[1];
                     assignment.witness(component.W(9), i) = P[2].X;
                     assignment.witness(component.W(10), i) = P[2].Y;
-                    assignment.witness(component.W(8), i + 1) = (P[1].Y - Q.Y) * (P[1].X - Q.X).inversed();
+                    typename BlueprintFieldType::value_type diff1 = (P[1].X - Q.X);
+                    assignment.witness(component.W(8), i + 1) = (P[1].Y - Q.Y) * (diff1.is_zero() ? 0: diff1.inversed());
                     Q.Y = (2 * bits[((i - j) / 2) * 5 + 2] - 1) * T.Y;
+
                     P[3] = (P[2] + Q) + P[2];
                     assignment.witness(component.W(11), i) = P[3].X;
                     assignment.witness(component.W(12), i) = P[3].Y;
-                    assignment.witness(component.W(9), i + 1) = (P[2].Y - Q.Y) * (P[2].X - Q.X).inversed();
+                    typename BlueprintFieldType::value_type diff2 = (P[2].X - Q.X);
+                    assignment.witness(component.W(9), i + 1) = (P[2].Y - Q.Y) * (diff2.is_zero() ? 0: diff2.inversed());
                     Q.Y = (2 * bits[((i - j) / 2) * 5 + 3] - 1) * T.Y;
+
                     P[4] = (P[3] + Q) + P[3];
                     assignment.witness(component.W(13), i) = P[4].X;
                     assignment.witness(component.W(14), i) = P[4].Y;
-                    assignment.witness(component.W(10), i + 1) = (P[3].Y - Q.Y) * (P[3].X - Q.X).inversed();
+                    typename BlueprintFieldType::value_type diff3 = (P[3].X - Q.X);
+                    assignment.witness(component.W(10), i + 1) = (P[3].Y - Q.Y) * (diff3.is_zero() ? 0: diff3.inversed());
                     Q.Y = (2 * bits[((i - j) / 2) * 5 + 4] - 1) * T.Y;
+
                     P[5] = (P[4] + Q) + P[4];
                     assignment.witness(component.W(0), i + 1) = P[5].X;
                     assignment.witness(component.W(1), i + 1) = P[5].Y;
-                    assignment.witness(component.W(11), i + 1) = (P[4].Y - Q.Y) * (P[4].X - Q.X).inversed();
+                    typename BlueprintFieldType::value_type diff4 = (P[4].X - Q.X);
+                    assignment.witness(component.W(11), i + 1) = (P[4].Y - Q.Y) * (diff4.is_zero() ? 0: diff4.inversed());
+
                     assignment.witness(component.W(2), i + 1) = bits[((i - j) / 2) * 5];
                     assignment.witness(component.W(3), i + 1) = bits[((i - j) / 2) * 5 + 1];
                     assignment.witness(component.W(4), i + 1) = bits[((i - j) / 2) * 5 + 2];

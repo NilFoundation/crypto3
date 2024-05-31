@@ -73,8 +73,8 @@ void test_variable_base_scalar_mul (
 			R.X = var_value(assignment, real_res.X);
 			R.Y = var_value(assignment, real_res.Y);
 
-			assert(expected.X == R.X);
-			assert(expected.Y - R.Y == 0); // not (expected.Y == R.Y) because of issue https://github.com/NilFoundation/crypto3-multiprecision/issues/38
+			BOOST_CHECK_EQUAL(expected.X, R.X);
+			BOOST_CHECK_EQUAL(expected.Y, R.Y);
     };
 
 	var scalar_var = {0, 2, false, var::column_type::public_input};
@@ -146,10 +146,10 @@ typename CurveType::scalar_field_type::value_type shift_scalar(typename CurveTyp
 	typename CurveType::scalar_field_type::value_type shifted;
 
 	if ((unshifted == 1) || (unshifted == 0) || (unshifted == -1)){
-		shifted = (unshifted - shift_for_1_0_neg1) / denominator_for_1_0_neg1;
+		shifted = (unshifted - shift_for_1_0_neg1) * denominator_for_1_0_neg1.inversed();
 	}
 	else {
-		shifted = (unshifted - shift) / denominator;
+		shifted = (unshifted - shift) * denominator.inversed();
 	}
 
 	return shifted;
@@ -169,13 +169,10 @@ template<typename CurveType>
 void test_vbsm(
 	typename CurveType::template g1_type<nil::crypto3::algebra::curves::coordinates::affine>::value_type point,
 	typename CurveType::scalar_field_type::value_type scalar) {
-		typename CurveType::template g1_type<nil::crypto3::algebra::curves::coordinates::affine>::value_type zero_point = {0, 0};
-		typename CurveType::template g1_type<nil::crypto3::algebra::curves::coordinates::affine>::value_type expected;
-		if (scalar != 0) {
-			expected = point * scalar;
-		} else {
-			expected = {0, 0};
-		}
+        typedef typename CurveType::template g1_type<nil::crypto3::algebra::curves::coordinates::affine>::value_type g1_value_type;
+		g1_value_type expected;
+
+		expected = point * scalar;
 
 		typename CurveType::scalar_field_type::value_type shifted = shift_scalar<CurveType>(scalar);
 		typename CurveType::scalar_field_type::integral_type shifted_integral_type = typename CurveType::scalar_field_type::integral_type(shifted.data);
@@ -219,7 +216,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_variable_base_scalar_mul_random_scalar_pall
     random_scalar.seed(seed_seq2);
 
 	typename BlueprintScalarType::value_type two = 2;
-	typename BlueprintScalarType::value_type threefff = 0x3fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff_cppui255;
+	typename BlueprintScalarType::value_type threefff = 0x3fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff_cppui_modular255;
 	typename BlueprintScalarType::value_type unshifted_threefff = 2*threefff + two.pow(255) + 1;
 
 	test_vbsm<curve_type>(random_point(), two + two.pow(255) + 1);
@@ -251,9 +248,9 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_variable_base_scalar_mul_random_scalar_pall
     random_scalar.seed(pallas_seed_seq);
 
 	typename pallas_curve_type::scalar_field_type::value_type pallas_two = 2;
-	typename pallas_curve_type::scalar_field_type::value_type pallas_threefff = 0x3fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff_cppui255;
+	typename pallas_curve_type::scalar_field_type::value_type pallas_threefff = 0x3fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff_cppui_modular255;
 	typename pallas_curve_type::scalar_field_type::value_type pallas_unshifted_threefff = 2*pallas_threefff + pallas_two.pow(255) + 1;
-	typename pallas_curve_type::scalar_field_type::value_type pallas_p = 0x40000000000000000000000000000000224698fc094cf91b992d30ed00000001_cppui255;
+	typename pallas_curve_type::scalar_field_type::value_type pallas_p = 0x40000000000000000000000000000000224698fc094cf91b992d30ed00000001_cppui_modular255;
 
 	test_vbsm<pallas_curve_type>(pallas_random_point(), pallas_two + pallas_two.pow(255) + 1);
 	test_vbsm<pallas_curve_type>(pallas_random_point(), pallas_two - pallas_two + pallas_two.pow(255) + 1);

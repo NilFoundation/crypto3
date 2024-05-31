@@ -183,8 +183,8 @@ void test_field_mul_all_cases() {
     }
 
     test_field_mul_useable<FieldType, NonNativeFieldType>(
-        glue_non_native<FieldType, NonNativeFieldType>({0, 0, 0x3ffffffffffffffff_cppui255, 0}),
-        glue_non_native<FieldType, NonNativeFieldType>({0, 0, 0x3ffffffffffffffff_cppui255, 0}));
+        glue_non_native<FieldType, NonNativeFieldType>({0, 0, 0x3ffffffffffffffff_cppui_modular255, 0}),
+        glue_non_native<FieldType, NonNativeFieldType>({0, 0, 0x3ffffffffffffffff_cppui_modular255, 0}));
 
     test_field_mul_useable<FieldType, NonNativeFieldType>(0, 0);
     test_field_mul_useable<FieldType, NonNativeFieldType>(1, 1);
@@ -203,16 +203,16 @@ void test_field_mul_all_cases() {
                                                           glue_non_native<FieldType, NonNativeFieldType>({1, 0, 0, 0}));
 
     test_field_mul_useable<FieldType, NonNativeFieldType>(
-        glue_non_native<FieldType, NonNativeFieldType>({0x2BCA8C5A0FDF3D53E_cppui253, 0x39840DDF4C421B2D5_cppui253,
-                                                        0x24FCE5728D26931CA_cppui253, 0xFBD6153B4CE63_cppui253}),
-        glue_non_native<FieldType, NonNativeFieldType>({0x3CD7BA9506A76AA1C_cppui253, 0x15C58810F101DDB2F_cppui253,
-                                                        0x1AA5750251F6DA658_cppui253, 0x1323F61B67242F_cppui253}));
+        glue_non_native<FieldType, NonNativeFieldType>({0x2BCA8C5A0FDF3D53E_cppui_modular253, 0x39840DDF4C421B2D5_cppui_modular253,
+                                                        0x24FCE5728D26931CA_cppui_modular253, 0xFBD6153B4CE63_cppui_modular253}),
+        glue_non_native<FieldType, NonNativeFieldType>({0x3CD7BA9506A76AA1C_cppui_modular253, 0x15C58810F101DDB2F_cppui_modular253,
+                                                        0x1AA5750251F6DA658_cppui_modular253, 0x1323F61B67242F_cppui_modular253}));
 
     test_field_mul_useable<FieldType, NonNativeFieldType>(
         glue_non_native<FieldType, NonNativeFieldType>(
-            {0xc801afd_cppui255, 0xc801afd_cppui255, 0xc801afd_cppui255, 0xc801afd_cppui255}),
+            {0xc801afd_cppui_modular255, 0xc801afd_cppui_modular255, 0xc801afd_cppui_modular255, 0xc801afd_cppui_modular255}),
         glue_non_native<FieldType, NonNativeFieldType>(
-            {0xc801afd_cppui255, 0xc801afd_cppui255, 0xc801afd_cppui255, 0xc801afd_cppui255}));
+            {0xc801afd_cppui_modular255, 0xc801afd_cppui_modular255, 0xc801afd_cppui_modular255, 0xc801afd_cppui_modular255}));
     for (std::size_t i = 0; i < 10; i++) {
         test_field_mul_useable<FieldType, NonNativeFieldType>(rand(), rand());
     }

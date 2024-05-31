@@ -158,7 +158,7 @@ namespace nil {
                 std::size_t last_row =
                     std::min<std::size_t>(end_row_index, assignment.selector_column_size(selector_index));
                 for (std::size_t row = start_row_index; row < last_row; row++) {
-                    if (assignment.selector(selector_index, row) != 0) {
+                    if (assignment.selector(selector_index, row) != BlueprintFieldType::value_type::zero()) {
                         for (const auto &variable : variable_set) {
                             zones.union_set(gate_var_address(start_row_index, row, variable),
                                         gate_var_address(start_row_index, row, *variable_set.begin()));
@@ -184,7 +184,7 @@ namespace nil {
                 std::size_t last_row =
                     std::min<std::size_t>(end_row_index, assignment.selector_column_size(selector_index));
                 for (std::size_t row = start_row_index; row < last_row; row++) {
-                    if (assignment.selector(selector_index, row) != 0) {
+                    if (assignment.selector(selector_index, row) != BlueprintFieldType::value_type::zero()) {
                         for (const auto &variable : variable_set) {
                             const auto var_address = gate_var_address(start_row_index, row, variable);
                             if (expected_zones.count(zones.find_set(var_address)) == 0) {

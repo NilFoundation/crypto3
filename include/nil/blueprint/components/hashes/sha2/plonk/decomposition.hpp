@@ -255,13 +255,13 @@ namespace nil {
                 using var = typename plonk_native_decomposition<BlueprintFieldType>::var;
 
                 auto constraint_1 =
-                    var(component.W(8), -1) - (var(component.W(3), 0) + var(component.W(2), 0) * 0x100000000_cppui255 +
-                                               var(component.W(1), 0) * 0x10000000000000000_cppui255 +
-                                               var(component.W(0), 0) * 0x1000000000000000000000000_cppui255);
+                    var(component.W(8), -1) - (var(component.W(3), 0) + var(component.W(2), 0) * 0x100000000_cppui_modular255 +
+                                               var(component.W(1), 0) * 0x10000000000000000_cppui_modular255 +
+                                               var(component.W(0), 0) * 0x1000000000000000000000000_cppui_modular255);
                 auto constraint_2 =
-                    var(component.W(8), 1) - (var(component.W(7), 0) + var(component.W(6), 0) * 0x100000000_cppui255 +
-                                              var(component.W(5), 0) * 0x10000000000000000_cppui255 +
-                                              var(component.W(4), 0) * 0x1000000000000000000000000_cppui255);
+                    var(component.W(8), 1) - (var(component.W(7), 0) + var(component.W(6), 0) * 0x100000000_cppui_modular255 +
+                                              var(component.W(5), 0) * 0x10000000000000000_cppui_modular255 +
+                                              var(component.W(4), 0) * 0x1000000000000000000000000_cppui_modular255);
                 auto constraint_3 = var(component.W(3), 0) -
                                                       (var(component.W(0), -1) + var(component.W(1), -1) * (65536));
                 auto constraint_4 = var(component.W(2), 0) -

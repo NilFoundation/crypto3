@@ -274,10 +274,10 @@ void test_div_or_zero(std::vector<typename FieldType::value_type> public_input){
         var(0, 0, false, var::column_type::public_input), var(0, 1, false, var::column_type::public_input)};
 
     typename FieldType::value_type expected_res;
-    if (public_input[1] != 0) {
-        expected_res = public_input[0] / public_input[1];
+    if (public_input[1] != FieldType::value_type::zero()) {
+        expected_res = public_input[0] * public_input[1].inversed();
     } else {
-        expected_res = 0;
+        expected_res = FieldType::value_type::zero();
     }
 
     auto result_check = [&expected_res, public_input](AssignmentType &assignment,
@@ -301,11 +301,14 @@ void test_div_or_zero(std::vector<typename FieldType::value_type> public_input){
 
 template <typename FieldType>
 void test_5_components(int i, int j) {
-    test_add<FieldType>({i, j});
-    test_sub<FieldType>({i, j});
-    test_mul<FieldType>({i, j});
-    test_mul_by_const<FieldType>({i}, j);
-    test_div_or_zero<FieldType>({i, j});
+    typename FieldType::value_type i_fe = i > 0 ? i : FieldType::modulus - std::abs(i);
+    typename FieldType::value_type j_fe = j > 0 ? j : FieldType::modulus - std::abs(j);
+
+    test_add<FieldType>({i_fe, j_fe});
+    test_sub<FieldType>({i_fe, j_fe});
+    test_mul<FieldType>({i_fe, j_fe});
+    test_mul_by_const<FieldType>({i_fe}, j_fe);
+    test_div_or_zero<FieldType>({i_fe, j_fe});
 }
 
 template <typename FieldType>

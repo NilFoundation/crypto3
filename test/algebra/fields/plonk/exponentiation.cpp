@@ -95,7 +95,10 @@ template <typename FieldType, std::size_t RandomTestsAmount>
 void exponentiation_tests(){
     for (int i = -2; i < 3; i++){
         for (int j = -2; j < 3; j++){
-            test_exponentiation<FieldType, 255>({i, j});
+            typename FieldType::value_type i_fe = i > 0 ? unsigned(i) : FieldType::modulus - unsigned(-i);
+            typename FieldType::value_type j_fe = j > 0 ? unsigned(j) : FieldType::modulus - unsigned(-j);
+
+            test_exponentiation<FieldType, 255>({i_fe, j_fe});
         }
     }
 
@@ -113,15 +116,15 @@ constexpr static const std::size_t random_tests_amount = 10;
 BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_exponentiation_one) {
-    test_exponentiation<nil::crypto3::algebra::fields::bls12_fr<381>, 1>({1, 1});
-    test_exponentiation<nil::crypto3::algebra::curves::vesta::base_field_type, 1>({1, 1});
-    test_exponentiation<nil::crypto3::algebra::curves::pallas::base_field_type, 1>({1, 1});
+    test_exponentiation<nil::crypto3::algebra::fields::bls12_fr<381>, 1>({1u, 1u});
+    test_exponentiation<nil::crypto3::algebra::curves::vesta::base_field_type, 1>({1u, 1u});
+    test_exponentiation<nil::crypto3::algebra::curves::pallas::base_field_type, 1>({1u, 1u});
 }
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_exponentiation_b1111) {
-    test_exponentiation<nil::crypto3::algebra::fields::bls12_fr<381>, 4>({2379842, 0b1111});
-    test_exponentiation<nil::crypto3::algebra::curves::vesta::base_field_type, 4>({2379842, 0b1111});
-    test_exponentiation<nil::crypto3::algebra::curves::pallas::base_field_type, 4>({2379842, 0b1111});
+    test_exponentiation<nil::crypto3::algebra::fields::bls12_fr<381>, 4>({2379842u, 0b1111u});
+    test_exponentiation<nil::crypto3::algebra::curves::vesta::base_field_type, 4>({2379842u, 0b1111u});
+    test_exponentiation<nil::crypto3::algebra::curves::pallas::base_field_type, 4>({2379842u, 0b1111u});
 }
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_exponentiation_pallas) {

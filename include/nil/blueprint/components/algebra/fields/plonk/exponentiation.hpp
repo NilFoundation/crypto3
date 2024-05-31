@@ -213,9 +213,9 @@ namespace nil {
                         {
                             std::vector<bool> bbb;
                             auto data = exponent.data;
-                            while (data != 0) {
-                                bbb.push_back((data - (data >> 1 << 1)) != 0);
-                                data = data >> 1;
+                            while (data != 0u) {
+                                bbb.push_back((data - (data >> 1u << 1u)) != 0u);
+                                data = data >> 1u;
                             }
                             for (std::uint32_t i = 1; i < component.padded_exponent_size - bbb.size(); ++i) {
                                 bits[i] = false;
@@ -225,12 +225,12 @@ namespace nil {
                             }
                         }
 
-                        typename BlueprintFieldType::value_type accumulated_n = 0;
-                        typename BlueprintFieldType::value_type acc1 = 1;
+                        typename BlueprintFieldType::value_type accumulated_n = 0u;
+                        typename BlueprintFieldType::value_type acc1 = 1u;
 
                         // we use first empty row to unify first row gate with others
-                        assignment.witness(component.W(1), start_row_index) = 0;
-                        assignment.witness(component.intermediate_start + component.intermediate_results_per_row - 1, start_row_index) = 1;
+                        assignment.witness(component.W(1), start_row_index) = 0u;
+                        assignment.witness(component.intermediate_start + component.intermediate_results_per_row - 1, start_row_index) = 1u;
                         std::size_t start_row_padded = start_row_index + 1;
 
                         std::size_t current_bit = 0;
@@ -238,15 +238,15 @@ namespace nil {
                             assignment.witness(component.W(0), row) = base;
 
                             for (std::size_t j = 0; j < component.intermediate_results_per_row; j++) {
-                                typename BlueprintFieldType::value_type intermediate_exponent = 0;
+                                typename BlueprintFieldType::value_type intermediate_exponent = 0u;
                                 for (std::size_t bit_column = 0; bit_column < component.bits_per_intermediate_result;
                                      bit_column++) {
                                     std::size_t column_idx = 14 - j * (component.bits_per_intermediate_result)-bit_column;
-                                    assignment.witness(component.W(column_idx), row) = bits[current_bit] ? 1 : 0;
+                                    assignment.witness(component.W(column_idx), row) = bits[current_bit] ? 1u : 0u;
                                     // wierd stuff is here for oracles scalar
                                     // std::cout<<"column_idx "<<column_idx<<" row "<<row<<" value "<<bits[current_bit]<<std::endl;
 
-                                    intermediate_exponent = 2 * intermediate_exponent + (bits[current_bit] ? 1 : 0);
+                                    intermediate_exponent = 2u * intermediate_exponent + (bits[current_bit] ? 1u : 0u);
 
                                     acc1 = acc1 * acc1;
                                     if (bits[current_bit]) {
@@ -256,7 +256,7 @@ namespace nil {
                                     current_bit++;
                                 }
                                 accumulated_n =
-                                    (accumulated_n * (1 << component.bits_per_intermediate_result)) + intermediate_exponent;
+                                    (accumulated_n * (1u << component.bits_per_intermediate_result)) + intermediate_exponent;
                                 assignment.witness(component.W(component.intermediate_start + j), row) = acc1;
                             }
                             assignment.witness(component.W(1), row) = accumulated_n;
@@ -275,7 +275,7 @@ namespace nil {
 
                     	using var = typename plonk_exponentiation<BlueprintFieldType, ExponentSize>::var;
 
-                        typename BlueprintFieldType::value_type exponent_shift = 2;
+                        typename BlueprintFieldType::value_type exponent_shift = 2u;
                         exponent_shift = power(exponent_shift, component.bits_per_row);
 
                         std::vector<crypto3::zk::snark::plonk_constraint<BlueprintFieldType>> constraints;
@@ -290,18 +290,18 @@ namespace nil {
                                 std::size_t column_idx = 14 - j * (component.bits_per_intermediate_result)-bit_column;
                                 constraints.emplace_back(
                                     var(component.W(column_idx), 0) *
-                                    (1 - var(component.W(column_idx), 0))); // fail on oracles scalar
+                                    (1u - var(component.W(column_idx), 0))); // fail on oracles scalar
 
                                 nil::crypto3::zk::snark::plonk_constraint<BlueprintFieldType> bit_res =
                                     var(component.W(0), 0) * var(component.W(column_idx), 0);
                                 if (j == 0 && bit_column == 0) {
                                     accumulated_n_constraint = var(component.W(column_idx), 0);
                                 } else {
-                                    accumulated_n_constraint = 2 * accumulated_n_constraint + var(component.W(column_idx), 0);
+                                    accumulated_n_constraint = 2u * accumulated_n_constraint + var(component.W(column_idx), 0);
                                 }
                                 intermediate_result_constraint = intermediate_result_constraint *
                                                                  intermediate_result_constraint *
-                                                                 (bit_res + (1 - var(component.W(column_idx), 0)));
+                                                                 (bit_res + (1u - var(component.W(column_idx), 0)));
                             }
 
                             intermediate_result_constraint =
@@ -349,9 +349,9 @@ namespace nil {
                             const std::uint32_t start_row_index) {
 
                             std::size_t row = start_row_index;
-                            assignment.constant(component.C(0), row) = 0;
+                            assignment.constant(component.C(0), row) = 0u;
                             row++;
-                            assignment.constant(component.C(0), row) = 1;
+                            assignment.constant(component.C(0), row) = 1u;
                             row++;
                 }
             }    // namespace components

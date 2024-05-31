@@ -163,7 +163,7 @@ namespace nil {
                 assignment.witness(component.W(2), j) = Q.X;
                 assignment.witness(component.W(3), j) = Q.Y;
                 typename CurveType::template g1_type<crypto3::algebra::curves::coordinates::affine>::value_type zero = {
-                    0, 0};
+                    0u, 0u};
                 if (P.X == zero.X && P.Y == zero.Y) {
                     assignment.witness(component.W(4), j) = Q.X;
                     assignment.witness(component.W(5), j) = Q.Y;
@@ -173,30 +173,30 @@ namespace nil {
                         assignment.witness(component.W(5), j) = P.Y;
                     } else {
                         if (Q.X == P.X && Q.Y == -P.Y) {
-                            assignment.witness(component.W(4), j) = 0;
-                            assignment.witness(component.W(5), j) = 0;
+                            assignment.witness(component.W(4), j) = 0u;
+                            assignment.witness(component.W(5), j) = 0u;
                         } else {
                             assignment.witness(component.W(4), j) = (P + Q).X;
                             assignment.witness(component.W(5), j) = (P + Q).Y;
                         }
                     }
                 }
-                if (P.X != 0) {
+                if (P.X != 0u) {
                     assignment.witness(component.W(6), j) = P.X.inversed();
                 } else {
-                    assignment.witness(component.W(6), j) = 0;
+                    assignment.witness(component.W(6), j) = 0u;
                 }
 
-                if (Q.X != 0) {
+                if (Q.X != 0u) {
                     assignment.witness(component.W(7), j) = Q.X.inversed();
                 } else {
-                    assignment.witness(component.W(7), j) = 0;
+                    assignment.witness(component.W(7), j) = 0u;
                 }
 
                 if (P.X != Q.X) {
-                    assignment.witness(component.W(10), j) = (Q.Y - P.Y) / (Q.X - P.X);
+                    assignment.witness(component.W(10), j) = (Q.Y - P.Y) * (Q.X - P.X).inversed();
 
-                    assignment.witness(component.W(9), j) = 0;
+                    assignment.witness(component.W(9), j) = 0u;
 
                     assignment.witness(component.W(8), j) = (Q.X - P.X).inversed();
                 } else {
@@ -204,14 +204,14 @@ namespace nil {
                     if (P.Y != -Q.Y) {
                         assignment.witness(component.W(9), j) = (Q.Y + P.Y).inversed();
                     } else {
-                        assignment.witness(component.W(9), j) = 0;
+                        assignment.witness(component.W(9), j) = 0u;
                     }
-                    if (P.Y != 0) {
-                        assignment.witness(component.W(10), j) = (3 * (P.X * P.X)) / (2 * P.Y);
+                    if (P.Y != 0u) {
+                        assignment.witness(component.W(10), j) = (3u * (P.X * P.X)) * (2u * P.Y).inversed();
                     } else {
-                        assignment.witness(component.W(10), j) = 0;
+                        assignment.witness(component.W(10), j) = 0u;
                     }
-                    assignment.witness(component.W(8), j) = 0;
+                    assignment.witness(component.W(8), j) = 0u;
                 }
 
                 return typename plonk_native_unified_addition<BlueprintFieldType, CurveType>::result_type(
@@ -233,9 +233,9 @@ namespace nil {
                     ((var(component.W(2), 0) - var(component.W(0), 0)) *
                      var(component.W(10), 0) - (var(component.W(3), 0) - var(component.W(1), 0)));
                 auto constraint_2 =
-                    (1 - (var(component.W(2), 0) - var(component.W(0), 0)) * var(component.W(8), 0)) *
-                    (2 * var(component.W(1), 0) * var(component.W(10), 0) -
-                     3 * var(component.W(0), 0) * var(component.W(0), 0));
+                    (1u - (var(component.W(2), 0) - var(component.W(0), 0)) * var(component.W(8), 0)) *
+                    (2u * var(component.W(1), 0) * var(component.W(10), 0) -
+                     3u * var(component.W(0), 0) * var(component.W(0), 0));
 
                 auto constraint_3 =
                     (var(component.W(0), 0) * var(component.W(2), 0) * var(component.W(2), 0) -
@@ -258,23 +258,23 @@ namespace nil {
                     (var(component.W(10), 0) * (var(component.W(0), 0) - var(component.W(4), 0)) -
                      var(component.W(1), 0) - var(component.W(5), 0));
                 auto constraint_7 =
-                    (1 - var(component.W(0), 0) * var(component.W(6), 0)) *
+                    (1u - var(component.W(0), 0) * var(component.W(6), 0)) *
                         (var(component.W(4), 0) - var(component.W(2), 0));
                 auto constraint_8 =
-                    (1 - var(component.W(0), 0) * var(component.W(6), 0)) *
+                    (1u - var(component.W(0), 0) * var(component.W(6), 0)) *
                         (var(component.W(5), 0) - var(component.W(3), 0));
                 auto constraint_9 =
-                    (1 - var(component.W(2), 0) * var(component.W(7), 0)) *
+                    (1u - var(component.W(2), 0) * var(component.W(7), 0)) *
                         (var(component.W(4), 0) - var(component.W(0), 0));
                 auto constraint_10 =
-                    (1 - var(component.W(2), 0) * var(component.W(7), 0)) *
+                    (1u - var(component.W(2), 0) * var(component.W(7), 0)) *
                         (var(component.W(5), 0) - var(component.W(1), 0));
                 auto constraint_11 =
-                    (1 - (var(component.W(2), 0) - var(component.W(0), 0)) * var(component.W(8), 0) -
+                    (1u - (var(component.W(2), 0) - var(component.W(0), 0)) * var(component.W(8), 0) -
                         (var(component.W(3), 0) + var(component.W(1), 0)) * var(component.W(9), 0)) *
                     var(component.W(4), 0);
                 auto constraint_12 =
-                    (1 - (var(component.W(2), 0) - var(component.W(0), 0)) * var(component.W(8), 0) -
+                    (1u - (var(component.W(2), 0) - var(component.W(0), 0)) * var(component.W(8), 0) -
                         (var(component.W(3), 0) + var(component.W(1), 0)) * var(component.W(9), 0)) *
                     var(component.W(5), 0);
 

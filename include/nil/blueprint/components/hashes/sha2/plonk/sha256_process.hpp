@@ -1545,9 +1545,8 @@ namespace nil {
                     assignment.witness(component.W(8), i + 4) = integral_a2;
 
                     assignment.witness(component.W(0), i + 3) =
-                        (sum - message_scheduling_words[(i - row) / 5 + 16]) /
-                        typename BlueprintFieldType::integral_type(
-                            typename BlueprintFieldType::value_type(2).pow(32).data);
+                        (sum - message_scheduling_words[(i - row) / 5 + 16]) *
+                            typename BlueprintFieldType::value_type(2).pow(32).inversed();
                 }
                 row = row + 240;
                 for (std::size_t i = row; i < row + 512; i = i + 8) {
@@ -1642,8 +1641,8 @@ namespace nil {
                     assignment.witness(component.W(4), i + 4) = tmp1;
                     assignment.witness(component.W(4), i + 3) = e_new;
                     assignment.witness(component.W(4), i + 2) =
-                        (sum - e_new) / typename BlueprintFieldType::integral_type(
-                                            typename BlueprintFieldType::value_type(2).pow(32).data);
+                        (sum - e_new) * typename BlueprintFieldType::integral_type(
+                                            typename BlueprintFieldType::value_type(2).pow(32).inversed().data);
 
                     typename BlueprintFieldType::integral_type integral_a2 =
                         typename BlueprintFieldType::integral_type(e_new.data);
@@ -1732,7 +1731,7 @@ namespace nil {
                             typename BlueprintFieldType::value_type(2).pow(32).data);
                     assignment.witness(component.W(2), i + 5) = a_new;
                     assignment.witness(component.W(3), i + 5) =
-                        (sum1 - a_new) / typename BlueprintFieldType::value_type(2).pow(32);
+                        (sum1 - a_new) * typename BlueprintFieldType::value_type(2).pow(32).inversed();
 
                     integral_a2 =
                         typename BlueprintFieldType::integral_type(a_new.data);

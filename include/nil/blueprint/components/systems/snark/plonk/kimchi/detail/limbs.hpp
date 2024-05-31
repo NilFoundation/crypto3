@@ -403,27 +403,44 @@ namespace nil {
                     c & mask, (c >> 64) & mask, (c >> 128) & mask, (c >> 192) & mask};
 
                 typename BlueprintFieldType::extended_integral_type b =
-                    typename BlueprintFieldType::extended_integral_type(value.data) + c;
+                    typename BlueprintFieldType::extended_integral_type(typename BlueprintFieldType::integral_type(value.data)) + c;
                 std::array<typename BlueprintFieldType::extended_integral_type, 4> b_chunks = {
                     b & mask, (b >> 64) & mask, (b >> 128) & mask, (b >> 192) & mask};
                 assignment.witness(component.W(5), row) = b_chunks[0];
                 assignment.witness(component.W(6), row) = b_chunks[1];
                 assignment.witness(component.W(7), row) = b_chunks[2];
                 assignment.witness(component.W(8), row) = b_chunks[3];
-                assignment.witness(component.W(9), row) =
-                    (typename BlueprintFieldType::extended_integral_type(assignment.witness(component.W(1), row).data) +
-                        c_chunks[0] - b_chunks[0]) >>
-                    64;
-                assignment.witness(component.W(10), row) =
-                    (typename BlueprintFieldType::extended_integral_type(assignment.witness(component.W(2), row).data) +
-                        c_chunks[1] - b_chunks[1] +
-                        typename BlueprintFieldType::extended_integral_type(assignment.witness(component.W(9), row).data)) >>
-                    64;
-                assignment.witness(component.W(11), row) =
-                    (typename BlueprintFieldType::extended_integral_type(assignment.witness(component.W(3), row).data) +
-                        c_chunks[2] - b_chunks[2] +
-                        typename BlueprintFieldType::extended_integral_type(assignment.witness(component.W(10), row).data)) >>
-                    64;
+
+                // We must be careful here not to have negative values.
+                typename BlueprintFieldType::extended_integral_type W9_part = typename BlueprintFieldType::integral_type(
+                    assignment.witness(component.W(1), row).data);
+                W9_part += c_chunks[0];
+                if (W9_part > b_chunks[0]) {
+                    assignment.witness(component.W(9), row) = (W9_part - b_chunks[0]) >> 64;
+                } else {
+                    assignment.witness(component.W(9), row) = BlueprintFieldType::modulus - typename BlueprintFieldType::integral_type((b_chunks[0] - W9_part) >> 64);
+                }
+
+                typename BlueprintFieldType::extended_integral_type W10_part = typename BlueprintFieldType::integral_type(
+                    assignment.witness(component.W(2), row).data);
+                W10_part += typename BlueprintFieldType::integral_type(assignment.witness(component.W(9), row).data);
+                W10_part += c_chunks[1];
+                if (W10_part > b_chunks[1]) {
+                    assignment.witness(component.W(10), row) = (W10_part - b_chunks[1]) >> 64;
+                } else {
+                    assignment.witness(component.W(10), row) = BlueprintFieldType::modulus - typename BlueprintFieldType::integral_type((b_chunks[1] - W10_part) >> 64);
+                }
+
+                typename BlueprintFieldType::extended_integral_type W11_part = typename BlueprintFieldType::integral_type(
+                    assignment.witness(component.W(3), row).data);
+                W11_part += typename BlueprintFieldType::integral_type(assignment.witness(component.W(10), row).data);
+                W11_part += c_chunks[2];
+                if (W11_part > b_chunks[2]) {
+                    assignment.witness(component.W(11), row) = (W11_part - b_chunks[2]) >> 64;
+                } else {
+                    assignment.witness(component.W(11), row) = BlueprintFieldType::modulus - typename BlueprintFieldType::integral_type((b_chunks[2] - W11_part) >> 64);
+                }
+
                 std::array<var, component_type::chunk_amount> chunks = {
                     var(component.W(1), row, false),
                     var(component.W(2), row, false),

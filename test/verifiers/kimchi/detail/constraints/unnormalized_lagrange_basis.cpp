@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_unnormalized_lagrange_basis_positive_power)
     using component_type = zk::components::unnormalized_lagrange_basis<ArithmetizationType, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
                                                                             11, 12, 13, 14>;
 
-    typename BlueprintFieldType::value_type group_gen = 0x0CB8102D0128EBB25343154773101EAF1A9DAEF679667EB4BD1E06B973E985E4_cppui256;
+    typename BlueprintFieldType::value_type group_gen = 0x0CB8102D0128EBB25343154773101EAF1A9DAEF679667EB4BD1E06B973E985E4_cppui_modular256;
     std::size_t domain_size = 512;
     int ith = 5;
     typename BlueprintFieldType::value_type x = algebra::random_element<BlueprintFieldType>();
@@ -114,7 +114,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_unnormalized_lagrange_basis_negative_power)
     using component_type = zk::components::unnormalized_lagrange_basis<ArithmetizationType, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
                                                                             11, 12, 13, 14>;
 
-    typename BlueprintFieldType::value_type group_gen = 0x0CB8102D0128EBB25343154773101EAF1A9DAEF679667EB4BD1E06B973E985E4_cppui256;
+    typename BlueprintFieldType::value_type group_gen = 0x0CB8102D0128EBB25343154773101EAF1A9DAEF679667EB4BD1E06B973E985E4_cppui_modular256;
     std::size_t domain_size = 512;
     int ith = -5;
     typename BlueprintFieldType::value_type x = algebra::random_element<BlueprintFieldType>();

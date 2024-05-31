@@ -34,8 +34,8 @@
 #include <boost/concept_check.hpp>
 #include <boost/range/concepts.hpp>
 
-#include <nil/crypto3/multiprecision/integer.hpp>
-#include <nil/crypto3/multiprecision/number.hpp>
+#include <boost/multiprecision/integer.hpp>
+#include <boost/multiprecision/number.hpp>
 
 #include <nil/crypto3/zk/snark/arithmetization/constraint_satisfaction_problems/r1cs.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
@@ -148,7 +148,7 @@ namespace nil {
                     void fill_with_bits_of_field_element(blueprint<ArithmetizationType> &bp,
                                                          const field_value_type &r) const {
                         for (std::size_t i = 0; i < this->size(); ++i) {
-                            bp.val((*this)[i]) = nil::crypto3::multiprecision::bit_test(r.data, i) ?
+                            bp.val((*this)[i]) = boost::multiprecision::bit_test(r.data, i) ?
                                                      field_value_type::one() :
                                                      field_value_type::zero();
                         }

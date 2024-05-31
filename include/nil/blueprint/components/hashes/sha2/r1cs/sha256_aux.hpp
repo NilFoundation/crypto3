@@ -321,8 +321,8 @@ namespace nil {
                     void generate_assignments() {
 
                         // temporary added until fixed-precision modular adaptor is ready:
-                        typedef nil::crypto3::multiprecision::number<
-                            nil::crypto3::multiprecision::backends::cpp_int_backend<>>
+                        typedef boost::multiprecision::number<
+                            boost::multiprecision::backends::cpp_int_backend<>>
                             non_fixed_precision_integral_type;
 
                         using integral_type = typename FieldType::integral_type;

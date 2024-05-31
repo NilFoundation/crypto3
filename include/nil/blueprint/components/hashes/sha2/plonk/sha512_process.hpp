@@ -89,26 +89,26 @@ namespace nil {
 
                 constexpr static const std::array<typename BlueprintFieldType::value_type, rounds_amount>
                     round_constant = {
-                        0x428a2f98d728ae22_cppui64, 0x7137449123ef65cd_cppui64, 0xb5c0fbcfec4d3b2f_cppui64, 0xe9b5dba58189dbbc_cppui64,
-                        0x3956c25bf348b538_cppui64, 0x59f111f1b605d019_cppui64, 0x923f82a4af194f9b_cppui64, 0xab1c5ed5da6d8118_cppui64,
-                        0xd807aa98a3030242_cppui64, 0x12835b0145706fbe_cppui64, 0x243185be4ee4b28c_cppui64, 0x550c7dc3d5ffb4e2_cppui64,
-                        0x72be5d74f27b896f_cppui64, 0x80deb1fe3b1696b1_cppui64, 0x9bdc06a725c71235_cppui64, 0xc19bf174cf692694_cppui64,
-                        0xe49b69c19ef14ad2_cppui64, 0xefbe4786384f25e3_cppui64, 0x0fc19dc68b8cd5b5_cppui64, 0x240ca1cc77ac9c65_cppui64,
-                        0x2de92c6f592b0275_cppui64, 0x4a7484aa6ea6e483_cppui64, 0x5cb0a9dcbd41fbd4_cppui64, 0x76f988da831153b5_cppui64,
-                        0x983e5152ee66dfab_cppui64, 0xa831c66d2db43210_cppui64, 0xb00327c898fb213f_cppui64, 0xbf597fc7beef0ee4_cppui64,
-                        0xc6e00bf33da88fc2_cppui64, 0xd5a79147930aa725_cppui64, 0x06ca6351e003826f_cppui64, 0x142929670a0e6e70_cppui64,
-                        0x27b70a8546d22ffc_cppui64, 0x2e1b21385c26c926_cppui64, 0x4d2c6dfc5ac42aed_cppui64, 0x53380d139d95b3df_cppui64,
-                        0x650a73548baf63de_cppui64, 0x766a0abb3c77b2a8_cppui64, 0x81c2c92e47edaee6_cppui64, 0x92722c851482353b_cppui64,
-                        0xa2bfe8a14cf10364_cppui64, 0xa81a664bbc423001_cppui64, 0xc24b8b70d0f89791_cppui64, 0xc76c51a30654be30_cppui64,
-                        0xd192e819d6ef5218_cppui64, 0xd69906245565a910_cppui64, 0xf40e35855771202a_cppui64, 0x106aa07032bbd1b8_cppui64,
-                        0x19a4c116b8d2d0c8_cppui64, 0x1e376c085141ab53_cppui64, 0x2748774cdf8eeb99_cppui64, 0x34b0bcb5e19b48a8_cppui64,
-                        0x391c0cb3c5c95a63_cppui64, 0x4ed8aa4ae3418acb_cppui64, 0x5b9cca4f7763e373_cppui64, 0x682e6ff3d6b2b8a3_cppui64,
-                        0x748f82ee5defb2fc_cppui64, 0x78a5636f43172f60_cppui64, 0x84c87814a1f0ab72_cppui64, 0x8cc702081a6439ec_cppui64,
-                        0x90befffa23631e28_cppui64, 0xa4506cebde82bde9_cppui64, 0xbef9a3f7b2c67915_cppui64, 0xc67178f2e372532b_cppui64,
-                        0xca273eceea26619c_cppui64, 0xd186b8c721c0c207_cppui64, 0xeada7dd6cde0eb1e_cppui64, 0xf57d4f7fee6ed178_cppui64,
-                        0x06f067aa72176fba_cppui64, 0x0a637dc5a2c898a6_cppui64, 0x113f9804bef90dae_cppui64, 0x1b710b35131c471b_cppui64,
-                        0x28db77f523047d84_cppui64, 0x32caab7b40c72493_cppui64, 0x3c9ebe0a15c9bebc_cppui64, 0x431d67c49c100d4c_cppui64,
-                        0x4cc5d4becb3e42b6_cppui64, 0x597f299cfc657e2a_cppui64, 0x5fcb6fab3ad6faec_cppui64, 0x6c44198c4a475817_cppui64};
+                        0x428a2f98d728ae22_cppui_modular64, 0x7137449123ef65cd_cppui_modular64, 0xb5c0fbcfec4d3b2f_cppui_modular64, 0xe9b5dba58189dbbc_cppui_modular64,
+                        0x3956c25bf348b538_cppui_modular64, 0x59f111f1b605d019_cppui_modular64, 0x923f82a4af194f9b_cppui_modular64, 0xab1c5ed5da6d8118_cppui_modular64,
+                        0xd807aa98a3030242_cppui_modular64, 0x12835b0145706fbe_cppui_modular64, 0x243185be4ee4b28c_cppui_modular64, 0x550c7dc3d5ffb4e2_cppui_modular64,
+                        0x72be5d74f27b896f_cppui_modular64, 0x80deb1fe3b1696b1_cppui_modular64, 0x9bdc06a725c71235_cppui_modular64, 0xc19bf174cf692694_cppui_modular64,
+                        0xe49b69c19ef14ad2_cppui_modular64, 0xefbe4786384f25e3_cppui_modular64, 0x0fc19dc68b8cd5b5_cppui_modular64, 0x240ca1cc77ac9c65_cppui_modular64,
+                        0x2de92c6f592b0275_cppui_modular64, 0x4a7484aa6ea6e483_cppui_modular64, 0x5cb0a9dcbd41fbd4_cppui_modular64, 0x76f988da831153b5_cppui_modular64,
+                        0x983e5152ee66dfab_cppui_modular64, 0xa831c66d2db43210_cppui_modular64, 0xb00327c898fb213f_cppui_modular64, 0xbf597fc7beef0ee4_cppui_modular64,
+                        0xc6e00bf33da88fc2_cppui_modular64, 0xd5a79147930aa725_cppui_modular64, 0x06ca6351e003826f_cppui_modular64, 0x142929670a0e6e70_cppui_modular64,
+                        0x27b70a8546d22ffc_cppui_modular64, 0x2e1b21385c26c926_cppui_modular64, 0x4d2c6dfc5ac42aed_cppui_modular64, 0x53380d139d95b3df_cppui_modular64,
+                        0x650a73548baf63de_cppui_modular64, 0x766a0abb3c77b2a8_cppui_modular64, 0x81c2c92e47edaee6_cppui_modular64, 0x92722c851482353b_cppui_modular64,
+                        0xa2bfe8a14cf10364_cppui_modular64, 0xa81a664bbc423001_cppui_modular64, 0xc24b8b70d0f89791_cppui_modular64, 0xc76c51a30654be30_cppui_modular64,
+                        0xd192e819d6ef5218_cppui_modular64, 0xd69906245565a910_cppui_modular64, 0xf40e35855771202a_cppui_modular64, 0x106aa07032bbd1b8_cppui_modular64,
+                        0x19a4c116b8d2d0c8_cppui_modular64, 0x1e376c085141ab53_cppui_modular64, 0x2748774cdf8eeb99_cppui_modular64, 0x34b0bcb5e19b48a8_cppui_modular64,
+                        0x391c0cb3c5c95a63_cppui_modular64, 0x4ed8aa4ae3418acb_cppui_modular64, 0x5b9cca4f7763e373_cppui_modular64, 0x682e6ff3d6b2b8a3_cppui_modular64,
+                        0x748f82ee5defb2fc_cppui_modular64, 0x78a5636f43172f60_cppui_modular64, 0x84c87814a1f0ab72_cppui_modular64, 0x8cc702081a6439ec_cppui_modular64,
+                        0x90befffa23631e28_cppui_modular64, 0xa4506cebde82bde9_cppui_modular64, 0xbef9a3f7b2c67915_cppui_modular64, 0xc67178f2e372532b_cppui_modular64,
+                        0xca273eceea26619c_cppui_modular64, 0xd186b8c721c0c207_cppui_modular64, 0xeada7dd6cde0eb1e_cppui_modular64, 0xf57d4f7fee6ed178_cppui_modular64,
+                        0x06f067aa72176fba_cppui_modular64, 0x0a637dc5a2c898a6_cppui_modular64, 0x113f9804bef90dae_cppui_modular64, 0x1b710b35131c471b_cppui_modular64,
+                        0x28db77f523047d84_cppui_modular64, 0x32caab7b40c72493_cppui_modular64, 0x3c9ebe0a15c9bebc_cppui_modular64, 0x431d67c49c100d4c_cppui_modular64,
+                        0x4cc5d4becb3e42b6_cppui_modular64, 0x597f299cfc657e2a_cppui_modular64, 0x5fcb6fab3ad6faec_cppui_modular64, 0x6c44198c4a475817_cppui_modular64};
 
                 const std::size_t rows_amount = get_rows_amount(this->witness_amount());
                 constexpr static const std::size_t gates_amount = 10;
@@ -617,8 +617,8 @@ namespace nil {
                         typename BlueprintFieldType::integral_type(sum.data) %
                         typename BlueprintFieldType::integral_type(typename BlueprintFieldType::value_type(2).pow(64).data);
                     assignment.witness(component.W(5), i + 3) = message_scheduling_words[(i - row) / 6 + 16];
-                    assignment.witness(component.W(6), i + 3) = (sum - message_scheduling_words[(i - row) / 6 + 16]) /
-                    typename BlueprintFieldType::integral_type(typename BlueprintFieldType::value_type(2).pow(64).data);
+                    assignment.witness(component.W(6), i + 3) = (sum - message_scheduling_words[(i - row) / 6 + 16]) *
+                        typename BlueprintFieldType::value_type(2).pow(64).inversed();
                 }
                 row = row + 384;
                 for (std::size_t i = row; i < row + 720; i = i + 9) {
@@ -723,7 +723,7 @@ namespace nil {
                     typename BlueprintFieldType::integral_type(typename BlueprintFieldType::value_type(2).pow(64).data);
                     assignment.witness(component.W(1), i + 4) = tmp1;
                     assignment.witness(component.W(2), i + 4) = e_new;
-                    assignment.witness(component.W(3), i + 4) = (sum - e_new)/typename BlueprintFieldType::integral_type(typename BlueprintFieldType::value_type(2).pow(64).data);
+                    assignment.witness(component.W(3), i + 4) = (sum - e_new) * typename BlueprintFieldType::integral_type(typename BlueprintFieldType::value_type(2).pow(64).inversed().data);
 
                     assignment.witness(component.W(0), i + 8) = a;
                     typename BlueprintFieldType::integral_type integral_a =
@@ -815,7 +815,7 @@ namespace nil {
                     typename BlueprintFieldType::value_type a_new = typename BlueprintFieldType::integral_type(sum1.data) %
                     typename BlueprintFieldType::integral_type(typename BlueprintFieldType::value_type(2).pow(64).data);
                     assignment.witness(component.W(7), i + 5) = a_new;
-                    assignment.witness(component.W(8), i + 5) = (sum1 - a_new)/ typename BlueprintFieldType::value_type(2).pow(64);
+                    assignment.witness(component.W(8), i + 5) = (sum1 - a_new) * typename BlueprintFieldType::value_type(2).pow(64).inversed();
                     h = g;
                     sparse_values[7] = sparse_values[6];
                     g = f;

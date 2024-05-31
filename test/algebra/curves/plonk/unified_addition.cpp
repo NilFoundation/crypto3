@@ -81,8 +81,8 @@ void test_unified_addition(std::vector<typename CurveType::base_field_type::valu
         std::cout << "expected: " << expected_res.X.data << " " << expected_res.Y.data << "\n";
         std::cout << "real    : " << var_value(assignment, real_res.X).data << " " << var_value(assignment, real_res.Y).data << "\n\n";
         #endif
-        assert(expected_res.X == var_value(assignment, real_res.X));
-        assert(expected_res.Y == var_value(assignment, real_res.Y));
+        BOOST_CHECK(expected_res.X == var_value(assignment, real_res.X));
+        BOOST_CHECK(expected_res.Y == var_value(assignment, real_res.Y));
     };
 
     component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10},{},{});
@@ -97,7 +97,7 @@ void test_unified_addition_with_zeroes() {
     boost::random::mt19937 seed_seq;
     generate_random_point.seed(seed_seq);
 
-    typename CurveType::template g1_type<nil::crypto3::algebra::curves::coordinates::affine>::value_type zero_circuits  = {0, 0};
+    typename CurveType::template g1_type<nil::crypto3::algebra::curves::coordinates::affine>::value_type zero_circuits = {0u, 0u};
     typename CurveType::template g1_type<nil::crypto3::algebra::curves::coordinates::affine>::value_type P = generate_random_point();
     typename CurveType::template g1_type<nil::crypto3::algebra::curves::coordinates::affine>::value_type Q = -P;
 
@@ -145,7 +145,7 @@ void test_unified_addition_random_data() {
 
     typename CurveType::template g1_type<nil::crypto3::algebra::curves::coordinates::affine>::value_type P = generate_random_point();
     typename CurveType::template g1_type<nil::crypto3::algebra::curves::coordinates::affine>::value_type Q = generate_random_point();
-    typename CurveType::template g1_type<nil::crypto3::algebra::curves::coordinates::affine>::value_type zero = {0, 0};
+    typename CurveType::template g1_type<nil::crypto3::algebra::curves::coordinates::affine>::value_type zero = {0u, 0u};
     typename CurveType::template g1_type<nil::crypto3::algebra::curves::coordinates::affine>::value_type expected_res;
 
     std::vector<typename CurveType::base_field_type::value_type> public_input;
@@ -161,7 +161,7 @@ void test_unified_addition_random_data() {
                 expected_res = Q;
             } else {
                 if (P.X == Q.X && P.Y == -Q.Y) {
-                    expected_res = {0, 0};
+                    expected_res = {0u, 0u};
                 } else {
                     expected_res = P + Q;
                 }

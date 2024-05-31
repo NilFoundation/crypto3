@@ -186,10 +186,13 @@ namespace nil {
                     typename ed25519_field_type::integral_type integral_eddsa_r =
                         typename ed25519_field_type::integral_type(eddsa_r.data);
                     typename ed25519_field_type::extended_integral_type eddsa_p = ed25519_field_type::modulus;
+
+                    // On the following like values like eddsa_a.data are of modular type. We do not allow converting them to
+                    // integral types of different precision, so we first need to convert them to integral type, then extend.
                     typename ed25519_field_type::extended_integral_type integral_eddsa_q =
-                        (typename ed25519_field_type::extended_integral_type(eddsa_a.data) +
-                        typename ed25519_field_type::extended_integral_type(eddsa_b.data) -
-                        typename ed25519_field_type::extended_integral_type(eddsa_r.data)) /
+                        (typename ed25519_field_type::extended_integral_type(typename ed25519_field_type::integral_type(eddsa_a.data)) +
+                        typename ed25519_field_type::extended_integral_type(typename ed25519_field_type::integral_type(eddsa_b.data)) -
+                        typename ed25519_field_type::extended_integral_type(typename ed25519_field_type::integral_type(eddsa_r.data))) /
                         eddsa_p;
                     typename ed25519_field_type::extended_integral_type pow = extended_base << 257;
                     typename ed25519_field_type::extended_integral_type minus_eddsa_p = pow - eddsa_p;
@@ -198,9 +201,10 @@ namespace nil {
                     std::array<typename BlueprintFieldType::value_type, 4> q;
                     std::array<typename BlueprintFieldType::value_type, 4> p;
                     typename BlueprintFieldType::integral_type mask = (pasta_base << 66) - 1;
-                    r[0] = (integral_eddsa_r) & (mask);
-                    q[0] = (integral_eddsa_q) & (mask);
-                    p[0] = (minus_eddsa_p) & (mask);
+                    typename BlueprintFieldType::extended_integral_type extended_mask = mask;
+                    r[0] = integral_eddsa_r & mask;
+                    q[0] = integral_eddsa_q & extended_mask;
+                    p[0] = minus_eddsa_p & extended_mask;
                     for (std::size_t i = 1; i < 4; i++) {
                         r[i] = (integral_eddsa_r >> (66 * i)) & (mask);
                     }
@@ -272,10 +276,13 @@ namespace nil {
                 typename ed25519_field_type::integral_type integral_eddsa_r =
                     typename ed25519_field_type::integral_type(eddsa_r.data);
                 typename ed25519_field_type::extended_integral_type eddsa_p = ed25519_field_type::modulus;
+
+                // On the following like values like eddsa_a.data are of modular type. We do not allow converting them to
+                // integral types of different precision, so we first need to convert them to integral type, then extend.
                 typename ed25519_field_type::extended_integral_type integral_eddsa_q =
-                    (typename ed25519_field_type::extended_integral_type(eddsa_a.data) +
-                     typename ed25519_field_type::extended_integral_type(eddsa_b.data) -
-                     typename ed25519_field_type::extended_integral_type(eddsa_r.data)) /
+                    (typename ed25519_field_type::extended_integral_type(typename ed25519_field_type::integral_type(eddsa_a.data)) +
+                     typename ed25519_field_type::extended_integral_type(typename ed25519_field_type::integral_type(eddsa_b.data)) -
+                     typename ed25519_field_type::extended_integral_type(typename ed25519_field_type::integral_type(eddsa_r.data))) /
                     eddsa_p;
                 typename ed25519_field_type::extended_integral_type pow = extended_base << 257;
                 typename ed25519_field_type::extended_integral_type minus_eddsa_p = pow - eddsa_p;
@@ -284,9 +291,10 @@ namespace nil {
                 std::array<typename BlueprintFieldType::value_type, 4> q;
                 std::array<typename BlueprintFieldType::value_type, 4> p;
                 typename BlueprintFieldType::integral_type mask = (pasta_base << 66) - 1;
-                r[0] = (integral_eddsa_r) & (mask);
-                q[0] = (integral_eddsa_q) & (mask);
-                p[0] = (minus_eddsa_p) & (mask);
+                typename BlueprintFieldType::extended_integral_type extended_mask = (pasta_base << 66) - 1;
+                r[0] = integral_eddsa_r & mask;
+                q[0] = integral_eddsa_q & extended_mask;
+                p[0] = minus_eddsa_p & extended_mask;
                 for (std::size_t i = 1; i < 4; i++) {
                     r[i] = (integral_eddsa_r >> (66 * i)) & (mask);
                 }
@@ -391,7 +399,7 @@ namespace nil {
                 typename ed25519_field_type::extended_integral_type pow = extended_base << 257;
                 typename ed25519_field_type::extended_integral_type minus_eddsa_p = pow - eddsa_p;
                 std::array<typename BlueprintFieldType::value_type, 4> p;
-                typename BlueprintFieldType::integral_type mask = (base << 66) - 1;
+                typename BlueprintFieldType::extended_integral_type mask = (base << 66) - 1;
                 p[0] = minus_eddsa_p & mask;
 
                 auto t = var(component.W(0), 0) + var(component.W(1), 0) + p[0] * var(component.W(2), 0);

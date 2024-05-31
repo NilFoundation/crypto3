@@ -93,9 +93,9 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_kimchi_detail_zk_w3_test_suite) {
 
     zk::components::kimchi_verifier_index_scalar<BlueprintFieldType> verifier_index;
 
-    typename BlueprintFieldType::value_type omega_val = 0x0CB8102D0128EBB25343154773101EAF1A9DAEF679667EB4BD1E06B973E985E4_cppui256;
+    typename BlueprintFieldType::value_type omega_val = 0x0CB8102D0128EBB25343154773101EAF1A9DAEF679667EB4BD1E06B973E985E4_cppui_modular256;
     std::size_t domain_size = 512;
-    typename BlueprintFieldType::value_type expected_result = 0x1B1A85952300603BBF8DD3068424B64608658ACBB72CA7D2BB9694ADFA504418_cppui256;
+    typename BlueprintFieldType::value_type expected_result = 0x1B1A85952300603BBF8DD3068424B64608658ACBB72CA7D2BB9694ADFA504418_cppui_modular256;
 
     std::vector<typename BlueprintFieldType::value_type> public_input;
 

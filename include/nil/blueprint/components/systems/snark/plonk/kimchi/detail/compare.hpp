@@ -37,8 +37,6 @@
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
 
-#include <nil/blueprint/components/algebra/fields/plonk/field_operations.hpp>
-
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
 #include <nil/blueprint/component.hpp>
@@ -373,8 +371,8 @@ namespace nil {
                         std::size_t row = component_start_row;
                         typename BlueprintFieldType::value_type base = 2;
                         assignment.constant(0)[row] =
-                            0x40000000000000000000000000000000224698fc0994a8dd8c46eb2100000001_cppui255 -
-                            0x40000000000000000000000000000000224698fc094cf91b992d30ed00000001_cppui255;
+                            0x40000000000000000000000000000000224698fc0994a8dd8c46eb2100000001_cppui_modular255 -
+                            0x40000000000000000000000000000000224698fc094cf91b992d30ed00000001_cppui_modular255;
                         row++;
                         assignment.constant(0)[row] = base.pow(87);
                         row++;

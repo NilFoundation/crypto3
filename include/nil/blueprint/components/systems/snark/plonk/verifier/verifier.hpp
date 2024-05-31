@@ -53,10 +53,10 @@
 namespace nil {
     namespace blueprint {
         namespace components {
-            template<typename BlueprintFieldType>
+            template<typename BlueprintFieldType, typename SrcParams>
             class plonk_flexible_verifier: public plonk_component<BlueprintFieldType>{
             public:
-                using placeholder_info_type = nil::crypto3::zk::snark::placeholder_info;
+                using placeholder_info_type = nil::crypto3::zk::snark::placeholder_info<SrcParams>;
                 using component_type =  plonk_component<BlueprintFieldType>;
                 using value_type = typename BlueprintFieldType::value_type;
                 using var = typename component_type::var;
@@ -110,7 +110,6 @@ namespace nil {
                         return result;
                     }
 
-                    template<typename SrcParams>
                     input_type(detail::placeholder_proof_input_type<SrcParams> proof_input){
                         proof = proof_input.vector();
                         commitments = proof_input.commitments();
@@ -164,13 +163,12 @@ namespace nil {
                     }
                 };
 
-                template <typename SrcParams>
                 static gate_manifest get_gate_manifest(
                     std::size_t witness_amount,
                     SrcParams src_params,
                     const typename SrcParams::constraint_system_type &constraint_system,
-                    const typename SrcParams::common_data_type &common_data,
-                    const typename SrcParams::fri_params_type &fri_params
+                    const typename nil::crypto3::zk::snark::placeholder_public_preprocessor<typename SrcParams::field_type, SrcParams>::preprocessed_data_type::common_data_type &common_data,
+                    const typename SrcParams::commitment_scheme_params_type &fri_params
                 ) {
                     gate_manifest manifest = gate_manifest(gate_manifest_type(witness_amount, fri_params.D[0]->size()));
                     return manifest;
@@ -184,19 +182,17 @@ namespace nil {
                     return manifest;
                 }
 
-                template <typename SrcParams>
                 constexpr static std::size_t get_rows_amount(
                     std::size_t witness_amount,
                     SrcParams src_params,
                     const typename SrcParams::constraint_system_type &constraint_system,
-                    const typename SrcParams::common_data_type &common_data,
-                    const typename SrcParams::fri_params_type &fri_params
+                    const typename nil::crypto3::zk::snark::placeholder_public_preprocessor<typename SrcParams::field_type, SrcParams>::preprocessed_data_type::common_data_type &common_data,
+                    const typename SrcParams::commitment_scheme_params_type &fri_params
                 ) {
                     auto &desc = common_data.desc;
-                    auto placeholder_info = nil::crypto3::zk::snark::prepare_placeholder_info<typename SrcParams::placeholder_params>(
+                    auto placeholder_info = nil::crypto3::zk::snark::prepare_placeholder_info<SrcParams>(
                         constraint_system,
-                        common_data, fri_params,
-                        constraint_system.permuted_columns().size()
+                        common_data
                     );
 
                     auto vk0 = common_data.vk.constraint_system_with_params_hash;
@@ -236,8 +232,7 @@ namespace nil {
                 template <
                     typename WitnessContainerType,
                     typename ConstantContainerType,
-                    typename PublicInputContainerType,
-                    typename SrcParams
+                    typename PublicInputContainerType
                 >
                 plonk_flexible_verifier(
                     WitnessContainerType witnesses,
@@ -245,15 +240,14 @@ namespace nil {
                     PublicInputContainerType public_inputs,
                     SrcParams src_params,
                     const typename SrcParams::constraint_system_type &constraint_system,
-                    const typename SrcParams::common_data_type &common_data,
-                    const typename SrcParams::fri_params_type &fri_params
+                    const typename nil::crypto3::zk::snark::placeholder_public_preprocessor<typename SrcParams::field_type, SrcParams>::preprocessed_data_type::common_data_type &common_data,
+                    const typename SrcParams::commitment_scheme_params_type &fri_params
                 ):  component_type(witnesses, constants, public_inputs, get_manifest())
                 {
                     auto &desc = common_data.desc;
-                    placeholder_info = nil::crypto3::zk::snark::prepare_placeholder_info<typename SrcParams::placeholder_params>(
+                    placeholder_info = nil::crypto3::zk::snark::prepare_placeholder_info<SrcParams>(
                         constraint_system,
-                        common_data, fri_params,
-                        constraint_system.permuted_columns().size()
+                        common_data
                     );
 
                     vk0 = common_data.vk.constraint_system_with_params_hash;
@@ -314,15 +308,15 @@ namespace nil {
                 typename BlueprintFieldType::value_type vk1;
             };
 
-            template<typename BlueprintFieldType>
-            typename plonk_flexible_verifier<BlueprintFieldType>::result_type
+            template<typename BlueprintFieldType, typename SrcParams>
+            typename plonk_flexible_verifier<BlueprintFieldType, SrcParams>::result_type
             generate_assignments(
-                const plonk_flexible_verifier<BlueprintFieldType> &component,
+                const plonk_flexible_verifier<BlueprintFieldType, SrcParams> &component,
                 assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &assignment,
-                const typename plonk_flexible_verifier<BlueprintFieldType>::input_type instance_input,
+                const typename plonk_flexible_verifier<BlueprintFieldType, SrcParams>::input_type instance_input,
                 const std::uint32_t start_row_index
             ) {
-                using component_type = plonk_flexible_verifier<BlueprintFieldType>;
+                using component_type = plonk_flexible_verifier<BlueprintFieldType, SrcParams>;
 
                 using swap_component_type = typename component_type::swap_component_type;
                 using swap_input_type = typename swap_component_type::input_type;
@@ -582,17 +576,17 @@ namespace nil {
             }
 
 
-            template<typename BlueprintFieldType>
-            const typename plonk_flexible_verifier<BlueprintFieldType>::result_type
+            template<typename BlueprintFieldType, typename SrcParams>
+            const typename plonk_flexible_verifier<BlueprintFieldType, SrcParams>::result_type
             generate_circuit(
-                const plonk_flexible_verifier<BlueprintFieldType> &component,
+                const plonk_flexible_verifier<BlueprintFieldType, SrcParams> &component,
                 circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
                 assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &assignment,
-                const typename plonk_flexible_verifier<BlueprintFieldType>::input_type &instance_input,
+                const typename plonk_flexible_verifier<BlueprintFieldType, SrcParams>::input_type &instance_input,
                 const std::size_t start_row_index
             ) {
                 std::cout << "Generate circuit" << std::endl;
-                using component_type = plonk_flexible_verifier<BlueprintFieldType>;
+                using component_type = plonk_flexible_verifier<BlueprintFieldType, SrcParams>;
                 using var = typename component_type::var;
                 using poseidon_component_type = typename component_type::poseidon_component_type;
                 using swap_component_type = typename component_type::swap_component_type;
@@ -604,7 +598,7 @@ namespace nil {
 
                 std::size_t row = start_row_index;
 
-                const typename plonk_flexible_verifier<BlueprintFieldType>::result_type result(start_row_index);
+                const typename plonk_flexible_verifier<BlueprintFieldType, SrcParams>::result_type result(start_row_index);
                 var zero_var = var(component.C(0), start_row_index, false, var::column_type::constant);
                 var vk0_var = var(component.C(0), start_row_index+2, false, var::column_type::constant);
                 var vk1_var = var(component.C(0), start_row_index+3, false, var::column_type::constant);

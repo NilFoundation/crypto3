@@ -47,22 +47,20 @@ namespace nil {
                     using var = crypto3::zk::snark::plonk_variable<value_type>;
 
                     using proof_type = nil::crypto3::zk::snark::placeholder_proof<field_type, typename PlaceholderParams::placeholder_params>;
-                    using common_data_type = typename nil::crypto3::zk::snark::placeholder_public_preprocessor<field_type, typename PlaceholderParams::placeholder_params>::preprocessed_data_type::common_data_type;
+                    using common_data_type = typename nil::crypto3::zk::snark::placeholder_public_preprocessor<field_type, PlaceholderParams>::preprocessed_data_type::common_data_type;
                     using constraint_system_type = typename PlaceholderParams::constraint_system_type;
-                    using placeholder_info_type = nil::crypto3::zk::snark::placeholder_info;
+                    using placeholder_info_type = nil::crypto3::zk::snark::placeholder_info<PlaceholderParams>;
 
                     placeholder_proof_input_type(
                         const common_data_type& common_data,
                         const constraint_system_type& constraint_system,
-                        const typename PlaceholderParams::fri_params_type &fri_params,
+                        const typename PlaceholderParams::commitment_scheme_params_type &fri_params,
                         std::size_t start_row_index = 0
                     ) : common_data(common_data), constraint_system(constraint_system), fri_params(fri_params)
                     {
-                        placeholder_info = nil::crypto3::zk::snark::prepare_placeholder_info<typename PlaceholderParams::placeholder_params>(
+                        placeholder_info = nil::crypto3::zk::snark::prepare_placeholder_info<PlaceholderParams>(
                             constraint_system,
-                            common_data, fri_params,
-                            constraint_system.permuted_columns().size()
-                        );
+                            common_data);
 
                         fill_vector();
                     }
@@ -257,7 +255,7 @@ namespace nil {
                     const common_data_type &common_data;
                     const constraint_system_type &constraint_system;
                     std::vector<var> var_vector;
-                    const typename PlaceholderParams::fri_params_type &fri_params;
+                    const typename PlaceholderParams::commitment_scheme_params_type &fri_params;
                     placeholder_info_type placeholder_info;
                 };
             }

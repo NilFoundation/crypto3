@@ -149,7 +149,7 @@ namespace nil {
                 assignment.witness(component.W(2), start_row_index) = s;
                 assignment.witness(component.W(3), start_row_index) = alpha;
                 assignment.witness(component.W(4), start_row_index) =
-                    y0 + (y1 - y0) * (s - alpha) / (value_type(2) * s);
+                    y0 + (y1 - y0) * (s - alpha) * (value_type(2) * s).inversed();
 
                 return typename plonk_fri_lin_inter<BlueprintFieldType>::result_type(
                     component, start_row_index);

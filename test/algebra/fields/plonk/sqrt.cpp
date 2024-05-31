@@ -109,7 +109,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_sqrt_nonresidue_test) {
 
     for (std::size_t i = 0; i < random_tests_amount; i++) {
         auto random_square = generate_random();
-        while (random_square.sqrt() != -1) {
+        while (!random_square.is_square()) {
             random_square = generate_random();
         }
         test_sqrt<field_type>(random_square);

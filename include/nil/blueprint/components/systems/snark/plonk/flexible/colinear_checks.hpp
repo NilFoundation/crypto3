@@ -229,7 +229,8 @@ namespace nil {
                             assignment.witness(component.W(block*5 + 5), start_row_index + row) = x*x; // new fake x
                             assignment.witness(component.W(block*5 + 6), start_row_index + row) = 0;   // new fake b
                             assignment.witness(component.W(block*5 + 7), start_row_index + row) = 0;   // new fake b = 0 so, it doesn't matter
-                            assignment.witness(component.W(block*5 + 8), start_row_index + row) = ((alpha + s ) * y0 - (alpha - s) * y1 ) / (2 * s);   // new fake y
+                            // TODO(martun): check if s being a zero, which I handled on the next line is ok. Maybe it was not supposed to be 0?
+                            assignment.witness(component.W(block*5 + 8), start_row_index + row) = ((alpha + s ) * y0 - (alpha - s) * y1 ) * (s == 0u ? 0u : (2 * s).inversed());   // new fake y
                             x = x * x;
                         }
                     }

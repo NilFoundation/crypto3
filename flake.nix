@@ -4,128 +4,105 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.11";
     nil_crypto3 = {
-      url = "https://github.com/NilFoundation/crypto3";
-      type = "git";
-      submodules = true;
+      url =
+        "git+https://github.com/NilFoundation/crypto3?submodules=1&rev=66096ae733cabc99a763e00e803d710493318563";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
+    flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, nil_crypto3 }:
-    let
-      # Systems supported
-      allSystems = [
-        "x86_64-linux" # 64-bit Intel/AMD Linux
-        "aarch64-linux" # 64-bit ARM Linux
-        "x86_64-darwin" # 64-bit Intel macOS
-        "aarch64-darwin" # 64-bit ARM macOS
-      ];
-
-      forAllSystems = f: nixpkgs.lib.genAttrs allSystems (system: f {
+  outputs = { self, nixpkgs, nil_crypto3, flake-utils }:
+    (flake-utils.lib.eachDefaultSystem (system:
+      let
         pkgs = import nixpkgs { inherit system; };
-      });
-
-      # This library is header-only, so we don't need to provide debug and
-      # release versions of package.
-      makePackage = { pkgs }:
-        let
-          stdenv = pkgs.llvmPackages_16.stdenv;
+        stdenv = pkgs.llvmPackages_16.stdenv;
+      in rec {
+        packages = rec {
           crypto3 = nil_crypto3.packages.${pkgs.system}.default;
-        in
-        stdenv.mkDerivation {
-          name = "zkllvm-blueprint";
+          zkllvm-blueprint = stdenv.mkDerivation {
+            name = "zkllvm-blueprint";
 
-          src = self;
+            src = self;
 
-          env.CXXFLAGS = toString ([
-            "-fPIC"
-          ]);
+            env.CXXFLAGS = toString ([ "-fPIC" ]);
 
-          env.NIX_CFLAGS_COMPILE = toString ([
-            "-Wno-unused-but-set-variable"
-          ]);
+            env.NIX_CFLAGS_COMPILE =
+              toString ([ "-Wno-unused-but-set-variable" ]);
 
-          buildInputs = with pkgs; [
-            cmake
-            pkg-config
-            clang_16
-            boost
-          ];
+            buildInputs = with pkgs; [ cmake pkg-config clang_16
+              (boost183.override {
+                enableShared = true;
+                enableStatic = true;
+                enableRelease = true;
+                enableDebug = true;
+              }) 
+            ];
 
-          # Because crypto3 is header-only, we must propagate it so users
-          # of this flake must not specify crypto3 in their derivations manually
-          propagatedBuildInputs = [
-            crypto3
-          ];
+            # Because crypto3 is header-only, we must propagate it so users
+            # of this flake must not specify crypto3 in their derivations manually
+            propagatedBuildInputs = [ crypto3 ];
 
-          cmakeFlags = [
-            "-DCMAKE_BUILD_TYPE=Release"
-            "-DCMAKE_CXX_STANDARD=17"
-          ];
+            cmakeFlags =
+              [ "-DCMAKE_BUILD_TYPE=Release"
+                "-DCMAKE_CXX_STANDARD=17" ];
 
-          doCheck = false;
+            doCheck = false;
+          };
         };
 
-      makeChecks = { pkgs }:
-        let
-          stdenv = pkgs.llvmPackages_16.stdenv;
-          crypto3 = nil_crypto3.packages.${pkgs.system}.default;
-        in
-        stdenv.mkDerivation {
-          # TODO: rewrite this using overrideAttrs on makePackage
-          name = "zkllvm-blueprint-tests";
+        checks = {
+          default = stdenv.mkDerivation {
+            # TODO: rewrite this using overrideAttrs on makePackage
+            name = "zkllvm-blueprint-tests";
 
-          src = self;
+            src = self;
 
-          env.CXXFLAGS = toString ([
-            "-fPIC"
-          ]);
+            env.CXXFLAGS = toString ([ "-fPIC" ]);
 
-          env.NIX_CFLAGS_COMPILE = toString ([
-            "-Wno-unused-but-set-variable"
-          ]);
+            env.NIX_CFLAGS_COMPILE =
+              toString ([ "-Wno-unused-but-set-variable" ]);
 
-          buildInputs = with pkgs; [
-            cmake
-            pkg-config
-            clang_16
-            boost
-            crypto3
-          ];
+            buildInputs = with pkgs; [
+              cmake
+              pkg-config
+              clang_16
+              boost183
+              packages.crypto3
+            ];
 
-          cmakeFlags = [
-            "-DCMAKE_BUILD_TYPE=Release"
-            "-DCMAKE_CXX_STANDARD=17"
-            "-DBUILD_TESTS=TRUE"
-          ];
+            cmakeFlags = [
+              "-DCMAKE_BUILD_TYPE=Release"
+              "-DCMAKE_CXX_STANDARD=17"
+              "-DENABLE_TESTS=TRUE"
+            ];
 
-          doCheck = true;
+            doCheck = true;
+          };
         };
 
-      makeDevShell = { pkgs }:
-        let
-          crypto3 = nil_crypto3.packages.${pkgs.system}.default;
-        in
-        pkgs.mkShell {
-          buildInputs = with pkgs; [
-            cmake
-            pkg-config
-            boost
-            clang_16
-            clang-tools_16
-            crypto3
-          ];
+        devShells = {
+          default = pkgs.mkShell {
+            buildInputs = with pkgs; [
+              cmake
+              pkg-config
+              boost183
+              clang_16
+              clang-tools_16
+              packages.crypto3
+            ];
 
-          shellHook = ''
-            echo "zkllvm-blueprint dev environment activated"
-          '';
+            shellHook = ''
+              echo "zkllvm-blueprint dev environment activated"
+            '';
+          };
         };
-    in
-    {
-      packages = forAllSystems ({ pkgs }: { default = makePackage { inherit pkgs; }; });
-      # TODO: because of issues in CMakeLists, these checks cannot be run right now.
-      # After fixing the way we bring Crypto3 dependency in CMake, these checks
-      # may be used in testing and CI workflow.
-      checks = forAllSystems ({ pkgs }: { default = makeChecks { inherit pkgs; }; });
-      devShells = forAllSystems ({ pkgs }: { default = makeDevShell { inherit pkgs; }; });
-    };
+      }));
 }
+
+# 1 build crypto 3 locally with the command 'nix build -L .?submodules=1#'
+# 2 redirect to the local build of crypto3: 'nix develop --redirect .#crypto3 /your/path/to/crypto3/result/'
+# 3a to build all in blueprint: 'nix flake -L check .?submodules=1#'
+# 3b to build individual targets:
+# nix develop . -c cmake -B build -DCMAKE_CXX_STANDARD=17 -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=FALSE -DENABLE_TESTS=TRUE -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
+# cd build
+# nix develop ../ -c cmake --build . -t blueprint_verifiers_flexible_constant_pow_test

@@ -591,25 +591,25 @@ namespace nil {
 
                         if (std::is_same<BlueprintFieldType,
                                          typename nil::crypto3::algebra::fields::pallas_base_field>::value) {
-                            u_val = 0x0000000000000000000000000000000000000000000000000000000000000001_cppui255;
-                            fu_val = 0x0000000000000000000000000000000000000000000000000000000000000006_cppui255;
+                            u_val = 0x0000000000000000000000000000000000000000000000000000000000000001_cppui_modular255;
+                            fu_val = 0x0000000000000000000000000000000000000000000000000000000000000006_cppui_modular255;
                             inv_three_u_squared_val =
-                                0x2AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC18465FD5B88A612661E209E00000001_cppui255;
+                                0x2AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC18465FD5B88A612661E209E00000001_cppui_modular255;
                             sqrt_neg_three_u_squared_val =
-                                0x25999506959B74E25955ABB8AF5563603A3F17A46F5A62923B5ABD7BFBFC9573_cppui255;
+                                0x25999506959B74E25955ABB8AF5563603A3F17A46F5A62923B5ABD7BFBFC9573_cppui_modular255;
                             sqrt_neg_three_u_squared_minus_u_over_2_val =
-                                0x12CCCA834ACDBA712CAAD5DC57AAB1B01D1F8BD237AD31491DAD5EBDFDFE4AB9_cppui255;
-                            b_val = 0x0000000000000000000000000000000000000000000000000000000000000005_cppui255;
+                                0x12CCCA834ACDBA712CAAD5DC57AAB1B01D1F8BD237AD31491DAD5EBDFDFE4AB9_cppui_modular255;
+                            b_val = 0x0000000000000000000000000000000000000000000000000000000000000005_cppui_modular255;
                         } else {    // vesta
-                            u_val = 0x0000000000000000000000000000000000000000000000000000000000000001_cppui255;
-                            fu_val = 0x0000000000000000000000000000000000000000000000000000000000000006_cppui255;
+                            u_val = 0x0000000000000000000000000000000000000000000000000000000000000001_cppui_modular255;
+                            fu_val = 0x0000000000000000000000000000000000000000000000000000000000000006_cppui_modular255;
                             inv_three_u_squared_val =
-                                0x2AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC18465FD5BB87093B2D9F21600000001_cppui255;
+                                0x2AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC18465FD5BB87093B2D9F21600000001_cppui_modular255;
                             sqrt_neg_three_u_squared_val =
-                                0x0D0334B0507CA51CA23B69B039EE1EB41FDA8CFA8F80675E5553A5C0A1541C9F_cppui255;
+                                0x0D0334B0507CA51CA23B69B039EE1EB41FDA8CFA8F80675E5553A5C0A1541C9F_cppui_modular255;
                             sqrt_neg_three_u_squared_minus_u_over_2_val =
-                                0x06819A58283E528E511DB4D81CF70F5A0FED467D47C033AF2AA9D2E050AA0E4F_cppui255;
-                            b_val = 0x0000000000000000000000000000000000000000000000000000000000000005_cppui255;
+                                0x06819A58283E528E511DB4D81CF70F5A0FED467D47C033AF2AA9D2E050AA0E4F_cppui_modular255;
+                            b_val = 0x0000000000000000000000000000000000000000000000000000000000000005_cppui_modular255;
                         }
                         // var u;
                         assignment.constant(0)[row] = u_val;

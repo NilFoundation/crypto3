@@ -73,7 +73,7 @@ BOOST_AUTO_TEST_CASE(blueprint_plonk_transcript_0) {
     var zero(0, 0, false, var::column_type::public_input);
     typename component_type::params_type params = {input, zero};
     std::vector<typename BlueprintFieldType::value_type> public_input = {0};
-    typename BlueprintFieldType::value_type result = 0x00000000000000000000000000000000C873AF205DFABB8A304600F3E09EEBA8_cppui256;
+    typename BlueprintFieldType::value_type result = 0x00000000000000000000000000000000C873AF205DFABB8A304600F3E09EEBA8_cppui_modular256;
     auto result_check = [&result](AssignmentType &assignment,
         component_type::result_type &real_res) {
         assert(result == assignment.var_value(real_res.squeezed));
