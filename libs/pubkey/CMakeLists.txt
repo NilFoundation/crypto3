@@ -20,8 +20,6 @@ cm_find_package(CM)
 include(CMDeploy)
 include(CMSetupVersion)
 
-option(BUILD_EXAMPLES "Build examples" FALSE)
-
 list(APPEND ${CURRENT_PROJECT_NAME}_LIBRARIES
         ${CMAKE_WORKSPACE_NAME}::algebra
         ${CMAKE_WORKSPACE_NAME}::random
