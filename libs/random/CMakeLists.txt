@@ -18,8 +18,6 @@ include(CMDeploy)
 include(CMConfig)
 include(CMSetupVersion)
 
-option(BUILD_EXAMPLES "Build examples" FALSE)
-
 cm_workspace(crypto3 SOURCES_DIR "${CMAKE_CURRENT_LIST_DIR}")
 
 cm_find_package(${CMAKE_WORKSPACE_NAME}_random)
