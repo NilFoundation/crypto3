@@ -12,10 +12,6 @@ cm_find_package(${CMAKE_WORKSPACE_NAME}_block)
 cm_find_package(${CMAKE_WORKSPACE_NAME}_hash)
 
 cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
-
-                       ${CMAKE_WORKSPACE_NAME}::block
-                       ${CMAKE_WORKSPACE_NAME}::hash
-
                        Boost::unit_test_framework)
 
 macro(define_mac_test name)

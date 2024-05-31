@@ -8,7 +8,6 @@
 
 cm_test_link_libraries(
     ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
-    ${CMAKE_WORKSPACE_NAME}::multiprecision
     Boost::unit_test_framework
     Boost::random
 )
