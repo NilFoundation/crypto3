@@ -10,16 +10,8 @@
 include(CMTest)
 
 cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
-
-                       ${CMAKE_WORKSPACE_NAME}::algebra
-                       ${CMAKE_WORKSPACE_NAME}::hash
-                       ${CMAKE_WORKSPACE_NAME}::mac
-                       ${CMAKE_WORKSPACE_NAME}::stream
-                       ${CMAKE_WORKSPACE_NAME}::multiprecision
-
-                       marshalling::crypto3_algebra
-
-                       Boost::unit_test_framework)
+    ${CMAKE_WORKSPACE_NAME}::multiprecision
+    Boost::unit_test_framework)
 
 #cm_test(NAME ${CURRENT_PROJECT_NAME}_chacha_test SOURCES ${CURRENT_TEST_SOURCES_DIR}/chacha.cpp)
 #set_target_properties(${CURRENT_PROJECT_NAME}_chacha_test PROPERTIES CXX_STANDARD 17)

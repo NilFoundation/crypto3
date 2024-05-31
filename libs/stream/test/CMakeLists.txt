@@ -11,9 +11,6 @@ include(CMTest)
 cm_find_package(${CMAKE_WORKSPACE_NAME}_block)
 
 cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
-
-                       ${CMAKE_WORKSPACE_NAME}::block
-
                        Boost::unit_test_framework)
 
 macro(define_stream_test name)

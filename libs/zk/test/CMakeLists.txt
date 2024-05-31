@@ -13,19 +13,9 @@ target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTER
     "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>")
 
 cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
-
-                       ${CMAKE_WORKSPACE_NAME}::algebra
-                       ${CMAKE_WORKSPACE_NAME}::math
-                       ${CMAKE_WORKSPACE_NAME}::containers
-                       ${CMAKE_WORKSPACE_NAME}::multiprecision
-                       ${CMAKE_WORKSPACE_NAME}::random
-
-                       marshalling::core
-                       marshalling::crypto3_multiprecision
-                       marshalling::crypto3_algebra
-                       marshalling::crypto3_zk
-
-                       Boost::unit_test_framework)
+    ${CMAKE_WORKSPACE_NAME}::random
+    marshalling::crypto3_zk
+    Boost::unit_test_framework)
 
 option(ZK_PLACEHOLDER_PROFILING_ENABLED "Build with placeholder profiling" FALSE)
 

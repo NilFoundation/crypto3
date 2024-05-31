@@ -9,9 +9,6 @@
 include(CMTest)
 
 cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
-
-                       ${CMAKE_WORKSPACE_NAME}::multiprecision
-
                        $<$<BOOL:${GMP_FOUND}>:${GMP_LIBRARIES}>
                        $<$<BOOL:${TOMMATH_FOUND}>:${TomMath_LIBRARIES}>
 
