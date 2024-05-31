@@ -51,16 +51,15 @@ endif()
 
 cm_project(blueprint WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME} LANGUAGES C CXX)
 
-find_package(CM)
 include(CMDeploy)
 include(FindPkgConfig)
 
-option(BUILD_TESTS "Build unit tests" FALSE)
+option(CMAKE_ENABLE_TESTS "Enable tests" FALSE) # used by CMTest module
 option(BUILD_EXAMPLES "Build examples" FALSE)
 
 find_package(crypto3 REQUIRED)
 find_package(Boost REQUIRED COMPONENTS container random filesystem log log_setup program_options thread system)
-if(ENABLE_TESTS)
+if(CMAKE_ENABLE_TESTS)
     find_package(Boost REQUIRED COMPONENTS unit_test_framework timer)
 endif()
 
