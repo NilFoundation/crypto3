@@ -25,7 +25,6 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#include "nil/crypto3/zk/commitments/batched_commitment.hpp"
 #define BOOST_TEST_MODULE crypto3_marshalling_kzg_commitment_test
 
 #include <boost/test/included/unit_test.hpp>
@@ -74,6 +73,7 @@
 #include <nil/crypto3/zk/commitments/detail/polynomial/eval_storage.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/kzg.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/kzg_v2.hpp>
+#include <nil/crypto3/zk/commitments/batched_commitment.hpp>
 #include <nil/crypto3/marshalling/zk/types/commitments/kzg.hpp>
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/params.hpp>
@@ -82,8 +82,6 @@
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/verifier.hpp>
 
 #include "detail/circuits.hpp"
-
-
 
 template<
     typename curve_type,
@@ -155,52 +153,3 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(placeholder_class_test, F, TestFixtures) {
 }
 
 BOOST_AUTO_TEST_SUITE_END()
-
-/*
-template<
-    typename curve_type,
-    typename transcript_hash_type
-    >
-struct batched_kzg_test_initializer {
-    bool run_test() {
-        typedef typename curve_type::scalar_field_type::value_type scalar_value_type;
-
-        using kzg_type = zk::commitments::batched_kzg<curve_type, transcript_hash_type>;
-        typedef typename kzg_type::transcript_type transcript_type;
-        using endianness = nil::marshalling::option::big_endian;
-
-        scalar_value_type alpha = 7;
-        typename kzg_type::params_type params(8, 8, alpha);
-
-        typename kzg_type::poly_type poly;
-
-        poly.template from_coefficients<std::vector<scalar_value_type>>({{ 1,  2,  3,  4,  5,  6,  7,  8}});
-
-        auto commitment = zk::algorithms::commit_one<kzg_type>(params, poly);
-
-        auto filled_commitment = marshalling::types::fill_commitment<endianness, kzg_type>(commitment);
-        auto _commitment = marshalling::types::make_commitment<endianness, kzg_type>(filled_commitment);
-
-        bool result = commitment == _commitment;
-        BOOST_CHECK( result );
-
-        std::cout << "test completed for [" << typeid(curve_type).name() << "]" <<std::endl;
-
-        return result;
-    }
-};
-
-BOOST_AUTO_TEST_SUITE(batched_kzg_marshalling)
-    using TestFixtures = boost::mpl::list<
-        batched_kzg_test_initializer< algebra::curves::bls12_381, hashes::keccak_1600<256> >,
-        batched_kzg_test_initializer< algebra::curves::mnt4_298, hashes::keccak_1600<256> >,
-        batched_kzg_test_initializer< algebra::curves::mnt6_298, hashes::keccak_1600<256> >
-        >;
-
-BOOST_AUTO_TEST_CASE_TEMPLATE(batched_kzg_test, F, TestFixtures) {
-    F fixture;
-    BOOST_CHECK(fixture.run_test());
-}
-
-BOOST_AUTO_TEST_SUITE_END()
-*/
