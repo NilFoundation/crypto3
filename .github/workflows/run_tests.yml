@@ -49,35 +49,21 @@ jobs:
             ${{ github.workspace }}/**
             !${{ github.workspace }}/
             !${{ github.workspace }}/**/.git/**
-
-      # nix is taken from the cloud-init template 
-      - name: Run checks
-        run: nix flake -L check .?submodules=1#
-        env:
-          NIX_CONFIG: |
-            cores = 2
-            max-jobs = 2
-
+      
+      # nix is taken from the cloud-init template, no need to install it.
       - name: Build and run tests
         env:
-          CMAKE_ARGS: "
-            -DCMAKE_CXX_STANDARD=17
-            -DCMAKE_BUILD_TYPE=Debug
-            -DBUILD_SHARED_LIBS=FALSE
-            -DENABLE_TESTS=TRUE
-            -DCMAKE_C_COMPILER=clang
-            -DCMAKE_CXX_COMPILER=clang++
-            ${{ matrix.add-args || ''}}"
+          NIX_CONFIG: |
+            cores = 4
+            max-jobs = 2
         run: |
-          ls -l -a
-          nix build -L ?submodules=1#zkllvm-blueprint
-          ls -l -a
-          ls -l ./result/
+          nix build -L .?submodules=1#checks.x86_64-linux.default
           results_dir="./results"
           mkdir -p "$results_dir"
-          cp -r ./result/* "$results_dir/$check_name"
-          rm result
-
+          cp -r ./result/* "$results_dir/all-checks"
+          ls -l -a
+          ls -l -a "$results_dir/all-checks/"
+          rm -rf result
       - name: Publish Test Results
         uses: EnricoMi/publish-unit-test-result-action/linux@v2
         with:
@@ -85,3 +71,12 @@ jobs:
           files: "results/**/*.xml"
           comment_mode: ${{ github.event.pull_request.head.repo.fork && 'off' || 'always' }} # Don't create PR comment from fork runs
           action_fail_on_inconclusive: true # fail, if no reports
+          action_fail: true
+      - name: 'Upload Artifacts'
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit-test-results
+          path: "results/**/*.xml"
+          retention-days: 5
+          if-no-files-found: error
+          overwrite: true

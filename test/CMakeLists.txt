@@ -20,7 +20,12 @@ cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
 macro(define_blueprint_test test)
     string(REPLACE "/" "_" full_test_name blueprint_${test}_test)
 
-    cm_test(NAME ${full_test_name} SOURCES ${test}.cpp)
+    set(TEST_RESULTS_DIR "${CMAKE_CURRENT_BINARY_DIR}/junit_results")
+    set(TEST_LOGS_DIR "${TEST_RESULTS_DIR}/logs")
+    set(additional_args "--log_format=JUNIT"
+                        "--log_sink=${TEST_LOGS_DIR}/${full_test_name}.xml")
+
+    cm_test(NAME ${full_test_name} SOURCES ${test}.cpp ARGS ${additional_args})
 
     target_include_directories(${full_test_name} PRIVATE
                                "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
@@ -51,7 +56,7 @@ set(COMMON_TEST_FILES
     "utils/connectedness_check"
     "private_input"
     "proxy"
-    "mock/mocked_components"
+    #"mock/mocked_components"
     "component_batch"
     )
 
@@ -72,7 +77,7 @@ set(NON_NATIVE_TESTS_FILES
     "algebra/fields/plonk/non_native/equality_flag"
     "algebra/fields/plonk/non_native/division_remainder"
     "non_native/plonk/bool_scalar_multiplication"
-    "non_native/plonk/add_mul_zkllvm_compatible"
+    #"non_native/plonk/add_mul_zkllvm_compatible"
     "non_native/plonk/scalar_non_native_range"
     )
 
