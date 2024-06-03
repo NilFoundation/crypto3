@@ -50,7 +50,7 @@ jobs:
             !${{ github.workspace }}/
             !${{ github.workspace }}/**/.git/**
 
-      - uses: cachix/install-nix-action@v23
+      - uses: cachix/install-nix-action@v27
       - uses: DeterminateSystems/magic-nix-cache-action@main
       - uses: DeterminateSystems/nix-installer-action@main
 
