@@ -34,8 +34,8 @@ jobs:
       - name: Clean up after previous checkout
         run: chmod +w -R ${GITHUB_WORKSPACE}; rm -rf ${GITHUB_WORKSPACE}/*;
 
-      - name: Checkout Crypto3
-        uses: actions/checkout@v3
+      - name: Checkout Blueprint
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
           submodules: recursive
