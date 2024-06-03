@@ -303,13 +303,14 @@ namespace nil {
                             Y = u * (R - A) - vvv * this->Y;    // Y3 = u*(R-A)-vvv*Y1
                             Z = vvv * this->Z;                  // Z3 = vvv*Z1
                         }
-
-                        friend std::ostream& operator<<(std::ostream& os, curve_element const& e)
-                        {
-                            os << "{\"X\":" << e.X << ",\"Y\":" << e.Y << ",\"Z\":" << e.Z << "}";
-                            return os;
-                        }
                     };
+
+                    template<typename CurveParams>
+                    std::ostream& operator<<(std::ostream& os, curve_element<CurveParams, forms::short_weierstrass, coordinates::projective_with_a4_minus_3> const& e)
+                    {
+                        os << "{\"X\":" << e.X << ",\"Y\":" << e.Y << ",\"Z\":" << e.Z << "}";
+                        return os;
+                    }
                 }    // namespace detail
             }        // namespace curves
         }            // namespace algebra

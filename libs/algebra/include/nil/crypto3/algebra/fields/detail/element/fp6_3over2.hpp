@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2024  Vasiliy Olekhov <vasiliy.olekhov@nil.foundation>
 //
 // MIT License
 //
@@ -168,6 +169,58 @@ namespace nil {
                         element_fp6_3over2 mulFp6_24_Fp_01(const element_fp<FieldParams> *B) {
                             return element_fp6_3over2(data[0], data[1].mul_Fp_0(B[1]), data[2].mul_Fp_0(B[0]));
                         }
+
+                        /** @brief Assume B in form [ c0:[a,b], c1:[c,d], c2:[0,0] ], i.e. c2 == 0
+                         *  Apply formulae from Devegili et al
+                         *  https://eprint.iacr.org/2006/471.pdf,  section 4
+                         * */
+                        element_fp6_3over2 mul_by_01(underlying_type const& c0, underlying_type const& c1) const
+                        {
+                            auto a_a = this->data[0] * c0;
+                            auto b_b = this->data[1] * c1;
+
+                            auto t1 = c1;
+                            auto tmp = this->data[1] + this->data[2];
+                            t1 *= tmp;
+                            t1 -= b_b;
+                            t1 = mul_by_non_residue(t1) + a_a;
+
+                            auto t3 = c0;
+                            tmp = this->data[0] + this->data[2];
+                            t3 *= tmp;
+                            t3 -= a_a;
+                            t3 += b_b;
+
+                            auto t2 = c0 + c1;
+                            tmp = this->data[0] + this->data[1];
+                            t2 *= tmp;
+                            t2 -= a_a;
+                            t2 -= b_b;
+
+                            return element_fp6_3over2(t1, t2, t3);
+                        }
+
+                        /** @brief Assume B in form [ c0:[0,0], c1:[c,d], c2:[0,0] ], i.e. B.data[0] == B.data[2] == 0
+                         *  Apply formulae from Devegili et al
+                         *  https://eprint.iacr.org/2006/471.pdf,  section 4
+                         * */
+                        element_fp6_3over2 mul_by_1(underlying_type const& c1) const {
+                            auto b_b = this->data[1].squared();
+
+                            auto t1 = c1;
+                            auto tmp = this->data[1] + this->data[2];
+                            t1 *= tmp;
+                            t1 -= b_b;
+                            t1 = mul_by_non_residue(t1);
+
+                            auto t2 = c1;
+                            tmp = this->data[0] + this->data[1];
+                            t2 *= tmp;
+                            t2 -= b_b;
+
+                            return element_fp6_3over2(t1, t2, b_b);
+                        }
+
 
                         constexpr element_fp6_3over2 squared() const {
                             return (*this) * (*this);    // maybe can be done more effective

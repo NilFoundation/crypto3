@@ -321,18 +321,12 @@ namespace nil {
                             Z = vvv * this->Z;                  // Z3 = vvv*Z1
 
                         }
-
-                        friend std::ostream& operator<<(std::ostream& os, curve_element const& e)
-                        {
-                            os << "{\"X\":" << e.X << ",\"Y\":" << e.Y << ",\"Z\":" << e.Z << "}";
-                            return os;
-                        }
                     };
 
                     template<typename CurveParams>
-                    std::ostream& operator<<(std::ostream& os, 
-                            const curve_element<CurveParams, forms::short_weierstrass, coordinates::projective>& elem) {
-                        os << "[ " << elem.X << ", " << elem.Y << ", " << elem.Z << " ]";
+                    std::ostream& operator<<(std::ostream& os,
+                            const curve_element<CurveParams, forms::short_weierstrass, coordinates::projective>& e) {
+                        os << "{\"X\":" << e.X << ",\"Y\":" << e.Y << ",\"Z\":" << e.Z << "}";
                         return os;
                     }
                 }    // namespace detail

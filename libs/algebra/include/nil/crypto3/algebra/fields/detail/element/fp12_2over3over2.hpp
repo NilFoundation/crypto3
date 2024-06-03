@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2024  Vasiliy Olekhov <vasiliy.olekhov@nil.foundation>
 //
 // MIT License
 //
@@ -281,6 +282,49 @@ namespace nil {
                             return res;
                             // return *this;
                         }
+
+                        /** @brief multiply by [ [c0, 0, 0], [c3, c4, 0] ] */
+                        element_fp12_2over3over2
+                            mul_by_034(const typename underlying_type::underlying_type &c0,
+                                       const typename underlying_type::underlying_type &c3,
+                                       const typename underlying_type::underlying_type &c4) const
+                        {
+                            auto a0 = this->data[0].data[0] * c0;
+                            auto a1 = this->data[0].data[1] * c0;
+                            auto a2 = this->data[0].data[2] * c0;
+
+                            auto a = underlying_type(a0,a1,a2);
+                            auto b = this->data[1].mul_by_01(c3, c4);
+
+                            auto _c0 = c0 + c3;
+                            auto e = (this->data[0]+this->data[1]).mul_by_01(_c0, c4);
+                            auto rc1 = e - (a+b);
+                            auto rc0 = mul_by_non_residue(b);
+                            rc0 += a;
+
+                            return element_fp12_2over3over2(rc0, rc1);
+                        }
+
+                        /** @brief multiply by [ [c0, c1, 0], [0, c4, 0] ] */
+                        element_fp12_2over3over2
+                            mul_by_014(const typename underlying_type::underlying_type &c0,
+                                       const typename underlying_type::underlying_type &c1,
+                                       const typename underlying_type::underlying_type &c4) const
+                        {
+                            auto aa = this->data[0].mul_by_01(c0, c1);
+                            auto bb = this->data[1].mul_by_1(c4);
+                            auto o = c1+c4;
+
+                            auto rc1 = this->data[0]+this->data[1];
+                            rc1 = rc1.mul_by_01(c0, o);
+                            rc1 -= aa;
+                            rc1 -= bb;
+                            auto rc0 = mul_by_non_residue(bb);
+                            rc0 += aa;
+
+                            return element_fp12_2over3over2(rc0, rc1);
+                        }
+
 
                         element_fp12_2over3over2
                             mul_by_045(const typename underlying_type::underlying_type &ell_0,

@@ -75,6 +75,12 @@ namespace nil {
                             bool operator==(const ate_g1_precomputed_type &other) const {
                                 return (this->PX == other.PX && this->PY == other.PY);
                             }
+
+                            friend std::ostream& operator<<(std::ostream &os, ate_g1_precomputed_type const& p) {
+                                os << "\"PX\":" << p.PX << "," << std::endl;
+                                os << "\"PY\":" << p.PY << std::endl;
+                                return os;
+                            }
                         };
 
                         struct ate_ell_coeffs {
@@ -95,6 +101,26 @@ namespace nil {
 
                             bool operator==(const ate_g2_precomputed_type &other) const {
                                 return (this->QX == other.QX && this->QY == other.QY && this->coeffs == other.coeffs);
+                            }
+
+                            friend std::ostream& operator<<(std::ostream &os, ate_g2_precomputed_type const& p) {
+                                os << "\"QX\":" << p.QX << "," << std::endl;
+                                os << "\"QY\":" << p.QY << "," << std::endl;
+                                os << "\"coeffs\": [" << std::endl;
+                                for(auto c = p.coeffs.begin(); c != p.coeffs.end();) {
+                                    os << "{";
+                                    os << "\"ell_0\": " << c->ell_0 << "," << std::endl;
+                                    os << "\"ell_VW\": " << c->ell_VW << "," << std::endl;
+                                    os << "\"ell_VV\": " << c->ell_VV << std::endl;
+                                    os << "}";
+                                    ++c;
+
+                                    if (c!=p.coeffs.end()) {
+                                        os << "," << std::endl;
+                                    }
+                                }
+                                os << "]" << std::endl;
+                                return os;
                             }
                         };
 
