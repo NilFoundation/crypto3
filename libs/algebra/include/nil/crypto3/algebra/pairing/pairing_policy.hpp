@@ -31,6 +31,14 @@ namespace nil {
         namespace algebra {
             namespace pairing {
 
+                /* Twist type as in https://eprint.iacr.org/2013/722.pdf
+                 * 3.4 Complete families of curves, p.7 
+                 */
+                enum class curve_twist_type {
+                    TWIST_TYPE_M,
+                    TWIST_TYPE_D
+                };
+
                 template<typename PairingCurveType>
                 struct pairing_policy;
             }    // namespace pairing

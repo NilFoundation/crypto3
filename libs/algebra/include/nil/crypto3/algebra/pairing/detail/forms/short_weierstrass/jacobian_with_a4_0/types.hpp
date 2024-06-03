@@ -36,6 +36,9 @@ namespace nil {
                 namespace detail {
 
                     template<typename CurveType>
+                    class pairing_params;
+
+                    template<typename CurveType>
                     class short_weierstrass_jacobian_with_a4_0_types_policy {
                         using curve_type = CurveType;
 
@@ -70,6 +73,8 @@ namespace nil {
 
                         struct ate_g2_precomputed_type {
                             using coeffs_type = ate_ell_coeffs;
+
+                            bool is_zero;
 
                             g2_field_value_type QX;
                             g2_field_value_type QY;

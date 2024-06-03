@@ -401,13 +401,14 @@ namespace nil {
                                                (this->X - field_value_type::one()) *
                                                    (this->X + field_value_type::one()).inversed());
                         }
-
-                        friend std::ostream& operator<<(std::ostream& os, curve_element const& e)
-                        {
-                            os << "{\"X\":" << e.X << ",\"Y\":" << e.Y << "}";
-                            return os;
-                        }
                     };
+
+                    template<typename CurveParams>
+                    std::ostream& operator<<(std::ostream& os, curve_element<CurveParams, forms::montgomery, coordinates::affine> const& e)
+                    {
+                        os << "{\"X\":" << e.X << ",\"Y\":" << e.Y << "}";
+                        return os;
+                    }
                 }    // namespace detail
             }        // namespace curves
         }            // namespace algebra

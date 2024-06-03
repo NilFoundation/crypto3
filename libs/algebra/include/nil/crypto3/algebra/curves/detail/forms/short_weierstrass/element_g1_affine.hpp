@@ -248,12 +248,6 @@ namespace nil {
                             }
                         }
 
-                        friend std::ostream& operator<<(std::ostream& os, curve_element const& e)
-                        {
-                            os << "{\"X\":" << e.X << ",\"Y\":" << e.Y << "}";
-                            return os;
-                        }
-
                     private:
                         /** @brief
                          * Affine addition formulas: (x1,y1)+(x2,y2)=(x3,y3) where
@@ -276,6 +270,13 @@ namespace nil {
                         }
                     };
 
+
+                    template<typename CurveParams>
+                    std::ostream& operator<<(std::ostream& os, curve_element<CurveParams, forms::short_weierstrass, coordinates::affine> const& e)
+                    {
+                        os << "{\"X\":" << e.X << ",\"Y\":" << e.Y << "}";
+                        return os;
+                    }
                 }    // namespace detail
             }        // namespace curves
         }            // namespace algebra

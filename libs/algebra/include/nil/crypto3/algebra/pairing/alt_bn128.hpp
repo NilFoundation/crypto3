@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2024  Vasiliy Olekhov <vasiliy.olekhov@nil.foundation>
 //
 // MIT License
 //
@@ -26,15 +27,18 @@
 #ifndef CRYPTO3_ALGEBRA_PAIRING_ALT_BN128_POLICY_HPP
 #define CRYPTO3_ALGEBRA_PAIRING_ALT_BN128_POLICY_HPP
 
-#include <nil/crypto3/algebra/curves/babyjubjub.hpp>
+#include <nil/crypto3/algebra/pairing/pairing_policy.hpp>
+
 #include <nil/crypto3/algebra/curves/alt_bn128.hpp>
 #include <nil/crypto3/algebra/pairing/detail/alt_bn128/params.hpp>
-#include <nil/crypto3/algebra/pairing/forms/short_weierstrass/jacobian_with_a4_0/ate_double_miller_loop.hpp>
-#include <nil/crypto3/algebra/pairing/forms/short_weierstrass/jacobian_with_a4_0/ate_miller_loop.hpp>
-#include <nil/crypto3/algebra/pairing/forms/short_weierstrass/jacobian_with_a4_0/ate_precompute_g1.hpp>
-#include <nil/crypto3/algebra/pairing/forms/short_weierstrass/jacobian_with_a4_0/ate_precompute_g2.hpp>
-#include <nil/crypto3/algebra/pairing/forms/short_weierstrass/jacobian_with_a4_0/final_exponentiation.hpp>
-#include <nil/crypto3/algebra/pairing/pairing_policy.hpp>
+
+#include <nil/crypto3/algebra/curves/babyjubjub.hpp>
+
+#include <nil/crypto3/algebra/pairing/forms/short_weierstrass/jacobian_with_a4_0_sbit/ate_double_miller_loop.hpp>
+#include <nil/crypto3/algebra/pairing/forms/short_weierstrass/jacobian_with_a4_0_sbit/ate_miller_loop.hpp>
+#include <nil/crypto3/algebra/pairing/forms/short_weierstrass/jacobian_with_a4_0_sbit/ate_precompute_g1.hpp>
+#include <nil/crypto3/algebra/pairing/forms/short_weierstrass/jacobian_with_a4_0_sbit/ate_precompute_g2.hpp>
+#include <nil/crypto3/algebra/pairing/forms/short_weierstrass/jacobian_with_a4_0_sbit/final_exponentiation.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -47,13 +51,13 @@ namespace nil {
 
                     using chained_curve_type = curves::babyjubjub;
 
-                    using precompute_g1 = pairing::short_weierstrass_jacobian_with_a4_0_ate_precompute_g1<curve_type>;
-                    using precompute_g2 = pairing::short_weierstrass_jacobian_with_a4_0_ate_precompute_g2<curve_type>;
-                    using miller_loop = pairing::short_weierstrass_jacobian_with_a4_0_ate_miller_loop<curve_type>;
+                    using precompute_g1 = pairing::short_weierstrass_jacobian_with_a4_0_sbit_ate_precompute_g1<curve_type>;
+                    using precompute_g2 = pairing::short_weierstrass_jacobian_with_a4_0_sbit_ate_precompute_g2<curve_type>;
+                    using miller_loop = pairing::short_weierstrass_jacobian_with_a4_0_sbit_ate_miller_loop<curve_type>;
                     using double_miller_loop =
-                        pairing::short_weierstrass_jacobian_with_a4_0_ate_double_miller_loop<curve_type>;
+                        pairing::short_weierstrass_jacobian_with_a4_0_sbit_ate_double_miller_loop<curve_type>;
                     using final_exponentiation =
-                        pairing::short_weierstrass_jacobian_with_a4_0_final_exponentiation<curve_type>;
+                        pairing::short_weierstrass_jacobian_with_a4_0_sbit_final_exponentiation<curve_type>;
 
                     using g1_precomputed_type = typename precompute_g1::g1_precomputed_type;
                     using g2_precomputed_type = typename precompute_g2::g2_precomputed_type;
