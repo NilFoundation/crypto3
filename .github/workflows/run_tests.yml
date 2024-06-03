@@ -26,7 +26,7 @@ jobs:
 
   build-and-test:
     needs: [ handle-syncwith ]
-    runs-on: ubuntu-latest
+    runs-on: ["self-hosted", "aws_autoscaling"]
     strategy:
       fail-fast: false
     steps:
@@ -50,15 +50,7 @@ jobs:
             !${{ github.workspace }}/
             !${{ github.workspace }}/**/.git/**
 
-      - uses: cachix/install-nix-action@v27
-      - uses: DeterminateSystems/magic-nix-cache-action@main
-      - uses: DeterminateSystems/nix-installer-action@main
-
-      - name: Configure Nix
-        run: |
-          mkdir -p ~/.config/nix
-          echo "extra-experimental-features = nix-command flakes" > ~/.config/nix/nix.conf
-
+      # nix is taken from the cloud-init template 
       - name: Run checks
         run: nix flake -L check .?submodules=1#
         env:
