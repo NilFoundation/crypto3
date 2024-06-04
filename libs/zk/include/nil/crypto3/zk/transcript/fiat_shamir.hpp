@@ -29,6 +29,7 @@
 
 #include <nil/marshalling/algorithms/pack.hpp>
 #include <nil/crypto3/marshalling/algebra/types/field_element.hpp>
+#include <nil/crypto3/marshalling/algebra/types/curve_element.hpp>
 
 #include <nil/crypto3/hash/algorithm/hash.hpp>
 #include <nil/crypto3/hash/keccak.hpp>
@@ -149,7 +150,10 @@ namespace nil {
                     }
 
                     template<typename InputRange>
-                    void operator()(const InputRange &r) {
+                    typename std::enable_if_t<
+                        !algebra::is_group_element<InputRange>::value &&
+                        !algebra::is_field_element<InputRange>::value>
+                    operator()(const InputRange &r) {
                         auto acc_convertible = hash<hash_type>(state);
                         state = accumulators::extract::hash<hash_type>(
                             hash<hash_type>(r, static_cast<accumulator_set<hash_type> &>(acc_convertible)));
@@ -160,6 +164,21 @@ namespace nil {
                         auto acc_convertible = hash<hash_type>(state);
                         state = accumulators::extract::hash<hash_type>(
                             hash<hash_type>(first, last, static_cast<accumulator_set<hash_type> &>(acc_convertible)));
+                    }
+
+                    template<typename element>
+                    typename std::enable_if_t<
+                        algebra::is_group_element<element>::value ||
+                        algebra::is_field_element<element>::value
+                        >
+                    operator()(element const& data) {
+                        nil::marshalling::status_type status;
+                        std::vector<std::uint8_t> byte_data =
+                            nil::marshalling::pack<nil::marshalling::option::big_endian>(data, status);
+                        BOOST_ASSERT(status == nil::marshalling::status_type::success);
+                        auto acc_convertible = hash<hash_type>(state);
+                        state = accumulators::extract::hash<hash_type>(
+                                hash<hash_type>(byte_data, static_cast<accumulator_set<hash_type> &>(acc_convertible)));
                     }
 
                     template<typename Field>
@@ -257,13 +276,26 @@ namespace nil {
                         sponge.absorb(hash<hash_type>(first, last));
                     }
 
-                    void operator()(const typename hash_type::digest_type input) {
+                    void operator()(const typename hash_type::digest_type &input) {
                         sponge.absorb(input);
                     }
 
                     template<typename InputRange>
-                    void operator()(const InputRange &r) {
+                    typename std::enable_if_t<
+                        !algebra::is_group_element<InputRange>::value
+                        >
+                    operator()(const InputRange &r) {
                         sponge.absorb(static_cast<typename hash_type::digest_type>(hash<hash_type>(r)));
+                    }
+
+                    template<typename element>
+                    typename std::enable_if_t<
+                        algebra::is_group_element<element>::value
+                        >
+                    operator()(element const& data) {
+                        auto affine = data.to_affine();
+                        sponge.absorb(affine.X);
+                        sponge.absorb(affine.Y);
                     }
 
                     template<typename InputIterator>
