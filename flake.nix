@@ -26,9 +26,6 @@
 
             env.CXXFLAGS = toString ([ "-fPIC" ]);
 
-            env.NIX_CFLAGS_COMPILE =
-              toString ([ "-Wno-unused-but-set-variable" ]);
-
             buildInputs = with pkgs; [ cmake pkg-config clang_16
               (boost183.override {
                 enableShared = true;
@@ -65,6 +62,7 @@
             "blueprint_algebra_fields_plonk_interpolation_test"
             "blueprint_algebra_fields_plonk_non_native_addition_test"
             "blueprint_algebra_fields_plonk_non_native_subtraction_test"
+            #blueprint_algebra_fields_plonk_non_native_multiplication_test, TODO: enable once fixed.
             "blueprint_algebra_fields_plonk_non_native_range_test"
             "blueprint_algebra_fields_plonk_non_native_reduction_test"
             "blueprint_algebra_fields_plonk_non_native_bit_decomposition_test"
@@ -77,7 +75,9 @@
             "blueprint_algebra_fields_plonk_non_native_comparison_flag_test"
             "blueprint_algebra_fields_plonk_non_native_equality_flag_test"
             "blueprint_algebra_fields_plonk_non_native_division_remainder_test"
+            #blueprint_non_native_plonk_scalar_non_native_range_test, TODO: enable once fixed.
             "blueprint_non_native_plonk_bool_scalar_multiplication_test"
+            #blueprint_non_native_plonk_add_mul_zkllvm_compatible_test, TODO: enable once fixed.
             "blueprint_hashes_plonk_decomposition_test"
             "blueprint_verifiers_placeholder_fri_cosets_test"
             "blueprint_hashes_plonk_sha256_process_test"
@@ -98,6 +98,7 @@
             "blueprint_verifiers_placeholder_gate_component_test"
             "blueprint_verifiers_flexible_pow_factor_test"
             "blueprint_proxy_test"
+            #blueprint_mock_mocked_components_test, TODO: Enable after code and test re-written.
             "blueprint_component_batch_test"
             "blueprint_verifiers_placeholder_expression_evaluation_component_test"
             "blueprint_verifiers_placeholder_final_polynomial_check_test"
@@ -116,9 +117,6 @@
             src = self;
 
             env.CXXFLAGS = toString ([ "-fPIC" ]);
-
-            env.NIX_CFLAGS_COMPILE =
-              toString ([ "-Wno-unused-but-set-variable" ]);
 
             buildInputs = with pkgs; [
               cmake
@@ -177,7 +175,7 @@
 
 # 1 build crypto 3 locally with the command 'nix build -L .?submodules=1#'
 # 2 redirect to the local build of crypto3: 'nix develop --redirect .#crypto3 /your/path/to/crypto3/result/'
-# 3a to build all in blueprint: 'nix flake -L check .?submodules=1#'
+# 3a to build all in blueprint: 'nix flake -L check .?submodules=1#' or build all and run tests: nix build -L .?submodules=1#checks.x86_64-linux.default
 # 3b to build individual targets:
 # nix develop . -c cmake -B build -DCMAKE_CXX_STANDARD=17 -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=FALSE -DCMAKE_ENABLE_TESTS=TRUE -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
 # cd build
