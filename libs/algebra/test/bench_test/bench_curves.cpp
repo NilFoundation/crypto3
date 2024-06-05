@@ -1,7 +1,5 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
-// Copyright (c) 2020-2021 Ilias Khairullin <ilias@nil.foundation>
+// Copyright (c) 2024 Martun Karapetyan <martun@nil.foundation>
 //
 // MIT License
 //
@@ -37,6 +35,9 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
+#include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/coordinates.hpp>
+#include <nil/crypto3/algebra/curves/forms.hpp>
+
 #include <nil/crypto3/algebra/curves/alt_bn128.hpp>
 #include <nil/crypto3/algebra/curves/bls12.hpp>
 #include <nil/crypto3/algebra/curves/edwards.hpp>
@@ -56,13 +57,43 @@
 
 #include <nil/crypto3/algebra/random_element.hpp>
 
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
-
 using namespace nil::crypto3::algebra;
 
 BOOST_AUTO_TEST_SUITE(curves_manual_tests)
 /**/
 
+template<typename CurveGroup, typename AffineCurveGroup>
+void curve_mixed_add_perf_test() {
+    using namespace nil::crypto3;
+    using namespace nil::crypto3::algebra;
+
+    typedef typename AffineCurveGroup::value_type affine_value_type;
+    typedef typename CurveGroup::value_type value_type;
+    typedef typename CurveGroup::curve_type::scalar_field_type::value_type scalar_type;
+
+    std::vector<value_type> points1;
+    std::vector<affine_value_type> points2;
+    std::vector<scalar_type> constants;
+
+    for (int i = 0; i < 1000; ++i) {
+        points1.push_back(algebra::random_element<CurveGroup>());
+        points2.push_back(algebra::random_element<AffineCurveGroup>());
+        constants.push_back(algebra::random_element<typename CurveGroup::curve_type::scalar_field_type>());
+    }
+
+    size_t SAMPLES = 10000;
+
+    std::chrono::time_point<std::chrono::high_resolution_clock> start(std::chrono::high_resolution_clock::now());
+
+    for (int i = 0; i < SAMPLES; ++i) {
+        int index = i % points1.size();
+        points1[index].mixed_add(points1[index]);
+    }
+    auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
+        std::chrono::high_resolution_clock::now() - start);
+    std::cout << "Addition time: " << std::fixed << std::setprecision(3)
+        << elapsed.count() / SAMPLES << " ns" << std::endl;
+}
 
 template<typename CurveGroup>
 void curve_operations_perf_test() {
@@ -70,20 +101,15 @@ void curve_operations_perf_test() {
     using namespace nil::crypto3::algebra;
 
     typedef typename CurveGroup::value_type value_type;
-    typedef typename CurveGroup::field_type::integral_type integral_type;
+    typedef typename CurveGroup::curve_type::scalar_field_type::value_type scalar_type;
 
     std::vector<value_type> points1;
     std::vector<value_type> points2;
-    std::vector<integral_type> constants;
+    std::vector<scalar_type> constants;
 
     for (int i = 0; i < 1000; ++i) {
         points1.push_back(algebra::random_element<CurveGroup>());
-        // We convert the number into string and back into number to convert the type, they are slightly different.
-        std::stringstream ss;
-        ss << algebra::random_element<typename CurveGroup::field_type>();
-
-        // For G2 group, we wil have 2 integral values in the ss, so taking only the first one.
-        constants.push_back(integral_type(ss.str().substr(0, ss.str().find(' '))));
+        constants.push_back(algebra::random_element<typename CurveGroup::curve_type::scalar_field_type>());
     }
     points2 = points1;
 
@@ -123,16 +149,41 @@ void curve_operations_perf_test() {
         << elapsed.count() / SAMPLES << " ns" << std::endl;
 }
 
-BOOST_AUTO_TEST_CASE(curve_operations_perf_test_bls12_381_g1) {
-    using policy_type = curves::bls12<381>::g1_type<>;
+BOOST_AUTO_TEST_CASE(curve_operations_perf_test_bls12_381_g1_jacobian) {
+    using policy_type = curves::bls12<381>::g1_type<
+        nil::crypto3::algebra::curves::coordinates::jacobian_with_a4_0, 
+        nil::crypto3::algebra::curves::forms::short_weierstrass>;
 
     curve_operations_perf_test<policy_type>();
 }
 
-BOOST_AUTO_TEST_CASE(curve_operations_perf_test_bls12_381_g2) {
-    using policy_type = curves::bls12<381>::g2_type<>;
+BOOST_AUTO_TEST_CASE(curve_operations_perf_test_bls12_381_g2_jacobian) {
+    using policy_type = curves::bls12<381>::g2_type<
+        nil::crypto3::algebra::curves::coordinates::jacobian_with_a4_0,
+        nil::crypto3::algebra::curves::forms::short_weierstrass>;
 
     curve_operations_perf_test<policy_type>();
+}
+
+BOOST_AUTO_TEST_CASE(curve_operations_perf_test_bls12_381_g1_projective) {
+    using policy_type = curves::bls12<381>::g1_type<
+        nil::crypto3::algebra::curves::coordinates::projective, 
+        nil::crypto3::algebra::curves::forms::short_weierstrass>;
+
+    curve_operations_perf_test<policy_type>();
+}
+
+// Performance for mixed addition.
+BOOST_AUTO_TEST_CASE(mixed_addition_perf_test_bls12_381_g1) {
+    using policy_type = curves::bls12<381>::g1_type<
+        nil::crypto3::algebra::curves::coordinates::projective, 
+        nil::crypto3::algebra::curves::forms::short_weierstrass>;
+
+    using affine_policy_type = curves::bls12<381>::g1_type<
+        nil::crypto3::algebra::curves::coordinates::affine, 
+        nil::crypto3::algebra::curves::forms::short_weierstrass>;
+
+    curve_mixed_add_perf_test<policy_type, affine_policy_type>();
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -55,16 +55,17 @@ using namespace nil::crypto3::algebra;
 
 BOOST_AUTO_TEST_SUITE(fields_manual_tests)
 
-BOOST_AUTO_TEST_CASE(field_operation_perf_test_pallas) {
+template<class Field>
+void run_perf_test() {
     using namespace nil::crypto3;
     using namespace nil::crypto3::algebra;
     using namespace nil::crypto3::algebra::fields;
 
-    typedef typename pallas_base_field::value_type value_type;
+    typedef typename Field::value_type value_type;
     std::vector<value_type> points1;
     std::vector<value_type> points2;
     for (int i = 0; i < 1000; ++i) {
-        points1.push_back(algebra::random_element<pallas_base_field>());
+        points1.push_back(algebra::random_element<Field>());
     }
     points2 = points1;
 
@@ -114,6 +115,14 @@ BOOST_AUTO_TEST_CASE(field_operation_perf_test_pallas) {
         std::chrono::high_resolution_clock::now() - start);
     std::cout << "Inversion time: " << std::fixed << std::setprecision(3)
         << elapsed.count() / (SAMPLES / 1000) << " ns" << std::endl;
+}
+
+BOOST_AUTO_TEST_CASE(field_operation_perf_test_pallas) {
+    run_perf_test<nil::crypto3::algebra::fields::pallas_base_field>();
+}
+
+BOOST_AUTO_TEST_CASE(field_operation_perf_test_bls12_381) {
+    run_perf_test<nil::crypto3::algebra::fields::bls12_base_field<381u>>();
 }
 
 BOOST_AUTO_TEST_SUITE_END()
