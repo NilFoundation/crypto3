@@ -22,7 +22,7 @@ macro(define_blueprint_test test)
 
     set(TEST_RESULTS_DIR "${CMAKE_CURRENT_BINARY_DIR}/junit_results")
     set(TEST_LOGS_DIR "${TEST_RESULTS_DIR}/logs")
-    set(additional_args "--log_format=JUNIT"
+    set(additional_args ${ARGV2} "--log_format=JUNIT"
                         "--log_sink=${TEST_LOGS_DIR}/${full_test_name}.xml")
 
     cm_test(NAME ${full_test_name} SOURCES ${test}.cpp ARGS ${additional_args})
@@ -69,8 +69,6 @@ set(NON_NATIVE_TESTS_FILES
     "algebra/fields/plonk/non_native/bit_decomposition"
     "algebra/fields/plonk/non_native/bit_composition"
     "algebra/fields/plonk/non_native/bit_shift_constant"
-    "algebra/fields/plonk/non_native/logic_ops"
-    "algebra/fields/plonk/non_native/lookup_logic_ops"
     "algebra/fields/plonk/non_native/comparison_checked"
     "algebra/fields/plonk/non_native/comparison_unchecked"
     "algebra/fields/plonk/non_native/comparison_flag"
@@ -80,6 +78,11 @@ set(NON_NATIVE_TESTS_FILES
     #"non_native/plonk/add_mul_zkllvm_compatible"
     "non_native/plonk/scalar_non_native_range"
     )
+
+set(NON_NATIVE_TESTS_FILES_WITH_PROOF_GEN
+    "algebra/fields/plonk/non_native/logic_ops"
+    "algebra/fields/plonk/non_native/lookup_logic_ops"
+)
 
 set(PLONK_TESTS_FILES
     "algebra/curves/plonk/variable_base_scalar_mul"
@@ -225,4 +228,8 @@ SET(ALL_TESTS_FILES
 
 foreach(TEST_FILE ${ALL_TESTS_FILES})
     define_blueprint_test(${TEST_FILE})
+endforeach()
+
+foreach(TEST_FILE ${NON_NATIVE_TESTS_FILES_WITH_PROOF_GEN})
+    define_blueprint_test(${TEST_FILE} ARGS "-DBLUEPRINT_PLACEHOLDER_PROOF_GEN=True")
 endforeach()
