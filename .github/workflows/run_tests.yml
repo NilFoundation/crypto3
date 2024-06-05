@@ -54,15 +54,13 @@ jobs:
       - name: Build and run tests
         env:
           NIX_CONFIG: |
-            cores = 4
-            max-jobs = 2
+            cores = 8
+            max-jobs = 4
         run: |
           nix build -L .?submodules=1#checks.x86_64-linux.default
           results_dir="./results"
           mkdir -p "$results_dir"
           cp -r ./result/* "$results_dir/all-checks"
-          ls -l -a
-          ls -l -a "$results_dir/all-checks/"
           rm -rf result
       - name: Publish Test Results
         uses: EnricoMi/publish-unit-test-result-action/linux@v2
