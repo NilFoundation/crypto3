@@ -178,6 +178,7 @@ namespace nil {
 
                         constexpr element_fp &operator--() {
                             data = data - typename modular_type::backend_type(1u, modulus_params);
+                            return *this;
                         }
 
                         constexpr element_fp operator--(int) {
