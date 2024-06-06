@@ -177,8 +177,7 @@ namespace nil {
                         }
 
                         constexpr element_fp &operator--() {
-                            data = data - data_type(1, modulus_params);
-                            return *this;
+                            data = data - data_type(1u, modulus_params);
                         }
 
                         constexpr element_fp operator--(int) {
@@ -238,7 +237,7 @@ namespace nil {
                     constexpr typename element_fp<FieldParams>::modular_params_type const element_fp<FieldParams>::modulus_params;
 
                     namespace element_fp_details {
-                        // These constexpr static variables can not be members of element_fp, because 
+                        // These constexpr static variables can not be members of element_fp, because
                         // element_fp is incomplete type until the end of its declaration.
                         template<typename FieldParams>
                         constexpr static element_fp<FieldParams> zero_instance = 0u;
