@@ -22,7 +22,7 @@ macro(define_blueprint_test test)
 
     set(TEST_RESULTS_DIR "${CMAKE_CURRENT_BINARY_DIR}/junit_results")
     set(TEST_LOGS_DIR "${TEST_RESULTS_DIR}/logs")
-    set(additional_args ${ARGV2} "--log_format=JUNIT"
+    set(additional_args "--log_format=JUNIT"
                         "--log_sink=${TEST_LOGS_DIR}/${full_test_name}.xml")
 
     cm_test(NAME ${full_test_name} SOURCES ${test}.cpp ARGS ${additional_args})
@@ -36,9 +36,9 @@ macro(define_blueprint_test test)
     set_target_properties(${full_test_name} PROPERTIES CXX_STANDARD 17)
 
     if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-        target_compile_options(${full_test_name} PRIVATE "-fconstexpr-steps=2147483647" "-ftemplate-backtrace-limit=0")
+        target_compile_options(${full_test_name} PRIVATE "${ARGV2}" "-fconstexpr-steps=2147483647" "-ftemplate-backtrace-limit=0")
     elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-        target_compile_options(${full_test_name} PRIVATE "-fconstexpr-ops-limit=4294967295" "-ftemplate-backtrace-limit=0")
+        target_compile_options(${full_test_name} PRIVATE "${ARGV2}" "-fconstexpr-ops-limit=4294967295" "-ftemplate-backtrace-limit=0")
     endif()
 
     get_target_property(target_type Boost::unit_test_framework TYPE)
