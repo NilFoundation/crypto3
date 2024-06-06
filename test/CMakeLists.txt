@@ -13,9 +13,34 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 
 find_package(Boost REQUIRED COMPONENTS random unit_test_framework)
 
-cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
+cm_test_link_libraries(blueprint
                        crypto3::all
                        ${Boost_LIBRARIES})
+
+option(ZK_PLACEHOLDER_PROFILING "Build with placeholder profiling" FALSE)
+option(ZK_PLACEHOLDER_DEBUG "Build with placeholder debug output" FALSE)
+
+if(ZK_PLACEHOLDER_PROFILING)
+    add_definitions(-DZK_PLACEHOLDER_PROFILING_ENABLED)
+endif()
+
+if(ZK_PLACEHOLDER_DEBUG)
+    add_definitions(-DZK_PLACEHOLDER_DEBUG_ENABLED)
+endif()
+
+option(BLUEPRINT_DEBUG "Build with blueprint debug output" FALSE)
+
+if(BLUEPRINT_DEBUG)
+    message(STATUS "BLUEPRINT DEBUG enabled")
+    add_definitions(-DBLUEPRINT_DEBUG_ENABLED)
+endif()
+
+option(BLUEPRINT_PLACEHOLDER_PROOF_GEN "Build with placeholder proof generation running" FALSE)
+
+if(BLUEPRINT_PLACEHOLDER_PROOF_GEN)
+    message(STATUS "BLUEPRINT PROOF GENERATION enabled")
+    add_definitions(-DBLUEPRINT_PLACEHOLDER_PROOF_GEN_ENABLED)
+endif()
 
 macro(define_blueprint_test test)
     string(REPLACE "/" "_" full_test_name blueprint_${test}_test)
