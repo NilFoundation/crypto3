@@ -177,7 +177,7 @@ namespace nil {
                         }
 
                         constexpr element_fp &operator--() {
-                            data = data - data_type(1u, modulus_params);
+                            data = data - typename modular_type::backend_type(1u, modulus_params);
                         }
 
                         constexpr element_fp operator--(int) {
