@@ -54,7 +54,7 @@ namespace nil {
                     /// The endomorphism coefficient
                     typename FieldType::value_type endo_coefficient;
                     /// The MDS matrix
-                    std::array<std::array<typename FieldType::value_type, 3>, 3> mds;
+                    typename hashes::detail::poseidon_constants<hashes::detail::mina_poseidon_policy<FieldType>>::mds_matrix_type mds;
                 };
 
                 enum gate_type {
@@ -108,8 +108,8 @@ namespace nil {
 
                 template<typename FieldType>
                 struct arithmetic_sponge_params {
-                    std::vector<std::vector<FieldType>> round_constants;
-                    std::array<std::array<FieldType,3>,3> mds;
+                    std::vector<std::vector<typename FieldType::value_type>> round_constants;
+                    typename hashes::detail::poseidon_constants<hashes::detail::mina_poseidon_policy<FieldType>>::mds_matrix_type mds;
                 };
 
                 struct Column;
@@ -126,38 +126,40 @@ namespace nil {
                     typedef typename commitment_scheme::commitment_type commitment_type;
                     typedef typename CurveType::scalar_field_type scalar_field_type;
 
-                    enum lookups_used { Single, Joint } lookup_used;
+                    enum lookups_used {
+                        Single, Joint
+                    } lookup_used;
                     std::vector<commitment_type> lookup_table;
                     std::vector<commitment_type> lookup_selectors;
 
                     commitment_type table_ids;
 
                     std::size_t max_joint_size;
-                    
+
                     commitment_type runtime_tables_selector;
                     bool runtime_tables_selector_is_used;
-                    
-                    static commitment_type combine_table(std::vector<commitment_type>& columns,
-                                            typename scalar_field_type::value_type column_combiner,
-                                            typename scalar_field_type::value_type table_id_combiner,
-                                            commitment_type& table_id_vector, 
-                                            commitment_type& runtime_vector){
+
+                    static commitment_type combine_table(std::vector<commitment_type> &columns,
+                                                         typename scalar_field_type::value_type column_combiner,
+                                                         typename scalar_field_type::value_type table_id_combiner,
+                                                         commitment_type &table_id_vector,
+                                                         commitment_type &runtime_vector) {
                         typename scalar_field_type::value_type j = scalar_field_type::value_type::one();
                         std::vector<typename scalar_field_type::value_type> scalars;
                         std::vector<commitment_type> commitments;
 
-                        for(auto &comm : columns){
+                        for (auto &comm: columns) {
                             scalars.push_back(j);
                             commitments.push_back(comm);
                             j *= column_combiner;
                         }
 
-                        if(table_id_vector.unshifted.size() != 0){
+                        if (table_id_vector.unshifted.size() != 0) {
                             scalars.push_back(table_id_combiner);
                             commitments.push_back(table_id_vector);
                         }
 
-                        if(runtime_vector.unshifted.size() != 0){
+                        if (runtime_vector.unshifted.size() != 0) {
                             scalars.push_back(column_combiner);
                             commitments.push_back(runtime_vector);
                         }

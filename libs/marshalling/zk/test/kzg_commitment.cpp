@@ -172,7 +172,7 @@ struct batched_kzg_test_initializer {
         scalar_value_type alpha = 7;
         typename kzg_type::params_type params(8, 8, alpha);
 
-        typename kzg_type::poly_type poly;
+        typename kzg_type::polynomial_type poly;
 
         poly.template from_coefficients<std::vector<scalar_value_type>>({{ 1,  2,  3,  4,  5,  6,  7,  8}});
 

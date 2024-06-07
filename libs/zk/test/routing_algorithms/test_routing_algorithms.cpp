@@ -62,15 +62,15 @@ void test_as_waksman(const std::size_t N) {
 
 BOOST_AUTO_TEST_SUITE(routing_algorithms_test_suite)
 
-BOOST_AUTO_TEST_CASE(routing_algorithms_test) {
-    std::size_t bn_size = 8;
-    printf("* for all permutations on %zu elements\n", bn_size);
-    test_benes(bn_size);
+    BOOST_AUTO_TEST_CASE(routing_algorithms_test) {
+        std::size_t bn_size = 8;
+        printf("* for all permutations on %zu elements\n", bn_size);
+        test_benes(bn_size);
 
-    std::size_t asw_max_size = 9;
-    for (std::size_t i = 2; i <= asw_max_size; ++i) {
-        test_as_waksman(i);
+        std::size_t asw_max_size = 9;
+        for (std::size_t i = 2; i <= asw_max_size; ++i) {
+            test_as_waksman(i);
+        }
     }
-}
 
 BOOST_AUTO_TEST_SUITE_END()

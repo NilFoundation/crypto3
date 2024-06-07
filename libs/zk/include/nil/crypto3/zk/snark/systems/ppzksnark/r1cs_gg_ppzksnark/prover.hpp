@@ -77,10 +77,10 @@ namespace nil {
                         BOOST_ASSERT(proving_key.constraint_system.is_satisfied(primary_input, auxiliary_input));
 
                         const qap_witness<scalar_field_type> qap_wit =
-                            reductions::r1cs_to_qap<scalar_field_type>::witness_map(
-                                proving_key.constraint_system, primary_input, auxiliary_input,
-                                scalar_field_type::value_type::zero(), scalar_field_type::value_type::zero(),
-                                scalar_field_type::value_type::zero());
+                                reductions::r1cs_to_qap<scalar_field_type>::witness_map(
+                                        proving_key.constraint_system, primary_input, auxiliary_input,
+                                        scalar_field_type::value_type::zero(), scalar_field_type::value_type::zero(),
+                                        scalar_field_type::value_type::zero());
 
                         /* We are dividing degree 2(d-1) polynomial by degree d polynomial
                            and not adding a PGHR-style ZK-patch, so our H is degree d-2 */
@@ -100,59 +100,59 @@ namespace nil {
 
                         // TODO: sort out indexing
                         std::vector<typename scalar_field_type::value_type> const_padded_assignment(
-                            1, scalar_field_type::value_type::one());
+                                1, scalar_field_type::value_type::one());
                         const_padded_assignment.insert(const_padded_assignment.end(),
                                                        qap_wit.coefficients_for_ABCs.begin(),
                                                        qap_wit.coefficients_for_ABCs.end());
 
                         typename g1_type::value_type evaluation_At =
-                            algebra::multiexp_with_mixed_addition<algebra::policies::multiexp_method_BDLO12>(
-                                proving_key.A_query.begin(),
-                                proving_key.A_query.begin() + qap_wit.num_variables + 1,
-                                const_padded_assignment.begin(),
-                                const_padded_assignment.begin() + qap_wit.num_variables + 1,
-                                chunks);
+                                algebra::multiexp_with_mixed_addition<algebra::policies::multiexp_method_BDLO12>(
+                                        proving_key.A_query.begin(),
+                                        proving_key.A_query.begin() + qap_wit.num_variables + 1,
+                                        const_padded_assignment.begin(),
+                                        const_padded_assignment.begin() + qap_wit.num_variables + 1,
+                                        chunks);
 
                         typename commitments::knowledge_commitment<g2_type, g1_type>::value_type evaluation_Bt =
-                            commitments::kc_multiexp_with_mixed_addition<algebra::policies::multiexp_method_BDLO12>(
-                                proving_key.B_query,
-                                0,
-                                qap_wit.num_variables + 1,
-                                const_padded_assignment.begin(),
-                                const_padded_assignment.begin() + qap_wit.num_variables + 1,
-                                chunks);
+                                commitments::kc_multiexp_with_mixed_addition<algebra::policies::multiexp_method_BDLO12>(
+                                        proving_key.B_query,
+                                        0,
+                                        qap_wit.num_variables + 1,
+                                        const_padded_assignment.begin(),
+                                        const_padded_assignment.begin() + qap_wit.num_variables + 1,
+                                        chunks);
 
                         typename g1_type::value_type evaluation_Ht =
-                            algebra::multiexp<algebra::policies::multiexp_method_BDLO12>(
-                                proving_key.H_query.begin(),
-                                proving_key.H_query.begin() + (qap_wit.degree - 1),
-                                qap_wit.coefficients_for_H.begin(),
-                                qap_wit.coefficients_for_H.begin() + (qap_wit.degree - 1),
-                                chunks);
+                                algebra::multiexp<algebra::policies::multiexp_method_BDLO12>(
+                                        proving_key.H_query.begin(),
+                                        proving_key.H_query.begin() + (qap_wit.degree - 1),
+                                        qap_wit.coefficients_for_H.begin(),
+                                        qap_wit.coefficients_for_H.begin() + (qap_wit.degree - 1),
+                                        chunks);
 
                         typename g1_type::value_type evaluation_Lt =
-                            algebra::multiexp_with_mixed_addition<algebra::policies::multiexp_method_BDLO12>(
-                                proving_key.L_query.begin(),
-                                proving_key.L_query.end(),
-                                const_padded_assignment.begin() + qap_wit.num_inputs + 1,
-                                const_padded_assignment.begin() + qap_wit.num_variables + 1,
-                                chunks);
+                                algebra::multiexp_with_mixed_addition<algebra::policies::multiexp_method_BDLO12>(
+                                        proving_key.L_query.begin(),
+                                        proving_key.L_query.end(),
+                                        const_padded_assignment.begin() + qap_wit.num_inputs + 1,
+                                        const_padded_assignment.begin() + qap_wit.num_variables + 1,
+                                        chunks);
 
                         /* A = alpha + sum_i(a_i*A_i(t)) + r*delta */
                         typename g1_type::value_type g1_A =
-                            proving_key.alpha_g1 + evaluation_At + r * proving_key.delta_g1;
+                                proving_key.alpha_g1 + evaluation_At + r * proving_key.delta_g1;
 
                         /* B = beta + sum_i(a_i*B_i(t)) + s*delta */
                         typename g1_type::value_type g1_B =
-                            proving_key.beta_g1 + evaluation_Bt.h + s * proving_key.delta_g1;
+                                proving_key.beta_g1 + evaluation_Bt.h + s * proving_key.delta_g1;
                         typename g2_type::value_type g2_B =
-                            proving_key.beta_g2 + evaluation_Bt.g + s * proving_key.delta_g2;
+                                proving_key.beta_g2 + evaluation_Bt.g + s * proving_key.delta_g2;
 
                         /* C = sum_i(a_i*((beta*A_i(t) + alpha*B_i(t) + C_i(t)) + H(t)*Z(t))/delta) + A*s + r*b -
                          * r*s*delta
                          */
                         typename g1_type::value_type g1_C =
-                            evaluation_Ht + evaluation_Lt + s * g1_A + r * g1_B - (r * s) * proving_key.delta_g1;
+                                evaluation_Ht + evaluation_Lt + s * g1_A + r * g1_B - (r * s) * proving_key.delta_g1;
 
                         return proof_type(std::move(g1_A), std::move(g2_B), std::move(g1_C));
                     }

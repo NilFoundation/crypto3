@@ -62,8 +62,8 @@
 #include <nil/crypto3/container/sparse_vector.hpp>
 #include <nil/crypto3/container/accumulation_vector.hpp>
 
-#include <nil/crypto3/multiprecision/number.hpp>
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <boost/multiprecision/number.hpp>
+#include <boost/multiprecision/cpp_int.hpp>
 #include <nil/crypto3/multiprecision/modular/modular_adaptor.hpp>
 
 #include <nil/crypto3/zk/snark/systems/ppzksnark/r1cs_gg_ppzksnark.hpp>
@@ -227,7 +227,7 @@ namespace nil {
             }
 
             template<typename InputIterator>
-            static inline linear_combination<typename CurveType::scalar_field_type>
+            static inline linear_combination<CurveType>
             linear_combination_process(InputIterator read_iter_begin, InputIterator read_iter_end,
                                        status_type &processingStatus) {
 
@@ -394,7 +394,7 @@ namespace nil {
             static inline crypto3::zk::commitments::knowledge_commitment_vector<typename CurveType::template g2_type<>,
                     typename CurveType::template g1_type<>>
             g2g1_knowledge_commitment_vector_process(InputIterator read_iter_begin, InputIterator read_iter_end,
-                    status_type &processingStatus) {
+                                                     status_type &processingStatus) {
 
                 using T = crypto3::zk::commitments::knowledge_commitment<typename CurveType::template g2_type<>,
                         typename CurveType::template g1_type<>>;
@@ -921,7 +921,7 @@ namespace nil {
             field_type_process(typename FieldType::value_type input_fp,
                                typename std::vector<chunk_type>::iterator &write_iter) {
 
-                typedef nil::crypto3::multiprecision::number<nil::crypto3::multiprecision::backends::cpp_int_backend<>>
+                typedef boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<>>
                         integral_type;
 
                 constexpr const std::size_t modulus_bits = FieldType::modulus_bits;
@@ -929,7 +929,7 @@ namespace nil {
                 constexpr const std::size_t modulus_chunks =
                         modulus_bits / chunk_size + (modulus_bits % chunk_size ? 1 : 0);
 
-                nil::crypto3::multiprecision::export_bits(integral_type(input_fp.data), write_iter, chunk_size, false);
+                boost::multiprecision::export_bits(integral_type(input_fp.data), write_iter, chunk_size, false);
                 write_iter += modulus_chunks;
             }
 

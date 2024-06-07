@@ -59,37 +59,49 @@ namespace nil {
                  *     a primary input for CS, and a proof.
                  */
                 template<typename CurveType>
-                bool run_r1cs_gg_ppzksnark_tvm_marshalling(const r1cs_example<typename CurveType::scalar_field_type> &example);
+                bool run_r1cs_gg_ppzksnark_tvm_marshalling(
+                        const r1cs_example<typename CurveType::scalar_field_type> &example);
 
                 template<typename CurveType>
-                void print_proving_key(r1cs_gg_ppzksnark_proving_key<CurveType> pk){
-                    std::cout << "alpha_g1: " 
-                    << pk.alpha_g1.to_affine().X.data << " " << pk.alpha_g1.to_affine().Y.data << " " << pk.alpha_g1.to_affine().Z.data << std::endl
-                    << "beta_g1: " 
-                    << pk.beta_g1.to_affine().X.data << " " << pk.beta_g1.to_affine().Y.data << " " << pk.beta_g1.to_affine().Z.data << std::endl
-                    << "beta_g2: " 
-                    << pk.beta_g2.to_affine().X.data[0].data << " " << pk.beta_g2.to_affine().Y.data[0].data << " " << pk.beta_g2.to_affine().Z.data[0].data << std::endl
-                    << pk.beta_g2.to_affine().X.data[1].data << " " << pk.beta_g2.to_affine().Y.data[1].data << " " << pk.beta_g2.to_affine().Z.data[1].data << std::endl
-                    << "delta_g1: " 
-                    << pk.delta_g1.to_affine().X.data << " " << pk.delta_g1.to_affine().Y.data << " " << pk.delta_g1.to_affine().Z.data << std::endl
-                    << "delta_g2: " 
-                    << pk.delta_g2.to_affine().X.data[0].data << " " << pk.delta_g2.to_affine().Y.data[0].data << " " << pk.delta_g2.to_affine().Z.data[0].data << std::endl
-                    << pk.delta_g2.to_affine().X.data[1].data << " " << pk.delta_g2.to_affine().Y.data[1].data << " " << pk.delta_g2.to_affine().Z.data[1].data << std::endl;
+                void print_proving_key(r1cs_gg_ppzksnark_proving_key<CurveType> pk) {
+                    std::cout << "alpha_g1: "
+                              << pk.alpha_g1.to_affine().X.data << " " << pk.alpha_g1.to_affine().Y.data << " "
+                              << pk.alpha_g1.to_affine().Z.data << std::endl
+                              << "beta_g1: "
+                              << pk.beta_g1.to_affine().X.data << " " << pk.beta_g1.to_affine().Y.data << " "
+                              << pk.beta_g1.to_affine().Z.data << std::endl
+                              << "beta_g2: "
+                              << pk.beta_g2.to_affine().X.data[0].data << " " << pk.beta_g2.to_affine().Y.data[0].data
+                              << " " << pk.beta_g2.to_affine().Z.data[0].data << std::endl
+                              << pk.beta_g2.to_affine().X.data[1].data << " " << pk.beta_g2.to_affine().Y.data[1].data
+                              << " " << pk.beta_g2.to_affine().Z.data[1].data << std::endl
+                              << "delta_g1: "
+                              << pk.delta_g1.to_affine().X.data << " " << pk.delta_g1.to_affine().Y.data << " "
+                              << pk.delta_g1.to_affine().Z.data << std::endl
+                              << "delta_g2: "
+                              << pk.delta_g2.to_affine().X.data[0].data << " " << pk.delta_g2.to_affine().Y.data[0].data
+                              << " " << pk.delta_g2.to_affine().Z.data[0].data << std::endl
+                              << pk.delta_g2.to_affine().X.data[1].data << " " << pk.delta_g2.to_affine().Y.data[1].data
+                              << " " << pk.delta_g2.to_affine().Z.data[1].data << std::endl;
                 }
 
                 template<typename CurveType>
-                void print_verification_key(r1cs_gg_ppzksnark_verification_key<CurveType> vk){
-                    std::cout << "gamma_g2: " 
-                        << vk.gamma_g2.to_affine().X.data[0].data << " " << vk.gamma_g2.to_affine().Y.data[0].data << " " << vk.gamma_g2.to_affine().Z.data[0].data << std::endl
-                        << vk.gamma_g2.to_affine().X.data[1].data << " " << vk.gamma_g2.to_affine().Y.data[1].data << " " << vk.gamma_g2.to_affine().Z.data[1].data << std::endl
-                        << "delta_g2: " 
-                        << vk.delta_g2.to_affine().X.data[0].data << " " << vk.delta_g2.to_affine().Y.data[0].data << " " << vk.delta_g2.to_affine().Z.data[0].data << std::endl
-                        << vk.delta_g2.to_affine().X.data[1].data << " " << vk.delta_g2.to_affine().Y.data[1].data << " " << vk.delta_g2.to_affine().Z.data[1].data << std::endl;
+                void print_verification_key(r1cs_gg_ppzksnark_verification_key<CurveType> vk) {
+                    std::cout << "gamma_g2: "
+                              << vk.gamma_g2.to_affine().X.data[0].data << " " << vk.gamma_g2.to_affine().Y.data[0].data
+                              << " " << vk.gamma_g2.to_affine().Z.data[0].data << std::endl
+                              << vk.gamma_g2.to_affine().X.data[1].data << " " << vk.gamma_g2.to_affine().Y.data[1].data
+                              << " " << vk.gamma_g2.to_affine().Z.data[1].data << std::endl
+                              << "delta_g2: "
+                              << vk.delta_g2.to_affine().X.data[0].data << " " << vk.delta_g2.to_affine().Y.data[0].data
+                              << " " << vk.delta_g2.to_affine().Z.data[0].data << std::endl
+                              << vk.delta_g2.to_affine().X.data[1].data << " " << vk.delta_g2.to_affine().Y.data[1].data
+                              << " " << vk.delta_g2.to_affine().Z.data[1].data << std::endl;
                 }
 
                 template<>
                 bool run_r1cs_gg_ppzksnark_tvm_marshalling<nil::crypto3::algebra::curves::bls12<381>>(
-                    const r1cs_example<typename nil::crypto3::algebra::curves::bls12<381>::scalar_field_type> &example) {
+                        const r1cs_example<typename nil::crypto3::algebra::curves::bls12<381>::scalar_field_type> &example) {
 
                     using CurveType = typename nil::crypto3::algebra::curves::bls12<381>;
 
@@ -98,17 +110,21 @@ namespace nil {
                     std::cout << "Starting generator" << std::endl;
 
                     typename scheme_type::keypair_type keypair =
-                        generate<scheme_type>(example.constraint_system);
+                            generate<scheme_type>(example.constraint_system);
 
                     std::cout << "Starting prover" << std::endl;
 
                     typename scheme_type::proof_type proof =
-                        prove<scheme_type>(keypair.first, example.primary_input, example.auxiliary_input);
+                            prove<scheme_type>(keypair.first, example.primary_input, example.auxiliary_input);
 
-                    std::cout << std::hex << "Obtained proof: " << proof.g_A.to_affine().X.data << " " << proof.g_A.to_affine().Y.data << " " << proof.g_A.to_affine().Z.data << std::endl
-                                                                << proof.g_B.to_affine().X.data[0].data << " " << proof.g_B.to_affine().X.data[1].data << " " << proof.g_B.to_affine().Y.data[0].data << std::endl
-                                                                << proof.g_B.to_affine().Y.data[1].data << " " << proof.g_B.to_affine().Z.data[0].data << " " << proof.g_B.to_affine().Z.data[1].data << std::endl
-                                                                << proof.g_C.to_affine().X.data << " " << proof.g_C.to_affine().Y.data << " " << proof.g_C.to_affine().Z.data << std::endl;
+                    std::cout << std::hex << "Obtained proof: " << proof.g_A.to_affine().X.data << " "
+                              << proof.g_A.to_affine().Y.data << " " << proof.g_A.to_affine().Z.data << std::endl
+                              << proof.g_B.to_affine().X.data[0].data << " " << proof.g_B.to_affine().X.data[1].data
+                              << " " << proof.g_B.to_affine().Y.data[0].data << std::endl
+                              << proof.g_B.to_affine().Y.data[1].data << " " << proof.g_B.to_affine().Z.data[0].data
+                              << " " << proof.g_B.to_affine().Z.data[1].data << std::endl
+                              << proof.g_C.to_affine().X.data << " " << proof.g_C.to_affine().Y.data << " "
+                              << proof.g_C.to_affine().Z.data << std::endl;
 
                     std::cout << std::hex << "Obtained proving key: " << std::endl;
                     print_proving_key(keypair.first);
@@ -118,21 +134,21 @@ namespace nil {
 
                     std::cout << std::hex << "Obtained primary input: " << std::endl;
 
-                    for (auto it = example.primary_input.begin(); it != example.primary_input.end(); it++){
-                        std::cout << std::hex << it->data << " " ;
+                    for (auto it = example.primary_input.begin(); it != example.primary_input.end(); it++) {
+                        std::cout << std::hex << it->data << " ";
                     }
                     std::cout << std::endl;
 
                     std::vector<std::uint8_t> proving_key_byteblob = nil::marshalling::verifier_input_serializer_tvm<scheme_type>::process(
-                        keypair.first);
+                            keypair.first);
 
                     marshalling::status_type provingProcessingStatus = marshalling::status_type::success;
 
-                    typename scheme_type::proving_key_type other = 
-                        nil::marshalling::verifier_input_deserializer_tvm<scheme_type>::proving_key_process( 
-                            proving_key_byteblob.cbegin(), 
-                            proving_key_byteblob.cend(),
-                            provingProcessingStatus);
+                    typename scheme_type::proving_key_type other =
+                            nil::marshalling::verifier_input_deserializer_tvm<scheme_type>::proving_key_process(
+                                    proving_key_byteblob.cbegin(),
+                                    proving_key_byteblob.cend(),
+                                    provingProcessingStatus);
 
                     std::cout << "Decoded proving key:" << std::endl;
                     print_proving_key(other);
@@ -144,56 +160,62 @@ namespace nil {
                     BOOST_CHECK(keypair.first.B_query == other.B_query && keypair.first.H_query == other.H_query);
                     BOOST_CHECK(keypair.first.L_query == other.L_query);
                     BOOST_CHECK(keypair.first.constraint_system == other.constraint_system);
-                    BOOST_CHECK(keypair.first.constraint_system.primary_input_size == other.constraint_system.primary_input_size);
-                    BOOST_CHECK(keypair.first.constraint_system.auxiliary_input_size == other.constraint_system.auxiliary_input_size);
-                    BOOST_CHECK(keypair.first.constraint_system.constraints.size() == other.constraint_system.constraints.size());
+                    BOOST_CHECK(keypair.first.constraint_system.primary_input_size ==
+                                other.constraint_system.primary_input_size);
+                    BOOST_CHECK(keypair.first.constraint_system.auxiliary_input_size ==
+                                other.constraint_system.auxiliary_input_size);
+                    BOOST_CHECK(keypair.first.constraint_system.constraints.size() ==
+                                other.constraint_system.constraints.size());
 
-                    for (std::size_t i = 0; i < keypair.first.constraint_system.constraints.size(); i++){
+                    for (std::size_t i = 0; i < keypair.first.constraint_system.constraints.size(); i++) {
                         std::cout << std::endl << "i:" << i << std::endl;
-                        BOOST_CHECK(keypair.first.constraint_system.constraints[i] == other.constraint_system.constraints[i]);
+                        BOOST_CHECK(keypair.first.constraint_system.constraints[i] ==
+                                    other.constraint_system.constraints[i]);
                     }
 
                     std::vector<std::uint8_t> verification_key_byteblob = nil::marshalling::verifier_input_serializer_tvm<scheme_type>::process(
-                        keypair.second);
+                            keypair.second);
                     std::vector<std::uint8_t> primary_input_byteblob = nil::marshalling::verifier_input_serializer_tvm<scheme_type>::process(
-                        example.primary_input);
+                            example.primary_input);
                     std::vector<std::uint8_t> proof_byteblob = nil::marshalling::verifier_input_serializer_tvm<scheme_type>::process(
-                        proof);
+                            proof);
 
-                    std::cout << "Verification key byteblob, size " << std::dec << verification_key_byteblob.size() << std::endl;
+                    std::cout << "Verification key byteblob, size " << std::dec << verification_key_byteblob.size()
+                              << std::endl;
 
-                    for (auto it = verification_key_byteblob.begin(); it != verification_key_byteblob.end(); ++it){
-                        std::cout << std::hex << std::size_t(*it) << " " ;
+                    for (auto it = verification_key_byteblob.begin(); it != verification_key_byteblob.end(); ++it) {
+                        std::cout << std::hex << std::size_t(*it) << " ";
                     }
 
                     std::cout << std::endl;
 
-                    std::cout << "Primary input byteblob, size " << std::dec << primary_input_byteblob.size() << std::endl;
+                    std::cout << "Primary input byteblob, size " << std::dec << primary_input_byteblob.size()
+                              << std::endl;
 
-                    for (auto it = primary_input_byteblob.begin(); it != primary_input_byteblob.end(); ++it){
-                        std::cout << std::hex << std::size_t(*it) << " " ;
+                    for (auto it = primary_input_byteblob.begin(); it != primary_input_byteblob.end(); ++it) {
+                        std::cout << std::hex << std::size_t(*it) << " ";
                     }
 
                     std::cout << std::endl;
 
                     std::cout << "Proof byteblob, size " << std::dec << proof_byteblob.size() << std::endl;
 
-                    for (auto it = proof_byteblob.begin(); it != proof_byteblob.end(); ++it){
-                        std::cout << std::hex << std::size_t(*it) << " " ;
+                    for (auto it = proof_byteblob.begin(); it != proof_byteblob.end(); ++it) {
+                        std::cout << std::hex << std::size_t(*it) << " ";
                     }
 
                     std::cout << std::endl;
 
                     std::vector<std::uint8_t> byteblob;
 
-                    byteblob.insert (byteblob.end(), proof_byteblob.begin(), proof_byteblob.end());
-                    byteblob.insert (byteblob.end(), primary_input_byteblob.begin(), primary_input_byteblob.end());
-                    byteblob.insert (byteblob.end(), verification_key_byteblob.begin(), verification_key_byteblob.end());
+                    byteblob.insert(byteblob.end(), proof_byteblob.begin(), proof_byteblob.end());
+                    byteblob.insert(byteblob.end(), primary_input_byteblob.begin(), primary_input_byteblob.end());
+                    byteblob.insert(byteblob.end(), verification_key_byteblob.begin(), verification_key_byteblob.end());
 
                     std::cout << "Data converted to byte blob" << std::endl;
 
-                    for (auto it = byteblob.begin(); it != byteblob.end(); ++it){
-                        std::cout << std::hex << std::size_t(*it) << " " ;
+                    for (auto it = byteblob.begin(); it != byteblob.end(); ++it) {
+                        std::cout << std::hex << std::size_t(*it) << " ";
                     }
 
                     std::cout << std::endl;
@@ -205,12 +227,13 @@ namespace nil {
                     std::cout << "Verifier with plain input finished, result: " << ans << std::endl;
 
                     marshalling::status_type processingStatus = marshalling::status_type::success;
-                    
-                    auto tup = nil::marshalling::verifier_input_deserializer_tvm<scheme_type>::verifier_input_process(byteblob.cbegin(), 
+
+                    auto tup = nil::marshalling::verifier_input_deserializer_tvm<scheme_type>::verifier_input_process(
+                            byteblob.cbegin(),
                             byteblob.cend(),
                             processingStatus);
 
-                    if (processingStatus != marshalling::status_type::success){
+                    if (processingStatus != marshalling::status_type::success) {
                         std::cout << "Incorrect datablob!" << std::endl;
 
                         return false;
@@ -226,28 +249,40 @@ namespace nil {
                     // typename scheme_type::primary_input_type de_pi = nil::marshalling::verifier_input_deserializer_tvm<scheme_type>::primary_input_process(primary_input_byteblob.cbegin(), primary_input_byteblob.cend());
                     // typename scheme_type::verification_key_type de_vk = nil::marshalling::verifier_input_deserializer_tvm<scheme_type>::verification_key_process(verification_key_byteblob.cbegin(), verification_key_byteblob.cend());
 
-                    std::cout << std::hex << "Decoded proof: " << de_prf.g_A.to_affine().X.data << " " << de_prf.g_A.to_affine().Y.data << " " << de_prf.g_A.to_affine().Z.data << std::endl
-                                                                << de_prf.g_B.to_affine().X.data[0].data << " " << de_prf.g_B.to_affine().X.data[1].data << " " << de_prf.g_B.to_affine().Y.data[0].data << std::endl
-                                                                << de_prf.g_B.to_affine().Y.data[1].data << " " << de_prf.g_B.to_affine().Z.data[0].data << " " << de_prf.g_B.to_affine().Z.data[1].data << std::endl
-                                                                << de_prf.g_C.to_affine().X.data << " " << de_prf.g_C.to_affine().Y.data << " " << de_prf.g_C.to_affine().Z.data << std::endl;
+                    std::cout << std::hex << "Decoded proof: " << de_prf.g_A.to_affine().X.data << " "
+                              << de_prf.g_A.to_affine().Y.data << " " << de_prf.g_A.to_affine().Z.data << std::endl
+                              << de_prf.g_B.to_affine().X.data[0].data << " " << de_prf.g_B.to_affine().X.data[1].data
+                              << " " << de_prf.g_B.to_affine().Y.data[0].data << std::endl
+                              << de_prf.g_B.to_affine().Y.data[1].data << " " << de_prf.g_B.to_affine().Z.data[0].data
+                              << " " << de_prf.g_B.to_affine().Z.data[1].data << std::endl
+                              << de_prf.g_C.to_affine().X.data << " " << de_prf.g_C.to_affine().Y.data << " "
+                              << de_prf.g_C.to_affine().Z.data << std::endl;
 
                     assert (de_prf == proof);
 
                     std::cout << std::hex << "Decoded primary input: " << std::endl;
 
-                    for (auto it = de_pi.begin(); it != de_pi.end(); it++){
-                        std::cout << std::hex << it->data << " " ;
+                    for (auto it = de_pi.begin(); it != de_pi.end(); it++) {
+                        std::cout << std::hex << it->data << " ";
                     }
                     std::cout << std::endl;
 
                     // assert (de_pi == example.primary_input);
 
-                    std::cout << std::hex << "Decoded verification key: " << "gamma_g2: " 
-                                                                << de_vk.gamma_g2.to_affine().X.data[0].data << " " << de_vk.gamma_g2.to_affine().Y.data[0].data << " " << de_vk.gamma_g2.to_affine().Z.data[0].data << std::endl
-                                                                << de_vk.gamma_g2.to_affine().X.data[1].data << " " << de_vk.gamma_g2.to_affine().Y.data[1].data << " " << de_vk.gamma_g2.to_affine().Z.data[1].data << std::endl
-                                                                << "delta_g2: " 
-                                                                << de_vk.delta_g2.to_affine().X.data[0].data << " " << de_vk.delta_g2.to_affine().Y.data[0].data << " " << de_vk.delta_g2.to_affine().Z.data[0].data << std::endl
-                                                                << de_vk.delta_g2.to_affine().X.data[1].data << " " << de_vk.delta_g2.to_affine().Y.data[1].data << " " << de_vk.delta_g2.to_affine().Z.data[1].data << std::endl;
+                    std::cout << std::hex << "Decoded verification key: " << "gamma_g2: "
+                              << de_vk.gamma_g2.to_affine().X.data[0].data << " "
+                              << de_vk.gamma_g2.to_affine().Y.data[0].data << " "
+                              << de_vk.gamma_g2.to_affine().Z.data[0].data << std::endl
+                              << de_vk.gamma_g2.to_affine().X.data[1].data << " "
+                              << de_vk.gamma_g2.to_affine().Y.data[1].data << " "
+                              << de_vk.gamma_g2.to_affine().Z.data[1].data << std::endl
+                              << "delta_g2: "
+                              << de_vk.delta_g2.to_affine().X.data[0].data << " "
+                              << de_vk.delta_g2.to_affine().Y.data[0].data << " "
+                              << de_vk.delta_g2.to_affine().Z.data[0].data << std::endl
+                              << de_vk.delta_g2.to_affine().X.data[1].data << " "
+                              << de_vk.delta_g2.to_affine().Y.data[1].data << " "
+                              << de_vk.delta_g2.to_affine().Z.data[1].data << std::endl;
 
                     assert (de_vk == keypair.second);
 
@@ -256,7 +291,7 @@ namespace nil {
                     ans = verify<scheme_type>(de_vk, de_pi, de_prf);
 
                     std::cout << "Verifier with decoded input finished, result: " << ans << std::endl;
-    
+
                     return ans;
                 }
             }    // namespace snark

@@ -6,11 +6,10 @@
 # http://www.boost.org/LICENSE_1_0.txt
 #---------------------------------------------------------------------------#
 
-cm_test_link_libraries(
-    ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
+cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
+
     Boost::unit_test_framework
-    Boost::random
-)
+    Boost::random)
 
 add_custom_target(algebra_runtime_tests)
 
@@ -21,18 +20,17 @@ macro(define_runtime_algebra_test name)
     cm_test(NAME ${test_name} SOURCES ${name}.cpp)
 
     target_include_directories(${test_name} PRIVATE
-        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
-        "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>"
+            "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+            "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>"
 
-        ${Boost_INCLUDE_DIRS}
-    )
+            ${Boost_INCLUDE_DIRS})
 
     set_target_properties(${test_name} PROPERTIES CXX_STANDARD 17
-        CXX_STANDARD_REQUIRED TRUE)
+            CXX_STANDARD_REQUIRED TRUE)
 
-    if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         target_compile_options(${test_name} PRIVATE "-fconstexpr-steps=2147483647" "-ftemplate-backtrace-limit=0")
-    elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         target_compile_options(${test_name} PRIVATE "-fconstexpr-ops-limit=4294967295" "-ftemplate-backtrace-limit=0")
     endif()
 
@@ -43,27 +41,27 @@ macro(define_compile_time_algebra_test name)
     cm_test(NAME algebra_${name}_compile_test SOURCES ${name}.cpp COMPILE_ONLY)
 
     target_include_directories(algebra_${name}_compile_test PRIVATE
-                               "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
-                               "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>"
+            "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+            "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>"
 
-                               ${Boost_INCLUDE_DIRS})
+            ${Boost_INCLUDE_DIRS})
 
     set_target_properties(algebra_${name}_compile_test PROPERTIES CXX_STANDARD 17)
 endmacro()
 
 set(RUNTIME_TESTS_NAMES
-    "curves"
-    "short_weierstrass_coordinates"
-    "curves_static"
-    "fields"
-    "fields_static"
-    "pairing"
-    "multiexp"
-    )
+        "curves"
+        "short_weierstrass_coordinates"
+        "curves_static"
+        "fields"
+        "fields_static"
+        "pairing"
+        "multiexp"
+)
 
 set(COMPILE_TIME_TESTS_NAMES
-    "matrix"
-    "vector")
+        "matrix"
+        "vector")
 
 foreach(TEST_NAME ${RUNTIME_TESTS_NAMES})
     define_runtime_algebra_test(${TEST_NAME})

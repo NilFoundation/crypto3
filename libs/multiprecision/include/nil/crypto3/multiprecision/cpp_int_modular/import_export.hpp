@@ -75,29 +75,27 @@ namespace boost {
 
             template<unsigned Bits, expression_template_option ExpressionTemplates, class Iterator>
             number<boost::multiprecision::backends::cpp_int_modular_backend<Bits>, ExpressionTemplates>&
-            import_bits_generic(
-                number<boost::multiprecision::backends::cpp_int_modular_backend<Bits>, 
-                ExpressionTemplates>& val, Iterator i, Iterator j, std::size_t chunk_size = 0, bool msv_first = true)
-            {
+            import_bits_generic(number<boost::multiprecision::backends::cpp_int_modular_backend<Bits>,
+                ExpressionTemplates>& val, Iterator i, Iterator j, std::size_t chunk_size = 0, bool msv_first = true) {
                 boost::multiprecision::backends::cpp_int_modular_backend<Bits> newval;
-            
+
                 using value_type = typename std::iterator_traits<Iterator>::value_type;
                 using difference_type = typename std::iterator_traits<Iterator>::difference_type;
                 using size_type = typename ::boost::multiprecision::detail::make_unsigned<difference_type>::type;
                 using tag_type = typename boost::multiprecision::backends::cpp_int_modular_backend<Bits>::trivial_tag;
-            
+
                 if (!chunk_size)
                    chunk_size = std::numeric_limits<value_type>::digits;
-            
+
                 size_type limbs = std::distance(i, j);
                 size_type bits  = limbs * chunk_size;
 
                 // We are not throwing, we will use as many bits from the input as we need to.
                 // BOOST_ASSERT(bits <= Bits);
-            
+
                 difference_type bit_location        = msv_first ? bits - chunk_size : 0;
                 difference_type bit_location_change = msv_first ? -static_cast<difference_type>(chunk_size) : chunk_size;
-            
+
                 while (i != j)
                 {
                     assign_bits(
@@ -106,14 +104,14 @@ namespace boost {
                     ++i;
                     bit_location += bit_location_change;
                 }
-            
+
                 // This will remove the upper bits using upper_limb_mask.
                 newval.normalize();
 
                 val.backend() = std::move(newval);
                 return val;
             }
-            
+
             template <unsigned Bits, expression_template_option ExpressionTemplates, class T>
             inline typename std::enable_if<!boost::multiprecision::backends::is_trivial_cpp_int_modular<boost::multiprecision::backends::cpp_int_modular_backend<Bits> >::value, number<boost::multiprecision::backends::cpp_int_modular_backend<Bits>, ExpressionTemplates>&>::type
             import_bits_fast(
@@ -157,16 +155,16 @@ namespace boost {
                 return val;
             }
         } // namespace detail
-            
+
         template <unsigned Bits, expression_template_option ExpressionTemplates, class Iterator>
         inline number<boost::multiprecision::backends::cpp_int_modular_backend<Bits>, ExpressionTemplates>&
         import_bits(
-            number<boost::multiprecision::backends::cpp_int_modular_backend<Bits>, ExpressionTemplates>& val, 
+            number<boost::multiprecision::backends::cpp_int_modular_backend<Bits>, ExpressionTemplates>& val,
             Iterator i, Iterator j, std::size_t chunk_size = 0, bool msv_first = true)
         {
             return detail::import_bits_generic(val, i, j, chunk_size, msv_first);
         }
-        
+
         template <unsigned Bits, expression_template_option ExpressionTemplates, class T>
         inline number<boost::multiprecision::backends::cpp_int_modular_backend<Bits>, ExpressionTemplates>&
         import_bits(
@@ -179,7 +177,7 @@ namespace boost {
         #endif
             return detail::import_bits_generic(val, i, j, chunk_size, msv_first);
         }
-            
+
         template <unsigned Bits, expression_template_option ExpressionTemplates,
             class OutputIterator>
         OutputIterator export_bits(
@@ -198,7 +196,7 @@ namespace boost {
                return out;
             }
             std::size_t bitcount = eval_msb_imp(val.backend()) + 1;
-        
+
             std::ptrdiff_t bit_location = msv_first ? static_cast<std::ptrdiff_t>(bitcount - chunk_size) : 0;
             const std::ptrdiff_t bit_step = msv_first ? static_cast<std::ptrdiff_t>(-static_cast<std::ptrdiff_t>(chunk_size)) : static_cast<std::ptrdiff_t>(chunk_size);
             while (bit_location % bit_step)
@@ -209,7 +207,7 @@ namespace boost {
                ++out;
                bit_location += bit_step;
             } while ((bit_location >= 0) && (bit_location < static_cast<int>(bitcount)));
-        
+
             return out;
         #ifdef BOOST_MSVC
         #pragma warning(pop)

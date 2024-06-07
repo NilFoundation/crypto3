@@ -51,24 +51,25 @@ using namespace nil::crypto3::zk::snark;
 
 BOOST_AUTO_TEST_SUITE(placeholder_quotient_polynomial_chunks)
 
-using curve_type = algebra::curves::pallas;
-using field_type = typename curve_type::base_field_type;
-using hash_type = hashes::keccak_1600<256>;
+    using curve_type = algebra::curves::pallas;
+    using field_type = typename curve_type::base_field_type;
+    using hash_type = hashes::keccak_1600<256>;
 
-using TestRunners = boost::mpl::list<
-    placeholder_test_runner< field_type, hash_type, hash_type, true,  8>,
-    placeholder_test_runner< field_type, hash_type, hash_type, true, 10>,
-    placeholder_test_runner< field_type, hash_type, hash_type, true, 30>,
-    placeholder_test_runner< field_type, hash_type, hash_type, true, 50>
+    using TestRunners = boost::mpl::list<
+            placeholder_test_runner<field_type, hash_type, hash_type, true, 8>,
+            placeholder_test_runner<field_type, hash_type, hash_type, true, 10>,
+            placeholder_test_runner<field_type, hash_type, hash_type, true, 30>,
+            placeholder_test_runner<field_type, hash_type, hash_type, true, 50>
     >;
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(quotient_polynomial_test, TestRunner, TestRunners) {
-    test_tools::random_test_initializer<field_type> random_test_initializer;
-    auto circuit = circuit_test_7<field_type>(
-        random_test_initializer.alg_random_engines.template get_alg_engine<field_type>(),
-        random_test_initializer.generic_random_engine
-    );
-    TestRunner test_runner(circuit);
-    BOOST_CHECK(test_runner.run_test());
-}
+    BOOST_AUTO_TEST_CASE_TEMPLATE(quotient_polynomial_test, TestRunner, TestRunners) {
+        test_tools::random_test_initializer<field_type> random_test_initializer;
+        auto circuit = circuit_test_7<field_type>(
+                random_test_initializer.alg_random_engines.template get_alg_engine<field_type>(),
+                random_test_initializer.generic_random_engine
+        );
+        TestRunner test_runner(circuit);
+        BOOST_CHECK(test_runner.run_test());
+    }
+
 BOOST_AUTO_TEST_SUITE_END()

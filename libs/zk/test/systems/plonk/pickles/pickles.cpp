@@ -31,10 +31,12 @@
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <boost/multiprecision/cpp_int.hpp>
 
 #include <nil/crypto3/algebra/curves/vesta.hpp>
 #include <nil/crypto3/algebra/curves/pallas.hpp>
+
+#include <nil/crypto3/algebra/fields/arithmetic_params/vesta.hpp>
 
 #include <nil/crypto3/zk/snark/systems/plonk/pickles/proof.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/pickles/expr.hpp>
@@ -42,7 +44,6 @@
 #include <nil/crypto3/zk/snark/systems/plonk/pickles/verifier_index.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/pickles/verifier.hpp>
 
-#include <nil/crypto3/algebra/fields/arithmetic_params/vesta.hpp>
 #include <nil/crypto3/math/domains/basic_radix2_domain.hpp>
 
 

@@ -78,7 +78,7 @@ namespace nil {
                     /// zeta^n and (zeta * omega)^n
                     std::array<typename scalar_field_type::value_type, 2> powers_of_eval_points_for_chunks;
                     /// ?
-                    std::vector < std::tuple < commitment_type, std::vector<std::vector<typename scalar_field_type::value_type>>>> polys;
+                    std::vector<std::tuple<commitment_type, std::vector<std::vector<typename scalar_field_type::value_type>>>> polys;
                     /// pre-computed zeta^n
                     typename scalar_field_type::value_type zeta1;
                     /// The evaluation f(zeta) - t(zeta) * Z_H(zeta)
@@ -87,45 +87,46 @@ namespace nil {
                 };
 
                 template<typename CurveType, typename VerifierIndexType = verifier_index<CurveType>>
-                std::vector<std::vector<std::vector<typename CurveType::scalar_field_type::value_type>>> prev_chal_evals(
-                            proof_type<CurveType> proof,
-                            VerifierIndexType index,
-                            std::vector<typename CurveType::scalar_field_type::value_type> evaluation_points,
-                            std::array<typename CurveType::scalar_field_type::value_type, 2> powers_of_eval_points_for_chunks){
+                std::vector<std::vector<std::vector<typename CurveType::scalar_field_type::value_type>>>
+                prev_chal_evals(
+                        proof_type<CurveType> proof,
+                        VerifierIndexType index,
+                        std::vector<typename CurveType::scalar_field_type::value_type> evaluation_points,
+                        std::array<typename CurveType::scalar_field_type::value_type, 2> powers_of_eval_points_for_chunks) {
                     typedef commitments::kimchi_pedersen<CurveType> commitment_scheme;
                     typedef typename CurveType::scalar_field_type scalar_field_type; // Fr
                     typedef typename CurveType::base_field_type base_field_type; // Fq
 
                     std::vector<std::vector<std::vector<typename scalar_field_type::value_type>>> prev_chal_evals;
 
-                    for(auto &[chals, comm] : proof.prev_challenges){
+                    for (auto &[chals, comm]: proof.prev_challenges) {
                         std::size_t b_len = 1 << chals.size();
                         std::vector<typename scalar_field_type::value_type> b;
                         prev_chal_evals.push_back(std::vector<std::vector<typename scalar_field_type::value_type>>());
 
-                        for(int i = 0; i < evaluation_points.size(); ++i){
+                        for (int i = 0; i < evaluation_points.size(); ++i) {
                             // prev_chal_evals.back().push_back(std::vector<typename scalar_field_type::value_type>());
-                            typename scalar_field_type::value_type full = commitment_scheme::b_poly(chals, evaluation_points[i]);
-                            if(index.max_poly_size == b_len){
+                            typename scalar_field_type::value_type full = commitment_scheme::b_poly(chals,
+                                                                                                    evaluation_points[i]);
+                            if (index.max_poly_size == b_len) {
                                 std::vector<typename scalar_field_type::value_type> vec_full = {full};
                                 prev_chal_evals.back().emplace_back(vec_full);
-                            }
-                            else{
+                            } else {
                                 typename scalar_field_type::value_type betaacc = scalar_field_type::value_type::one();
                                 typename scalar_field_type::value_type diff;
 
-                                for(std::size_t j = index.max_poly_size; j < b_len; ++j){
+                                for (std::size_t j = index.max_poly_size; j < b_len; ++j) {
                                     typename scalar_field_type::value_type b_j;
-                                    if(b.empty()){
+                                    if (b.empty()) {
                                         b = commitment_scheme::b_poly_coefficents(chals);
                                     }
                                     b_j = b[j];
-                                    
+
                                     diff += betaacc * b[j];
                                     betaacc *= evaluation_points[i];
                                 }
                                 std::vector<typename scalar_field_type::value_type> tmp_vec = {
-                                    full - (diff * powers_of_eval_points_for_chunks[i]), diff,
+                                        full - (diff * powers_of_eval_points_for_chunks[i]), diff,
                                 };
 
                                 prev_chal_evals.back().emplace_back(tmp_vec);
@@ -139,8 +140,8 @@ namespace nil {
                 /// This function runs the random oracle argument
                 template<typename CurveType, typename EFqSponge, typename EFrSponge, typename VerifierIndexType = verifier_index<CurveType>>
                 OraclesResult<CurveType, EFqSponge> oracles(proof_type<CurveType> proof,
-                            VerifierIndexType index,
-                            typename commitments::kimchi_pedersen<CurveType>::commitment_type p_comm) {
+                                                            VerifierIndexType index,
+                                                            typename commitments::kimchi_pedersen<CurveType>::commitment_type p_comm) {
                     typedef commitments::kimchi_pedersen<CurveType> commitment_scheme;
                     typedef typename commitment_scheme::commitment_type commitment_type;
                     typedef typename commitment_scheme::evaluation_type evaluation_type;
@@ -160,33 +161,35 @@ namespace nil {
                     fq_sponge.absorb_g(p_comm.unshifted);
 
                     //~ 3. Absorb the commitments to the registers / witness columns with the Fq-Sponge.
-                    for (auto &commit : proof.commitments.w_comm) {
+                    for (auto &commit: proof.commitments.w_comm) {
                         fq_sponge.absorb_g(commit.unshifted);
                     }
 
                     std::tuple<ScalarChallenge<typename CurveType::scalar_field_type>,
-                                typename CurveType::scalar_field_type::value_type>
+                            typename CurveType::scalar_field_type::value_type>
                             joint_combiner;
-                    if(index.lookup_index_is_used) {
-                        BOOST_ASSERT_MSG(proof.commitments.lookup_is_used, "lookup should be in proof commitments"); 
+                    if (index.lookup_index_is_used) {
+                        BOOST_ASSERT_MSG(proof.commitments.lookup_is_used, "lookup should be in proof commitments");
 
-                        if(index.lookup_index.runtime_tables_selector_is_used){
-                            BOOST_ASSERT_MSG(proof.commitments.lookup.runtime_is_used, "lookup runtime should be in proof commitments"); 
+                        if (index.lookup_index.runtime_tables_selector_is_used) {
+                            BOOST_ASSERT_MSG(proof.commitments.lookup.runtime_is_used,
+                                             "lookup runtime should be in proof commitments");
                             fq_sponge.absorb_g(proof.commitments.lookup.runtime.unshifted);
                         }
 
                         ScalarChallenge<typename CurveType::scalar_field_type> s;
 
                         if (index.lookup_index.lookup_used == lookup_verifier_index<CurveType>::lookups_used::Single) {
-                            s = ScalarChallenge<typename CurveType::scalar_field_type>(CurveType::scalar_field_type::value_type::zero());
-                        }
-                        else if (index.lookup_index.lookup_used == lookup_verifier_index<CurveType>::lookups_used::Joint) {
+                            s = ScalarChallenge<typename CurveType::scalar_field_type>(
+                                    CurveType::scalar_field_type::value_type::zero());
+                        } else if (index.lookup_index.lookup_used ==
+                                   lookup_verifier_index<CurveType>::lookups_used::Joint) {
                             s = ScalarChallenge<typename CurveType::scalar_field_type>(fq_sponge.challenge());
                         }
 
                         joint_combiner = std::make_tuple(s, s.to_field(index.srs.endo_r));
 
-                        for(auto &commit : proof.commitments.lookup.sorted){
+                        for (auto &commit: proof.commitments.lookup.sorted) {
                             fq_sponge.absorb_g(commit.unshifted);
                         }
                     }
@@ -209,7 +212,7 @@ namespace nil {
                     //     proof.commitments.lookup[i] = fq_sponge.absorb_g(proof.commitments.lookup[i].aggreg.unshifted);
                     // }
 
-                    if(proof.commitments.lookup_is_used){
+                    if (proof.commitments.lookup_is_used) {
                         fq_sponge.absorb_g(proof.commitments.lookup.aggreg.unshifted);
                     }
 
@@ -218,19 +221,21 @@ namespace nil {
                     fq_sponge.absorb_g(proof.commitments.z_comm.unshifted);
 
                     //~ 10. Sample $\alpha'$ with the Fq-Sponge.
-                    ScalarChallenge<scalar_field_type> alpha_chal = ScalarChallenge<scalar_field_type>(fq_sponge.challenge());
+                    ScalarChallenge<scalar_field_type> alpha_chal = ScalarChallenge<scalar_field_type>(
+                            fq_sponge.challenge());
 
                     //~ 11. Derive $\alpha$ from $\alpha'$ using the endomorphism (TODO: details).
                     typename scalar_field_type::value_type alpha = alpha_chal.to_field(index.srs.endo_r);
                     //~ 12. Enforce that the length of the $t$ commitment is of size `PERMUTS`.
                     BOOST_ASSERT_MSG(proof.commitments.t_comm.unshifted.size() == kimchi_constant::PERMUTES,
-                                    "IncorrectCommitmentLength(t)");
+                                     "IncorrectCommitmentLength(t)");
 
                     //~ 13. Absorb the commitment to the quotient polynomial $t$ into the argument.
                     fq_sponge.absorb_g(proof.commitments.t_comm.unshifted);
 
                     //~ 14. Sample $\zeta'$ with the Fq-Sponge.
-                    ScalarChallenge<scalar_field_type> zeta_chal = ScalarChallenge<scalar_field_type>(fq_sponge.challenge());
+                    ScalarChallenge<scalar_field_type> zeta_chal = ScalarChallenge<scalar_field_type>(
+                            fq_sponge.challenge());
 
                     //~ 15. Derive $\zeta$ from $\zeta'$ using the endomorphism (TODO: specify).
                     typename scalar_field_type::value_type zeta = zeta_chal.to_field(index.srs.endo_r);
@@ -251,21 +256,21 @@ namespace nil {
 
                     std::vector<typename scalar_field_type::value_type> w;
                     w.reserve(proof.public_input.size());
-                    if(proof.public_input.size() > 0){
+                    if (proof.public_input.size() > 0) {
                         w.push_back(scalar_field_type::value_type::one());
                     }
 
                     Alphas<scalar_field_type> all_alphas = index.powers_of_alpha;
-                    
+
                     all_alphas.instantiate(alpha);
-                    
-                    for(int i = 0; i < proof.public_input.size(); ++i){
+
+                    for (int i = 0; i < proof.public_input.size(); ++i) {
                         w.push_back(w.back() * index.domain.omega);
                     }
 
                     // compute Lagrange base evaluation denominators
                     std::vector<typename scalar_field_type::value_type> zeta_minus_x;
-                    for (auto &i : w) {
+                    for (auto &i: w) {
                         zeta_minus_x.push_back(zeta - i);
                     }
 
@@ -278,7 +283,7 @@ namespace nil {
                     //                    ark_ff::fields::batch_inversion::<Fr<G>>(&mut zeta_minus_x);
                     // zeta_minus_x = zeta_minus_x.inverse() * Fr::one();
 
-                    std::transform(zeta_minus_x.begin(), zeta_minus_x.end(), zeta_minus_x.begin(), [](auto &element){
+                    std::transform(zeta_minus_x.begin(), zeta_minus_x.end(), zeta_minus_x.begin(), [](auto &element) {
                         return element.inversed();
                     });
                     //~ 18. Evaluate the negated public polynomial (if present) at $\zeta$ and $\zeta\omega$.
@@ -288,16 +293,17 @@ namespace nil {
                     if (!proof.public_input.empty()) {
                         typename scalar_field_type::value_type tmp;
                         std::size_t iter_size = std::min({proof.public_input.size(), zeta_minus_x.size(), w.size()});
-                        
-                        for(int i = 0; i < iter_size; ++i){
+
+                        for (int i = 0; i < iter_size; ++i) {
                             tmp -= proof.public_input[i] * zeta_minus_x[i] * w[i];
                         }
 
-                        typename scalar_field_type::value_type size_inv = typename scalar_field_type::value_type(index.domain.size()).inversed();
+                        typename scalar_field_type::value_type size_inv = typename scalar_field_type::value_type(
+                                index.domain.size()).inversed();
 
                         p_eval[0].push_back(tmp * (zeta1 - scalar_field_type::value_type::one()) * size_inv);
                         p_eval[1].push_back(tmp * (zetaw.pow(n) - scalar_field_type::value_type::one()) * size_inv);
-                    } else{
+                    } else {
                         p_eval.resize(2);
                     }
 
@@ -330,8 +336,8 @@ namespace nil {
                     //~ 25. Create a list of all polynomials that have an evaluation proof.
                     std::vector<typename scalar_field_type::value_type> evaluation_points = {zeta, zetaw};
                     std::array<typename scalar_field_type::value_type, 2> powers_of_eval_points_for_chunks = {
-                        zeta.pow(index.max_poly_size),
-                        zetaw.pow(index.max_poly_size)
+                            zeta.pow(index.max_poly_size),
+                            zetaw.pow(index.max_poly_size)
                     };
 
                     // let polys : Vec<(PolyComm<G>, _)> =
@@ -343,37 +349,38 @@ namespace nil {
 
                     std::vector<std::tuple<commitment_type, std::vector<std::vector<typename scalar_field_type::value_type>>>> polys;
                     std::vector<std::vector<std::vector<typename scalar_field_type::value_type>>> prev_chal_evals_vec = prev_chal_evals(
-                        proof, index, evaluation_points, powers_of_eval_points_for_chunks
+                            proof, index, evaluation_points, powers_of_eval_points_for_chunks
                     );
 
-                    for(int i = 0; i < proof.prev_challenges.size(); ++i){
+                    for (int i = 0; i < proof.prev_challenges.size(); ++i) {
                         polys.emplace_back(std::get<1>(proof.prev_challenges[i]), prev_chal_evals_vec[i]);
                     }
 
 
                     std::vector<proof_evaluation_type<typename scalar_field_type::value_type>> evals = {
-                        proof.evals[0].combine(powers_of_eval_points_for_chunks[0]),
-                        proof.evals[1].combine(powers_of_eval_points_for_chunks[1])
+                            proof.evals[0].combine(powers_of_eval_points_for_chunks[0]),
+                            proof.evals[1].combine(powers_of_eval_points_for_chunks[1])
                     };
 
                     //~ 26. Compute the evaluation of $ft(\zeta)$.
                     typename scalar_field_type::value_type zkp = index.zkpm.evaluate(zeta);
                     typename scalar_field_type::value_type zeta1m1 = zeta1 - scalar_field_type::value_type::one();
 
-                    std::vector<typename scalar_field_type::value_type> alpha_powers = all_alphas.get_alphas(argument_type::Permutation, kimchi_constant::CONSTRAINTS);
+                    std::vector<typename scalar_field_type::value_type> alpha_powers = all_alphas.get_alphas(
+                            argument_type::Permutation, kimchi_constant::CONSTRAINTS);
                     typename scalar_field_type::value_type alpha0 = alpha_powers[0];
                     typename scalar_field_type::value_type alpha1 = alpha_powers[1];
                     typename scalar_field_type::value_type alpha2 = alpha_powers[2];
 
-                    typename scalar_field_type::value_type ft_eval0 = (evals[0].w[kimchi_constant::PERMUTES - 1] + gamma) * evals[1].z * alpha0 * zkp;
+                    typename scalar_field_type::value_type ft_eval0 =
+                            (evals[0].w[kimchi_constant::PERMUTES - 1] + gamma) * evals[1].z * alpha0 * zkp;
                     for (size_t i = 0; i < evals[0].s.size(); ++i) {
                         ft_eval0 *= (beta * evals[0].s[i]) + evals[0].w[i] + gamma;
                     }
 
                     if (!p_eval.empty() && !p_eval[0].empty()) {
                         ft_eval0 -= p_eval[0][0];
-                    } 
-                    else { // ??????????????
+                    } else { // ??????????????
                         ft_eval0 -= scalar_field_type::value_type::zero();
                     }
 
@@ -384,35 +391,42 @@ namespace nil {
 
                     ft_eval0 -= tmp;
 
-                    typename scalar_field_type::value_type numerator = ((zeta1m1 * alpha1 * (zeta - index.w)) + 
-                            (zeta1m1 * alpha2 * (zeta - scalar_field_type::value_type::one()))) * (scalar_field_type::value_type::one() - evals[0].z);
+                    typename scalar_field_type::value_type numerator = ((zeta1m1 * alpha1 * (zeta - index.w)) +
+                                                                        (zeta1m1 * alpha2 * (zeta -
+                                                                                             scalar_field_type::value_type::one()))) *
+                                                                       (scalar_field_type::value_type::one() -
+                                                                        evals[0].z);
 
-                    typename scalar_field_type::value_type denominator = (zeta - index.w) * (zeta - scalar_field_type::value_type::one());
+                    typename scalar_field_type::value_type denominator =
+                            (zeta - index.w) * (zeta - scalar_field_type::value_type::one());
                     denominator = denominator.inversed();
 
                     ft_eval0 += numerator * denominator;
 
-                    Constants<scalar_field_type> cs{alpha, beta, gamma, std::get<1>(joint_combiner), index.endo, index.fr_sponge_params.mds};
+                    Constants<scalar_field_type> cs{alpha, beta, gamma, std::get<1>(joint_combiner), index.endo,
+                                                    index.fr_sponge_params.mds_matrix};
 
                     ft_eval0 -=
-                        PolishToken<scalar_field_type>::evaluate(index.linearization.constant_term, index.domain, zeta, evals, cs);
+                            PolishToken<scalar_field_type>::evaluate(index.linearization.constant_term, index.domain,
+                                                                     zeta, evals, cs);
 
 
                     std::vector<std::tuple<evaluation_type, int>> es;
 
-                    for(auto &poly : polys){
+                    for (auto &poly: polys) {
                         evaluation_type eval(commitment_type(), std::get<1>(poly), -1);
                         es.emplace_back(eval, -1);
                     }
 
                     es.emplace_back(evaluation_type(commitment_type(), p_eval, -1), -1);
-                    std::vector<std::vector<typename scalar_field_type::value_type>> ft_eval = {{ft_eval0}, {proof.ft_eval1}}; 
+                    std::vector<std::vector<typename scalar_field_type::value_type>> ft_eval = {{ft_eval0},
+                                                                                                {proof.ft_eval1}};
                     es.emplace_back(evaluation_type(commitment_type(), ft_eval, -1), -1);
 
                     std::vector<std::vector<typename scalar_field_type::value_type>> z;
                     std::vector<std::vector<typename scalar_field_type::value_type>> generic_selector;
                     std::vector<std::vector<typename scalar_field_type::value_type>> poseidon_selector;
-                    for(auto &eval : proof.evals){
+                    for (auto &eval: proof.evals) {
                         z.push_back(eval.z);
                         generic_selector.push_back(eval.generic_selector);
                         poseidon_selector.push_back(eval.poseidon_selector);
@@ -421,32 +435,34 @@ namespace nil {
                     es.emplace_back(evaluation_type(commitment_type(), generic_selector, -1), -1);
                     es.emplace_back(evaluation_type(commitment_type(), poseidon_selector, -1), -1);
 
-                    for(int i = 0; i < proof.evals[0].w.size(); ++i){
-                        std::vector<std::vector<typename scalar_field_type::value_type>> w_copy = {proof.evals[0].w[i], proof.evals[1].w[i]};
+                    for (int i = 0; i < proof.evals[0].w.size(); ++i) {
+                        std::vector<std::vector<typename scalar_field_type::value_type>> w_copy = {proof.evals[0].w[i],
+                                                                                                   proof.evals[1].w[i]};
                         es.emplace_back(evaluation_type(commitment_type(), w_copy, -1), -1);
                     }
 
-                    for(int i = 0; i < proof.evals[0].s.size(); ++i){
-                        std::vector<std::vector<typename scalar_field_type::value_type>> s_copy = {proof.evals[0].s[i], proof.evals[1].s[i]};
+                    for (int i = 0; i < proof.evals[0].s.size(); ++i) {
+                        std::vector<std::vector<typename scalar_field_type::value_type>> s_copy = {proof.evals[0].s[i],
+                                                                                                   proof.evals[1].s[i]};
                         es.emplace_back(evaluation_type(commitment_type(), s_copy, -1), -1);
                     }
 
 
                     typename scalar_field_type::value_type combined_inner_product0 = commitment_scheme::combined_inner_product(
-                        evaluation_points,
-                        v,
-                        u,
-                        es,
-                        index.srs.g.size()
+                            evaluation_points,
+                            v,
+                            u,
+                            es,
+                            index.srs.g.size()
                     );
 
                     RandomOracles<scalar_field_type> oracles = {
-                        joint_combiner, beta, gamma, alpha_chal, alpha, zeta, v, u, zeta_chal, v_chal, u_chal
+                            joint_combiner, beta, gamma, alpha_chal, alpha, zeta, v, u, zeta_chal, v_chal, u_chal
                     };
 
-                    return OraclesResult<CurveType, EFqSponge>{fq_sponge,  digest, oracles,
-                                          all_alphas, p_eval, powers_of_eval_points_for_chunks,
-                                          polys,      zeta1,  ft_eval0, combined_inner_product0};
+                    return OraclesResult<CurveType, EFqSponge>{fq_sponge, digest, oracles,
+                                                               all_alphas, p_eval, powers_of_eval_points_for_chunks,
+                                                               polys, zeta1, ft_eval0, combined_inner_product0};
                 }
             }        // namespace snark
         }            // namespace zk

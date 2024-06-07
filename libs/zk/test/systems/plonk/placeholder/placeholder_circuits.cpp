@@ -45,99 +45,99 @@
 
 BOOST_AUTO_TEST_SUITE(placeholder_circuits)
 
-using curve_type = algebra::curves::pallas;
-using field_type = typename curve_type::base_field_type;
-using hash_type = hashes::poseidon<nil::crypto3::hashes::detail::mina_poseidon_policy<field_type>>;
-using test_runner_type = placeholder_test_runner<field_type, hash_type, hash_type>;
+    using curve_type = algebra::curves::pallas;
+    using field_type = typename curve_type::base_field_type;
+    using hash_type = hashes::poseidon<nil::crypto3::hashes::detail::mina_poseidon_policy<field_type>>;
+    using test_runner_type = placeholder_test_runner<field_type, hash_type, hash_type>;
 
-BOOST_AUTO_TEST_CASE(circuit1)
-{
-    test_tools::random_test_initializer<field_type> random_test_initializer;
-    auto circuit = circuit_test_1<field_type>(
-        random_test_initializer.alg_random_engines.template get_alg_engine<field_type>(),
-        random_test_initializer.generic_random_engine
-    );
-    test_runner_type test_runner(circuit);
-    BOOST_CHECK(test_runner.run_test());
-}
+    BOOST_AUTO_TEST_CASE(circuit1)
+    {
+        test_tools::random_test_initializer<field_type> random_test_initializer;
+        auto circuit = circuit_test_1<field_type>(
+                random_test_initializer.alg_random_engines.template get_alg_engine<field_type>(),
+                random_test_initializer.generic_random_engine
+        );
+        test_runner_type test_runner(circuit);
+        BOOST_CHECK(test_runner.run_test());
+    }
 
-BOOST_AUTO_TEST_CASE(circuit2)
-{
-    test_tools::random_test_initializer<field_type> random_test_initializer;
-    auto pi0 = random_test_initializer.alg_random_engines.template get_alg_engine<field_type>()();
-    auto circuit = circuit_test_t<field_type>(
-        pi0,
-        random_test_initializer.alg_random_engines.template get_alg_engine<field_type>(),
-        random_test_initializer.generic_random_engine
-    );
-    test_runner_type test_runner(circuit);
-    BOOST_CHECK(test_runner.run_test());
-}
+    BOOST_AUTO_TEST_CASE(circuit2)
+    {
+        test_tools::random_test_initializer<field_type> random_test_initializer;
+        auto pi0 = random_test_initializer.alg_random_engines.template get_alg_engine<field_type>()();
+        auto circuit = circuit_test_t<field_type>(
+                pi0,
+                random_test_initializer.alg_random_engines.template get_alg_engine<field_type>(),
+                random_test_initializer.generic_random_engine
+        );
+        test_runner_type test_runner(circuit);
+        BOOST_CHECK(test_runner.run_test());
+    }
 
-BOOST_AUTO_TEST_CASE(circuit3)
-{
-    test_tools::random_test_initializer<field_type> random_test_initializer;
-    auto circuit = circuit_test_3<field_type>(
-        random_test_initializer.alg_random_engines.template get_alg_engine<field_type>(),
-        random_test_initializer.generic_random_engine
-    );
-    test_runner_type test_runner(circuit);
-    BOOST_CHECK(test_runner.run_test());
-}
+    BOOST_AUTO_TEST_CASE(circuit3)
+    {
+        test_tools::random_test_initializer<field_type> random_test_initializer;
+        auto circuit = circuit_test_3<field_type>(
+                random_test_initializer.alg_random_engines.template get_alg_engine<field_type>(),
+                random_test_initializer.generic_random_engine
+        );
+        test_runner_type test_runner(circuit);
+        BOOST_CHECK(test_runner.run_test());
+    }
 
-BOOST_AUTO_TEST_CASE(circuit4)
-{
-    test_tools::random_test_initializer<field_type> random_test_initializer;
-    auto circuit = circuit_test_4<field_type>(
-        random_test_initializer.alg_random_engines.template get_alg_engine<field_type>(),
-        random_test_initializer.generic_random_engine
-    );
-    test_runner_type test_runner(circuit);
-    BOOST_CHECK(test_runner.run_test());
-}
+    BOOST_AUTO_TEST_CASE(circuit4)
+    {
+        test_tools::random_test_initializer<field_type> random_test_initializer;
+        auto circuit = circuit_test_4<field_type>(
+                random_test_initializer.alg_random_engines.template get_alg_engine<field_type>(),
+                random_test_initializer.generic_random_engine
+        );
+        test_runner_type test_runner(circuit);
+        BOOST_CHECK(test_runner.run_test());
+    }
 
-BOOST_AUTO_TEST_CASE(circuit5)
-{
-    test_tools::random_test_initializer<field_type> random_test_initializer;
-    auto circuit = circuit_test_5<field_type>(
-        random_test_initializer.alg_random_engines.template get_alg_engine<field_type>(),
-        random_test_initializer.generic_random_engine
-    );
-    test_runner_type test_runner(circuit);
-    BOOST_CHECK(test_runner.run_test());
-}
+    BOOST_AUTO_TEST_CASE(circuit5)
+    {
+        test_tools::random_test_initializer<field_type> random_test_initializer;
+        auto circuit = circuit_test_5<field_type>(
+                random_test_initializer.alg_random_engines.template get_alg_engine<field_type>(),
+                random_test_initializer.generic_random_engine
+        );
+        test_runner_type test_runner(circuit);
+        BOOST_CHECK(test_runner.run_test());
+    }
 
-BOOST_AUTO_TEST_CASE(circuit6)
-{
-    test_tools::random_test_initializer<field_type> random_test_initializer;
-    auto circuit = circuit_test_6<field_type>(
-        random_test_initializer.alg_random_engines.template get_alg_engine<field_type>(),
-        random_test_initializer.generic_random_engine
-    );
-    test_runner_type test_runner(circuit);
-    BOOST_CHECK(test_runner.run_test());
-}
+    BOOST_AUTO_TEST_CASE(circuit6)
+    {
+        test_tools::random_test_initializer<field_type> random_test_initializer;
+        auto circuit = circuit_test_6<field_type>(
+                random_test_initializer.alg_random_engines.template get_alg_engine<field_type>(),
+                random_test_initializer.generic_random_engine
+        );
+        test_runner_type test_runner(circuit);
+        BOOST_CHECK(test_runner.run_test());
+    }
 
-BOOST_AUTO_TEST_CASE(circuit7)
-{
-    test_tools::random_test_initializer<field_type> random_test_initializer;
-    auto circuit = circuit_test_7<field_type>(
-        random_test_initializer.alg_random_engines.template get_alg_engine<field_type>(),
-        random_test_initializer.generic_random_engine
-    );
-    test_runner_type test_runner(circuit);
-    BOOST_CHECK(test_runner.run_test());
-}
+    BOOST_AUTO_TEST_CASE(circuit7)
+    {
+        test_tools::random_test_initializer<field_type> random_test_initializer;
+        auto circuit = circuit_test_7<field_type>(
+                random_test_initializer.alg_random_engines.template get_alg_engine<field_type>(),
+                random_test_initializer.generic_random_engine
+        );
+        test_runner_type test_runner(circuit);
+        BOOST_CHECK(test_runner.run_test());
+    }
 
-BOOST_AUTO_TEST_CASE(circuit_fib)
-{
-    test_tools::random_test_initializer<field_type> random_test_initializer;
-    auto circuit = circuit_test_fib<field_type, 100>(
-        random_test_initializer.alg_random_engines.template get_alg_engine<field_type>()
-    );
-    test_runner_type test_runner(circuit);
-    BOOST_CHECK(test_runner.run_test());
-}
+    BOOST_AUTO_TEST_CASE(circuit_fib)
+    {
+        test_tools::random_test_initializer<field_type> random_test_initializer;
+        auto circuit = circuit_test_fib<field_type, 100>(
+                random_test_initializer.alg_random_engines.template get_alg_engine<field_type>()
+        );
+        test_runner_type test_runner(circuit);
+        BOOST_CHECK(test_runner.run_test());
+    }
 
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -250,7 +250,7 @@ namespace nil {
                     typedef poly_comm<typename scalar_field_type::value_type> blinding_type;
                     typedef std::tuple<commitment_type, blinding_type> blinded_commitment_type;
 
-                    struct poly_type_single {
+                    struct polynomial_type_single {
                         // polynomial itself
                         math::polynomial<typename scalar_field_type::value_type> coeffs;
                         // optional degree bound - poly degree must not exceed it
@@ -258,11 +258,12 @@ namespace nil {
                         // chunked commitment
                         blinding_type commit;
 
-                        poly_type_single(math::polynomial<typename scalar_field_type::value_type> &coeffs, int bound,
-                                         blinding_type &commit) : coeffs(coeffs), bound(bound), commit(commit) {}
+                        polynomial_type_single(math::polynomial<typename scalar_field_type::value_type> &coeffs,
+                                               int bound,
+                                               blinding_type &commit) : coeffs(coeffs), bound(bound), commit(commit) {}
                     };
 
-                    typedef std::vector<poly_type_single> poly_type;
+                    typedef std::vector<polynomial_type_single> polynomial_type;
 
                     struct proof_type {
                         std::vector<std::tuple<typename group_type::value_type, typename group_type::value_type>> lr;
@@ -383,7 +384,7 @@ namespace nil {
                     }
 
                     static proof_type proof_eval(const params_type &params, group_map_type &group_map,
-                                                 const poly_type &plms,
+                                                 const polynomial_type &plms,
                                                  const std::vector<typename scalar_field_type::value_type> &elm,
                                                  const typename scalar_field_type::value_type &polyscale,
                                                  const typename scalar_field_type::value_type &evalscale,

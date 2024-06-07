@@ -28,7 +28,7 @@
 #include <boost/assert.hpp>
 #include <boost/static_assert.hpp>
 
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <boost/multiprecision/cpp_int.hpp>
 
 namespace nil {
     namespace crypto3 {

@@ -50,12 +50,11 @@ namespace nil {
                 // arithmetic_sponge_params<base_field_value_type> fq_sponge_params;  
                 // hashes::detail::poseidon_constants_kimchi<scalar_field_type> fr_sponge_params;
                 // hashes::detail::poseidon_constants_kimchi<base_field_type> fq_sponge_params;
-                template<
-                    typename CurveType, 
-                    typename PoseidonKimchiScalarConstants = hashes::detail::poseidon_constants<nil::crypto3::hashes::detail::mina_poseidon_policy<typename CurveType::scalar_field_type>>,
-                    typename PoseidonKimchiBaseConstants = hashes::detail::poseidon_constants<nil::crypto3::hashes::detail::mina_poseidon_policy<typename CurveType::base_field_type>>,
-                    std::size_t WiresAmount = kimchi_constant::COLUMNS, 
-                    std::size_t Permuts = kimchi_constant::PERMUTES
+                template<typename CurveType,
+                        typename PoseidonKimchiScalarConstants = hashes::detail::poseidon_constants<nil::crypto3::hashes::detail::mina_poseidon_policy<typename CurveType::scalar_field_type>>,
+                        typename PoseidonKimchiBaseConstants = hashes::detail::poseidon_constants<nil::crypto3::hashes::detail::mina_poseidon_policy<typename CurveType::base_field_type>>,
+                        std::size_t WiresAmount = kimchi_constant::COLUMNS,
+                        std::size_t Permuts = kimchi_constant::PERMUTES
                 >
                 struct verifier_index {
                     typedef commitments::kimchi_pedersen<CurveType> commitment_scheme;
@@ -74,7 +73,7 @@ namespace nil {
                     commitment_type generic_comm;
 
                     commitment_type psm_comm;
-                    
+
                     commitment_type complete_add_comm;
                     commitment_type mul_comm;
                     commitment_type emul_comm;
@@ -96,8 +95,8 @@ namespace nil {
                     //                    linearization;    // TODO:
                     //                    Linearization<Vec<PolishToken<scalar_field_value_type<G>>>>
                     Alphas<scalar_field_type> powers_of_alpha;
-                    PoseidonKimchiScalarConstants   fr_sponge_params;
-                    PoseidonKimchiBaseConstants   fq_sponge_params;
+                    PoseidonKimchiScalarConstants fr_sponge_params;
+                    PoseidonKimchiBaseConstants fq_sponge_params;
 
                     verifier_index() : domain(2) {}
                 };

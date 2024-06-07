@@ -40,8 +40,8 @@ namespace nil {
         namespace algebra {
             template<typename MultiexpMethod, typename InputBaseIterator, typename InputFieldIterator>
             typename std::iterator_traits<InputBaseIterator>::value_type
-                multiexp(InputBaseIterator vec_start, InputBaseIterator vec_end, InputFieldIterator scalar_start,
-                         InputFieldIterator scalar_end, const std::size_t chunks_count) {
+            multiexp(InputBaseIterator vec_start, InputBaseIterator vec_end, InputFieldIterator scalar_start,
+                     InputFieldIterator scalar_end, const std::size_t chunks_count) {
 
                 typedef typename std::iterator_traits<InputBaseIterator>::value_type base_value_type;
 
@@ -58,11 +58,11 @@ namespace nil {
 
                 for (std::size_t i = 0; i < chunks_count; ++i) {
                     result =
-                        result + MultiexpMethod::process(
-                                     vec_start + i * one_chunk_size,
-                                     (i == chunks_count - 1 ? vec_end : vec_start + (i + 1) * one_chunk_size),
-                                     scalar_start + i * one_chunk_size,
-                                     (i == chunks_count - 1 ? scalar_end : scalar_start + (i + 1) * one_chunk_size));
+                            result + MultiexpMethod::process(
+                                    vec_start + i * one_chunk_size,
+                                    (i == chunks_count - 1 ? vec_end : vec_start + (i + 1) * one_chunk_size),
+                                    scalar_start + i * one_chunk_size,
+                                    (i == chunks_count - 1 ? scalar_end : scalar_start + (i + 1) * one_chunk_size));
                 }
 
                 return result;
@@ -70,9 +70,9 @@ namespace nil {
 
             template<typename MultiexpMethod, typename InputBaseIterator, typename InputFieldIterator>
             typename std::iterator_traits<InputBaseIterator>::value_type
-                multiexp_with_mixed_addition(InputBaseIterator vec_start, InputBaseIterator vec_end,
-                                             InputFieldIterator scalar_start, InputFieldIterator scalar_end,
-                                             const std::size_t chunks_count) {
+            multiexp_with_mixed_addition(InputBaseIterator vec_start, InputBaseIterator vec_end,
+                                         InputFieldIterator scalar_start, InputFieldIterator scalar_end,
+                                         const std::size_t chunks_count) {
 
                 typedef typename std::iterator_traits<InputBaseIterator>::value_type base_value_type;
                 typedef typename std::iterator_traits<InputFieldIterator>::value_type field_value_type;
@@ -150,7 +150,7 @@ namespace nil {
                 const std::size_t last_in_window = 1ul << (scalar_size - (outerc - 1) * window);
 
                 window_table<GroupType> powers_of_g(
-                    outerc, std::vector<typename GroupType::value_type>(in_window, GroupType::value_type::zero()));
+                        outerc, std::vector<typename GroupType::value_type>(in_window, GroupType::value_type::zero()));
 
                 typename GroupType::value_type gouter = g;
 
@@ -199,8 +199,8 @@ namespace nil {
             }
 
             template<typename GroupType, typename FieldType, typename InputRange,
-                     typename = typename std::enable_if<
-                         std::is_same<typename InputRange::value_type, typename FieldType::value_type>::value>::type>
+                    typename = typename std::enable_if<
+                            std::is_same<typename InputRange::value_type, typename FieldType::value_type>::value>::type>
             std::vector<typename GroupType::value_type> batch_exp(const std::size_t scalar_size,
                                                                   const std::size_t window,
                                                                   const window_table<GroupType> &table,
@@ -215,14 +215,14 @@ namespace nil {
             }
 
             template<typename GroupType, typename FieldType, typename InputRange,
-                     typename = typename std::enable_if<
-                         std::is_same<typename InputRange::value_type, typename FieldType::value_type>::value>::type>
+                    typename = typename std::enable_if<
+                            std::is_same<typename InputRange::value_type, typename FieldType::value_type>::value>::type>
             std::vector<typename GroupType::value_type>
-                batch_exp_with_coeff(const std::size_t scalar_size,
-                                     const std::size_t window,
-                                     const window_table<GroupType> &table,
-                                     const typename FieldType::value_type &coeff,
-                                     const InputRange &v) {
+            batch_exp_with_coeff(const std::size_t scalar_size,
+                                 const std::size_t window,
+                                 const window_table<GroupType> &table,
+                                 const typename FieldType::value_type &coeff,
+                                 const InputRange &v) {
                 std::vector<typename GroupType::value_type> res(std::distance(v.begin(), v.end()), table[0][0]);
 
                 for (std::size_t i = 0; i < v.size(); ++i) {
@@ -234,8 +234,8 @@ namespace nil {
 
             template<typename GroupType, typename InputRange>
             typename std::enable_if<
-                std::is_same<typename InputRange::value_type, typename GroupType::value_type>::value, void>::type
-                batch_to_special(InputRange &vec) {
+                    std::is_same<typename InputRange::value_type, typename GroupType::value_type>::value, void>::type
+            batch_to_special(InputRange &vec) {
 
                 std::vector<typename GroupType::value_type> non_zero_vec;
                 for (std::size_t i = 0; i < vec.size(); ++i) {

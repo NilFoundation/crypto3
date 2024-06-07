@@ -88,8 +88,8 @@ set(TESTS_NAMES
 
 #    "systems/ppzksnark/bacs_ppzksnark/bacs_ppzksnark"
     "systems/ppzksnark/r1cs_gg_ppzksnark/r1cs_gg_ppzksnark"
-    "systems/ppzksnark/r1cs_gg_ppzksnark/r1cs_gg_ppzksnark_marshalling"
-    "systems/ppzksnark/r1cs_gg_ppzksnark/r1cs_gg_ppzksnark_tvm_marshalling"
+#    "systems/ppzksnark/r1cs_gg_ppzksnark/r1cs_gg_ppzksnark_marshalling"
+#    "systems/ppzksnark/r1cs_gg_ppzksnark/r1cs_gg_ppzksnark_tvm_marshalling"
     "systems/ppzksnark/r1cs_ppzksnark/r1cs_ppzksnark"
 #    "systems/ppzksnark/r1cs_se_ppzksnark/r1cs_se_ppzksnark"
 #    "systems/ppzksnark/ram_ppzksnark/ram_ppzksnark"

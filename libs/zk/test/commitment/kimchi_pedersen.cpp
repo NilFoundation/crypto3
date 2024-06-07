@@ -33,8 +33,8 @@ using batchproof_type = kimchi_pedersen::batchproof_type;
 using commitment_type = kimchi_pedersen::commitment_type;
 using blinding_type = kimchi_pedersen::blinding_type;
 using proof_type = kimchi_pedersen::proof_type;
-using poly_type = kimchi_pedersen::poly_type;
-using poly_type_single = kimchi_pedersen::poly_type_single;
+using polynomial_type = kimchi_pedersen::polynomial_type;
+using polynomial_type_single = kimchi_pedersen::polynomial_type_single;
 using evaluation_type = kimchi_pedersen::evaluation_type;
 using blinded_commitment_type = kimchi_pedersen::blinded_commitment_type;
 
@@ -147,7 +147,7 @@ BOOST_AUTO_TEST_CASE(kimchi_commitment_test_opening_proof) {
     scalar_value_type u = algebra::random_element<scalar_field_type>();
     scalar_value_type v = algebra::random_element<scalar_field_type>();
 
-    poly_type polys {{poly1, -1, std::get<1>(commitment)},
+    polynomial_type polys {{poly1, -1, std::get<1>(commitment)},
                      {poly2, static_cast<int>(poly2.degree() + 1), std::get<1>(bounded_commitment)}};
 
     std::vector<scalar_value_type> elm {algebra::random_element<scalar_field_type>(),
@@ -216,7 +216,7 @@ BOOST_AUTO_TEST_CASE(kimchi_commitment_test_case) {
             commitments.emplace_back(CommitmentAndSecrets({eval_commit, poly, std::get<1>(blinded_commitment)}));
         }
 
-        poly_type polynomials;
+        polynomial_type polynomials;
 
         for (auto &c : commitments) {
             polynomials.emplace_back(c.poly, c.eval_commit.commit.bound, c.chunked_blinding);
