@@ -1,5 +1,5 @@
 {
-  description = "Nix flake for Crypto3 header-only C++ library by Nil; Foundation";
+  description = "Nix flake for Crypto3 header-only C++ library by =nil; Foundation";
 
   inputs = {
     nixpkgs.url = github:NixOS/nixpkgs/nixos-23.11;
