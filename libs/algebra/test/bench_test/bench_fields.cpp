@@ -115,6 +115,18 @@ void run_perf_test() {
         std::chrono::high_resolution_clock::now() - start);
     std::cout << "Inversion time: " << std::fixed << std::setprecision(3)
         << elapsed.count() / (SAMPLES / 1000) << " ns" << std::endl;
+
+    start = std::chrono::high_resolution_clock::now();
+
+    for (int i = 0; i < SAMPLES; ++i) {
+        int index = i % points1.size();
+        BOOST_CHECK_EQUAL(points1[index], points1[index]);
+    }
+
+    elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
+        std::chrono::high_resolution_clock::now() - start);
+    std::cout << "Equality check time: " << std::fixed << std::setprecision(3)
+        << elapsed.count() / SAMPLES << " ns" << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(field_operation_perf_test_pallas) {
