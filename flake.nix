@@ -2,10 +2,19 @@
   description = "Nix flake for Crypto3 header-only C++ library by =nil; Foundation";
 
   inputs = {
-    nixpkgs.url = github:NixOS/nixpkgs/nixos-23.11;
+    nixpkgs.url = "github:NixOS/nixpkgs";
+    nix-3rdparty = {
+      url = "github:NilFoundation/nix-3rdparty";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+      };
+    };
   };
 
-  outputs = { self, nixpkgs, ... }:
+  outputs = { self
+  , nixpkgs
+  , nix-3rdparty
+  , ... }:
     let
       supportedSystems = [
         "x86_64-linux"
@@ -17,7 +26,10 @@
 
       makeCrypto3Derivation = { system }:
         let
-          pkgs = nixpkgs.legacyPackages.${system};
+          pkgs = import nixpkgs {
+            overlays = [ nix-3rdparty.overlays.${system}.default ];
+            inherit system;
+        };
         in
         pkgs.stdenv.mkDerivation {
           name = "Crypto3";
@@ -26,6 +38,7 @@
 
           nativeBuildInputs = with pkgs; [
             cmake
+            cmake_modules
             ninja
             pkg-config
           ];
@@ -51,11 +64,15 @@
 
       makeCrypto3Shell = { system }:
         let
-          pkgs = nixpkgs.legacyPackages.${system};
+          pkgs = import nixpkgs {
+            overlays = [ nix-3rdparty.overlays.${system}.default ];
+            inherit system;
+        };
         in
         pkgs.mkShell {
           buildInputs = with pkgs; [
             cmake
+            cmake_modules
             ninja
             clang
             gcc
@@ -75,7 +92,10 @@
 
       makeCrypto3Tests = { system }:
         let
-          pkgs = nixpkgs.legacyPackages.${system};
+          pkgs = import nixpkgs {
+            overlays = [ nix-3rdparty.overlays.${system}.default ];
+            inherit system;
+        };
           isDarwin = builtins.match ".*-darwin" system != null; # Used only to exclude gcc from macOS.
           testCompilers = [
             "clang"
