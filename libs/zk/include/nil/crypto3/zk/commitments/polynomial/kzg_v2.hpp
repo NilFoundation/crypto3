@@ -155,26 +155,12 @@ namespace nil {
                          * #295 */
 
                         // Push commitments to transcript
-                        transcript(
-                                ::nil::crypto3::hashes::conditional_block_to_field_elements_wrapper<
-                                        typename CommitmentSchemeType::transcript_hash_type::word_type,
-                                        decltype(_commitments[batch_ind])
-                                >(_commitments[batch_ind])
-                        );
+                        transcript(_commitments[batch_ind]);
 
                         // Push evaluation points to transcript
                         for (std::size_t i = 0; i < this->_z.get_batch_size(batch_ind); i++) {
                             for (std::size_t j = 0; j < this->_z.get_poly_points_number(batch_ind, i); j++) {
-                                nil::marshalling::status_type status;
-                                std::vector<uint8_t> byteblob =
-                                        nil::marshalling::pack<endianness>(this->_z.get(batch_ind, i, j), status);
-                                BOOST_ASSERT(status == nil::marshalling::status_type::success);
-                                transcript(
-                                        ::nil::crypto3::hashes::conditional_block_to_field_elements_wrapper<
-                                                typename CommitmentSchemeType::transcript_hash_type::word_type,
-                                                decltype(byteblob)
-                                        >(byteblob)
-                                );
+                                transcript(this->_z.get(batch_ind, i, j));
                             }
                         }
 
@@ -182,16 +168,7 @@ namespace nil {
                         for (std::size_t i = 0; i < this->_points[batch_ind].size(); i++) {
                             auto poly = this->get_U(batch_ind, i);
                             for (std::size_t j = 0; j < poly.size(); ++j) {
-                                nil::marshalling::status_type status;
-                                std::vector<uint8_t> byteblob =
-                                        nil::marshalling::pack<endianness>(poly[j], status);
-                                BOOST_ASSERT(status == nil::marshalling::status_type::success);
-                                transcript(
-                                        ::nil::crypto3::hashes::conditional_block_to_field_elements_wrapper<
-                                                typename CommitmentSchemeType::transcript_hash_type::word_type,
-                                                decltype(byteblob)
-                                        >(byteblob)
-                                );
+                                transcript(poly[j]);
                             }
                         }
                     }
@@ -273,14 +250,7 @@ namespace nil {
                         typename CommitmentSchemeType::single_commitment_type pi_1 = nil::crypto3::zk::algorithms::commit_one<CommitmentSchemeType>(
                                 _params, f);
 
-                        nil::marshalling::status_type status;
-                        std::vector<std::uint8_t> pi1_byteblob = nil::marshalling::pack<endianness>(pi_1, status);
-                        BOOST_ASSERT(status == nil::marshalling::status_type::success);
-
-                        transcript(::nil::crypto3::hashes::conditional_block_to_field_elements_wrapper<
-                                typename CommitmentSchemeType::transcript_hash_type::word_type,
-                                decltype(pi1_byteblob)
-                        >(pi1_byteblob));
+                        transcript(pi_1);
 
                         auto theta_2 = transcript.template challenge<typename curve_type::scalar_field_type>();
                         math::polynomial<typename CommitmentSchemeType::scalar_value_type> theta_2_vanish = {
@@ -310,12 +280,7 @@ namespace nil {
                                 _params, L);
 
                         /* TODO: Review the necessity of sending pi_2 to transcript */
-                        std::vector<uint8_t> pi2_byteblob = nil::marshalling::pack<endianness>(pi_2, status);
-                        BOOST_ASSERT(status == nil::marshalling::status_type::success);
-                        transcript(::nil::crypto3::hashes::conditional_block_to_field_elements_wrapper<
-                                typename CommitmentSchemeType::transcript_hash_type::word_type,
-                                decltype(pi2_byteblob)
-                        >(pi2_byteblob));
+                        transcript(pi_2);
 
                         return {this->_z, pi_1, pi_2};
                     }
@@ -333,19 +298,16 @@ namespace nil {
                         }
 
                         auto theta = transcript.template challenge<typename CommitmentSchemeType::curve_type::scalar_field_type>();
-                        nil::marshalling::status_type status;
-                        std::vector<std::uint8_t> byteblob = nil::marshalling::pack<endianness>(proof.pi_1, status);
-                        BOOST_ASSERT(status == nil::marshalling::status_type::success);
-                        transcript(
-                                ::nil::crypto3::hashes::conditional_block_to_field_elements_wrapper<
-                                        typename CommitmentSchemeType::transcript_hash_type::word_type,
-                                        decltype(byteblob)
-                                >(byteblob));
+
+                        transcript(proof.pi_1);
+
                         auto theta_2 = transcript.template challenge<typename CommitmentSchemeType::curve_type::scalar_field_type>();
                         auto theta_i = CommitmentSchemeType::scalar_value_type::one();
 
                         auto F = CommitmentSchemeType::single_commitment_type::zero();
                         auto rsum = CommitmentSchemeType::scalar_value_type::zero();
+
+                        nil::marshalling::status_type status;
 
                         for (const auto &it: this->_commitments) {
                             auto k = it.first;

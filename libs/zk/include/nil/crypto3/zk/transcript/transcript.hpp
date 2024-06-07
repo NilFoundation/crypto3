@@ -26,6 +26,8 @@
 #ifndef CRYPTO3_ZK_TRANSCRIPT_HPP
 #define CRYPTO3_ZK_TRANSCRIPT_HPP
 
+#include <tuple>
+
 namespace nil {
     namespace crypto3 {
         namespace zk {
