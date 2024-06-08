@@ -1385,4 +1385,27 @@ BOOST_AUTO_TEST_CASE(polynomial_dfs_resize_perf_test, *boost::unit_test::disable
     std::cout << "Resize time: " << duration.count() << " microseconds." << std::endl;
 }
 
+BOOST_AUTO_TEST_CASE(polynomial_dfs_equality_check_perf_test, *boost::unit_test::disabled()) {
+    size_t size = 131072 * 16;
+
+    polynomial_dfs<typename FieldType::value_type> poly = {
+        size / 128, size, nil::crypto3::algebra::random_element<FieldType>()};
+
+    std::vector<polynomial_dfs<typename FieldType::value_type>> poly4(64, poly);
+
+    auto start = std::chrono::high_resolution_clock::now();
+
+    for (int i = 0; i < poly4.size(); ++i) {
+        BOOST_CHECK(poly4[i] == poly);
+    }
+
+    // Record the end time
+    auto end = std::chrono::high_resolution_clock::now();
+
+    // Calculate the duration
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+
+    std::cout << "Equality check time: " << duration.count() << " microseconds." << std::endl;
+}
+
 BOOST_AUTO_TEST_SUITE_END()

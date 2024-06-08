@@ -370,6 +370,22 @@ namespace boost {
             static const expression_template_option value = boost::multiprecision::et_off;
         };
 
+        // We need to specialize this function, because default boost implementation is "return a.compare(b) == 0;", which is waay slower.    
+        template<unsigned Bits, typename StorageType, expression_template_option ExpressionTemplates>
+            inline BOOST_MP_CXX14_CONSTEXPR bool operator==(
+                const number<backends::modular_adaptor<backends::cpp_int_modular_backend<Bits>, StorageType>, ExpressionTemplates>& a,
+                const number<backends::modular_adaptor<backends::cpp_int_modular_backend<Bits>, StorageType>, ExpressionTemplates>& b) {
+            return a.backend().compare_eq(b.backend());
+        }
+
+        // We need to specialize this function, because default boost implementation is "return a.compare(b) == 0;", which is waay slower.    
+        template<unsigned Bits, typename StorageType, expression_template_option ExpressionTemplates>
+            inline BOOST_MP_CXX14_CONSTEXPR bool operator!=(
+                const number<backends::modular_adaptor<backends::cpp_int_modular_backend<Bits>, StorageType>, ExpressionTemplates>& a,
+                const number<backends::modular_adaptor<backends::cpp_int_modular_backend<Bits>, StorageType>, ExpressionTemplates>& b) {
+            return !a.backend().compare_eq(b.backend());
+        }
+
     }   // namespace multiprecision
 }   // namespace boost
 
