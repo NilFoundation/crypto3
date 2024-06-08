@@ -61,14 +61,14 @@ namespace nil {
                     using commitment_type = typename ParamsType::commitment_type;
                     using field_type = typename ParamsType::field_type;
                     using transcript_type = TranscriptType;
-                    using poly_type = PolynomialType;
+                    using polynomial_type = PolynomialType;
 
                     eval_storage<field_type> _z;
 
                     polys_evaluator() = default;
 
                 protected:
-                    std::map<std::size_t, std::vector<poly_type>> _polys;
+                    std::map<std::size_t, std::vector<polynomial_type>> _polys;
                     std::map<std::size_t, bool> _locked; // _locked[batch] is true after it is commited
                     std::map<std::size_t, std::vector<std::vector<typename field_type::value_type>>> _points;
 
@@ -195,7 +195,7 @@ namespace nil {
                         return root;
                     }
 
-                    void append_to_batch(std::size_t index, const poly_type& poly){
+                    void append_to_batch(std::size_t index, const polynomial_type& poly){
                         if( _locked.find(index) == _locked.end() ) _locked[index] = false;
                         BOOST_ASSERT(!_locked[index]); // We cannot modify batch after commitment
                         _polys[index].push_back(poly);

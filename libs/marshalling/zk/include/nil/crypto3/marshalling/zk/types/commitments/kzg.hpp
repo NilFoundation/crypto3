@@ -48,7 +48,7 @@ namespace nil {
     namespace crypto3 {
         namespace marshalling {
             namespace types {
-                /* KZGScheme is like batched_kzg,
+                /* CommitmentSchemeType is like batched_kzg,
                  * commitment is a std::vector<uint8_t>, holding serialized g1 points
                  * */
                 template <typename TTypeBase, typename KZGScheme>
@@ -82,7 +82,7 @@ namespace nil {
                     return result;
                 }
 
-                /* KZGScheme is like kzg_batched_commitment_v2 */
+                /* CommitmentSchemeType is like kzg_batched_commitment_v2 */
                 template <typename TTypeBase, typename KZGScheme>
                 struct eval_proof<TTypeBase, KZGScheme, std::enable_if_t<nil::crypto3::zk::is_kzg<KZGScheme> > > {
 

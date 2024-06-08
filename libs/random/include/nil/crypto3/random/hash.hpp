@@ -30,7 +30,7 @@
 #include <vector>
 #include <array>
 
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <boost/multiprecision/cpp_int.hpp>
 
 #include <nil/crypto3/hash/algorithm/hash.hpp>
 

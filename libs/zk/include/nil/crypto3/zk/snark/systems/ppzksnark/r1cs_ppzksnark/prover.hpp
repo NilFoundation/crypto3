@@ -101,17 +101,17 @@ namespace nil {
                         const std::size_t chunks = 1;
 #endif
 
-                        g_A = g_A + kc_multiexp_with_mixed_addition<algebra::policies::multiexp_method_BDLO12>(
+                        g_A = g_A + commitments::kc_multiexp_with_mixed_addition<algebra::policies::multiexp_method_BDLO12>(
                                         proving_key.A_query, 1, 1 + qap_wit.num_variables,
                                         qap_wit.coefficients_for_ABCs.begin(),
                                         qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_variables + 1, chunks);
 
-                        g_B = g_B + kc_multiexp_with_mixed_addition<algebra::policies::multiexp_method_BDLO12>(
+                        g_B = g_B + commitments::kc_multiexp_with_mixed_addition<algebra::policies::multiexp_method_BDLO12>(
                                         proving_key.B_query, 1, 1 + qap_wit.num_variables,
                                         qap_wit.coefficients_for_ABCs.begin(),
                                         qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_variables + 1, chunks);
 
-                        g_C = g_C + kc_multiexp_with_mixed_addition<algebra::policies::multiexp_method_BDLO12>(
+                        g_C = g_C + commitments::kc_multiexp_with_mixed_addition<algebra::policies::multiexp_method_BDLO12>(
                                         proving_key.C_query, 1, 1 + qap_wit.num_variables,
                                         qap_wit.coefficients_for_ABCs.begin(),
                                         qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_variables + 1, chunks);

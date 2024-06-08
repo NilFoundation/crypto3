@@ -56,28 +56,29 @@ using namespace nil::crypto3::zk::snark;
 
 BOOST_AUTO_TEST_SUITE(placeholder_hashes_test)
 
-using curve_type = algebra::curves::pallas;
-using field_type = typename curve_type::base_field_type;
-using poseidon_type = hashes::poseidon<nil::crypto3::hashes::detail::mina_poseidon_policy<field_type>>;
-using keccak_256_type = hashes::keccak_1600<256>;
-using keccak_512_type = hashes::keccak_1600<512>;
-using sha2_256_type = hashes::sha2<256>;
+    using curve_type = algebra::curves::pallas;
+    using field_type = typename curve_type::base_field_type;
+    using poseidon_type = hashes::poseidon<nil::crypto3::hashes::detail::mina_poseidon_policy<field_type>>;
+    using keccak_256_type = hashes::keccak_1600<256>;
+    using keccak_512_type = hashes::keccak_1600<512>;
+    using sha2_256_type = hashes::sha2<256>;
 
-using TestRunners = boost::mpl::list<
-    placeholder_test_runner<field_type, poseidon_type, poseidon_type>,
-    placeholder_test_runner<field_type, keccak_256_type, keccak_256_type>,
-    placeholder_test_runner<field_type, keccak_512_type, keccak_512_type>,
-    placeholder_test_runner<field_type, sha2_256_type, sha2_256_type>
->;
+    using TestRunners = boost::mpl::list<
+            placeholder_test_runner<field_type, poseidon_type, poseidon_type>,
+            placeholder_test_runner<field_type, keccak_256_type, keccak_256_type>,
+            placeholder_test_runner<field_type, keccak_512_type, keccak_512_type>,
+            placeholder_test_runner<field_type, sha2_256_type, sha2_256_type>
+    >;
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(hash_test, TestRunner, TestRunners) {
-    test_tools::random_test_initializer<field_type> random_test_initializer;
-    auto circuit = circuit_test_1<field_type>(
-        random_test_initializer.alg_random_engines.template get_alg_engine<field_type>(),
-        random_test_initializer.generic_random_engine
-    );
-    TestRunner test_runner(circuit);
-    BOOST_CHECK(test_runner.run_test());
-}
+    BOOST_AUTO_TEST_CASE_TEMPLATE(hash_test, TestRunner, TestRunners) {
+        test_tools::random_test_initializer<field_type> random_test_initializer;
+        auto circuit = circuit_test_1<field_type>(
+                random_test_initializer.alg_random_engines.template get_alg_engine<field_type>(),
+                random_test_initializer.generic_random_engine
+        );
+        TestRunner test_runner(circuit);
+        BOOST_CHECK(test_runner.run_test());
+    }
+
 BOOST_AUTO_TEST_SUITE_END()
 

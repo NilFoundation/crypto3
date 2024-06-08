@@ -10,27 +10,29 @@
 #define CRYPTO3_HASH_POSEIDON_LFSR_HPP
 
 #include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
-#include <nil/crypto3/algebra/vector/vector.hpp>
 
+#include <nil/crypto3/algebra/vector/vector.hpp>
 #include <nil/crypto3/algebra/random_element.hpp>
-#include <nil/crypto3/hash/detail/poseidon/poseidon_constants.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace hashes {
             namespace detail {
+                template<typename T>
+                struct poseidon_constants;
+
                 using namespace boost::multiprecision;
 
                 // Uses Grain-LFSR stream cipher for constants generation.
-                template<typename poseidon_policy_type>
+                template<typename PolicyType>
                 class poseidon_constants_generator {
                 public:
 
                     BOOST_STATIC_ASSERT_MSG(
-                        !poseidon_policy_type::mina_version,
+                        !PolicyType::mina_version,
                         "Constants generation can only be used with the original version, not Mina version.");
 
-                    typedef poseidon_policy_type policy_type;
+                    typedef PolicyType policy_type;
                     typedef typename policy_type::field_type field_type;
 
                     constexpr static const std::size_t state_words = policy_type::state_words;
@@ -43,13 +45,13 @@ namespace nil {
                     typedef typename field_type::integral_type integral_type;
                     constexpr static const integral_type modulus = field_type::modulus;
 
-                    typedef poseidon_constants<poseidon_policy_type> poseidon_constants_type;
+                    typedef poseidon_constants<PolicyType> poseidon_constants_type;
                     typedef typename poseidon_constants_type::mds_matrix_type mds_matrix_type;
                     typedef typename poseidon_constants_type::state_vector_type state_vector_type;
 
                     constexpr static const std::size_t lfsr_state_bits = 80;
                     typedef number<backends::cpp_int_modular_backend<lfsr_state_bits>> lfsr_state_type;
-    
+
                     typedef typename poseidon_constants_type::round_constants_type round_constants_type;
 
                     /*! 
@@ -63,9 +65,9 @@ namespace nil {
                     static std::pair<mds_matrix_type, round_constants_type> generate_constants() {
                         return {generate_mds_matrix(), generate_round_constants()};
                     }
-                    
+
                 private:
-                    
+
 #ifdef CRYPTO3_HASH_POSEIDON_COMPILE_TIME
                     constexpr
 #endif
@@ -78,16 +80,16 @@ namespace nil {
                         while (!secure_MDS_found) {
                             secure_MDS_found = true;
                             for (std::size_t i = 0; i < state_words; i++) {
-                                x[i] = algebra::random_element<field_type>(); 
-                                y[i] = algebra::random_element<field_type>(); 
+                                x[i] = algebra::random_element<field_type>();
+                                y[i] = algebra::random_element<field_type>();
                             }
 
                             for (std::size_t i = 0; i < state_words; i++) {
                                 for (std::size_t j = 0; j < state_words; j++) {
-                                    if ((i != j && x[i] == x[j]) || 
-                                            (i != j && y[i] == y[j]) || 
+                                    if ((i != j && x[i] == x[j]) ||
+                                            (i != j && y[i] == y[j]) ||
                                             (x[i] == y[j])) {
-                                        secure_MDS_found = false; 
+                                        secure_MDS_found = false;
                                         break;
                                     }
                                     // We use minus in the next line, as is done in Mina implementation.

@@ -17,14 +17,14 @@ namespace nil {
         namespace hashes {
             namespace detail {
                 template<typename Policy>
-                struct nil_poseidon_sponge_construction {
-                // This is a quite strange sponge. It has rate = 3 on first absorb, then rate = 2.
-                // E.g., we have ABCDEFG values as input. Rate is 3, Capacity is 1: (full state: 0|0|0|0). Values are consumed as:
-                // 0|0|0|0 -absorb-> A|B|C|0 -permute-> S1|S2|S3|S4 -> S4|0|0|0 -absorb-> S4|D|E|0 -permute->
-                //   S1'|S2'|S3'|S4' -> S4'|0|0|0 -> ...
-                // As we could see, it does not fit into standard sponge construction, where permutation is called each Rate
-                // elements (each Rate - 1 instead). State is zeroed after the permutation. Only the first element is returned
-                // from squeeze(), not Rate elements...
+                struct poseidon_sponge_construction_custom {
+                    // This is a quite strange sponge. It has rate = 3 on first absorb, then rate = 2.
+                    // E.g., we have ABCDEFG values as input. Rate is 3, Capacity is 1: (full state: 0|0|0|0). Values are consumed as:
+                    // 0|0|0|0 -absorb-> A|B|C|0 -permute-> S1|S2|S3|S4 -> S4|0|0|0 -absorb-> S4|D|E|0 -permute->
+                    //   S1'|S2'|S3'|S4' -> S4'|0|0|0 -> ...
+                    // As we could see, it does not fit into standard sponge construction, where permutation is called each Rate
+                    // elements (each Rate - 1 instead). State is zeroed after the permutation. Only the first element is returned
+                    // from squeeze(), not Rate elements...
                 public:
                     using permutation_type = poseidon_permutation<Policy>;
 
@@ -37,24 +37,24 @@ namespace nil {
                     constexpr static const std::size_t block_words = Policy::block_words;
                     constexpr static const std::size_t digest_words = Policy::digest_words;
 
-                    nil_poseidon_sponge_construction() {
+                    poseidon_sponge_construction_custom() {
                         reset();
                     }
 
-                    nil_poseidon_sponge_construction(word_type word) {
+                    poseidon_sponge_construction_custom(word_type word) {
                         // Currently used for hack in zk fiat-shamir scheme challenge extraction
                         reset();
                         state_[0] = word;
                     }
 
-                    void absorb(const block_type& block) {
-                        for (auto &word : block) {
+                    void absorb(const block_type &block) {
+                        for (auto &word: block) {
                             absorb(word);
                         }
                     }
 
                     void absorb_with_padding(const block_type &block,
-                                          const std::size_t last_block_words_filled = block_words) {
+                                             const std::size_t last_block_words_filled = block_words) {
                         // No extra padding, just consume block as is
                         for (std::size_t i = 0; i < last_block_words_filled; ++i) {
                             absorb(block[i]);

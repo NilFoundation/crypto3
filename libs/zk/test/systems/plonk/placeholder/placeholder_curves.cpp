@@ -65,27 +65,28 @@ using namespace nil::crypto3::zk::snark;
 
 BOOST_AUTO_TEST_SUITE(placeholder_curves_test)
 
-using hash_type = hashes::keccak_1600<256>;
+    using hash_type = hashes::keccak_1600<256>;
 
-using TestRunners = boost::mpl::list<
-    placeholder_test_runner<algebra::curves::pallas       ::scalar_field_type, hash_type, hash_type>,
-    placeholder_test_runner<algebra::curves::vesta        ::scalar_field_type, hash_type, hash_type>,
-    placeholder_test_runner<algebra::curves::mnt4_298     ::scalar_field_type, hash_type, hash_type>,
-    placeholder_test_runner<algebra::curves::mnt6_298     ::scalar_field_type, hash_type, hash_type>,
-    placeholder_test_runner<algebra::curves::bls12_381    ::scalar_field_type, hash_type, hash_type>,
-    placeholder_test_runner<algebra::curves::bls12_377    ::scalar_field_type, hash_type, hash_type>,
-    placeholder_test_runner<algebra::curves::alt_bn128_254::scalar_field_type, hash_type, hash_type>
->;
+    using TestRunners = boost::mpl::list<
+            placeholder_test_runner<algebra::curves::pallas::scalar_field_type, hash_type, hash_type>,
+            placeholder_test_runner<algebra::curves::vesta::scalar_field_type, hash_type, hash_type>,
+            placeholder_test_runner<algebra::curves::mnt4_298::scalar_field_type, hash_type, hash_type>,
+            placeholder_test_runner<algebra::curves::mnt6_298::scalar_field_type, hash_type, hash_type>,
+            placeholder_test_runner<algebra::curves::bls12_381::scalar_field_type, hash_type, hash_type>,
+            placeholder_test_runner<algebra::curves::bls12_377::scalar_field_type, hash_type, hash_type>,
+            placeholder_test_runner<algebra::curves::alt_bn128_254::scalar_field_type, hash_type, hash_type>
+    >;
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(curve_test, TestRunner, TestRunners) {
-    using field_type = typename TestRunner::field_type;
-    test_tools::random_test_initializer<field_type> random_test_initializer;
-    auto circuit = circuit_test_1<field_type>(
-        random_test_initializer.alg_random_engines.template get_alg_engine<field_type>(),
-        random_test_initializer.generic_random_engine
-    );
-    TestRunner test_runner(circuit);
-    BOOST_CHECK(test_runner.run_test());
-}
+    BOOST_AUTO_TEST_CASE_TEMPLATE(curve_test, TestRunner, TestRunners) {
+        using field_type = typename TestRunner::field_type;
+        test_tools::random_test_initializer<field_type> random_test_initializer;
+        auto circuit = circuit_test_1<field_type>(
+                random_test_initializer.alg_random_engines.template get_alg_engine<field_type>(),
+                random_test_initializer.generic_random_engine
+        );
+        TestRunner test_runner(circuit);
+        BOOST_CHECK(test_runner.run_test());
+    }
+
 BOOST_AUTO_TEST_SUITE_END()
 

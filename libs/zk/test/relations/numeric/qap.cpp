@@ -73,7 +73,7 @@ void test_qap(const std::size_t qap_degree, const std::size_t num_inputs, const 
 
     auto begin = std::chrono::high_resolution_clock::now();
 
-    r1cs_example<FieldType> example;
+    r1cs_example <FieldType> example;
     if (binary_input) {
         example = generate_r1cs_example_with_binary_input<FieldType>(num_constraints, num_inputs);
     } else {
@@ -90,9 +90,9 @@ void test_qap(const std::size_t qap_degree, const std::size_t num_inputs, const 
     std::cout << "Constraint system satisfied" << std::endl;
 
     const typename FieldType::value_type t = random_element<FieldType>(),
-                                         d1 = random_element<FieldType>(),
-                                         d2 = random_element<FieldType>(),
-                                         d3 = random_element<FieldType>();
+            d1 = random_element<FieldType>(),
+            d2 = random_element<FieldType>(),
+            d3 = random_element<FieldType>();
     begin = std::chrono::high_resolution_clock::now();
 
     qap_instance<FieldType> qap_inst_1 = reductions::r1cs_to_qap<FieldType>::instance_map(example.constraint_system);
@@ -105,7 +105,7 @@ void test_qap(const std::size_t qap_degree, const std::size_t num_inputs, const 
     begin = std::chrono::high_resolution_clock::now();
 
     qap_instance_evaluation<FieldType> qap_inst_2 =
-        reductions::r1cs_to_qap<FieldType>::instance_map_with_evaluation(example.constraint_system, t);
+            reductions::r1cs_to_qap<FieldType>::instance_map_with_evaluation(example.constraint_system, t);
 
     end = std::chrono::high_resolution_clock::now();
     elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
@@ -115,7 +115,8 @@ void test_qap(const std::size_t qap_degree, const std::size_t num_inputs, const 
     begin = std::chrono::high_resolution_clock::now();
 
     qap_witness<FieldType> qap_wit =
-        reductions::r1cs_to_qap<FieldType>::witness_map(example.constraint_system, example.primary_input, example.auxiliary_input, d1, d2, d3);
+            reductions::r1cs_to_qap<FieldType>::witness_map(example.constraint_system, example.primary_input,
+                                                            example.auxiliary_input, d1, d2, d3);
 
     end = std::chrono::high_resolution_clock::now();
     elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
@@ -128,25 +129,26 @@ void test_qap(const std::size_t qap_degree, const std::size_t num_inputs, const 
 
 BOOST_AUTO_TEST_SUITE(qap_test_suite)
 
-BOOST_AUTO_TEST_CASE(qap_test_case) {
-    const std::size_t num_inputs = 10;
+    BOOST_AUTO_TEST_CASE(qap_test_case) {
+        const std::size_t num_inputs = 10;
 
-    using basic_curve_type = curves::mnt6<298>;
+        using basic_curve_type = curves::mnt6<298>;
 
-    const std::size_t basic_domain_size = 1ul << fields::arithmetic_params<basic_curve_type::scalar_field_type>::s;
-    const std::size_t step_domain_size = (1ul << 10) + (1ul << 8);
-    const std::size_t extended_domain_size = 1ul << (fields::arithmetic_params<basic_curve_type::scalar_field_type>::s + 1);
-    const std::size_t extended_domain_size_special = extended_domain_size - 1;
+        const std::size_t basic_domain_size = 1ul << fields::arithmetic_params<basic_curve_type::scalar_field_type>::s;
+        const std::size_t step_domain_size = (1ul << 10) + (1ul << 8);
+        const std::size_t extended_domain_size =
+                1ul << (fields::arithmetic_params<basic_curve_type::scalar_field_type>::s + 1);
+        const std::size_t extended_domain_size_special = extended_domain_size - 1;
 
-    test_qap<typename basic_curve_type::scalar_field_type>(basic_domain_size, num_inputs, true);
-    test_qap<typename basic_curve_type::scalar_field_type>(step_domain_size, num_inputs, true);
-    test_qap<typename basic_curve_type::scalar_field_type>(extended_domain_size, num_inputs, true);
-    test_qap<typename basic_curve_type::scalar_field_type>(extended_domain_size_special, num_inputs, true);
+        test_qap<typename basic_curve_type::scalar_field_type>(basic_domain_size, num_inputs, true);
+        test_qap<typename basic_curve_type::scalar_field_type>(step_domain_size, num_inputs, true);
+        test_qap<typename basic_curve_type::scalar_field_type>(extended_domain_size, num_inputs, true);
+        test_qap<typename basic_curve_type::scalar_field_type>(extended_domain_size_special, num_inputs, true);
 
-    test_qap<typename basic_curve_type::scalar_field_type>(basic_domain_size, num_inputs, false);
-    test_qap<typename basic_curve_type::scalar_field_type>(step_domain_size, num_inputs, false);
-    test_qap<typename basic_curve_type::scalar_field_type>(extended_domain_size, num_inputs, false);
-    test_qap<typename basic_curve_type::scalar_field_type>(extended_domain_size_special, num_inputs, false);
-}
+        test_qap<typename basic_curve_type::scalar_field_type>(basic_domain_size, num_inputs, false);
+        test_qap<typename basic_curve_type::scalar_field_type>(step_domain_size, num_inputs, false);
+        test_qap<typename basic_curve_type::scalar_field_type>(extended_domain_size, num_inputs, false);
+        test_qap<typename basic_curve_type::scalar_field_type>(extended_domain_size_special, num_inputs, false);
+    }
 
 BOOST_AUTO_TEST_SUITE_END()

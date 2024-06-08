@@ -62,7 +62,7 @@ namespace nil {
                     using proof_type = typename LPCScheme::proof_type;
                     using transcript_type = typename LPCScheme::transcript_type;
                     using transcript_hash_type = typename LPCScheme::transcript_hash_type;
-                    using poly_type = PolynomialType;
+                    using polynomial_type = PolynomialType;
                     using lpc = LPCScheme;
                     using eval_storage_type = typename LPCScheme::eval_storage_type;
                     using preprocessed_data_type = std::map<std::size_t, std::vector<value_type>>;
@@ -124,7 +124,7 @@ namespace nil {
                         // Prepare z-s and combined_Q;
                         auto theta = transcript.template challenge<field_type>();
                         typename field_type::value_type theta_acc = field_type::value_type::one();
-                        poly_type combined_Q;
+                        polynomial_type combined_Q;
                         math::polynomial<value_type> V;
 
                         auto points = this->get_unique_points();
@@ -187,7 +187,7 @@ namespace nil {
                         );
 
                         typename fri_type::proof_type fri_proof = nil::crypto3::zk::algorithms::proof_eval<
-                            fri_type, poly_type
+                            fri_type, polynomial_type
                         >(
                             this->_polys,
                             combined_Q,

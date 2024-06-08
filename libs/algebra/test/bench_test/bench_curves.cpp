@@ -35,6 +35,8 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
+#include <boost/multiprecision/cpp_int.hpp>
+
 #include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/coordinates.hpp>
 #include <nil/crypto3/algebra/curves/forms.hpp>
 
@@ -89,10 +91,10 @@ void curve_mixed_add_perf_test() {
         int index = i % points1.size();
         points1[index].mixed_add(points1[index]);
     }
-    auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
-        std::chrono::high_resolution_clock::now() - start);
-    std::cout << "Addition time: " << std::fixed << std::setprecision(3)
-        << elapsed.count() / SAMPLES << " ns" << std::endl;
+    auto elapsed =
+        std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start);
+    std::cout << "Addition time: " << std::fixed << std::setprecision(3) << elapsed.count() / SAMPLES << " ns"
+              << std::endl;
 }
 
 template<typename CurveGroup>
@@ -120,10 +122,10 @@ void curve_operations_perf_test() {
         int index = i % points1.size();
         points2[index] *= constants[index];
     }
-    auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
-        std::chrono::high_resolution_clock::now() - start);
-    std::cout << "Scalar Multiplication time: " << std::fixed << std::setprecision(3)
-        << elapsed.count() / SAMPLES << " ns" << std::endl;
+    auto elapsed =
+        std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start);
+    std::cout << "Scalar Multiplication time: " << std::fixed << std::setprecision(3) << elapsed.count() / SAMPLES
+              << " ns" << std::endl;
 
     start = std::chrono::high_resolution_clock::now();
 
@@ -131,10 +133,9 @@ void curve_operations_perf_test() {
         int index = i % points1.size();
         points2[index] += points1[index];
     }
-    elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
-        std::chrono::high_resolution_clock::now() - start);
-    std::cout << "Addition time: " << std::fixed << std::setprecision(3)
-        << elapsed.count() / SAMPLES << " ns" << std::endl;
+    elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start);
+    std::cout << "Addition time: " << std::fixed << std::setprecision(3) << elapsed.count() / SAMPLES << " ns"
+              << std::endl;
 
     start = std::chrono::high_resolution_clock::now();
 
@@ -143,45 +144,39 @@ void curve_operations_perf_test() {
         points2[index] -= points1[index];
     }
 
-    elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
-        std::chrono::high_resolution_clock::now() - start);
-    std::cout << "Substraction time: " << std::fixed << std::setprecision(3)
-        << elapsed.count() / SAMPLES << " ns" << std::endl;
+    elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start);
+    std::cout << "Substraction time: " << std::fixed << std::setprecision(3) << elapsed.count() / SAMPLES << " ns"
+              << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(curve_operations_perf_test_bls12_381_g1_jacobian) {
-    using policy_type = curves::bls12<381>::g1_type<
-        nil::crypto3::algebra::curves::coordinates::jacobian_with_a4_0, 
-        nil::crypto3::algebra::curves::forms::short_weierstrass>;
+    using policy_type = curves::bls12<381>::g1_type<nil::crypto3::algebra::curves::coordinates::jacobian_with_a4_0,
+                                                    nil::crypto3::algebra::curves::forms::short_weierstrass>;
 
     curve_operations_perf_test<policy_type>();
 }
 
 BOOST_AUTO_TEST_CASE(curve_operations_perf_test_bls12_381_g2_jacobian) {
-    using policy_type = curves::bls12<381>::g2_type<
-        nil::crypto3::algebra::curves::coordinates::jacobian_with_a4_0,
-        nil::crypto3::algebra::curves::forms::short_weierstrass>;
+    using policy_type = curves::bls12<381>::g2_type<nil::crypto3::algebra::curves::coordinates::jacobian_with_a4_0,
+                                                    nil::crypto3::algebra::curves::forms::short_weierstrass>;
 
     curve_operations_perf_test<policy_type>();
 }
 
 BOOST_AUTO_TEST_CASE(curve_operations_perf_test_bls12_381_g1_projective) {
-    using policy_type = curves::bls12<381>::g1_type<
-        nil::crypto3::algebra::curves::coordinates::projective, 
-        nil::crypto3::algebra::curves::forms::short_weierstrass>;
+    using policy_type = curves::bls12<381>::g1_type<nil::crypto3::algebra::curves::coordinates::projective,
+                                                    nil::crypto3::algebra::curves::forms::short_weierstrass>;
 
     curve_operations_perf_test<policy_type>();
 }
 
 // Performance for mixed addition.
 BOOST_AUTO_TEST_CASE(mixed_addition_perf_test_bls12_381_g1) {
-    using policy_type = curves::bls12<381>::g1_type<
-        nil::crypto3::algebra::curves::coordinates::projective, 
-        nil::crypto3::algebra::curves::forms::short_weierstrass>;
+    using policy_type = curves::bls12<381>::g1_type<nil::crypto3::algebra::curves::coordinates::projective,
+                                                    nil::crypto3::algebra::curves::forms::short_weierstrass>;
 
-    using affine_policy_type = curves::bls12<381>::g1_type<
-        nil::crypto3::algebra::curves::coordinates::affine, 
-        nil::crypto3::algebra::curves::forms::short_weierstrass>;
+    using affine_policy_type = curves::bls12<381>::g1_type<nil::crypto3::algebra::curves::coordinates::affine,
+                                                           nil::crypto3::algebra::curves::forms::short_weierstrass>;
 
     curve_mixed_add_perf_test<policy_type, affine_policy_type>();
 }

@@ -29,10 +29,10 @@ namespace nil {
         namespace hashes {
             namespace detail {
 
-                template<typename poseidon_policy_type>
+                template<typename PolicyType>
                 class poseidon_constants {
                 public:
-                    typedef poseidon_policy_type policy_type;
+                    typedef PolicyType policy_type;
                     typedef typename policy_type::word_type element_type;
                     constexpr static const std::size_t state_words = policy_type::state_words;
 
@@ -46,7 +46,7 @@ namespace nil {
 
                     // Choose which constants we want, original or kimchi. We may later add
                     // other sets of constants here.
-                    typedef typename std::conditional<poseidon_policy_type::mina_version, poseidon_kimchi_constants_data<policy_type>, poseidon_original_constants_data<policy_type>>::type constants_data_type;
+                    typedef typename std::conditional<PolicyType::mina_version, poseidon_kimchi_constants_data<policy_type>, poseidon_original_constants_data<policy_type>>::type constants_data_type;
 
                     poseidon_constants() {
                         // Transpose the matrix.
@@ -66,12 +66,8 @@ namespace nil {
                         A_vector = algebra::vectmatmul(A_vector, mds_matrix);
                     }
 
-                private:
                     mds_matrix_type mds_matrix;
-
                 };
-
-
             }    // namespace detail
         }        // namespace hashes
     }            // namespace crypto3

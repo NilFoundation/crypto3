@@ -98,7 +98,7 @@
 
 #include <type_traits>
 
-#include <nil/crypto3/hash/detail/poseidon/nil_poseidon_sponge.hpp>
+#include <nil/crypto3/hash/detail/poseidon/poseidon_sponge.hpp>
 #include <nil/crypto3/hash/detail/sponge_construction.hpp>
 
 namespace nil {
@@ -183,7 +183,7 @@ namespace nil {
                 std::enable_if_t<
                     is_specialization_of<sponge_construction, typename HashType::construction::type>::value ||
                     is_specialization_of<algebraic_sponge_construction, typename HashType::construction::type>::value ||
-                    is_specialization_of<nil::crypto3::hashes::detail::nil_poseidon_sponge_construction, typename HashType::construction::type>::value
+                    is_specialization_of<nil::crypto3::hashes::detail::poseidon_sponge_construction_custom, typename HashType::construction::type>::value
                 >
             > {
                 static const bool value = true;

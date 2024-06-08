@@ -36,7 +36,7 @@
 
 #ifdef CRYPTO3_VDF_BOOST
 #include <nil/crypto3/multiprecision/number.hpp>
-#include <nil/crypto3/multiprecision/cpp_int.hpp>
+#include <boost/multiprecision/cpp_int.hpp>
 #ifdef CRYPTO3_VDF_BOOST_GMP
 #include <nil/crypto3/multiprecision/gmp.hpp>
 #endif

@@ -122,13 +122,13 @@ namespace nil {
                         template<typename TIter>
                         nil::marshalling::status_type read(TIter &iter, std::size_t size) {
                             
-                            if (size < (std::is_same_v<typename std::iterator_traits<TIter>::value_type, bool> ? 
+                            if (size < (std::is_same<typename std::iterator_traits<TIter>::value_type, bool>::value ?
                                             bit_length() : length())) {
                                 return nil::marshalling::status_type::not_enough_data;
                             }
 
                             read_no_status(iter);
-                            iter += (std::is_same_v<typename std::iterator_traits<TIter>::value_type, bool> ? 
+                            iter += (std::is_same<typename std::iterator_traits<TIter>::value_type, bool>::value ?
                                             max_bit_length() : max_length());
                             return nil::marshalling::status_type::success;
                         }
@@ -141,14 +141,14 @@ namespace nil {
 
                         template<typename TIter>
                         nil::marshalling::status_type write(TIter &iter, std::size_t size) const {
-                            if (size < (std::is_same_v<typename std::iterator_traits<TIter>::value_type, bool> ? 
+                            if (size < (std::is_same<typename std::iterator_traits<TIter>::value_type, bool>::value ?
                                             bit_length() : length())) {
                                 return nil::marshalling::status_type::buffer_overflow;
                             }
 
                             write_no_status(iter);
 
-                            iter += (std::is_same_v<typename std::iterator_traits<TIter>::value_type, bool> ? 
+                            iter += (std::is_same<typename std::iterator_traits<TIter>::value_type, bool>::value ?
                                             max_bit_length() : max_length());
                             return nil::marshalling::status_type::success;
                         }

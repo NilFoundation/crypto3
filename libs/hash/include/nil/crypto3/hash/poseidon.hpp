@@ -13,12 +13,14 @@
 #ifdef __ZKLLVM__
 #include <nil/crypto3/algebra/curves/pallas.hpp>
 #else
+
 #include <nil/crypto3/hash/accumulators/hash.hpp>
-#include <nil/crypto3/hash/detail/poseidon/nil_poseidon_sponge.hpp>
+#include <nil/crypto3/hash/detail/poseidon/poseidon_sponge.hpp>
 #include <nil/crypto3/hash/detail/poseidon/poseidon_functions.hpp>
 #include <nil/crypto3/hash/detail/poseidon/poseidon_permutation.hpp>
 #include <nil/crypto3/hash/detail/sponge_construction.hpp>
 #include <nil/crypto3/hash/detail/stream_processors/stream_processors_enum.hpp>
+
 #endif
 
 namespace nil {
@@ -55,9 +57,7 @@ namespace nil {
                         // This is required by 'is_hash' concept.
                     };
 
-                    using type = detail::nil_poseidon_sponge_construction<
-                        policy_type
-                    >;
+                    using type = detail::poseidon_sponge_construction_custom<policy_type>;
                 };
 
                 constexpr static detail::stream_processor_type stream_processor = detail::stream_processor_type::Raw;
@@ -83,11 +83,11 @@ namespace nil {
                     };
 
                     using type = algebraic_sponge_construction<
-                        policy_type,
-                        typename policy_type::iv_generator,
-                        detail::poseidon_functions<policy_type>,
-                        detail::poseidon_functions<policy_type>,
-                        detail::poseidon_functions<policy_type>
+                            policy_type,
+                            typename policy_type::iv_generator,
+                            detail::poseidon_functions<policy_type>,
+                            detail::poseidon_functions<policy_type>,
+                            detail::poseidon_functions<policy_type>
                     >;
                 };
 

@@ -60,7 +60,7 @@ void test_fold_polynomial() {
 
     std::size_t d_log = boost::static_log2<d>::value;
     std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
-        math::calculate_domain_set<FieldType>(d_log, 1);
+            math::calculate_domain_set<FieldType>(d_log, 1);
 
     math::polynomial<typename FieldType::value_type> f = {{1u, 3u, 4u, 3u}};
 
@@ -70,12 +70,12 @@ void test_fold_polynomial() {
     typename FieldType::value_type alpha = algebra::random_element<FieldType>();
 
     math::polynomial<typename FieldType::value_type> f_next =
-        zk::commitments::detail::fold_polynomial<FieldType>(f, alpha);
+            zk::commitments::detail::fold_polynomial<FieldType>(f, alpha);
 
     BOOST_CHECK_EQUAL(f_next.degree(), f.degree() / 2);
-    std::vector<std::pair<typename FieldType::value_type, typename FieldType::value_type>> interpolation_points {
-        std::make_pair(omega, f.evaluate(omega)),
-        std::make_pair(-omega, f.evaluate(-omega)),
+    std::vector<std::pair<typename FieldType::value_type, typename FieldType::value_type>> interpolation_points{
+            std::make_pair(omega, f.evaluate(omega)),
+            std::make_pair(-omega, f.evaluate(-omega)),
     };
 
     math::polynomial<typename FieldType::value_type> interpolant = math::lagrange_interpolation(interpolation_points);
@@ -94,7 +94,7 @@ void test_fold_polynomial_dfs() {
 
     std::size_t d_log = boost::static_log2<d>::value;
     std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
-        math::calculate_domain_set<FieldType>(d_log, 2);
+            math::calculate_domain_set<FieldType>(d_log, 2);
 
     math::polynomial<typename FieldType::value_type> f = {{1u, 3u, 4u, 3u}};
 
@@ -114,7 +114,7 @@ void test_fold_polynomial_dfs() {
     }
 
     math::polynomial_dfs<typename FieldType::value_type> f_next_dfs =
-        zk::commitments::detail::fold_polynomial<FieldType>(f_dfs, alpha, D[0]);
+            zk::commitments::detail::fold_polynomial<FieldType>(f_dfs, alpha, D[0]);
     std::vector<typename FieldType::value_type> f_next_vector(f_next_dfs.begin(), f_next_dfs.end());
     D[1]->inverse_fft(f_next_vector);
     math::polynomial<typename FieldType::value_type> f_next(f_next_vector.size());
@@ -123,9 +123,9 @@ void test_fold_polynomial_dfs() {
     }
 
     BOOST_CHECK_EQUAL(f_next.degree(), f.degree() / 2);
-    std::vector<std::pair<typename FieldType::value_type, typename FieldType::value_type>> interpolation_points {
-        std::make_pair(omega, f.evaluate(omega)),
-        std::make_pair(-omega, f.evaluate(-omega)),
+    std::vector<std::pair<typename FieldType::value_type, typename FieldType::value_type>> interpolation_points{
+            std::make_pair(omega, f.evaluate(omega)),
+            std::make_pair(-omega, f.evaluate(-omega)),
     };
 
     math::polynomial<typename FieldType::value_type> interpolant = math::lagrange_interpolation(interpolation_points);
@@ -136,21 +136,21 @@ void test_fold_polynomial_dfs() {
 
 BOOST_AUTO_TEST_SUITE(fold_polynomial_test_suite)
 
-BOOST_AUTO_TEST_CASE(fold_polynomial_test) {
-    test_fold_polynomial<algebra::curves::mnt4<298>>();
+    BOOST_AUTO_TEST_CASE(fold_polynomial_test) {
+        test_fold_polynomial<algebra::curves::mnt4<298>>();
 
-    test_fold_polynomial<algebra::curves::pallas>();
+        test_fold_polynomial<algebra::curves::pallas>();
 
-    test_fold_polynomial<algebra::curves::vesta>();
-}
+        test_fold_polynomial<algebra::curves::vesta>();
+    }
 
-BOOST_AUTO_TEST_CASE(fold_polynomial_dfs_test) {
+    BOOST_AUTO_TEST_CASE(fold_polynomial_dfs_test) {
 
-    test_fold_polynomial_dfs<algebra::curves::mnt4<298>>();
+        test_fold_polynomial_dfs<algebra::curves::mnt4<298>>();
 
-    test_fold_polynomial_dfs<algebra::curves::pallas>();
+        test_fold_polynomial_dfs<algebra::curves::pallas>();
 
-    test_fold_polynomial_dfs<algebra::curves::vesta>();
-}
+        test_fold_polynomial_dfs<algebra::curves::vesta>();
+    }
 
 BOOST_AUTO_TEST_SUITE_END()

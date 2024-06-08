@@ -37,7 +37,7 @@
 #include <nil/crypto3/hash/sha2.hpp>
 #include <nil/crypto3/hash/type_traits.hpp>
 #include <nil/crypto3/hash/type_traits.hpp>
-#include <nil/crypto3/hash/detail/poseidon/nil_poseidon_sponge.hpp>
+#include <nil/crypto3/hash/detail/poseidon/poseidon_sponge.hpp>
 
 #include <nil/crypto3/algebra/curves/pallas.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/pallas.hpp>
@@ -342,7 +342,7 @@ namespace nil {
                     }
 
                 public:
-                    hashes::detail::nil_poseidon_sponge_construction<typename Hash::policy_type> sponge;
+                    hashes::detail::poseidon_sponge_construction_custom<typename Hash::policy_type> sponge;
                 };
 
             }    // namespace transcript
