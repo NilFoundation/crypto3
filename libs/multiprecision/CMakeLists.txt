@@ -11,17 +11,9 @@ cmake_minimum_required(VERSION 3.5)
 
 set(BOOST_CMAKE FALSE)
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake"
-     "${CMAKE_CURRENT_LIST_DIR}/cmake/packages"
-     "${CMAKE_CURRENT_LIST_DIR}/cmake/modules/share/modules/cmake")
-
 include(CMDeploy)
 include(CMConfig)
 include(CMSetupVersion)
-
-if(NOT CMAKE_WORKSPACE_NAME OR NOT ("${CMAKE_WORKSPACE_NAME}" STREQUAL "crypto3"))
-    cm_workspace(crypto3)
-endif()
 
 cm_project(multiprecision WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME} LANGUAGES CXX)
 
