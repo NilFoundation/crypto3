@@ -6,15 +6,6 @@
 # http://www.boost.org/LICENSE_1_0.txt
 #---------------------------------------------------------------------------#
 
-list(APPEND CMAKE_MODULE_PATH
-     "${CMAKE_CURRENT_LIST_DIR}/cmake"
-     "${CMAKE_CURRENT_LIST_DIR}/cmake/packages"
-     "${CMAKE_CURRENT_LIST_DIR}/cmake/modules/share/modules/cmake")
-
-if(NOT CMAKE_WORKSPACE_NAME OR NOT ("${CMAKE_WORKSPACE_NAME}" STREQUAL "crypto3"))
-    cm_workspace(crypto3)
-endif()
-
 cm_project(modes WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME})
 
 include(CMConfig)

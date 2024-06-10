@@ -23,13 +23,8 @@
 #  SOFTWARE.
 #---------------------------------------------------------------------------//
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake"
-        "${CMAKE_CURRENT_LIST_DIR}/cmake/modules/share/modules/cmake")
-
 include(CMConfig)
 include(CMSetupVersion)
-
-cm_workspace(crypto3)
 
 include(CMDeploy)
 include(CMSetupVersion)
