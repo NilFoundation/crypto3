@@ -301,6 +301,9 @@ namespace nil {
                         case var::column_type::selector:
                             BOOST_ASSERT_MSG(false, "Selectors should be moved while moving gates.");
                             break;
+                        case var::column_type::uninitialized:
+                            BOOST_ASSERT_MSG(false, "Uninitialized variable should not be moved.");
+                            break;
                     }
                     return new_var;
                 }
@@ -329,6 +332,9 @@ namespace nil {
                             break;
                         case var::column_type::selector:
                             BOOST_ASSERT_MSG(false, "Selector columns should not be inside gates.");
+                            break;
+                        case var::column_type::uninitialized:
+                            BOOST_ASSERT_MSG(false, "Uninitialized variable should not be moved.");
                             break;
                     }
                     return new_var;

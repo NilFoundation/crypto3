@@ -102,29 +102,6 @@ namespace nil {
             return step_list;
         }
 
-        // TODO(martun): remove this from here, we have a constructor for FRI params.
-        template<typename fri_type, typename FieldType>
-        typename fri_type::params_type create_fri_params(
-                const std::size_t degree_log, const std::size_t lambda,
-                const std::size_t expand_factor = 4, const std::size_t max_step = 1) {
-            math::polynomial<typename FieldType::value_type> q = {0u, 0u, 1u};
-
-            const std::size_t r = degree_log - 1;
-
-            std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> domain_set =
-                math::calculate_domain_set<FieldType>(degree_log + expand_factor, r);
-
-            typename fri_type::params_type params(
-                (1 << degree_log) - 1,
-                domain_set,
-                generate_random_step_list(r, max_step),
-                expand_factor,
-                lambda
-            );
-
-            return params;
-        }
-
         template<typename ComponentType, typename BlueprintFieldType>
         class plonk_test_assigner {
         public:
@@ -200,7 +177,7 @@ namespace nil {
 
             static boost::random::mt19937 gen;
             static boost::random::uniform_int_distribution<> dist(0, 100);
-            std::size_t start_row = 0; // dist(gen);
+            std::size_t start_row = 0; //dist(gen);
             // resize to ensure that if the component is empty by default (e.g. a component which only uses batching)
             if (start_row != 0) {
                 assignment.witness(0, start_row - 1) = 0u;
@@ -316,11 +293,10 @@ namespace nil {
 
             profiling(assignment);
 #endif
-            //assignment.export_table(std::cout);
-            //bp.export_circuit(std::cout);
+            // assignment.export_table(std::cout);
+            // bp.export_circuit(std::cout);
 
             assert(blueprint::is_satisfied(bp, assignment) == expected_to_pass);
-
             return std::make_tuple(desc, bp, assignment);
         }
 
@@ -428,15 +404,12 @@ namespace nil {
 
             std::size_t table_rows_log = std::ceil(std::log2(desc.rows_amount));
 
-            typename fri_type::params_type fri_params = create_fri_params<fri_type, BlueprintFieldType>(
-                table_rows_log, Lambda);
+            typename fri_type::params_type fri_params(1,table_rows_log, Lambda, 2);
             commitment_scheme_type lpc_scheme(fri_params);
-
-            std::size_t permutation_size = desc.witness_columns + desc.public_input_columns + desc.constant_columns;
 
             typename nil::crypto3::zk::snark::placeholder_public_preprocessor<BlueprintFieldType, placeholder_params_type>::preprocessed_data_type
                 preprocessed_public_data = nil::crypto3::zk::snark::placeholder_public_preprocessor<BlueprintFieldType, placeholder_params_type>::process(
-                    bp, assignments.public_table(), desc, lpc_scheme, permutation_size
+                    bp, assignments.public_table(), desc, lpc_scheme
                 );
 
             typename nil::crypto3::zk::snark::placeholder_private_preprocessor<BlueprintFieldType, placeholder_params_type>::preprocessed_data_type

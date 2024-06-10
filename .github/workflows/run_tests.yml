@@ -49,7 +49,7 @@ jobs:
             ${{ github.workspace }}/**
             !${{ github.workspace }}/
             !${{ github.workspace }}/**/.git/**
-      
+
       # nix is taken from the cloud-init template, no need to install it.
       - name: Build and run tests
         env:

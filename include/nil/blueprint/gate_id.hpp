@@ -60,6 +60,7 @@ namespace nil {
 
             std::array<std::array<std::vector<value_type>, 3>, 2> witnesses;
             std::array<std::array<std::vector<value_type>, 3>, 2> constants;
+            std::array<std::array<std::vector<value_type>, 3>, 2> selectors;
             // Used to separate constraints from each other in ids.
             std::vector<value_type> constraint_mults;
             // Used to separate lookup variables from each other in ids.
@@ -124,6 +125,10 @@ namespace nil {
                 return get_value_helper(constants, point, index, rotation);
             }
 
+            value_type get_selector(std::size_t point, std::size_t index, std::size_t rotation) {
+                return get_value_helper(selectors, point, index, rotation);
+            }
+
             value_type get_power(std::size_t index) {
                 return get_power_helper(constraint_mults, index);
             }
@@ -144,9 +149,10 @@ namespace nil {
                         return this->get_witness(point, var.index, var.rotation);
                     case var::column_type::constant:
                         return this->get_constant(point, var.index, var.rotation);
-                    case var::column_type::public_input:
                     case var::column_type::selector:
-                        BOOST_ASSERT_MSG(false, "Public input/selectors should not be in a gate.");
+                        return this->get_selector(point, var.index, var.rotation);
+                    case var::column_type::public_input:
+                        BOOST_ASSERT_MSG(false, "Public input variables should not be in a gate.");
                     case var::column_type::uninitialized:
                         BOOST_ASSERT_MSG(false, "Uninitialized variable should not be inside a gate.");
                 }

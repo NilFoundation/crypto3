@@ -115,10 +115,8 @@ namespace nil {
             using value_type = typename BlueprintFieldType::value_type;
             using column_type = typename crypto3::zk::snark::plonk_column<BlueprintFieldType>;
             using shared_container_type = typename std::array<column_type, 1>;
-
             using constant_set_compare_type = detail::constant_batch_ref_compare<BlueprintFieldType>;
 
-            std::size_t next_selector_index = 0;
             std::uint32_t assignment_allocated_rows = 0;
             std::vector<value_type> assignment_private_storage;
             // for variables used in component batching
@@ -366,6 +364,7 @@ namespace nil {
             virtual void enable_selector(const std::size_t selector_index, const std::size_t row_index) {
 
                 selector(selector_index, row_index) = BlueprintFieldType::value_type::one();
+                assignment_allocated_rows = std::uint32_t(std::max(std::size_t(assignment_allocated_rows), row_index + 1));
             }
 
             virtual void enable_selector(const std::size_t selector_index,
@@ -374,9 +373,9 @@ namespace nil {
                                  const std::size_t index_step = 1) {
 
                 for (std::size_t row_index = begin_row_index; row_index <= end_row_index; row_index += index_step) {
-
                     enable_selector(selector_index, row_index);
                 }
+                assignment_allocated_rows = std::uint32_t(std::max(std::size_t(assignment_allocated_rows), end_row_index));
             }
 
             void fill_selector(std::uint32_t index, const column_type& column) override {
