@@ -563,27 +563,34 @@ namespace nil {
             }
 
             template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>,
-                    typename = typename std::enable_if<detail::is_field_element<FieldValueType>::value>::type>
-            polynomial<FieldValueType, Allocator> operator*(const polynomial<FieldValueType, Allocator> &A,
-                                                            const FieldValueType &B) {
-
-                return A * polynomial<FieldValueType>(B);
+                     typename = typename std::enable_if<detail::is_field_element<FieldValueType>::value>::type>
+            polynomial<FieldValueType, Allocator> operator*(const polynomial<FieldValueType, Allocator>& A,
+                                                            const FieldValueType& B) {
+                polynomial<FieldValueType> result(A);
+                for( auto it = result.begin(); it != result.end(); it++ ){
+                    *it *= B;
+                }
+                return result;
             }
 
             template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>,
-                    typename = typename std::enable_if<detail::is_field_element<FieldValueType>::value>::type>
-            polynomial<FieldValueType, Allocator> operator*(const FieldValueType &A,
-                                                            const polynomial<FieldValueType, Allocator> &B) {
-
-                return polynomial<FieldValueType>(A) * B;
+                     typename = typename std::enable_if<detail::is_field_element<FieldValueType>::value>::type>
+            polynomial<FieldValueType, Allocator> operator*(const FieldValueType& A,
+                                                            const polynomial<FieldValueType, Allocator>& B) {
+                // Call the upper function.
+                return B * A;
             }
 
             template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>,
-                    typename = typename std::enable_if<detail::is_field_element<FieldValueType>::value>::type>
-            polynomial<FieldValueType, Allocator> operator/(const polynomial<FieldValueType, Allocator> &A,
-                                                            const FieldValueType &B) {
-
-                return A / polynomial<FieldValueType>(B);
+                     typename = typename std::enable_if<detail::is_field_element<FieldValueType>::value>::type>
+            polynomial<FieldValueType, Allocator> operator/(const polynomial<FieldValueType, Allocator>& A,
+                                                            const FieldValueType& B) {
+                polynomial<FieldValueType> result(A);
+                FieldValueType B_inversed = B.inversed();
+                for( auto it = result.begin(); it != result.end(); it++ ){
+                    *it *= B_inversed;
+                }
+                return result;
             }
 
             template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>,

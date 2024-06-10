@@ -720,18 +720,20 @@ namespace nil {
                      typename = typename std::enable_if<detail::is_field_element<FieldValueType>::value>::type>
             polynomial_dfs<FieldValueType, Allocator> operator*(const FieldValueType& A,
                                                             const polynomial_dfs<FieldValueType, Allocator>& B) {
-                polynomial_dfs<FieldValueType> result(B);
-                for( auto it = result.begin(); it != result.end(); it++ ){
-                    *it *= A;
-                }
-                return result;
+                // Call the upper function.
+                return B * A;
             }
 
             template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>,
                      typename = typename std::enable_if<detail::is_field_element<FieldValueType>::value>::type>
             polynomial_dfs<FieldValueType, Allocator> operator/(const polynomial_dfs<FieldValueType, Allocator>& A,
                                                             const FieldValueType& B) {
-                return A / polynomial_dfs<FieldValueType>(0, A.size(), B);
+                polynomial_dfs<FieldValueType> result(A);
+                FieldValueType B_inversed = B.inversed();
+                for( auto it = result.begin(); it != result.end(); it++ ){
+                    *it *= B_inversed;
+                }
+                return result;
             }
 
             template<typename FieldValueType, typename Allocator = std::allocator<FieldValueType>,
