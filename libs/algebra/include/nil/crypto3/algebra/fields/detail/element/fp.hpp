@@ -224,6 +224,12 @@ namespace nil {
                             return element_fp(data * data);    // maybe can be done more effective
                         }
 
+                        constexpr element_fp& square_inplace() {
+                            data *= data;
+                            return *this;
+                        }
+
+
                         constexpr bool is_square() const {
                             element_fp tmp = this->pow(policy_type::group_order_minus_one_half);
                             return (tmp.is_one() || tmp.is_zero());

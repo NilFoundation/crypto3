@@ -26,6 +26,7 @@
 
 #include <iostream>
 #include <chrono>
+#include <ratio>
 #include <type_traits>
 
 #include <boost/test/unit_test.hpp>
@@ -83,20 +84,51 @@ void curve_mixed_add_perf_test() {
         constants.push_back(algebra::random_element<typename CurveGroup::curve_type::scalar_field_type>());
     }
 
-    size_t SAMPLES = 10000;
+    size_t SAMPLES_PER_BATCH = 100;
+    size_t BATCHES = 100;
+    using duration = std::chrono::duration<double, std::nano>;
 
-    std::chrono::time_point<std::chrono::high_resolution_clock> start(std::chrono::high_resolution_clock::now());
+    std::vector<duration> batch_duration;
+    batch_duration.resize(BATCHES);
 
-    for (int i = 0; i < SAMPLES; ++i) {
-        int index = i % points1.size();
-        points1[index].mixed_add(points1[index]);
+
+//    std::chrono::time_point<std::chrono::high_resolution_clock> start, finish;
+
+    auto result = points1[0];
+
+    for(std::size_t b = 0; b < BATCHES ; ++b) {
+
+        auto start = std::chrono::high_resolution_clock::now();
+        
+        for (int i = 0; i < SAMPLES_PER_BATCH; ++i) {
+            int index = i % points1.size();
+            result.mixed_add(points1[index]);
+        }
+
+        auto finish = std::chrono::high_resolution_clock::now();
+
+        batch_duration[b] = (finish - start) / SAMPLES_PER_BATCH;
     }
-    auto elapsed =
-        std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start);
-    std::cout << "Addition time: " << std::fixed << std::setprecision(3) << elapsed.count() / SAMPLES << " ns"
-              << std::endl;
+
+    duration min_dur, max_dur, avg_dur;
+    min_dur = max_dur = avg_dur = batch_duration[0];
+    for(std::size_t b = 1; b < BATCHES ; ++b) {
+        avg_dur += batch_duration[b];
+        if (batch_duration[b] > max_dur) {
+            max_dur = batch_duration[b];
+        }
+        if (batch_duration[b] < min_dur) {
+            min_dur = batch_duration[b];
+        }
+    }
+    avg_dur /= BATCHES;
+    std::cout << "Mixed Addition time: "
+        << min_dur.count() << " ns (min) "
+        << avg_dur.count() << " ns (avg) "
+        << max_dur.count() << " ns (max)" << std::endl;
 }
 
+#if 0
 template<typename CurveGroup>
 void curve_operations_perf_test() {
     using namespace nil::crypto3;
@@ -148,7 +180,9 @@ void curve_operations_perf_test() {
     std::cout << "Substraction time: " << std::fixed << std::setprecision(3) << elapsed.count() / SAMPLES << " ns"
               << std::endl;
 }
+#endif
 
+#if 0
 BOOST_AUTO_TEST_CASE(curve_operations_perf_test_bls12_381_g1_jacobian) {
     using policy_type = curves::bls12<381>::g1_type<nil::crypto3::algebra::curves::coordinates::jacobian_with_a4_0,
                                                     nil::crypto3::algebra::curves::forms::short_weierstrass>;
@@ -169,11 +203,13 @@ BOOST_AUTO_TEST_CASE(curve_operations_perf_test_bls12_381_g1_projective) {
 
     curve_operations_perf_test<policy_type>();
 }
+#endif
 
 // Performance for mixed addition.
 BOOST_AUTO_TEST_CASE(mixed_addition_perf_test_bls12_381_g1) {
-    using policy_type = curves::bls12<381>::g1_type<nil::crypto3::algebra::curves::coordinates::projective,
-                                                    nil::crypto3::algebra::curves::forms::short_weierstrass>;
+    using policy_type = curves::bls12<381>::g1_type<
+        nil::crypto3::algebra::curves::coordinates::jacobian_with_a4_0, 
+        nil::crypto3::algebra::curves::forms::short_weierstrass>;
 
     using affine_policy_type = curves::bls12<381>::g1_type<nil::crypto3::algebra::curves::coordinates::affine,
                                                            nil::crypto3::algebra::curves::forms::short_weierstrass>;
