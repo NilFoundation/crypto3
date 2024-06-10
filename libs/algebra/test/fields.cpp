@@ -69,6 +69,8 @@
 #include <nil/crypto3/algebra/curves/bls12.hpp>
 #include <nil/crypto3/algebra/curves/pallas.hpp>
 #include <nil/crypto3/algebra/curves/vesta.hpp>
+#include <nil/crypto3/algebra/curves/secp_k1.hpp>
+#include <nil/crypto3/algebra/curves/secp_r1.hpp>
 
 using namespace nil::crypto3::algebra;
 
@@ -571,6 +573,77 @@ BOOST_DATA_TEST_CASE(field_not_square_test_goldilocks64_base_field, string_data(
     using policy_type = typename fields::goldilocks64_base_field;
 
     field_not_square_test<policy_type>(data_set);
+}
+
+BOOST_AUTO_TEST_CASE(field_not_square_test_secp_k1) {
+
+    for(auto const& data_set: string_data("field_not_square_test_secp_k1_160_base_field") ) {
+        field_not_square_test<typename curves::secp_k1<160>::base_field_type>( data_set );
+    }
+    for(auto const& data_set: string_data("field_not_square_test_secp_k1_192_base_field") ) {
+        field_not_square_test<typename curves::secp_k1<192>::base_field_type>( data_set );
+    }
+    for(auto const& data_set: string_data("field_not_square_test_secp_k1_224_base_field") ) {
+        field_not_square_test<typename curves::secp_k1<224>::base_field_type>( data_set );
+    }
+    for(auto const& data_set: string_data("field_not_square_test_secp_k1_256_base_field") ) {
+        field_not_square_test<typename curves::secp_k1<256>::base_field_type>( data_set );
+    }
+
+    for(auto const& data_set: string_data("field_not_square_test_secp_k1_160_scalar_field") ) {
+        field_not_square_test<typename curves::secp_k1<160>::scalar_field_type>( data_set );
+    }
+    for(auto const& data_set: string_data("field_not_square_test_secp_k1_192_scalar_field") ) {
+        field_not_square_test<typename curves::secp_k1<192>::scalar_field_type>( data_set );
+    }
+    for(auto const& data_set: string_data("field_not_square_test_secp_k1_224_scalar_field") ) {
+        field_not_square_test<typename curves::secp_k1<224>::scalar_field_type>( data_set );
+    }
+    for(auto const& data_set: string_data("field_not_square_test_secp_k1_256_scalar_field") ) {
+        field_not_square_test<typename curves::secp_k1<256>::scalar_field_type>( data_set );
+    }
+}
+
+BOOST_AUTO_TEST_CASE(field_not_square_test_secp_r1) {
+
+    for(auto const& data_set: string_data("field_not_square_test_secp_r1_160_base_field") ) {
+        field_not_square_test<typename curves::secp_r1<160>::base_field_type>( data_set );
+    }
+    for(auto const& data_set: string_data("field_not_square_test_secp_r1_192_base_field") ) {
+        field_not_square_test<typename curves::secp_r1<192>::base_field_type>( data_set );
+    }
+    for(auto const& data_set: string_data("field_not_square_test_secp_r1_224_base_field") ) {
+        field_not_square_test<typename curves::secp_r1<224>::base_field_type>( data_set );
+    }
+    for(auto const& data_set: string_data("field_not_square_test_secp_r1_256_base_field") ) {
+        field_not_square_test<typename curves::secp_r1<256>::base_field_type>( data_set );
+    }
+    for(auto const& data_set: string_data("field_not_square_test_secp_r1_384_base_field") ) {
+        field_not_square_test<typename curves::secp_r1<384>::base_field_type>( data_set );
+    }
+    for(auto const& data_set: string_data("field_not_square_test_secp_r1_521_base_field") ) {
+        field_not_square_test<typename curves::secp_r1<521>::base_field_type>( data_set );
+    }
+
+    for(auto const& data_set: string_data("field_not_square_test_secp_r1_160_scalar_field") ) {
+        field_not_square_test<typename curves::secp_r1<160>::scalar_field_type>( data_set );
+    }
+    for(auto const& data_set: string_data("field_not_square_test_secp_r1_192_scalar_field") ) {
+        field_not_square_test<typename curves::secp_r1<192>::scalar_field_type>( data_set );
+    }
+    for(auto const& data_set: string_data("field_not_square_test_secp_r1_224_scalar_field") ) {
+        field_not_square_test<typename curves::secp_r1<224>::scalar_field_type>( data_set );
+    }
+    for(auto const& data_set: string_data("field_not_square_test_secp_r1_256_scalar_field") ) {
+        field_not_square_test<typename curves::secp_r1<256>::scalar_field_type>( data_set );
+    }
+    for(auto const& data_set: string_data("field_not_square_test_secp_r1_384_scalar_field") ) {
+        field_not_square_test<typename curves::secp_r1<384>::scalar_field_type>( data_set );
+    }
+    for(auto const& data_set: string_data("field_not_square_test_secp_r1_521_scalar_field") ) {
+        field_not_square_test<typename curves::secp_r1<521>::scalar_field_type>( data_set );
+    }
+
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -56,7 +56,10 @@ namespace nil {
 
                     constexpr static const std::size_t number_bits = policy_type::number_bits;
 
-                    constexpr static const integral_type modulus = 0xfffffffffffffffffffffffffffffffeffffac73_cppui_modular160;
+                    constexpr static const integral_type modulus =
+                        0xfffffffffffffffffffffffffffffffeffffac73_cppui_modular160;
+
+                    constexpr static const integral_type group_order_minus_one_half = (modulus - 1) / 2;
 
                     typedef typename policy_type::modular_backend modular_backend;
                     constexpr static const modular_params_type modulus_params = modulus.backend();
@@ -86,6 +89,8 @@ namespace nil {
                     constexpr static const integral_type modulus =
                         0xfffffffffffffffffffffffffffffffffffffffeffffee37_cppui_modular192;
 
+                    constexpr static const integral_type group_order_minus_one_half = (modulus - 1) / 2;
+
                     typedef typename policy_type::modular_backend modular_backend;
                     constexpr static const modular_params_type modulus_params = modulus.backend();
                     typedef boost::multiprecision::number<
@@ -113,6 +118,8 @@ namespace nil {
 
                     constexpr static const integral_type modulus =
                         0xfffffffffffffffffffffffffffffffffffffffffffffffeffffe56d_cppui_modular224;
+
+                    constexpr static const integral_type group_order_minus_one_half = (modulus - 1) / 2;
 
                     typedef typename policy_type::modular_backend modular_backend;
                     constexpr static const modular_params_type modulus_params = modulus.backend();
@@ -142,6 +149,8 @@ namespace nil {
                     constexpr static const integral_type modulus =
                         0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2f_cppui_modular256;
 
+                    constexpr static const integral_type group_order_minus_one_half = (modulus - 1) / 2;
+
                     typedef typename policy_type::modular_backend modular_backend;
                     constexpr static const modular_params_type modulus_params = modulus.backend();
                     typedef boost::multiprecision::number<
@@ -165,24 +174,28 @@ namespace nil {
                 constexpr typename std::size_t const secp_k1_fq<160>::number_bits;
                 constexpr typename std::size_t const secp_k1_fq<160>::value_bits;
                 constexpr typename secp_k1_fq<160>::integral_type const secp_k1_fq<160>::modulus;
+                constexpr typename secp_k1_fq<160>::integral_type const secp_k1_fq<160>::group_order_minus_one_half;
                 constexpr typename secp_k1_fq<160>::modular_params_type const secp_k1_fq<160>::modulus_params;
 
                 constexpr typename std::size_t const secp_k1_fq<192>::modulus_bits;
                 constexpr typename std::size_t const secp_k1_fq<192>::number_bits;
                 constexpr typename std::size_t const secp_k1_fq<192>::value_bits;
                 constexpr typename secp_k1_fq<192>::integral_type const secp_k1_fq<192>::modulus;
+                constexpr typename secp_k1_fq<192>::integral_type const secp_k1_fq<192>::group_order_minus_one_half;
                 constexpr typename secp_k1_fq<192>::modular_params_type const secp_k1_fq<192>::modulus_params;
 
                 constexpr typename std::size_t const secp_k1_fq<224>::modulus_bits;
                 constexpr typename std::size_t const secp_k1_fq<224>::number_bits;
                 constexpr typename std::size_t const secp_k1_fq<224>::value_bits;
                 constexpr typename secp_k1_fq<224>::integral_type const secp_k1_fq<224>::modulus;
+                constexpr typename secp_k1_fq<224>::integral_type const secp_k1_fq<224>::group_order_minus_one_half;
                 constexpr typename secp_k1_fq<224>::modular_params_type const secp_k1_fq<224>::modulus_params;
 
                 constexpr typename std::size_t const secp_k1_fq<256>::modulus_bits;
                 constexpr typename std::size_t const secp_k1_fq<256>::number_bits;
                 constexpr typename std::size_t const secp_k1_fq<256>::value_bits;
                 constexpr typename secp_k1_fq<256>::integral_type const secp_k1_fq<256>::modulus;
+                constexpr typename secp_k1_fq<256>::integral_type const secp_k1_fq<256>::group_order_minus_one_half;
                 constexpr typename secp_k1_fq<256>::modular_params_type const secp_k1_fq<256>::modulus_params;
             }    // namespace fields
         }        // namespace algebra
