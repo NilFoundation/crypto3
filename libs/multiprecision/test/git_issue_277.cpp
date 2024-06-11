@@ -36,5 +36,3 @@ int main()
    test<boost::multiprecision::checked_int1024_t>();
    return boost::report_errors();
 }
-
-

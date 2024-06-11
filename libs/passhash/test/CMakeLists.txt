@@ -27,7 +27,7 @@ macro(define_passhash_test name)
                                ${Boost_INCLUDE_DIRS})
 
     set_target_properties(passhash_${name}_test PROPERTIES CXX_STANDARD 14)
-    
+
 endmacro()
 
 set(TESTS_NAMES

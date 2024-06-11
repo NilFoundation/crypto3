@@ -62,7 +62,7 @@ that this class may not be available on all platforms.]
 
 Effects: Constructs a random_device, optionally using the given token as an
 access specification (for example, a URL) to some implementation-defined
-service for monitoring a stochastic process. 
+service for monitoring a stochastic process.
 
   double entropy() const
 
@@ -70,7 +70,7 @@ Returns: An entropy estimate for the random numbers returned by `operator()`,
 in the range `min()` to `log2(max()+1)`. A deterministic random number
 generator (e.g. a pseudo-random number engine) has entropy 0.
 
-Throws: Nothing. 
+Throws: Nothing.
 
 [endsect]
 

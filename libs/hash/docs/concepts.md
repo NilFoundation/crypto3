@@ -34,6 +34,3 @@ The following static data member definitions must be valid and have their specif
 |```X::block_bits``` |```std::size_t```|```Integral``` bits amount in ```BlockType```|
 |```X::digest_bits```|```std::size_t```|```Integral``` bits amount in ```DigestType```|
 |```X::block_words```|```std::size_t```|```Integral``` amount of ```WordType``` values in ```BlockType```|
-
-
-  

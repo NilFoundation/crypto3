@@ -29,14 +29,14 @@ rankdir="TB"
 
 node [shape="box"]
 
-a [label="Algorithm" color="#f5f2f1" fontcolor="#f5f2f1" fontname="helvetica"]; 
-b [label="Accumulator" color="#f5f2f1" fontcolor="#f5f2f1" fontname="helvetica"]; 
-c [label="Processing Mode" color="#f5f2f1" fontcolor="#f5f2f1" fontname="helvetica"]; 
+a [label="Algorithm" color="#f5f2f1" fontcolor="#f5f2f1" fontname="helvetica"];
+b [label="Accumulator" color="#f5f2f1" fontcolor="#f5f2f1" fontname="helvetica"];
+c [label="Processing Mode" color="#f5f2f1" fontcolor="#f5f2f1" fontname="helvetica"];
 d [label="Scheme Policies" color="#f5f2f1" fontcolor="#f5f2f1" fontname="helvetica"];
 
 a -> b; b -> c; c -> d;
 
-} 
+}
 @enddot
 
 Detailed descriptions of each step and architecture parts are presented below.
@@ -154,7 +154,7 @@ It accepts range of polynomial coefficients and other parameters like threshold 
 
 The algorithm verifies share according to the specification of chosen secret sharing scheme `Scheme`. Example of secret sharing scheme supporting verification of dealt share is Feldman scheme.
 
-It accepts range of public representatives of polynomial coefficients which were used to deal shares and verified share of the type `share_sss<Scheme>`. Public representatives are assumed to be of the type `Scheme::public_coeff_type`. 
+It accepts range of public representatives of polynomial coefficients which were used to deal shares and verified share of the type `share_sss<Scheme>`. Public representatives are assumed to be of the type `Scheme::public_coeff_type`.
 
 #### reconstruct_secret.hpp
 
@@ -172,7 +172,7 @@ It accepts range of public representatives of participant shares of the type `pu
 
 The algorithm deals share according to the specification of chosen distributed key generation (DKG) scheme `Scheme`. Example of such scheme is Pedersen distributed key generation protocol.
 
-It accepts range of shares of the type `share_sss<Scheme>` dealt by other participant for current part and return its share of the same type. Except that range it accepts number of participants participating in the protocol execution. 
+It accepts range of shares of the type `share_sss<Scheme>` dealt by other participant for current part and return its share of the same type. Except that range it accepts number of participants participating in the protocol execution.
 
 ## Pubkey Policies {#pubkey_policies}
 
@@ -225,8 +225,7 @@ Pubkey library defines following types of accumulators:
 Each of the mentioned accumulators contain private field named internal accumulator. That type of accumulator is dedicated to accumulate input data of the executing algorithm and then during extraction it performs all needed preparation of input data like hashing, padding or encoding. Thus, pubkey accumulators play the role of wrapper of internal accumulator, performing more complex logic on the input data. Then during extraction of pubkey accumulator it extracts its internal accumulator and passes extracted data to the finalization function defined in the chosen operation policy or in the key object (`private_key` or `public_key`).
 
 Internal accumulators used in pubkey module could be classified into two classes:
-* pkpad accumulators - in that case accumulators defined in the pkpad module are used as internal accumulators. This module is dedicated to preprocessing data before execution of any asymmetric crypto-scheme algorithm. Example of such preprocessing procedure is hasing of input data before its signing by any asymmetric signature crypto-scheme according to the protocol [EMSA1](https://standards.ieee.org/standard/1363-2000.html). 
+* pkpad accumulators - in that case accumulators defined in the pkpad module are used as internal accumulators. This module is dedicated to preprocessing data before execution of any asymmetric crypto-scheme algorithm. Example of such preprocessing procedure is hasing of input data before its signing by any asymmetric signature crypto-scheme according to the protocol [EMSA1](https://standards.ieee.org/standard/1363-2000.html).
 * crypto-scheme ad-hoc accumulators - in that case some internal type of the chosen asymmetric crypto-scheme policy is used. Every time new portion of input data is passed to the accumulator it is transmitted to the crypto-scheme policy function defined by the particular [concept](@ref pubkey_concept) where it is processed and accumulated. For example, in such manner accumulators of secret sharing schemes works. Such accumulators type exists due to not all pubkey algorithms process simple data of built-in types, like range of integrals. For example, shares dealing algorithm accepts polynomial coefficients which are of the algebraic field element type from algebra module, so additional logic to process such input data should be defined.
 
 Accumulators caching ability depends on the used internal accumulator type and on the executing algorithm. For example, in the case of signature creation algorithm with hashing of input message, lower in the call stack hashing accumulator will be used. Such type of accumulators supports caching of input data, which means there is an input cache sized as same as particular `Hash::block_type`, which accumulates unprocessed data. Another example is secret reconstruction accumulator which should be fully filled with the input shares before execution of reconstruction process as all the indexes of the input shares should be known to the moment of secret reconstruction.
-

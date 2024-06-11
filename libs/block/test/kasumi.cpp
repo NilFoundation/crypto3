@@ -48,7 +48,7 @@ BOOST_AUTO_TEST_CASE(kasumi_1) {
     std::vector<char> key = {'\x2b', '\xd6', '\x45', '\x9f', '\x82', '\xc5', '\xb3', '\x00', '\x95', '\x2c', '\x49', '\x10', '\x48', '\x81', '\xff', '\x48'};
 
     std::string out = encrypt<block::kasumi>(input, key);
-    
+
     BOOST_CHECK_EQUAL(out, "df1f9b251c0bf45f");
 }
 

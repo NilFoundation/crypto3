@@ -4,7 +4,7 @@ Stream ciphers for =nil; Foundation's cryptography suite
 
 ## Building
 
-This library uses Boost CMake build modules (https://github.com/BoostCMake/cmake_modules.git). 
+This library uses Boost CMake build modules (https://github.com/BoostCMake/cmake_modules.git).
 To actually include this library in a project it is required to:
 
 1. Add [CMake Modules](https://github.com/BoostCMake/cmake_modules.git) as submodule to target project repository.

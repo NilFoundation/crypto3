@@ -183,4 +183,3 @@ cpp_bin_float_50 f3(cpp_bin_float_50(1.234)) = 1.2339999999999999857891452847979
 //] //[/big_seventh_example_output]
 
 */
-

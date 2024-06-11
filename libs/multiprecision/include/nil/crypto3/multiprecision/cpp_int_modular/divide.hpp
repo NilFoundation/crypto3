@@ -16,7 +16,7 @@ namespace boost {
             // Functions in this file should be called only for creation of montgomery and Barett params, no during "normal" execution, so we do NOT care about the execution speed, and will just redirect calls to normal boost::cpp_int.
 
             template<unsigned Bits1, unsigned Bits2, unsigned Bits3>
-            inline BOOST_MP_CXX14_CONSTEXPR void 
+            inline BOOST_MP_CXX14_CONSTEXPR void
             eval_modulus(cpp_int_modular_backend<Bits1> &result,
                          const cpp_int_modular_backend<Bits2> &a,
                          const cpp_int_modular_backend<Bits3> &b) noexcept {
@@ -28,11 +28,11 @@ namespace boost {
             // Just a call to the upper function, similar to operator*=.
             // Caller is responsible for the result to fit in Bits1 bits, we will NOT throw!
             template<unsigned Bits1, unsigned Bits2>
-            inline BOOST_MP_CXX14_CONSTEXPR void 
+            inline BOOST_MP_CXX14_CONSTEXPR void
             eval_modulus(cpp_int_modular_backend<Bits1> &result,
                          const cpp_int_modular_backend<Bits2> &a) noexcept {
                 boost::multiprecision::backends::cpp_int_backend<Bits1, Bits1, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked> result_cpp_int = result.to_cpp_int();
-                boost::multiprecision::backends::eval_modulus(result_cpp_int, a.to_cpp_int()); 
+                boost::multiprecision::backends::eval_modulus(result_cpp_int, a.to_cpp_int());
                 result.from_cpp_int(result_cpp_int);
             }
 
@@ -41,7 +41,7 @@ namespace boost {
             // element, not during "normal" execution. We will use conversion to normal boost::cpp_int here and then
             // convert back.
             template<unsigned Bits1, unsigned Bits2, unsigned Bits3>
-            inline BOOST_MP_CXX14_CONSTEXPR void 
+            inline BOOST_MP_CXX14_CONSTEXPR void
             eval_divide(cpp_int_modular_backend<Bits1> &result,
                           const cpp_int_modular_backend<Bits2> &a,
                           const cpp_int_modular_backend<Bits3> &b) noexcept {
@@ -54,11 +54,11 @@ namespace boost {
             // Covers the case where the second operand is not trivial.
             template<unsigned Bits1, unsigned Bits2>
             inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
-                !boost::multiprecision::backends::is_trivial_cpp_int_modular<cpp_int_modular_backend<Bits2>>::value>::type 
+                !boost::multiprecision::backends::is_trivial_cpp_int_modular<cpp_int_modular_backend<Bits2>>::value>::type
             eval_divide(cpp_int_modular_backend<Bits1> &result,
                          const cpp_int_modular_backend<Bits2> &a) noexcept {
                 boost::multiprecision::backends::cpp_int_backend<Bits1, Bits1, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked> result_cpp_int = result.to_cpp_int();
-                boost::multiprecision::backends::eval_divide(result_cpp_int, a.to_cpp_int()); 
+                boost::multiprecision::backends::eval_divide(result_cpp_int, a.to_cpp_int());
                 result.from_cpp_int(result_cpp_int);
             }
 
@@ -68,14 +68,14 @@ namespace boost {
             template<unsigned Bits1, unsigned Bits2>
             inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
                 !boost::multiprecision::backends::is_trivial_cpp_int_modular<cpp_int_modular_backend<Bits1>>::value &&
-                boost::multiprecision::backends::is_trivial_cpp_int_modular<cpp_int_modular_backend<Bits2>>::value>::type 
+                boost::multiprecision::backends::is_trivial_cpp_int_modular<cpp_int_modular_backend<Bits2>>::value>::type
             eval_divide(cpp_int_modular_backend<Bits1> &result,
                          const cpp_int_modular_backend<Bits2> &a) noexcept {
                 using cpp_int_type = boost::multiprecision::backends::cpp_int_backend<Bits1, Bits1, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked>;
                 cpp_int_type result_cpp_int = result.to_cpp_int();
                 // Here we need cpp_int_type::limb_type to compile, otherwise it's ambiguous which function to call, boost has functions
                 // for signed and unsigned.
-                boost::multiprecision::backends::eval_divide(result_cpp_int, boost::multiprecision::limb_type(*a.limbs())); 
+                boost::multiprecision::backends::eval_divide(result_cpp_int, boost::multiprecision::limb_type(*a.limbs()));
                 result.from_cpp_int(result_cpp_int);
             }
 

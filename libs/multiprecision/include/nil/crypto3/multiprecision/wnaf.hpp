@@ -11,7 +11,7 @@
 
 #include <boost/multiprecision/number.hpp>
 
-namespace boost {   
+namespace boost {
     namespace multiprecision {
 
        template<typename Backend>

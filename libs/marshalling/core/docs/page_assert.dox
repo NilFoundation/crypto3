@@ -26,7 +26,7 @@
 /// int main(int argc, const char* argv[])
 /// {
 ///     nil::marshalling::enable_assert<MyAssert> enabledAssert;
-///     // From this point custom assertion failure bahaviour takes place.   
+///     // From this point custom assertion failure bahaviour takes place.
 ///     ...
 /// }
 /// @endcode
@@ -35,12 +35,12 @@
 /// int main(int argc, const char* argv[])
 /// {
 ///     nil::marshalling::enable_assert<MyAssert> assert1;
-///     // From this point custom assertion failure bahaviour takes place.   
+///     // From this point custom assertion failure bahaviour takes place.
 ///     ...
-///     { 
+///     {
 ///          nil::marshalling::enable_assert<SomeOtherMyAssert> assert2;
-///         // From this point different custom assertion failure bahaviour 
-///         // defined in SomeOtherMyAssert class takes place.    
+///         // From this point different custom assertion failure bahaviour
+///         // defined in SomeOtherMyAssert class takes place.
 ///         ...
 ///     } // assert2 is out of scope, the custom assertion failure behavior
 ///       // registered with assert1 is restored.

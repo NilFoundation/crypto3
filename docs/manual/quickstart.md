@@ -3,8 +3,8 @@
 Quickstart
 ========================
 
-By the end of this guide ,you will have set up a development environment for crypto3 projects 
-and be able to run an example.This will enable you to test ideas quickly and further explore the 
+By the end of this guide ,you will have set up a development environment for crypto3 projects
+and be able to run an example.This will enable you to test ideas quickly and further explore the
 API's of the suite.
 
 ## Install dependencies
@@ -32,14 +32,14 @@ cd crypto3-scaffold
 
 ## Project structure
 
-The project is an example of generic usage of the suite,adding the whole crypto3 suite as a submodule 
+The project is an example of generic usage of the suite,adding the whole crypto3 suite as a submodule
 dependency.
 
 ```
 root
 ├── libs : submodule including the mono-repository for crypto3 suite
-├── src  
-│   ├── bls 
+├── src
+│   ├── bls
 │   │  │──── src: source for bls signing example.
 
 ```
@@ -53,13 +53,13 @@ git submodule update --init --recursive
 
 - **Build** : The project is built using cmake system.
 
-``` 
+```
 mkdir build && cd build
 cmake .. && make
 ```
 
 - Run executable
-``` 
+```
 ./src/bls/crypto3-scaffold
 ```
 
@@ -76,7 +76,7 @@ If you have more than one compiler installed i.e g++ & clang++. The make system 
 clang++ by finding the path and passing it in the variable below.
 
 ```
-`which clang++`  
+`which clang++`
 cmake .. -DCMAKE_CXX_COMPILER=<path to clang++ from above>
 ```
 

@@ -32,15 +32,15 @@ namespace nil {
         namespace pubkey {
 
           /*!
-           * @brief 
-           * 
+           * @brief
+           *
            * @ingroup pubkey_algorithms
-           * 
-           * Key agreement refers to one form of key exchange  in which two or more users 
-           * execute a protocol to securely share a resultant key value. As an alternative 
-           * to key agreement, a key transport protocol may be used. The distinguishing 
-           * feature of a key agreement protocol is that participating users each contribute 
-           * an equal portion toward the computation of the resultant shared key value 
+           *
+           * Key agreement refers to one form of key exchange  in which two or more users
+           * execute a protocol to securely share a resultant key value. As an alternative
+           * to key agreement, a key transport protocol may be used. The distinguishing
+           * feature of a key agreement protocol is that participating users each contribute
+           * an equal portion toward the computation of the resultant shared key value
            * (as opposed to one user computing and distributing a key value to other users).
            *
            */

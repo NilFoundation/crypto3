@@ -13,7 +13,7 @@
 #include <nil/crypto3/zk/snark/systems/plonk/pickles/detail/mapping.hpp>
 
 using namespace nil::crypto3;
-                
+
 BOOST_AUTO_TEST_SUITE(pickles_kimchi_to_group_test_suite)
 
 BOOST_AUTO_TEST_CASE(pickles_kimchi_to_field_test_case_1){

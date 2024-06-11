@@ -32,12 +32,12 @@ namespace nil {
             namespace detail {
                 template<typename ResultT, std::size_t ChunkBits = 3>
                 struct lookup;
-                
+
                 template<typename ResultT>
                 struct lookup<ResultT, 3> {
                     typedef ResultT result_type;
                     static constexpr std::size_t chunk_bits = 3;
-                    
+
                     template<typename BitRange>
                     static inline result_type process(const BitRange &bits) {
                         int result = (1 - 2 * bits[2]) * (1 + bits[0] + 2 * bits[1]);

@@ -155,7 +155,7 @@ BOOST_CXX14_CONSTEXPR T do_test_constexpr_bitwise(T a, U b)
    a = a >> 2;
 
    return a;
-} 
+}
 
 template <class T>
 BOOST_CXX14_CONSTEXPR T test_constexpr_bitwise(T a)
@@ -197,7 +197,7 @@ BOOST_CXX14_CONSTEXPR T do_test_constexpr_logical(T a, U b)
    if(!a)
       ++result;
    return result;
-} 
+}
 
 template <class T>
 BOOST_CXX14_CONSTEXPR T test_constexpr_logical(T a)
@@ -258,7 +258,7 @@ BOOST_CXX14_CONSTEXPR T do_test_constexpr_compare(T a, U b)
       ++result;
 
    return result;
-} 
+}
 
 template <class T>
 BOOST_CXX14_CONSTEXPR T test_constexpr_compare(T a)

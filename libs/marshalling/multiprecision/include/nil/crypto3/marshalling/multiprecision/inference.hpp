@@ -46,7 +46,7 @@ namespace nil {
             using default_endianness = option::big_endian;
         public:
             template <typename TEndian = default_endianness, typename... TOptions>
-            using type = typename nil::crypto3::marshalling::types::integral<field_type<TEndian>, 
+            using type = typename nil::crypto3::marshalling::types::integral<field_type<TEndian>,
                 boost::multiprecision::number<Backend, ExpressionTemplates>, TOptions...>;
             static const bool value = true;
             static const bool fixed_size = true;

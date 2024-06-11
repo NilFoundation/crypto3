@@ -36,7 +36,7 @@ namespace nil {
         namespace algebra {
             namespace curves {
                 namespace detail {
-                 
+
 
                     /**
                      * @brief https://zips.z.cash/protocol/protocol.pdf#pallasandvesta

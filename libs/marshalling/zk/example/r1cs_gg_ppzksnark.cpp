@@ -52,10 +52,10 @@ using namespace nil::crypto3::zk;
 
 template<typename FieldType>
 components::blueprint<FieldType> test_disjunction_component(size_t w) {
-    
+
     using field_type = FieldType;
 
-    std::size_t n = std::log2(w) + 
+    std::size_t n = std::log2(w) +
         ((w > (1ul << std::size_t(std::log2(w))))? 1 : 0);
 
     components::blueprint<field_type> bp;
@@ -136,13 +136,13 @@ int main(int argc, char *argv[]) {
 
     const typename scheme_type::proof_type proof =
         zk::snark::prove<scheme_type>(keypair.first, bp.primary_input(), bp.auxiliary_input());
-    
+
     using verification_key_marshalling_type = types::r1cs_gg_ppzksnark_verification_key<
         nil::marshalling::field_type<
             Endianness>,
         typename scheme_type::verification_key_type>;
 
-    verification_key_marshalling_type filled_verification_key_val = 
+    verification_key_marshalling_type filled_verification_key_val =
         types::fill_r1cs_gg_ppzksnark_verification_key<
             typename scheme_type::verification_key_type,
             Endianness>(keypair.second);
@@ -152,7 +152,7 @@ int main(int argc, char *argv[]) {
             Endianness>,
         typename scheme_type::proof_type>;
 
-    proof_marshalling_type filled_proof_val = 
+    proof_marshalling_type filled_proof_val =
         types::fill_r1cs_gg_ppzksnark_proof<
             typename scheme_type::proof_type,
             Endianness>(proof);
@@ -162,7 +162,7 @@ int main(int argc, char *argv[]) {
             Endianness>,
         typename scheme_type::primary_input_type>;
 
-    primary_input_marshalling_type filled_primary_input_val = 
+    primary_input_marshalling_type filled_primary_input_val =
         types::fill_r1cs_gg_ppzksnark_primary_input<
             typename scheme_type::primary_input_type,
             Endianness>(bp.primary_input());
@@ -175,15 +175,15 @@ int main(int argc, char *argv[]) {
     verification_key_byteblob.resize(filled_verification_key_val.length(), 0x00);
     auto write_iter = verification_key_byteblob.begin();
 
-    typename nil::marshalling::status_type status =  
-        filled_verification_key_val.write(write_iter, 
+    typename nil::marshalling::status_type status =
+        filled_verification_key_val.write(write_iter,
             verification_key_byteblob.size());
 
     std::vector<unit_type> proof_byteblob;
     proof_byteblob.resize(filled_proof_val.length(), 0x00);
     write_iter = proof_byteblob.begin();
 
-    status = filled_proof_val.write(write_iter, 
+    status = filled_proof_val.write(write_iter,
             proof_byteblob.size());
 
     std::vector<unit_type> primary_input_byteblob;
@@ -191,7 +191,7 @@ int main(int argc, char *argv[]) {
     primary_input_byteblob.resize(filled_primary_input_val.length(), 0x00);
     auto primary_input_write_iter = primary_input_byteblob.begin();
 
-    status = filled_primary_input_val.write(primary_input_write_iter, 
+    status = filled_primary_input_val.write(primary_input_write_iter,
             primary_input_byteblob.size());
 
     std::cout << "Byteblobs filled." << std::endl;

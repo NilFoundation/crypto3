@@ -5,7 +5,7 @@
 /// protocol to be an easy and relatively quick process. It provides all the necessary
 /// types and classes to make the definition of the custom messages, as well as
 /// wrapping transport data fields, to be simple declarative statements of type and
-/// class definitions. These statements will specify @b WHAT needs to be implemented. 
+/// class definitions. These statements will specify @b WHAT needs to be implemented.
 /// The @b Marshalling library internals handle the **HOW** part.
 ///
 /// The internals of the @b Marshalling library is mostly template classes which use
@@ -16,14 +16,14 @@
 ///
 /// The @b Marshalling library allows having <b>single implementation</b> of the binary
 /// protocol messages, which can be re-compiled and used for any possible application:
-/// bare-metal with constrained resources, Linux based embedded systems, even 
+/// bare-metal with constrained resources, Linux based embedded systems, even
 /// independent GUI analysis tools.
 ///
 /// The @b Marshalling library was specifically developed to be used in **embedded** systems
 /// including @b bare-metal ones. It doesn't use exceptions and/or RTTI. It also
 /// minimises usage of dynamic memory allocation and provides an ability to exclude
 /// it altogether if required, which may be needed when developing @b bare-metal
-/// embedded systems. 
+/// embedded systems.
 ///
 /// @ref page_use_prot is a tutorial on how to use already defined custom binary protocol.
 /// If you are about to develop one, it would be beneficial to read it as well

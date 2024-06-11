@@ -19,7 +19,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace boost {   
+namespace boost {
     namespace multiprecision {
         namespace backends {
 
@@ -238,9 +238,9 @@ namespace boost {
                     Backend_padded_limbs compliment = static_cast<limb_type>(1u), modulus = m_mod;
                     eval_left_shift(compliment, Bits);
                     eval_subtract(compliment, modulus);
-                    m_mod_compliment = compliment; 
+                    m_mod_compliment = compliment;
                 }
- 
+
                 BOOST_MP_CXX14_CONSTEXPR void initialize(const Backend &m) {
                     initialize_modulus(m);
                     initialize_barrett_params();
@@ -319,7 +319,7 @@ namespace boost {
                 //
                 template<typename Backend1, typename Backend2,
                          typename boost::enable_if_c<
-                             boost::multiprecision::backends::max_precision<Backend2>::value < boost::multiprecision::backends::max_precision<Backend>::value, bool>::type = true> 
+                             boost::multiprecision::backends::max_precision<Backend2>::value < boost::multiprecision::backends::max_precision<Backend>::value, bool>::type = true>
                 BOOST_MP_CXX14_CONSTEXPR void barrett_reduce(Backend1 &result, const Backend2 &input) const {
                     Backend input_adjusted(input);
                     barrett_reduce(result, input_adjusted);
@@ -396,7 +396,7 @@ namespace boost {
 
                     eval_add(result, y);
                     // If we overflow and set the carry, we need to subtract the modulus, which is the same as adding
-                    // 2 ^ Bits - Modulus to the remaining part of the number. After this we know for sure that the 
+                    // 2 ^ Bits - Modulus to the remaining part of the number. After this we know for sure that the
                     // result < Modulus, do not waste time on checking again.
                     if (result.has_carry()) {
                         eval_add(result, m_mod_compliment);
@@ -683,7 +683,7 @@ namespace boost {
                 BOOST_MP_CXX14_CONSTEXPR modular_functions_fixed &operator=(const modular_functions_fixed &o) {
                     m_mod = o.get_mod();
                     m_barrett_mu = o.get_mu();
-                    m_montgomery_r2 = o.get_r2(); 
+                    m_montgomery_r2 = o.get_r2();
                     m_montgomery_p_dash = o.get_p_dash();
                     m_mod_compliment = o.get_mod_compliment();
 

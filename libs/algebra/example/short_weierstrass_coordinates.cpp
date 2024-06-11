@@ -41,9 +41,9 @@ void coordinates_examples() {
     e2(0x609eaeb55609889d764de70df4536a52a6773ce14244d2109afb1f6140d64ed2_cppui_modular256), e3(1),
     e4(0x72213568b6cec6bad10c649c22d9388857085132ea254320c7d3c12727f55d97_cppui_modular256),
     e5(0xff9d5ca60a4f5ae00b2abdb6dddb3f4fc5c853ed56a33a85ccaa7d3093084579_cppui_modular256), e6(1);
-  
 
-	
+
+
     group_value_type c1(e1, e2, e3), c2(e4, e5, e6);//, c3(e7,e8,e9),c4(e10,e11,e12);
 
     std::cout << "Curve element values: " << std::endl;

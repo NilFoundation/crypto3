@@ -1976,7 +1976,7 @@ void test_mixed(const std::integral_constant<bool, true>&)
    r = static_cast<cast_type>(Num(4) * n4) / Real(4);
    BOOST_CHECK_EQUAL(r, static_cast<cast_type>(n4));
 
-   typedef std::integral_constant<bool, 
+   typedef std::integral_constant<bool,
        (!std::numeric_limits<Num>::is_specialized || std::numeric_limits<Num>::is_signed) && (!std::numeric_limits<Real>::is_specialized || std::numeric_limits<Real>::is_signed)>
        signed_tag;
 

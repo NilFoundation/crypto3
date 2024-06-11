@@ -48,4 +48,3 @@ using namespace nil::crypto3::algebra::curves;
 
     return sha2_result2;
 }
-

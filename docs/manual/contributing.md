@@ -21,7 +21,7 @@ repository, so the development team could review the contents and create a neces
 issues set in modules related.
 
 ### Creating a discussion
-Discussions should be created on GitHub for any proposed changes or suggestions to the library 
+Discussions should be created on GitHub for any proposed changes or suggestions to the library
 
 
 ### Pull Requests

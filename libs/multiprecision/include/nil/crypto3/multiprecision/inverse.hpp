@@ -19,7 +19,7 @@
 #include <nil/crypto3/multiprecision/modular/modular_adaptor_fixed.hpp>
 #include <nil/crypto3/multiprecision/modular/inverse.hpp>
 
-namespace boost {   
+namespace boost {
     namespace multiprecision {
 
        template<typename Backend, boost::multiprecision::expression_template_option ExpressionTemplates>

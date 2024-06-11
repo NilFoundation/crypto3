@@ -250,7 +250,7 @@ namespace nil {
 #ifdef STANDARD_EC_INF_POINTS_ENABLED
                         constexpr static const std::array<typename field_type::value_type, 2> zero_fill = {
                             field_type::value_type::zero(), field_type::value_type::one()};
-#else                       
+#else
                         constexpr static const std::array<typename field_type::value_type, 2> zero_fill = {
                             field_type::value_type::zero(), field_type::value_type::zero()};
 #endif

@@ -30,8 +30,8 @@ namespace nil {
     namespace crypto3 {
         namespace pubkey {
           /*!
-           * @brief 
-           * 
+           * @brief
+           *
            * @ingroup pubkey_algorithms
            *
            */

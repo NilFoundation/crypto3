@@ -1,5 +1,5 @@
 # =nil; Foundation's Cryptography Suite
-[![Build docs](https://github.com/NilFoundation/crypto3/actions/workflows/build_docs.yaml/badge.svg)](https://github.com/NilFoundation/crypto3/actions/workflows/build_docs.yaml) 
+[![Build docs](https://github.com/NilFoundation/crypto3/actions/workflows/build_docs.yaml/badge.svg)](https://github.com/NilFoundation/crypto3/actions/workflows/build_docs.yaml)
 [![Discord](https://img.shields.io/discord/969303013749579846.svg?logo=discord&style=flat-square)](https://discord.gg/KmTAEjbmM3)
 [![Telegram](https://img.shields.io/badge/Telegram-2CA5E0?style=flat-square&logo=telegram&logoColor=dark)](https://t.me/nilfoundation)
 [![Twitter](https://img.shields.io/twitter/follow/nil_foundation)](https://twitter.com/nil_foundation)
@@ -17,7 +17,7 @@ and architectures(x86/ARM).
 Developed by [=nil; Crypto3](https://crypto3.nil.foundation) and supported by [=nil; Foundation](https://nil.foundation).
 
 Rationale, tutorials and references are available [here](https://crypto3.nil.foundation/projects/crypto3)
- 
+
 ## Contents
 1. [Repository Structure](#repository-structure)
 2. [Installation](#installation)
@@ -40,20 +40,20 @@ root
 │   ├── codec: encoding/decoding algorithms
 │   ├── containers: containers and generic commitment schemes for accumulating data, includes Merkle Tree
 │   ├── hash: hashing algorithms
-│   ├── kdf: key derivation functions 
+│   ├── kdf: key derivation functions
 │   ├── mac: message authentication codes
 │   ├── marshalling: marshalling libraries for types in crypto3 library
 │   ├── math: set of Fast Fourier Transforms evaluation algorithms and Polynomial Arithmetics
 │   ├── modes: cipher modes
-│   ├── multiprecision: integer, rational, floating-point, complex and interval number types. 
-│   ├── passhash: password hashing operations 
+│   ├── multiprecision: integer, rational, floating-point, complex and interval number types.
+│   ├── passhash: password hashing operations
 │   ├── pbkdf: password based key derivation functions
 │   ├── pkmodes: threshold, aggregation modes for public key schemes
 │   ├── pkpad: padding module for public key schemes
 │   ├── pubkey: pubkey signing APIs
-│   ├── random: randomisation primitives 
+│   ├── random: randomisation primitives
 │   ├── stream: stream ciphers
-│   ├── vdf: verifiable delay functions 
+│   ├── vdf: verifiable delay functions
 │   ├── zk: zk cryptography schemes
 ```
 
@@ -68,7 +68,7 @@ root
 ### Clone & Build
 
 ```
-git clone --recurse-submodules https://github.com/nilfoundation/crypto3.git 
+git clone --recurse-submodules https://github.com/nilfoundation/crypto3.git
 cd crypto3 && mkdir build && cd build
 cmake ..
 make tests
@@ -89,7 +89,7 @@ The suite is used as a header-only and is currently statically linked. Future ve
 Generic usage of cryptography suite consists of all modules available at
 [GitHub =nil; Crypto3 Team Repositories](https://github.com/orgs/NilFoundation/teams/nil-crypto3/repositories).
 This is an umbrella-repository where  Modules
-are added as submodules emplaced in `libs` directory. A developer can thus add this  
+are added as submodules emplaced in `libs` directory. A developer can thus add this
 project as a submodule and would not need to resolve dependencies. See [crypto3-scaffold](https://github.com/NilFoundation/crypto3-scaffold) as an example of usage.
 
 The generic module can be added to your c++ project as follows
@@ -133,4 +133,3 @@ This cryptography suite is authored by [=nil; Crypto3](https://crypto3.nil.found
 ## Licence
 
 The software is provided under [MIT](LICENSE) Licence.
-

@@ -31,7 +31,7 @@ def switch_output(base, pos, sz, top):
     AS-Waksman network.
 
     If `top' = True, return the top wire, otherwise return bottom
-    wire. """
+    wire."""
     relpos = pos - base
     assert relpos % 2 == 0 and relpos + 1 < sz
     if top:
@@ -90,7 +90,7 @@ def construct_as_waksman_topology(n):
         if left > right:
             return
 
-        sz = (hi - lo + 1)
+        sz = hi - lo + 1
         assert len(rhs_dests) == sz
 
         assert (right - left + 1) >= width(sz)
@@ -103,7 +103,9 @@ def construct_as_waksman_topology(n):
                 neighbors[left][i] = [i]
                 neighbors[right][i] = [rhs_dests[i - lo]]
             # Recurse to construct the corresponding subnetwork.
-            construct_as_waksman_topology_inner(left + 1, right - 1, lo, hi, range(lo, hi + 1))
+            construct_as_waksman_topology_inner(
+                left + 1, right - 1, lo, hi, range(lo, hi + 1)
+            )
         elif sz == 2:
             # Non-trivial base case: routing a 2-element permutation.
             neighbors[left][lo] = [rhs_dests[0], rhs_dests[1]]
@@ -122,8 +124,14 @@ def construct_as_waksman_topology(n):
                 switches[left][i] = None
                 switches[right][i] = None
 
-                neighbors[left][i] = [switch_output(lo, i, sz, True), switch_output(lo, i, sz, False)]
-                neighbors[left][i + 1] = [switch_output(lo, i, sz, False), switch_output(lo, i, sz, True)]
+                neighbors[left][i] = [
+                    switch_output(lo, i, sz, True),
+                    switch_output(lo, i, sz, False),
+                ]
+                neighbors[left][i + 1] = [
+                    switch_output(lo, i, sz, False),
+                    switch_output(lo, i, sz, True),
+                ]
 
                 new_rhs_dests[switch_input(lo, i, sz, True) - lo] = i
                 new_rhs_dests[switch_input(lo, i, sz, False) - lo] = i + 1
@@ -144,8 +152,12 @@ def construct_as_waksman_topology(n):
                 neighbors[left][hi] == [switch_output(lo, hi - 1, sz, False)]
 
             d = top_height(sz)
-            construct_as_waksman_topology_inner(left + 1, right - 1, lo, lo + d - 1, new_rhs_dests[:d])
-            construct_as_waksman_topology_inner(left + 1, right - 1, lo + d, hi, new_rhs_dests[d:])
+            construct_as_waksman_topology_inner(
+                left + 1, right - 1, lo, lo + d - 1, new_rhs_dests[:d]
+            )
+            construct_as_waksman_topology_inner(
+                left + 1, right - 1, lo + d, hi, new_rhs_dests[d:]
+            )
 
     construct_as_waksman_topology_inner(0, w - 1, 0, n - 1, range(n))
     return (neighbors, switches)
@@ -220,7 +232,7 @@ def route_as_waksman(n, network, pi):
         if left > right:
             return
 
-        sz = (hi - lo + 1)
+        sz = hi - lo + 1
         assert (right - left + 1) >= width(sz)
 
         if right - left + 1 > width(sz):
@@ -232,7 +244,7 @@ def route_as_waksman(n, network, pi):
         elif sz == 2:
             # Non-trivial base case: switch settings for a 2-element permutation.
             assert set([pi[lo], pi[lo + 1]]) == set([lo, lo + 1])
-            switches[left][lo] = (pi[lo] != lo)
+            switches[left][lo] = pi[lo] != lo
         else:
             newpi = defaultdict(lambda: None)
             newpiinv = defaultdict(lambda: None)
@@ -262,7 +274,9 @@ def route_as_waksman(n, network, pi):
                     # switch on RHS, so route the other value from
                     # that switch using the lower subnetwork.
                     rhs_switch = switch_position_from_wire_position(lo, pi[hi])
-                    rhs_switch_val = get_switch_value_from_top_bottom_decision(lo, pi[hi], False)
+                    rhs_switch_val = get_switch_value_from_top_bottom_decision(
+                        lo, pi[hi], False
+                    )
                     switches[right][rhs_switch] = rhs_switch_val
                     tprime = switch_input(lo, rhs_switch, sz, False)
                     newpi[hi] = tprime
@@ -293,7 +307,9 @@ def route_as_waksman(n, network, pi):
                     if switches[left][lhs_switch] is None:
                         switches[left][lhs_switch] = False
                     lhs_switch_val = switches[left][lhs_switch]
-                    use_top = get_top_bottom_decision_from_switch_value(lo, to_route, lhs_switch_val)
+                    use_top = get_top_bottom_decision_from_switch_value(
+                        lo, to_route, lhs_switch_val
+                    )
 
                     t = switch_output(lo, lhs_switch, sz, use_top)
                     if pi[to_route] == hi:
@@ -306,14 +322,19 @@ def route_as_waksman(n, network, pi):
                         to_route = max_unrouted
                         route_left = True
                     else:
-                        rhs_switch = switch_position_from_wire_position(lo, pi[to_route])
+                        rhs_switch = switch_position_from_wire_position(
+                            lo, pi[to_route]
+                        )
                         # We know that the corresponding switch on RHS
                         # cannot be set, so set it according to our
                         # incoming wire.
                         assert switches[right][rhs_switch] is None
 
-                        switches[right][rhs_switch] = get_switch_value_from_top_bottom_decision(lo, pi[to_route],
-                                                                                                use_top)
+                        switches[right][
+                            rhs_switch
+                        ] = get_switch_value_from_top_bottom_decision(
+                            lo, pi[to_route], use_top
+                        )
                         tprime = switch_input(lo, rhs_switch, sz, use_top)
                         newpi[t] = tprime
                         newpiinv[tprime] = t
@@ -330,8 +351,12 @@ def route_as_waksman(n, network, pi):
 
                     assert switches[right][rhs_switch] is not None
                     rhs_switch_val = switches[right][rhs_switch]
-                    use_top = get_top_bottom_decision_from_switch_value(lo, to_route, rhs_switch_val)
-                    lhs_switch_val = get_switch_value_from_top_bottom_decision(lo, piinv[to_route], use_top)
+                    use_top = get_top_bottom_decision_from_switch_value(
+                        lo, to_route, rhs_switch_val
+                    )
+                    lhs_switch_val = get_switch_value_from_top_bottom_decision(
+                        lo, piinv[to_route], use_top
+                    )
 
                     # The value on LHS is either the same or unset
                     assert switches[left][lhs_switch] in [None, lhs_switch_val]
@@ -406,7 +431,7 @@ def test_routing_of_all_permutations(n):
 def profile_routing_algorithm_speed(k_min, k_max):
     prev_t = None
     for k in xrange(k_min, k_max + 1):
-        n = 2 ** k
+        n = 2**k
         pi = range(n)
         random.shuffle(pi)
         network = construct_network(n)
@@ -419,7 +444,7 @@ def profile_routing_algorithm_speed(k_min, k_max):
         prev_t = t
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     for n in xrange(2, 9):
         test_routing_of_all_permutations(n)
     # profile_routing_algorithm_speed(2, 16)

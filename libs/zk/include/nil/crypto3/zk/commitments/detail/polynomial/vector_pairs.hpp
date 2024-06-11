@@ -10,7 +10,7 @@ namespace nil {
         namespace zk {
             namespace commitments {
                 namespace detail {
-                    
+
                     // Computes a random linear combination over v1/v2.
                     //
                     // Checking that many pairs of elements are exponentiated by

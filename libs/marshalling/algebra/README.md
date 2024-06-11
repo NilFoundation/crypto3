@@ -1,4 +1,4 @@
-# Marshalling utilities for =nil;Crypto3 Algebra 
+# Marshalling utilities for =nil;Crypto3 Algebra
 
 This module provides extension of [=nil;Marshalling](https://github.com/NilFoundation/marshalling) utilities for [=nil;Crypto3 Algebra](https://github.com/NilFoundation/crypto3-algebra)
 

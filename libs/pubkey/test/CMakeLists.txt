@@ -18,7 +18,7 @@ macro(define_pubkey_test name)
 
                                ${Boost_INCLUDE_DIRS})
 
-    
+
     set_target_properties(pubkey_${name}_test PROPERTIES CXX_STANDARD 17)
 
 

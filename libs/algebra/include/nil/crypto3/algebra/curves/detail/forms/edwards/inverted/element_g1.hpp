@@ -93,8 +93,8 @@ namespace nil {
                          *    @return the selected point (X:Y:Z)
                          *
                          */
-                        constexpr curve_element(const field_value_type& X, const field_value_type& Y, const field_value_type& Z) 
-                            : X(X), Y(Y), Z(Z) 
+                        constexpr curve_element(const field_value_type& X, const field_value_type& Y, const field_value_type& Z)
+                            : X(X), Y(Y), Z(Z)
                         { }
 
                         template<typename Backend,

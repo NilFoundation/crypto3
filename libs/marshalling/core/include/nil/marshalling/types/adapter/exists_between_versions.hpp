@@ -70,7 +70,7 @@ namespace nil {
 
                     bool set_version(version_type version) {
                         bool updated = base_impl_type::set_version(version);
-                        typename types::optional_mode mode = 
+                        typename types::optional_mode mode =
                             types::optional_mode::missing;
                         if (above_from(version) && below_until(version)) {
                             mode = types::optional_mode::exists;

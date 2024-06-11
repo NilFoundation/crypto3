@@ -8,7 +8,7 @@ algorithms implemented in way C++ standard library
 implies: concepts, algorithms, predictable behavior,
 latest standard features support and clean architecture
 without compromising security and performance.
-  
+
 Crypto3.Codec consists of several parts to review:
 * [Manual](@ref codec_manual).
 * [Implementation](@ref codec_impl).

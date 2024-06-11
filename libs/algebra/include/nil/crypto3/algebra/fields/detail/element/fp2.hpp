@@ -309,7 +309,7 @@ namespace nil {
                         element_fp2<FieldParams>::non_residue;
 
                     namespace element_fp2_details {
-                        // These constexpr static variables can not be members of element_fp2, because 
+                        // These constexpr static variables can not be members of element_fp2, because
                         // element_fp2 is incomplete type until the end of its declaration.
                         template<typename FieldParams>
                         constexpr static element_fp2<FieldParams> zero_instance(

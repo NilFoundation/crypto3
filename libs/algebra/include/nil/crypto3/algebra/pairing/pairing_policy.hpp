@@ -32,7 +32,7 @@ namespace nil {
             namespace pairing {
 
                 /* Twist type as in https://eprint.iacr.org/2013/722.pdf
-                 * 3.4 Complete families of curves, p.7 
+                 * 3.4 Complete families of curves, p.7
                  */
                 enum class curve_twist_type {
                     TWIST_TYPE_M,

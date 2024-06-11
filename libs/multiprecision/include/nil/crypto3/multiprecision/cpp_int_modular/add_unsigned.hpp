@@ -16,7 +16,7 @@ namespace boost {
             template<unsigned Bits>
             inline BOOST_MP_CXX14_CONSTEXPR void
                 add_unsigned_constexpr(
-                    cpp_int_modular_backend<Bits>& result, 
+                    cpp_int_modular_backend<Bits>& result,
                     const cpp_int_modular_backend<Bits>& a,
                     const cpp_int_modular_backend<Bits>& b) noexcept {
 
@@ -137,7 +137,7 @@ namespace boost {
                     // Nothing fancy, just let uintmax_t take the strain:
                     unsigned s = a.size();
                     if (s == 1) {
-                        double_limb_type v = static_cast<double_limb_type>(*a.limbs()) + 
+                        double_limb_type v = static_cast<double_limb_type>(*a.limbs()) +
                             static_cast<double_limb_type>(*b.limbs());
                         double_limb_type mask = cpp_int_modular_backend<Bits>::upper_limb_mask;
                         if (v & ~mask) {
@@ -182,7 +182,7 @@ namespace boost {
 #endif
                     for (; i < s; ++i)
                         carry = ::boost::multiprecision::detail::addcarry_limb(carry, pa[i], pb[i], pr + i);
-                    
+
                     if (Bits % cpp_int_modular_backend<Bits>::limb_bits == 0)
                         result.set_carry(carry);
                     else {

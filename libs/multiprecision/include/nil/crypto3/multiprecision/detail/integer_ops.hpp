@@ -4,7 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at https://www.boost.org/LICENSE_1_0.txt
 //
-// We need to include this file after modular adaptor, in order for these functions to 'see' 
+// We need to include this file after modular adaptor, in order for these functions to 'see'
 //---------------------------------------------------------------------------//
 
 #ifndef CRYPTO3_MP_DETAIL_INTEGER_OPS_HPP
@@ -25,7 +25,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
     // We will directly call eval_powm here, that's what a call through a default_ops::powm_func would do if expression tempaltes are off. We don't want to change that structure.
     boost::multiprecision::backends::modular_adaptor<Backend, modular_params_type> result;
     result.set_modular_params(b.backend().mod_data());
-    boost::multiprecision::backends::eval_powm(result, b.backend(), p); 
+    boost::multiprecision::backends::eval_powm(result, b.backend(), p);
     return result;
 }
 
@@ -38,7 +38,7 @@ inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
     // We will directly call eval_powm here, that's what a call through a default_ops::powm_func would do if expression tempaltes are off. We don't want to change that structure.
     boost::multiprecision::backends::modular_adaptor<Backend, modular_params_type> result;
     result.set_modular_params(b.backend().mod_data());
-    boost::multiprecision::backends::eval_powm(result, b.backend(), p.backend()); 
+    boost::multiprecision::backends::eval_powm(result, b.backend(), p.backend());
     return result;
 }
 }} // namespace boost::multiprecision

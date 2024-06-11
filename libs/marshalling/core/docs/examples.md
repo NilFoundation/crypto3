@@ -17,9 +17,9 @@ using MyIntField = nil::marshalling::types::int_value<MyFieldBase, std::uint16_t
 
 The definition of unsigned integer with 3 bytes serialization length:
 ```cpp
-using My3ByteIntField = 
+using My3ByteIntField =
     nil::marshalling::types::int_value<
-        MyFieldBase, // big endian serialization 
+        MyFieldBase, // big endian serialization
         std::uint32_t, // store as 4 byte unsigned integer
         nil::marshalling::option::fixed_length<3> // serialise using only 3 bytes
     >;
@@ -28,12 +28,12 @@ using My3ByteIntField =
 Definition of the year value, serialized using only 1 byte as an offset from
 year 2000, and default constructed as year 2017:
 ```cpp
-using MyYearField = 
+using MyYearField =
     nil::marshalling::types::int_value<
         MyFieldBase, // big endian serialization
         std::int16_t, // store as 2 byte value
         nil::marshalling::option::fixed_length<1>, // serialise using only 1 byte
-        nil::marshalling::option::num_value_ser_offset<-2000> // add (-2000) before serialization and 
+        nil::marshalling::option::num_value_ser_offset<-2000> // add (-2000) before serialization and
                                                 // subtruct (-2000) after deserialization
         nil::marshalling::option::default_num_value<2017> // construct with default value 2017
     >;
@@ -41,7 +41,7 @@ using MyYearField =
 
 Variant length (Base-128) integer value:
 ```cpp
-using MyVarLengthField = 
+using MyVarLengthField =
     nil::marshalling::types::int_value<
         MyFieldBase, // big endian serialization
         std::uint32_t, // store as 4 bytes value
@@ -59,7 +59,7 @@ enum class MyEnum : std::uint8_t // Serialise using 1 byte
     NumOfValues
 };
 
-using MyEnumField = 
+using MyEnumField =
     nil::marshalling::types::enum_value<
         MyFieldBase, // big endian serialization
         MyEnum, // use MyEnum as storage type
@@ -69,11 +69,11 @@ using MyEnumField =
 
 2 bytes bitmask value:
 ```cpp
-struct MyBitmaskField : public 
+struct MyBitmaskField : public
     nil::marshalling::types::bitmask_value<
         MyFieldBase, // big endian serialization
         nil::marshalling::types::fixed_length<2> // serialise using 2 bytes
-        bitmask_reserved_bits<0xfff0> // Specify reserved bits 
+        bitmask_reserved_bits<0xfff0> // Specify reserved bits
     >
 {
     MARSHALLING_BITMASK_BITS_SEQ(name1, name2, name3, name4); // provide names for bits for convenient access
@@ -98,7 +98,7 @@ struct MyBitfield : public
 
 Simple raw data list:
 ```cpp
-using MyRawDataList = 
+using MyRawDataList =
     nil::marshalling::types::array_list<
         MyFieldBase,
         std::uint8_t
@@ -107,7 +107,7 @@ using MyRawDataList =
 
 Raw data list with 2 byte size prefix:
 ```cpp
-using MyRawDataList2 = 
+using MyRawDataList2 =
     nil::marshalling::types::array_list<
         MyFieldBase,
         std::uint8_t,
@@ -119,7 +119,7 @@ using MyRawDataList2 =
 
 Size prefixed list of complex (bundle) elements:
 ```cpp
-using MyComplexList = 
+using MyComplexList =
     nil::marshalling::types::array_list<
         MyFieldBase,
         nil::marshalling::types::bundle<
@@ -137,21 +137,21 @@ using MyComplexList =
 
 String with 1 byte size prefix:
 ```cpp
-using MyString = 
+using MyString =
     nil::marshalling::types::string<
         MyFieldBase,
         nil::marshalling::option::sequence_size_field_prefix<
             nil::marshalling::types::int_value<MyFieldBase, std::uint8_t>
-        >        
+        >
     >
 ```
 
 Optional 2 byte integer, default constructed as "missing".:
 ```cpp
-using MyOptInt = 
+using MyOptInt =
     nil::marshalling::types::optional<
         nil::marshalling::types::int_value<MyFieldBase, std::uint16_t>,
-        nil::marshalling::option::default_optional_mode<nil::marshalling::types::optional_mode::missing>        
+        nil::marshalling::option::default_optional_mode<nil::marshalling::types::optional_mode::missing>
     >
 ```
 
@@ -171,13 +171,13 @@ enum msg_id : std::uint16_t
 The message message definition will usually like like this:
 ```cpp
 // fields_type used by Message1 (defined below)
-using Message1Fields = 
+using Message1Fields =
     std::tuple<
-        MyIntField,  
+        MyIntField,
         MyBitmaskField
         MyRawDataList2
     >;
-    
+
 // The definition of Message1 message
 template <typename TMsgBase> // Interface class passed as a template parameter
 class Message1 : public
@@ -193,7 +193,7 @@ class Message1 : public
 };
 ```
 
-The definition of the message contents is common for any application. The 
+The definition of the message contents is common for any application. The
 generated code depends on the used message interface classes.
 
 # Defining Interface
@@ -221,7 +221,7 @@ using App2Interface =
         nil::marshalling::option::msg_type<msg_id>, // Provide type used for message ID
         nil::marshalling::option::id_info_interface, // Support polymorphic retreival of message ID
         nil::marshalling::option::read_iterator<const std::uint8_t*>, // Support polymorphic read using "const std::uint8_t*" as iterator
-        nil::marshalling::option::write_iterator<std::back_insert_itetrator<std::vector<std::uint8_t> > >, 
+        nil::marshalling::option::write_iterator<std::back_insert_itetrator<std::vector<std::uint8_t> > >,
                                                           // Support polymorphic write using
                                                           // "std::back_insert_itetrator<std::vector<std::uint8_t> > >" as iterator
         nil::marshalling::option::handler<MyOtherHandler> // Support dispatch to handling object of "MyOtherHandler" type
@@ -253,10 +253,10 @@ using MsgIdField = nil::marshalling::types::enum_value<MyFieldBase, msg_id>
 using MsgSizeField = nil::marshalling::types::int_value<MyFieldBase, std::uint16_t>
 
 // Define transport stack by wrapping "layers"
-using Stack = 
-    nil::marshalling::protocol::MsgSizeLayer< // The SIZE 
+using Stack =
+    nil::marshalling::protocol::MsgSizeLayer< // The SIZE
         MsgSizeField,
-        nil::marshalling::option::MsgIdLayer< // The ID 
+        nil::marshalling::option::MsgIdLayer< // The ID
             MsgIdField,
             nil::marshalling::protocol::MsgDataLayer<> // The PAYLOAD
         >
@@ -290,15 +290,15 @@ using SyncField =
     >;
 
 // Define transport stack by wrapping "layers"
-using Stack = 
+using Stack =
     nil::marshalling::protocol::SyncPrefixLayer< // The SYNC
         SyncField,
         nil::marshalling::protocol::ChecksumLayer // The CHECKSUM
             ChecksumField,
             nil::marshalling::protocol::checksum::crc_ccitt, // Use CRC-CCITT calculation
-            nil::marshalling::protocol::MsgSizeLayer< // The SIZE 
+            nil::marshalling::protocol::MsgSizeLayer< // The SIZE
                 MsgSizeField,
-                nil::marshalling::option::MsgIdLayer< // The ID 
+                nil::marshalling::option::MsgIdLayer< // The ID
                     MsgIdField,
                     nil::marshalling::protocol::MsgDataLayer<> // The PAYLOAD
                 >
@@ -306,4 +306,3 @@ using Stack =
         >
     >;
 ```
-

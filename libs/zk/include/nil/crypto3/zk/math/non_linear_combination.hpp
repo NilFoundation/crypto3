@@ -106,7 +106,7 @@ namespace nil {
                 non_linear_combination operator-() const {
                     return (*this) * (-VariableType::assignment_type::one());
                 }
-                
+
                 std::size_t max_degree() const {
                     std::size_t max_degree = 0;
                     for (const term_type &nlt : this->terms) {
@@ -141,7 +141,7 @@ namespace nil {
                         }
                     }
                 }
-                
+
                 bool operator==(const non_linear_combination &other) const {
                     if (this->terms.size() != other.terms.size())
                         return false;

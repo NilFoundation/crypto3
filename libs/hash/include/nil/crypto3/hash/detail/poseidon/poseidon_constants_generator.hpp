@@ -54,7 +54,7 @@ namespace nil {
 
                     typedef typename poseidon_constants_type::round_constants_type round_constants_type;
 
-                    /*! 
+                    /*!
                      * @brief Randomly generates all the constants required, using the correct generation rules.
                      * If called multiple times, will return DIFFERENT constants.
                      */
@@ -104,7 +104,7 @@ namespace nil {
                             if (new_mds_matrix.det() == 0)
                                 secure_MDS_found = false;
 
-                            // TODO(martun): check that mds has NO eignevalues. 
+                            // TODO(martun): check that mds has NO eignevalues.
                             // if len(new_mds_matrix.characteristic_polynomial().roots()) == 0:
                                 // return new_mds_matrix
                             // The original matrix security check is here: https://extgit.iaik.tugraz.at/krypto/hadeshash/-/blob/master/code/generate_params_poseidon.sage

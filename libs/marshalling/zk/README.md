@@ -1,4 +1,4 @@
-# Marshalling utilities for =nil;Crypto3 Zero-Knowledge Schemes Cryptography 
+# Marshalling utilities for =nil;Crypto3 Zero-Knowledge Schemes Cryptography
 
 This module provides extension of [=nil;Marshalling](https://github.com/NilFoundation/marshalling) utilities for [=nil;Crypto3 Zero-Knowledge Schemes Cryptography](https://github.com/NilFoundation/crypto3-zk)
 

@@ -22,7 +22,7 @@ type to be integral.
 
 By term *endianness* we mean the significance order of groups of bytes further called *units* combined with the
 significance order of bits inside of each unit. For example, bit_unit_little_bit endianness refers to the *most
-significant unit first* order, and each unit contains the bits in the *least significant bit first* order.  
+significant unit first* order, and each unit contains the bits in the *least significant bit first* order.
 Generally, we have the four following types of endianness:
 
 1. `big_unit_big_bit` endianness refers to the *most significant unit first* order, and each unit contains the bits in
@@ -103,7 +103,7 @@ std::array<uint32_t, 2> output {0x78563412};
 
 input:
 
-@dot digraph bytes { 
+@dot digraph bytes {
 bgcolor="#151515"
 node [shape=record color="#f5f2f1" fontcolor="#f5f2f1" fontname="helvetica"];
 
@@ -115,7 +115,7 @@ struct2 [label="0x56 | 0x78 "];
 
 output:
 
-@dot digraph bytes { 
+@dot digraph bytes {
 bgcolor="#151515"
 node [shape=record color="#f5f2f1" fontcolor="#f5f2f1" fontname="helvetica"];
 
@@ -139,7 +139,7 @@ std::array<uint64_t, 1> output = {0x1234567890abcdef};
 
 input:
 
-@dot digraph bytes { 
+@dot digraph bytes {
 bgcolor="#151515"
 node [shape=record color="#f5f2f1" fontcolor="#f5f2f1" fontname="helvetica"];
 
@@ -153,7 +153,7 @@ struct4 [label="0xcd | 0xef "]; } @enddot
 
 output:
 
-@dot digraph bytes { 
+@dot digraph bytes {
 bgcolor="#151515"
 node [shape=record color="#f5f2f1" fontcolor="#f5f2f1" fontname="helvetica"];
 
@@ -175,7 +175,7 @@ std::array<uint16_t, 2> output = {0x482c, 0x6a1e};
 
 input:
 
-@dot digraph bytes { 
+@dot digraph bytes {
 bgcolor="#151515"
 node [shape=record color="#f5f2f1" fontcolor="#f5f2f1" fontname="helvetica"];
 
@@ -189,7 +189,7 @@ struct4 [label="0x78"]; } @enddot
 
 output:
 
-@dot digraph bytes { 
+@dot digraph bytes {
 bgcolor="#151515"
 node [shape=record color="#f5f2f1" fontcolor="#f5f2f1" fontname="helvetica"];
 
@@ -219,7 +219,7 @@ output chunk with units in `OutputEndianness` order and can be described as foll
 
 1. Check whether `InputEndianness` or `OutputEndianness` is `little_bit`. This condition determines the data chunk order
    reversal presence or absence. (We have already seen how the order of chunks changed in `big_unit_big_bit`
-   -to-`little_unit_big_bit` conversion, so this is just the generalization.)  
+   -to-`little_unit_big_bit` conversion, so this is just the generalization.)
    The choice of endianness depends on an algorithm where this step is carried out (imploder or exploder).
 2. If the endianness on the previous step is `little_bit`, set shift equal to `OutputBits` - (`InputBits` +
    already_processed_bits) in the case of imploder, and to `InputBits` - (`OutputBits` + already_processed_bits) in the
@@ -281,14 +281,14 @@ for each output_chunk:
 		/* Step 1 */
 		if OutputEndianness is little_unit:
 			shift = already_processed_bits
-		else 
+		else
 			shift = OutputValueBits - (InputValueBits + already_processed_bits)
-		
+
 		/* Step 2 */
 		tmp = input_chunk
 		if InputEndianness and OutputEndianness have not same unit order:
 			reverse_unit_order(tmp)
-		
+
 		/* Step 3 */
 		if InputEndianness and OutputEndianness have not same bit order:
 			reverse_bit_order(tmp)
@@ -324,16 +324,16 @@ for each input_chunk:
 		/* Step 1 */
 		if InputEndianness is little_unit:
 			shift = already_processed_bits
-		else 
+		else
 			shift = InputValueBits - (OutputValueBits + already_processed_bits)
-		
+
 		/* Splitting input data */
 		tmp = input_chunk >> shift
-		
+
 		/* Step 2 */
 		if InputEndianness and OutputEndianness have not same unit order:
 			reverse_unit_order(tmp)
-		
+
 		/* Step 3 */
 		if InputEndianness and OutputEndianness have not same bit order:
 			reverse_bit_order(tmp)

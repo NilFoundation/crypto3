@@ -33,26 +33,26 @@
 
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
-#include <boost/test/data/monomorphic.hpp>
+// #include <boost/test/data/monomorphic.hpp>
 
-#include <nil/crypto3/algebra/curves/mnt4.hpp>
-#include <nil/crypto3/algebra/fields/arithmetic_params/mnt4.hpp>
-#include <nil/crypto3/algebra/curves/pallas.hpp>
-#include <nil/crypto3/algebra/fields/arithmetic_params/pallas.hpp>
-#include <nil/crypto3/algebra/random_element.hpp>
+// #include <nil/crypto3/algebra/curves/mnt4.hpp>
+// #include <nil/crypto3/algebra/fields/arithmetic_params/mnt4.hpp>
+// #include <nil/crypto3/algebra/curves/pallas.hpp>
+// #include <nil/crypto3/algebra/fields/arithmetic_params/pallas.hpp>
+// #include <nil/crypto3/algebra/random_element.hpp>
 
-#include <nil/crypto3/math/polynomial/polynomial.hpp>
-#include <nil/crypto3/math/polynomial/lagrange_interpolation.hpp>
-#include <nil/crypto3/math/algorithms/unity_root.hpp>
-#include <nil/crypto3/math/domains/evaluation_domain.hpp>
-#include <nil/crypto3/math/algorithms/make_evaluation_domain.hpp>
-#include <nil/crypto3/math/algorithms/calculate_domain_set.hpp>
+// #include <nil/crypto3/math/polynomial/polynomial.hpp>
+// #include <nil/crypto3/math/polynomial/lagrange_interpolation.hpp>
+// #include <nil/crypto3/math/algorithms/unity_root.hpp>
+// #include <nil/crypto3/math/domains/evaluation_domain.hpp>
+// #include <nil/crypto3/math/algorithms/make_evaluation_domain.hpp>
+// #include <nil/crypto3/math/algorithms/calculate_domain_set.hpp>
 
-#include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
-#include <nil/crypto3/zk/commitments/polynomial/fri.hpp>
-#include <nil/crypto3/zk/commitments/type_traits.hpp>
+// #include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
+// #include <nil/crypto3/zk/commitments/polynomial/fri.hpp>
+// #include <nil/crypto3/zk/commitments/type_traits.hpp>
 
-#include <nil/crypto3/random/algebraic_random_device.hpp>
+// #include <nil/crypto3/random/algebraic_random_device.hpp>
 
 using namespace nil::crypto3;
 

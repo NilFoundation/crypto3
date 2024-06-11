@@ -606,7 +606,7 @@ namespace nil {
                     selectors_assignment[0].resize(test_circuit.usable_rows);
                     for(std::size_t i = 0; i < witness_columns; i++) {
                         private_assignment[i].resize(test_circuit.usable_rows);
-                        private_assignment[i][0] = private_assignment[i][2] = public_input_assignment[0][i] = 
+                        private_assignment[i][0] = private_assignment[i][2] = public_input_assignment[0][i] =
                             typename FieldType::value_type(rnd() % witness_columns);
                         private_assignment[i][1] = 1u;
                         plonk_variable<typename FieldType::value_type> pi(

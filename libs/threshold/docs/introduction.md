@@ -7,7 +7,7 @@ The Crypto3.PkModes library extends the =nil; Foundation's cryptography suite an
   implies: concepts
  , algorithms, predictable
   behavior, latest standard features support and clean architecture without compromising security and performance.
- 
+
 Crypto3.Modes consists of several parts to review:
 * [Manual](@ref pkmodes_manual).
 * [Implementation](@ref pkmodes_impl).

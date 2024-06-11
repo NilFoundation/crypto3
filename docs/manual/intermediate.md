@@ -9,19 +9,19 @@ By the end of this tutorial , a user will understand how to sign data and use di
 
 Pre-requisites
 ================
-The user has set up their development environment as outlined in the quickstart tutorial [TODO : here]() 
+The user has set up their development environment as outlined in the quickstart tutorial [TODO : here]()
 and can compile example programs in the scaffold repository.
 
 
 Background
 ===============
-ECDSA signatures are fairly common in most protocols ex Bitcoin/Ethereum. BLS signatures use 
-different curve/computation which enables nicer properties such as signature aggregation. 
-Signature aggregation allows for multiple parties to compute a single signature. ECDSA multi-sigs 
-leak privacy as it is easy to identify a multi-sig public key and transactions leak data like the 
-signer or scheme e.g: 3 of 5 signatures and needs to be done onchain for each signature. BLS signatures 
-can be aggregated offline and 
-appear no different from a traditional public key. Thus preserving privacy and reducing compute resources 
+ECDSA signatures are fairly common in most protocols ex Bitcoin/Ethereum. BLS signatures use
+different curve/computation which enables nicer properties such as signature aggregation.
+Signature aggregation allows for multiple parties to compute a single signature. ECDSA multi-sigs
+leak privacy as it is easy to identify a multi-sig public key and transactions leak data like the
+signer or scheme e.g: 3 of 5 signatures and needs to be done onchain for each signature. BLS signatures
+can be aggregated offline and
+appear no different from a traditional public key. Thus preserving privacy and reducing compute resources
 in verification. Weighted threshold signatures take this concept a step further by assigning weights
 to each of the keys and only considering a signature valid when a threshold is reached.
 
@@ -34,14 +34,14 @@ Weighted BLS Threshold Signatures
 The following pattern is used throughout the library.
 - Initialization : This phase involves creating the cryptographic object. Ex: Key-Pair.
 - Accumulation:  Accumulation is done (where needed) as a repeated set of operations involving the object on
-which an algorithm needs to be performed. 
+which an algorithm needs to be performed.
 - Finalisation: This steps requires accumulated data to be finalised padded before running an algorithm.
 
 Algorithms in the crypto3 library will carry out the above steps for the user. Algorithms can do operations
 such as signing , aggregating , verifying.
 
 
-Starting point to use any public key operations in crypto3 library is to create a cryptographic scheme. 
+Starting point to use any public key operations in crypto3 library is to create a cryptographic scheme.
 
 Below create a BLS scheme as follows. Currently supported curves are `BLS12-381` and `BLS12-377`
 Schemes are also customisable and the following parameters.
@@ -55,15 +55,15 @@ using curve_type = nil::crypto3::algebra::curves::bls12_381;
 using base_scheme_type = bls<bls_default_public_params<>, bls_mps_ro_version, bls_basic_scheme, curve_type>;
 ```
 
-Schemes can operate in two [modes](https://github.com/NilFoundation/crypto3-pkmodes/). 
-- Isomorphic : Single key 
+Schemes can operate in two [modes](https://github.com/NilFoundation/crypto3-pkmodes/).
+- Isomorphic : Single key
 - Threshold : Multiple key operations
 
 Weighted threshold schemes can have one of the following secret sharing mechanisms.
-- `Weighted Shamir Secret Sharing` 
+- `Weighted Shamir Secret Sharing`
 - TODO Add others
 
-Once the scheme is selected, we can pull the types out for the public/private keys.  
+Once the scheme is selected, we can pull the types out for the public/private keys.
 
 ```c++
 using mode_type = modes::threshold<base_scheme_type, weighted_shamir_sss>;
@@ -96,7 +96,7 @@ using aggregation_processing_mode_type =
 We now take a closer look at our main.
 
 - `n` : Is the number of keys we want our `dealer` to create
-- `t` : Is the threshold value which must be met for a signature to be considered valid 
+- `t` : Is the threshold value which must be met for a signature to be considered valid
 
 ```c++
     std::size_t n = 20;
@@ -137,7 +137,7 @@ We now sign this data using **all** private keys we see two algorithms
 ```
 
 Next we run the following algorithms
-- `aggregate` : Algorithm aggregates all signatures into a single one. 
+- `aggregate` : Algorithm aggregates all signatures into a single one.
 - `verify` : The verification algorithm validates the signature against the message.
 
 ```c++

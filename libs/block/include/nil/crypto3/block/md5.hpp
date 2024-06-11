@@ -83,7 +83,7 @@ namespace nil {
                 };
 
                 typedef typename stream_endian::little_octet_big_bit endian_type;
-                
+
                 md5(const key_type &k) : key(k) {
                 }
 

@@ -15,7 +15,7 @@
 
 #include <boost/multiprecision/detail/default_ops.hpp>
 
-namespace boost {   
+namespace boost {
     namespace multiprecision {
         namespace backends {
             using boost::multiprecision::default_ops::eval_is_zero;
@@ -96,7 +96,7 @@ namespace boost {
                     Bits, Bits, boost::multiprecision::signed_magnitude, boost::multiprecision::unchecked>;
                 using unsigned_cpp_int_type = boost::multiprecision::backends::cpp_int_backend<
                     Bits, Bits, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked>;
- 
+
                 signed_cpp_int_type a_cpp_int = a.to_cpp_int();
                 signed_cpp_int_type m_cpp_int = m.to_cpp_int();
                 signed_cpp_int_type result_cpp_int;
@@ -337,7 +337,7 @@ namespace boost {
                     Bits, Bits, boost::multiprecision::signed_magnitude, boost::multiprecision::unchecked>;
                 using unsigned_cpp_int_type = boost::multiprecision::backends::cpp_int_backend<
                     Bits, Bits, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked>;
- 
+
                 signed_cpp_int_type n_cpp_int = n.to_cpp_int();
                 signed_cpp_int_type mod_cpp_int = mod.to_cpp_int();
                 signed_cpp_int_type result_cpp_int;
@@ -429,7 +429,7 @@ namespace boost {
                     Bits, Bits, boost::multiprecision::signed_magnitude, boost::multiprecision::unchecked>;
                 using unsigned_cpp_int_type = boost::multiprecision::backends::cpp_int_backend<
                     Bits, Bits, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked>;
- 
+
                 signed_cpp_int_type a_cpp_int = a.to_cpp_int();
                 signed_cpp_int_type p_cpp_int = p.to_cpp_int();
                 signed_cpp_int_type k_cpp_int = k.to_cpp_int();

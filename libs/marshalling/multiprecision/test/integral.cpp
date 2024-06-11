@@ -24,7 +24,7 @@
 //---------------------------------------------------------------------------//
 
 #define BOOST_TEST_MODULE crypto3_marshalling_integral_test
-// #define BOOST_TEST_MAIN 
+// #define BOOST_TEST_MAIN
 
 #include <boost/test/unit_test.hpp>
 #include <boost/algorithm/string/case_conv.hpp>
@@ -53,7 +53,7 @@ T generate_random() {
     static boost::random::uniform_int_distribution<unsigned> ui(0, limbs);
     static boost::random::mt19937 gen;
     T val = gen();
-    unsigned lim = ui(gen); 
+    unsigned lim = ui(gen);
     for (unsigned i = 0; i < lim; ++i) {
         val *= (gen.max)();
         val += gen();
@@ -149,14 +149,14 @@ void test_round_trip_non_fixed_precision(T val) {
     using unit_type = OutputType;
 
     std::vector<unit_type> cv;
-    export_bits(val, std::back_inserter(cv), units_bits, 
+    export_bits(val, std::back_inserter(cv), units_bits,
         std::is_same<TEndianness, nil::marshalling::option::big_endian>::value?true:false);
 
     nil::marshalling::status_type status;
     T test_val = nil::marshalling::pack<TEndianness>(cv, status);
 
     // std::cout << std::hex << test_val << '\n' << val << '\n';
-    
+
     // std::cout << "bits:\n";
     // for(auto a : cv){
     //     std::cout << a;

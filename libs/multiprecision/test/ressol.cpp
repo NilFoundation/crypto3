@@ -77,41 +77,41 @@ BOOST_AUTO_TEST_CASE(ressol_runtime_315_bit_tests) {
 
 BOOST_AUTO_TEST_CASE(ressol_runtime_18_bit_tests) {
     using T = number<cpp_int_modular_backend<18>>;
- 
+
     BOOST_CHECK_EQUAL(ressol(T(1024u), T(174763u)), 174731u);
 }
 
 BOOST_AUTO_TEST_CASE(ressol_runtime_7_bit_tests) {
     using T = number<cpp_int_modular_backend<7>>;
- 
+
     // When there is no square root, we return 0 now, not -1. This will change when proper error management is introduced.
     BOOST_CHECK_EQUAL(ressol(T(64), T(85)), 0u);
 }
 
 BOOST_AUTO_TEST_CASE(ressol_runtime_8_bit_tests) {
     using T = number<cpp_int_modular_backend<8>>;
- 
+
     // When there is no square root, we return 0 now, not -1. This will change when proper error management is introduced.
     BOOST_CHECK_EQUAL(ressol(T(181), T(217)), 0);
 }
 
 BOOST_AUTO_TEST_CASE(ressol_runtime_16_bit_tests) {
     using T = number<cpp_int_modular_backend<16>>;
- 
+
     // When there is no square root, we return 0 now, not -1. This will change when proper error management is introduced.
     BOOST_CHECK_EQUAL(ressol(T(4225), T(33153)), 0);
 }
 
 BOOST_AUTO_TEST_CASE(ressol_runtime_15_bit_tests) {
     using T = number<cpp_int_modular_backend<15>>;
- 
+
     // When there is no square root, we return 0 now, not -1. This will change when proper error management is introduced.
     BOOST_CHECK_EQUAL(ressol(T(2048), T(31417)), 0);
 }
 
 BOOST_AUTO_TEST_CASE(ressol_runtime_13_bit_tests) {
     using T = number<cpp_int_modular_backend<13>>;
- 
+
     // When there is no square root, we return 0 now, not -1. This will change when proper error management is introduced.
     BOOST_CHECK_EQUAL(ressol(T(2), T(4369)), 0);
 }
@@ -285,4 +285,3 @@ BOOST_AUTO_TEST_SUITE_END()  // ressol_runtime_tests
 //
 //    return true;
 //}
-

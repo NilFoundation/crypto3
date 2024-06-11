@@ -404,4 +404,3 @@ If the type `X` satisfies `PublicSecret` concept then following expressions must
 |Expression|Return type|Effects|
 |---|---|---|
 |`x.get_value()`|`const X::value_type &`|return share value|
-

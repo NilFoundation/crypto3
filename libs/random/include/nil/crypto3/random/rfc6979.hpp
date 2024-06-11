@@ -186,7 +186,7 @@ namespace nil {
 
                     // d.
                     internal_accumulator_type acc_d(Key);
-                    
+
                     nil::marshalling::status_type status;
                     modulus_octets_container_type int2octets_x =
                         ::nil::marshalling::pack<::nil::marshalling::option::big_endian>(x, status);

@@ -12,7 +12,7 @@ namespace nil {
         namespace zk {
             namespace snark {
                 template <typename FieldType>
-                typename FieldType::value_type unnormalized_lagrange_basis(math::basic_radix2_domain<FieldType> domain, int i, 
+                typename FieldType::value_type unnormalized_lagrange_basis(math::basic_radix2_domain<FieldType> domain, int i,
                                                                     typename FieldType::value_type pt){
                     typename FieldType::value_type omega_i = i < 0 ? domain.omega.pow(-i).inversed() : domain.omega.pow(i);
 
@@ -127,7 +127,7 @@ namespace nil {
                 template <typename FieldType>
                 struct PolishToken {
                     // typedef typename CurveType::scalar_field_type scalar_field_type;
-                    // typedef proof_evaluation_type<FieldType> 
+                    // typedef proof_evaluation_type<FieldType>
 
                     token_type token;
                     std::pair<std::size_t, std::size_t> mds_value;
@@ -147,12 +147,12 @@ namespace nil {
 
                     PolishToken(token_type token, std::size_t value) : token(token), pow_value(value), load_value(value) {}
 
-                    PolishToken(int unnormalized_lagrange_basis_value) : token(token), 
-                            unnormalized_lagrange_basis_value(unnormalized_lagrange_basis_value) {} 
-                    
+                    PolishToken(int unnormalized_lagrange_basis_value) : token(token),
+                            unnormalized_lagrange_basis_value(unnormalized_lagrange_basis_value) {}
+
                     static typename FieldType::value_type evaluate(std::vector<PolishToken<FieldType>>& toks,
                                                             math::basic_radix2_domain<FieldType>& domain,
-                                                            typename FieldType::value_type pt, 
+                                                            typename FieldType::value_type pt,
                                                             std::vector<proof_evaluation_type<typename FieldType::value_type>>& evals,
                                                             Constants<FieldType>& c){
                         std::vector<typename FieldType::value_type> stack, cache;
@@ -177,22 +177,22 @@ namespace nil {
                             }
                             else if(t.token == token_type::VanishesOnLast4Rows){
                                 stack.push_back(eval_vanishes_on_last_4_rows(domain, pt));
-                            }   
+                            }
                             else if(t.token == token_type::UnnormalizedLagrangeBasis){
                                 stack.push_back(unnormalized_lagrange_basis<FieldType>(domain, t.unnormalized_lagrange_basis_value, pt));
-                            }   
+                            }
                             else if(t.token == token_type::Literal){
                                 stack.push_back(t.literal_value);
                             }
                             else if(t.token == token_type::Dup){
                                 stack.push_back(stack.back());
-                            }   
+                            }
                             else if(t.token == token_type::Cell){
                                 stack.push_back(variable_evaluate<FieldType>(t.cell_value, evals));
-                            }   
+                            }
                             else if(t.token == token_type::Pow){
                                 stack.back() = stack.back().pow(t.pow_value);
-                            }   
+                            }
                             else if(t.token == token_type::Add){
                                 assert(stack.size() > 1);
                                 typename FieldType::value_type y = stack.back();
@@ -201,7 +201,7 @@ namespace nil {
                                 stack.pop_back();
 
                                 stack.push_back(x + y);
-                            }   
+                            }
                             else if(t.token == token_type::Mul){
                                 assert(stack.size() > 1);
                                 typename FieldType::value_type y = stack.back();
@@ -210,7 +210,7 @@ namespace nil {
                                 stack.pop_back();
 
                                 stack.push_back(x * y);
-                            }   
+                            }
                             else if(t.token == token_type::Sub){
                                 assert(stack.size() > 1);
                                 typename FieldType::value_type y = stack.back();
@@ -219,13 +219,13 @@ namespace nil {
                                 stack.pop_back();
 
                                 stack.push_back(x - y);
-                            }   
+                            }
                             else if(t.token == token_type::Store){
                                 cache.push_back(stack.back());
-                            }   
+                            }
                             else if(t.token == token_type::Load){
                                 stack.push_back(cache[t.load_value]);
-                            }   
+                            }
                         }
 
                         assert(stack.size() == 1);

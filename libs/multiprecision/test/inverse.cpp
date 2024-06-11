@@ -227,7 +227,7 @@ BOOST_AUTO_TEST_CASE(test_cpp_int_modular_backend_6_bits) {
 //BOOST_AUTO_TEST_CASE(test_cpp_int_modular_backend_6_bits) {
 //    using namespace boost::multiprecision;
 //    using T = boost::multiprecision::cpp_int_modular_modular_backend<6>;
-// 
+//
 //    modular = number<backends::modular_adaptor<T, backends::modular_params_rt<T>>>(3, 8);
 //    modular.backend().mod_data().adjust_regular(res.backend(),
 //                                                inverse_extended_euclidean_algorithm(modular).backend().base_data());

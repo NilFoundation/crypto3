@@ -67,7 +67,7 @@ namespace nil {
         };
 
         template<typename TTypeBase, typename CurveGroupType, typename... TOptions>
-        struct is_curve_element<nil::crypto3::marshalling::types::curve_element<TTypeBase, 
+        struct is_curve_element<nil::crypto3::marshalling::types::curve_element<TTypeBase,
             CurveGroupType, TOptions...>> {
 
             static const bool value = true;
@@ -80,14 +80,14 @@ namespace nil {
         };
 
         template<typename TTypeBase, typename FieldValueType, typename... TOptions>
-        struct is_field_element<nil::crypto3::marshalling::types::extended_field_element<TTypeBase, 
+        struct is_field_element<nil::crypto3::marshalling::types::extended_field_element<TTypeBase,
             FieldValueType, TOptions...>> {
 
             static const bool value = true;
         };
 
         template<typename TTypeBase, typename FieldValueType, typename... TOptions>
-        struct is_field_element<nil::crypto3::marshalling::types::pure_field_element<TTypeBase, 
+        struct is_field_element<nil::crypto3::marshalling::types::pure_field_element<TTypeBase,
             FieldValueType, TOptions...>> {
 
             static const bool value = true;

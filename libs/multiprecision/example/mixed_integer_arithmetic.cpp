@@ -39,7 +39,7 @@ int main()
 }
 //]
 
-/* 
+/*
 
 Program output:
 
@@ -52,4 +52,3 @@ Program output:
 
 //]
 */
-

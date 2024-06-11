@@ -82,8 +82,8 @@ namespace nil {
                          *    @return the selected point $(X:Y:Z)$ in the projective coordinates
                          *
                          */
-                        constexpr curve_element(const field_value_type& X, const field_value_type& Y) 
-                            : X(X), Y(Y) 
+                        constexpr curve_element(const field_value_type& X, const field_value_type& Y)
+                            : X(X), Y(Y)
                         { }
 
                         template<typename Backend,

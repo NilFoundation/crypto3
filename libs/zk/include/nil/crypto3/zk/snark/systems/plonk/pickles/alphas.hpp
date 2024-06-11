@@ -49,7 +49,7 @@ namespace nil {
                     /// The powers of alpha: 1, alpha, alpha^2, etc.
                     /// If set to [Some], you can't register new constraints.
                     std::vector<typename FieldType::value_type> alphas;
-                    std::unordered_map<argument_type, std::pair<int, int>> mapping; 
+                    std::unordered_map<argument_type, std::pair<int, int>> mapping;
 
                     Alphas() : next_power(0) {}
                     // Create alphas from 0 to next_power - 1
@@ -58,7 +58,7 @@ namespace nil {
                         if(mapping.find(arg) == mapping.end()){
                             mapping[arg] = std::make_pair(next_power, power);
                         }
-                        
+
                         next_power += power;
                     }
 

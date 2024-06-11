@@ -39,7 +39,7 @@
 /// assertion failure report behaviour.
 ///
 /// See @ref page_assert for detail on how to define custom assertion failure
-/// behaviour.  
+/// behaviour.
 ///
 /// @section page_use_prot_interface Defining Message Interface Class
 /// The protocol definition is expected to define extendable message interface
@@ -58,7 +58,7 @@
 ///     };
 ///
 /// template <typename... TOptions>
-/// using Message = 
+/// using Message =
 ///     nil::marshalling::Message<
 ///         nil::marshalling::option::big_endian, // endian
 ///         nil::marshalling::option::msg_id_type<msg_id>, // type of message ID
@@ -71,7 +71,7 @@
 /// @code
 /// namespace my_protocol
 /// {
-///     
+///
 /// class Message : public nil::marshalling::Message
 ///     // nil::marshalling::field_type class with the same endian option.
 ///     // Can (and should) be provided as a base class to all the
@@ -94,7 +94,7 @@
 /// However, if some other type is used, such as std::string, then @b msg_id_param_type
 /// is a const-reference to @b msg_id_type.
 ///
-/// The message interface class may be extended with multiple options, which 
+/// The message interface class may be extended with multiple options, which
 /// automatically add virtual functions, and hence create polymorphic behaviour
 /// relevant to the client application.
 ///
@@ -157,18 +157,18 @@
 /// won't be created.
 ///
 /// The @ref nil::marshalling::Message interface class defines @ref nil::marshalling::Message::has_get_id()
-/// static constexpr member function, which may be used at compile time to 
+/// static constexpr member function, which may be used at compile time to
 /// determine whether the @ref nil::marshalling::option::id_info_interface option has been used, i.e.
 /// the message interface class defines mentioned earlier
 /// functions.
 ///
 /// @subsection page_use_prot_interface_read Polymorphic Read of Payload (Deserialization)
 /// If the implementation requires polymorphic read and process of input messages, the @b read()
-/// operation needs to be added to the interface. It is achieved by using 
+/// operation needs to be added to the interface. It is achieved by using
 /// @ref nil::marshalling::option::read_iterator option to provide a type of the iterator that
 /// is going to be used for reading:
 /// @code
-/// using MyMessage = 
+/// using MyMessage =
 ///     my_protocol::Message<
 ///         ...
 ///         nil::marshalling::option::read_iterator<const std::uint8_t*>,
@@ -199,10 +199,10 @@
 /// }
 /// @endcode
 /// Please @b note, that Marshalling library doesn't impose any restrictions on
-/// how the input data is collected and stored. It is a responsibility of the 
-/// @b caller to allocate and maintain the input buffer, while providing only an 
+/// how the input data is collected and stored. It is a responsibility of the
+/// @b caller to allocate and maintain the input buffer, while providing only an
 /// iterator for read operation. @n
-/// Also @b note, that iterator is passed by reference, which allows advancing 
+/// Also @b note, that iterator is passed by reference, which allows advancing
 /// operator when read operation is performed. @n
 /// For example:
 /// @code
@@ -212,27 +212,27 @@
 ///     auto es = msg->read(readIter, len); // readIter is advanced in the read operation
 ///     if (es != nil::marshalling::ErrorStatus::success) {
 ///         ... // Report and handle error
-///         return 0U; 
+///         return 0U;
 ///     }
-///     
+///
 ///     // Report number of processed bytes from buffer:
 ///     auto bytesCount = std::distance(MyMessage::read_iterator(buf), readIter);
 ///     return bytesCount;
 /// }
 /// @endcode
 /// The @ref nil::marshalling::Message interface class defines @ref nil::marshalling::Message::has_read()
-/// static constexpr member function, which may be used at compile time to 
+/// static constexpr member function, which may be used at compile time to
 /// determine whether the @ref nil::marshalling::option::read_iterator option has been used, i.e.
 /// the message interface class defines mentioned earlier
 /// types and functions.
 ///
 /// @subsection page_use_prot_interface_write Polymorphic Write of Payload (Serialisation)
 /// If the implementation requires polymorphic serialization of the messages and sending them over I/O
-/// link, the @b write() operation needs to be added to the interface. It is 
+/// link, the @b write() operation needs to be added to the interface. It is
 /// achieved by using  nil::marshalling::option::write_iterator option to provide a type of
 /// the iterator that is going to be used for writing:
 /// @code
-/// using MyMessage = 
+/// using MyMessage =
 ///     my_protocol::Message<
 ///         ...
 ///         nil::marshalling::option::write_iterator<std::back_insert_iterator<std::vector<std::uint8_t> > >,
@@ -263,17 +263,17 @@
 /// }
 /// @endcode
 /// Please @b note, that Marshalling library doesn't impose any restrictions on
-/// storage type for the output buffer. It is a responsibility of the 
-/// @b caller to allocate and maintain the output buffer, while providing only an 
+/// storage type for the output buffer. It is a responsibility of the
+/// @b caller to allocate and maintain the output buffer, while providing only an
 /// iterator for write operation. In the example above the output buffer
 /// is chosen to be @b std::vector<std::uint8_t> and the write operation will
 /// be performed using @b push_back() calls on this vector (due to @b std::back_insert_iterator
 /// being chosen as @b write_iterator). @n
-/// Also @b note, that iterator is passed by reference, which allows advancing 
-/// operator when write operation is performed. 
+/// Also @b note, that iterator is passed by reference, which allows advancing
+/// operator when write operation is performed.
 ///
 /// The @ref nil::marshalling::Message interface class defines @ref nil::marshalling::Message::has_write()
-/// static constexpr member function, which may be used at compile time to 
+/// static constexpr member function, which may be used at compile time to
 /// determine whether the @ref nil::marshalling::option::write_iterator option has been used, i.e.
 /// the message interface class defines mentioned earlier
 /// types and functions.
@@ -284,7 +284,7 @@
 /// The Marshalling library provides nil::marshalling::option::length_info_interface option that
 /// adds @b length() member function to the interface.
 /// @code
-/// using MyMessage = 
+/// using MyMessage =
 ///     my_protocol::Message<
 ///         ...
 ///         nil::marshalling::option::length_info_interface,
@@ -307,7 +307,7 @@
 /// };
 /// @endcode
 /// The @ref nil::marshalling::Message interface class defines @ref nil::marshalling::Message::has_length()
-/// static constexpr member function, which may be used at compile time to 
+/// static constexpr member function, which may be used at compile time to
 /// determine whether the @ref nil::marshalling::option::length_info_interface option has been used, i.e.
 /// the message interface class defines mentioned earlier
 /// functions.
@@ -343,7 +343,7 @@
 /// };
 /// @endcode
 /// The @ref nil::marshalling::Message interface class defines @ref nil::marshalling::Message::has_valid()
-/// static constexpr member function, which may be used at compile time to 
+/// static constexpr member function, which may be used at compile time to
 /// determine whether the @ref nil::marshalling::option::valid_check_interface option has been used, i.e.
 /// the message interface class defines mentioned earlier
 /// functions.
@@ -357,7 +357,7 @@
 /// properly handled. Using simple
 /// switch statement on message ID (returned by @b get_id() interface function)
 /// can be very @b INEFFICIENT. The Marshalling library provides much more efficient way
-/// to dispatch messages to appropriate handler. 
+/// to dispatch messages to appropriate handler.
 ///
 /// The handler class needs to be forward declared and passed
 /// to the definition of @b MyMessage interface via nil::marshalling::option::handler option.
@@ -365,7 +365,7 @@
 /// // Forward declaration
 /// class MyHandler;
 ///
-/// using MyHandler = 
+/// using MyHandler =
 ///     my_protocol::Message<
 ///         ...
 ///         nil::marshalling::option::handler<MyHandler>,
@@ -399,7 +399,7 @@
 /// below in @ref page_use_prot_handling section.
 ///
 /// The @ref nil::marshalling::Message interface class defines @ref nil::marshalling::Message::has_dispatch()
-/// static constexpr member function, which may be used at compile time to 
+/// static constexpr member function, which may be used at compile time to
 /// determine whether the @ref nil::marshalling::option::handler option has been used, i.e.
 /// the message interface class defines mentioned earlier
 /// types and functions.
@@ -407,15 +407,15 @@
 /// @subsection page_use_prot_interface_refresh Keeping Message Contents in a Consistent State
 /// Some communication protocol may define fields that depend on other fields.
 /// For example, bits in a bitmask field may be used to define whether some
-/// optional fields exist. Or the information about amount of elements in 
-/// the list to follow may reside in an independent numeric field. @n 
+/// optional fields exist. Or the information about amount of elements in
+/// the list to follow may reside in an independent numeric field. @n
 /// After updating such fields directly, using the interface of the message object,
 /// the message contents may end up being in an inconsistent (or invalid) state.
 /// There may be a need to polymorphically normalise the state of the message object. The
 /// Marshalling library provides nil::marshalling::option::refresh_interface option, that adds
 /// @b refresh() member function to the message interface.
 /// @code
-/// using MyMessage = 
+/// using MyMessage =
 ///     nil::marshalling::Message<
 ///         ...
 ///         nil::marshalling::option::refresh_interface,
@@ -448,7 +448,7 @@
 /// may just override it with proper implementation.
 ///
 /// The @ref nil::marshalling::Message interface class defines @ref nil::marshalling::Message::has_refresh()
-/// static constexpr member function, which may be used at compile time to 
+/// static constexpr member function, which may be used at compile time to
 /// determine whether the @ref nil::marshalling::option::refresh_interface option has been used, i.e.
 /// the message interface class defines mentioned earlier
 /// functions.
@@ -459,7 +459,7 @@
 /// option, that adds @b name() member function to the message interface
 /// (see @ref nil::marshalling::Message::name()).
 /// @code
-/// using MyMessage = 
+/// using MyMessage =
 ///     nil::marshalling::Message<
 ///         ...
 ///         nil::marshalling::option::name_interface,
@@ -471,7 +471,7 @@
 /// class MyMessage
 /// {
 /// public:
-///     // Retrieve name of the message 
+///     // Retrieve name of the message
 ///     const char* name() const
 ///     {
 ///         return name_impl();
@@ -482,34 +482,34 @@
 /// };
 /// @endcode
 /// The @ref nil::marshalling::Message interface class defines @ref nil::marshalling::Message::has_name()
-/// static constexpr member function, which may be used at compile time to 
+/// static constexpr member function, which may be used at compile time to
 /// determine whether the @ref nil::marshalling::option::name_interface option has been used, i.e.
 /// the message interface class defines mentioned earlier
 /// functions.
 ///
 /// @subsection page_use_prot_interface_virt_destructor Virtual Destructor
 /// By default the @ref nil::marshalling::Message class defines its
-/// destructor as @b virtual if and only if it exhibits a polymorphic behaviour, 
+/// destructor as @b virtual if and only if it exhibits a polymorphic behaviour,
 /// i.e. if there is at least one other virtual function defined. There are a couple of
 /// ways to change this default behaviour.
-/// @li If the definition of the common message interface class using 
-///     exhibits polymorphic 
+/// @li If the definition of the common message interface class using
+///     exhibits polymorphic
 ///     behaviour (i.e. has other virtual functions), but mustn't define its
 ///     destructor as @b virtual, use @ref nil::marshalling::option::no_virtual_destructor
 ///     option in the interface class definition.
 ///     @code
-///     using MyMessage = 
+///     using MyMessage =
 ///         my_protocol::Message<
 ///             ...,
 ///             nil::marshalling::option::no_virtual_destructor
 ///         >;
 ///     @endcode
-/// @li If the definition of the common interface class 
-///     doesn't have any virtual function, but still requires an ability to 
-///     be polymorphically deleted, i.e. must have virtual destructor, just 
+/// @li If the definition of the common interface class
+///     doesn't have any virtual function, but still requires an ability to
+///     be polymorphically deleted, i.e. must have virtual destructor, just
 ///     inherit from @b my_protocol::Message and define the destructor as virtual.
 ///     @code
-///     class MyMessage : public 
+///     class MyMessage : public
 ///         my_protocol::Message<>
 ///     {
 ///     public:
@@ -520,12 +520,12 @@
 /// @subsection page_use_prot_interface_summary Interface options_type Summary
 /// All the options introduced above can be used in any order. They can also
 /// be repeated multiple times. However, the option that was defined first takes
-/// priority over (or overrides) the same option defined later. @n 
+/// priority over (or overrides) the same option defined later. @n
 /// For example, the definition below defines @b write_iterator to be
-/// <b>std::uint8_t*</b>, because it was defined with first 
+/// <b>std::uint8_t*</b>, because it was defined with first
 /// nil::marshalling::option::write_iterator option:
 /// @code
-/// using MyMessage = 
+/// using MyMessage =
 ///     my_protocol::Message<
 ///         ...
 ///         nil::marshalling::option::write_iterator<std::uint8_t*>,
@@ -533,7 +533,7 @@
 ///         nil::marshalling::option::write_iterator<std::back_insert_iterator<std::vector<std::uint8_t> >,
 ///         ...
 ///     >;
-/// @endcode  
+/// @endcode
 /// The definition below gives a full interface of all
 /// the introduced functions: @b get_id(), @b read(), @b write(), @b dispatch(),
 /// @b length(), @b valid(), @b refresh(), and @b name().
@@ -552,12 +552,12 @@
 ///
 /// @section page_use_prot_messages Protocol Messages
 /// The protocol messages are expected to be defined as template classes, receiving
-/// at least one template parameter, which specifies the application specific interface 
+/// at least one template parameter, which specifies the application specific interface
 /// class. For example
 /// @code
 /// namespace my_protocol
 /// {
-/// 
+///
 /// namespace message
 /// {
 ///
@@ -576,7 +576,7 @@
 /// } // namespace my_protocol
 /// @endcode
 /// The interface class that was defined for the application (@b MyMessage) needs
-/// to be passed as @b TBase template parameter. The defined message class 
+/// to be passed as @b TBase template parameter. The defined message class
 /// extends @ref nil::marshalling::MessageBase, which in turn extends provided interface
 /// class @b TBase, which in turn extends @ref nil::marshalling::Message. The inheritence
 /// hierarchy may look like this:
@@ -601,7 +601,7 @@
 /// @code
 /// namespace my_protocol
 /// {
-/// 
+///
 /// namespace message
 /// {
 ///
@@ -665,7 +665,7 @@
 /// @code
 /// namespace my_protocol
 /// {
-/// 
+///
 /// namespace message
 /// {
 ///
@@ -689,7 +689,7 @@
 /// @code
 /// namespace my_protocol
 /// {
-/// 
+///
 /// namespace message
 /// {
 ///
@@ -767,8 +767,8 @@
 /// @endcode
 ///
 /// @section page_use_prot_fields Message fields_type
-/// In order to continue with the tutorial, it is paramount to understand a 
-/// concept of @b fields, which are abstractions around value storage primitives and/or objects, 
+/// In order to continue with the tutorial, it is paramount to understand a
+/// concept of @b fields, which are abstractions around value storage primitives and/or objects,
 /// such as integral values, floating point values, strings, arrays, etc..
 /// Every @b field class is defined in @ref nil::marshalling::field namespace and
 /// exposes predefined interface in order to
@@ -782,7 +782,7 @@
 /// public:
 ///     // Define inner storage type
 ///     using value_type = T;
-///     
+///
 ///     // Get access to the stored value
 ///     value_type& value() { return m_value; }
 ///     const value_type& value() const { return m_value; }
@@ -809,7 +809,7 @@
 /// }
 /// @endcode
 /// The main things to note are that every field definition class:
-/// @li receives its base class as the first 
+/// @li receives its base class as the first
 ///     template parameter. It is expected to be a variant of @ref
 ///     nil::marshalling::field_type with @ref nil::marshalling::option::big_endian or @ref
 ///     nil::marshalling::option::little_endian option to specify the serialization endian.
@@ -823,7 +823,7 @@
 ///     environment and/or behaviour (such as modifying the default storage type).
 /// @li defines @b value_type inner value storage
 ///     type and provides @b value() member functions to access the stored value.
-/// @li provides @b read() and @b write() member functions to read and write the 
+/// @li provides @b read() and @b write() member functions to read and write the
 ///     inner value given the iterator used for reading / writing and available
 ///     length of the buffer.
 /// @li has @b length() member function to report how many bytes are required to
@@ -833,7 +833,7 @@
 /// @li has @b refresh() member function to bring its contents to consistent / valid
 ///     state when required.
 ///
-/// Also note that all the member function are NON-virtual, i.e. the field 
+/// Also note that all the member function are NON-virtual, i.e. the field
 /// abstractions do not have polymorphic behaviour.
 ///
 /// The most important member function to a client application is @b value().
@@ -843,7 +843,7 @@
 /// auto myFieldValue = myField.value();
 /// myField.value() = 5U;
 /// @endcode
-/// Other member functions are of lesser importance to the client application, 
+/// Other member functions are of lesser importance to the client application,
 /// they are used by the protocol definition itself to properly (de)serialise
 /// message contents and provide other useful functionality.
 ///
@@ -868,7 +868,7 @@
 /// using MyFieldBase = nil::marshalling::field_type<nil::marshalling::option::big_endian>
 ///
 /// // definition of integral field
-/// using MyIntField = 
+/// using MyIntField =
 ///     nil::marshalling::types::IntValue<
 ///         MyFieldBase, // base class for all the fields, defined by the protocol definition library
 ///         std::uint16_t
@@ -884,10 +884,10 @@
 /// information, but serialized as offset from year @b 2000 with a single byte.
 /// Such field may be defined as following:
 /// @code
-/// using YearField = 
+/// using YearField =
 ///     nil::marshalling::types::IntValue<
-///         MyFieldBase, 
-///         std::int16_t, 
+///         MyFieldBase,
+///         std::int16_t,
 ///         nil::marshalling::option::fixed_length<1>,
 ///         nil::marshalling::option::num_value_ser_offset<-2000>
 ///     >;
@@ -898,14 +898,14 @@
 /// YearField field;
 /// field.value() = 2018; // serialized as 0x12;
 /// @endcode
-/// Some protocols may exchange floating point values by serialising them as 
+/// Some protocols may exchange floating point values by serialising them as
 /// integral ones. For example, multiply the floating point value by 1000 before
 /// the serialization, and upon reception divide the received value by 1000 to
 /// get the floating point one. Such fields will be defined using @ref
 /// nil::marshalling::types::IntValue type with using @ref nil::marshalling::option::scaling_ratio
 /// option
 /// @code
-/// using MyFpField = 
+/// using MyFpField =
 ///     nil::marshalling::types::IntValue<
 ///         MyFieldBase, // base class for all the fields, defined by the protocol definition library
 ///         std::int32_t,
@@ -919,7 +919,7 @@
 /// @code
 /// MyFpField field;
 /// field.set_scaled(1.3f);
-/// assert(field.value() == 1300); 
+/// assert(field.value() == 1300);
 /// auto asDouble = field.get_scaled<double>(); // equivalent to 1.3
 /// @endcode
 /// In addition to @b scaling, the @b Marshalling library also provides an ability
@@ -927,7 +927,7 @@
 /// @b 1/10 of the @b millimetres. The definition of such field may look like
 /// this
 /// @code
-/// using MyDistance = 
+/// using MyDistance =
 ///     nil::marshalling::types::IntValue<
 ///         MyFieldBase,
 ///         std::int32_t,
@@ -938,10 +938,10 @@
 /// @ref nil::marshalling::units namespace. When using the provided conversion function the application developer
 /// doesn't need to remember the original units and/or scaling factor. The @b Marshalling library
 /// does all the math. It also prevents (at compile time) usage of wrong conversion
-/// functions, say calculating time (@b milliseconds), when specified units are 
+/// functions, say calculating time (@b milliseconds), when specified units are
 /// @b distance (@b millimetres).
 /// @code
-/// MyDistance field; 
+/// MyDistance field;
 /// nil::marshalling::units::setMeters(field, 1.2345);
 /// std::cout << "distance in 1/10 of mm:" << field.value() << std::endl; // prints 12345
 /// std::cout << "distance in mm" << nil::marshalling::units::get_millimeters<double>(field); // prints 1234.5
@@ -952,7 +952,7 @@
 /// @ref nil::marshalling::option::default_num_value option to specify some other value
 /// @code
 /// // definition of integral field
-/// using MyIntField = 
+/// using MyIntField =
 ///     nil::marshalling::types::IntValue<
 ///         MyFieldBase, // base class for all the fields, defined by the protocol definition library
 ///         std::uint16_t,
@@ -977,7 +977,7 @@
 ///     NumOfValues
 /// };
 ///
-/// using SomeEnumField = 
+/// using SomeEnumField =
 ///     nil::marshalling::types::EnumValue<
 ///         MyFieldBase,
 ///         SomeEnumVal,
@@ -988,16 +988,16 @@
 /// SomeEnumField field;
 /// assert(field.value() == SomeEnumVal::Val3); // initialised by default to Val3;
 /// field.value() = SomeEnumVal::Val2;
-/// @endcode 
+/// @endcode
 ///
 /// @subsection page_use_prot_fields_bitmask_value Bitmask value fields_type
 /// Bitmasks (or bitsets) are also numeric values where every bit has separate,
 /// independent meaning. Such fields are defined using @ref nil::marshalling::types::BitmaskValue
-/// class. 
+/// class.
 /// @code
-/// struct MyBitmask : public 
+/// struct MyBitmask : public
 ///     nil::marshalling::types::BitmaskValue<
-///         MyFieldBase, 
+///         MyFieldBase,
 ///         nil::marshalling::option::fixed_length<1>,
 ///         nil::marshalling::option::bitmask_reserved_bits<0x2, 0> // Second bit is reserved and must be 0
 ///     >
@@ -1007,7 +1007,7 @@
 /// @endcode
 /// The field definition will use @ref nil::marshalling::option::fixed_length option in
 /// order to specify its serialization length. The inner @b value_type type will
-/// be calculated automatically and defined as one of the unsigned types: 
+/// be calculated automatically and defined as one of the unsigned types:
 /// @b std::uint8_t, @b std::uint16_t, @b std::uint32_t, or @b std::uint64_t.
 /// The usage of @ref nil::marshalling::option::bitmask_reserved_bits option will mark
 /// certain bits as "reserved". It influences only validity check functionality
@@ -1024,7 +1024,7 @@
 /// @code
 /// struct MyBitmask : public
 ///     nil::marshalling::types::BitmaskValue<
-///         MyFieldBase, 
+///         MyFieldBase,
 ///         nil::marshalling::option::fixed_length<1>,
 ///         nil::marshalling::option::bitmask_reserved_bits<0x2, 0> // Second bit is reserved and must be 0
 ///     >
@@ -1037,12 +1037,12 @@
 /// @code
 /// struct MyBitmask : public
 ///     nil::marshalling::types::BitmaskValue<
-///         MyFieldBase, 
+///         MyFieldBase,
 ///         nil::marshalling::option::fixed_length<1>,
 ///         nil::marshalling::option::bitmask_reserved_bits<0x2, 0>
 ///     >
 /// {
-///     enum BitIdx 
+///     enum BitIdx
 ///     {
 ///         BitIdx_first,
 ///         BitIdx_third=2,
@@ -1063,11 +1063,11 @@
 ///     ...
 /// }
 /// @endcode
-/// The generated convenience access functions use existing 
+/// The generated convenience access functions use existing
 /// @ref nil::marshalling::types::BitmaskValue::get_bit_value() and
 /// @ref nil::marshalling::types::BitmaskValue::set_bit_value() member functions.
 ///
-/// It is also possible to set multiple bits at the same time by accessing 
+/// It is also possible to set multiple bits at the same time by accessing
 /// the stored value directly
 /// @code
 /// MyBitmask field;
@@ -1118,9 +1118,9 @@
 /// enum class StopBits {...}
 /// enum class FlowControl {...}
 ///
-/// struct SerialConfigField : public 
+/// struct SerialConfigField : public
 ///     nil::marshalling::types::Bitfield<
-///         MyFieldBase, 
+///         MyFieldBase,
 ///         std::tuple<
 ///             nil::marshalling::types::EnumValue<MyFieldBase, Baud, nil::marshalling::option::fixed_bit_length<3> >,
 ///             nil::marshalling::types::EnumValue<MyFieldBase, Parity, nil::marshalling::option::fixed_bit_length<2> >,
@@ -1136,15 +1136,15 @@
 /// All the member fields of the @ref nil::marshalling::types::Bitfield are stored internally
 /// as @b std::tuple, as the result the inner @b value_type of such field is
 /// @b std::tuple of all member fields and call to @ref nil::marshalling::types::Bitfield::value()
-/// member function will give an access to it. 
+/// member function will give an access to it.
 ///
 /// The field definition is expected to use @ref MARSHALLING_FIELD_MEMBERS_ACCESS() macro,
-/// which will generate @b FieldIdx enum as well as convenience access member 
+/// which will generate @b FieldIdx enum as well as convenience access member
 /// functions. The code becomes equivalent to:
 /// @code
-/// struct SerialConfigField : public 
+/// struct SerialConfigField : public
 ///     nil::marshalling::types::Bitfield<
-///         MyFieldBase, 
+///         MyFieldBase,
 ///         std::tuple<
 ///             nil::marshalling::types::EnumValue<MyFieldBase, Baud, nil::marshalling::option::fixed_bit_length<3> >,
 ///             nil::marshalling::types::EnumValue<MyFieldBase, Parity, nil::marshalling::option::fixed_bit_length<2> >,
@@ -1163,7 +1163,7 @@
 ///         FieldIdx_reserved,
 ///         FieldIdx_numOfValues
 ///     };
-/// 
+///
 ///     // Accessor to "baud" field
 ///     auto field_baud() -> decltype(std::get<FieldIdx_baud>(value()))
 ///     {
@@ -1197,13 +1197,13 @@
 /// SerialConfigField configField;
 /// configField.field_baud().value() = Baud::Val_115200;
 /// @endcode
-/// 
+///
 /// @subsection page_use_prot_fields_bundle Bundle fields_type
 /// There are cases when multiple independent fields need to be bundled into
 /// a single field and expose the required interface of reading, writing,
 /// calculating length, checking field's contents validity, and bringing field's
 /// value into a consistent state. It may be required
-/// when a message contains sequence (see @ref page_use_prot_fields_array_list) 
+/// when a message contains sequence (see @ref page_use_prot_fields_array_list)
 /// of such bundles/structs. The Marshalling library provides @ref nil::marshalling::types::Bundle
 /// field for this purpose. It is quite similar to @ref nil::marshalling::types::Bitfield described
 /// earlier. The difference is that every member field
@@ -1231,7 +1231,7 @@
 /// };
 /// @endcode
 /// Just like with @ref page_use_prot_fields_bitfield, the inner @b value_type type
-/// of such field is a @b std::tuple of member fields, and usage of 
+/// of such field is a @b std::tuple of member fields, and usage of
 /// @ref MARSHALLING_FIELD_MEMBERS_ACCESS() has exactly the same effect, i.e. generates
 /// inner @b FieldIdx enum and convenience access member functions:
 /// @code
@@ -1282,7 +1282,7 @@
 /// interface to properly handle such sequences of data. It supports a
 /// sequence of raw bytes
 /// @code
-/// using MySimpleList = 
+/// using MySimpleList =
 ///     nil::marshalling::types::array_list<
 ///         MyFieldBase,
 ///         std::uint8_t // raw byte type as second template parameter
@@ -1290,10 +1290,10 @@
 /// @endcode
 /// as well as using sequence of any fields defined in nil::marshalling::field namespace
 /// @code
-/// using MyComplexList = 
+/// using MyComplexList =
 ///     nil::marshalling::types::array_list<
 ///         MyFieldBase,
-///         MyBundle // Complex bundle field, defined in previous section 
+///         MyBundle // Complex bundle field, defined in previous section
 ///     >;
 /// @endcode
 /// The @b default storage type (inner @b value_type type) of these fields is
@@ -1306,7 +1306,7 @@
 /// @ref page_use_prot_fields_customisation section below in more detail.
 ///
 /// Please pay attention, that in case of non-raw data lists, the inner @b std::vector
-/// contains fields, not values. As the result access to the stored values 
+/// contains fields, not values. As the result access to the stored values
 /// may require a bit of extra function calls:
 /// @code
 /// MyComplexList list;
@@ -1319,7 +1319,7 @@
 /// Some protocols may define fixed size lists. In such case lists are defined
 /// with usage of @ref nil::marshalling::option::sequence_fixed_size option.
 /// @code
-/// using MyList = 
+/// using MyList =
 ///     nil::marshalling::types::array_list<
 ///         MyFieldBase,
 ///         nil::marshalling::types::IntValue<MyFieldBase, std::uint16_t>,
@@ -1342,7 +1342,7 @@
 /// @endcode
 /// It is very similar to nil::marshalling::types::array_list
 /// it terms of value storage, read/write operations, and supported options.
-/// By default the value is stored as 
+/// By default the value is stored as
 /// <a href="http://en.cppreference.com/w/cpp/string/basic_string">std::string</a>.
 /// @code
 /// MyString myStr;
@@ -1358,7 +1358,7 @@
 /// like with lists it doesn't automatically resize inner string, just ensures
 /// right amount of characters "on the wire" when field is serialized.
 /// @code
-/// using MyFixedString = 
+/// using MyFixedString =
 ///     nil::marshalling::types::String<
 ///         MyFieldBase,
 ///         nil::marshalling::option::sequence_fixed_size<32>
@@ -1370,11 +1370,11 @@
 ///
 /// @subsection page_use_prot_fields_fp_value Floating Point value fields_type
 /// Floating point value fields are defined using @ref nil::marshalling::types::FloatValue
-/// They are very similar to 
-/// @ref page_use_prot_fields_int_value, but use @b float or @b double as its 
-/// internal storage type. They abstract the IEEE 754 floating point 
+/// They are very similar to
+/// @ref page_use_prot_fields_int_value, but use @b float or @b double as its
+/// internal storage type. They abstract the IEEE 754 floating point
 /// values, which are serialized "as is" with either big or little endian
-/// encoding. The floating point value fields also support 
+/// encoding. The floating point value fields also support
 /// the same scaling and units conversion just like @ref page_use_prot_fields_int_value.
 ///
 /// @subsection page_use_prot_fields_optional Optional fields_type
@@ -1386,7 +1386,7 @@
 /// library provides @ref nil::marshalling::types::Optional which is a mere wrapper around
 /// other fields and provides an ability to set the optional state of the field.
 /// @code
-/// using OptField = 
+/// using OptField =
 ///     nil::marshalling::types::Optional<
 ///         nil::marshalling::types::IntValue<MyFieldBase, std::int32_t>
 ///     >;
@@ -1399,7 +1399,7 @@
 /// The default mode can be changed using @ref nil::marshalling::option::exists_by_default
 /// or @ref nil::marshalling::option::missing_by_default options. For example
 /// @code
-/// using ExistingOptField = 
+/// using ExistingOptField =
 ///     nil::marshalling::types::Optional<
 ///         nil::marshalling::types::IntValue<MyFieldBase, std::int32_t>,
 ///         nil::marshalling::option::exists_by_default
@@ -1419,11 +1419,11 @@
 /// @endcode
 ///
 /// @subsection page_use_prot_fields_variant Variant fields_type
-/// Some protocols may require usage of heterogeneous fields or lists of 
+/// Some protocols may require usage of heterogeneous fields or lists of
 /// heterogeneous fields, i.e. the ones that can be of multiple types. Good example
 /// would be a list of @b properties, where every property is a key/value pair. The
 /// key is a numeric ID of the property, while value can be a numeric field of
-/// any length or a string one. Such fields are defined using 
+/// any length or a string one. Such fields are defined using
 /// @ref nil::marshalling::types::Variant class. It is very similar to @ref
 /// page_use_prot_fields_bundle, but serves as one big union of provided member
 /// fields, i.e. only one can be used at a time. These fields are quite rare
@@ -1449,7 +1449,7 @@
 ///
 /// namespace my_protocol
 /// {
-/// 
+///
 /// namespace message
 /// {
 ///
@@ -1458,14 +1458,14 @@
 /// {
 ///     using field1 = ...;
 ///     using field2 = ...
-///     using field3 = 
+///     using field3 =
 ///         nil::marshalling::types::String<
 ///             MyFieldBase,
-///             typename TOpt::message::Message1Fields::field3 // Extra option(s) 
+///             typename TOpt::message::Message1Fields::field3 // Extra option(s)
 ///         >
 ///
 ///     // bunding type
-///     using All = 
+///     using All =
 ///         std::tuple<
 ///             field1,
 ///             field2,
@@ -1474,9 +1474,9 @@
 /// };
 ///
 /// template <typename TBase, typename TOpt = DefaultOptions>
-/// class Message1 : public 
+/// class Message1 : public
 ///     nil::marshalling::MessageBase<
-///         TBase, 
+///         TBase,
 ///         nil::marshalling::option::static_num_id_impl<MsgId_Message1>,
 ///         nil::marshalling::option::fields_impl<Message1Fields<TOpt>::All>, // using fields with extra options
 ///         nil::marshalling::option::msg_type<Message1<TBase, TOpt> >
@@ -1490,8 +1490,8 @@
 ///
 /// } // namespace my_protocol
 /// @endcode
-/// The inner structure of @b DefaultOptions struct is not important, but 
-/// the recommended practice is to resemble the scope of fields. It may look 
+/// The inner structure of @b DefaultOptions struct is not important, but
+/// the recommended practice is to resemble the scope of fields. It may look
 /// like this
 /// @code
 /// namespace my_protocol
@@ -1510,7 +1510,7 @@
 /// };
 /// } // my_protocol
 /// @endcode
-/// The application is expected to provide its own options describing 
+/// The application is expected to provide its own options describing
 /// struct / class if needed. The easiest way is to extend provided @b DefaultOptions
 /// and override selected types. For example
 /// @code
@@ -1550,20 +1550,20 @@
 /// storage type for @ref page_use_prot_fields_string is @b std::string. These
 /// types are suitable for most of C++ applications, but may be unsuitable for
 /// bare-metal embedded platforms. That why the protocol definition @b must allow
-/// additional customisation of such fields. 
+/// additional customisation of such fields.
 ///
 /// The @b Marshalling library provides
-/// multiple options to change the default storage type. 
+/// multiple options to change the default storage type.
 /// There is @ref nil::marshalling::option::fixed_size_storage option. When passed to the
 /// @ref nil::marshalling::types::array_list or @ref nil::marshalling::types::String, it changes the
 /// default storage type to be @ref nil::marshalling::container::static_vector or
 /// @ref nil::marshalling::processing::StaticString respectively. These types expose the same
-/// public API as @b std::vector or @b std::string, but use pre-allocated 
+/// public API as @b std::vector or @b std::string, but use pre-allocated
 /// storage area (as their private member) to store the elements / characters.
 /// Note, that the @ref nil::marshalling::option::fixed_size_storage option has a template
 /// parameter, which specify number of elements (not necessarily bytes) to be
 /// stored. If the field definition already uses @ref nil::marshalling::option::sequence_fixed_size
-/// option to specify that number of elements is fixed, there is 
+/// option to specify that number of elements is fixed, there is
 /// @ref nil::marshalling::option::sequence_fixed_size_use_fixed_size_storage
 /// option which has the same effect of forcing @ref nil::marshalling::container::static_vector
 /// or @ref nil::marshalling::processing::StaticString to be storage types, but does not
@@ -1588,7 +1588,7 @@
 /// the input buffer is contiguous, i.e the pointer to the last element is @b always
 /// greater than pointer to the first one (not some kind of circular buffer), then
 /// to copying of the data may be avoided by using @ref nil::marshalling::option::orig_data_view
-/// option. The option will change the default storage types to be 
+/// option. The option will change the default storage types to be
 /// @ref nil::marshalling::processing::ArrayView or @ref nil::marshalling::processing::StringView. @b NOTE, that
 /// passing @ref nil::marshalling::option::orig_data_view option to @ref nil::marshalling::types::array_list
 /// is possible only if it is list of raw data (@b std::uint8_t is used as element type).
@@ -1605,7 +1605,7 @@
 /// };
 /// @endcode
 ///
-/// If default standard @b std::vector / @b std::string or all the provided 
+/// If default standard @b std::vector / @b std::string or all the provided
 /// by the @b Marshalling library storage type are
 /// not good enough, it is possible to specify custom storage type
 /// using @ref nil::marshalling::option::custom_storage_type option. For example:
@@ -1616,7 +1616,7 @@
 ///     {
 ///         struct Message1Fields : public my_protocol::DefaultOptions::message::Message1Fields
 ///         {
-///             using field3 = 
+///             using field3 =
 ///                 nil::marshalling::option::custom_storage_type<
 ///                     boost::container::pmr::string
 ///                 >;
@@ -1640,18 +1640,18 @@
 ///
 /// namespace my_protocol
 /// {
-/// 
+///
 /// namespace message
 /// {
 ///
 /// template <typename TOpt = DefaultOptions>
 /// struct Message1Fields
 /// {
-///     using field1 = 
+///     using field1 =
 ///         nil::marshalling::types::IntValue<
 ///             MyFieldBase,
 ///             std::uint8_t,
-///             typename TOpt::message::Message1Fields::field1, // Extra options 
+///             typename TOpt::message::Message1Fields::field1, // Extra options
 ///             nil::marshalling::option::default_num_value<10>,
 ///             nil::marshalling::option::valid_num_value_range<10, 20>
 ///         >;
@@ -1659,9 +1659,9 @@
 /// };
 ///
 /// template <typename TBase, typename TOpt = DefaultOptions>
-/// class Message1 : public 
+/// class Message1 : public
 ///     nil::marshalling::MessageBase<
-///         TBase, 
+///         TBase,
 ///         nil::marshalling::option::static_num_id_impl<MsgId_Message1>,
 ///         nil::marshalling::option::fields_impl<Message1Fields<TOpt>::All>, // using fields with extra options
 ///         nil::marshalling::option::msg_type<Message1<TBase, TOpt> >
@@ -1675,7 +1675,7 @@
 /// } // namespace my_protocol
 /// @endcode
 /// If not other options are passed as @b message::Message1Fields::field1 inner
-/// type of application specific options struct / class, then the inner value of 
+/// type of application specific options struct / class, then the inner value of
 /// @b field1 will be initialised to @b 10 upon construction and the range of
 /// valid values will be <b>[10, 20]</b>. Such default settings may be modified
 /// using various options. For example, making the value to be initialised to @b 5 and
@@ -1687,7 +1687,7 @@
 ///     {
 ///         struct Message1Fields : public my_protocol::DefaultOptions::message::Message1Fields
 ///         {
-///             using field1 = 
+///             using field1 =
 ///                 std::tuple<
 ///                     nil::marshalling::option::default_num_value<5>,
 ///                     nil::marshalling::option::ValidNumValue<5>
@@ -1697,9 +1697,9 @@
 /// };
 /// @endcode
 /// After these extra options are passed to the field's definition it becomes
-/// equivalent to 
+/// equivalent to
 /// @code
-///     using field1 = 
+///     using field1 =
 ///         nil::marshalling::types::IntValue<
 ///             MyFieldBase,
 ///             std::uint8_t,
@@ -1728,7 +1728,7 @@
 ///     {
 ///         struct Message1Fields : public my_protocol::DefaultOptions::message::Message1Fields
 ///         {
-///             using field1 = 
+///             using field1 =
 ///                 std::tuple<
 ///                     nil::marshalling::option::default_num_value<5>, // change the default value
 ///                     nil::marshalling::option::ValidNumValue<5>, // add 5 to valid ranges of [40, 50]
@@ -1748,10 +1748,10 @@
 /// supported options and read their documentation for more detail.
 ///
 /// @section page_use_prot_transport Transport Framing
-/// In addition to definition of the messages and their contents, every 
-/// communication protocol must ensure that the message is successfully delivered 
+/// In addition to definition of the messages and their contents, every
+/// communication protocol must ensure that the message is successfully delivered
 /// over the I/O link to the other side. The serialized message payload must
-/// be wrapped in some kind of transport information prior to being sent and 
+/// be wrapped in some kind of transport information prior to being sent and
 /// unwrapped on the other side when received. The @b Marshalling protocol defines
 /// multiple so called @b layers (defined in @b nil::marshalling::protocol namespace).
 /// The transport framing will be defined using those @b layer classes and will
@@ -1767,8 +1767,8 @@
 ///     typename TAllocationOptions = nil::marshalling::option::empty_option, // Extra options for nil::marshalling::protocol::MsgIdLayer
 ///     typename TPayloadOptions = nil::marshalling::option::empty_option // Extra options for payload storage
 /// >
-/// struct ProtocolStack : public 
-///     MySyncPrefix<TMessage, TInputMessages, TAllocationOptions, TPayloadOptions> 
+/// struct ProtocolStack : public
+///     MySyncPrefix<TMessage, TInputMessages, TAllocationOptions, TPayloadOptions>
 /// {
 ///     MARSHALLING_PROTOCOL_LAYERS_ACCESS(...);
 /// };
@@ -1777,7 +1777,7 @@
 /// @endcode
 /// The first template parameter (@b TMessage) is common message interface class desribed
 /// earlier in @ref page_use_prot_interface section.
-/// 
+///
 /// The second template parameter (@b TInputMessages) is @b std::tuple of input
 /// messages that @b read operation is expected to recognise. The message classes
 /// must be sorted by the ascending order of message IDs. The protocol definition
@@ -1785,9 +1785,9 @@
 /// messages, which can be used as reference.
 ///
 /// The third template parameter (@b TAllocationOptions) is extra option(s)
-/// (bundled in @b std::tuple if more than one) to be passed to 
+/// (bundled in @b std::tuple if more than one) to be passed to
 /// @ref nil::marshalling::protocol::MsgIdLayer class which is responsible for message
-/// allocation. By default the message object is dynamically allocated, it is 
+/// allocation. By default the message object is dynamically allocated, it is
 /// possible to modify such behaviour by using @ref nil::marshalling::option::in_place_allocation
 /// option. It will be explained in more detail further below.
 ///
@@ -1802,7 +1802,7 @@
 ///
 /// @subsection page_use_prot_transport_read Reading Transport Framing and Message Payload
 /// Below is an example of how to implement data processing loop, which parses
-/// the raw bytes in the provided input buffer, creates appropriate message 
+/// the raw bytes in the provided input buffer, creates appropriate message
 /// message object and dispatches it to the right handler.
 /// @code
 /// // Alias to my_protocol::ProtocolStack
@@ -1822,7 +1822,7 @@
 ///
 ///         // type of the message interface class
 ///         using msg_type = ProtStack::msg_ptr_type::element_type;
-///     
+///
 ///         // Get the iterator for reading
 ///         auto begIter = nil::marshalling::readIteratorFor<msg_type>(buf + consumed);
 ///         auto iter = begIter;
@@ -1831,8 +1831,8 @@
 ///         auto es = protStack.read(msgPtr, iter, len - consumed);
 ///         if (es == nil::marshalling::ErrorStatus::not_enough_data) {
 ///             break; // Not enough data in the buffer, stop processing
-///         } 
-///     
+///         }
+///
 ///         if (es == nil::marshalling::ErrorStatus::protocol_error) {
 ///             // Something is not right with the data, remove one character and try again
 ///            ++consumed;
@@ -1856,7 +1856,7 @@
 /// @li The first template parameter passed to @b my_protocol::ProtocolStack is
 ///     @b MyMessage interface class defined earlier in @ref page_use_prot_interface
 ///     section.
-/// @li The protocol stack type defines type of the smart pointer that 
+/// @li The protocol stack type defines type of the smart pointer that
 ///     holds message object that was allocation during @b read operation:
 ///     @code
 ///     ProtStack::msg_ptr_type msgPtr;
@@ -1873,10 +1873,10 @@
 ///     the message payload will be read by invoking the @ref nil::marshalling::Message::read()
 ///     member function. It means that common message interface class must support
 ///     polymorphic read (see @ref page_use_prot_interface_read).
-///     It means that the iterator used 
+///     It means that the iterator used
 ///     for reading needs to be convertible to @ref nil::marshalling::Message::read_iterator. It
 ///     can be achieved by using @ref nil::marshalling::read_iterator_for() template function,
-///     which will initialise and return appropriate iterator type. Another 
+///     which will initialise and return appropriate iterator type. Another
 ///     possible way of allocating the iterator can be as following:
 ///     @code
 ///     msg_type::read_iterator iter = buf + consumed;
@@ -1884,7 +1884,7 @@
 /// @li After the read operation is determined to be successful, the @b msgPtr
 ///     holds dynamically allocated message object. The dispatching of the
 ///     message for the handling is performed using polymorphic @b dispatch().
-///     It will require common message interface class to support 
+///     It will require common message interface class to support
 ///     @ref page_use_prot_interface_handle. See also @ref page_use_prot_handling
 ///     section below for more detail on message handling.
 ///
@@ -1910,7 +1910,7 @@
 ///         auto es = protStack.read(msg, iter, len - consumed);
 ///         if (es == nil::marshalling::ErrorStatus::not_enough_data) {
 ///             break; // Not enough data in the buffer, stop processing
-///         } 
+///         }
 ///
 ///         if (es == nil::marshalling::ErrorStatus::invalid_msg_id) {
 ///             // Unexpected message (not AckMsg) has been received, report or handle error
@@ -1918,7 +1918,7 @@
 ///             consumed += std::distance(begIter, iter);
 ///             continue;
 ///         }
-///     
+///
 ///         if (es == nil::marshalling::ErrorStatus::protocol_error) {
 ///             // Something is not right with the data, remove one character and try again
 ///            ++consumed;
@@ -1942,7 +1942,7 @@
 /// is used in the code above.
 ///
 /// @subsection page_use_prot_transport_msg_alloc Message Object Allocation
-/// By default, the message object is dynamically allocated. However, some 
+/// By default, the message object is dynamically allocated. However, some
 /// applications (especially bare-metal ones) may require something different.
 /// The @b Marshalling library has @ref nil::marshalling::option::in_place_allocation option,
 /// which may be passed as third template parameter (@b TAllocationOptions)
@@ -1953,12 +1953,12 @@
 /// which means only one message object can be allocated at a time. The
 /// smart pointer holding the message (@b ProtocolStack::msg_ptr_type) is still
 /// @b std::unique_ptr, but with custom deleter.
-/// 
+///
 /// @subsection page_use_prot_transport_generic_msg Using Generic Message
 /// In general, if message ID cannot be recognised, then appropriate message object cannot be
 /// created and processed, i.e. the reading loop will just discard such input.
 /// However, there are applications that serve as some kind of a @b bridge or
-/// a @b firewall, i.e. need to recognise and process only limited 
+/// a @b firewall, i.e. need to recognise and process only limited
 /// number of input messages, all the rest need to be forwarded "as-is" or
 /// maybe wrapped in different transport frame before sending it over
 /// different I/O link. To help with such task @b Marshalling library provides
@@ -1971,23 +1971,23 @@
 /// using MyGenericMessage = nil::marshalling::generic_message<MyMessage>;
 ///
 /// // Limited number of supported messages
-/// using MyInputMessages = 
+/// using MyInputMessages =
 ///     std::tuple<
 ///         my_protocol::Message1<MyMessage>,
 ///         my_protocol::Message2<MyMessage>
 ///     >;
 ///
 /// // Protocol stack definition
-/// using ProtStack = 
+/// using ProtStack =
 ///     my_protocol::ProtocolStack<
-///         MyMessage, 
+///         MyMessage,
 ///         MyInputMessages,
 ///         nil::marshalling::option::support_generic_message<MyGenericMessage>
 ///     >;
 /// @endcode
 /// @b NOTE, that @ref nil::marshalling::generic_message has only single field, which
 /// is a list of raw data (@ref nil::marshalling::types::array_list). The @b read operation
-/// of such field will result in copying the data from input buffer to 
+/// of such field will result in copying the data from input buffer to
 /// internal storage of this field. The @ref nil::marshalling::generic_message
 /// class has also other template parameters (except common message interface class).
 /// The second template parameter is option(s) that are going to be passed to this
@@ -2002,9 +2002,9 @@
 /// and @ref nil::marshalling::option::support_generic_message as the third template parameter to
 /// @b ProtocolStack type definition using @b std::tuple bundling.
 /// @code
-/// using ProtStack = 
+/// using ProtStack =
 ///     my_protocol::ProtocolStack<
-///         MyMessage, 
+///         MyMessage,
 ///         MyInputMessages,
 ///         std::tuple<
 ///             nil::marshalling::option::in_place_allocation,
@@ -2037,7 +2037,7 @@
 /// @ref page_use_prot_interface_length is also recommended. It will be used
 /// to write the required value right away. However, if not provided the dummy
 /// value (@b 0) will be written at first, then after the write operation is complete,
-/// the number of written bytes will be calculated and the previously written 
+/// the number of written bytes will be calculated and the previously written
 /// dummy value updated accordingly. @b NOTE, that such update is possible only
 /// if iterator used for writing is random-access one. Such update won't be
 /// possible. In this case @ref nil::marshalling::ErrorStatus::update_required error status
@@ -2058,7 +2058,7 @@
 ///         auto updateIter = &outBuf[0];
 ///         es = protStack.update(updateIter, outBuf.size());
 ///     }
-///         
+///
 ///     if (es == nil::marshalling::ErrorStatus::success) {
 ///         ... // Send contents of dataToSend via I/O link
 ///     }
@@ -2067,7 +2067,7 @@
 /// Similar scenario of a need to handle @ref nil::marshalling::ErrorStatus::update_required
 /// error status may occur when transport framing contains checksum value and
 /// output (not random-access) iterator is used. The checksum calculation requires
-/// going over the written data to calculate the value. However, it won't be 
+/// going over the written data to calculate the value. However, it won't be
 /// possible to do right away, the @b update() call must follow.
 ///
 /// The @b ProtocolStack does not require usage of polymorphic
@@ -2107,21 +2107,21 @@
 /// ProtStack::all_fields_type fields;
 /// auto es = protStack.read_fields_cached(fields, msgPtr, readIter, bufSize);
 /// @endcode
-/// The layer class that is responsible to read/write payload data 
+/// The layer class that is responsible to read/write payload data
 /// (see @ref nil::marshalling::protocol::MsgDataLayer) uses @ref nil::marshalling::types::array_list
 /// to define a field that will store the payload when "caching" operations are
 /// performed. That's where the fourth template parameter (@b TPayloadOptions)
-/// to @b ProtocolStack definition comes in play. 
+/// to @b ProtocolStack definition comes in play.
 /// In case the the input / output buffer outlives the @b all_fields_type
 /// object, consider passing @ref nil::marshalling::option::orig_data_view option as the
 /// fourth template parameter to @b ProtocolStack definition, which will pass it to
-/// to the field containing the message payload raw data. Otherwise, the 
+/// to the field containing the message payload raw data. Otherwise, the
 /// payload part from the read / written buffer will also be copied to storage
 /// area of the cached payload field.
 ///
 /// As was mentioned earlier, the protocol stack is defined using so called
 /// @b layer classes (defined in @ref nil::marshalling::protocol namespace) by wrapping
-/// one another. Access to the appropriate layer may be obtained using a 
+/// one another. Access to the appropriate layer may be obtained using a
 /// sequence of calls to @b next_layer() member functions (see
 /// @ref nil::marshalling::protocol::ProtocolLayerBase::next_layer()). Alternatively, the protocol stack
 /// definition is also expected to use @ref MARSHALLING_PROTOCOL_LAYERS_ACCESS()
@@ -2136,8 +2136,8 @@
 ///     typename TAllocationOptions = nil::marshalling::option::empty_option, // Extra options for MsgIdLayer
 ///     typename TPayloadOptions = nil::marshalling::option::empty_option // Extra options for payload storage
 /// >
-/// struct ProtocolStack : public 
-///     MySyncPrefix<TMessage, TInputMessages, TAllocationOptions, TPayloadOptions> 
+/// struct ProtocolStack : public
+///     MySyncPrefix<TMessage, TInputMessages, TAllocationOptions, TPayloadOptions>
 /// {
 ///     MARSHALLING_PROTOCOL_LAYERS_ACCESS(payload, id, size, checksum, sync);
 /// };
@@ -2145,7 +2145,7 @@
 /// } // namespace my_protocol
 /// @endcode
 /// The provided names are used in generation of access member functions with
-/// @b layer_ prefix. The code above is equivalent to having the following 
+/// @b layer_ prefix. The code above is equivalent to having the following
 /// member functions defined.
 /// @code
 /// template <
@@ -2154,8 +2154,8 @@
 ///     typename TAllocationOptions = nil::marshalling::option::empty_option, // Extra options for MsgIdLayer
 ///     typename TPayloadOptions = nil::marshalling::option::empty_option // Extra options for payload storage
 /// >
-/// struct ProtocolStack : public 
-///     MySyncPrefix<TMessage, TInputMessages, TAllocationOptions, TPayloadOptions> 
+/// struct ProtocolStack : public
+///     MySyncPrefix<TMessage, TInputMessages, TAllocationOptions, TPayloadOptions>
 /// {
 ///     // Access to PAYLOAD layer
 ///     decltype(auto) layer_payload();
@@ -2209,12 +2209,12 @@
 /// @section page_use_prot_handling Message Handling
 /// When a message is received over I/O link and successfully deserialized, it
 /// needs to be dispatched to appropriate handling function. Many
-/// developers write quite big (depends on number of messages it needs to handle) 
-/// switch statement that checks the ID of the message and calls appropriate 
-/// function in the relevant case area. Other developers try to minimise 
-/// performance impact by introducing hand written map from message ID to the 
-/// handling function. Such approaches are quite inefficient in terms of 
-/// execution performance as well as development effort required to introduce 
+/// developers write quite big (depends on number of messages it needs to handle)
+/// switch statement that checks the ID of the message and calls appropriate
+/// function in the relevant case area. Other developers try to minimise
+/// performance impact by introducing hand written map from message ID to the
+/// handling function. Such approaches are quite inefficient in terms of
+/// execution performance as well as development effort required to introduce
 /// a new message when protocol evolves.
 ///
 /// The @b Marshalling library has a built-in efficient (O(1)) dispatch mechanism, which
@@ -2256,12 +2256,12 @@
 /// msg2->dispatch(handler); // invokes handle(MyMessage&)
 /// @endcode
 ///
-/// @b NOTE, that @b MyMessage class is only forward declared when 
+/// @b NOTE, that @b MyMessage class is only forward declared when
 /// @ref page_use_prot_interface (@b MyMessage), but needs to be properly
 /// defined (included if in separate file) when defining @ref page_use_prot_transport.
 ///
 /// @subsection page_use_prot_handling_multi Having Multiple Handlers
-/// There may be a need for being able to dispatch message for multiple independent handlers. 
+/// There may be a need for being able to dispatch message for multiple independent handlers.
 /// Good example would be having a state-machine, where every state processes
 /// the same message in different way. It is simple to implement by just
 /// defining the handling functions as @b virtual.
@@ -2397,13 +2397,13 @@
 /// specify the return type of handling functions.
 ///
 /// @section page_use_prot_extra_transport Extra Transport Values
-/// Some protocols may use extra values in their transport information, which 
-/// may influence the way how message payload is being read and/or message 
-/// object being handled. Good example would be having a protocol version, 
+/// Some protocols may use extra values in their transport information, which
+/// may influence the way how message payload is being read and/or message
+/// object being handled. Good example would be having a protocol version,
 /// which defines what message payload fields were serialized and which were
-/// not (because they were introduced in later version of the protocol). 
+/// not (because they were introduced in later version of the protocol).
 /// Such extra information is stored in the message object itself. If this is
-/// the case, the protocol definition is expected to use 
+/// the case, the protocol definition is expected to use
 /// @ref nil::marshalling::option::extra_transport_fields option in addition to specifying
 /// serialization endian and message ID type (described in @ref
 /// page_use_prot_interface).
@@ -2411,11 +2411,11 @@
 /// @code
 /// namespace my_protocol
 /// {
-/// 
+///
 /// // field_type describing protocol version.
-/// using MyVersionField = 
+/// using MyVersionField =
 ///     nil::marshalling::types::IntValue<
-///         MyFieldBase, 
+///         MyFieldBase,
 ///         std::uint16_t,
 ///         nil::marshalling::option::default_num_value<5> // Implementing v5 of the protocol by default
 ///     >;
@@ -2447,7 +2447,7 @@
 /// @code
 /// namespace my_protocol
 /// {
-/// 
+///
 /// template <typename... TOptions>
 /// class Message : public
 ///     nil::marshalling::Message<
@@ -2500,13 +2500,13 @@
 ///     ... // do something with version information
 /// }
 /// @endcode
-/// @b NOTE, that the defined "extra transport fields" are there to attach 
-/// some extra information, delivered as part of transport framing, to message 
+/// @b NOTE, that the defined "extra transport fields" are there to attach
+/// some extra information, delivered as part of transport framing, to message
 /// object itself. These fields are @b NOT getting serialized / deserialized when message
 /// object (payload) being read / written.
 ///
 /// The @ref nil::marshalling::Message interface class defines @ref nil::marshalling::Message::has_transport_fields()
-/// static constexpr member function, which may be used at compile time to 
+/// static constexpr member function, which may be used at compile time to
 /// determine whether the @ref nil::marshalling::option::extra_transport_fields option has been used, i.e.
 /// the message interface class defines mentioned earlier
 /// types and functions.
@@ -2521,7 +2521,7 @@
 /// @code
 /// namespace my_protocol
 /// {
-/// 
+///
 /// // field_type describing protocol version.
 /// using MyVersionField = nil::marshalling::types::IntValue<...>;
 ///
@@ -2553,7 +2553,7 @@
 /// @code
 /// namespace my_protocol
 /// {
-/// 
+///
 /// template <typename... TOptions>
 /// class Message : public
 ///     nil::marshalling::Message<...>
@@ -2574,14 +2574,14 @@
 /// of the relevant transport fields itself. The message contents are not
 /// being updated. There is a need to invoke @b do_fields_version_update() member
 /// function (see @ref nil::marshalling::MessageBase::do_fields_version_update()),
-/// which will do the job of updating message 
+/// which will do the job of updating message
 /// contents accordingly.
 /// @code
 /// using MyMessage1 = my_protocol::MyMessage<...>;
 /// MyMessage1 msg;
 /// msg.version() = 5U; // Update the version
 /// msg.do_fields_version_update(); // Update the message contents that depend on version
-/// @endcode 
+/// @endcode
 /// The @b refresh functionality (direct or polymorphic) also contains update
 /// of the fields' version, which can be used instead.
 /// @code
@@ -2624,8 +2624,8 @@
 ///     typename TAllocationOptions = nil::marshalling::option::empty_option, // Extra options for MsgIdLayer
 ///     typename TPayloadOptions = nil::marshalling::option::empty_option // Extra options for payload storage
 /// >
-/// struct ProtocolStack : public 
-///     MySizePrefix<TMessage, TInputMessages, TAllocationOptions, TPayloadOptions> 
+/// struct ProtocolStack : public
+///     MySizePrefix<TMessage, TInputMessages, TAllocationOptions, TPayloadOptions>
 /// {
 ///     MARSHALLING_PROTOCOL_LAYERS_ACCESS(payload, version, id, size);
 /// };
@@ -2648,17 +2648,17 @@
 /// @section page_use_prot_msg_customisation Application Specific Customisation of Messages
 /// When most of the messages are uni-directional, i.e. are either only sent or
 /// only received, then it may make sense to split the common message interface
-/// class @b MyMessage (see @ref page_use_prot_interface) into two 
+/// class @b MyMessage (see @ref page_use_prot_interface) into two
 /// interface classes: for @b input and for @b output. It will save the generation
 /// of unnecessary virtual functions which are not used, but occupy space.
 /// @code
-/// using MyInputMessage = 
+/// using MyInputMessage =
 ///     my_protocol::Message<
 ///         nil::marshalling::option::read_iterator<const std::uint8_t*>, // polymorphic read
 ///         nil::marshalling::option::handler<MyHandler> // polymorphic dispatch
 ///     >;
 ///
-///  using MyOutputMessage = 
+///  using MyOutputMessage =
 ///     my_protocol::Message<
 ///         nil::marshalling::option::write_iterator<std::uint8_t*>, // polymorphic write
 ///         nil::marshalling::option::id_info_interface, // polymorphic ID retrieve
@@ -2681,7 +2681,7 @@
 /// message interface will do the job. However generating unnecessary virtual
 /// functions for bare-metal application may be a heavy price to pay, especially
 /// when ROM size is small. The @b Marshalling library provides several
-/// options that inhibit generation of virtual functions. These extra options 
+/// options that inhibit generation of virtual functions. These extra options
 /// need to be passed to @ref nil::marshalling::MessageBase class when defining a message
 /// class. Available options are:
 /// @li @ref nil::marshalling::option::no_read_impl
@@ -2707,18 +2707,18 @@
 ///         ...
 ///     };
 /// };
-/// 
+///
 /// namespace message
 /// {
 ///
 /// template <typename TBase, typename TOpt = DefaultOptions>
-/// class Message1 : public 
+/// class Message1 : public
 ///     nil::marshalling::MessageBase<
-///         TBase, 
+///         TBase,
 ///         nil::marshalling::option::static_num_id_impl<MsgId_Message1>,
 ///         nil::marshalling::option::fields_impl<Message1Fields<TOpt>::All>,
 ///         nil::marshalling::option::msg_type<Message1<TBase, TOpt> >,
-///         typename TOpt::message::Message1 // Extra options 
+///         typename TOpt::message::Message1 // Extra options
 ///     >
 /// {
 ///     ...
@@ -2777,13 +2777,13 @@
 ///     }
 /// };
 /// @endcode
-/// Don't forget to bundle newly defined messages in @b std::tuple and pass 
+/// Don't forget to bundle newly defined messages in @b std::tuple and pass
 /// them to @ref page_use_prot_transport definition or @ref page_use_prot_handling_generic
 /// when needed.
 /// @code
-/// using MyInputMessages = 
+/// using MyInputMessages =
 ///     std::tuple<
-///         MyMessage1, 
+///         MyMessage1,
 ///         MyMessage2,
 ///         ...
 ///     >;

@@ -15,7 +15,7 @@ macro(define_marshalling_example name)
     add_executable(marshalling_${name}_example ${name}.cpp)
 
     target_link_libraries(marshalling_${name}_example PRIVATE
-                          
+
                           crypto3::multiprecision
                           crypto3::algebra
                           crypto3::zk

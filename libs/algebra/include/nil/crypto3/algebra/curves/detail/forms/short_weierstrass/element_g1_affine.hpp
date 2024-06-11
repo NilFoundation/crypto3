@@ -82,7 +82,7 @@ namespace nil {
                          *    @return the selected point $(X:Y)$ in the affine coordinates
                          *
                          */
-                        constexpr curve_element(const field_value_type& X, const field_value_type& Y) 
+                        constexpr curve_element(const field_value_type& X, const field_value_type& Y)
                             : X(X), Y(Y){
                         }
 
