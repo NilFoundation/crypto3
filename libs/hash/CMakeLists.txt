@@ -92,6 +92,10 @@ if(CRYPTO3_HASH_SHA3)
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_SHA3)
 endif()
 
+if(CRYPTO3_HASH_SHAKE)
+    add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_SHAKE)
+endif()
+
 if(CRYPTO3_HASH_TIGER)
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_TIGER)
 endif()
