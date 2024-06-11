@@ -4,7 +4,7 @@
 # get a warning when you try to disable exceptions or use the static CRT. I hate to use this
 # globally imposed solution, but we are going to hack the global flags to use properties to
 # determine whether they are on or off
-# 
+#
 # Create custom properties called CXX_EXCEPTIONS, CXX_RTTI and CXX_STATIC_RUNTIME
 # These get placed at global, directory and target scopes
 foreach(scope GLOBAL DIRECTORY TARGET)

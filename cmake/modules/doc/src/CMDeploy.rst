@@ -25,4 +25,3 @@ This is the namespace to add to the targets that are exported.
 .. option:: COMPATIBILITY <compatibility>
 
 This uses the version compatibility specified by cmake version config.
-

@@ -48,4 +48,3 @@ cm_test_header(NAME simpleteststaticheader HEADER simple.h STATIC)
 
 add_library(simpletestinterface INTERFACE)
 cm_mark_as_test(simpletestinterface)
-

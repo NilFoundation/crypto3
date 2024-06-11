@@ -18,4 +18,3 @@ cm_install_targets(TARGETS basicapp)
 
 cm_test(NAME basciapptest SOURCES main.cpp)
 target_link_libraries(basciapptest simple)
-

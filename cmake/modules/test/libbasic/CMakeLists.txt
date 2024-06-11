@@ -18,4 +18,3 @@ cm_deploy(TARGETS basic)
 
 cm_test(NAME basictest SOURCES test.cpp)
 target_link_libraries(basictest basic)
-

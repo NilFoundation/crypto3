@@ -23,4 +23,3 @@ cm_add_test_subdirectory(test)
 if(TARGET simpletest)
     message(FATAL_ERROR "simpletest was not added")
 endif()
-

@@ -85,5 +85,3 @@ cm_add_test_subdirectory
 .. program:: cm_add_test_subdirectory
 
 This calls ``add_subdirectory`` if the ``ENABLE_TESTS`` property is true. The default value for the property is set by ``CMAKE_ENABLE_TESTS`` variable.
-
-
