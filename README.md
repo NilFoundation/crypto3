@@ -2,23 +2,40 @@
 
 [![Run tests](https://github.com/NilFoundation/zkllvm-blueprint/actions/workflows/run_tests.yml/badge.svg)](https://github.com/NilFoundation/zkllvm-blueprint/actions/workflows/run_tests.yml)
 
-## Building
-
-This library uses Boost CMake build modules (https://github.com/BoostCMake/cmake_modules.git).
-To actually include this library in a project it is required to:
-
-1. Add [CMake Modules](https://github.com/BoostCMake/cmake_modules.git) as submodule to target project repository.
-2. Add all the internal dependencies using [CMake Modules](https://github.com/BoostCMake/cmake_modules.git) as submodules to target project repository.
-3. Initialize parent project with [CMake Modules](https://github.com/BoostCMake/cmake_modules.git) (Look at [crypto3](https://github.com/nilfoundation/crypto3.git) for the example)
-
 ## Dependencies
 
-### Internal
+- [Boost](https://boost.org) (>= 1.76)
+- [cmake](https://cmake.org/) (>=3.21.4)
+- Following dependencies must be built and installed from sources:
+  - [CMake Modules](https://github.com/BoostCMake/cmake_modules.git)
+  - [crypto3](https://github.com/nilfoundation/crypto3.git)
 
-* [Crypto3.Algebra](https://github.com/nilfoundation/crypto3-algebra.git).
-* [Crypto3.Math](https://github.com/nilfoundation/crypto3-math.git).
-* [Crypto3.Multiprecision](https://github.com/nilfoundation/crypto3-multiprecision.git).
-* [Crypto3.ZK](https://github.com/nilfoundation/crypto3-zk.git).
+## Building and installation
 
-### External
-* [Boost](https://boost.org) (>= 1.76)
+```bash
+cmake -B build -DCMAKE_INSTALL_PREFIX=/path/to/install
+make -C build install
+```
+
+> Note: if you got an error on `find_package` during cmake configuration, make sure that you provided paths to the installed dependencies (for example, via `CMAKE_PREFIX_PATH` environment variable)
+
+## Nix support
+This repository provides Nix flake, so once you have installed Nix with flake support, you can use single command to fetch all the dependencies and build:
+
+```bash
+nix build ?submodules=1#
+```
+
+To activate Nix development environment:
+
+```bash
+nix develop
+```
+
+To run all tests:
+
+```bash
+nix flake check -L ?submodules=1#
+```
+
+To build/develop/test with local crypto3 version, add an argument `--override-input nil_crypto3 /path/to/local/crypto3` to any of the above commands.
