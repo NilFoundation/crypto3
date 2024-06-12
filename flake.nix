@@ -131,7 +131,6 @@
 
             cmakeFlags = [
               "-DCMAKE_CXX_STANDARD=17"
-              "-DBUILD_SHARED_LIBS=TRUE"
               "-DCMAKE_ENABLE_TESTS=TRUE"
               "-DCMAKE_C_COMPILER=clang"
               "-DCMAKE_CXX_COMPILER=clang++"
@@ -186,6 +185,6 @@
 # 2 redirect to the local build of crypto3: 'nix develop --redirect .#crypto3 /your/path/to/crypto3/result/'
 # 3a to build all in blueprint: 'nix flake -L check .?submodules=1#' or build all and run tests: nix build -L .?submodules=1#checks.x86_64-linux.default
 # 3b to build individual targets:
-# nix develop . -c cmake -B build -DCMAKE_CXX_STANDARD=17 -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=FALSE -DCMAKE_ENABLE_TESTS=TRUE -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
+# nix develop . -c cmake -B build -DCMAKE_CXX_STANDARD=17 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_ENABLE_TESTS=TRUE -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
 # cd build
 # nix develop ../ -c cmake --build . -t blueprint_verifiers_flexible_constant_pow_test
