@@ -33,9 +33,11 @@
 
             propagatedBuildInputs = [ crypto3 pkgs.boost183 ];
 
-            cmakeFlags =
-              [ "-DCMAKE_BUILD_TYPE=Release"
-                "-DCMAKE_CXX_STANDARD=17" ];
+            cmakeBuildType = "Release";
+
+            cmakeFlags = [
+              "-DCMAKE_CXX_STANDARD=17"
+            ];
 
             doCheck = false;
           };
