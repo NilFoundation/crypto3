@@ -15,9 +15,9 @@
       let
         pkgs = import nixpkgs { inherit system; };
         stdenv = pkgs.llvmPackages_16.stdenv;
+        crypto3 = nil_crypto3.packages.${system}.default;
       in rec {
         packages = rec {
-          crypto3 = nil_crypto3.packages.${pkgs.system}.default;
           zkllvm-blueprint = stdenv.mkDerivation {
             name = "zkllvm-blueprint";
 
@@ -130,7 +130,7 @@
               pkg-config
               clang_16
               boost183
-              packages.crypto3
+              crypto3
             ];
 
             cmakeBuildType = "Debug";
@@ -168,7 +168,7 @@
               boost183
               clang_16
               clang-tools_16
-              packages.crypto3
+              crypto3
             ];
 
             shellHook = ''
