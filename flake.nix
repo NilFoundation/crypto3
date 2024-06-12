@@ -23,8 +23,6 @@
 
             src = self;
 
-            env.CXXFLAGS = toString ([ "-fPIC" ]);
-
             buildInputs = with pkgs; [
               cmake
               pkg-config
@@ -119,8 +117,6 @@
             name = "zkllvm-blueprint-tests";
 
             src = self;
-
-            env.CXXFLAGS = toString ([ "-fPIC" ]);
 
             buildInputs = with pkgs; [
               cmake
