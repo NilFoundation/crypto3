@@ -26,6 +26,8 @@
 
 #define BOOST_TEST_MODULE algebra_curves_bench_test
 
+#include <ostream>
+#include <fstream>
 #include <chrono>
 #include <cstdint>
 #include <string>
@@ -69,6 +71,58 @@ void run_perf_test() {
     }
     points2 = points1;
 
+    typedef void (*opfunc)(value_type & result, value_type const& sample);
+
+    auto gather_stats = [&points1](opfunc operation, size_t samples_per_batch) {
+        size_t BATCHES = 1000;
+        
+        using duration = std::chrono::duration<double, std::nano>;
+
+        std::vector<duration> batch_duration;
+        batch_duration.resize(BATCHES);
+
+        for(size_t b = 0; b < BATCHES; ++b) {
+            std::cerr << "Batch " << b << std::endl;
+            auto start = std::chrono::high_resolution_clock::now();
+            auto result = points1[0];
+
+            for(size_t i = 0; i < samples_per_batch; ++i) {
+                operation(result, points1[i % points1.size()]);
+            }
+
+            auto finish = std::chrono::high_resolution_clock::now();
+            batch_duration[b] = (finish - start) * 1.0 / samples_per_batch;
+        }
+
+        /* Filter two outliers */
+        sort(batch_duration.begin(), batch_duration.end());
+        auto s = batch_duration[1];
+        for(size_t b = 2; b < batch_duration.size()-2; ++b) {
+            s += batch_duration[b];
+        }
+
+        s /= batch_duration.size() - 2;
+        std::cout << "Average: " << std::fixed << std::setprecision(3) << s.count() << std::endl;
+
+        return batch_duration;
+    };
+
+    auto plus_results = gather_stats( [](value_type &result, value_type const& sample) { result += sample; }, 1000000);
+    auto mul_results = gather_stats( [](value_type &result, value_type const& sample) { result *= sample; }, 1000000);
+    auto inv_results = gather_stats( [](value_type &result, value_type const& sample) { result = sample.inversed(); }, 1000);
+
+    std::ofstream f("1k-pallas.log", std::ofstream::out);
+    f << "sum,mul,inv" << std::endl;
+
+    for(size_t i = 0; i < plus_results.size(); ++i) {
+        f
+            << std::fixed << std::setprecision(3) << plus_results[i].count() << ","
+            << std::fixed << std::setprecision(3) << mul_results[i].count() << ","
+            << std::fixed << std::setprecision(3) << inv_results[i].count()
+            << std::endl;
+    }
+
+    /*
     std::chrono::time_point<std::chrono::high_resolution_clock> start(std::chrono::high_resolution_clock::now());
 
     size_t SAMPLES = 10000000;
@@ -127,14 +181,19 @@ void run_perf_test() {
         std::chrono::high_resolution_clock::now() - start);
     std::cout << "Equality check time: " << std::fixed << std::setprecision(3)
         << elapsed.count() / SAMPLES << " ns" << std::endl;
+        */
 }
 
 BOOST_AUTO_TEST_CASE(field_operation_perf_test_pallas) {
     run_perf_test<nil::crypto3::algebra::fields::pallas_base_field>();
 }
 
-BOOST_AUTO_TEST_CASE(field_operation_perf_test_bls12_381) {
+BOOST_AUTO_TEST_CASE(field_operation_perf_test_bls12_381_base) {
     run_perf_test<nil::crypto3::algebra::fields::bls12_base_field<381u>>();
+}
+
+BOOST_AUTO_TEST_CASE(field_operation_perf_test_bls12_381_scalar) {
+    run_perf_test<nil::crypto3::algebra::fields::bls12_scalar_field<381u>>();
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -43,3 +43,33 @@ foreach(TEST_NAME ${RUNTIME_TESTS_NAMES})
     define_runtime_algebra_test(${TEST_NAME})
 endforeach()
 
+macro(define_sltbenchmarked_test name)
+    set(bench_name "algebra_${name}_sltbench_test")
+    
+    cm_test(NAME ${bench_name} SOURCES ${name}.cpp)
+
+    target_include_directories(${bench_name} PRIVATE
+                               "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+                               "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>"
+                               "/home/olekhov/soft/sltbench/install/include"
+
+                               ${Boost_INCLUDE_DIRS})
+
+    target_link_libraries(${bench_name}
+        "/home/olekhov/soft/sltbench/install/lib/libsltbench.a"
+    )
+
+    set_target_properties(${bench_name} PROPERTIES CXX_STANDARD 17
+        CXX_STANDARD_REQUIRED TRUE)
+
+    if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+        target_compile_options(${bench_name} PRIVATE "-fconstexpr-steps=2147483647")
+    elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        target_compile_options(${bench_name} PRIVATE "-fconstexpr-ops-limit=4294967295")
+    endif()
+
+    target_compile_definitions(${bench_name} PRIVATE TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/data/")
+endmacro()
+
+define_sltbenchmarked_test("slt_bench_fields")
+

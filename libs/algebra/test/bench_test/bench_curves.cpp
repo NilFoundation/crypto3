@@ -74,15 +74,36 @@ void curve_mixed_add_perf_test() {
     typedef typename CurveGroup::value_type value_type;
     typedef typename CurveGroup::curve_type::scalar_field_type::value_type scalar_type;
 
+    using integral_type = typename CurveGroup::field_type::integral_type;
+
     std::vector<value_type> points1;
     std::vector<affine_value_type> points2;
     std::vector<scalar_type> constants;
 
-    for (int i = 0; i < 1000; ++i) {
+    size_t SAMPLE_POINTS = 10;
+
+    points1.push_back( value_type( {
+        integral_type("134259237214329583859572659902079218325987377002085142995452804377364522466038358476049939515655792490847794794525"),
+        integral_type("1809534154292907788172682460748792788554180452365596942941215464028404682438291049442742832837471944151906865833554")
+                }));
+
+    points1.push_back( value_type( {
+        integral_type("2607267007883347124342512866089200338971754315737412002026691972321782832942488267664625960949017951416919909922006"),
+        integral_type("3981354946063234465291394610773776476896996022527754048687201420910953491368502231624587677046665607818103081900111")
+                }));
+
+    points1.push_back( value_type( {
+        integral_type("2768531198125823394096395795073120709798104974725544690117020537032512543084168194909941520331104556839346036427726"),
+        integral_type("1754758978115289139414189505104210117716683061164960084683469377165597159992957437833991574831425252027886109201264")
+                }));
+
+    /*
+    for (int i = 0; i < SAMPLE_POINTS; ++i) {
         points1.push_back(algebra::random_element<CurveGroup>());
         points2.push_back(algebra::random_element<AffineCurveGroup>());
         constants.push_back(algebra::random_element<typename CurveGroup::curve_type::scalar_field_type>());
     }
+    */
 
     size_t SAMPLES_PER_BATCH = 100;
     size_t BATCHES = 100;
