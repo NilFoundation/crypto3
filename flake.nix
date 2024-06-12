@@ -31,8 +31,6 @@
               clang_16
             ];
 
-            # Because crypto3 is header-only, we must propagate it so users
-            # of this flake must not specify crypto3 in their derivations manually
             propagatedBuildInputs = [ crypto3 pkgs.boost183 ];
 
             cmakeFlags =
@@ -116,7 +114,6 @@
 
         checks = {
           default = stdenv.mkDerivation {
-            # TODO: rewrite this using overrideAttrs on makePackage
             name = "zkllvm-blueprint-tests";
 
             src = self;
