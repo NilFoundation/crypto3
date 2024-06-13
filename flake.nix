@@ -4,8 +4,7 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
     nil_crypto3 = {
-      url =
-        "git+https://github.com/NilFoundation/crypto3?submodules=1&rev=1cf64acec2f4022224cb19673854250e08a6d7c3";
+      url = "github:NilFoundation/crypto3";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     flake-utils.url = "github:numtide/flake-utils";

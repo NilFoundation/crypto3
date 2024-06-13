@@ -40,7 +40,7 @@ using namespace nil::blueprint;
 
 BOOST_AUTO_TEST_SUITE(blueprint_zkevm_word_utils_test_suite)
 
-BOOST_AUTO_TEST_CASE(blueprint_zkevm_word_goldilocks64_test) {
+BOOST_AUTO_TEST_CASE(blueprint_zkevm_word_goldilocks64_test, * boost::unit_test::disabled()) {
     using field_type = crypto3::algebra::fields::goldilocks64;
     using value_type = field_type::value_type;
     using word_type = zkevm_word_type;

@@ -46,18 +46,15 @@
       "locked": {
         "lastModified": 1717829899,
         "narHash": "sha256-5ZVG0gt1z5ctEHun1rCwGoblu6C4hXkHbu+OcA8iqpc=",
-        "ref": "12a9320d108d810605fe474354540b28cbb66f19",
+        "owner": "NilFoundation",
+        "repo": "crypto3",
         "rev": "1cf64acec2f4022224cb19673854250e08a6d7c3",
-        "revCount": 9136,
-        "submodules": true,
-        "type": "git",
-        "url": "https://github.com/NilFoundation/crypto3"
+        "type": "github"
       },
       "original": {
-        "rev": "1cf64acec2f4022224cb19673854250e08a6d7c3",
-        "submodules": true,
-        "type": "git",
-        "url": "https://github.com/NilFoundation/crypto3"
+        "owner": "NilFoundation",
+        "repo": "crypto3",
+        "type": "github"
       }
     },
     "nix-3rdparty": {
