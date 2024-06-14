@@ -107,17 +107,19 @@ void run_perf_test() {
         return batch_duration;
     };
 
-    auto plus_results = gather_stats( [](value_type &result, value_type const& sample) { result += sample; }, 1000000);
-    auto mul_results = gather_stats( [](value_type &result, value_type const& sample) { result *= sample; }, 1000000);
-    auto inv_results = gather_stats( [](value_type &result, value_type const& sample) { result = sample.inversed(); }, 1000);
+    auto plus_results = gather_stats( [](value_type &result, value_type const& sample) { result + sample; }, 1000000);
+    auto mul_results = gather_stats( [](value_type &result, value_type const& sample) { result *sample; }, 1000000);
+    auto sqr_results = gather_stats( [](value_type &result, value_type const& sample) { sample.squared(); }, 1000000);
+    auto inv_results = gather_stats( [](value_type &result, value_type const& sample) { sample.inversed(); }, 10);
 
     std::ofstream f("1k-pallas.log", std::ofstream::out);
-    f << "sum,mul,inv" << std::endl;
+    f << "sum,mul,sqr,inv" << std::endl;
 
     for(size_t i = 0; i < plus_results.size(); ++i) {
         f
             << std::fixed << std::setprecision(3) << plus_results[i].count() << ","
             << std::fixed << std::setprecision(3) << mul_results[i].count() << ","
+            << std::fixed << std::setprecision(3) << sqr_results[i].count() << ","
             << std::fixed << std::setprecision(3) << inv_results[i].count()
             << std::endl;
     }

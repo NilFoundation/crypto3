@@ -151,6 +151,10 @@ namespace nil {
                             return element_fp(-data);
                         }
 
+                        void negate_inplace() {
+                            data = -data;
+                        }
+
                         constexpr element_fp operator/(const element_fp &B) const {
                             //                        return element_fp(data / B.data);
                             return element_fp(data * B.inversed().data);
@@ -200,6 +204,10 @@ namespace nil {
 
                         constexpr element_fp doubled() const {
                             return element_fp(data + data);
+                        }
+
+                        void double_inplace() {
+                            data += data;
                         }
 
                         // If the element does not have a square root, this function must not be called.
