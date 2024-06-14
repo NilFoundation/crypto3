@@ -199,6 +199,10 @@ namespace nil {
                             return result_type(X * Z.inversed(), Y * Z.inversed());    //  x=X/Z, y=Y/Z
                         }
 
+                        static curve_element from_affine(curve_element<params_type, form, curves::coordinates::affine> const &other) {
+                            return curve_element(other.X, other.Y, field_value_type::one());
+                        }
+
                         /*************************  Arithmetic operations  ***********************************/
 
                         constexpr curve_element& operator=(const curve_element &other) {

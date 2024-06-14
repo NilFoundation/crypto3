@@ -47,22 +47,60 @@ namespace nil {
 
                             if (!first.is_zero()) {
 
-                                field_value_type A = (first.X).squared();                        // A = X1^2
-                                field_value_type B = (first.Y).squared();                        // B = Y1^2
-                                field_value_type C = field_value_type(2u) * first.Z.squared();   // C = 2*Z1^2
-                                field_value_type D = ElementType::params_type::a * A;            // D = a*A
-                                field_value_type E = (first.X + first.Y).squared() - A - B;      // E = (X1+Y1)^2-A-B
-                                field_value_type G = D + B;                                      // G = D+B
-                                field_value_type F = G - C;                                      // F = G-C
-                                field_value_type H = D - B;                                      // H = D-B
-                                first.X = E * F;                                     // X3 = E*F
-                                first.Y = G * H;                                     // Y3 = G*H
-                                first.T = E * H;                                     // T3 = E*H
-                                first.Z = F * G;                                     // Z3 = F*G
+                                // A = X1^2
+                                field_value_type A (first.X);
+                                A.square_inplace();
+
+                                // B = Y1^2
+                                field_value_type B (first.Y);
+                                B.square_inplace();
+
+                                // C = 2*Z1^2
+                                field_value_type C (first.Z);
+                                C.square_inplace();
+                                C.double_inplace();
+
+                                // D = a*A
+                                field_value_type D (A);
+                                D *= field_value_type(ElementType::params_type::a);
+
+                                // E = (X1+Y1)^2-A-B
+                                field_value_type E (first.X);
+                                E += first.Y;
+                                E.square_inplace();
+                                E -= A;
+                                E -= B;
+
+                                // G = D+B
+                                field_value_type G (D);
+                                G += B;
+
+                                // F = G-C
+                                field_value_type F (G);
+                                F -= C;
+
+                                // H = D-B
+                                field_value_type H (D);
+                                H -= B;
+
+                                // X3 = E*F
+                                first.X = E;
+                                first.X *= F;
+
+                                // Y3 = G*H
+                                first.Y = G;
+                                first.Y *= H;
+
+                                // T3 = E*H
+                                first.T = E;
+                                first.T *= H;
+
+                                // Z3 = F*G
+                                first.Z = F;
+                                first.Z *= G;
                             }
                         }
                     };
-
                 }    // namespace detail
             }        // namespace curves
         }            // namespace algebra

@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2024 Martun Karapetyan <martun@nil.foundation>
+// Copyright (c) 2024 Vasiliy Olekhov <vasiliy.olekhov@nil.foundation>
 //
 // MIT License
 //
@@ -26,6 +27,7 @@
 
 #include <iostream>
 #include <chrono>
+#include <ratio>
 #include <type_traits>
 
 #include <boost/test/unit_test.hpp>
@@ -38,6 +40,7 @@
 #include <boost/multiprecision/cpp_int.hpp>
 
 #include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/coordinates.hpp>
+#include <nil/crypto3/algebra/curves/detail/forms/twisted_edwards/coordinates.hpp>
 #include <nil/crypto3/algebra/curves/forms.hpp>
 
 #include <nil/crypto3/algebra/curves/alt_bn128.hpp>
@@ -65,7 +68,7 @@ BOOST_AUTO_TEST_SUITE(curves_manual_tests)
 /**/
 
 template<typename CurveGroup, typename AffineCurveGroup>
-void curve_mixed_add_perf_test() {
+void curve_operations_perf_test(std::string const& curve_name) {
     using namespace nil::crypto3;
     using namespace nil::crypto3::algebra;
 
@@ -73,112 +76,159 @@ void curve_mixed_add_perf_test() {
     typedef typename CurveGroup::value_type value_type;
     typedef typename CurveGroup::curve_type::scalar_field_type::value_type scalar_type;
 
+    using integral_type = typename CurveGroup::field_type::integral_type;
+
     std::vector<value_type> points1;
     std::vector<affine_value_type> points2;
     std::vector<scalar_type> constants;
 
-    for (int i = 0; i < 1000; ++i) {
-        points1.push_back(algebra::random_element<CurveGroup>());
+    size_t SAMPLE_POINTS = 10;
+    for (int i = 0; i < SAMPLE_POINTS; ++i) {
+        auto p1 = algebra::random_element<CurveGroup>();
+        auto p1a = p1.to_affine();
+
+        points1.push_back(value_type::from_affine(p1a));
         points2.push_back(algebra::random_element<AffineCurveGroup>());
         constants.push_back(algebra::random_element<typename CurveGroup::curve_type::scalar_field_type>());
     }
 
-    size_t SAMPLES = 10000;
+    using duration = std::chrono::duration<double, std::nano>;
 
-    std::chrono::time_point<std::chrono::high_resolution_clock> start(std::chrono::high_resolution_clock::now());
+    auto run_batched_test = [](
+        std::string const& test_name,
+        std::size_t BATCHES,
+        std::size_t samples_per_batch,
+        value_type & A,
+        value_type const& B,
+        std::function<void (value_type & A, value_type const& B)> opfunc)
+    {
+        std::vector<duration> batch_duration;
+        batch_duration.resize(BATCHES);
 
-    for (int i = 0; i < SAMPLES; ++i) {
-        int index = i % points1.size();
-        points1[index].mixed_add(points1[index]);
+        for(size_t b = 0; b < BATCHES; ++b) {
+            if (b % (BATCHES/10) == 0) std::cerr << "Batch progress:" << b << std::endl;
+            auto start = std::chrono::high_resolution_clock::now();
+            for(size_t i = 0; i < samples_per_batch; ++i) {
+                opfunc(A, B);
+            }
+            volatile auto res = A;
+
+            auto finish = std::chrono::high_resolution_clock::now();
+            batch_duration[b] = (finish - start) * 1.0 / samples_per_batch;
+        }
+
+        /* To filter 10% outliers, sort results and set margin to BATCHES/20 = 5% */
+        // sort(batch_duration.begin(), batch_duration.end());
+        std::size_t margin = 0; // BATCHES/20;
+        auto s = batch_duration[margin];
+        for(size_t b = margin+1; b < batch_duration.size()-margin; ++b) {
+            s += batch_duration[b];
+        }
+
+        s /= batch_duration.size() - margin*2;
+        std::cout << test_name << ": " << std::fixed << std::setprecision(3) << s.count() << std::endl;
+
+        return batch_duration;
+    };
+
+    size_t SAMPLES_PER_BATCH = 10000;
+    size_t BATCHES = 1000;
+
+    auto madd_res = run_batched_test(
+            "madd",
+            BATCHES, SAMPLES_PER_BATCH,
+            points1[0], points1[1],
+            []( value_type & A, value_type const& B) { A.mixed_add(B); } );
+
+    auto add_res = run_batched_test(
+            "add",
+            BATCHES, SAMPLES_PER_BATCH,
+            points1[0], points1[1],
+            []( value_type & A, value_type const& B) { A += B; } );
+
+    auto dbl_res = run_batched_test(
+            "dbl",
+            BATCHES, SAMPLES_PER_BATCH,
+            points1[0], points1[1],
+            []( value_type & A, value_type const& B) { A.double_inplace(); } );
+
+    auto smul_res = run_batched_test(
+            "smul",
+            BATCHES, SAMPLES_PER_BATCH / 256,
+            points1[0], points1[1],
+            [&]( value_type & A, value_type const& B) { A *= constants[0]; } );
+
+    std::ofstream f(curve_name + "-stats.log", std::ofstream::out);
+    f << "# " << typeid(CurveGroup).name() << std::endl;
+    f << "madd,add,dbl,smul" << std::endl;
+    std::size_t prec = 4;
+    for(std::size_t i = 0; i < BATCHES; ++i) {
+        f
+            << std::fixed << std::setprecision(prec) << madd_res[i].count() << ","
+            << std::fixed << std::setprecision(prec) << add_res[i].count() << ","
+            << std::fixed << std::setprecision(prec) << dbl_res[i].count() << ","
+            << std::fixed << std::setprecision(prec) << smul_res[i].count()
+            << std::endl;
     }
-    auto elapsed =
-        std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start);
-    std::cout << "Addition time: " << std::fixed << std::setprecision(3) << elapsed.count() / SAMPLES << " ns"
-              << std::endl;
 }
 
-template<typename CurveGroup>
-void curve_operations_perf_test() {
-    using namespace nil::crypto3;
-    using namespace nil::crypto3::algebra;
+BOOST_AUTO_TEST_CASE(perf_test_bls12_381_g1) {
+    using policy_type = nil::crypto3::algebra::curves::bls12<381>::g1_type<
+        nil::crypto3::algebra::curves::coordinates::jacobian_with_a4_0,
+        nil::crypto3::algebra::curves::forms::short_weierstrass>;
 
-    typedef typename CurveGroup::value_type value_type;
-    typedef typename CurveGroup::curve_type::scalar_field_type::value_type scalar_type;
-
-    std::vector<value_type> points1;
-    std::vector<value_type> points2;
-    std::vector<scalar_type> constants;
-
-    for (int i = 0; i < 1000; ++i) {
-        points1.push_back(algebra::random_element<CurveGroup>());
-        constants.push_back(algebra::random_element<typename CurveGroup::curve_type::scalar_field_type>());
-    }
-    points2 = points1;
-
-    std::chrono::time_point<std::chrono::high_resolution_clock> start(std::chrono::high_resolution_clock::now());
-
-    size_t SAMPLES = 10000;
-    for (int i = 0; i < SAMPLES; ++i) {
-        int index = i % points1.size();
-        points2[index] *= constants[index];
-    }
-    auto elapsed =
-        std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start);
-    std::cout << "Scalar Multiplication time: " << std::fixed << std::setprecision(3) << elapsed.count() / SAMPLES
-              << " ns" << std::endl;
-
-    start = std::chrono::high_resolution_clock::now();
-
-    for (int i = 0; i < SAMPLES; ++i) {
-        int index = i % points1.size();
-        points2[index] += points1[index];
-    }
-    elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start);
-    std::cout << "Addition time: " << std::fixed << std::setprecision(3) << elapsed.count() / SAMPLES << " ns"
-              << std::endl;
-
-    start = std::chrono::high_resolution_clock::now();
-
-    for (int i = 0; i < SAMPLES; ++i) {
-        int index = i % points1.size();
-        points2[index] -= points1[index];
-    }
-
-    elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start);
-    std::cout << "Substraction time: " << std::fixed << std::setprecision(3) << elapsed.count() / SAMPLES << " ns"
-              << std::endl;
-}
-
-BOOST_AUTO_TEST_CASE(curve_operations_perf_test_bls12_381_g1_jacobian) {
-    using policy_type = curves::bls12<381>::g1_type<nil::crypto3::algebra::curves::coordinates::jacobian_with_a4_0,
-                                                    nil::crypto3::algebra::curves::forms::short_weierstrass>;
-
-    curve_operations_perf_test<policy_type>();
-}
-
-BOOST_AUTO_TEST_CASE(curve_operations_perf_test_bls12_381_g2_jacobian) {
-    using policy_type = curves::bls12<381>::g2_type<nil::crypto3::algebra::curves::coordinates::jacobian_with_a4_0,
-                                                    nil::crypto3::algebra::curves::forms::short_weierstrass>;
-
-    curve_operations_perf_test<policy_type>();
-}
-
-BOOST_AUTO_TEST_CASE(curve_operations_perf_test_bls12_381_g1_projective) {
-    using policy_type = curves::bls12<381>::g1_type<nil::crypto3::algebra::curves::coordinates::projective,
-                                                    nil::crypto3::algebra::curves::forms::short_weierstrass>;
-
-    curve_operations_perf_test<policy_type>();
-}
-
-// Performance for mixed addition.
-BOOST_AUTO_TEST_CASE(mixed_addition_perf_test_bls12_381_g1) {
-    using policy_type = curves::bls12<381>::g1_type<nil::crypto3::algebra::curves::coordinates::projective,
-                                                    nil::crypto3::algebra::curves::forms::short_weierstrass>;
-
-    using affine_policy_type = curves::bls12<381>::g1_type<nil::crypto3::algebra::curves::coordinates::affine,
+    using affine_policy_type = nil::crypto3::algebra::curves::bls12<381>::g1_type<nil::crypto3::algebra::curves::coordinates::affine,
                                                            nil::crypto3::algebra::curves::forms::short_weierstrass>;
 
-    curve_mixed_add_perf_test<policy_type, affine_policy_type>();
+    curve_operations_perf_test<policy_type, affine_policy_type>("bls12-381-j0");
 }
+
+BOOST_AUTO_TEST_CASE(perf_test_pallas) {
+    using policy_type = nil::crypto3::algebra::curves::pallas::g1_type<
+        nil::crypto3::algebra::curves::coordinates::jacobian_with_a4_0, 
+        nil::crypto3::algebra::curves::forms::short_weierstrass>;
+
+    using affine_policy_type = nil::crypto3::algebra::curves::pallas::g1_type<nil::crypto3::algebra::curves::coordinates::affine,
+                                                           nil::crypto3::algebra::curves::forms::short_weierstrass>;
+
+    curve_operations_perf_test<policy_type, affine_policy_type>("pallas-j0");
+}
+
+BOOST_AUTO_TEST_CASE(perf_test_mnt4) {
+    using policy_type = nil::crypto3::algebra::curves::mnt4<298>::g1_type<
+        nil::crypto3::algebra::curves::coordinates::projective,
+        nil::crypto3::algebra::curves::forms::short_weierstrass>;
+
+    using affine_policy_type = nil::crypto3::algebra::curves::mnt4<298>::g1_type<
+        nil::crypto3::algebra::curves::coordinates::affine,
+        nil::crypto3::algebra::curves::forms::short_weierstrass>;
+
+    curve_operations_perf_test<policy_type, affine_policy_type>("mnt4-p");
+}
+
+BOOST_AUTO_TEST_CASE(perf_test_mnt6) {
+    using policy_type = nil::crypto3::algebra::curves::mnt6<298>::g1_type<
+        nil::crypto3::algebra::curves::coordinates::projective,
+        nil::crypto3::algebra::curves::forms::short_weierstrass>;
+
+    using affine_policy_type = nil::crypto3::algebra::curves::mnt6<298>::g1_type<
+        nil::crypto3::algebra::curves::coordinates::affine,
+        nil::crypto3::algebra::curves::forms::short_weierstrass>;
+
+    curve_operations_perf_test<policy_type, affine_policy_type>("mnt6-p");
+}
+
+BOOST_AUTO_TEST_CASE(perf_test_ed25519) {
+    using policy_type = nil::crypto3::algebra::curves::ed25519::g1_type<
+        nil::crypto3::algebra::curves::coordinates::extended_with_a_minus_1,
+        nil::crypto3::algebra::curves::forms::twisted_edwards>;
+
+    using affine_policy_type = nil::crypto3::algebra::curves::ed25519::g1_type<
+        nil::crypto3::algebra::curves::coordinates::affine,
+        nil::crypto3::algebra::curves::forms::twisted_edwards>;
+
+    curve_operations_perf_test<policy_type, affine_policy_type>("ed25519-ex-1");
+}
+
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2024 Vasiliy Olekhov <vasiliy.olekhov@nil.foundation>
 //
 // MIT License
 //
@@ -46,20 +47,55 @@ namespace nil {
 
                             if (!first.is_zero()) {
 
-                                field_value_type A = (first.X).squared();    // A = X1^2
-                                field_value_type B = (first.Y).squared();    // B = Y1^2
-                                field_value_type C = B.squared();            // C = B^2
-                                field_value_type D = (first.X + B).squared() - A - C;
-                                D = D + D;                            // D = 2 * ((X1 + B)^2 - A - C)
-                                field_value_type E = A + A + A;       // E = 3 * A
-                                field_value_type F = E.squared();     // F = E^2
-                                field_value_type Y1Z1 = (first.Y) * (first.Z);
+                                // A = X1^2
+                                field_value_type A (first.X);
+                                A.square_inplace();
 
-                                first.X = F - (D + D);    // X3 = F - 2 D
-                                field_value_type eightC = C.doubled().doubled().doubled();
+                                // B = Y1^2
+                                field_value_type B (first.Y);
+                                B.square_inplace();
 
-                                first.Y = E * (D - first.X) - eightC;    // Y3 = E * (D - X3) - 8 * C
-                                first.Z = Y1Z1 + Y1Z1;    // Z3 = 2 * Y1 * Z1
+                                // C = B^2
+                                field_value_type C (B);
+                                C.square_inplace();
+
+                                // D = 2 * ((X1 + B)^2 - A - C)
+                                field_value_type D (first.X);
+                                D += B;
+                                D.square_inplace();
+                                D -= A;
+                                D -= C;
+                                D.double_inplace();
+
+                                // E = 3 * A
+                                field_value_type E(A);
+                                E += A;
+                                E += A;
+
+                                // F = E^2
+                                field_value_type F(E);
+                                F.square_inplace();
+
+                                field_value_type Y1Z1 (first.Y);
+                                Y1Z1 *= first.Z;
+
+                                // X3 = F - 2 D
+                                first.X = F;
+                                first.X -= D;
+                                first.X -= D;
+
+                                // Y3 = E * (D - X3) - 8 * C
+                                C.double_inplace();
+                                C.double_inplace();
+                                C.double_inplace();
+                                first.Y = D;
+                                first.Y -= first.X;
+                                first.Y *= E;
+                                first.Y -= C;
+
+                                // Z3 = 2 * Y1 * Z1
+                                first.Z = Y1Z1;
+                                first.Z += Y1Z1;
                             }
                         }
                     };

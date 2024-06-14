@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2024 Vasiliy Olekhov <vasiliy.olekhov@nil.foundation>
 //
 // MIT License
 //
@@ -46,27 +47,69 @@ namespace nil {
 
                             if (!first.is_zero()) {
 
-                                const field_value_type XX = (first.X).squared();    // XX  = X1^2
-                                const field_value_type ZZ = (first.Z).squared();    // ZZ  = Z1^2
-                                const field_value_type w = field_value_type(ElementType::params_type::a) * ZZ +
-                                                           (XX + XX + XX);    // w   = a*ZZ + 3*XX
-                                const field_value_type Y1Z1 = (first.Y) * (first.Z);
-                                const field_value_type s = Y1Z1 + Y1Z1;      // s   = 2*Y1*Z1
-                                const field_value_type ss = s.squared();     // ss  = s^2
-                                const field_value_type sss = s * ss;         // sss = s*ss
-                                const field_value_type R = (first.Y) * s;    // R   = Y1*s
-                                const field_value_type RR = R.squared();     // RR  = R^2
-                                const field_value_type B =
-                                    ((first.X) + R).squared() - XX - RR;                   // B   = (X1+R)^2 - XX - RR
-                                const field_value_type h = w.squared() - B.doubled();      // h   = w^2 - 2*B
-                                                                                           //
-                                first.X = h * s;                         // X3  = h*s
-                                first.Y = w * (B - h) - RR.doubled();    // Y3  = w*(B-h) - 2*RR
-                                first.Z = sss;                           // Z3  = sss
+                                // XX  = X1^2
+                                field_value_type XX (first.X);
+                                XX.square_inplace();
+
+                                // ZZ  = Z1^2
+                                field_value_type ZZ (first.Z);
+                                ZZ.square_inplace();
+
+                                // w   = a*ZZ + 3*XX
+                                field_value_type w (ZZ);
+                                w *= field_value_type(ElementType::params_type::a);
+                                w += XX;
+                                w += XX;
+                                w += XX;
+
+                                // s   = 2*Y1*Z1
+                                field_value_type s (first.Y);
+                                s *= first.Z;
+                                s.double_inplace();
+
+                                // ss  = s^2
+                                // sss = s*ss
+                                // Z3 = sss
+                                first.Z = s;
+                                first.Z.square_inplace();
+                                first.Z *= s;
+
+                                // R   = Y1*s
+                                field_value_type R (first.Y);
+                                R *= s;
+
+                                // RR  = R^2
+                                field_value_type RR(R);
+                                RR.square_inplace();
+
+                                // B   = (X1+R)^2 - XX - RR
+                                field_value_type B (first.X);
+                                B += R;
+                                B.square_inplace();
+                                B -= XX;
+                                B -= RR;
+
+                                // h   = w^2 - 2*B
+                                field_value_type h (w);
+                                h.square_inplace();
+                                h -= B;
+                                h -= B;
+
+                                // X3  = h*s
+                                first.X = h;
+                                first.X *= s;
+
+                                // Y3  = w*(B-h) - 2*RR
+                                first.Y = B;
+                                first.Y -= h;
+                                first.Y *= w;
+                                first.Y -= RR;
+                                first.Y -= RR;
+
+                                // Z3  = sss, see above
                             }
                         }
                     };
-
                 }    // namespace detail
             }        // namespace curves
         }            // namespace algebra
