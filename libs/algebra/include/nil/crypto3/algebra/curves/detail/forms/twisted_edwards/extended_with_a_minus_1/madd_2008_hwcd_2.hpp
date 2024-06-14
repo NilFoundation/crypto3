@@ -47,23 +47,60 @@ namespace nil {
 
                             // assert(second.Z == field_value_type::one());
 
-                            field_value_type A = first.X * second.X;    // A = X1*X2
-                            field_value_type B = first.Y * second.Y;    // B = Y1*Y2
-                            field_value_type C = first.Z * second.T;    // C = Z1*T2
-                            field_value_type D = first.T;               // D = T1
-                            field_value_type E = D + C;                 // E = D+C
-                            field_value_type F =
-                                (first.X - first.Y) * (second.X + second.Y) + B - A;     // F = (X1-Y1)*(X2+Y2)+B-A
-                            field_value_type G = B + ElementType::params_type::a * A;    // G = B+a*A
-                            field_value_type H = D - C;                                  // H = D-C
-                            first.X = E * F;                                 // X3 = E*F
-                            first.Y = G * H;                                 // Y3 = G*H
-                            first.T = E * H;                                 // T3 = E*H
-                            first.Z = F * G;                                 // Z3 = F*G
+                            // A = X1*X2
+                            field_value_type A (first.X);
+                            A *= second.X;
 
+                            // B = Y1*Y2
+                            field_value_type B (first.Y);
+                            B *= second.Y;
+
+                            // C = Z1*T2
+                            field_value_type C (first.Z);
+                            C *= second.T;
+
+                            // D = T1
+                            field_value_type D (first.T);
+
+                            // E = D+C
+                            field_value_type E (D);
+                            E += C;
+
+                            // F = (X1-Y1)*(X2+Y2)+B-A
+                            field_value_type t0 (first.X);
+                            t0 -= first.Y;
+                            field_value_type F (second.X);
+                            F += second.Y;
+                            F *= t0;
+                            F += B;
+                            F -= A;
+
+                            // G = B+a*A
+                            field_value_type G (A);
+                            G *= field_value_type(ElementType::params_type::a);
+                            G += B;
+
+                            // H = D-C
+                            field_value_type H (D);
+                            H -= C;
+
+                            // X3 = E*F
+                            first.X = E;
+                            first.X *= F;
+
+                            // Y3 = G*H
+                            first.Y = G;
+                            first.Y *= H;
+
+                            // T3 = E*H
+                            first.T = E;
+                            first.T *= H;
+
+                            // Z3 = F*G
+                            first.Z = F;
+                            first.Z *= G;
                         }
                     };
-
                 }    // namespace detail
             }        // namespace curves
         }            // namespace algebra

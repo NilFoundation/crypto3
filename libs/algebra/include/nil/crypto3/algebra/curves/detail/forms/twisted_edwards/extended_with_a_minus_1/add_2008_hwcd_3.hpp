@@ -44,24 +44,64 @@ namespace nil {
 
                             using field_value_type = typename ElementType::field_type::value_type;
 
-                            field_value_type A = (first.Y - first.X) * (second.Y - second.X);    // A = (Y1-X1)*(Y2-X2)
-                            field_value_type B = (first.Y + first.X) * (second.Y + second.X);    // B = (Y1+X1)*(Y2+X2)
-                            field_value_type C = first.T * field_value_type(2u) * ElementType::params_type::d *
-                                                 second.T;                                    // C = T1*k*T2
-                            field_value_type D = first.Z * field_value_type(2u) * second.Z;   // D = Z1*2*Z2
-                            field_value_type E = B - A;                                       // E = B-A
-                            field_value_type F = D - C;                                       // F = D-C
-                            field_value_type G = D + C;                                       // G = D+C
-                            field_value_type H = B + A;                                       // H = B+A
+                            // A = (Y1-X1)*(Y2-X2)
+                            field_value_type t0 (first.Y);
+                            t0 -= first.X;
+                            field_value_type A (second.Y);
+                            A -= second.X;
+                            A *= t0;
 
-                            first.X = E * F;                                      // X3 = E*F
-                            first.Y = G * H;                                      // Y3 = G*H
-                            first.T = E * H;                                      // T3 = E*H
-                            first.Z = F * G;                                      // Z3 = F*G
+                            // B = (Y1+X1)*(Y2+X2)
+                            field_value_type t1 (first.Y);
+                            t1 += first.X;
+                            field_value_type B (second.Y);
+                            B += second.X;
+                            B *= t1;
 
+                            // C = T1*k*T2 // k = 2d?
+                            field_value_type C (first.T);
+                            C *= field_value_type(ElementType::params_type::d);
+                            C *= second.T;
+                            C.double_inplace();
+
+                            // D = Z1*2*Z2
+                            field_value_type D (first.Z);
+                            D *= second.Z;
+                            D.double_inplace();
+
+                            // E = B-A
+                            field_value_type E (B);
+                            E -= A;
+
+                            // F = D-C
+                            field_value_type F (D);
+                            F -= C;
+
+                            // G = D+C
+                            field_value_type G (D);
+                            G += C;
+
+                            // H = B+A
+                            field_value_type H (B);
+                            H += A;
+
+                            // X3 = E*F
+                            first.X = E;
+                            first.X *= F;
+
+                            // Y3 = G*H
+                            first.Y = G;
+                            first.Y *= H;
+
+                            // T3 = E*H
+                            first.T = E;
+                            first.T *= H;
+
+                            // Z3 = F*G
+                            first.Z = F;
+                            first.Z *= G;
                         }
                     };
-
                 }    // namespace detail
             }        // namespace curves
         }            // namespace algebra

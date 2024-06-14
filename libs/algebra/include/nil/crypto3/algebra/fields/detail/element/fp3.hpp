@@ -113,6 +113,12 @@ namespace nil {
                             return element_fp3(data[0].doubled(), data[1].doubled(), data[2].doubled());
                         }
 
+                        constexpr void double_inplace() {
+                            data[0].double_inplace();
+                            data[1].double_inplace();
+                            data[2].double_inplace();
+                        }
+
                         constexpr element_fp3 operator-(const element_fp3 &B) const {
                             return element_fp3(data[0] - B.data[0], data[1] - B.data[1], data[2] - B.data[2]);
                         }
@@ -197,7 +203,13 @@ namespace nil {
                         }
 
                         constexpr element_fp3 squared() const {
-                            return (*this) * (*this);    // maybe can be done more effective
+                            // maybe be done more effective
+                            return (*this) * (*this);
+                        }
+
+                        constexpr void square_inplace() {
+                            // maybe be done more effective
+                            (*this) *= (*this);
                         }
 
                         constexpr bool is_square() const {

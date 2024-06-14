@@ -126,6 +126,11 @@ namespace nil {
                             return zero() - *this;
                         }
 
+                        constexpr void negate_inplace() {
+                            data[0].negate_inplace();
+                            data[1].negate_inplace();
+                        }
+
                         constexpr element_fp2 operator*(const element_fp2 &B) const {
                             // TODO: the use of data and B.data directly in return statement addition cause constexpr
                             // error for gcc
@@ -195,6 +200,11 @@ namespace nil {
                             return element_fp2(data[0].doubled(), data[1].doubled());
                         }
 
+                        constexpr void double_inplace() {
+                            data[0].double_inplace();
+                            data[1].double_inplace();
+                        }
+
                         constexpr element_fp2 sqrt() const {
 
                             element_fp2 one = this->one();
@@ -244,6 +254,20 @@ namespace nil {
 
                             return element_fp2((A + B) * (A + non_residue * B) - AB - non_residue * AB, AB + AB);
                         }
+
+                        constexpr void square_inplace() {
+                            // return (*this) * (*this);    // maybe can be done more effective
+
+                            /* Devegili OhEig Scott Dahab --- Multiplication and Squaring on Pairing-Friendly
+                             * Fields.pdf; Section 3 (Complex squaring) */
+                            // TODO: reference here could cause error in constexpr for gcc
+                            const underlying_type A = data[0], B = data[1];
+                            const underlying_type AB = A * B;
+
+                            data[0] = (A + B) * (A + non_residue * B) - AB - non_residue * AB;
+                            data[1] = AB + AB;
+                        }
+
 
                         constexpr bool is_square() const {
                             element_fp2 tmp = this->pow(field_type::extension_policy::group_order_minus_one_half);

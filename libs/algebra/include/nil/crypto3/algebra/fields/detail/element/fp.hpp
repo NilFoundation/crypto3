@@ -151,6 +151,10 @@ namespace nil {
                             return element_fp(-data);
                         }
 
+                        constexpr void negate_inplace() {
+                            data = -data;
+                        }
+
                         constexpr element_fp operator/(const element_fp &B) const {
                             //                        return element_fp(data / B.data);
                             return element_fp(data * B.inversed().data);
@@ -202,6 +206,10 @@ namespace nil {
                             return element_fp(data + data);
                         }
 
+                        constexpr void double_inplace() {
+                            data += data;
+                        }
+
                         // If the element does not have a square root, this function must not be called.
                         // Call is_square() before using this function.
                         constexpr element_fp sqrt() const {
@@ -223,6 +231,12 @@ namespace nil {
                         constexpr element_fp squared() const {
                             return element_fp(data * data);    // maybe can be done more effective
                         }
+
+                        constexpr element_fp& square_inplace() {
+                            data *= data;
+                            return *this;
+                        }
+
 
                         constexpr bool is_square() const {
                             element_fp tmp = this->pow(policy_type::group_order_minus_one_half);

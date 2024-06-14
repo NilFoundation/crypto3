@@ -223,6 +223,11 @@ namespace nil {
                             return *this;
                         }
 
+                        static curve_element from_affine(curve_element<params_type, form, curves::coordinates::affine> const &other) {
+                            return curve_element(other.X, other.Y, other.X*other.Y, field_value_type::one());
+                        }
+
+
                         template<typename Backend,
                                  boost::multiprecision::expression_template_option ExpressionTemplates>
                         constexpr const curve_element& operator=(

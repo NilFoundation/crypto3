@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2024 Vasiliy Olekhov <vasiliy.olekhov@nil.foundation>
 //
 // MIT License
 //
@@ -49,19 +50,66 @@ namespace nil {
                             // Because for some reasons it's not so
                             // assert(second.Z == field_value_type::one());
 
-                            const field_value_type Z1Z1 = (first.Z).squared();            // Z1Z1 = Z1^2
-                            const field_value_type U2 = second.X * Z1Z1;                  // X2*Z1Z1
-                            const field_value_type S2 = second.Y * first.Z * Z1Z1;        // S2 = Y2 * Z1 * Z1Z1
-                            const field_value_type H = U2 - (first.X);                    // H = U2-X1
-                            const field_value_type HH = H.squared();                      // HH = H^2
-                            const field_value_type I = HH.doubled().doubled();            // I = 4*HH
-                            const field_value_type J = H * I;                             // J = H*I
-                            const field_value_type r = (S2 - (first.Y)).doubled();        // r = 2*(S2-Y1)
-                            const field_value_type V = first.X * I;                       // V = X1*I
-                            first.X = r.squared() - J - V.doubled();    // X3 = r^2-J-2*V
-                            first.Y = r * (V - first.X) - (first.Y * J).doubled(); // Y3 = r*(V-X3)-2*Y1*J
-                            first.Z = (first.Z + H).squared() - Z1Z1 - HH;    // Z3 = (Z1+H)^2-Z1Z1-HH
+                            // Z1Z1 = Z1^2
+                            field_value_type Z1Z1 (first.Z);
+                            Z1Z1.square_inplace();
 
+                            // X2*Z1Z1
+                            field_value_type U2 (second.X);
+                            U2 *= Z1Z1;
+
+                            // S2 = Y2 * Z1 * Z1Z1
+                            field_value_type S2 (second.Y);
+                            S2 *= first.Z;
+                            S2 *= Z1Z1;
+
+                            // H = U2-X1
+                            field_value_type H (U2);
+                            H -= first.X;
+
+                            // HH = H^2
+                            field_value_type HH (H);
+                            HH.square_inplace();
+
+                            // I = 4*HH
+                            field_value_type I (HH);
+                            I.double_inplace();
+                            I.double_inplace();
+
+                            // J = H*I
+                            field_value_type J (H);
+                            J *= I;
+
+                            // r = 2*(S2-Y1)
+                            field_value_type r (S2);
+                            r -= first.Y;
+                            r.double_inplace();
+
+                            // V = X1*I
+                            field_value_type V (first.X);
+                            V *= I;
+
+                            // X3 = r^2-J-2*V
+                            field_value_type r2 (r);
+                            r2.square_inplace();
+                            first.X = r2;
+                            first.X -= J;
+                            first.X -= V;
+                            first.X -= V;
+
+                            // Y3 = r*(V-X3)-2*Y1*J
+                            V -= first.X;
+                            r *= V;
+                            first.Y *= J;
+                            first.Y.double_inplace();
+                            first.Y -= r;
+                            first.Y.negate_inplace();
+
+                            // Z3 = (Z1+H)^2-Z1Z1-HH
+                            first.Z += H;
+                            first.Z.square_inplace();
+                            first.Z -= Z1Z1;
+                            first.Z -= HH;
                         }
                     };
 
