@@ -62,6 +62,7 @@
 
 #include <nil/crypto3/algebra/fields/detail/element/fp.hpp>
 #include <nil/crypto3/algebra/fields/detail/element/fp2.hpp>
+#include <nil/crypto3/algebra/fields/goldilocks64/base_field.hpp>
 
 using namespace nil::crypto3::algebra;
 
@@ -827,6 +828,13 @@ BOOST_AUTO_TEST_CASE(field_operation_test_mnt6_fq6) {
     static_assert(element1.pow(C1) == element_pow_C, "pow error");
     static_assert(element2.squared() == element_pow_2, "pow error");
     static_assert(-element1 == minus_element, "minus error");
+}
+
+BOOST_AUTO_TEST_CASE(test_goldilocks) {
+    using field_type = nil::crypto3::algebra::fields::goldilocks64;
+    using value_type = field_type::value_type;
+    constexpr value_type val = 0xdef0;
+    static_assert(val.data == 0xdef0u, "goldilocks initialization error");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

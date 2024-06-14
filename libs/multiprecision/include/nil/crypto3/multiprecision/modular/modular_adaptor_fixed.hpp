@@ -78,7 +78,7 @@ namespace boost {
                 template<typename UI,
                          typename std::enable_if_t<std::is_integral<UI>::value && std::is_unsigned<UI>::value> const * = nullptr>
                 BOOST_MP_CXX14_CONSTEXPR modular_adaptor(UI b, const Backend &m)
-                        : m_base(static_cast<typename std::tuple_element<0, unsigned_types>::type>(b)) {
+                        : m_base(limb_type(b)) {
                     this->set_modular_params(m);
                     this->mod_data().adjust_modular(m_base);
                 }
@@ -89,13 +89,13 @@ namespace boost {
                 template<typename SI,
                          typename std::enable_if_t<std::is_integral<SI>::value && std::is_signed<SI>::value> const * = nullptr>
                 BOOST_MP_CXX14_CONSTEXPR modular_adaptor(SI b)
-                        : m_base(static_cast<typename std::tuple_element<0, unsigned_types>::type>(0)) {
+                        : m_base(limb_type(0u)) {
 
                     if (b >= 0) {
-                        m_base = static_cast<typename std::tuple_element<0, unsigned_types>::type>(b);
+                        m_base = static_cast<limb_type>(b);
                     } else {
                         m_base = this->mod_data().get_mod();
-                        eval_subtract(m_base, static_cast<typename std::tuple_element<0, unsigned_types>::type>(-b) );
+                        eval_subtract(m_base, static_cast<limb_type>(-b) );
                     }
 
                     // This method must be called only for compile time modular params.
@@ -106,7 +106,7 @@ namespace boost {
                 template<typename UI,
                          typename std::enable_if_t<std::is_integral<UI>::value && std::is_unsigned<UI>::value> const * = nullptr>
                 BOOST_MP_CXX14_CONSTEXPR modular_adaptor(UI b)
-                        : m_base(static_cast<typename std::tuple_element<0, unsigned_types>::type>(b)) {
+                        : m_base(static_cast<limb_type>(b)) {
                     // This method must be called only for compile time modular params.
                     // this->set_modular_params(m);
                     this->mod_data().adjust_modular(m_base);
@@ -115,13 +115,13 @@ namespace boost {
                 template<typename SI,
                          typename std::enable_if_t<std::is_integral<SI>::value && std::is_signed<SI>::value> const * = nullptr>
                 BOOST_MP_CXX14_CONSTEXPR modular_adaptor(SI b, const modular_type &m)
-                        : m_base(static_cast<typename std::tuple_element<0, unsigned_types>::type>(0)) {
+                        : m_base(limb_type(0u)) {
 
                     if (b >= 0) {
-                        m_base = static_cast<typename std::tuple_element<0, unsigned_types>::type>(b);
+                        m_base = static_cast<limb_type>(b);
                     } else {
                         m_base = this->mod_data().get_mod();
-                        eval_subtract(m_base, static_cast<typename std::tuple_element<0, unsigned_types>::type>(-b));
+                        eval_subtract(m_base, static_cast<limb_type>(-b));
                     }
 
                     this->set_modular_params(m);
@@ -131,7 +131,7 @@ namespace boost {
                 template<typename UI,
                          typename std::enable_if_t<std::is_integral<UI>::value && std::is_unsigned<UI>::value> const * = nullptr>
                 BOOST_MP_CXX14_CONSTEXPR modular_adaptor(UI b, const modular_type &m)
-                        : m_base(static_cast<typename std::tuple_element<0, unsigned_types>::type>(b)) {
+                        : m_base(static_cast<limb_type>(b)) {
                     this->set_modular_params(m);
                     this->mod_data().adjust_modular(m_base);
                 }
@@ -263,7 +263,7 @@ namespace boost {
 
             protected:
                 Backend m_base;
-                static BOOST_MP_CXX14_CONSTEXPR Backend m_zero = static_cast<typename std::tuple_element<0, unsigned_types>::type>(0u);
+                static BOOST_MP_CXX14_CONSTEXPR Backend m_zero = static_cast<typename std::tuple_element<0, unsigned_types>::type>(0u);;
             };
 
             template<unsigned Bits, typename Backend1,

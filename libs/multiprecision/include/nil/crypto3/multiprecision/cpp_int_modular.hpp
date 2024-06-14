@@ -417,8 +417,7 @@ namespace boost {
             struct is_allowed_cpp_int_modular_base_conversion
                 : public std::conditional<std::is_same<Arg, limb_type>::value
 #ifdef TVM
-                                              || std::is_same<Arg, unsigned int>::value||
-                                              std::is_same<Arg, int>::value
+                                              || std::is_same<Arg, unsigned int>::value
 #endif
 #if BOOST_ENDIAN_LITTLE_BYTE && !defined(BOOST_MP_TEST_NO_LE)
                                               || std::is_same<Arg, double_limb_type>::value
