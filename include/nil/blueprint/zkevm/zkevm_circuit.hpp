@@ -117,7 +117,7 @@ namespace nil {
 
             zkevm_circuit(assignment_type &assignment_, circuit_type &circuit_, std::size_t start_row_index_ = 1)
                 :assignment(assignment_), circuit(circuit_), opcodes_info_instance(opcodes_info::instance()),
-                 selector_manager(assignment_, circuit_),
+                 sel_manager(assignment_, circuit_),
                  curr_row(start_row_index_), start_row_index(start_row_index_) {
 
                 BOOST_ASSERT_MSG(start_row_index > 0,
@@ -190,7 +190,7 @@ namespace nil {
             }
 
             selector_manager_type &get_selector_manager() {
-                return selector_manager;
+                return sel_manager;
             }
 
             const std::vector<std::size_t> &get_state_selector_cols() {
@@ -237,19 +237,19 @@ namespace nil {
         private:
             void init_state() {
                 state.pc = state_var_type(
-                   selector_manager.allocate_witess_column(), state_var_type::column_type::witness, 1);
+                   sel_manager.allocate_witess_column(), state_var_type::column_type::witness, 1);
                 state.stack_size = state_var_type(
-                   selector_manager.allocate_witess_column(), state_var_type::column_type::witness, 0);
+                   sel_manager.allocate_witess_column(), state_var_type::column_type::witness, 0);
                 state.memory_size = state_var_type(
-                   selector_manager.allocate_witess_column(), state_var_type::column_type::witness, 0);
+                   sel_manager.allocate_witess_column(), state_var_type::column_type::witness, 0);
                 state.curr_gas = state_var_type(
-                   selector_manager.allocate_witess_column(), state_var_type::column_type::witness, 0);
+                   sel_manager.allocate_witess_column(), state_var_type::column_type::witness, 0);
                 state.rows_until_next_op = state_var_type(
-                   selector_manager.allocate_witess_column(), state_var_type::column_type::witness, 0);
+                   sel_manager.allocate_witess_column(), state_var_type::column_type::witness, 0);
                 state.rows_until_next_op_inv = state_var_type(
-                   selector_manager.allocate_witess_column(), state_var_type::column_type::witness, 0);
+                   sel_manager.allocate_witess_column(), state_var_type::column_type::witness, 0);
                 state.step_selection = state_var_type(
-                   selector_manager.allocate_witess_column(), state_var_type::column_type::witness, 1);
+                   sel_manager.allocate_witess_column(), state_var_type::column_type::witness, 1);
             }
 
             std::vector<constraint_type> generate_generic_transition_constraints(
@@ -307,7 +307,7 @@ namespace nil {
                 std::vector<constraint_type> last_constraints;
                 // first step is step selection
                 first_constraints.push_back(state.step_selection.variable() - 1);
-                start_selector = selector_manager.add_gate(first_constraints);
+                start_selector = sel_manager.add_gate(first_constraints);
                 // TODO: proper end constraints
                 end_selector = circuit.add_gate(last_constraints);
 
@@ -315,10 +315,10 @@ namespace nil {
                 const std::size_t state_selector_cols_amount =
                     state_selector_type::get_manifest(opcodes_amount).witness_amount->max_value_if_sat();
                 for (std::size_t i = 0; i < state_selector_cols_amount; i++) {
-                    state_selector_cols.push_back(selector_manager.allocate_witess_column());
+                    state_selector_cols.push_back(sel_manager.allocate_witess_column());
                 }
                 for (std::size_t i = 0; i < max_opcode_cols; i++) {
-                    opcode_cols.push_back(selector_manager.allocate_witess_column());
+                    opcode_cols.push_back(sel_manager.allocate_witess_column());
                 }
                 state_selector = std::make_shared<state_selector_type>(
                     state_selector_cols, std::array<std::uint32_t, 0>({}), std::array<std::uint32_t, 0>({}),
@@ -332,7 +332,7 @@ namespace nil {
                 const std::size_t opcode_row_selection_cols_amount =
                     state_selector_type::get_manifest(max_opcode_height).witness_amount->max_value_if_sat();
                 for (std::size_t i = 0; i < opcode_row_selection_cols_amount; i++) {
-                    opcode_row_selection_cols.push_back(selector_manager.allocate_witess_column());
+                    opcode_row_selection_cols.push_back(sel_manager.allocate_witess_column());
                 }
                 opcode_row_selector = std::make_shared<state_selector_type>(
                     opcode_row_selection_cols, std::array<std::uint32_t, 0>({}), std::array<std::uint32_t, 0>({}),
@@ -390,7 +390,7 @@ namespace nil {
                         }
                     }
                 }
-                middle_selector = selector_manager.add_gate(middle_constraints);
+                middle_selector = sel_manager.add_gate(middle_constraints);
 
                 assignment.enable_selector(start_selector, curr_row);
                 assignment.enable_selector(middle_selector, curr_row);
@@ -417,7 +417,7 @@ namespace nil {
             circuit_type &circuit;
             // information about opcode metadata (mapping, etc.)
             const opcodes_info &opcodes_info_instance;
-            selector_manager_type selector_manager;
+            selector_manager_type sel_manager;
             std::shared_ptr<state_selector_type> state_selector;
             std::shared_ptr<state_selector_type> opcode_row_selector;
             // opcode objects
