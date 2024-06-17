@@ -70,65 +70,67 @@ void run_perf_test(std::string const& field_name) {
     std::vector<value_type> points2;
     for (int i = 0; i < 1000; ++i) {
         points1.push_back(algebra::random_element<Field>());
+        points2.push_back(algebra::random_element<Field>());
     }
-    points2 = points1;
 
-    typedef void (*opfunc)(value_type & result, value_type const& sample);
+    auto gather_stats = [&points1, &points2]
+        (std::function<void(value_type & result, value_type const& sample)> operation,
+        size_t samples_per_batch, const std::string& operation_name) {
+            size_t BATCHES = 1000;
 
-    auto gather_stats = [&points1](opfunc operation, size_t samples_per_batch) {
-        size_t BATCHES = 1000;
+            using duration = std::chrono::duration<double, std::nano>;
 
-        using duration = std::chrono::duration<double, std::nano>;
+            std::vector<duration> batch_duration;
+            batch_duration.resize(BATCHES);
+            auto save = points1[3];;
 
-        std::vector<duration> batch_duration;
-        batch_duration.resize(BATCHES);
-        auto save = points1[3];;
+            for(size_t b = 0; b < BATCHES; ++b) {
+                // if (b % (BATCHES/10) == 0) std::cerr << "Batch progress:" << b << std::endl;
+                auto start = std::chrono::high_resolution_clock::now();
+                auto points_index = 0;
 
-        for(size_t b = 0; b < BATCHES; ++b) {
-            if (b % (BATCHES/10) == 0) std::cerr << "Batch progress:" << b << std::endl;
-            auto start = std::chrono::high_resolution_clock::now();
-            auto result = points1[0];
-            auto sample = points1[1];
+                for(size_t i = 0; i < samples_per_batch; ++i) {
+                    operation(points1[points_index], points2[points_index]);
+                    ++points_index;
+                    if (points_index == 1000)
+                        points_index = 0;
+                }
 
-            for(size_t i = 0; i < samples_per_batch; ++i) {
-                operation(result, sample);
+                auto finish = std::chrono::high_resolution_clock::now();
+                batch_duration[b] = (finish - start) * 1.0 / samples_per_batch;
             }
 
-            auto finish = std::chrono::high_resolution_clock::now();
-            save += result;
-            batch_duration[b] = (finish - start) * 1.0 / samples_per_batch;
-        }
+            // prevent value 'result' from optimizating out
+            std::cerr << save << std::endl;
 
-        // prevent value 'result' from optimizating out
-        std::cerr << save << std::endl;
+            auto s = batch_duration[0];
+            for(size_t b = 1; b < batch_duration.size(); ++b) {
+                s += batch_duration[b];
+            }
 
-        auto s = batch_duration[0];
-        for(size_t b = 1; b < batch_duration.size(); ++b) {
-            s += batch_duration[b];
-        }
+            s /= batch_duration.size() - 2;
+            std::cout << "Average time for operator " << operation_name << ": " << std::fixed << std::setprecision(3) << s.count() << std::endl;
 
-        s /= batch_duration.size() - 2;
-        std::cout << "Average: " << std::fixed << std::setprecision(3) << s.count() << std::endl;
+            return batch_duration;
+        };
 
-        return batch_duration;
-    };
-
-    auto plus_results = gather_stats( [](value_type &result, value_type const& sample) { result += sample; },       1000000);
-    auto mul_results = gather_stats( [](value_type &result, value_type const& sample)  { result *= sample; },        100000);
-    auto sqr_results = gather_stats( [](value_type &result, value_type const& sample)  { result.square_inplace(); }, 100000);
-    auto inv_results = gather_stats( [](value_type &result, value_type const& sample)  { result = sample.inversed(); }, 100);
+    auto plus_results = gather_stats( [](value_type &result, value_type const& sample) { result += sample; }, 1000000, "Addition");
+    auto minus_results = gather_stats( [](value_type &result, value_type const& sample) { result -= sample; }, 1000000, "Subtraction");
+    auto mul_results = gather_stats( [](value_type &result, value_type const& sample)  { result *= sample; }, 100000, "Multiplication");
+    auto sqr_results = gather_stats( [](value_type &result, value_type const& sample)  { result.square_inplace(); }, 100000, "Square In-Place");
+    auto inv_results = gather_stats( [](value_type &result, value_type const& sample)  { result = sample.inversed(); }, 100, "Inverse");
 
     std::ofstream f(field_name+"-stats.log", std::ofstream::out);
     f << "# " << typeid(Field).name() << std::endl;
     f << "sum,mul,sqr,inv" << std::endl;
 
     for(size_t i = 0; i < plus_results.size(); ++i) {
-        f
-            << std::fixed << std::setprecision(3) << plus_results[i].count() << ","
-            << std::fixed << std::setprecision(3) << mul_results[i].count() << ","
-            << std::fixed << std::setprecision(3) << sqr_results[i].count() << ","
-            << std::fixed << std::setprecision(3) << inv_results[i].count()
-            << std::endl;
+        f << std::fixed << std::setprecision(3) << plus_results[i].count() << ","
+          << std::fixed << std::setprecision(3) << minus_results[i].count() << ","
+          << std::fixed << std::setprecision(3) << mul_results[i].count() << ","
+          << std::fixed << std::setprecision(3) << sqr_results[i].count() << ","
+          << std::fixed << std::setprecision(3) << inv_results[i].count()
+          << std::endl;
     }
 
     f.close();
