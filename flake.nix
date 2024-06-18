@@ -25,13 +25,11 @@
 
             env.CXXFLAGS = toString ([ "-fPIC" ]);
 
-            buildInputs = with pkgs; [ cmake pkg-config clang_16
-              (boost183.override {
-                enableShared = true;
-                enableStatic = true;
-                enableRelease = true;
-                enableDebug = true;
-              })
+            buildInputs = with pkgs; [
+              cmake
+              pkg-config
+              clang_16
+              boost183
             ];
 
             # Because crypto3 is header-only, we must propagate it so users
