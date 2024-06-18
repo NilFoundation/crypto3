@@ -74,7 +74,32 @@ cmake ..
 make tests
 ```
 
+## Nix support
 
+This repository provides Nix flake, so once you have installed Nix with flake support, you can use single command to fetch all the dependencies and build:
+
+```bash
+nix build
+```
+
+To activate Nix development environment:
+
+```bash
+nix develop
+```
+
+To run all tests:
+
+```bash
+nix flake check
+```
+
+To run single test:
+
+```bash
+nix develop . -c cmake -B build -DCMAKE_CXX_STANDARD=17 -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=FALSE -DCMAKE_ENABLE_TESTS=TRUE -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=Debug  -DCMAKE_CXX_FLAGS=-ggdb
+nix develop -c cmake --build build -t <test_target> // for example multiprecision_modular_adaptor_fixed_test
+```
 
 ## Usage
 
