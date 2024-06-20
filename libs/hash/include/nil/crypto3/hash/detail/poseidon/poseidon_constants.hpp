@@ -18,7 +18,6 @@
 #include <nil/crypto3/algebra/vector/operators.hpp>
 
 #include <nil/crypto3/hash/detail/poseidon/poseidon_policy.hpp>
-#include <nil/crypto3/hash/detail/poseidon/original_constants.hpp>
 #include <nil/crypto3/hash/detail/poseidon/kimchi_constants.hpp>
 
 #include <boost/assert.hpp>
@@ -46,7 +45,7 @@ namespace nil {
 
                     // Choose which constants we want, original or kimchi. We may later add
                     // other sets of constants here.
-                    typedef typename std::conditional<PolicyType::mina_version, poseidon_kimchi_constants_data<policy_type>, poseidon_original_constants_data<policy_type>>::type constants_data_type;
+                    typedef poseidon_kimchi_constants_data<policy_type> constants_data_type;
 
                     poseidon_constants() {
                         // Transpose the matrix.
