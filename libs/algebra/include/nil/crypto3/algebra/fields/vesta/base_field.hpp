@@ -26,7 +26,9 @@
 #ifndef CRYPTO3_ALGEBRA_FIELDS_VESTA_BASE_FIELD_HPP
 #define CRYPTO3_ALGEBRA_FIELDS_VESTA_BASE_FIELD_HPP
 
+#ifndef __ZKLLVM__
 #include <nil/crypto3/algebra/fields/detail/element/fp.hpp>
+#endif
 
 #include <nil/crypto3/algebra/fields/params.hpp>
 #include <nil/crypto3/algebra/fields/field.hpp>

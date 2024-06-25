@@ -26,9 +26,11 @@
 #ifndef CRYPTO3_ALGEBRA_FIELDS_FIELD_HPP
 #define CRYPTO3_ALGEBRA_FIELDS_FIELD_HPP
 
+#ifndef __ZKLLVM__
 #include <boost/multiprecision/number.hpp>
 #include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
 #include <nil/crypto3/multiprecision/modular/modular_adaptor.hpp>
+#endif
 
 namespace nil {
     namespace crypto3 {

@@ -26,7 +26,9 @@
 #ifndef CRYPTO3_ALGEBRA_FIELDS_PALLAS_BASE_FIELD_HPP
 #define CRYPTO3_ALGEBRA_FIELDS_PALLAS_BASE_FIELD_HPP
 
+#ifndef __ZKLLVM__
 #include <nil/crypto3/algebra/fields/detail/element/fp.hpp>
+#endif
 
 #include <nil/crypto3/algebra/fields/params.hpp>
 #include <nil/crypto3/algebra/fields/field.hpp>
@@ -45,7 +47,7 @@ namespace nil {
                     constexpr static const std::size_t number_bits = policy_type::number_bits;
                     constexpr static const std::size_t value_bits = modulus_bits;
                     constexpr static const std::size_t arity = 1;
-                    
+
                     typedef typename policy_type::integral_type integral_type;
                     typedef typename policy_type::extended_integral_type extended_integral_type;
 #ifdef __ZKLLVM__
