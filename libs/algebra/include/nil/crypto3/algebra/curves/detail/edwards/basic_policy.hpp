@@ -82,16 +82,9 @@ namespace nil {
                             0x64536D55979879327CF1306BB5A6277D254EF9776CE70_cppui_modular179;    ///< coefficient of short
                                                                                          ///< Weierstrass curve
                                                                                          ///< $y^2=x^3+a*x+b$
-#ifdef STANDARD_EC_INF_POINTS_ENABLED
                         constexpr static const std::array<typename g1_field_type::value_type, 3> g1_zero_fill = {
                             g1_field_type::value_type::one(), g1_field_type::value_type::zero(),
                             g1_field_type::value_type::zero()};
-#else
-                        constexpr static const std::array<typename g1_field_type::value_type, 3> g1_zero_fill = {
-                            g1_field_type::value_type::zero(), g1_field_type::value_type::zero(),
-                            g1_field_type::value_type::zero()};
-#endif
-
 
                         constexpr static const std::array<typename g1_field_type::value_type, 3> g1_one_fill = {
                             typename g1_field_type::value_type(
@@ -101,15 +94,9 @@ namespace nil {
                             typename g1_field_type::value_type(
                                 0x3c6395f7eeafc1d930f0234a46e4a4806b953f0c3374ac_cppui_modular182)};
 
-#ifdef STANDARD_EC_INF_POINTS_ENABLED
                         constexpr static const std::array<typename g2_field_type::value_type, 3> g2_zero_fill = {
                             g2_field_type::value_type::one(), g2_field_type::value_type::zero(),
                             g2_field_type::value_type::zero()};
-#else
-                        constexpr static const std::array<typename g2_field_type::value_type, 3> g2_zero_fill = {
-                            g2_field_type::value_type::zero(), g2_field_type::value_type::zero(),
-                            g2_field_type::value_type::zero()};
-#endif
 
                         constexpr static const std::array<typename g2_field_type::value_type, 3> g2_one_fill = {
                             typename g2_field_type::value_type(
