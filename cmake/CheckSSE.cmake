@@ -59,7 +59,7 @@ macro(check_sse)
         endif(SSE42_TRUE)
 
     elseif(CMAKE_SYSTEM_NAME MATCHES "Darwin")
-        execute_process(COMMAND "/usr/sbin/sysctl -n machdep.cpu.features" OUTPUT_VARIABLE
+        execute_process(COMMAND "/usr/bin/env -S sysctl -n machdep.cpu.features" OUTPUT_VARIABLE
                      CPUINFO)
 
         string(REGEX REPLACE "^.*[^S](SSE2).*$" "\\1" SSE_THERE "${CPUINFO}")
