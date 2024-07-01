@@ -136,7 +136,7 @@ namespace nil {
                         // TODO: return status
                         assert(i < 256);
                     }
-                    point = typename group_type::field_type::value_type(group_type::params_type::cofactor) * point;
+                    point = typename curve_type::scalar_field_type::value_type(group_type::params_type::cofactor) * point;
                     // TODO: return status
                     assert(!point.is_zero());
                     assert(point.is_well_formed());

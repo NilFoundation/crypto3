@@ -2,6 +2,7 @@
 // Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020-2021 Ilias Khairullin <ilias@nil.foundation>
 // Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2024 Vasiliy Olekhov <vasiliy.olekhov@nil.foundation>
 //
 // MIT License
 //
@@ -32,135 +33,103 @@
 #include <boost/multiprecision/number.hpp>
 #include <nil/crypto3/multiprecision/modular/modular_adaptor.hpp>
 
-#include <cstdint>
+#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
+
+#include <nil/crypto3/algebra/wnaf.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace curves {
                 namespace detail {
-                    template<typename GroupValueType,
+                    template<typename CurveElementType,
                              typename Backend,
                              boost::multiprecision::expression_template_option ExpressionTemplates>
-                    typename std::enable_if<
-                    has_mixed_add<GroupValueType>::value, GroupValueType>::type
-                    constexpr scalar_mul(const GroupValueType &base,
+                    CurveElementType constexpr scalar_mul(const CurveElementType &base,
                                    const boost::multiprecision::number<Backend, ExpressionTemplates> &scalar) {
                         if (scalar.is_zero()) {
-                            return GroupValueType::zero();
+                            return CurveElementType::zero();
                         }
-                        GroupValueType result;
 
-                        bool found_one = false;
-                        bool use_mixed_add = base.Z.is_one();
+                        const size_t window_size = 3;
+                        auto naf = boost::multiprecision::eval_find_wnaf_a(window_size + 1, scalar.backend());
+                        std::array<CurveElementType, 1ul << window_size > table;
+                        CurveElementType tmp = base;
+                        CurveElementType dbl = base;
+                        dbl.double_inplace();
+                        for (size_t i = 0; i < 1ul << window_size; ++i) {
+                            table[i] = tmp;
+                            tmp += dbl;
+                        }
 
-                        for (auto i = static_cast<std::int64_t>(boost::multiprecision::msb(scalar)); i >= 0; --i) {
-                            if (found_one) {
-                                result.double_inplace();
+                        CurveElementType res = CurveElementType::zero();
+                        bool found_nonzero = false;
+                        for (long i = naf.size() - 1; i >= 0; --i) {
+                            if (found_nonzero) {
+                                res.double_inplace();
                             }
 
-                            if (boost::multiprecision::bit_test(scalar, i)) {
-                                found_one = true;
-                                if(use_mixed_add) {
-                                    result.mixed_add(base);
+                            if (naf[i] != 0) {
+                                found_nonzero = true;
+                                if (naf[i] > 0) {
+                                    res += table[naf[i] / 2];
                                 } else {
-                                    result += base;
+                                    res -= table[(-naf[i]) / 2];
                                 }
                             }
                         }
-
-                        return result;
+                        return res;
                     }
 
-                    template<typename GroupValueType,
+                    template<typename CurveElementType>
+                    constexpr CurveElementType& operator *= (
+                            CurveElementType& point,
+                            typename CurveElementType::params_type::scalar_field_type::value_type const& scalar)
+                    {
+                        return point *= static_cast<typename CurveElementType::params_type::scalar_field_type::integral_type>(scalar.data);
+                    }
+
+                    template<typename CurveElementType,
                              typename Backend,
                              boost::multiprecision::expression_template_option ExpressionTemplates>
-                    typename std::enable_if<
-                    !has_mixed_add<GroupValueType>::value, GroupValueType>::type
-                    constexpr scalar_mul(const GroupValueType &base,
-                                   const boost::multiprecision::number<Backend, ExpressionTemplates> &scalar) {
-                        if (scalar.is_zero()) {
-                            return GroupValueType::zero();
-                        }
-                        GroupValueType result;
-
-                        bool found_one = false;
-                        for (auto i = static_cast<std::int64_t>(boost::multiprecision::msb(scalar)); i >= 0; --i) {
-                            if (found_one) {
-                                result.double_inplace();
-                            }
-
-                            if (boost::multiprecision::bit_test(scalar, i)) {
-                                found_one = true;
-                                result += base;
-                            }
-                        }
-                        return result;
-                    }
-
-                    template<typename curve_element_type, typename scalar_value_type>
-                    typename std::enable_if<
-                    has_mixed_add<curve_element_type>::value, curve_element_type>::type
-                    & operator *= (
-                            curve_element_type& point,
-                            scalar_value_type const& scalar)
+                    constexpr CurveElementType& operator *= (
+                            CurveElementType& point,
+                            const boost::multiprecision::number<Backend, ExpressionTemplates> &scalar)
                     {
                         if (scalar.is_zero()) {
-                            point = curve_element_type::zero();
+                            point = CurveElementType::zero();
                             return point;
                         }
 
-                        bool found_one = false;
-                        bool use_mixed_add = point.Z.is_one();
-                        auto base = point;
+                        const size_t window_size = 3;
+                        auto naf = boost::multiprecision::eval_find_wnaf_a(window_size + 1, scalar.backend());
+                        std::array<CurveElementType, 1ul << window_size > table;
+                        CurveElementType tmp = point;
+                        CurveElementType dbl = point;
+                        dbl.double_inplace();
+                        for (size_t i = 0; i < 1ul << window_size; ++i) {
+                            table[i] = tmp;
+                            tmp += dbl;
+                        }
 
-                        for (auto i = static_cast<std::int64_t>(boost::multiprecision::msb(scalar.data)); i >= 0; --i) {
-                            if (found_one) {
-                                point.double_inplace();
+                        CurveElementType res = CurveElementType::zero();
+                        bool found_nonzero = false;
+                        for (long i = naf.size() - 1; i >= 0; --i) {
+                            if (found_nonzero) {
+                                res.double_inplace();
                             }
 
-                            if (boost::multiprecision::bit_test(scalar.data, i)) {
-                                if (found_one) {
-                                    if(use_mixed_add) {
-                                        point.mixed_add(base);
-                                    } else {
-                                        point += base;
-                                    }
+                            if (naf[i] != 0) {
+                                found_nonzero = true;
+                                if (naf[i] > 0) {
+                                    res += table[naf[i] / 2];
+                                } else {
+                                    res -= table[(-naf[i]) / 2];
                                 }
-                                found_one = true;
                             }
                         }
-                        return point;
-                    }
 
-
-                    template<typename curve_element_type, typename scalar_value_type>
-                    typename std::enable_if<
-                    !has_mixed_add<curve_element_type>::value, curve_element_type>::type
-                    & operator *= (
-                            curve_element_type& point,
-                            scalar_value_type const& scalar)
-                    {
-                        if (scalar.is_zero()) {
-                            point = curve_element_type::zero();
-                            return point;
-                        }
-
-                        bool found_one = false;
-                        auto base = point;
-
-                        for (auto i = static_cast<std::int64_t>(boost::multiprecision::msb(scalar.data)); i >= 0; --i) {
-                            if (found_one) {
-                                point.double_inplace();
-                            }
-
-                            if (boost::multiprecision::bit_test(scalar.data, i)) {
-                                if (found_one) {
-                                    point += base;
-                                }
-                                found_one = true;
-                            }
-                        }
+                        point = res;
                         return point;
                     }
 
@@ -205,7 +174,7 @@ namespace nil {
                                             GroupValueType>::type
                         operator*(const GroupValueType &left, const FieldValueType &right) {
 
-                        return left * right.data;
+                        return left * static_cast<typename GroupValueType::params_type::scalar_field_type::integral_type>(right.data);
                     }
 
                     template<typename GroupValueType, typename FieldValueType>

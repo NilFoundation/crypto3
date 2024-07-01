@@ -56,9 +56,9 @@ namespace nil {
                     class curve_element<CurveParams, forms::montgomery, coordinates::affine> {
                     public:
                         using field_type = typename CurveParams::field_type;
+                        using params_type = CurveParams;
 
                     private:
-                        using params_type = CurveParams;
                         using field_value_type = typename field_type::value_type;
 
                         bool is_inf_point;

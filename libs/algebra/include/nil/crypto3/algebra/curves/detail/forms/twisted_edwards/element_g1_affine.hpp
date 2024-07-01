@@ -56,9 +56,9 @@ namespace nil {
                     public:
 
                         using field_type = typename CurveParams::field_type;
+                        using params_type = CurveParams;
 
                     private:
-                        using params_type = CurveParams;
                         using field_value_type = typename field_type::value_type;
 
                     public:
