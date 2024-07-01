@@ -20,7 +20,9 @@
     },
     "nix-3rdparty": {
       "inputs": {
-        "flake-utils": "flake-utils",
+        "flake-utils": [
+          "flake-utils"
+        ],
         "nixpkgs": [
           "nixpkgs"
         ]
@@ -56,6 +58,7 @@
     },
     "root": {
       "inputs": {
+        "flake-utils": "flake-utils",
         "nix-3rdparty": "nix-3rdparty",
         "nixpkgs": "nixpkgs"
       }
