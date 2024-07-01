@@ -251,6 +251,11 @@ namespace nil {
                             return (*this) + (-other);
                         }
 
+                        constexpr curve_element& operator-=(const curve_element &other) {
+                            return (*this) += (-other);
+                        }
+
+
                         /** @brief
                          *
                          * @return doubled element from group G1

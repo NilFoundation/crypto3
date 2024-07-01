@@ -19,7 +19,7 @@ namespace nil {
         namespace hashes {
             namespace detail {
                 template<typename T>
-                struct poseidon_constants;
+                class poseidon_constants;
 
                 using namespace boost::multiprecision;
 

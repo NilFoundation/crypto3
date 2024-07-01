@@ -55,9 +55,9 @@ namespace nil {
                     public:
 
                         using field_type = typename CurveParams::field_type;
+                        using params_type = CurveParams;
 
                     private:
-                        using params_type = CurveParams;
                         using field_value_type = typename field_type::value_type;
 
                     public:
@@ -239,7 +239,6 @@ namespace nil {
 
                             if (!this->is_zero()) {
                                 field_value_type Xsquared3pa = 3u * X.squared() + params_type::a;
-                                field_value_type Y2squared = Y.doubled().squared();
                                 field_value_type Y2i = Y.doubled().inversed();
 
                                 Y = (X.doubled() + X) * Xsquared3pa * Y2i -

@@ -2,6 +2,7 @@
 // Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
 // Copyright (c) 2020-2021 Ilias Khairullin <ilias@nil.foundation>
+// Copyright (c) 2024 Vasiliy Olekhov <vasiliy.olekhov@nil.foundation>
 //
 // MIT License
 //
@@ -27,7 +28,6 @@
 #define BOOST_TEST_MODULE algebra_curves_test
 
 #include <iostream>
-#include <chrono>
 #include <type_traits>
 
 #include <boost/test/unit_test.hpp>
@@ -98,26 +98,25 @@ enum curve_operation_test_points : std::size_t {
 
 template<typename CurveGroup>
 void check_curve_operations(const std::vector<typename CurveGroup::value_type> &points,
-                            const std::vector<std::size_t> &constants) {
-    using scalar = typename CurveGroup::params_type::scalar_field_type::value_type;
+                            const std::vector<typename CurveGroup::field_type::integral_type> &constants) {
 
     BOOST_CHECK_EQUAL(points[p1] + CurveGroup::value_type::zero(), points[p1]);
     BOOST_CHECK_EQUAL(points[p1] - CurveGroup::value_type::zero(), points[p1]);
     BOOST_CHECK_EQUAL(points[p1] - points[p1], CurveGroup::value_type::zero());
-    BOOST_CHECK_EQUAL(points[p1] * static_cast<scalar>(0u), CurveGroup::value_type::zero());
+    BOOST_CHECK_EQUAL(points[p1] * (0u), CurveGroup::value_type::zero());
 
     BOOST_CHECK_EQUAL(points[p1] + points[p2], points[p1_plus_p2]);
     BOOST_CHECK_EQUAL(points[p1] - points[p2], points[p1_minus_p2]);
     typename CurveGroup::value_type p_copy = points[p1];
     p_copy.double_inplace();
     BOOST_CHECK_EQUAL(p_copy, points[p1_dbl]);
-    BOOST_CHECK_EQUAL(points[p1] * static_cast<scalar>(constants[C1]), points[p1_mul_C1]);
-    BOOST_CHECK_EQUAL((points[p2] * static_cast<scalar>(constants[C1])) +
-                          (points[p2] * static_cast<scalar>(constants[C2])),
+    BOOST_CHECK_EQUAL(points[p1] * (constants[C1]), points[p1_mul_C1]);
+    BOOST_CHECK_EQUAL((points[p2] * (constants[C1])) +
+                          (points[p2] * (constants[C2])),
                       points[p2_mul_C1_plus_p2_mul_C2]);
-    BOOST_CHECK_EQUAL((points[p2] * static_cast<scalar>(constants[C1])) +
-                          (points[p2] * static_cast<scalar>(constants[C2])),
-                      points[p2] * static_cast<scalar>(constants[C1] + constants[C2]));
+    BOOST_CHECK_EQUAL((points[p2] * (constants[C1])) +
+                          (points[p2] * (constants[C2])),
+                      points[p2] * (constants[C1] + constants[C2]));
     p_copy = points[p2];
     p_copy.mixed_add(points[p1_to_affine]);
     BOOST_CHECK_EQUAL(p_copy, points[p1_mixed_add_p2]);
@@ -137,12 +136,20 @@ void check_curve_operations(const std::vector<typename CurveGroup::value_type> &
     BOOST_CHECK_EQUAL(result, points[p1_minus_p2]);
 
     result = points[p1];
-    result *= static_cast<scalar>(constants[C1]);
+    result *= (constants[C1]);
     BOOST_CHECK_EQUAL(result, points[p1_mul_C1]);
 
     result = points[p2];
-    result *= static_cast<scalar>(constants[C1]);
-    result += points[p2] * static_cast<scalar>(constants[C2]);
+    result *= (constants[C1]);
+    result += points[p2] * (constants[C2]);
+    BOOST_CHECK_EQUAL(result, points[p2_mul_C1_plus_p2_mul_C2]);
+
+    /* Check operators * and *= for 'scalar' type. The above is checked for integral type */
+    using scalar = typename CurveGroup::params_type::scalar_field_type::value_type;
+    scalar c1(constants[C1]), c2(constants[C2]);
+    result = points[p2];
+    result *= c1;
+    result += points[p2] * c2;
     BOOST_CHECK_EQUAL(result, points[p2_mul_C1_plus_p2_mul_C2]);
 }
 
@@ -162,13 +169,12 @@ void check_curve_operations_twisted_edwards(
     typename CurveGroup::value_type p_copy = points[p1];
     p_copy.double_inplace();
     BOOST_CHECK_EQUAL(p_copy, points[p1_dbl]);
-    BOOST_CHECK_EQUAL(points[p1] * static_cast<scalar>(constants[C1]), points[p1_mul_C1]);
-    BOOST_CHECK_EQUAL((points[p2] * static_cast<scalar>(constants[C1])) +
-                          (points[p2] * static_cast<scalar>(constants[C2])),
-                      points[p2_mul_C1_plus_p2_mul_C2]);
-    BOOST_CHECK_EQUAL((points[p2] * static_cast<scalar>(constants[C1])) +
-                          (points[p2] * static_cast<scalar>(constants[C2])),
-                      points[p2] * static_cast<scalar>(constants[C1] + constants[C2]));
+    BOOST_CHECK_EQUAL( points[p1] * (constants[C1]), points[p1_mul_C1]);
+    BOOST_CHECK_EQUAL((points[p2] * (constants[C1])) +
+                      (points[p2] * (constants[C2])), points[p2_mul_C1_plus_p2_mul_C2]);
+    BOOST_CHECK_EQUAL((points[p2] * (constants[C1])) +
+                      (points[p2] * (constants[C2])),
+                       points[p2] * (constants[C1] + constants[C2]));
     // BOOST_CHECK_EQUAL(points[p1].mixed_add(points[p2]), points[p1_mixed_add_p2]);
     // typename CurveGroup::value_type p1_copy = typename CurveGroup::value_type(points[p1]).to_affine();
     // BOOST_CHECK_EQUAL(p1_copy, points[p1_to_affine]);
@@ -185,12 +191,20 @@ void check_curve_operations_twisted_edwards(
     BOOST_CHECK_EQUAL(result, points[p1_minus_p2]);
 
     result = points[p1];
-    result *= static_cast<scalar>(constants[C1]);
+    result *= (constants[C1]);
     BOOST_CHECK_EQUAL(result, points[p1_mul_C1]);
 
     result = points[p2];
-    result *= static_cast<scalar>(constants[C1]);
-    result += points[p2] * static_cast<scalar>(constants[C2]);
+    result *= (constants[C1]);
+    result += points[p2] * (constants[C2]);
+    BOOST_CHECK_EQUAL(result, points[p2_mul_C1_plus_p2_mul_C2]);
+
+    /* Check operators * and *= for 'scalar' type. The above is checked for integral type */
+    using scalar = typename CurveGroup::params_type::scalar_field_type::value_type;
+    scalar c1(constants[C1]), c2(constants[C2]);
+    result = points[p2];
+    result *= c1;
+    result += points[p2] * c2;
     BOOST_CHECK_EQUAL(result, points[p2_mul_C1_plus_p2_mul_C2]);
 }
 
@@ -206,7 +220,7 @@ void check_montgomery_twisted_edwards_conversion(
 
 template<typename FpCurveGroup, typename TestSet>
 void fp_curve_test_init(std::vector<typename FpCurveGroup::value_type> &points,
-                        std::vector<std::size_t> &constants,
+                        std::vector<typename FpCurveGroup::field_type::integral_type> &constants,
                         const TestSet &test_set) {
     typedef typename FpCurveGroup::field_type::value_type field_value_type;
     std::array<field_value_type, 3> coordinates;
@@ -291,7 +305,7 @@ void fp_extended_curve_twisted_edwards_test_init(
 
 template<typename Fp2CurveGroup, typename TestSet>
 void fp2_curve_test_init(std::vector<typename Fp2CurveGroup::value_type> &points,
-                         std::vector<std::size_t> &constants,
+                         std::vector<typename Fp2CurveGroup::field_type::integral_type> &constants,
                          const TestSet &test_set) {
     using fp2_value_type = typename Fp2CurveGroup::field_type::value_type;
     using integral_type = typename fp2_value_type::underlying_type::integral_type;
@@ -321,7 +335,7 @@ void fp2_curve_test_init(std::vector<typename Fp2CurveGroup::value_type> &points
 
 template<typename Fp3CurveGroup, typename TestSet>
 void fp3_curve_test_init(std::vector<typename Fp3CurveGroup::value_type> &points,
-                         std::vector<std::size_t> &constants,
+                         std::vector<typename Fp3CurveGroup::field_type::integral_type> &constants,
                          const TestSet &test_set) {
     using fp3_value_type = typename Fp3CurveGroup::field_type::value_type;
     using integral_type = typename fp3_value_type::underlying_type::integral_type;
@@ -353,11 +367,11 @@ void fp3_curve_test_init(std::vector<typename Fp3CurveGroup::value_type> &points
 template<typename CurveGroup, typename TestSet>
 void curve_operation_test(const TestSet &test_set,
                           void (&test_init)(std::vector<typename CurveGroup::value_type> &,
-                                            std::vector<std::size_t> &,
+                                            std::vector<typename CurveGroup::field_type::integral_type> &,
                                             const TestSet &)) {
 
     std::vector<typename CurveGroup::value_type> points;
-    std::vector<std::size_t> constants;
+    std::vector<typename CurveGroup::field_type::integral_type> constants;
 
     test_init(points, constants, test_set);
 

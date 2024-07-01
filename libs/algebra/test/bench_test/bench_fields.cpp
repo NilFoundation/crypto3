@@ -25,12 +25,11 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#define BOOST_TEST_MODULE algebra_curves_bench_test
+#define BOOST_TEST_MODULE algebra_fields_bench_test
 
 #include <ostream>
 #include <fstream>
 #include <chrono>
-#include <cstdint>
 #include <string>
 
 #include <boost/test/unit_test.hpp>
@@ -68,13 +67,17 @@ void run_perf_test(std::string const& field_name) {
     typedef typename Field::value_type value_type;
     std::vector<value_type> points1;
     std::vector<value_type> points2;
-    for (int i = 0; i < 1000; ++i) {
+
+    // size of arrays is 4 times larger than typical L1 data cache
+    size_t SAMPLES_COUNT = 4*32*1024/sizeof(value_type);
+
+    for (int i = 0; i < SAMPLES_COUNT; ++i) {
         points1.push_back(algebra::random_element<Field>());
         points2.push_back(algebra::random_element<Field>());
     }
 
     auto gather_stats = [&points1, &points2]
-        (std::function<void(value_type & result, value_type const& sample)> operation,
+        (std::function<void(std::vector<value_type> & result, std::vector<value_type> const& samples, std::size_t sample)> operation,
         size_t samples_per_batch, const std::string& operation_name) {
             size_t BATCHES = 1000;
 
@@ -90,7 +93,7 @@ void run_perf_test(std::string const& field_name) {
                 auto points_index = 0;
 
                 for(size_t i = 0; i < samples_per_batch; ++i) {
-                    operation(points1[points_index], points2[points_index]);
+                    operation(points1, points2, i);
                     ++points_index;
                     if (points_index == 1000)
                         points_index = 0;
@@ -114,26 +117,63 @@ void run_perf_test(std::string const& field_name) {
             return batch_duration;
         };
 
-    auto plus_results = gather_stats( [](value_type &result, value_type const& sample) { result += sample; }, 1000000, "Addition");
-    auto minus_results = gather_stats( [](value_type &result, value_type const& sample) { result -= sample; }, 1000000, "Subtraction");
-    auto mul_results = gather_stats( [](value_type &result, value_type const& sample)  { result *= sample; }, 100000, "Multiplication");
-    auto sqr_results = gather_stats( [](value_type &result, value_type const& sample)  { result.square_inplace(); }, 100000, "Square In-Place");
-    auto inv_results = gather_stats( [](value_type &result, value_type const& sample)  { result = sample.inversed(); }, 100, "Inverse");
 
-    std::ofstream f(field_name+"-stats.log", std::ofstream::out);
+    for(int mult = 1; mult <= 100; ++mult) {
+        int MULTIPLICATOR = mult;
+        std::cout << "MULT: " << MULTIPLICATOR << std::endl;
+
+    auto plus_results = gather_stats(
+        [&](std::vector<value_type> &result, std::vector<value_type> const& samples, std::size_t sample)
+        {
+            for(int m = 0; m < MULTIPLICATOR; m++)
+                result[sample*(sample+m) % SAMPLES_COUNT] += samples[sample*(sample+m)*17 % SAMPLES_COUNT];
+        }, 10000 / MULTIPLICATOR, "Addition");
+
+    auto mul_results = gather_stats(
+        [&](std::vector<value_type> &result, std::vector<value_type> const& samples, std::size_t sample)
+        {
+            for(int m = 0; m < MULTIPLICATOR; m++)
+                result[sample*(sample+m) % SAMPLES_COUNT] *= samples[sample*(sample+m)*17 % SAMPLES_COUNT];
+        }, 1000 / MULTIPLICATOR, "Multiplication");
+
+    auto minus_results = gather_stats(
+        [&](std::vector<value_type> &result, std::vector<value_type> const& samples, std::size_t sample)
+        {
+            for(int m = 0; m < MULTIPLICATOR; m++)
+                result[sample*(sample+m) % SAMPLES_COUNT] -= samples[sample*(sample+m)*17 % SAMPLES_COUNT];
+        }, 10000 / MULTIPLICATOR, "Subtraction");
+
+    auto sqr_results = gather_stats(
+        [&](std::vector<value_type> &result, std::vector<value_type> const& samples, std::size_t sample)
+        {
+            for(int m = 0; m < MULTIPLICATOR; m++)
+                result[sample*(sample+m) % SAMPLES_COUNT].square_inplace();
+        }, 1000 / MULTIPLICATOR, "Square In-Place");
+
+    auto inv_results = gather_stats(
+        [&](std::vector<value_type> &result, std::vector<value_type> const& samples, std::size_t sample)
+        {
+            for(int m = 0; m < MULTIPLICATOR; m++)
+                result[sample*(sample+m) % SAMPLES_COUNT] = samples[sample*(sample+m)*17 % SAMPLES_COUNT].inversed();
+        }, 100 / MULTIPLICATOR, "Inverse");
+    char filename[200]= {0};
+    sprintf(filename,"%s-stats-%03d.csv", field_name.c_str(), MULTIPLICATOR);
+
+    std::ofstream f(filename, std::ofstream::out);
     f << "# " << typeid(Field).name() << std::endl;
     f << "sum,mul,sqr,inv" << std::endl;
 
     for(size_t i = 0; i < plus_results.size(); ++i) {
-        f << std::fixed << std::setprecision(3) << plus_results[i].count() << ","
+        f << std::fixed << std::setprecision(3) << plus_results[i].count()  << ","
+          << std::fixed << std::setprecision(3) << mul_results[i].count()   << ","
           << std::fixed << std::setprecision(3) << minus_results[i].count() << ","
-          << std::fixed << std::setprecision(3) << mul_results[i].count() << ","
-          << std::fixed << std::setprecision(3) << sqr_results[i].count() << ","
+          << std::fixed << std::setprecision(3) << sqr_results[i].count()   << ","
           << std::fixed << std::setprecision(3) << inv_results[i].count()
           << std::endl;
     }
 
     f.close();
+    }
 }
 
 BOOST_AUTO_TEST_CASE(field_operation_perf_test_pallas) {
