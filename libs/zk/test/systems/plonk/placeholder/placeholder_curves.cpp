@@ -89,4 +89,3 @@ BOOST_AUTO_TEST_SUITE(placeholder_curves_test)
     }
 
 BOOST_AUTO_TEST_SUITE_END()
-

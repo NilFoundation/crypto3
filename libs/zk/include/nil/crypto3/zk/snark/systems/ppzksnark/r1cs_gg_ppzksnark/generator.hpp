@@ -235,7 +235,7 @@ namespace nil {
                                                std::move(gamma_ABC_g1), std::move(gamma_g1));
                     }
 
-                    // Generate *unsafe* CRS for specific toxic waste 
+                    // Generate *unsafe* CRS for specific toxic waste
                     // For testing purposes only
                     static inline auto deterministic_basic_process(const constraint_system_type &constraint_system,
                                                                     const typename scalar_field_type::value_type &t,

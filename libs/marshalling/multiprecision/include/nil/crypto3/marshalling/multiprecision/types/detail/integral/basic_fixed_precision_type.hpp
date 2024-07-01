@@ -121,7 +121,7 @@ namespace nil {
 
                         template<typename TIter>
                         nil::marshalling::status_type read(TIter &iter, std::size_t size) {
-                            
+
                             if (size < (std::is_same<typename std::iterator_traits<TIter>::value_type, bool>::value ?
                                             bit_length() : length())) {
                                 return nil::marshalling::status_type::not_enough_data;

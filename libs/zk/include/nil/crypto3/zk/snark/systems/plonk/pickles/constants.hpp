@@ -33,7 +33,7 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-                
+
                 struct kimchi_constant {
                     constexpr static const std::size_t CHALLENGE_LENGTH_IN_LIMBS = 2;
                     constexpr static const std::size_t PERMUTES = 7;

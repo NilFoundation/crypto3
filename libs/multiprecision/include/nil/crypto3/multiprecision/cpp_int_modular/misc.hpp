@@ -37,7 +37,7 @@ namespace boost {
                         numeric_limits_workaround<R>::digits <
                         cpp_int_modular_backend<Bits>::limb_bits) {
                         if (boost::multiprecision::detail::is_signed<R>::value &&
-                                   boost::multiprecision::detail::is_integral<R>::value && 
+                                   boost::multiprecision::detail::is_integral<R>::value &&
                                    static_cast<boost::multiprecision::limb_type>(
                                        (std::numeric_limits<R>::max)()) <= backend.limbs()[0]) {
                             *result = (numeric_limits_workaround<R>::max)();
@@ -144,9 +144,9 @@ namespace boost {
                     //
                     for (std::size_t i = a.size() - 1; i > 0; --i) {
                         if (a.limbs()[i] != 0)
-                            return i * cpp_int_modular_backend<Bits>::limb_bits + 
+                            return i * cpp_int_modular_backend<Bits>::limb_bits +
                                 boost::multiprecision::detail::find_msb(a.limbs()[i]);
-                    } 
+                    }
                     return boost::multiprecision::detail::find_msb(a.limbs()[0]);
                 }
 
@@ -183,7 +183,7 @@ namespace boost {
                 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
                     is_trivial_cpp_int_modular<cpp_int_modular_backend<Bits>>::value, bool>::type
                     eval_bit_test(const cpp_int_modular_backend<Bits> &val, std::size_t index) noexcept {
-                    // For trivial cpp_int_modular, limb_type sometimes can be 128 bits, not 64. So we need to use 
+                    // For trivial cpp_int_modular, limb_type sometimes can be 128 bits, not 64. So we need to use
                     // local_limb_type instead of limb_type for trivial_cpp_int when using bit operations.
                     using local_limb_type = typename boost::multiprecision::backends::cpp_int_modular_backend<Bits>::local_limb_type;
 
@@ -217,7 +217,7 @@ namespace boost {
                 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_trivial_cpp_int_modular<
                     cpp_int_modular_backend<Bits>>::value>::type
                     eval_bit_set(cpp_int_modular_backend<Bits> &val, std::size_t index) {
-                    // For trivial cpp_int_modular, limb_type sometimes can be 128 bits, not 64. So we need to use 
+                    // For trivial cpp_int_modular, limb_type sometimes can be 128 bits, not 64. So we need to use
                     // local_limb_type instead of limb_type for trivial_cpp_int when using bit operations.
                     using local_limb_type = typename boost::multiprecision::backends::cpp_int_modular_backend<Bits>::local_limb_type;
 
@@ -248,7 +248,7 @@ namespace boost {
                 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_trivial_cpp_int_modular<
                     cpp_int_modular_backend<Bits>>::value>::type
                     eval_bit_unset(cpp_int_modular_backend<Bits> &val, std::size_t index) {
-                    // For trivial cpp_int_modular, limb_type sometimes can be 128 bits, not 64. So we need to use 
+                    // For trivial cpp_int_modular, limb_type sometimes can be 128 bits, not 64. So we need to use
                     // local_limb_type instead of limb_type for trivial_cpp_int when using bit operations.
                     using local_limb_type = typename boost::multiprecision::backends::cpp_int_modular_backend<Bits>::local_limb_type;
 
@@ -279,7 +279,7 @@ namespace boost {
                 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<is_trivial_cpp_int_modular<
                     cpp_int_modular_backend<Bits>>::value>::type
                     eval_bit_flip(cpp_int_modular_backend<Bits> &val, std::size_t index) {
-                    // For trivial cpp_int_modular, limb_type sometimes can be 128 bits, not 64. So we need to use 
+                    // For trivial cpp_int_modular, limb_type sometimes can be 128 bits, not 64. So we need to use
                     // local_limb_type instead of limb_type for trivial_cpp_int when using bit operations.
                     using local_limb_type = typename boost::multiprecision::backends::cpp_int_modular_backend<Bits>::local_limb_type;
 
@@ -337,7 +337,7 @@ namespace boost {
                 inline BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
                     is_trivial_cpp_int_modular<cpp_int_modular_backend<Bits>>::value, unsigned>::type
                     eval_msb(const cpp_int_modular_backend<Bits> &a) {
-                    
+
                     return eval_msb_imp(a);
                 }
 

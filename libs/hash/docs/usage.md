@@ -19,7 +19,7 @@ int main(int argc, char *argv[]) {
     std::string out = hash<hashes::md5>(input.begin(), input.end());
     assert(out == "900150983cd24fb0d6963f7d28e17f72");
 }
- 
+
 ```
 
 Similar technique is available for ranges:
@@ -36,7 +36,7 @@ int main(int argc, char *argv[]) {
     std::string out = hashes<hash::md5>(input);
     assert(out == "900150983cd24fb0d6963f7d28e17f72");
 }
- 
+
 ```
 
 ## Stateful hashing

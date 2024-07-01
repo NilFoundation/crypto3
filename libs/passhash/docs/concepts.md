@@ -2,4 +2,4 @@
 
 @tableofcontents
 
-## Password Hash Concept {#passhash_concept} 
+## Password Hash Concept {#passhash_concept}

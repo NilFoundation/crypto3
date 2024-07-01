@@ -142,7 +142,7 @@ namespace nil {
                     }
 
                     static serialized_type adjust_to_serialized(base_serialized_type val, sign_extend_tag) {
-                        unsigned_serialized_type valueTmp = 
+                        unsigned_serialized_type valueTmp =
                             static_cast<unsigned_serialized_type>(val) & UnsignedValueMask;
 
                         return sign_ext_unsigned_serialized(valueTmp, has_sign_tag());
@@ -153,7 +153,7 @@ namespace nil {
                     }
 
                     static base_serialized_type adjust_from_serialized(serialized_type val, sign_extend_tag) {
-                        unsigned_serialized_type valueTmp = 
+                        unsigned_serialized_type valueTmp =
                             static_cast<unsigned_serialized_type>(val) & UnsignedValueMask;
                         return static_cast<base_serialized_type>(
                             sign_ext_unsigned_serialized(valueTmp, has_sign_tag()));

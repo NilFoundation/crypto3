@@ -468,4 +468,3 @@ BOOST_AUTO_TEST_CASE(test_numeric_limits_snips) {
 #endif
 #endif
 }    // BOOST_AUTO_TEST_CASE(test_numeric_limits_snips)
-

@@ -62,7 +62,7 @@ namespace nil {
 
                         constexpr element_fp4(const element_fp4 &B) : data {B.data} {}
 
-                        constexpr element_fp4(const element_fp4 &&B) BOOST_NOEXCEPT 
+                        constexpr element_fp4(const element_fp4 &&B) BOOST_NOEXCEPT
                             : data(std::move(B.data)) {}
 
                         // Creating a zero is a fairly slow operation and is called very often, so we must return a
@@ -250,7 +250,7 @@ namespace nil {
                         element_fp4<FieldParams>::non_residue;
 
                     namespace element_fp4_details {
-                        // These constexpr static variables can not be members of element_fp2, because 
+                        // These constexpr static variables can not be members of element_fp2, because
                         // element_fp2 is incomplete type until the end of its declaration.
                         template<typename FieldParams>
                         constexpr static element_fp4<FieldParams> zero_instance(

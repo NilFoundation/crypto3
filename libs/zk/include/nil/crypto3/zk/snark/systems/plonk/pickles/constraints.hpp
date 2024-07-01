@@ -18,7 +18,7 @@ namespace nil {
                     constexpr static const std::size_t GENERIC_REGISTERS = 3;
 
                     static value_type perm_scalars(std::vector<proof_evaluation_type<value_type>>& e, value_type beta,
-                                value_type& gamma, std::vector<value_type>& alphas, 
+                                value_type& gamma, std::vector<value_type>& alphas,
                                 value_type& zkp_zeta){
                         value_type res = e[1].z * beta * alphas.front() * zkp_zeta;
                         for(int i = 0; i < std::min(e[0].w.size(), e[0].s.size()); ++i){
@@ -29,7 +29,7 @@ namespace nil {
                     }
 
                     static void generic_gate(std::vector<value_type>& res, const value_type& alpha_pow,
-                                             const std::size_t register_offset, const value_type& generic_zeta, 
+                                             const std::size_t register_offset, const value_type& generic_zeta,
                                              const std::array<value_type, kimchi_constant::COLUMNS>& w_zeta){
                         value_type alpha_generic = alpha_pow * generic_zeta;
 
@@ -44,7 +44,7 @@ namespace nil {
                         // constant
                         res.push_back(alpha_generic);
                     }
-                    static std::vector<value_type> gnrc_scalars(const std::vector<value_type>& alphas, 
+                    static std::vector<value_type> gnrc_scalars(const std::vector<value_type>& alphas,
                                                                 const std::array<value_type, kimchi_constant::COLUMNS>& w_zeta,
                                                                 const value_type& generic_zeta){
                         std::vector<value_type> res;

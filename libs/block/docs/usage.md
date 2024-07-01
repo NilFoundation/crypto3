@@ -6,7 +6,7 @@
 
 The easiest way to use Crypto3.Block library is to use an algorithm with explicit key initialization and
  implicit state usage. Following example encrypts byte sequence with AES block cipher:
- 
+
 ```cpp
 
 #include <nil/crypto3/block/aes.hpp>
@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
     assert(out == "3ad77bb40d7a3660a89ecaf32466ef97f5d3d58503b9699de785895a96fdbaaf"
                     "43b1cd7f598ece23881b00e3ed0306887b0c785e27e8ad3f8223207104725dd4");
 }
- 
+
 ```
 
 Similar technique is available for ranges:
@@ -52,12 +52,12 @@ int main(int argc, char *argv[]) {
     assert(out == "3ad77bb40d7a3660a89ecaf32466ef97f5d3d58503b9699de785895a96fdbaaf"
                     "43b1cd7f598ece23881b00e3ed0306887b0c785e27e8ad3f8223207104725dd4");
 }
- 
+
 ```
 
 ## Stateful encryption
 
-In case of accumulative encryption requirement is present, following example demonstrates 
+In case of accumulative encryption requirement is present, following example demonstrates
 [accumulator](@ref block::accumulator_set) usage:
 
 ```cpp

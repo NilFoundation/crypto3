@@ -69,7 +69,7 @@ namespace nil {
          */
 
         template<std::size_t DigestBits>
-        struct digest : public boost::container::small_vector<octet_type, DigestBits / octet_bits> { 
+        struct digest : public boost::container::small_vector<octet_type, DigestBits / octet_bits> {
 
             digest(): boost::container::small_vector<octet_type, DigestBits / octet_bits>(){};
 

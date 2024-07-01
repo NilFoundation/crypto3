@@ -81,4 +81,3 @@ BOOST_AUTO_TEST_SUITE(placeholder_hashes_test)
     }
 
 BOOST_AUTO_TEST_SUITE_END()
-

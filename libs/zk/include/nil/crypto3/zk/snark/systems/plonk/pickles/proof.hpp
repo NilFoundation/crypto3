@@ -46,7 +46,7 @@ namespace nil {
                     value_type runtime;
                     bool runtime_is_used;
 
-                    lookup_evaluation_type(std::vector<value_type>& sorted, value_type& aggreg, 
+                    lookup_evaluation_type(std::vector<value_type>& sorted, value_type& aggreg,
                         value_type& table, value_type& runtime) : sorted(sorted),
                         aggreg(aggreg), table(table), runtime(runtime) {};
 
@@ -66,11 +66,11 @@ namespace nil {
                     value_type generic_selector;
                     value_type poseidon_selector;
 
-                    base_proof_evaluation_type(std::array<value_type, WiresAmount>& w, 
+                    base_proof_evaluation_type(std::array<value_type, WiresAmount>& w,
                         value_type& z, std::array<value_type, Permuts - 1>& s,
-                        lookup_evaluation_type<value_type> &lookup, 
-                        value_type& generic_selector, value_type& poseidon_selector) : 
-                        w(w), z(z), s(s), lookup(lookup), generic_selector(generic_selector), 
+                        lookup_evaluation_type<value_type> &lookup,
+                        value_type& generic_selector, value_type& poseidon_selector) :
+                        w(w), z(z), s(s), lookup(lookup), generic_selector(generic_selector),
                         poseidon_selector(poseidon_selector) {}
 
                     base_proof_evaluation_type() = default;
@@ -84,7 +84,7 @@ namespace nil {
                 template <typename value_type>
                 struct proof_evaluation_type<std::vector<value_type>> : base_proof_evaluation_type<std::vector<value_type>>{
                     using base_proof_evaluation_type<std::vector<value_type>>::base_proof_evaluation_type;
-                    
+
                     proof_evaluation_type<value_type> combine(value_type& pt){
                         std::array<value_type, kimchi_constant::PERMUTES - 1> s_combined;
                         for(int i = 0; i < s_combined.size(); ++i){
@@ -121,7 +121,7 @@ namespace nil {
                                 math::polynomial<value_type> temp_polynomial_sorted(this->lookup.sorted[i].begin(), this->lookup.sorted[i].end());
                                 lookup_combined.sorted[i] = temp_polynomial_sorted.evaluate(pt);
                             }
-                            
+
                             if(this->lookup.runtime_is_used){
                                 math::polynomial<value_type> temp_polynomial_runtime(this->lookup.runtime.begin(),
                                                                                             this->lookup.runtime.end());
@@ -129,11 +129,11 @@ namespace nil {
                             }
                         }
 
-                        return proof_evaluation_type<value_type>(w_combined, z_combined, s_combined, lookup_combined, 
+                        return proof_evaluation_type<value_type>(w_combined, z_combined, s_combined, lookup_combined,
                                 generic_selector_combined, poseidon_selector_combined);
                     }
                 };
-                
+
                 template<typename CurveType>
                 struct lookup_commitment_type {
                     typedef commitments::kimchi_pedersen<CurveType> commitment_scheme;
@@ -144,7 +144,7 @@ namespace nil {
                     commitment_type runtime;
                     bool runtime_is_used;
                 };
-                
+
                 template<typename CurveType>
                 struct proof_commitment_type {
                     typedef commitments::kimchi_pedersen<CurveType> commitment_scheme;
@@ -181,7 +181,7 @@ namespace nil {
                     // Previous challenges
                     std::vector<
                         std::pair<
-                            std::vector<typename CurveType::scalar_field_type::value_type>, 
+                            std::vector<typename CurveType::scalar_field_type::value_type>,
                             commitment_type
                         >
                     >   prev_challenges;

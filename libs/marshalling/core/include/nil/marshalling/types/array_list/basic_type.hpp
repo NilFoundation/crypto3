@@ -291,7 +291,7 @@ namespace nil {
                                 return sum + e.length();
                             });
                     }
-                    
+
                     constexpr std::size_t bit_length_internal(field_elem_tag) const {
                         return bit_field_length(field_elem_tag());
                     }
@@ -514,7 +514,7 @@ namespace nil {
 
                     template<typename TIter>
                     void eval_assign(TIter &iter, std::size_t len, assign_missing_tag) {
-                        typename value_type::const_pointer data = 
+                        typename value_type::const_pointer data =
                             reinterpret_cast<typename value_type::const_pointer>(&(*iter));
                         value_ = value_type(data, len);
                     }

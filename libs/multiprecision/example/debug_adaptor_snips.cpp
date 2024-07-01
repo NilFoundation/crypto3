@@ -32,4 +32,3 @@ int main() {
     t1();
     return 0;
 }
-

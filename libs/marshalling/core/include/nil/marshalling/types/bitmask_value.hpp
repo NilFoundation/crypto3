@@ -99,11 +99,11 @@ namespace nil {
                 using parsed_options_type = detail::options_parser<TOptions...>;
 
             private:
-                
-                using bitmask_behaviour_type = 
+
+                using bitmask_behaviour_type =
                     detail::bitmask_undertlying_type_type<parsed_options_type>;
 
-                using integral_type = 
+                using integral_type =
                     integral<TFieldBase, bitmask_behaviour_type, TOptions...>;
 
             public:

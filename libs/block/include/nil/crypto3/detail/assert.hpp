@@ -87,4 +87,3 @@ namespace nil {
 }
 
 #endif  // CRYPTO3_DETAIL_ASSERTS_HPP
-

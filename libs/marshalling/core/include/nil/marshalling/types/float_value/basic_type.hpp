@@ -110,7 +110,7 @@ namespace nil {
 
                     template<typename TIter>
                     void read_no_status(TIter &iter) {
-                        serialized_type serializedValue = 
+                        serialized_type serializedValue =
                             base_impl_type::template read_data<serialized_type>(iter);
                         value_ = from_serialized(serializedValue);
                     }

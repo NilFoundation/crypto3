@@ -57,7 +57,7 @@ namespace nil {
                 bool run_bacs_ppzksnark(const bacs_example<typename CurveType::scalar_field_type> &example) {
 
                     using basic_proof_system = bacs_ppzksnark<CurveType>;
-                    
+
                     std::cout << "Call to run_bacs_ppzksnark" << std::endl;
 
                     std::cout << "BACS ppzkSNARK Generator" << std::endl;

@@ -1,10 +1,10 @@
-# Public Key Cryptography Schemes Modes for =nil; Foundation's Cryptography Suite 
+# Public Key Cryptography Schemes Modes for =nil; Foundation's Cryptography Suite
 
 Public key cryptography modes library for =nil; Foundation's cryptography suite. Includes threshold, aggregatable modes for schemes defined within pubkey library.
 
 ## Building
 
-This library uses Boost CMake build modules (https://github.com/BoostCMake/cmake_modules.git). 
+This library uses Boost CMake build modules (https://github.com/BoostCMake/cmake_modules.git).
 To actually include this library in a project it is required to:
 
 1. Add [CMake Modules](https://github.com/BoostCMake/cmake_modules.git) as submodule to target project repository.

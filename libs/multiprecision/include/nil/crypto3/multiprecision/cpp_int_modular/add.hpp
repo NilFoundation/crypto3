@@ -198,7 +198,7 @@ namespace boost {
             template<unsigned Bits1, unsigned Bits2>
             BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
                 !boost::multiprecision::backends::is_trivial_cpp_int_modular<cpp_int_modular_backend<Bits1>>::value &&
-                !boost::multiprecision::backends::is_trivial_cpp_int_modular<cpp_int_modular_backend<Bits2>>::value && 
+                !boost::multiprecision::backends::is_trivial_cpp_int_modular<cpp_int_modular_backend<Bits2>>::value &&
                 (Bits1 > Bits2)>::type
                 eval_subtract(cpp_int_modular_backend<Bits1>& result,
                               const cpp_int_modular_backend<Bits2>& o) noexcept {

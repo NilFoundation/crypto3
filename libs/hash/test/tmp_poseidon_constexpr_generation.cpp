@@ -187,7 +187,7 @@ struct round_constants_generator {
     constexpr round_constants_generator() : constants() {
         // generate_round_constants();
         generate_round_constants_unfolded();
-        
+
     }
 
     integral_type constants[(full_rounds + part_rounds) * t];
@@ -200,7 +200,7 @@ int main() {
     constexpr std::size_t full_rounds = 8;
     constexpr std::size_t part_rounds = 56;
     typedef round_constants_generator<width, full_rounds, part_rounds> rcg;
-    
+
     // Add option -fconstexpr-ops-limit=4294967296 to compiler
     constexpr rcg gen;
     for (std::size_t i = 0; i < (8 + 56) * 4; i++)

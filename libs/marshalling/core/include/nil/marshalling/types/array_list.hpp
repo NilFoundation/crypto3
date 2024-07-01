@@ -167,7 +167,7 @@ namespace nil {
                 constexpr std::size_t bit_length() const {
                     return base_impl_type::bit_length();
                 }
-                
+
                 /// @brief Read field value from input data sequence
                 /// @details By default, the read operation will try to consume all the
                 ///     data available, unless size limiting option (such as

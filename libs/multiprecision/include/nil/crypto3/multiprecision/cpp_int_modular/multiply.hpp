@@ -13,11 +13,11 @@
 namespace boost {
     namespace multiprecision {
         namespace backends {
-            // Functions in this file should be called only for creation of montgomery and Barett params, calculation of inverse element and 
+            // Functions in this file should be called only for creation of montgomery and Barett params, calculation of inverse element and
             // montgomery_reduce. Since these functions are relatively slow and are not called very often, we will not optimize them.
             // We do NOT care about the execution speed, and will just redirect calls to normal boost::cpp_int.
             template<unsigned Bits1, unsigned Bits2>
-            inline BOOST_MP_CXX14_CONSTEXPR void 
+            inline BOOST_MP_CXX14_CONSTEXPR void
             eval_multiply(cpp_int_modular_backend<Bits1 + Bits2> &result,
                           const cpp_int_modular_backend<Bits1> &a,
                           const cpp_int_modular_backend<Bits2> &b) noexcept {
@@ -77,7 +77,7 @@ namespace boost {
                 cpp_int_type result_cpp_int = result.to_cpp_int();
                 // Here we need cpp_int_type::limb_type to compile, otherwise it's ambiguous which function to call, boost has functions
                 // for signed and unsigned.
-                boost::multiprecision::backends::eval_multiply(result_cpp_int, boost::multiprecision::limb_type(*o.limbs())); 
+                boost::multiprecision::backends::eval_multiply(result_cpp_int, boost::multiprecision::limb_type(*o.limbs()));
                 result.from_cpp_int(result_cpp_int);
             }
 
@@ -124,4 +124,4 @@ namespace boost {
 }   // namespace boost
 
 
-#endif 
+#endif

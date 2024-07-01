@@ -117,7 +117,7 @@ BOOST_AUTO_TEST_SUITE(polynomial_subtraction_test_suite)
     }
 
     BOOST_AUTO_TEST_CASE(polynomial_subtraction_equal) {
-        test_substraction({1u, 3u, 4u, 25u, 6u, 7u, 7u, 2u}, {9u, 3u, 11u, 14u, 7u, 1u, 5u, 8u}, 
+        test_substraction({1u, 3u, 4u, 25u, 6u, 7u, 7u, 2u}, {9u, 3u, 11u, 14u, 7u, 1u, 5u, 8u},
             {FieldType::modulus - 8u, 0u, FieldType::modulus - 7u, 11u, FieldType::modulus - 1u, 6u, 2u, FieldType::modulus - 6u});
     }
 
@@ -127,14 +127,14 @@ BOOST_AUTO_TEST_SUITE(polynomial_subtraction_test_suite)
     }
 
     BOOST_AUTO_TEST_CASE(polynomial_subtraction_long_b) {
-        test_substraction({1u, 3u, 4u, 25u, 6u}, {9u, 3u, 11u, 14u, 7u, 1u, 5u, 8u}, 
+        test_substraction({1u, 3u, 4u, 25u, 6u}, {9u, 3u, 11u, 14u, 7u, 1u, 5u, 8u},
             {FieldType::modulus - 8u, 0u, FieldType::modulus - 7u, 11u, FieldType::modulus - 1u, FieldType::modulus - 1u,
              FieldType::modulus - 5u, FieldType::modulus - 8u});
     }
 
     BOOST_AUTO_TEST_CASE(polynomial_subtraction_zero_a) {
-        test_substraction({0u, 0u, 0u}, {1u, 3u, 4u, 25u, 6u, 7u, 7u, 2u}, 
-            {FieldType::modulus - 1, FieldType::modulus - 3, FieldType::modulus - 4, FieldType::modulus - 25, 
+        test_substraction({0u, 0u, 0u}, {1u, 3u, 4u, 25u, 6u, 7u, 7u, 2u},
+            {FieldType::modulus - 1, FieldType::modulus - 3, FieldType::modulus - 4, FieldType::modulus - 25,
              FieldType::modulus - 6, FieldType::modulus - 7, FieldType::modulus - 7, FieldType::modulus - 2});
     }
 
@@ -205,7 +205,7 @@ BOOST_AUTO_TEST_SUITE(polynomial_division_test_suite)
     }
 
     BOOST_AUTO_TEST_CASE(polynomial_division) {
-        test_division({5u, 0u, 0u, 13u, 0u, 1u}, {13u, 2u, 1u}, {18u, 4u, FieldType::modulus - 2u, 1u}, 
+        test_division({5u, 0u, 0u, 13u, 0u, 1u}, {13u, 2u, 1u}, {18u, 4u, FieldType::modulus - 2u, 1u},
             {FieldType::modulus - 229u, FieldType::modulus - 88u});
     }
 

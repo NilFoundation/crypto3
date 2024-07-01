@@ -29,4 +29,3 @@ target_link_libraries(simpletestheader simple)
 
 cm_test_header(NAME simpleteststaticheader HEADER simple.h STATIC)
 target_link_libraries(simpleteststaticheader simple)
-

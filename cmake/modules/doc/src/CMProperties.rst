@@ -38,7 +38,7 @@ Default value is ``on``.
 CXX_WARNINGS_AS_ERRORS
 ----------------------
 
-The ``CXX_WARNINGS_AS_ERRORS`` property makes it possible to treat warnings as errors and abort compilation on a warning. The value ``on`` enables this behaviour. The default value is ``off``. 
+The ``CXX_WARNINGS_AS_ERRORS`` property makes it possible to treat warnings as errors and abort compilation on a warning. The value ``on`` enables this behaviour. The default value is ``off``.
 
 ---------------------
 INTERFACE_DESCRIPTION

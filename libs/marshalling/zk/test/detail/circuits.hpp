@@ -497,7 +497,7 @@ namespace nil {
                         unsigned(rnd() % 2), unsigned(rnd() % 2), 0u, 0u, 0u};
                     table[1] = {unsigned(rnd() % 2), unsigned(rnd() % 2), unsigned(rnd() % 2),
                         unsigned(rnd() % 2), unsigned(rnd() % 2), 0u, 0u, 0u};;
-                    table[2] = {table[0][0] * table[1][0], table[0][1] * table[1][1], 
+                    table[2] = {table[0][0] * table[1][0], table[0][1] * table[1][1],
                         table[0][2] * table[1][2], table[0][3] * table[1][3], table[0][4] * table[1][4], 0u, 0u, 0u};
 
 
@@ -795,7 +795,7 @@ namespace nil {
                     }
 
                     // lookup inputs
-                    table[0] = {unsigned(rnd() % 5 + 2), unsigned(rnd() % 5 + 2), unsigned(rnd() % 5 + 2), 
+                    table[0] = {unsigned(rnd() % 5 + 2), unsigned(rnd() % 5 + 2), unsigned(rnd() % 5 + 2),
                                 unsigned(rnd() % 5 + 2), unsigned(rnd() % 5 + 2), unsigned(rnd() % 5 + 2)};
                     table[1] = {7u, table[0][0] + table[0][1], table[0][1] + table[0][2], table[0][2] + table[0][3],
                                 table[0][3] + table[0][4], table[0][4] + table[0][5]};

@@ -14,7 +14,7 @@
 #include <nil/crypto3/multiprecision/modular/montgomery_params.hpp>
 #include <nil/crypto3/multiprecision/modular/barrett_params.hpp>
 
-namespace boost {   
+namespace boost {
     namespace multiprecision {
         namespace backends {
 

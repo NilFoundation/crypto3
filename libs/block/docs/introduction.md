@@ -4,10 +4,10 @@
 
 Crypto3.Block library extends the =nil; Crypto3 C++
 cryptography suite and provides a set of block ciphers
-implemented in way C++ standard library implies: 
-concepts, algorithms, predictable behavior, latest 
+implemented in way C++ standard library implies:
+concepts, algorithms, predictable behavior, latest
 standard features support and clean architecture without compromising security and performance.
-  
+
 Crypto3.Block consists of several parts to review:
 * [Manual](@ref block_ciphers_manual).
 * [Implementation](@ref block_ciphers_impl).

@@ -192,14 +192,14 @@ namespace nil {
 
                         std::array<digest_value_type, element_size> data;
                         state = hash<hash_type>(state);
-                        // TODO(martun): for now we copy 256 bits into a larger group element. For example for 
+                        // TODO(martun): for now we copy 256 bits into a larger group element. For example for
                         // mnt6_base_field<298ul> the first 42 bits will be zero.
                         // Use something like hash to field(h2f.hpp) for this.
                         std::size_t count = std::min(data.size(), state.size());
                         std::copy(state.begin(), state.begin() + count, data.begin() + data.size() - count);
-                        
+
                         nil::marshalling::status_type status;
-                        boost::multiprecision::number<modular_backend_of_hash_size> raw_result = 
+                        boost::multiprecision::number<modular_backend_of_hash_size> raw_result =
                             nil::marshalling::pack(state, status);
                         BOOST_ASSERT(status == nil::marshalling::status_type::success);
 

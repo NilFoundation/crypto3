@@ -193,7 +193,7 @@ namespace nil {
                                                              const std::vector<typename FieldType::value_type>& b) {
                     kronecker_substitution<FieldType>(c, a, b);
                 }
-            }    // namespace polynomial    
+            }    // namespace polynomial
         }    // namespace fft
     }        // namespace crypto3
 }    // namespace nil

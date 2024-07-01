@@ -33,12 +33,12 @@ namespace nil {
         namespace pubkey {
 
 		/*!
-         * @brief 
-         * 
+         * @brief
+         *
          * @ingroup pubkey_algorithms
-         * 
-         * Private key - a key known only to its owner. Only the user keeping his private key 
-         * secret guarantees the impossibility of forging a document and digital signature on 
+         *
+         * Private key - a key known only to its owner. Only the user keeping his private key
+         * secret guarantees the impossibility of forging a document and digital signature on
          * behalf of the certifier by an attacker.
          *
          */

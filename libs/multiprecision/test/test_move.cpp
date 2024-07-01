@@ -112,7 +112,7 @@ int main() {
 
     test_move_and_assign<cpp_int>();
     test_move_and_assign<int512_t>();
-    
+
     return boost::report_errors();
 }
 

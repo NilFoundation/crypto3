@@ -33,7 +33,7 @@ The BCM modules provide some high-level cmake functions to take care of all the 
 
     cmake_minimum_required (VERSION 3.5)
     project(boost_config)
-    
+
     find_package(CM)
     include(CMDeploy)
     include(CMSetupVersion)
@@ -45,7 +45,7 @@ The BCM modules provide some high-level cmake functions to take care of all the 
     set_property(TARGET boost_config PROPERTY EXPORT_NAME config)
 
     cm_deploy(TARGETS config INCLUDE include)
-    
+
 
 This sets up the Boost.Config cmake with the version ``1.64.0``. More importantly the user can now install the library, like this::
 

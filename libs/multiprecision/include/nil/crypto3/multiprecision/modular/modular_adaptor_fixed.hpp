@@ -135,7 +135,7 @@ namespace boost {
                     this->set_modular_params(m);
                     this->mod_data().adjust_modular(m_base);
                 }
-                
+
                 // We may consider to remove this constructor later, and set Bits2 to Bits only,
                 // but we need it for use cases from h2f/h2c,
                 // where a larger number of 512 or 256 bits is passed to a field of 255 or 254 bits.
@@ -370,7 +370,7 @@ namespace boost {
             static const expression_template_option value = boost::multiprecision::et_off;
         };
 
-        // We need to specialize this function, because default boost implementation is "return a.compare(b) == 0;", which is waay slower.    
+        // We need to specialize this function, because default boost implementation is "return a.compare(b) == 0;", which is waay slower.
         template<unsigned Bits, typename StorageType, expression_template_option ExpressionTemplates>
             inline BOOST_MP_CXX14_CONSTEXPR bool operator==(
                 const number<backends::modular_adaptor<backends::cpp_int_modular_backend<Bits>, StorageType>, ExpressionTemplates>& a,
@@ -378,7 +378,7 @@ namespace boost {
             return a.backend().compare_eq(b.backend());
         }
 
-        // We need to specialize this function, because default boost implementation is "return a.compare(b) == 0;", which is waay slower.    
+        // We need to specialize this function, because default boost implementation is "return a.compare(b) == 0;", which is waay slower.
         template<unsigned Bits, typename StorageType, expression_template_option ExpressionTemplates>
             inline BOOST_MP_CXX14_CONSTEXPR bool operator!=(
                 const number<backends::modular_adaptor<backends::cpp_int_modular_backend<Bits>, StorageType>, ExpressionTemplates>& a,

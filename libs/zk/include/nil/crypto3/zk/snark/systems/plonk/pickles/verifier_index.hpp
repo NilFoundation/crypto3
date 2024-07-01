@@ -47,7 +47,7 @@ namespace nil {
             namespace snark {
 
                 // arithmetic_sponge_params<scalar_field_value_type> fr_sponge_params;
-                // arithmetic_sponge_params<base_field_value_type> fq_sponge_params;  
+                // arithmetic_sponge_params<base_field_value_type> fq_sponge_params;
                 // hashes::detail::poseidon_constants_kimchi<scalar_field_type> fr_sponge_params;
                 // hashes::detail::poseidon_constants_kimchi<base_field_type> fq_sponge_params;
                 template<typename CurveType,

@@ -26,5 +26,5 @@ namespace boost {
         }
     }   // namespace multiprecision
 }   // namespace boost
-                    
+
 #endif

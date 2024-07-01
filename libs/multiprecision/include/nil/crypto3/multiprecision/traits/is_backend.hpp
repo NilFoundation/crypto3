@@ -9,7 +9,7 @@
 #include <boost/multiprecision/traits/is_backend.hpp>
 
 namespace boost {
-    namespace multiprecision { 
+    namespace multiprecision {
         namespace backends {
             template<typename Backend, typename StorageType>
             class modular_adaptor;

@@ -64,7 +64,7 @@ namespace nil {
                     }
 
                     static inline const reinforced_concrete_operators_type rc_operators = get_rc_operators_type();
-                    
+
                     static inline void permute(state_type &A){
                         state_vector_type A_vector;
                         std::copy(A.begin(), A.end(), A_vector.begin());

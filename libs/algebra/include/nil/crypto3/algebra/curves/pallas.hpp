@@ -55,4 +55,3 @@ namespace nil {
 }    // namespace nil
 
 #endif    // CRYPTO3_ALGEBRA_CURVES_PALLAS_HPP
- 

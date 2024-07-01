@@ -53,7 +53,7 @@
 #include <nil/crypto3/algebra/fields/arithmetic_params/mnt6.hpp>
 
 #include <nil/crypto3/algebra/curves/bls12.hpp>
-#include <nil/crypto3/algebra/pairing/bls12.hpp> 
+#include <nil/crypto3/algebra/pairing/bls12.hpp>
 
 /*
 #include <nil/crypto3/algebra/curves/alt_bn128.hpp>

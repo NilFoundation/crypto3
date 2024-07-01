@@ -37,7 +37,7 @@ namespace nil {
     namespace crypto3 {
         namespace algebra {
             namespace fields {
-                
+
                 template<>
                 struct arithmetic_params<ed25519> : public params<ed25519> {
                 private:
@@ -52,7 +52,7 @@ namespace nil {
 
                 constexpr typename arithmetic_params<ed25519>::integral_type const
                     arithmetic_params<ed25519>::multiplicative_generator;
-           
+
             }    // namespace fields
         }        // namespace algebra
     }            // namespace crypto3

@@ -23,67 +23,67 @@
 #include <cmath>
 #include <vector>
 
-namespace boost {   
+namespace boost {
     namespace multiprecision {
         namespace backends {
             template<typename Backend, const modular_params<Backend> &Modulus>
             class modular_params_ct {
             public:
                 typedef modular_params<Backend> modular_type;
- 
+
                 BOOST_MP_CXX14_CONSTEXPR modular_params_ct() {
                 }
- 
+
                 BOOST_MP_CXX14_CONSTEXPR modular_params_ct(modular_type &input) {
                 }
- 
+
                 BOOST_MP_CXX14_CONSTEXPR void set_modular_params(const modular_type &input) {
                 }
- 
+
                 template<typename T>
                 BOOST_MP_CXX14_CONSTEXPR void set_modular_params(const T &input) {
                 }
- 
+
                 BOOST_MP_CXX14_CONSTEXPR const modular_type &mod_data() const {
                     return m_mod;
                 }
- 
+
             protected:
                 BOOST_MP_CXX14_CONSTEXPR static const modular_type m_mod = Modulus;
             };
- 
+
             // Must be used only in the tests, we must normally use only modular_params_ct.
             template<typename Backend>
             class modular_params_rt {
             public:
                 typedef modular_params<Backend> modular_type;
- 
+
                 BOOST_MP_CXX14_CONSTEXPR modular_params_rt() {
                 }
 
                 BOOST_MP_CXX14_CONSTEXPR modular_params_rt(modular_type input) {
                     m_mod = input;
                 }
- 
+
                 BOOST_MP_CXX14_CONSTEXPR void set_modular_params(const modular_type &input) {
                     m_mod = input;
                 }
- 
+
                 BOOST_MP_CXX14_CONSTEXPR void set_modular_params(const Backend &input) {
                     m_mod = input;
                 }
- 
+
                 BOOST_MP_CXX14_CONSTEXPR modular_type &mod_data() {
                     return m_mod;
                 }
                 BOOST_MP_CXX14_CONSTEXPR const modular_type &mod_data() const {
                     return m_mod;
                 }
- 
+
             public:
                 modular_type m_mod;
             };
- 
+
             // Used for converting number<modular_adaptor<Backend>> to number<Backend>.
             // We cannot change the first argument to a reference...
             template<class Backend, typename ModularParamsType>
@@ -96,13 +96,13 @@ namespace boost {
                 eval_eq(const modular_adaptor<Backend, ModularParamsType> &a, const T &b) {
                 return a.compare(b) == 0;
             }
- 
+
             template<class Backend1, class Backend2>
             BOOST_MP_CXX14_CONSTEXPR void eval_redc(Backend1 &result, const modular_params<Backend2> &mod) {
                 mod.reduce(result);
                 eval_modulus(result, mod.get_mod());
             }
- 
+
             template<class Backend, typename ModularParamsType>
             BOOST_MP_CXX14_CONSTEXPR void eval_add(modular_adaptor<Backend, ModularParamsType> &result,
                                     const modular_adaptor<Backend, ModularParamsType> &o) {
@@ -111,7 +111,7 @@ namespace boost {
                     eval_subtract(result.base_data(), result.mod_data().get_mod());
                 }
             }
- 
+
             template<class Backend, typename ModularParamsType>
             BOOST_MP_CXX14_CONSTEXPR void eval_subtract(modular_adaptor<Backend, ModularParamsType> &result,
                                          const modular_adaptor<Backend, ModularParamsType> &o) {
@@ -121,12 +121,12 @@ namespace boost {
                     eval_add(result.base_data(), result.mod_data().get_mod());
                 }
             }
- 
+
             template<unsigned Bits, typename ModularParamsType>
             BOOST_MP_CXX14_CONSTEXPR void eval_subtract(
                 modular_adaptor<cpp_int_modular_backend<Bits>, ModularParamsType> &result,
                 const modular_adaptor<cpp_int_modular_backend<Bits>, ModularParamsType> &o) {
- 
+
                 if (eval_lt(result.base_data(), o.base_data())) {
                     auto v = result.mod_data().get_mod();
                     eval_subtract(v, o.base_data());
@@ -135,14 +135,14 @@ namespace boost {
                     eval_subtract(result.base_data(), o.base_data());
                 }
             }
- 
+
             template<class Backend, typename ModularParamsType>
             BOOST_MP_CXX14_CONSTEXPR void eval_multiply(modular_adaptor<Backend, ModularParamsType> &result,
                                          const modular_adaptor<Backend, ModularParamsType> &o) {
                 eval_multiply(result.base_data(), o.base_data());
                 eval_redc(result.base_data(), result.mod_data());
             }
- 
+
             template<class Backend, typename ModularParamsType>
             BOOST_MP_CXX14_CONSTEXPR void eval_divide(modular_adaptor<Backend, ModularParamsType> &result,
                                        const modular_adaptor<Backend, ModularParamsType> &o) {
@@ -154,7 +154,7 @@ namespace boost {
                 result.mod_data().adjust_modular(result.base_data());
                 result.mod_data().adjust_regular(tmp2, result.base_data());
             }
- 
+
             template<class Backend, typename ModularParamsType>
             BOOST_MP_CXX14_CONSTEXPR void eval_modulus(modular_adaptor<Backend, ModularParamsType> &result,
                                         const modular_adaptor<Backend, ModularParamsType> &o) {
@@ -181,13 +181,13 @@ namespace boost {
                 BOOST_NOEXCEPT {
                 return eval_is_zero(val.base_data());
             }
- 
+
             // TODO: check returned value
             template<class Backend, typename ModularParamsType>
             BOOST_MP_CXX14_CONSTEXPR int eval_get_sign(const modular_adaptor<Backend, ModularParamsType> &) {
                 return 1;
             }
- 
+
             template<class Backend, typename ModularParamsType, class T, class V>
             BOOST_MP_CXX14_CONSTEXPR void assign_components(modular_adaptor<Backend, ModularParamsType> &result, const T &a,
                                              const V &b) {
@@ -195,35 +195,35 @@ namespace boost {
                 result.mod_data() = b;
                 result.mod_data().adjust_modular(result.base_data());
             }
- 
+
             template<class Backend, typename ModularParamsType>
             BOOST_MP_CXX14_CONSTEXPR void eval_sqrt(modular_adaptor<Backend, ModularParamsType> &result,
                                      const modular_adaptor<Backend, ModularParamsType> &val) {
                 eval_sqrt(result.base_data(), val.base_data());
             }
- 
+
             template<class Backend, typename ModularParamsType>
             BOOST_MP_CXX14_CONSTEXPR void eval_abs(modular_adaptor<Backend, ModularParamsType> &result,
                                     const modular_adaptor<Backend, ModularParamsType> &val) {
                 result = val;
             }
- 
+
             inline size_t window_bits(size_t exp_bits) {
                 BOOST_STATIC_CONSTEXPR size_t wsize_count = 6;
                 BOOST_STATIC_CONSTEXPR size_t wsize[wsize_count][2] = {{1434, 7}, {539, 6}, {197, 4},
                                                                        {70, 3},   {17, 2},  {0, 0}};
- 
+
                 size_t window_bits = 1;
- 
+
                 size_t j = wsize_count - 1;
                 while (wsize[j][0] > exp_bits) {
                     --j;
                 }
                 window_bits += wsize[j][1];
- 
+
                 return window_bits;
             }
- 
+
             template<class Backend, typename ModularParamsType>
             inline void find_modular_pow(modular_adaptor<Backend, ModularParamsType> &result,
                                          const modular_adaptor<Backend, ModularParamsType> &b,
@@ -233,7 +233,7 @@ namespace boost {
                 unsigned long cur_exp_index;
                 size_t exp_bits = eval_msb(exp);
                 m_window_bits = window_bits(exp_bits + 1);
- 
+
                 std::vector<Backend> m_g(1U << m_window_bits);
                 Backend *p_g = m_g.data();
                 Backend x(1, mod);
@@ -251,7 +251,7 @@ namespace boost {
                 }
                 size_t exp_nibbles = (exp_bits + 1 + m_window_bits - 1) / m_window_bits;
                 std::vector<size_t> exp_index;
- 
+
                 for (size_t i = 0; i < exp_nibbles; ++i) {
                     Backend tmp = nibble;
                     eval_bitwise_and(tmp, mask);
@@ -259,25 +259,25 @@ namespace boost {
                     eval_right_shift(nibble, m_window_bits);
                     exp_index.push_back(cur_exp_index);
                 }
- 
+
                 eval_multiply(x, m_g[exp_index[exp_nibbles - 1]]);
                 for (size_t i = exp_nibbles - 1; i > 0; --i) {
- 
+
                     for (size_t j = 0; j != m_window_bits; ++j) {
                         eval_multiply(x, x);
                     }
- 
+
                     eval_multiply(x, m_g[exp_index[i - 1]]);
                 }
                 result = x;
             }
- 
+
             template<class Backend, typename ModularParamsType, typename T>
             BOOST_MP_CXX14_CONSTEXPR void eval_pow(modular_adaptor<Backend, ModularParamsType> &result,
                                     const modular_adaptor<Backend, ModularParamsType> &b, const T &e) {
                 find_modular_pow(result, b, e);
             }
- 
+
             template<class Backend, typename ModularParamsType>
             BOOST_MP_CXX14_CONSTEXPR void eval_pow(modular_adaptor<Backend, ModularParamsType> &result,
                                     const modular_adaptor<Backend, ModularParamsType> &b,
@@ -286,20 +286,20 @@ namespace boost {
                 e.mod_data().adjust_regular(exp, e.base_data());
                 find_modular_pow(result, b, exp);
             }
- 
+
             template<typename Backend1, typename Backend2, typename T, typename ModularParamsType>
             BOOST_MP_CXX14_CONSTEXPR void eval_powm(modular_adaptor<Backend1, ModularParamsType> &result,
                                      const modular_adaptor<Backend2, ModularParamsType> &b, const T &e) {
                 eval_pow(result, b, e);
             }
- 
+
             template<typename Backend1, typename Backend2, typename Backend3, typename ModularParamsType>
             BOOST_MP_CXX14_CONSTEXPR void eval_powm(modular_adaptor<Backend1, ModularParamsType> &result,
                                      const modular_adaptor<Backend2, ModularParamsType> &b,
                                      const modular_adaptor<Backend3, ModularParamsType> &e) {
                 eval_pow(result, b, e);
             }
- 
+
             template<class Backend, typename ModularParamsType, class UI>
             inline BOOST_MP_CXX14_CONSTEXPR void eval_left_shift(modular_adaptor<Backend, ModularParamsType> &t, UI i) noexcept {
                 Backend tmp;
@@ -308,7 +308,7 @@ namespace boost {
                 t.base_data() = tmp;
                 t.mod_data().adjust_modular(t.base_data());
             }
- 
+
             template<class Backend, typename ModularParamsType, class UI>
             BOOST_MP_CXX14_CONSTEXPR void eval_right_shift(modular_adaptor<Backend, ModularParamsType> &t, UI i) {
                 Backend tmp;
@@ -317,7 +317,7 @@ namespace boost {
                 t.base_data() = tmp;
                 t.mod_data().adjust_modular(t.base_data());
             }
- 
+
             template<class Backend, typename ModularParamsType, class UI>
             BOOST_MP_CXX14_CONSTEXPR void eval_left_shift(modular_adaptor<Backend, ModularParamsType> &t,
                                            const modular_adaptor<Backend, ModularParamsType> &v, UI i) {
@@ -328,7 +328,7 @@ namespace boost {
                 t.base_data() = tmp1;
                 t.mod_data().adjust_modular(t.base_data());
             }
- 
+
             template<class Backend, typename ModularParamsType, class UI>
             BOOST_MP_CXX14_CONSTEXPR void eval_right_shift(modular_adaptor<Backend, ModularParamsType> &t,
                                             const modular_adaptor<Backend, ModularParamsType> &v, UI i) {
@@ -339,7 +339,7 @@ namespace boost {
                 t.base_data() = tmp1;
                 t.mod_data().adjust_modular(t.base_data());
             }
- 
+
             template<class Backend, typename ModularParamsType>
             BOOST_MP_CXX14_CONSTEXPR void eval_bitwise_and(modular_adaptor<Backend, ModularParamsType> &result,
                                             const modular_adaptor<Backend, ModularParamsType> &v) {
@@ -350,7 +350,7 @@ namespace boost {
                 result.base_data() = tmp1;
                 result.mod_data().adjust_modular(result.base_data());
             }
- 
+
             template<class Backend, typename ModularParamsType>
             BOOST_MP_CXX14_CONSTEXPR void eval_bitwise_or(modular_adaptor<Backend, ModularParamsType> &result,
                                            const modular_adaptor<Backend, ModularParamsType> &v) {
@@ -361,7 +361,7 @@ namespace boost {
                 result.base_data() = tmp1;
                 result.mod_data().adjust_modular(result.base_data());
             }
- 
+
             template<class Backend, typename ModularParamsType>
             BOOST_MP_CXX14_CONSTEXPR void eval_bitwise_xor(modular_adaptor<Backend, ModularParamsType> &result,
                                             const modular_adaptor<Backend, ModularParamsType> &v) {
@@ -372,28 +372,28 @@ namespace boost {
                 result.base_data() = tmp1;
                 result.mod_data().adjust_modular(result.base_data());
             }
- 
+
             template<typename Backend, typename ModularParamsType>
             BOOST_MP_CXX14_CONSTEXPR int eval_msb(const modular_adaptor<Backend, ModularParamsType> &m) {
                 Backend tmp;
                 m.mod_data().adjust_regular(tmp, m.base_data());
                 return eval_msb(tmp);
             }
- 
+
             template<typename Backend, typename ModularParamsType>
             BOOST_MP_CXX14_CONSTEXPR unsigned eval_lsb(const modular_adaptor<Backend, ModularParamsType> &m) {
                 Backend tmp;
                 m.mod_data().adjust_regular(tmp, m.base_data());
                 return eval_lsb(tmp);
             }
- 
+
             template<typename Backend, typename ModularParamsType>
             BOOST_MP_CXX14_CONSTEXPR bool eval_bit_test(const modular_adaptor<Backend, ModularParamsType> &m, std::size_t index) {
                 Backend tmp;
                 m.mod_data().adjust_regular(tmp, m.base_data());
                 return eval_bit_test(tmp, index);
             }
- 
+
             template<typename Backend, typename ModularParamsType>
             BOOST_MP_CXX14_CONSTEXPR void eval_bit_set(modular_adaptor<Backend, ModularParamsType> &result, std::size_t index) {
                 Backend tmp;
@@ -401,9 +401,9 @@ namespace boost {
                 eval_bit_set(tmp, index);
                 result.mod_data().adjust_modular(result.base_data(), tmp);
             }
- 
+
              // We must make sure any call with any integral type ends up here, if we use std::size_t here, something this function is not preferred by
-             // the compiler and boost's version is used, which is worse.            
+             // the compiler and boost's version is used, which is worse.
             template<typename Backend, typename ModularParamsType>
             BOOST_MP_CXX14_CONSTEXPR void eval_bit_unset(modular_adaptor<Backend, ModularParamsType> &result, std::size_t index) {
                 Backend tmp;
@@ -411,7 +411,7 @@ namespace boost {
                 eval_bit_unset(tmp, index);
                 result.mod_data().adjust_modular(result.base_data(), tmp);
             }
- 
+
             template<typename Backend, typename ModularParamsType>
             BOOST_MP_CXX14_CONSTEXPR void eval_bit_flip(modular_adaptor<Backend, ModularParamsType> &result, std::size_t index) {
                 Backend tmp;
@@ -419,31 +419,31 @@ namespace boost {
                 eval_bit_flip(tmp, index);
                 result.mod_data().adjust_modular(result.base_data(), tmp);
             }
- 
+
             template<typename Backend, typename ModularParamsType>
             BOOST_MP_CXX14_CONSTEXPR modular_adaptor<Backend, ModularParamsType>
                 eval_ressol(const modular_adaptor<Backend, ModularParamsType> &input) {
- 
+
                 Backend new_base, res;
                 modular_adaptor<Backend, ModularParamsType> res_mod;
- 
+
                 input.mod_data().adjust_regular(new_base, input.base_data());
                 res = eval_ressol(new_base, input.mod_data().get_mod());
                 assign_components(res_mod, res, input.mod_data().get_mod());
- 
+
                 return res_mod;
             }
- 
+
             template<typename Backend, typename ModularParamsType>
             BOOST_MP_CXX14_CONSTEXPR void eval_inverse_mod(modular_adaptor<Backend, ModularParamsType> &result,
                                             const modular_adaptor<Backend, ModularParamsType> &input) {
                 Backend new_base, res;
- 
+
                 input.mod_data().adjust_regular(new_base, input.base_data());
                 eval_inverse_mod(res, new_base, input.mod_data().get_mod());
                 assign_components(result, res, input.mod_data().get_mod());
             }
- 
+
             template<typename Backend, typename ModularParamsType>
             inline BOOST_MP_CXX14_CONSTEXPR std::size_t hash_value(
                 const modular_adaptor<Backend, ModularParamsType> &val) noexcept {

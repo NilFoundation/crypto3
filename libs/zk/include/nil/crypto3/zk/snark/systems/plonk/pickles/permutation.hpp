@@ -8,7 +8,7 @@ namespace nil {
         namespace zk {
             namespace snark {
                 template<typename FieldType>
-                typename FieldType::value_type eval_vanishes_on_last_4_rows(math::basic_radix2_domain<FieldType>& domain, 
+                typename FieldType::value_type eval_vanishes_on_last_4_rows(math::basic_radix2_domain<FieldType>& domain,
                             typename FieldType::value_type& x){
                     typename FieldType::value_type w4 = domain.get_domain_element(domain.size() - (kimchi_constant::ZK_ROWS + 1));
                     typename FieldType::value_type w3 = domain.omega * w4;
@@ -20,6 +20,6 @@ namespace nil {
             }    // namespace components
         }        // namespace zk
     }            // namespace crypto3
-} 
+}
 
 #endif

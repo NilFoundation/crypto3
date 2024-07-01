@@ -13,7 +13,7 @@
 
 #include <nil/crypto3/multiprecision/modular/modular_functions_fixed.hpp>
 
-namespace boost {   
+namespace boost {
     namespace multiprecision {
         namespace backends {
 

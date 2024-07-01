@@ -14,7 +14,7 @@
 
 #include <boost/utility/enable_if.hpp>
 
-namespace boost {   
+namespace boost {
     namespace multiprecision {
         namespace backends {
 

@@ -43,7 +43,7 @@ namespace nil {
             namespace types {
                 template<typename TTypeBase, typename Variable, typename = void>
                 struct variable;
-                
+
                 //********************************* plonk_variable ***************************/
                 template<typename TTypeBase, typename VariableType>
                 struct variable<TTypeBase, VariableType> {
@@ -72,9 +72,9 @@ namespace nil {
                     using bool_marshalling_type = nil::marshalling::types::integral<TTypeBase, bool>;
 
                     return result_type(std::make_tuple(
-                        size_t_marshalling_type(var.index), 
+                        size_t_marshalling_type(var.index),
                         int32_marshalling_type(var.rotation),
-                        bool_marshalling_type(var.relative), 
+                        bool_marshalling_type(var.relative),
                         octet_marshalling_type(var.type)
                     ));
                 }
@@ -92,7 +92,7 @@ namespace nil {
                 //****************** vector of plonk_variable *************************/
                 template<typename TTypeBase, typename VariableType>
                 using variables = nil::marshalling::types::array_list<
-                    TTypeBase, 
+                    TTypeBase,
                     typename variable<TTypeBase, VariableType>::type,
                     nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, std::size_t>>
                 >;

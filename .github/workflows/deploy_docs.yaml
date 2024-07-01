@@ -12,7 +12,7 @@ on:
         type: choice
         description: Target
         required: true
-        options: 
+        options:
         - staging
         - production
         default: staging

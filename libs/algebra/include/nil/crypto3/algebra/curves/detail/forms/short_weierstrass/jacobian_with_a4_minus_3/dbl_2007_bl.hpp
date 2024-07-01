@@ -49,7 +49,7 @@ namespace nil {
                                 field_value_type XX = (first.X).squared();    // XX = X1^2
                                 field_value_type YY = (first.Y).squared();    // YY = Y1^2
                                 field_value_type YYYY = YY.squared();         // YYYY = YY^2
-                                field_value_type ZZ = (first.Z).squared();    // ZZ = Z1^2 
+                                field_value_type ZZ = (first.Z).squared();    // ZZ = Z1^2
                                 field_value_type S = ((first.X + YY).squared() - XX - YYYY).doubled();          // S = 2*((X1 + YY)^2 -XX - YYYY)
                                 field_value_type M = XX.doubled() + XX - ZZ.squared().doubled()- ZZ.squared();  // M = 3*XX + a*ZZ^2
                                 field_value_type T = M.squared() - S.doubled(); // T = M^2 - 2S

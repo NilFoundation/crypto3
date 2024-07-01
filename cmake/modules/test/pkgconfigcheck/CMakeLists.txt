@@ -43,4 +43,3 @@ if(DEFINED PKG_CONFIG_HEADER)
     cm_test_header(NAME testheader HEADER ${PKG_CONFIG_HEADER})
     cm_test_header(NAME teststaticheader HEADER ${PKG_CONFIG_HEADER} STATIC)
 endif()
-

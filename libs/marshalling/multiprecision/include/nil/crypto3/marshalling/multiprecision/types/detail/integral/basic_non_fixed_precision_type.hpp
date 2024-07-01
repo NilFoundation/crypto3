@@ -127,7 +127,7 @@ namespace nil {
                     private:
                         template<typename TIter>
                         void read_no_status(TIter &iter, std::size_t size) {
-                            size = std::is_same_v<typename std::iterator_traits<TIter>::value_type, bool> ? 
+                            size = std::is_same_v<typename std::iterator_traits<TIter>::value_type, bool> ?
                                         size : size * 8;
                             value_ =
                                 crypto3::marshalling::processing::read_data<T, typename base_impl_type::endian_type>(

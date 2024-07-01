@@ -7,13 +7,13 @@ There are two scenarios where the users will consume their dependencies in the b
 * Prebuilt binaries using ``find_package``
 * Integrated builds using ``add_subdirectory``
 
-When we build libraries using cmake, we want to be able to support both scenarios. 
+When we build libraries using cmake, we want to be able to support both scenarios.
 
 The first scenario the user would build and install each dependency. With this scenario, we need to generate usage requirements that can be consumed by the user, and ultimately this is done through cmake's ``find_package`` mechanism.
 
 In the integrated build scenario, the user adds the sources with ``add_subdirectory``, and then all dependencies are built in the user's build. There is no need to generate usage requirements as the cmake targets are directly available in the build.
 
-Let's first look at standalone build. 
+Let's first look at standalone build.
 
 ------------------------------
 Building standalone with cmake
@@ -26,7 +26,7 @@ Let's look at building a library like Boost.Filesystem using just cmake. When we
 
 Then we can define the library and the sources it will build::
 
-    add_library(boost_filesystem 
+    add_library(boost_filesystem
         src/operations.cpp
         src/portability.cpp
         src/codecvt_error_category.cpp
@@ -60,7 +60,7 @@ Using ``PUBLIC`` means this include directory will be used internally to build, 
 
 Calling ``find_package`` will find those libraries and provide a target we can use to link against. The next step is to link it using ``target_link_libraries``::
 
-    target_link_libraries(boost_filesystem PUBLIC 
+    target_link_libraries(boost_filesystem PUBLIC
         boost::core
         boost::static_assert
         boost::iterator
@@ -155,7 +155,7 @@ Putting it all together we have a cmake file that looks like this::
     find_package(boost_io)
     find_package(boost_config)
 
-    add_library(boost_filesystem 
+    add_library(boost_filesystem
       src/operations.cpp
       src/portability.cpp
       src/codecvt_error_category.cpp
@@ -171,7 +171,7 @@ Putting it all together we have a cmake file that looks like this::
     target_include_directories(boost_filesystem PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     )
-    target_link_libraries(boost_filesystem PUBLIC 
+    target_link_libraries(boost_filesystem PUBLIC
         boost::core
         boost::static_assert
         boost::iterator
@@ -259,7 +259,7 @@ Next, we add the library and link against the dependencies like always::
     find_package(boost_io)
     find_package(boost_config)
 
-    add_library(boost_filesystem 
+    add_library(boost_filesystem
       src/operations.cpp
       src/portability.cpp
       src/codecvt_error_category.cpp
@@ -272,7 +272,7 @@ Next, we add the library and link against the dependencies like always::
     add_library(boost::filesystem ALIAS boost_filesystem)
     set_property(TARGET boost_filesystem PROPERTY EXPORT_NAME filesystem)
 
-    target_link_libraries(boost_filesystem PUBLIC 
+    target_link_libraries(boost_filesystem PUBLIC
         boost::core
         boost::static_assert
         boost::iterator

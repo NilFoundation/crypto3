@@ -46,13 +46,13 @@ namespace nil {
         template<typename T>
         struct is_array_list {
 
-            static const bool value = has_type_tag<T, 
+            static const bool value = has_type_tag<T,
                 boost::is_same<boost::mpl::placeholders::_1, types::tag::array_list>>::value;
         };
 
         template<typename T>
         struct is_raw_array_list {
-            static const bool value = has_type_tag<T, 
+            static const bool value = has_type_tag<T,
                 boost::is_same<boost::mpl::placeholders::_1, types::tag::raw_array_list>>::value;
         };
 
@@ -63,7 +63,7 @@ namespace nil {
         /// @related nil::marshalling::types::bitfield
         template<typename T>
         struct is_bitfield {
-            static const bool value = has_type_tag<T, 
+            static const bool value = has_type_tag<T,
                 boost::is_same<boost::mpl::placeholders::_1, types::tag::bitfield>>::value;
         };
 
@@ -74,7 +74,7 @@ namespace nil {
         /// @related nil::marshalling::types::bitmask_value
         template<typename T>
         struct is_bitmask_value {
-            static const bool value = has_type_tag<T, 
+            static const bool value = has_type_tag<T,
                 boost::is_same<boost::mpl::placeholders::_1, types::tag::bitmask>>::value;
         };
 
@@ -85,7 +85,7 @@ namespace nil {
         /// @related nil::marshalling::types::bundle
         template<typename T>
         struct is_bundle {
-            static const bool value = has_type_tag<T, 
+            static const bool value = has_type_tag<T,
                 boost::is_same<boost::mpl::placeholders::_1, types::tag::bundle>>::value;
         };
 
@@ -96,7 +96,7 @@ namespace nil {
         /// @related nil::marshalling::types::enumeration
         template<typename T>
         struct is_enumeration {
-            static const bool value = has_type_tag<T, 
+            static const bool value = has_type_tag<T,
                 boost::is_same<boost::mpl::placeholders::_1, types::tag::enumeration>>::value;
         };
 
@@ -107,7 +107,7 @@ namespace nil {
         /// @related nil::marshalling::types::float_value
         template<typename T>
         struct is_float_value {
-            static const bool value = has_type_tag<T, 
+            static const bool value = has_type_tag<T,
                 boost::is_same<boost::mpl::placeholders::_1, types::tag::floating_point>>::value;
         };
 
@@ -118,7 +118,7 @@ namespace nil {
         /// @related nil::marshalling::types::integral
         template<typename T>
         struct is_integral {
-            static const bool value = has_type_tag<T, 
+            static const bool value = has_type_tag<T,
                 boost::is_same<boost::mpl::placeholders::_1, types::tag::integral>>::value;
         };
 
@@ -129,7 +129,7 @@ namespace nil {
         /// @related nil::marshalling::types::no_value
         template<typename T>
         struct is_no_value {
-            static const bool value = has_type_tag<T, 
+            static const bool value = has_type_tag<T,
                 boost::is_same<boost::mpl::placeholders::_1, types::tag::no_value>>::value;
         };
 
@@ -140,7 +140,7 @@ namespace nil {
         /// @related nil::marshalling::types::optional
         template<typename T>
         struct is_optional {
-            static const bool value = has_type_tag<T, 
+            static const bool value = has_type_tag<T,
                 boost::is_same<boost::mpl::placeholders::_1, types::tag::optional>>::value;
         };
 
@@ -151,7 +151,7 @@ namespace nil {
         /// @related nil::marshalling::types::string
         template<typename T>
         struct is_string {
-            static const bool value = has_type_tag<T, 
+            static const bool value = has_type_tag<T,
                 boost::is_same<boost::mpl::placeholders::_1, types::tag::string>>::value;
         };
 
@@ -162,13 +162,13 @@ namespace nil {
         /// @related nil::marshalling::types::variant
         template<typename T>
         struct is_variant {
-            static const bool value = has_type_tag<T, 
+            static const bool value = has_type_tag<T,
                 boost::is_same<boost::mpl::placeholders::_1, types::tag::variant>>::value;
         };
 
         template<typename T>
         struct is_marshalling_type {
-            static const bool value = 
+            static const bool value =
                 boost::is_base_of<detail::field_base<>, T>::value;
         };
 

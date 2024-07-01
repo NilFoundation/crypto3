@@ -42,4 +42,3 @@ set(RUNTIME_TESTS_NAMES
 foreach(TEST_NAME ${RUNTIME_TESTS_NAMES})
     define_runtime_algebra_test(${TEST_NAME})
 endforeach()
-

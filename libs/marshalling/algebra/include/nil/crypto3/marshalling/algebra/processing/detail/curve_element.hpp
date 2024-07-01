@@ -89,7 +89,7 @@ namespace nil {
                     }
 
                     template<typename GroupAffineElement>
-                    static inline typename 
+                    static inline typename
                     std::enable_if<
                         std::is_same<algebra::curves::coordinates::affine,
                         typename GroupAffineElement::coordinates>::value,
