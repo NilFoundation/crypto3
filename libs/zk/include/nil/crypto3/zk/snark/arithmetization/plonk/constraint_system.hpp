@@ -37,7 +37,7 @@
 
 #include <cstdlib>
 #include <vector>
-#include <unordered_set>
+#include <set>
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/gate.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint.hpp>
@@ -98,8 +98,9 @@ namespace nil {
                     {
                     }
 
-                    std::unordered_set<variable_type> permuted_columns() const{
-                        std::unordered_set<variable_type> result;
+                    // Use std::set to ensure elements in permuted_columns are iterated in ascending order.
+                    std::set<variable_type> permuted_columns() const{
+                        std::set<variable_type> result;
                         for( std::size_t i = 0; i < _copy_constraints.size(); i++){
                             auto var0 = _copy_constraints[i].first;
                             auto var1 = _copy_constraints[i].second;
