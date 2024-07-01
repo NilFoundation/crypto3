@@ -158,4 +158,85 @@ BOOST_AUTO_TEST_CASE(field_operation_perf_test_bls12_381_scalar) {
     run_perf_test<nil::crypto3::algebra::fields::bls12_scalar_field<381u>>("bls12_381_scalar");
 }
 
+template<class Field>
+void run_perf_constructor(std::string const& field_name) {
+    using namespace nil::crypto3;
+    using namespace nil::crypto3::algebra;
+    using namespace nil::crypto3::algebra::fields;
+
+    typedef typename Field::value_type value_type;
+    std::vector<value_type> points1;
+    std::vector<value_type> points2;
+    for (int i = 0; i < 1000; ++i) {
+        points1.push_back(algebra::random_element<Field>());
+        points2.push_back(algebra::random_element<Field>());
+    }
+
+    auto gather_stats = [&points1, &points2]
+        (std::function<void(value_type & result, value_type const& sample)> operation,
+        size_t samples_per_batch, const std::string& operation_name) {
+            size_t BATCHES = 1000;
+
+            using duration = std::chrono::duration<double, std::nano>;
+
+            std::vector<duration> batch_duration;
+            batch_duration.resize(BATCHES);
+            auto save = points1[3];;
+
+            for(size_t b = 0; b < BATCHES; ++b) {
+                // if (b % (BATCHES/10) == 0) std::cerr << "Batch progress:" << b << std::endl;
+                auto start = std::chrono::high_resolution_clock::now();
+                auto points_index = 0;
+
+                for(size_t i = 0; i < samples_per_batch; ++i) {
+                    operation(points1[points_index], points2[points_index]);
+                    ++points_index;
+                    if (points_index == 1000)
+                        points_index = 0;
+                }
+
+                auto finish = std::chrono::high_resolution_clock::now();
+                batch_duration[b] = (finish - start) * 1.0 / samples_per_batch;
+            }
+
+            // prevent value 'result' from optimizating out
+            std::cerr << save << std::endl;
+
+            auto s = batch_duration[0];
+            for(size_t b = 1; b < batch_duration.size(); ++b) {
+                s += batch_duration[b];
+            }
+
+            s /= batch_duration.size() - 2;
+            std::cout << "Average time for operator " << operation_name << ": " << std::fixed << std::setprecision(3) << s.count() << std::endl;
+
+            return batch_duration;
+        };
+
+
+    auto modular_constructor_results = gather_stats(
+            [](value_type &result, value_type const& sample) {
+                result = sample;
+            },
+            10000000,
+            "eq");
+
+    std::ofstream f("ctr-"+field_name+"-stats.log", std::ofstream::out);
+    f << "# " << typeid(Field).name() << std::endl;
+    f << "modeq" << std::endl;
+
+    for(size_t i = 0; i < modular_constructor_results.size(); ++i) {
+        f << std::fixed << std::setprecision(3) << modular_constructor_results[i].count() << ","
+          << std::endl;
+    }
+
+    f.close();
+}
+
+
+BOOST_AUTO_TEST_CASE(field_operation_perf_test_bls12_381_constructor) {
+    run_perf_constructor<nil::crypto3::algebra::fields::bls12_base_field<381u>>("bls12_381");
+}
+
+
 BOOST_AUTO_TEST_SUITE_END()
