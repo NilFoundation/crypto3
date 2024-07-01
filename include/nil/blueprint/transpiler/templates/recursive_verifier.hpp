@@ -210,8 +210,8 @@ const std::array<int, gates_amount> gates_sizes = {$GATES_SIZES$};
 const size_t unique_points = $UNIQUE_POINTS$;
 const size_t singles_amount = $SINGLES_AMOUNT$;
 const std::array<std::size_t, batches_num> batches_amount_list = {$BATCHES_AMOUNT_LIST$};
-pallas::base_field_type::value_type vk0 = pallas::base_field_type::value_type(0x$VK0$_cppui255);
-pallas::base_field_type::value_type vk1 = pallas::base_field_type::value_type(0x$VK1$_cppui255);
+pallas::base_field_type::value_type vk0 = pallas::base_field_type::value_type(0x$VK0$_cppui_modular255);
+pallas::base_field_type::value_type vk1 = pallas::base_field_type::value_type(0x$VK1$_cppui_modular255);
 
 
 $LOOKUP_VARS$

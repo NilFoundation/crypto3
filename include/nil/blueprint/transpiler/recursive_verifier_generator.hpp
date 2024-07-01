@@ -452,7 +452,7 @@ namespace nil {
                     std::string result;
                     std::vector <std::string> v;
                     if( term.get_coeff() != field_type::value_type::one() || term.get_vars().size() == 0)
-                        v.push_back("pallas::base_field_type::value_type(0x" + to_hex_string(term.get_coeff()) + "_cppui255)");
+                        v.push_back("pallas::base_field_type::value_type(0x" + to_hex_string(term.get_coeff()) + "_cppui_modular255)");
                     for(auto& var: term.get_vars()){
                         v.push_back("z[" + to_string(_indices.at(var)) + "]");
                     }
@@ -662,7 +662,7 @@ namespace nil {
                     prepare_U_V_str << "\n";
                 }
                 for( std::size_t j = 0; j < placeholder_info.batches_sizes[0]; j++){
-                    prepare_U_V_str << "\tU[unique_points] += theta_acc * pallas::base_field_type::value_type(0x"<< std::hex << common_data.commitment_scheme_data.at(0)[j] << std::dec << "_cppui255); theta_acc *= challenges.lpc_theta;\n";
+                    prepare_U_V_str << "\tU[unique_points] += theta_acc * pallas::base_field_type::value_type(0x"<< std::hex << common_data.commitment_scheme_data.at(0)[j] << std::dec << "_cppui_modular255); theta_acc *= challenges.lpc_theta;\n";
                 }
 
                 std::stringstream lpc_y_computation;
@@ -716,7 +716,7 @@ namespace nil {
                     }
                     start_position += batches_sizes[i];
                     if( i == 0 )
-                        initial_proof_check_str += "\t\t__builtin_assigner_exit_check(hash_state == pallas::base_field_type::value_type(0x$VK1$_cppui255));\n\n";
+                        initial_proof_check_str += "\t\t__builtin_assigner_exit_check(hash_state == pallas::base_field_type::value_type(0x$VK1$_cppui_modular255));\n\n";
                     else
                         initial_proof_check_str += "\t\t__builtin_assigner_exit_check(hash_state == proof.commitments[" + to_string(i-1) + "]);\n\n";
                 }
@@ -1030,8 +1030,8 @@ namespace nil {
                 reps["$QUOTIENT_POLYS_AMOUNT$"] = to_string(quotient_polys);
                 reps["$D0_SIZE$"] = to_string(fri_params.D[0]->m);
                 reps["$D0_LOG$"] = to_string(log2(fri_params.D[0]->m));
-                reps["$D0_OMEGA$"] = "pallas::base_field_type::value_type(0x" + to_hex_string(fri_params.D[0]->get_domain_element(1)) + "_cppui255)";
-                reps["$OMEGA$"] = "pallas::base_field_type::value_type(0x" + to_hex_string(common_data.basic_domain->get_domain_element(1)) + "_cppui255)";
+                reps["$D0_OMEGA$"] = "pallas::base_field_type::value_type(0x" + to_hex_string(fri_params.D[0]->get_domain_element(1)) + "_cppui_modular255)";
+                reps["$OMEGA$"] = "pallas::base_field_type::value_type(0x" + to_hex_string(common_data.basic_domain->get_domain_element(1)) + "_cppui_modular255)";
                 reps["$FRI_ROUNDS$"] = to_string(fri_params.r);
                 reps["$UNIQUE_POINTS$"] = to_string(singles_strs.size());
                 reps["$SINGLES_AMOUNT$"] = to_string(singles_strs.size());
