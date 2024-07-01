@@ -2,14 +2,6 @@ name: Crypto3 Build and Test on macOS Platforms
 
 on:
   workflow_call:
-    inputs:
-      submodules-refs:
-        type: string
-        description: "Lines with submodules' repo names and refs (e.g. `org/repo: ref`)"
-        required: false
-
-env:
-  TESTS_ARTIFACT_NAME: "test-results-mac"
 
 jobs:
   build-and-test:
@@ -20,17 +12,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          submodules: recursive
-
-      - name: Checkout submodules to specified refs
-        if: inputs.submodules-refs != ''
-        uses: NilFoundation/ci-cd/actions/recursive-checkout@v1.2.1
-        with:
-          refs: ${{ inputs.submodules-refs }}
-          paths: |
-            ${{ github.workspace }}/**
-            !${{ github.workspace }}/
-            !${{ github.workspace }}/**/.git/**
 
       # From https://github.com/DeterminateSystems/magic-nix-cache-action
       - uses: DeterminateSystems/nix-installer-action@main
@@ -38,40 +19,8 @@ jobs:
       - uses: DeterminateSystems/flake-checker-action@main
 
       - name: Run checks
-        run: nix flake -L check .?submodules=1#
+        run: nix flake -L check
         env:
           NIX_CONFIG: |
             cores = 0
             max-jobs = 1
-
-      - name: Copy test results
-        run: |
-          check_names=(
-            "algebra-clang"
-            "containers-clang"
-            "hash-clang"
-            "marshalling-algebra-clang"
-            "marshalling-core-clang"
-            "marshalling-zk-clang"
-            "math-clang"
-            "pubkey-clang"
-            "zk-clang"
-          )
-
-          results_dir="./results"
-          mkdir -p "$results_dir"
-
-          for check_name in "${check_names[@]}"; do
-            # This completes immediately since results are in cache
-            nix build -L .?submodules=1#checks.aarch64-darwin.$check_name
-            cp -r ./result/* "$results_dir/$check_name"
-            rm result
-          done
-
-      - name: Publish Test Results
-        uses: EnricoMi/publish-unit-test-result-action/linux@v2
-        with:
-          check_name: "Mac Test Results"
-          files: "results/**/*.xml"
-          comment_mode: ${{ github.event.pull_request.head.repo.fork && 'off' || 'always' }} # Don't create PR comment from fork runs
-          action_fail_on_inconclusive: true # fail, if no reports
