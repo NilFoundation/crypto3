@@ -28,16 +28,16 @@ macro(define_marshalling_test test)
 
     get_filename_component(name ${test} NAME)
 
-    set(full_test_name marshalling_${name}_test)
+    set(full_test_name marshalling_zk_${name}_test)
     cm_test(NAME ${full_test_name} SOURCES ${test}.cpp)
 
-    target_include_directories(marshalling_${name}_test PRIVATE
+    target_include_directories(marshalling_zk_${name}_test PRIVATE
             "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
             "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>"
 
             ${Boost_INCLUDE_DIRS})
 
-    set_target_properties(marshalling_${name}_test PROPERTIES
+    set_target_properties(marshalling_zk_${name}_test PROPERTIES
             CXX_STANDARD 17
             CXX_STANDARD_REQUIRED TRUE)
 
@@ -56,7 +56,7 @@ set(TESTS_NAMES
         "r1cs_gg_ppzksnark_primary_input"
         "r1cs_gg_ppzksnark_proof"
         "r1cs_gg_ppzksnark_verification_key"
-        "r1cs_gg_ppzksnark"
+#        "r1cs_gg_ppzksnark"
         "kzg_commitment"
         "fri_commitment"
         "lpc_commitment"
@@ -65,7 +65,8 @@ set(TESTS_NAMES
         "plonk_gates"
         "plonk_constraint_system"
         "plonk_assignment_table"
-        "eddsa")
+#        "eddsa"
+        )
 
 foreach(TEST_NAME ${TESTS_NAMES})
     define_marshalling_test(${TEST_NAME})

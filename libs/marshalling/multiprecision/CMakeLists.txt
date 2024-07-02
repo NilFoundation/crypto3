@@ -2,8 +2,8 @@ include(CMConfig)
 include(CMDeploy)
 include(CMSetupVersion)
 
-cm_workspace(marshalling)
-cm_project(crypto3_multiprecision WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME} LANGUAGES C CXX)
+cm_workspace(crypto3)
+cm_project(marshalling-multiprecision WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME} LANGUAGES C CXX)
 
 cm_find_package(CM)
 include(CMDeploy)
@@ -30,7 +30,7 @@ target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
                       Boost::container
 
                       crypto3::multiprecision
-                      ${CMAKE_WORKSPACE_NAME}::core)
+                      ${CMAKE_WORKSPACE_NAME}::marshalling-core)
 
 cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
           INCLUDE include
