@@ -2,8 +2,8 @@ include(CMConfig)
 include(CMDeploy)
 include(CMSetupVersion)
 
-cm_workspace(marshalling)
-cm_project(crypto3_zk WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME} LANGUAGES C CXX)
+cm_workspace(crypto3)
+cm_project(marshalling-zk WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME} LANGUAGES C CXX)
 
 cm_find_package(CM)
 include(CMDeploy)
@@ -35,9 +35,9 @@ target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
                       crypto3::containers
                       crypto3::math
 
-                      ${CMAKE_WORKSPACE_NAME}::crypto3_multiprecision
-                      ${CMAKE_WORKSPACE_NAME}::crypto3_algebra
-                      ${CMAKE_WORKSPACE_NAME}::core)
+                      ${CMAKE_WORKSPACE_NAME}::marshalling-multiprecision
+                      ${CMAKE_WORKSPACE_NAME}::marshalling-algebra
+                      ${CMAKE_WORKSPACE_NAME}::marshalling-core)
 
 cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
           INCLUDE include

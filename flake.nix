@@ -96,63 +96,6 @@
             "clang"
             # TODO: fix gcc linkage on macOS, remove optional condition
           ] ++ nixpkgs.lib.optional (!isDarwin) "gcc";
-          # We have lots of failing tests. Modules with such tests are kept here. Built as separate targets.
-          brokenModuleToTestsNames = {
-            pubkey = [
-              "pubkey_ecdsa_test"
-              "pubkey_bls_test"
-            ];
-            zk = [
-              "crypto3_zk_commitment_fold_polynomial_test"
-              "crypto3_zk_commitment_fri_test"
-              "crypto3_zk_commitment_lpc_test"
-              "crypto3_zk_systems_plonk_placeholder_placeholder_circuits_test"
-              "crypto3_zk_systems_plonk_placeholder_placeholder_curves_test"
-              "crypto3_zk_systems_plonk_placeholder_placeholder_gate_argument_test"
-              "crypto3_zk_systems_plonk_placeholder_placeholder_goldilocks_test"
-              "crypto3_zk_systems_plonk_placeholder_placeholder_hashes_test"
-              "crypto3_zk_systems_plonk_placeholder_placeholder_kzg_test"
-              "crypto3_zk_systems_plonk_placeholder_placeholder_lookup_argument_test"
-              "crypto3_zk_systems_plonk_placeholder_placeholder_permutation_argument_test"
-              "crypto3_zk_systems_plonk_placeholder_placeholder_quotient_polynomial_chunks_test"
-              # "crypto3_zk_commitment_powers_of_tau_test"
-              "crypto3_zk_commitment_proof_of_knowledge_test"
-              "crypto3_zk_commitment_r1cs_gg_ppzksnark_mpc_test"
-              "crypto3_zk_math_expression_test"
-              "crypto3_zk_systems_plonk_plonk_constraint_test"
-            ];
-            # Everything is built successfully, just can't use regex to distinguish from other marshalling tests
-            # TODO: change prefix to marshalling_core inside module, move to moduleToTestsRegex
-            marshalling-core = [
-              "marshalling_processing_test"
-              "marshalling_interfaces_test"
-              "marshalling_types_test"
-            ];
-            # Ditto
-            marshalling-zk = [
-              "marshalling_fri_commitment_test"
-              "marshalling_lpc_commitment_test"
-              "marshalling_placeholder_common_data_test"
-              "marshalling_placeholder_proof_test"
-              "marshalling_sparse_vector_test"
-              "marshalling_accumulation_vector_test"
-              "marshalling_plonk_constraint_system_test"
-              "marshalling_plonk_assignment_table_test"
-              "marshalling_plonk_gates_test"
-              "marshalling_r1cs_gg_ppzksnark_primary_input_test"
-              "marshalling_r1cs_gg_ppzksnark_proof_test"
-              "marshalling_r1cs_gg_ppzksnark_verification_key_test"
-              "marshalling_merkle_proof_test"
-            ];
-            # Ditto
-            marshalling-algebra = [
-              "marshalling_field_element_test"
-              "marshalling_field_element_non_fixed_size_container_test"
-              "marshalling_curve_element_fixed_size_container_test"
-              "marshalling_curve_element_non_fixed_size_container_test"
-              "marshalling_curve_element_test"
-            ];
-          };
           # Modules with no failing tests are kept here. Built as `tests-crypto3-<module_name>` targets
           moduleToTestsRegex = {
             algebra = "algebra_.*_test";
@@ -161,6 +104,11 @@
             math = "math_.*_test";
             block = "block_.*_test";
             multiprecision = "multiprecision_.*_test";
+            zk = "crypto3_zk_*_test";
+            pubkey = "pubkey_*_test";
+            marshalling-core = "marshalling_core_*_test";
+            marshalling-zk = "marshalling_zk_*_test";
+            marshalling-algebra = "marshalling_algebra_*_test";
           };
           makeTestDerivation = { name, compiler, targets ? [ ], buildTargets ? targets, testTargets ? targets }:
             (makeCrypto3Derivation { inherit system; }).overrideAttrs (oldAttrs: {
@@ -197,27 +145,12 @@
 
               dontInstall = true;
             });
-          compilerBrokenModuleTestsNamesPairs = pkgs.lib.cartesianProductOfSets {
-            compiler = testCompilers;
-            module = pkgs.lib.attrNames brokenModuleToTestsNames;
-          };
           compilerModuleTestsRegexPairs = pkgs.lib.cartesianProductOfSets {
             compiler = testCompilers;
             module = pkgs.lib.attrNames moduleToTestsRegex;
           };
         in
         pkgs.lib.listToAttrs (
-          builtins.map
-            (pair: {
-              name = "${pair.module}-${pair.compiler}";
-              value = makeTestDerivation {
-                name = pair.module;
-                compiler = pair.compiler;
-                targets = brokenModuleToTestsNames.${pair.module};
-              };
-            })
-            compilerBrokenModuleTestsNamesPairs
-          ++
           builtins.map
             (pair: {
               name = "${pair.module}-${pair.compiler}";

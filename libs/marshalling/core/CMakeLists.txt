@@ -1,8 +1,8 @@
 include(CMConfig)
 include(CMSetupVersion)
 
-cm_workspace(marshalling)
-cm_project(core WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME} LANGUAGES C CXX)
+cm_workspace(crypto3)
+cm_project(marshalling-core WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME} LANGUAGES C CXX)
 
 include(CMDeploy)
 include(FindPkgConfig)

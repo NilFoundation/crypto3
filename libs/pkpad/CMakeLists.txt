@@ -65,7 +65,7 @@ target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
 #                      ${CMAKE_WORKSPACE_NAME}::codec
                       ${CMAKE_WORKSPACE_NAME}::hash
                       ${CMAKE_WORKSPACE_NAME}::algebra
-                      marshalling::crypto3_algebra
+                      crypto3::marshalling-algebra
 
                       Boost::container)
 

@@ -21,7 +21,7 @@ cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
                    )
 
 macro(define_marshalling_test name)
-    set(test_name "marshalling_${name}_test")
+    set(test_name "marshalling_algebra_${name}_test")
 
     cm_test(NAME ${test_name} SOURCES ${name}.cpp)
 
