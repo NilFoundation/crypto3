@@ -114,26 +114,67 @@ void run_perf_test(std::string const& field_name) {
             return batch_duration;
         };
 
-    auto plus_results = gather_stats( [](value_type &result, value_type const& sample) { result += sample; }, 1000000, "Addition");
-    auto minus_results = gather_stats( [](value_type &result, value_type const& sample) { result -= sample; }, 1000000, "Subtraction");
-    auto mul_results = gather_stats( [](value_type &result, value_type const& sample)  { result *= sample; }, 100000, "Multiplication");
-    auto sqr_results = gather_stats( [](value_type &result, value_type const& sample)  { result.square_inplace(); }, 100000, "Square In-Place");
-    auto inv_results = gather_stats( [](value_type &result, value_type const& sample)  { result = sample.inversed(); }, 100, "Inverse");
 
-    std::ofstream f(field_name+"-stats.log", std::ofstream::out);
+    for(int mult = 0; mult <= 100; ++mult) {
+        int MULTIPLICATOR = mult;
+        if (MULTIPLICATOR == 0) MULTIPLICATOR=1;
+        std::cout << "MULT: " << MULTIPLICATOR << std::endl;
+
+    auto plus_results = gather_stats(
+        [&MULTIPLICATOR](value_type &result, value_type const& sample)
+        {
+            for(int m = 0; m < MULTIPLICATOR; m++)
+            result += sample;
+        }, 1000000 / MULTIPLICATOR, "Addition");
+#if 0
+    auto minus_results = gather_stats(
+        [&MULTIPLICATOR](value_type &result, value_type const& sample)
+        {
+            for(int m = 0; m < MULTIPLICATOR; m++)
+            result -= sample;
+        }, 1000000 / MULTIPLICATOR, "Subtraction");
+
+    auto mul_results = gather_stats(
+        [&MULTIPLICATOR](value_type &result, value_type const& sample)
+        {
+            for(int m = 0; m < MULTIPLICATOR; m++)
+            result *= sample;
+        }, 100000 / MULTIPLICATOR, "Multiplication");
+
+    auto sqr_results = gather_stats(
+        [&MULTIPLICATOR](value_type &result, value_type const& sample)
+        {
+            for(int m = 0; m < MULTIPLICATOR; m++)
+            result.square_inplace();
+        }, 100000 / MULTIPLICATOR, "Square In-Place");
+
+    auto inv_results = gather_stats(
+        [&MULTIPLICATOR](value_type &result, value_type const& sample)
+        {
+            for(int m = 0; m < MULTIPLICATOR; m++)
+            result = sample.inversed();
+        }, 100 / MULTIPLICATOR, "Inverse");
+#endif
+    char filename[200]= {0};
+    sprintf(filename,"%s-stats-%03d.csv", field_name.c_str(), MULTIPLICATOR);
+
+    std::ofstream f(filename, std::ofstream::out);
     f << "# " << typeid(Field).name() << std::endl;
     f << "sum,mul,sqr,inv" << std::endl;
 
     for(size_t i = 0; i < plus_results.size(); ++i) {
-        f << std::fixed << std::setprecision(3) << plus_results[i].count() << ","
-          << std::fixed << std::setprecision(3) << minus_results[i].count() << ","
-          << std::fixed << std::setprecision(3) << mul_results[i].count() << ","
-          << std::fixed << std::setprecision(3) << sqr_results[i].count() << ","
-          << std::fixed << std::setprecision(3) << inv_results[i].count()
+        f << std::fixed << std::setprecision(3) << plus_results[i].count() /* / MULTIPLICATOR */ << ","
+#if 0
+          << std::fixed << std::setprecision(3) << minus_results[i].count()/* / MULTIPLICATOR */ << ","
+          << std::fixed << std::setprecision(3) << mul_results[i].count()  /* / MULTIPLICATOR */ << ","
+          << std::fixed << std::setprecision(3) << sqr_results[i].count()  /* / MULTIPLICATOR */ << ","
+          << std::fixed << std::setprecision(3) << inv_results[i].count()  /* / MULTIPLICATOR */
+#endif
           << std::endl;
     }
 
     f.close();
+    }
 }
 
 BOOST_AUTO_TEST_CASE(field_operation_perf_test_pallas) {
@@ -216,9 +257,59 @@ void run_perf_constructor(std::string const& field_name) {
 
     auto modular_constructor_results = gather_stats(
             [](value_type &result, value_type const& sample) {
-                result = sample;
+
+#define BATCH_EQ(first, suffix) \
+            auto xx ## suffix ## 00 = first; \
+            auto xx ## suffix ## 01 = xx ## suffix ## 00; \
+            auto xx ## suffix ## 02 = xx ## suffix ## 01; \
+            auto xx ## suffix ## 03 = xx ## suffix ## 02; \
+            auto xx ## suffix ## 04 = xx ## suffix ## 03; \
+            auto xx ## suffix ## 05 = xx ## suffix ## 04; \
+            auto xx ## suffix ## 06 = xx ## suffix ## 05; \
+            auto xx ## suffix ## 07 = xx ## suffix ## 06; \
+            auto xx ## suffix ## 08 = xx ## suffix ## 07; \
+            auto xx ## suffix ## 09 = xx ## suffix ## 08;
+
+#define BATCH_10x(first, suffix) \
+            BATCH_EQ(first, suffix ## 00); \
+            BATCH_EQ(first, suffix ## 01); \
+            BATCH_EQ(first, suffix ## 02); \
+            BATCH_EQ(first, suffix ## 03); \
+            BATCH_EQ(first, suffix ## 04); \
+            BATCH_EQ(first, suffix ## 05); \
+            BATCH_EQ(first, suffix ## 06); \
+            BATCH_EQ(first, suffix ## 07); \
+            BATCH_EQ(first, suffix ## 08); \
+            BATCH_EQ(first, suffix ## 09);
+
+#define BATCH_100x(first, suffix) \
+            BATCH_10x(first, suffix ## 00); \
+            BATCH_10x(first, suffix ## 01); \
+            BATCH_10x(first, suffix ## 02); \
+            BATCH_10x(first, suffix ## 03); \
+            BATCH_10x(first, suffix ## 04); \
+            BATCH_10x(first, suffix ## 05); \
+            BATCH_10x(first, suffix ## 06); \
+            BATCH_10x(first, suffix ## 07); \
+            BATCH_10x(first, suffix ## 08); \
+            BATCH_10x(first, suffix ## 09);
+
+#define BATCH_1000x(first, suffix) \
+            BATCH_100x(first, suffix ## 00); \
+            BATCH_100x(first, suffix ## 01); \
+            BATCH_100x(first, suffix ## 02); \
+            BATCH_100x(first, suffix ## 03); \
+            BATCH_100x(first, suffix ## 04); \
+            BATCH_100x(first, suffix ## 05); \
+            BATCH_100x(first, suffix ## 06); \
+            BATCH_100x(first, suffix ## 07); \
+            BATCH_100x(first, suffix ## 08); \
+            BATCH_100x(first, suffix ## 09);
+
+                BATCH_1000x(sample, 00);
+                result = xx0009090909;
             },
-            10000000,
+            1000,
             "eq");
 
     std::ofstream f("ctr-"+field_name+"-stats.log", std::ofstream::out);

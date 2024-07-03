@@ -134,41 +134,61 @@ void curve_operations_perf_test(std::string const& curve_name) {
     size_t SAMPLES_PER_BATCH = 10000;
     size_t BATCHES = 1000;
 
-    auto madd_res = run_batched_test(
-            "madd",
-            BATCHES, SAMPLES_PER_BATCH,
-            points1[0], points1[1],
-            []( value_type & A, value_type const& B) { A.mixed_add(B); } );
+    for(int MULTIPLICATOR = 1; MULTIPLICATOR <= 10; ++MULTIPLICATOR) {
+        std::cout << "MULT: " << MULTIPLICATOR << std::endl;
 
-    auto add_res = run_batched_test(
-            "add",
-            BATCHES, SAMPLES_PER_BATCH,
-            points1[0], points1[1],
-            []( value_type & A, value_type const& B) { A += B; } );
+        auto madd_res = run_batched_test(
+                "madd",
+                BATCHES, SAMPLES_PER_BATCH / MULTIPLICATOR,
+                points1[0], points1[1],
+                [&]( value_type & A, value_type const& B) {
+                for(int m = 0; m < MULTIPLICATOR; ++m)
+                A.mixed_add(B);
+                } );
 
-    auto dbl_res = run_batched_test(
-            "dbl",
-            BATCHES, SAMPLES_PER_BATCH,
-            points1[0], points1[1],
-            []( value_type & A, value_type const& B) { A.double_inplace(); } );
+        auto add_res = run_batched_test(
+                "add",
+                BATCHES, SAMPLES_PER_BATCH / MULTIPLICATOR,
+                points1[0], points1[1],
+                [&]( value_type & A, value_type const& B) {
+                for(int m = 0; m < MULTIPLICATOR; ++m)
+                A += B;
+                } );
 
-    auto smul_res = run_batched_test(
-            "smul",
-            BATCHES, SAMPLES_PER_BATCH / 256,
-            points1[0], points1[1],
-            [&]( value_type & A, value_type const& B) { A *= constants[0]; } );
+        auto dbl_res = run_batched_test(
+                "dbl",
+                BATCHES, SAMPLES_PER_BATCH / MULTIPLICATOR,
+                points1[0], points1[1],
+                [&]( value_type & A, value_type const& B) {
+                for(int m = 0; m < MULTIPLICATOR; ++m)
+                A.double_inplace();
+                } );
 
-    std::ofstream f(curve_name + "-stats.log", std::ofstream::out);
-    f << "# " << typeid(CurveGroup).name() << std::endl;
-    f << "madd,add,dbl,smul" << std::endl;
-    std::size_t prec = 4;
-    for(std::size_t i = 0; i < BATCHES; ++i) {
-        f
-            << std::fixed << std::setprecision(prec) << madd_res[i].count() << ","
-            << std::fixed << std::setprecision(prec) << add_res[i].count() << ","
-            << std::fixed << std::setprecision(prec) << dbl_res[i].count() << ","
-            << std::fixed << std::setprecision(prec) << smul_res[i].count()
-            << std::endl;
+        auto smul_res = run_batched_test(
+                "smul",
+                BATCHES, SAMPLES_PER_BATCH / 256 / MULTIPLICATOR,
+                points1[0], points1[1],
+                [&]( value_type & A, value_type const& B) {
+                for(int m = 0; m < MULTIPLICATOR; ++m)
+                A *= constants[0];
+                } );
+
+        char filename[200]= {0};
+        sprintf(filename,"%s-curve-ops-%03d.csv", curve_name.c_str(), MULTIPLICATOR);
+
+        std::ofstream f(filename, std::ofstream::out);
+        f << "# " << typeid(CurveGroup).name() << std::endl;
+        f << "madd,add,dbl,smul" << std::endl;
+        std::size_t prec = 4;
+        for(std::size_t i = 0; i < BATCHES; ++i) {
+            f
+                << std::fixed << std::setprecision(prec) << madd_res[i].count() << ","
+                << std::fixed << std::setprecision(prec) << add_res[i].count() << ","
+                << std::fixed << std::setprecision(prec) << dbl_res[i].count() << ","
+                << std::fixed << std::setprecision(prec) << smul_res[i].count()
+                << std::endl;
+        }
+
     }
 }
 
