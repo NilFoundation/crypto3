@@ -643,4 +643,224 @@ BOOST_AUTO_TEST_CASE(hash_to_field_bls12_381_g1_h2f_shake128_test) {
     }
 }
 
+BOOST_AUTO_TEST_CASE(hash_to_field_bls12_381_g2_h2f_shake128_test) {
+    // https://tools.ietf.org/html/draft-irtf-cfrg-hash-to-curve-10#appendix-J.10.1
+    using curve_type = curves::bls12_381;
+    using group_type = typename curve_type::g2_type<>;
+    using field_type = typename group_type::field_type;
+    using field_value_type = typename field_type::value_type;
+    using integral_type = typename field_type::integral_type;
+    using hash_type = hashes::h2f<field_type,
+                                  hashes::shake<128, 2048>,
+                                  hashes::h2f_default_params<field_type,
+                                                             hashes::shake<128, 2048>,
+                                                             128,
+                                                             hashes::UniformityCount::uniform_count,
+                                                             hashes::ExpandMsgVariant::rfc_xof>>;
+
+    using samples_type = std::vector<std::tuple<std::string, std::array<field_value_type, 2>>>;
+    samples_type samples = {
+        {"",
+         {field_value_type(integral_type("21761119417140609572957506711724462644916292942987174604015733000612083054138"
+                                         "77868370459391860290442637242685798287"),
+                           integral_type("21727803743924291497680999138943700735898742815755951136165147607237967756386"
+                                         "41300727609117779478067420156555937182")),
+          field_value_type(integral_type("19802774580858068514278700330311615707558747455624782896791901258745532214031"
+                                         "68804685581811930976162756736377819200"),
+                           integral_type("30577482064538241631055790494561748316708062368356777820792422645161630521893"
+                                         "90202713360090520912664585635089365842"))}},
+        {"abc",
+         {field_value_type(integral_type("28095779702340744474188222080117336804030388680055502193888265667402470600038"
+                                         "53667807528408681210194383505927321734"),
+                           integral_type("13480905020538778032639559738025205303070065891728990555656586377754061695581"
+                                         "74504663705980198627002645830947565535")),
+          field_value_type(integral_type("36128837908863750412786113353103990083658782138245371922196435006135331142272"
+                                         "55727791939831017201995232349524111099"),
+                           integral_type("37031718815542562878057377216607493299341531037255524917868423138783142182529"
+                                         "72527052232848741612107413733184042704"))}},
+        {"abcdef0123456789",
+         {field_value_type(integral_type("34179051443373825021627221887887003686762026645123594023800727335353607515140"
+                                         "90249139105898909846372034808498893681"),
+                           integral_type("18602926449762697029401068753653039886784602628583881790458942559844506726399"
+                                         "97323424814684516295366461881861836534")),
+          field_value_type(integral_type("13725831502352924801704573350984719213058089778288294729248198070849411653182"
+                                         "66758515896635824313576096391677734981"),
+                           integral_type("36908193745246653651064804888056323355497509997526047701009643674942412752742"
+                                         "19038923167463498905572382098560535117"))}},
+        {"q128_"
+         "qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq"
+         "qqqqqqqqqqqqqqqqqqq",
+         {field_value_type(integral_type("39599762187870594643873274175209553764202031577019663999380556114139666401464"
+                                         "89507356572246555322990727985468040245"),
+                           integral_type("25676933779138698592679819807400247892045745812751340998780556381675609475573"
+                                         "09341944273444974680463976608552489852")),
+          field_value_type(integral_type("61454319429737261771070011869457935134248576585039662467468431549997609359625"
+                                         "6444120666417881167834118723680453590"),
+                           integral_type("23955509127144125773005085188669236528208316300227858678645065700992358659384"
+                                         "54674609909635896529114812122026503129"))}},
+        {"a512_"
+         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+         {field_value_type(integral_type("42031133646911283970924437529711587195926963466037233984948270009038220365544"
+                                         "5945666063808629865323003385081140252"),
+                           integral_type("32382326666448732822661723450194270503118452492444836120698898827195542329051"
+                                         "10784475616069209850193778954228519664")),
+          field_value_type(integral_type("12731197979403258068394380733350947413090025310423363781063761800501631636886"
+                                         "27388411388878626108888409981407889320"),
+                           integral_type("15029123207785810142032112101030614655730726369761948395001369689467321863650"
+                                         "57656474980051133773877281944958080905"))}},
+
+        // {"",
+        //  {field_value_type(integral_type(""),
+        //                    integral_type("")),
+        //   field_value_type(integral_type(""),
+        //                    integral_type(""))}},
+    };
+
+    for (auto &s : samples) {
+        check_hash_to_field_ro<hash_type>(std::get<0>(s), std::get<1>(s));
+    }
+}
+
+BOOST_AUTO_TEST_CASE(hash_to_field_bls12_381_g1_h2f_shake256_test) {
+    // field elements were generated using the SageMath code from https://github.com/cfrg/draft-irtf-cfrg-hash-to-curve
+    using curve_type = curves::bls12_381;
+    using field_type = typename curve_type::base_field_type;
+    using field_value_type = typename field_type::value_type;
+    using integral_type = typename field_type::integral_type;
+    using hash_type = hashes::h2f<field_type,
+                                  hashes::shake<256, 1024>,
+                                  hashes::h2f_default_params<field_type,
+                                                             hashes::shake<256, 1024>,
+                                                             128,
+                                                             hashes::UniformityCount::uniform_count,
+                                                             hashes::ExpandMsgVariant::rfc_xof>>;
+
+    using samples_type = std::vector<std::tuple<std::string, std::array<field_value_type, 2>>>;
+    samples_type samples = {
+        {"",
+         {field_value_type(integral_type("35649413618876074642626806365137625720526779547687130805164279468893543348816"
+                                         "81149428744233836573075940920773556605")),
+          field_value_type(integral_type("32191598794272535593202043296699690894078346767469611555064692257309991804181"
+                                         "2868917504156030442189555841682260203"))}},
+        {"abc",
+         {field_value_type(integral_type("36297070445601380522183773418551096131819097989283494533273211638846992997294"
+                                         "86359633941000674339086857170774012891")),
+          field_value_type(integral_type("21336734814454478909919797987655643716116374700180214090544223636910007807464"
+                                         "09314360354255496017833770999585612365"))}},
+        {"abcdef0123456789",
+         {field_value_type(integral_type("89562627513935962103233763683462050306922022114977595123138177164512223976408"
+                                         "2253394057881856751461508824060407068")),
+          field_value_type(integral_type("26390405268558144935650411401535229593735188494011206900329278546785106492536"
+                                         "24259827299638645593197965314405990223"))}},
+        {"q128_"
+         "qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq"
+         "qqqqqqqqqqqqqqqqqqq",
+         {field_value_type(integral_type("22916397665345561448194985375368991003209854878197341043956812081252109413817"
+                                         "62551072041089523763472685246541885147")),
+          field_value_type(integral_type("29915744450377534368569430780604829283215920795851547158261172894680433208614"
+                                         "31194687978643395782359715681390717481"))}},
+        {"a512_"
+         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+         {field_value_type(integral_type("24547068103260723032692377284190124714469178784622226928569646544131198218365"
+                                         "12158594441511421199579041183882320701")),
+          field_value_type(integral_type("32777440595410240006428031495965340366546892470064030857364419905126509912456"
+                                         "78958004541570391981799856710821139287"))}}
+        // {"", {field_value_type(integral_type("")), field_value_type(integral_type(""))}}
+    };
+
+    for (auto &s : samples) {
+        check_hash_to_field_ro<hash_type>(std::get<0>(s), std::get<1>(s));
+    }
+}
+
+BOOST_AUTO_TEST_CASE(hash_to_field_bls12_381_g2_h2f_shake256_test) {
+    // https://tools.ietf.org/html/draft-irtf-cfrg-hash-to-curve-10#appendix-J.10.1
+    using curve_type = curves::bls12_381;
+    using group_type = typename curve_type::g2_type<>;
+    using field_type = typename group_type::field_type;
+    using field_value_type = typename field_type::value_type;
+    using integral_type = typename field_type::integral_type;
+    using hash_type = hashes::h2f<field_type,
+                                  hashes::shake<256, 2048>,
+                                  hashes::h2f_default_params<field_type,
+                                                             hashes::shake<256, 2048>,
+                                                             128,
+                                                             hashes::UniformityCount::uniform_count,
+                                                             hashes::ExpandMsgVariant::rfc_xof>>;
+
+    using samples_type = std::vector<std::tuple<std::string, std::array<field_value_type, 2>>>;
+    samples_type samples = {
+        {"",
+         {field_value_type(integral_type("21963274071619108128097264722317071301606486779929326898554083672936128235770"
+                                         "4338072415018530247540214055249982132"),
+                           integral_type("10590351498334984848373840030203446950121731278087575746096550910348395558555"
+                                         "1845368665743236877541939312930239681")),
+          field_value_type(integral_type("28091471905464214407695546469896700624773788481198476844345274031808508333074"
+                                         "97632818619741493854405328865108683275"),
+                           integral_type("30726366767257068092443502510012136173512294464519767218243017912162500672713"
+                                         "34346694333455334523250618559647124233"))}},
+        {"abc",
+         {field_value_type(integral_type("23225806639179019890338382797325715438756600031652555722973808596165865668617"
+                                         "34165851712176216313509198818511530980"),
+                           integral_type("32557071023082220791916058169457485364134976942295371950651552550860380978496"
+                                         "48899273319477344766487385190825894003")),
+          field_value_type(integral_type("32194294443752251899867889497549719798956652948195916403399424005829214370036"
+                                         "91862946903896256965180933287123015934"),
+                           integral_type("28319630043143611222959994456903801307817254469122958785870712904900231118040"
+                                         "53145378372949657374193108898073660733"))}},
+        {"abcdef0123456789",
+         {field_value_type(integral_type("17902175988373130734012933586467293569612298137867080532295054921824759111317"
+                                         "92567425530299937389989900138225324599"),
+                           integral_type("12969006743881285697018500257524475024956462836065688657073044500573635075580"
+                                         "27645375674431249396430197967082812936")),
+          field_value_type(integral_type("34406529846799115946535633828620145267368064157958635700227172206263842971745"
+                                         "02640487083363023891622316284584216690"),
+                           integral_type("28213835204899604742609273129426581197007138205118023703504592620948962976872"
+                                         "75979972257250936391927795870833532960"))}},
+        {"q128_"
+         "qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq"
+         "qqqqqqqqqqqqqqqqqqq",
+         {field_value_type(integral_type("10092932943035553727564168499381428496298566886087918016632369681584459692382"
+                                         "01675258277772727721484256251128244060"),
+                           integral_type("17168004723799863694173561785055094879931106899957934052491965588500285242621"
+                                         "24538058198857628689491715908814880409")),
+          field_value_type(integral_type("25719222627124083185067835874983100017932189620376996637741387888990217611488"
+                                         "60467345466576023662564107715706227472"),
+                           integral_type("36331609886282561421947333390942915867716324305897456844342657503519500457553"
+                                         "83718695873025565472006812136924244469"))}},
+        {"a512_"
+         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+         {field_value_type(integral_type("35495382464173722991366714917826997437591972701057816539555858479132737998763"
+                                         "6201901377834680498342583094405742933"),
+                           integral_type("16036052280914287202478767463603457793835943149293145136061129905834330994782"
+                                         "51445849500798421048684965287365764494")),
+          field_value_type(integral_type("19494580623629045697224611727282567482926073920822674841457409389744912206228"
+                                         "80992714498950980540123997447376922328"),
+                           integral_type("98171940250611754694458305588405551184270341958151133249793446650353577775558"
+                                         "2925716311702110312401790485459582370"))}},
+
+        // {"",
+        //  {field_value_type(integral_type(""),
+        //                    integral_type("")),
+        //   field_value_type(integral_type(""),
+        //                    integral_type(""))}},
+    };
+
+    for (auto &s : samples) {
+        check_hash_to_field_ro<hash_type>(std::get<0>(s), std::get<1>(s));
+    }
+}
+
 BOOST_AUTO_TEST_SUITE_END()

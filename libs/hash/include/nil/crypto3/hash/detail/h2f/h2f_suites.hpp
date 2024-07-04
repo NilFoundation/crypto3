@@ -104,8 +104,45 @@ namespace nil {
 
                 // BLS12381G2_XOF:SHAKE128_SSWU_RO_
                 constexpr static std::array<std::uint8_t, 32> suite_id = {
-                    0x42, 0x4c, 0x53, 0x31, 0x32, 0x33, 0x38, 0x31, 0x47, 0x32, 0x5f, 0x58, 0x4d, 0x44, 0x3a, 0x53,
+                    0x42, 0x4c, 0x53, 0x31, 0x32, 0x33, 0x38, 0x31, 0x47, 0x32, 0x5f, 0x58, 0x4f, 0x46, 0x3a, 0x53,
                     0x48, 0x41, 0x4b, 0x45, 0x31, 0x32, 0x38, 0x5f, 0x53, 0x53, 0x57, 0x55, 0x5f, 0x52, 0x4f, 0x5f};
+
+                constexpr static std::size_t m = field_type::arity;
+                constexpr static std::size_t k = 128;
+                /// L = ceil((ceil(log2(p)) + k) / 8)
+                constexpr static std::size_t L = 64;
+            };
+
+            template<>
+            struct h2f_suite<typename algebra::curves::bls12_381::base_field_type, shake<256, 1024>, 128> {
+                typedef typename algebra::curves::bls12_381::base_field_type field_type;
+                typedef typename field_type::value_type field_value_type;
+                typedef typename field_type::modular_type modular_type;
+                typedef shake<256, 1024> hash_type;
+
+                // BLS12381G1_XOF:SHAKE256_SSWU_RO_
+                constexpr static std::array<std::uint8_t, 32> suite_id = {
+                    0x42, 0x4c, 0x53, 0x31, 0x32, 0x33, 0x38, 0x31, 0x47, 0x31, 0x5f, 0x58, 0x4f, 0x46, 0x3a, 0x53,
+                    0x48, 0x41, 0x4b, 0x45, 0x32, 0x35, 0x36, 0x5f, 0x53, 0x53, 0x57, 0x55, 0x5f, 0x52, 0x4f, 0x5f};
+
+                constexpr static std::size_t m = field_type::arity;
+                constexpr static std::size_t k = 128;
+                /// L = ceil((ceil(log2(p)) + k) / 8)
+                constexpr static std::size_t L = 64;
+            };
+
+            template<>
+            struct h2f_suite<typename algebra::fields::fp2<typename algebra::curves::bls12_381::base_field_type>,
+                             shake<256, 2048>, 128> {
+                typedef typename algebra::curves::bls12_381::g2_type<>::field_type field_type;
+                typedef typename field_type::value_type field_value_type;
+                typedef typename field_type::modular_type modular_type;
+                typedef shake<256, 2048> hash_type;
+
+                // BLS12381G2_XOF:SHAKE256_SSWU_RO_
+                constexpr static std::array<std::uint8_t, 32> suite_id = {
+                    0x42, 0x4c, 0x53, 0x31, 0x32, 0x33, 0x38, 0x31, 0x47, 0x32, 0x5f, 0x58, 0x4f, 0x46, 0x3a, 0x53,
+                    0x48, 0x41, 0x4b, 0x45, 0x32, 0x35, 0x36, 0x5f, 0x53, 0x53, 0x57, 0x55, 0x5f, 0x52, 0x4f, 0x5f};
 
                 constexpr static std::size_t m = field_type::arity;
                 constexpr static std::size_t k = 128;
