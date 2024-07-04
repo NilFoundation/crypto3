@@ -20,9 +20,9 @@ cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
         crypto3::hash
         crypto3::random
         crypto3::math
-        ${CMAKE_WORKSPACE_NAME}::crypto3_multiprecision
-        ${CMAKE_WORKSPACE_NAME}::crypto3_algebra
-        ${CMAKE_WORKSPACE_NAME}::core)
+        ${CMAKE_WORKSPACE_NAME}::marshalling-multiprecision
+        ${CMAKE_WORKSPACE_NAME}::marshalling-algebra
+        ${CMAKE_WORKSPACE_NAME}::marshalling-core)
 
 macro(define_marshalling_test test)
 
