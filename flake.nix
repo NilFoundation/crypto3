@@ -3,19 +3,19 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
-    nil_crypto3 = {
+    nil-crypto3 = {
       url = "github:NilFoundation/crypto3";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, nil_crypto3, flake-utils }:
+  outputs = { self, nixpkgs, nil-crypto3, flake-utils }:
     (flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs { inherit system; };
         stdenv = pkgs.llvmPackages_16.stdenv;
-        crypto3 = nil_crypto3.packages.${system}.default;
+        crypto3 = nil-crypto3.packages.${system}.default;
       in rec {
         packages = rec {
           zkllvm-blueprint = stdenv.mkDerivation {
@@ -182,7 +182,7 @@
 }
 
 # 1 build crypto 3 locally with the command 'nix build -L .?submodules=1#'
-# 2 use the local source of crypto3: 'nix develop --override-input nil_crypto3 /your/path/to/crypto3 .?submodules=1#'
+# 2 use the local source of crypto3: 'nix develop --override-input nil-crypto3 /your/path/to/crypto3 .?submodules=1#'
 # 3a to build all in blueprint: 'nix flake -L check .?submodules=1#' or build all and run tests: nix build -L .?submodules=1#checks.x86_64-linux.default
 # 3b to build individual targets:
 # nix develop . -c cmake -B build -DCMAKE_CXX_STANDARD=17 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_ENABLE_TESTS=TRUE -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++

@@ -38,4 +38,4 @@ To run all tests:
 nix flake check -L ?submodules=1#
 ```
 
-To build/develop/test with local crypto3 version, add an argument `--override-input nil_crypto3 /path/to/local/crypto3` to any of the above commands.
+To build/develop/test with local crypto3 version, add an argument `--override-input nil-crypto3 /path/to/local/crypto3` to any of the above commands.
