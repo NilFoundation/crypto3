@@ -54,9 +54,8 @@ namespace nil {
             namespace detail {
                 template<std::size_t k, std::size_t len_in_bytes, typename Hash,
                          /// Hash::digest_type is required to be uint8_t[]
-                         typename = typename std::enable_if<std::is_same<
-                             std::uint8_t,
-                             typename std::iterator_traits<typename Hash::digest_type>::value_type>::value>::type>
+                         typename = typename std::enable_if<
+                            std::is_same<std::uint8_t, typename Hash::digest_type::value_type>::value>::type>
                 class expand_message_xmd {
                     // https://tools.ietf.org/html/draft-irtf-cfrg-hash-to-curve-10#section-5.4.1
                     static_assert(Hash::block_bits % 8 == 0, "r_in_bytes is not a multiple of 8");
@@ -139,9 +138,8 @@ namespace nil {
 
                 template<std::size_t k, std::size_t len_in_bytes, typename Hash,
                          /// Hash::digest_type is required to be uint8_t[]. 
-                         typename = typename std::enable_if<std::is_same<
-                             std::uint8_t,
-                             typename std::iterator_traits<typename Hash::digest_type>::value_type>::value>::type>
+                         typename = typename std::enable_if<
+                            std::is_same<std::uint8_t, typename Hash::digest_type::value_type>::value>::type>
                 class expand_message_xof {
                     // https://tools.ietf.org/html/draft-irtf-cfrg-hash-to-curve-10#section-5.4.2
                     static_assert(Hash::block_bits % 8 == 0, "r_in_bytes is not a multiple of 8");
