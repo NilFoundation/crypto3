@@ -82,7 +82,7 @@ void curve_operations_perf_test(std::string const& curve_name) {
     std::vector<affine_value_type> points2;
     std::vector<scalar_type> constants;
 
-    size_t SAMPLE_POINTS = 10;
+    size_t SAMPLE_POINTS = 1000;
     for (int i = 0; i < SAMPLE_POINTS; ++i) {
         auto p1 = algebra::random_element<CurveGroup>();
         auto p1a = p1.to_affine();
@@ -94,28 +94,30 @@ void curve_operations_perf_test(std::string const& curve_name) {
 
     using duration = std::chrono::duration<double, std::nano>;
 
-    auto run_batched_test = [](
+    auto run_batched_test = [&](
         std::string const& test_name,
         std::size_t BATCHES,
         std::size_t samples_per_batch,
-        value_type & A,
-        value_type const& B,
+        std::vector<value_type> const& B,
         std::function<void (value_type & A, value_type const& B)> opfunc)
     {
         std::vector<duration> batch_duration;
         batch_duration.resize(BATCHES);
 
+        auto res = B[0];
+
         for(size_t b = 0; b < BATCHES; ++b) {
             if (b % (BATCHES/10) == 0) std::cerr << "Batch progress:" << b << std::endl;
             auto start = std::chrono::high_resolution_clock::now();
             for(size_t i = 0; i < samples_per_batch; ++i) {
-                opfunc(A, B);
+                opfunc(res, B[i*i % SAMPLE_POINTS]);
             }
-            volatile auto res = A;
 
             auto finish = std::chrono::high_resolution_clock::now();
             batch_duration[b] = (finish - start) * 1.0 / samples_per_batch;
         }
+
+        std::cout << res << std::endl;
 
         /* To filter 10% outliers, sort results and set margin to BATCHES/20 = 5% */
         // sort(batch_duration.begin(), batch_duration.end());
@@ -124,6 +126,7 @@ void curve_operations_perf_test(std::string const& curve_name) {
         for(size_t b = margin+1; b < batch_duration.size()-margin; ++b) {
             s += batch_duration[b];
         }
+
 
         s /= batch_duration.size() - margin*2;
         std::cout << test_name << ": " << std::fixed << std::setprecision(3) << s.count() << std::endl;
@@ -140,7 +143,7 @@ void curve_operations_perf_test(std::string const& curve_name) {
         auto madd_res = run_batched_test(
                 "madd",
                 BATCHES, SAMPLES_PER_BATCH / MULTIPLICATOR,
-                points1[0], points1[1],
+                points1,
                 [&]( value_type & A, value_type const& B) {
                 for(int m = 0; m < MULTIPLICATOR; ++m)
                 A.mixed_add(B);
@@ -149,7 +152,7 @@ void curve_operations_perf_test(std::string const& curve_name) {
         auto add_res = run_batched_test(
                 "add",
                 BATCHES, SAMPLES_PER_BATCH / MULTIPLICATOR,
-                points1[0], points1[1],
+                points1,
                 [&]( value_type & A, value_type const& B) {
                 for(int m = 0; m < MULTIPLICATOR; ++m)
                 A += B;
@@ -158,7 +161,7 @@ void curve_operations_perf_test(std::string const& curve_name) {
         auto dbl_res = run_batched_test(
                 "dbl",
                 BATCHES, SAMPLES_PER_BATCH / MULTIPLICATOR,
-                points1[0], points1[1],
+                points1,
                 [&]( value_type & A, value_type const& B) {
                 for(int m = 0; m < MULTIPLICATOR; ++m)
                 A.double_inplace();
@@ -167,7 +170,7 @@ void curve_operations_perf_test(std::string const& curve_name) {
         auto smul_res = run_batched_test(
                 "smul",
                 BATCHES, SAMPLES_PER_BATCH / 256 / MULTIPLICATOR,
-                points1[0], points1[1],
+                points1,
                 [&]( value_type & A, value_type const& B) {
                 for(int m = 0; m < MULTIPLICATOR; ++m)
                 A *= constants[0];

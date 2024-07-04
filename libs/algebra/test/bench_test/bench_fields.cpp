@@ -68,13 +68,17 @@ void run_perf_test(std::string const& field_name) {
     typedef typename Field::value_type value_type;
     std::vector<value_type> points1;
     std::vector<value_type> points2;
-    for (int i = 0; i < 1000; ++i) {
+
+    // size of arrays is 4 times larger that typical L1 data cache
+    size_t SAMPLES_COUNT = 4*32*1024/sizeof(value_type);
+
+    for (int i = 0; i < SAMPLES_COUNT; ++i) {
         points1.push_back(algebra::random_element<Field>());
         points2.push_back(algebra::random_element<Field>());
     }
 
     auto gather_stats = [&points1, &points2]
-        (std::function<void(value_type & result, value_type const& sample)> operation,
+        (std::function<void(std::vector<value_type> & result, std::vector<value_type> const& samples, std::size_t sample)> operation,
         size_t samples_per_batch, const std::string& operation_name) {
             size_t BATCHES = 1000;
 
@@ -90,7 +94,7 @@ void run_perf_test(std::string const& field_name) {
                 auto points_index = 0;
 
                 for(size_t i = 0; i < samples_per_batch; ++i) {
-                    operation(points1[points_index], points2[points_index]);
+                    operation(points1, points2, i);
                     ++points_index;
                     if (points_index == 1000)
                         points_index = 0;
@@ -115,16 +119,15 @@ void run_perf_test(std::string const& field_name) {
         };
 
 
-    for(int mult = 0; mult <= 100; ++mult) {
+    for(int mult = 1; mult <= 100; ++mult) {
         int MULTIPLICATOR = mult;
-        if (MULTIPLICATOR == 0) MULTIPLICATOR=1;
         std::cout << "MULT: " << MULTIPLICATOR << std::endl;
 
     auto plus_results = gather_stats(
-        [&MULTIPLICATOR](value_type &result, value_type const& sample)
+        [&](std::vector<value_type> &result, std::vector<value_type> const& samples, std::size_t sample)
         {
             for(int m = 0; m < MULTIPLICATOR; m++)
-            result += sample;
+            result[sample*(sample+m) % SAMPLES_COUNT] += samples[sample*(sample+m)*17 % SAMPLES_COUNT];
         }, 1000000 / MULTIPLICATOR, "Addition");
 #if 0
     auto minus_results = gather_stats(
