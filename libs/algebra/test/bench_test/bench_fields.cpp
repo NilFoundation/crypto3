@@ -127,8 +127,16 @@ void run_perf_test(std::string const& field_name) {
         [&](std::vector<value_type> &result, std::vector<value_type> const& samples, std::size_t sample)
         {
             for(int m = 0; m < MULTIPLICATOR; m++)
-            result[sample*(sample+m) % SAMPLES_COUNT] += samples[sample*(sample+m)*17 % SAMPLES_COUNT];
+                result[sample*(sample+m) % SAMPLES_COUNT] += samples[sample*(sample+m)*17 % SAMPLES_COUNT];
         }, 1000000 / MULTIPLICATOR, "Addition");
+
+    auto mul_results = gather_stats(
+        [&](std::vector<value_type> &result, std::vector<value_type> const& samples, std::size_t sample)
+        {
+            for(int m = 0; m < MULTIPLICATOR; m++)
+                result[sample*(sample+m) % SAMPLES_COUNT] *= samples[sample*(sample+m)*17 % SAMPLES_COUNT];
+        }, 100000 / MULTIPLICATOR, "Multiplication");
+
 #if 0
     auto minus_results = gather_stats(
         [&MULTIPLICATOR](value_type &result, value_type const& sample)
@@ -136,13 +144,6 @@ void run_perf_test(std::string const& field_name) {
             for(int m = 0; m < MULTIPLICATOR; m++)
             result -= sample;
         }, 1000000 / MULTIPLICATOR, "Subtraction");
-
-    auto mul_results = gather_stats(
-        [&MULTIPLICATOR](value_type &result, value_type const& sample)
-        {
-            for(int m = 0; m < MULTIPLICATOR; m++)
-            result *= sample;
-        }, 100000 / MULTIPLICATOR, "Multiplication");
 
     auto sqr_results = gather_stats(
         [&MULTIPLICATOR](value_type &result, value_type const& sample)
@@ -167,9 +168,9 @@ void run_perf_test(std::string const& field_name) {
 
     for(size_t i = 0; i < plus_results.size(); ++i) {
         f << std::fixed << std::setprecision(3) << plus_results[i].count() /* / MULTIPLICATOR */ << ","
+          << std::fixed << std::setprecision(3) << mul_results[i].count()  /* / MULTIPLICATOR */ << ","
 #if 0
           << std::fixed << std::setprecision(3) << minus_results[i].count()/* / MULTIPLICATOR */ << ","
-          << std::fixed << std::setprecision(3) << mul_results[i].count()  /* / MULTIPLICATOR */ << ","
           << std::fixed << std::setprecision(3) << sqr_results[i].count()  /* / MULTIPLICATOR */ << ","
           << std::fixed << std::setprecision(3) << inv_results[i].count()  /* / MULTIPLICATOR */
 #endif
