@@ -644,23 +644,23 @@ namespace nil {
 
                 ranges rows;
                 if (size) {
-                    rows.push_back({0, size});
+                    rows.push_back({0, size - 1});
                 }
                 ranges witnesses;
                 if (witnesses_size) {
-                    witnesses.push_back({0, witnesses_size});
+                    witnesses.push_back({0, witnesses_size - 1});
                 }
                 ranges public_inputs;
                 if (public_size) {
-                    public_inputs.push_back({0, public_size});
+                    public_inputs.push_back({0, public_size - 1});
                 }
                 ranges constants;
                 if (constants_size) {
-                    constants.push_back({0, constants_size});
+                    constants.push_back({0, constants_size - 1});
                 }
                 ranges selectors;
                 if (selectors_size) {
-                    selectors.push_back({0, selectors_size});
+                    selectors.push_back({0, selectors_size - 1});
                 }
                 return export_table(os, witnesses, public_inputs, constants, selectors, rows, wide_export);
             }

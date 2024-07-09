@@ -97,6 +97,13 @@ void test_mul(typename CurveType::base_field_type::value_type b_val,
     foreign_integral_type base = 1;
     foreign_integral_type mask = (base << 66) - 1;
 
+    if (P == Ed25519Type::template g1_type<crypto3::algebra::curves::coordinates::affine>::value_type::zero()) {
+        Py = 1;
+    }
+    if (T == Ed25519Type::template g1_type<crypto3::algebra::curves::coordinates::affine>::value_type::zero()) {
+        Ty = 1;
+    }
+
     std::vector<typename BlueprintFieldType::value_type> public_input = {
         Tx & mask, (Tx >> 66) & mask, (Tx >> 132) & mask, (Tx >> 198) & mask,
         Ty & mask, (Ty >> 66) & mask, (Ty >> 132) & mask, (Ty >> 198) & mask,

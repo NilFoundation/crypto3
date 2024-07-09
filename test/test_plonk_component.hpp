@@ -26,8 +26,7 @@
 // @file Declaration of interfaces for PLONK unified addition component.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_TEST_PLONK_COMPONENT_HPP
-#define CRYPTO3_TEST_PLONK_COMPONENT_HPP
+#pragma once
 
 #include <fstream>
 #include <random>
@@ -594,5 +593,3 @@ namespace nil {
         }
     }    // namespace crypto3
 }    // namespace nil
-
-#endif    // CRYPTO3_TEST_PLONK_COMPONENT_HPP

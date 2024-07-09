@@ -24,8 +24,7 @@
 // @file Declaration of interfaces for auxiliary components for the VARIABLE_BASE_MULTIPLICATION component.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_BLUEPRINT_COMPONENTS_VARIABLE_BASE_MULTIPLICATION_EDWARD25519_HPP
-#define CRYPTO3_BLUEPRINT_COMPONENTS_VARIABLE_BASE_MULTIPLICATION_EDWARD25519_HPP
+#pragma once
 
 #include "nil/blueprint/components/algebra/fields/plonk/non_native/detail/bit_builder_component.hpp"
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
@@ -230,6 +229,7 @@ namespace nil {
                     using bool_scalar_mul_component = typename component_type::bool_scalar_mul_component;
 
                     std::size_t row = start_row_index;
+                    // check if T is zero
                     std::array<var, 4> T_x = instance_input.T.x;
                     std::array<var, 4> T_y = instance_input.T.y;
 
@@ -395,5 +395,3 @@ namespace nil {
         }    // namespace components
     }        // namespace blueprint
 }    // namespace nil
-
-#endif    // CRYPTO3_BLUEPRINT_COMPONENTS_VARIABLE_BASE_MULTIPLICATION_EDWARD25519_HPP

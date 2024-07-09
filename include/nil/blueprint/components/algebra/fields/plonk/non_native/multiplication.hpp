@@ -243,7 +243,7 @@ namespace nil {
                     u1_chunks[0] = u1_integral & ((1 << 22) - 1);
                     u1_chunks[1] = (u1_integral >> 22) & ((1 << 22) - 1);
                     u1_chunks[2] = (u1_integral >> 44) & ((1 << 22) - 1);
-                    u1_chunks[3] = (u1_integral >> 66) & ((1 << 8) - 1);
+                    u1_chunks[3] = (u1_integral >> 66) & ((1 << 9) - 1);
 
                     return {r[0], r[1], r[2], r[3]};
                 }
@@ -358,7 +358,7 @@ namespace nil {
                 u1_chunks[0] = u1_integral & ((1 << 22) - 1);
                 u1_chunks[1] = (u1_integral >> 22) & ((1 << 22) - 1);
                 u1_chunks[2] = (u1_integral >> 44) & ((1 << 22) - 1);
-                u1_chunks[3] = (u1_integral >> 66) & ((1 << 8) - 1);
+                u1_chunks[3] = (u1_integral >> 66) & ((1 << 9) - 1);
 
                 assignment.witness(component.W(0), row + 4) = a[0];
                 assignment.witness(component.W(1), row + 4) = a[1];
