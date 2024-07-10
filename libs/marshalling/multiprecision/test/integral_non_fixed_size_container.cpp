@@ -84,22 +84,12 @@ void test_round_trip_non_fixed_size_container_fixed_precision(const Container &v
 
     nil::marshalling::status_type status;
 
-#if defined(BOOST_OS_MACOS) && defined(BOOST_LIB_STD_CXX)
-    boost::container::vector<unit_type> cv =
-            nil::marshalling::pack<Endianness>(val_container, status);
-#else
     std::vector<unit_type> cv =
             nil::marshalling::pack<Endianness>(val_container, status);
-#endif
-
 
     BOOST_CHECK(status == nil::marshalling::status_type::success);
 
-#if defined(BOOST_OS_MACOS) && defined(BOOST_LIB_STD_CXX)
-    boost::container::vector<typename Container::value_type> test_val = nil::marshalling::pack<Endianness>(cv, status);
-#else
     std::vector<typename Container::value_type> test_val = nil::marshalling::pack<Endianness>(cv, status);
-#endif
 
     BOOST_CHECK(std::equal(val_container.begin(), val_container.end(), test_val.begin()));
     BOOST_CHECK(status == nil::marshalling::status_type::success);
@@ -115,11 +105,7 @@ void test_round_trip_non_fixed_size_container_fixed_precision() {
             std::cout << std::dec << i << " tested" << std::endl;
         }
 
-#if defined(BOOST_OS_MACOS) && defined(BOOST_LIB_STD_CXX)
-        boost::container::vector<T> val_container;
-#else
         std::vector<T> val_container;
-#endif
 
         for (std::size_t i = 0; i < TSize; i++) {
             val_container.push_back(generate_random<T>());
