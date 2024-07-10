@@ -9,6 +9,7 @@
 #include <climits>
 #include <cstring>
 
+#include <boost/predef/os/macos.h>
 #include <boost/multiprecision/traits/std_integer_traits.hpp>
 #include <boost/multiprecision/detail/endian.hpp>
 #include <boost/multiprecision/cpp_int/import_export.hpp> // For 'extract_bits'.
@@ -45,6 +46,19 @@ namespace boost {
                         assign_bits(val, bits, bit_location, chunk_bits, tag);
                 }
             }
+
+#ifdef BOOST_OS_MACOS_AVAILABLE
+            // Especially for mac, for the case when a vector<bool> is being converted to a number.
+            // When you dereference an iterator to std::vector<bool> you will receive 
+            // std::__bit_const_reference<std::vector<bool>>>.
+            template<unsigned Bits>
+            void assign_bits(boost::multiprecision::backends::cpp_int_modular_backend<Bits>& val,
+                             std::__bit_const_reference<std::vector<bool>> bits,
+                            std::size_t bit_location, std::size_t chunk_bits,
+                             const std::integral_constant<bool, false>& tag) {
+               assign_bits(val, static_cast<bool>(bits), bit_location, chunk_bits, tag);
+            }
+#endif
 
             template<unsigned Bits, class Unsigned>
             void assign_bits(boost::multiprecision::backends::cpp_int_modular_backend<Bits>& val,

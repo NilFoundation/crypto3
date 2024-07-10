@@ -258,15 +258,9 @@ namespace nil {
                         } else {
                             nil::marshalling::status_type status;
                             typename scalar_field_type::integral_type scalar_f(f.data);
-#if defined(BOOST_OS_MACOS) && defined(BOOST_LIB_STD_CXX)
-                            boost::container::vector<bool> bits = nil::marshalling::pack<nil::marshalling::option::big_endian>(
-                                    scalar_f, status);
-                            boost::container::vector<bool> shifted_bits(bits.size(), false);
-#else
                             std::vector<bool> bits = nil::marshalling::pack<nil::marshalling::option::big_endian>(
                                     scalar_f, status);
                             std::vector<bool> shifted_bits(bits.size(), false);
-#endif
 
                             std::copy(bits.begin(), bits.end() - 1, shifted_bits.begin() + 1);
 
