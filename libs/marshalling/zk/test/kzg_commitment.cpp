@@ -28,7 +28,7 @@
 #include "nil/crypto3/zk/commitments/batched_commitment.hpp"
 #define BOOST_TEST_MODULE crypto3_marshalling_kzg_commitment_test
 
-#include <boost/test/included/unit_test.hpp>
+#include <boost/test/unit_test.hpp>
 #include <boost/algorithm/string/case_conv.hpp>
 #include <iostream>
 #include <iomanip>

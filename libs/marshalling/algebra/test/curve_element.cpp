@@ -25,7 +25,7 @@
 
 #define BOOST_TEST_MODULE crypto3_marshalling_curve_element_test
 
-#include <boost/test/included/unit_test.hpp>
+#include <boost/test/unit_test.hpp>
 
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/random/mersenne_twister.hpp>

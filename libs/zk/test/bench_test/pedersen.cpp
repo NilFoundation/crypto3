@@ -2,6 +2,7 @@
 // Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2021 Nikita Kaskov <nbering@nil.foundation>
 // Copyright (c) 2022 Ilia Shirobokov <i.shirobokov@nil.foundation>
+// Copyright (c) 2024 Martun Karapetyan <martun@nil.foundation>
 //
 // MIT License
 //
@@ -48,72 +49,15 @@ using namespace nil::crypto3;
 
 BOOST_AUTO_TEST_SUITE(pedersen_test_suite)
 
-BOOST_AUTO_TEST_CASE(pedersen_basic_test) {
+BOOST_AUTO_TEST_CASE(pedersen_long_test) {
 
     // setup
     using curve_type = algebra::curves::bls12<381>;
     using curve_group_type = curve_type::template g1_type<>;
     using field_type = typename curve_type::scalar_field_type;
 
-    constexpr static const int n = 50;
-    constexpr static const int k = 26;
-    curve_group_type::value_type g = algebra::random_element<curve_group_type>();
-    curve_group_type::value_type h = algebra::random_element<curve_group_type>();
-    while (g == h) {
-        h = algebra::random_element<curve_group_type>();
-    }
-
-    typedef typename zk::commitments::pedersen<curve_type> pedersen_type;
-
-    typedef typename pedersen_type::proof_type proof_type;
-    typedef typename pedersen_type::params_type params_type;
-
-    params_type params;
-
-    params.n = n;
-    params.k = k;
-    params.g = g;
-    params.h = h;
-
-    BOOST_CHECK(g != h);
-    BOOST_CHECK(n >= k);
-    BOOST_CHECK(k > 0);
-
-    // commit
-    constexpr static const field_type::value_type w = field_type::value_type(37684);
-
-    // eval
-    proof_type proof = pedersen_type::proof_eval(params, w);
-
-    // verify
-    BOOST_CHECK(pedersen_type::verify_eval(params, proof));
-
-    std::vector<int> idx;
-    std::vector<int> idx_base;
-    for (int i = 1; i <= n; ++i) {
-        idx_base.push_back(i);
-    }
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::shuffle(idx_base.begin(), idx_base.end(), gen);
-    for (int i = 0; i < k; ++i) {
-        idx.push_back(idx_base[i]);
-    }
-
-    BOOST_CHECK(idx.size() >= k);
-    field_type::value_type secret = pedersen_type::message_eval(params, proof, idx);
-    BOOST_CHECK(w == secret);
-}
-
-BOOST_AUTO_TEST_CASE(pedersen_short_test) {
-
-    // setup
-    using curve_type = algebra::curves::bls12<381>;
-    using curve_group_type = curve_type::template g1_type<>;
-    using field_type = typename curve_type::scalar_field_type;
-
-    constexpr static const int n = 2;
-    constexpr static const int k = 1;
+    constexpr static const int n = 2000000000;
+    constexpr static const int k = 1999999999;
     static curve_group_type::value_type g = algebra::random_element<curve_group_type>();
     static curve_group_type::value_type h = algebra::random_element<curve_group_type>();
     while (g == h) {
@@ -137,7 +81,7 @@ BOOST_AUTO_TEST_CASE(pedersen_short_test) {
     BOOST_CHECK(k > 0);
 
     // commit
-    constexpr static const field_type::value_type w = field_type::value_type(3);
+    constexpr static const field_type::value_type w = field_type::value_type(300000000);
 
     // eval
     proof_type proof = pedersen_type::proof_eval(params, w);
