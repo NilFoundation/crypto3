@@ -430,8 +430,7 @@ namespace nil {
                     }
 
                     std::unique_ptr<std::vector<math::polynomial_dfs<typename FieldType::value_type>>> prepare_lookup_input() {
-                        // Copied from gate argument.
-                        // TODO: remove code duplication.
+
                         auto value_type_to_polynomial_dfs = [](
                             const typename VariableType::assignment_type& coeff) {
                                 return polynomial_dfs_type(0, 1, coeff);
@@ -439,34 +438,6 @@ namespace nil {
 
                         math::expression_variable_type_converter<VariableType, DfsVariableType> converter(
                             value_type_to_polynomial_dfs);
-
-                        auto get_var_value = [&domain=basic_domain, &assignments=plonk_columns]
-                        (const DfsVariableType &var) {
-                            polynomial_dfs_type assignment;
-                            switch (var.type) {
-                                case DfsVariableType::column_type::witness:
-                                    assignment = assignments.witness(var.index);
-                                    break;
-                                case DfsVariableType::column_type::public_input:
-                                    assignment = assignments.public_input(var.index);
-                                    break;
-                                case DfsVariableType::column_type::constant:
-                                    assignment = assignments.constant(var.index);
-                                    break;
-                                case DfsVariableType::column_type::selector:
-                                    assignment = assignments.selector(var.index);
-                                    break;
-                                default:
-                                    std::cerr << "Invalid column type";
-                                    std::abort();
-                                    break;
-                            }
-
-                            if (var.rotation != 0) {
-                                assignment = math::polynomial_shift(assignment, var.rotation, domain->m);
-                            }
-                            return assignment;
-                        };
 
                         typename FieldType::value_type theta_acc;
 
@@ -480,7 +451,28 @@ namespace nil {
                                 theta_acc = theta;
                                 for(std::size_t k = 0; k < constraint.lookup_input.size(); k++){
                                     expr = converter.convert(constraint.lookup_input[k]);
-                                    math::cached_expression_evaluator<DfsVariableType> evaluator(expr, get_var_value);
+                                    // For each variable with a rotation pre-compute its value.
+                                    std::unordered_map<DfsVariableType, polynomial_dfs_type> rotated_variable_values;
+
+                                    math::expression_for_each_variable_visitor<DfsVariableType> visitor(
+                                        [&rotated_variable_values, &assignments=plonk_columns, &domain=basic_domain]
+                                        (const DfsVariableType& var) {
+                                            if (var.rotation == 0)
+                                                return;
+                                            rotated_variable_values[var] = assignments.get_variable_value(var, domain);
+                                        }
+                                    );
+                                    visitor.visit(expr);
+
+                                    math::cached_expression_evaluator<DfsVariableType> evaluator(expr, 
+                                        [&domain=basic_domain, &assignments=plonk_columns, &rotated_variable_values]
+                                        (const DfsVariableType &var) -> const polynomial_dfs_type& {
+                                            if (var.rotation == 0) {
+                                                return assignments.get_variable_value_without_rotation(var);
+                                            }
+                                            return rotated_variable_values[var];
+                                        }
+                                    );
 
                                     l += theta_acc * lookup_selector * evaluator.evaluate();
                                     theta_acc *= theta;

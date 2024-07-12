@@ -88,7 +88,7 @@ namespace nil {
                                  const plonk_assignment_table<FieldType> &assignments) const {
                         math::expression_evaluator<VariableType> evaluator(
                             *this,
-                            [&assignments, row_index](const VariableType &var) {
+                            [&assignments, row_index](const VariableType &var) -> const typename VariableType::assignment_type& {
                                 std::size_t rows_amount = assignments.rows_amount();
                                 switch (var.type) {
                                     case VariableType::column_type::witness:
@@ -100,8 +100,8 @@ namespace nil {
                                     case VariableType::column_type::selector:
                                         return assignments.selector(var.index)[(rows_amount + row_index + var.rotation) % rows_amount];
                                     default:
-                                        BOOST_ASSERT_MSG(false, "Invalid column type");
-                                        return VariableType::assignment_type::zero();
+                                        std::cerr << "Invalid column type" << std::endl;
+                                        abort();
                                 }
                             });
 
@@ -110,38 +110,33 @@ namespace nil {
 
                     math::polynomial<typename VariableType::assignment_type>
                        evaluate(const plonk_polynomial_table<FieldType> &assignments,
-                                std::shared_ptr<math::evaluation_domain<FieldType>>
-                                    domain) const {
-                       using polynomial_type = math::polynomial<typename VariableType::assignment_type>;
-                       using polynomial_variable_type = plonk_variable<polynomial_type>;
-                       math::expression_variable_type_converter<VariableType, polynomial_variable_type> converter;
+                                std::shared_ptr<math::evaluation_domain<FieldType>> domain) const {
+                        using polynomial_type = math::polynomial<typename VariableType::assignment_type>;
+                        using polynomial_variable_type = plonk_variable<polynomial_type>;
 
-                       math::expression_evaluator<polynomial_variable_type> evaluator(
-                           converter.convert(*this),
-                           [&domain, &assignments](const VariableType &var) {
-                                polynomial_type assignment;
-                                switch (var.type) {
-                                    case VariableType::column_type::witness:
-                                        assignment = assignments.witness(var.index);
-                                        break;
-                                    case VariableType::column_type::public_input:
-                                        assignment = assignments.public_input(var.index);
-                                        break;
-                                    case VariableType::column_type::constant:
-                                        assignment = assignments.constant(var.index);
-                                        break;
-                                    case VariableType::column_type::selector:
-                                        assignment = assignments.selector(var.index);
-                                        break;
-                                    default:
-                                        BOOST_ASSERT_MSG(false, "Invalid column type");
-                                }
+                        // Convert scalar values to polynomials inside the expression.
+                        math::expression_variable_type_converter<VariableType, polynomial_variable_type> converter;
+                        auto converted_expression = converter.convert(*this);
 
-                                if (var.rotation != 0) {
-                                    assignment =
-                                        math::polynomial_shift(assignment, domain->get_domain_element(var.rotation));
+                        // For each variable with a rotation pre-compute its value.
+                        std::unordered_map<polynomial_variable_type, polynomial_type> rotated_variable_values;
+
+                        math::expression_for_each_variable_visitor<polynomial_variable_type> visitor(
+                            [&rotated_variable_values, &assignments, &domain](const polynomial_variable_type& var) {
+                                if (var.rotation == 0)
+                                    return;
+                                rotated_variable_values[var] = assignments.get_variable_value(var, domain);
+                        });
+                        visitor.visit(converted_expression);
+
+                        math::expression_evaluator<polynomial_variable_type> evaluator(
+                            converted_expression,
+                            [&domain, &assignments, &rotated_variable_values]
+                            (const VariableType &var) -> const polynomial_type& {
+                                if (var.rotation == 0) {
+                                    return assignments.get_variable_value_without_rotation(var, domain);
                                 }
-                                return assignment;
+                                return rotated_variable_values[var];
                             });
                         return evaluator.evaluate();
                     }
@@ -152,46 +147,43 @@ namespace nil {
                         using polynomial_dfs_type = math::polynomial_dfs<typename VariableType::assignment_type>;
                         using polynomial_dfs_variable_type = plonk_variable<polynomial_dfs_type>;
 
+                        // Convert scalar values to polynomials inside the expression.
                         math::expression_variable_type_converter<variable_type, polynomial_dfs_variable_type> converter(
                             [&assignments](const typename VariableType::assignment_type& coeff) {
                                 polynomial_dfs_type(0, assignments.rows_amount(), coeff);
                             });
-                        math::expression_evaluator<polynomial_dfs_variable_type> evaluator(
-                            converter.convert(*this),
-                            [&domain, &assignments](const polynomial_dfs_variable_type &var) {
-                                polynomial_dfs_type assignment;
-                                switch (var.type) {
-                                    case VariableType::column_type::witness:
-                                        assignment = assignments.witness(var.index);
-                                        break;
-                                    case VariableType::column_type::public_input:
-                                        assignment = assignments.public_input(var.index);
-                                        break;
-                                    case VariableType::column_type::constant:
-                                        assignment = assignments.constant(var.index);
-                                        break;
-                                    case VariableType::column_type::selector:
-                                        assignment = assignments.selector(var.index);
-                                        break;
-                                    default:
-                                        BOOST_ASSERT_MSG(false, "Invalid column type");
-                                }
 
-                                if (var.rotation != 0) {
-                                    assignment = math::polynomial_shift(assignment, var.rotation, domain->m);
+                        auto converted_expression = converter.convert(*this);
+
+                        // For each variable with a rotation pre-compute its value.
+                        std::unordered_map<polynomial_dfs_variable_type, polynomial_dfs_type> rotated_variable_values;
+
+                        math::expression_for_each_variable_visitor<polynomial_dfs_variable_type> visitor(
+                            [&rotated_variable_values, &assignments, &domain](const polynomial_dfs_variable_type& var) {
+                                if (var.rotation == 0)
+                                    return ;
+                                rotated_variable_values[var] = assignments.get_variable_value(var, domain);
+                        });
+                        visitor.visit(converted_expression);
+
+                        math::expression_evaluator<polynomial_dfs_variable_type> evaluator(
+                            converted_expression,
+                            [&domain, &assignments, &rotated_variable_values]
+                            (const polynomial_dfs_variable_type &var) -> const polynomial_dfs_type& {
+                                if (var.rotation == 0) {
+                                    return assignments.get_variable_value_without_rotation(var, domain);
                                 }
-                                return assignment;
+                                return rotated_variable_values[var];
                             }
                         );
 
                         return evaluator.evaluate();
                     }
 
-                    typename VariableType::assignment_type
-                        evaluate(detail::plonk_evaluation_map<VariableType> &assignments) const {
+                    typename VariableType::assignment_type evaluate(detail::plonk_evaluation_map<VariableType> &assignments) const  {
                         math::expression_evaluator<VariableType> evaluator(
                             *this,
-                            [&assignments](const VariableType &var) {
+                            [&assignments](const VariableType &var) -> const typename VariableType::assignment_type& {
                                 std::tuple<std::size_t, int, typename VariableType::column_type> key =
                                     std::make_tuple(var.index, var.rotation, var.type);
 

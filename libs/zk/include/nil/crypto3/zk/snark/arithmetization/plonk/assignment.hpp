@@ -32,12 +32,14 @@
 #include <nil/crypto3/zk/snark/arithmetization/plonk/padding.hpp>
 #include <nil/crypto3/random/algebraic_engine.hpp>
 #include <nil/crypto3/math/polynomial/polynomial_dfs.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/variable.hpp>
 
 namespace nil {
     namespace blueprint {
         template<typename ArithmetizationType>
         class assignment;
     } // namespace blueprint
+
     namespace crypto3 {
         namespace zk {
             namespace snark {
@@ -55,6 +57,7 @@ namespace nil {
                 class plonk_private_table {
                 public:
                     using witnesses_container_type = std::vector<ColumnType>;
+                    using VariableType = plonk_variable<ColumnType>;
 
                 protected:
 
@@ -80,6 +83,31 @@ namespace nil {
 
                     std::uint32_t witness_column_size(std::uint32_t index) const {
                         return _witnesses[index].size();
+                    }
+
+                    const ColumnType& get_variable_value_without_rotation(const VariableType& var) const {
+                        switch (var.type) {
+                            case VariableType::column_type::witness:
+                                return witness(var.index);
+                            case VariableType::column_type::public_input:
+                                return public_input(var.index);
+                            case VariableType::column_type::constant:
+                                return constant(var.index);
+                            case VariableType::column_type::selector:
+                                return selector(var.index);
+                            default:
+                                std::cerr << "Invalid column type" << std::endl;
+                                abort();
+                        }
+                    }
+
+                    ColumnType get_variable_value(const VariableType& var, std::shared_ptr<math::evaluation_domain<FieldType>> domain) const {
+                         if (var.rotation == 0) {
+                             return get_variable_value_without_rotation(var);
+                         }
+                         return math::polynomial_shift(
+                            this->get_variable_value_without_rotation(var),
+                            var.rotation, domain->m);
                     }
 
                     const ColumnType& witness(std::uint32_t index) const {
@@ -126,6 +154,7 @@ namespace nil {
                     using public_input_container_type = std::vector<ColumnType>;
                     using constant_container_type = std::vector<ColumnType>;
                     using selector_container_type = std::vector<ColumnType>;
+                    using VariableType = plonk_variable<ColumnType>;
 
                 protected:
 
@@ -286,6 +315,7 @@ namespace nil {
                     using public_input_container_type = typename public_table_type::public_input_container_type;
                     using constant_container_type = typename public_table_type::constant_container_type;
                     using selector_container_type = typename public_table_type::selector_container_type;
+                    using VariableType = plonk_variable<ColumnType>;
 
                 protected:
                     // These are normally created by the assigner, or read from a file.
@@ -307,6 +337,31 @@ namespace nil {
                                 std::size_t selectors_amount)
                         : _private_table(witnesses_amount)
                         , _public_table(public_inputs_amount, constants_amount, selectors_amount) {
+                    }
+
+                    const ColumnType& get_variable_value_without_rotation(const VariableType& var) const {
+                        switch (var.type) {
+                            case VariableType::column_type::witness:
+                                return witness(var.index);
+                            case VariableType::column_type::public_input:
+                                return public_input(var.index);
+                            case VariableType::column_type::constant:
+                                return constant(var.index);
+                            case VariableType::column_type::selector:
+                                return selector(var.index);
+                            default:
+                                std::cerr << "Invalid column type" << std::endl;
+                                abort();
+                        }
+                    }
+
+                    ColumnType get_variable_value(const VariableType& var, std::shared_ptr<math::evaluation_domain<FieldType>> domain) const {
+                         if (var.rotation == 0) {
+                             return get_variable_value_without_rotation(var);
+                         }
+                         return math::polynomial_shift(
+                            this->get_variable_value_without_rotation(var),
+                            var.rotation, domain->m);
                     }
 
                     const ColumnType& witness(std::uint32_t index) const {

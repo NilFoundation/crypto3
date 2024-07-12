@@ -93,29 +93,7 @@ namespace nil {
                             // We may have variable values in required sizes in some cases.
                             if (variable_values_out.find(var) != variable_values_out.end())
                                 continue;
-                            polynomial_dfs_type assignment;
-                            switch (var.type) {
-                                case polynomial_dfs_variable_type::column_type::witness:
-                                    assignment = assignments.witness(var.index);
-                                    break;
-                                case polynomial_dfs_variable_type::column_type::public_input:
-                                    assignment = assignments.public_input(var.index);
-                                    break;
-                                case polynomial_dfs_variable_type::column_type::constant:
-                                    assignment = assignments.constant(var.index);
-                                    break;
-                                case polynomial_dfs_variable_type::column_type::selector:
-                                    assignment = assignments.selector(var.index);
-                                    break;
-                                default:
-                                    std::cerr << "Invalid column type";
-                                    std::abort();
-                                    break;
-                            }
-
-                            if (var.rotation != 0) {
-                                assignment = math::polynomial_shift(assignment, var.rotation, domain->m);
-                            }
+                            polynomial_dfs_type assignment = assignments.get_variable_value(var, domain); 
                             if (count > 1) {
                                 assignment.resize(extended_domain_size, domain, extended_domain);
                             }
@@ -206,9 +184,11 @@ namespace nil {
                                 extended_domain_sizes[i], variable_values);
 
                             math::cached_expression_evaluator<polynomial_dfs_variable_type> evaluator(
-                                expressions[i], [&assignments=variable_values, domain_size=extended_domain_sizes[i]](const polynomial_dfs_variable_type &var) {
-                                return assignments[var];
-                            });
+                                expressions[i], [&assignments=variable_values, domain_size=extended_domain_sizes[i]]
+                                (const polynomial_dfs_variable_type &var) -> const polynomial_dfs_type& {
+                                    return assignments[var];
+                                }
+                            );
 
                             F[0] += evaluator.evaluate();
                         }
