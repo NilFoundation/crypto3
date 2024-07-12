@@ -95,7 +95,7 @@ namespace nil {
                  */
                 expression_evaluator(
                     const math::expression<VariableType>& expr,
-                    std::function<ValueType(const VariableType&)> get_var_value)
+                    std::function<const ValueType&(const VariableType&)> get_var_value)
                         : expr(expr)
                         , get_var_value(get_var_value) {
                 }
@@ -140,7 +140,7 @@ namespace nil {
                 const math::expression<VariableType>& expr;
 
                 // A function used to retrieve the value of a variable.
-                std::function<ValueType(const VariableType &var)> get_var_value;
+                std::function<const ValueType&(const VariableType &var)> get_var_value;
 
            };
 
@@ -207,7 +207,7 @@ namespace nil {
                  */
                 cached_expression_evaluator(
                     const math::expression<VariableType>& expr,
-                    std::function<ValueType(const VariableType&)> get_var_value)
+                    std::function<const ValueType&(const VariableType&)> get_var_value)
                         : _expr(expr)
                         , _get_var_value(get_var_value) {
                 }
@@ -304,7 +304,7 @@ namespace nil {
                 const math::expression<VariableType>& _expr;
 
                 // A function used to retrieve the value of a variable.
-                std::function<ValueType(const VariableType &var)> _get_var_value;
+                std::function<const ValueType&(const VariableType &var)> _get_var_value;
 
                 // Shows how many times each subexpression appears. We count have the expression
                 // itself as a key, but apparently it's waay too slow. Just map the hash->count, assume

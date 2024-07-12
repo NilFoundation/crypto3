@@ -46,110 +46,116 @@ using namespace nil::crypto3::math;
 
 BOOST_AUTO_TEST_SUITE(expression_tests_suite)
 
-    BOOST_AUTO_TEST_CASE(expression_to_non_linear_combination_test) {
+BOOST_AUTO_TEST_CASE(expression_to_non_linear_combination_test) {
 
-        // setup
-        using curve_type = algebra::curves::pallas;
-        using FieldType = typename curve_type::base_field_type;
-        using variable_type = typename nil::crypto3::zk::snark::plonk_variable<typename FieldType::value_type>;
+    // setup
+    using curve_type = algebra::curves::pallas;
+    using FieldType = typename curve_type::base_field_type;
+    using variable_type = typename nil::crypto3::zk::snark::plonk_variable<typename FieldType::value_type>;
 
-        variable_type w0(0, 0, variable_type::column_type::witness);
-        variable_type w1(3, -1, variable_type::column_type::public_input);
-        variable_type w2(4, 1, variable_type::column_type::public_input);
-        variable_type w3(6, 2, variable_type::column_type::constant);
+    variable_type w0(0, 0, variable_type::column_type::witness);
+    variable_type w1(3, -1, variable_type::column_type::public_input);
+    variable_type w2(4, 1, variable_type::column_type::public_input);
+    variable_type w3(6, 2, variable_type::column_type::constant);
 
-        expression<variable_type> expr = (w0 + w1) * (w2 + w3) - w1 * (w2 + w0);
+    expression<variable_type> expr = (w0 + w1) * (w2 + w3) - w1 * (w2 + w0);
+   
+    expression_to_non_linear_combination_visitor<variable_type> visitor;
+    non_linear_combination<variable_type> result = visitor.convert(expr);
+    non_linear_combination<variable_type> expected({w0 * w2, w0 * w3, w1 * w3, -w1 * w0});
+ 
+    // We may get the terms in a different order due to changes in the code, and that's fine.
+    BOOST_CHECK_EQUAL(result, expected);
+}
 
-        expression_to_non_linear_combination_visitor<variable_type> visitor;
-        non_linear_combination<variable_type> result = visitor.convert(expr);
-        non_linear_combination<variable_type> expected({w0 * w2, w0 * w3, w1 * w3, -w1 * w0});
+BOOST_AUTO_TEST_CASE(expression_evaluation_test) {
 
-        // We may get the terms in a different order due to changes in the code, and that's fine.
-        BOOST_CHECK_EQUAL(result, expected);
-    }
+    // setup
+    using curve_type = algebra::curves::pallas;
+    using FieldType = typename curve_type::base_field_type;
+    using variable_type = typename nil::crypto3::zk::snark::plonk_variable<typename FieldType::value_type>;
 
-    BOOST_AUTO_TEST_CASE(expression_evaluation_test) {
+    variable_type w0(0, 0, variable_type::column_type::witness);
+    variable_type w1(3, -1, variable_type::column_type::public_input);
+    variable_type w2(4, 1, variable_type::column_type::public_input);
+    variable_type w3(6, 2, variable_type::column_type::constant);
 
-        // setup
-        using curve_type = algebra::curves::pallas;
-        using FieldType = typename curve_type::base_field_type;
-        using variable_type = typename nil::crypto3::zk::snark::plonk_variable<typename FieldType::value_type>;
+    expression<variable_type> expr = (w0 + w1) * (w2 + w3);
+   
+    variable_type::assignment_type w0_value(1u);
+    variable_type::assignment_type w1_value(2u);
+    variable_type::assignment_type w2_value(3u);
+    variable_type::assignment_type w3_value(4u);
+    expression_evaluator<variable_type> evaluator(
+        expr,
+        [&w0, &w1, &w2, &w3, &w0_value, &w1_value, &w2_value, &w3_value]
+        (const variable_type& var) -> const variable_type::assignment_type& {
+            if (var == w0) return w0_value;
+            if (var == w1) return w1_value;
+            if (var == w2) return w2_value;
+            if (var == w3) return w3_value;
+            std::cerr << "Variable not found" << std::endl;
+            abort();
+        }
+    );
+ 
+    BOOST_CHECK(evaluator.evaluate() == variable_type::assignment_type((1u + 2u) * (3u + 4u)));
+}
 
-        variable_type w0(0, 0, variable_type::column_type::witness);
-        variable_type w1(3, -1, variable_type::column_type::public_input);
-        variable_type w2(4, 1, variable_type::column_type::public_input);
-        variable_type w3(6, 2, variable_type::column_type::constant);
+BOOST_AUTO_TEST_CASE(expression_max_degree_visitor_test) {
 
-        expression<variable_type> expr = (w0 + w1) * (w2 + w3);
+    // setup
+    using curve_type = algebra::curves::pallas;
+    using FieldType = typename curve_type::base_field_type;
+    using variable_type = typename nil::crypto3::zk::snark::plonk_variable<typename FieldType::value_type>;
 
-        expression_evaluator<variable_type> evaluator(
-                expr,
-                [&w0, &w1, &w2, &w3](const variable_type &var) {
-                    if (var == w0) return variable_type::assignment_type(1u);
-                    if (var == w1) return variable_type::assignment_type(2u);
-                    if (var == w2) return variable_type::assignment_type(3u);
-                    if (var == w3) return variable_type::assignment_type(4u);
-                    return variable_type::assignment_type::zero();
-                }
-        );
+    variable_type w0(0, 0, variable_type::column_type::witness);
+    variable_type w1(3, -1, variable_type::column_type::public_input);
+    variable_type w2(4, 1, variable_type::column_type::public_input);
+    variable_type w3(6, 2, variable_type::column_type::constant);
 
-        BOOST_CHECK(evaluator.evaluate() == variable_type::assignment_type((1u + 2u) * (3u + 4u)));
-    }
+    expression<variable_type> expr = (w0 + w1) * (w2 + w3) + w0 * w1 * (w2 + w3);
+   
+    expression_max_degree_visitor<variable_type> visitor;
 
-    BOOST_AUTO_TEST_CASE(expression_max_degree_visitor_test) {
+    BOOST_CHECK_EQUAL(visitor.compute_max_degree(expr), 3);
+}
 
-        // setup
-        using curve_type = algebra::curves::pallas;
-        using FieldType = typename curve_type::base_field_type;
-        using variable_type = typename nil::crypto3::zk::snark::plonk_variable<typename FieldType::value_type>;
+BOOST_AUTO_TEST_CASE(expression_for_each_variable_visitor_test) {
 
-        variable_type w0(0, 0, variable_type::column_type::witness);
-        variable_type w1(3, -1, variable_type::column_type::public_input);
-        variable_type w2(4, 1, variable_type::column_type::public_input);
-        variable_type w3(6, 2, variable_type::column_type::constant);
+    // setup
+    using curve_type = algebra::curves::pallas;
+    using FieldType = typename curve_type::base_field_type;
+    using variable_type = typename nil::crypto3::zk::snark::plonk_variable<typename FieldType::value_type>;
 
-        expression<variable_type> expr = (w0 + w1) * (w2 + w3) + w0 * w1 * (w2 + w3);
+    variable_type w0(0, 0, variable_type::column_type::witness);
+    variable_type w1(3, -1, variable_type::column_type::public_input);
+    variable_type w2(4, 1, variable_type::column_type::public_input);
+    variable_type w3(6, 2, variable_type::column_type::constant);
 
-        expression_max_degree_visitor<variable_type> visitor;
+    expression<variable_type> expr = (w0 + w1) * (w2 + w3) + w0 * w1 * (w2 + w3);
+   
+    std::set<int> variable_indices;
+    std::set<int> variable_rotations;
 
-        BOOST_CHECK_EQUAL(visitor.compute_max_degree(expr), 3);
-    }
+    expression_for_each_variable_visitor<variable_type> visitor(
+        [&variable_indices, &variable_rotations](const variable_type& var) {
+            variable_indices.insert(var.index);
+            variable_rotations.insert(var.rotation);
+        }
+    );
 
-    BOOST_AUTO_TEST_CASE(expression_for_each_variable_visitor_test) {
+    visitor.visit(expr);
 
-        // setup
-        using curve_type = algebra::curves::pallas;
-        using FieldType = typename curve_type::base_field_type;
-        using variable_type = typename nil::crypto3::zk::snark::plonk_variable<typename FieldType::value_type>;
+    std::set<int> expected_indices = {0, 3, 4, 6};
+    std::set<int> expected_rotations = {0, -1, 1, 2};
 
-        variable_type w0(0, 0, variable_type::column_type::witness);
-        variable_type w1(3, -1, variable_type::column_type::public_input);
-        variable_type w2(4, 1, variable_type::column_type::public_input);
-        variable_type w3(6, 2, variable_type::column_type::constant);
-
-        expression<variable_type> expr = (w0 + w1) * (w2 + w3) + w0 * w1 * (w2 + w3);
-
-        std::set<int> variable_indices;
-        std::set<int> variable_rotations;
-
-        expression_for_each_variable_visitor<variable_type> visitor(
-                [&variable_indices, &variable_rotations](const variable_type &var) {
-                    variable_indices.insert(var.index);
-                    variable_rotations.insert(var.rotation);
-                }
-        );
-
-        visitor.visit(expr);
-
-        std::set<int> expected_indices = {0, 3, 4, 6};
-        std::set<int> expected_rotations = {0, -1, 1, 2};
-
-        BOOST_CHECK_EQUAL_COLLECTIONS(
-                variable_indices.begin(), variable_indices.end(),
-                expected_indices.begin(), expected_indices.end());
-        BOOST_CHECK_EQUAL_COLLECTIONS(
-                variable_rotations.begin(), variable_rotations.end(),
-                expected_rotations.begin(), expected_rotations.end());
-    }
+    BOOST_CHECK_EQUAL_COLLECTIONS(
+        variable_indices.begin(), variable_indices.end(),
+        expected_indices.begin(), expected_indices.end());
+    BOOST_CHECK_EQUAL_COLLECTIONS(
+        variable_rotations.begin(), variable_rotations.end(),
+        expected_rotations.begin(), expected_rotations.end());
+}
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -66,12 +66,11 @@ namespace nil {
                 constexpr static const std::size_t value_bits = ValueBits;
                 typedef typename boost::uint_t<value_bits>::least value_type;
                 BOOST_STATIC_ASSERT(word_bits % value_bits == 0);
+
                 constexpr static const std::size_t block_values = block_bits / value_bits;
                 typedef std::array<value_type, block_values> cache_type;
 
             protected:
-                BOOST_STATIC_ASSERT(block_bits % value_bits == 0);
-
                 inline void process_block(std::size_t block_seen = block_bits) {
                     using namespace nil::crypto3::detail;
                     // Convert the input into words
