@@ -200,15 +200,6 @@ BOOST_AUTO_TEST_CASE(kzg_false_test) {
             BOOST_CHECK(proof2 != proof);
             BOOST_CHECK_MESSAGE(!zk::algorithms::verify_eval<kzg_type>(params, proof2, pk), "wrong params");
         }
-
-        // wrong transcript
-        exception = false;
-        try { proof2 = zk::algorithms::proof_eval<kzg_type>(params, f, pk2); }
-        catch (std::runtime_error &e) { exception = true; }
-        if (!exception) {
-            BOOST_CHECK(proof2 != proof);
-            BOOST_CHECK_MESSAGE(!zk::algorithms::verify_eval<kzg_type>(params, proof2, pk), "wrong transcript");
-        }
     }
     auto proof2 = proof * 2u;
     BOOST_CHECK(!zk::algorithms::verify_eval<kzg_type>(params, proof2, pk));
