@@ -31,7 +31,7 @@
 
 #define BOOST_TEST_MODULE placeholder_lookup_argument_test
 
-#include <boost/test/included/unit_test.hpp>
+#include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 
 #include <nil/crypto3/algebra/curves/pallas.hpp>
