@@ -7,41 +7,12 @@
 # http://www.boost.org/LICENSE_1_0.txt
 #---------------------------------------------------------------------------#
 
-#add_custom_target(${CURRENT_PROJECT_NAME}_test_suite_arithmetic_tests)
-#add_custom_target(${CURRENT_PROJECT_NAME}_test_suite_functions_and_limits)
-#add_custom_target(${CURRENT_PROJECT_NAME}_test_suite_conversions)
-#add_custom_target(${CURRENT_PROJECT_NAME}_test_suite_cpp_int_tests)
 add_custom_target(${CURRENT_PROJECT_NAME}_test_suite_modular_cpp_int_tests)
-#add_custom_target(${CURRENT_PROJECT_NAME}_test_suite_misc)
-#add_custom_target(${CURRENT_PROJECT_NAME}_test_suite_specfun)
-#add_custom_target(${CURRENT_PROJECT_NAME}_test_suite_concepts)
-#add_custom_target(${CURRENT_PROJECT_NAME}_test_suite_examples)
-#add_custom_target(${CURRENT_PROJECT_NAME}_test_suite_compile_fail)
 
 cm_test_link_libraries(
     ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
     Boost::unit_test_framework
 )
-
-# HACK: Workaround broken includes
-file(GLOB TEST_HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/*.hpp ${CMAKE_CURRENT_SOURCE_DIR}/*.ipp)
-set(CMAKE_INCLUDE_CURRENT_DIR TRUE)
-foreach(HEADER ${TEST_HEADERS})
-    configure_file(${HEADER} ${CMAKE_CURRENT_BINARY_DIR}/libs/${CURRENT_PROJECT_NAME}/test/${HEADER}
-                   @ONLY)
-endforeach()
-
-add_library(${CURRENT_PROJECT_NAME}_test_settings INTERFACE)
-target_include_directories(${CURRENT_PROJECT_NAME}_test_settings INTERFACE ${CURRENT_TEST_SOURCES_DIR}/include)
-cm_test_link_libraries(${CURRENT_PROJECT_NAME}_test_settings)
-
-if(EIGEN_FOUND)
-    try_compile(EIGEN_COMPILED ${CMAKE_BINARY_DIR} ${CURRENT_TEST_SOURCES_DIR}/../config/has_eigen.cpp
-                CMAKE_FLAGS "-DCMAKE_CXX_LINK_EXECUTABLE='echo not linking now...'" "-DINCLUDE_DIRECTORIES=${EIGEN3_INCLUDE_DIRS}")
-endif()
-
-# TODO: figure out if it is needed
-# add_library(no_eh_support SHARED ${CURRENT_TEST_SOURCES_DIR}/no_eh_test_support.cpp)
 
 macro(define_runtime_multiprecision_test name)
     set(test_name "${CURRENT_PROJECT_NAME}_${name}_test")
@@ -81,6 +52,7 @@ set(RUNTIME_TESTS_NAMES
     "inverse"
     "jacobi"
     "ressol"
+    "arithmetic_non_matching_bitlength_numbers"
     )
 
 set(MODULAR_TESTS_NAMES

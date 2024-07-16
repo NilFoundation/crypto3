@@ -54,8 +54,6 @@
 #include <nil/crypto3/algebra/fields/fp2.hpp>
 #include <nil/crypto3/algebra/fields/fp3.hpp>
 
-#include <nil/crypto3/algebra/random_element.hpp>
-
 #include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
 
 using namespace nil::crypto3::algebra;
