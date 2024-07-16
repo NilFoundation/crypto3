@@ -54,7 +54,6 @@
 #include <nil/crypto3/algebra/fields/secp/secp_k1/scalar_field.hpp>
 #include <nil/crypto3/algebra/fields/secp/secp_r1/base_field.hpp>
 #include <nil/crypto3/algebra/fields/secp/secp_r1/scalar_field.hpp>
-#include <nil/crypto3/algebra/random_element.hpp>
 
 #include <nil/crypto3/algebra/fields/curve25519/base_field.hpp>
 #include <nil/crypto3/algebra/fields/curve25519/scalar_field.hpp>

@@ -35,8 +35,8 @@ macro(define_runtime_zk_test name)
 endmacro()
 
 set(RUNTIME_TESTS_NAMES
-    "bench_pedersen"
-    "bench_lpc"
+    "pedersen"
+    "lpc"
     )
 
 foreach(TEST_NAME ${RUNTIME_TESTS_NAMES})

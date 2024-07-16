@@ -52,11 +52,11 @@ namespace boost {
                         const cpp_int_modular_backend<Bits2>& b) noexcept {
                 for (int i = b.size() - 1; i > a.size() - 1 ; --i) {
                     if (b.limbs()[i] != 0)
-                        return false;
+                        return true;
                 }
                 for (int i = a.size() - 1; i > b.size() - 1 ; --i) {
                     if (a.limbs()[i] != 0)
-                        return true;
+                        return false;
                 }
                 for (int i = std::min(a.size() - 1, b.size() - 1); i >= 0; --i) {
                     if (a.limbs()[i] != b.limbs()[i])

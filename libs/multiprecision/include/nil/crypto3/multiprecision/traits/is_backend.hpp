@@ -28,6 +28,14 @@ namespace boost {
             struct is_backend<boost::multiprecision::backends::modular_adaptor<Backend, StorageType>> {
                static BOOST_MP_CXX14_CONSTEXPR bool value = true;
             };
+
+            // If boost wants to convert one cpp_int_modular_backend to another for comparison, make it convert the 
+            // shorter one to the longer by adding zeros, not cut the longer one.
+            template <unsigned Bits1, unsigned Bits2>
+            struct is_first_backend_imp<true, boost::multiprecision::backends::cpp_int_modular_backend<Bits1>,
+                                        boost::multiprecision::backends::cpp_int_modular_backend<Bits2>> 
+                : public std::integral_constant < bool, Bits1 >= Bits2> {};
+
         } // namespace detail
     } // multiprecision
 } // namespace boost
