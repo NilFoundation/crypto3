@@ -116,7 +116,7 @@ BOOST_AUTO_TEST_SUITE(fri_test_suite)
                 2, //expand_factor
                 lambda,
                 true,
-                0xFFFFF
+                20
         );
 
         BOOST_CHECK(D[1]->m == D[0]->m / 2);

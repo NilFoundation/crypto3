@@ -13,6 +13,7 @@
 #include <boost/multiprecision/detail/constexpr.hpp>
 #include <boost/multiprecision/detail/bitscan.hpp>    // lsb etc
 #include <boost/functional/hash_fwd.hpp>
+#include <boost/functional/hash.hpp>
 
 #ifdef BOOST_MSVC
 #pragma warning(push)

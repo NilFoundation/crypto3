@@ -190,6 +190,7 @@ namespace nil {
                     // Differs from static, because we pack the result into byte blob.
                     commitment_type commit(std::size_t index) {
                         this->_ind_commitments[index] = {};
+                        this->_ind_commitments[index].resize(this->_polys[index].size());
                         this->state_commited(index);
 
                         std::vector<std::uint8_t> result = {};

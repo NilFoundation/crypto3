@@ -154,7 +154,7 @@ namespace nil {
                                 std::size_t lambda,
                                 std::size_t expand_factor,
                                 bool use_grinding = false,
-                                std::size_t grinding_parameter = 0xFFFF
+                                std::size_t grinding_parameter = 16
                             ): lambda(lambda)
                               , use_grinding(use_grinding)
                               , grinding_parameter(grinding_parameter)
@@ -171,7 +171,7 @@ namespace nil {
                                 std::size_t lambda,
                                 std::size_t expand_factor,
                                 bool use_grinding = false,
-                                std::size_t grinding_parameter = 0xFFFF
+                                std::size_t grinding_parameter = 16
                             ): lambda(lambda)
                               , use_grinding(use_grinding)
                               , grinding_parameter(grinding_parameter)
@@ -189,7 +189,7 @@ namespace nil {
                                 std::size_t expand_factor,
                                 std::size_t lambda,
                                 bool use_grinding = false,
-                                std::size_t grinding_parameter = 0xFFFF
+                                std::size_t grinding_parameter = 16
                             ) : lambda(lambda)
                               , use_grinding(use_grinding)
                               , grinding_parameter(grinding_parameter)

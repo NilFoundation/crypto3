@@ -27,6 +27,7 @@
 #define CRYPTO3_ALGEBRA_FIELDS_ELEMENT_FP2_HPP
 
 #include <type_traits>
+#include <boost/functional/hash.hpp>
 
 #include <nil/crypto3/algebra/fields/detail/exponentiation.hpp>
 #include <nil/crypto3/algebra/fields/detail/element/operations.hpp>

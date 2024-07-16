@@ -546,7 +546,7 @@ namespace nil {
                     }
 
                     // Each lookup table should fill full rectangle inside assignment table
-                    // Lookup tables may contain repeated values, but they shoul be placed into one
+                    // Lookup tables may contain repeated values, but they should be placed into one
                     // option one under another.
                     // Because of theta randomness compressed lookup tables' vectors for different table may contain
                     // similar values only with negligible probability.

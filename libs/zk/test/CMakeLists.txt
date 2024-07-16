@@ -56,7 +56,7 @@ set(TESTS_NAMES
 #    "commitment/r1cs_gg_ppzksnark_mpc"
 #    "commitment/type_traits"
 #    "commitment/kimchi_pedersen"
-#    "commitment/proof_of_work"
+    "commitment/proof_of_work"
 
     "math/expression"
 

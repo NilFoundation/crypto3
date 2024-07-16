@@ -72,6 +72,25 @@ namespace nil {
                     std::map<std::size_t, bool> _locked; // _locked[batch] is true after it is commited
                     std::map<std::size_t, std::vector<std::vector<typename field_type::value_type>>> _points;
 
+                    // We frequently search over the this->_points structure, and it's better to keep a hashmap that maps point to
+                    // it's index in vector for faster search. We need to duplicate this data for now, because the order of points matters.
+                    std::map<std::size_t, std::vector<std::unordered_map<typename field_type::value_type, std::size_t>>> _points_map;
+
+                    // Creates '_points_map'. We need to think about re-designing this class later. Currently this is used from LPC.
+                    void build_points_map() {
+                        for (const auto& [i, V]: this->_points) {
+                            _points_map[i].resize(V.size());
+                            for (std::size_t j = 0; j < V.size(); ++j) {
+                                const auto& batch = V[j];
+                                for (std::size_t k = 0; k < batch.size(); ++k) {
+                                    // We need to store the index of the first occurance of each point.
+                                    if (_points_map[i][j].find(batch[k]) == _points_map[i][j].end())
+                                        _points_map[i][j][batch[k]] = k;
+                                }
+                            }
+                        }
+                    }
+
                 protected:
                     math::polynomial<typename field_type::value_type> get_V(
                         const std::vector<typename field_type::value_type> &points) const {
@@ -108,16 +127,18 @@ namespace nil {
                     }
 
                     // We call them singles in recursive verifier
+                    // We keep the order of points, not sure if that was required.
                     std::vector<typename field_type::value_type> get_unique_points() const {
-                        std::vector<typename field_type::value_type> result;
-//                        std::unordered_set<typename field_type::value_type> result_set;
 
-                        for( auto const &[k, point_batch]:_points ){
+                        std::vector<typename field_type::value_type> result;
+                        std::unordered_set<typename field_type::value_type> result_set;
+
+                        for( auto const &[k, point_batch]: _points ){
                             for( auto const &point_set: point_batch ){
-                                for( auto const &point:point_set ){
-                                    if( std::find(result.begin(), result.end(), point) == result.end() ){
+                                for( auto const &point: point_set ){
+                                    if (result_set.find(point) == result_set.end()) {
                                         result.push_back(point);
-  //                                      result_set.insert(point);
+                                        result_set.insert(point);
                                     }
                                 }
                             }
@@ -180,7 +201,7 @@ namespace nil {
 
                             BOOST_ASSERT(poly.size() == point.size() || point.size() == 1);
 
-                            for (std::size_t i = 0; i < poly.size(); i++) {
+                            for (std::size_t i = 0; i < poly.size(); ++i) {
                                 _z.set_poly_points_number(k, i, point[i].size());
                                 for (std::size_t j = 0; j < point[i].size(); j++) {
                                     _z.set(k, i, j, poly[i].evaluate(point[i][j]));
