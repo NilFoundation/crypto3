@@ -51,16 +51,18 @@ BOOST_AUTO_TEST_SUITE(proof_of_knowledge_test_suite)
         using poseidon = nil::crypto3::hashes::poseidon<policy>;
         using pow_type = nil::crypto3::zk::commitments::field_proof_of_work<poseidon, field_type>;
 
-        const integral_type expected_mask = integral_type(0xFF80000000000000) << (field_type::modulus_bits - 64);
+        std::size_t grinding_bits = 9;
         nil::crypto3::zk::transcript::fiat_shamir_heuristic_sequential<poseidon> transcript;
         auto old_transcript_1 = transcript, old_transcript_2 = transcript;
 
-        auto result = pow_type::generate(transcript, 9);
-        BOOST_ASSERT(pow_type::verify(old_transcript_1, result, 9));
+        auto result = pow_type::generate(transcript, grinding_bits);
+        BOOST_ASSERT(pow_type::verify(old_transcript_1, result, grinding_bits));
 
         // manually reimplement verify to ensure that changes in implementation didn't break it
         old_transcript_2(result);
         auto chal = old_transcript_2.template challenge<field_type>();
+        const integral_type expected_mask = integral_type( (1 << grinding_bits) - 1 ) << (field_type::modulus_bits - grinding_bits);
+
         BOOST_ASSERT((integral_type(chal.data) & expected_mask) == 0);
 
         using hard_pow_type = nil::crypto3::zk::commitments::field_proof_of_work<poseidon, field_type>;
@@ -70,28 +72,26 @@ BOOST_AUTO_TEST_SUITE(proof_of_knowledge_test_suite)
 
     BOOST_AUTO_TEST_CASE(pow_basic_test) {
         using keccak = nil::crypto3::hashes::keccak_1600<512>;
-        const std::uint32_t mask = 0xFFFFF000;
+
+        const std::uint32_t grinding_bits = 20;
+        const uint64_t expected_mask = (1ULL << grinding_bits) - 1;
+
         using pow_type = nil::crypto3::zk::commitments::proof_of_work<keccak, std::uint32_t>;
 
         nil::crypto3::zk::transcript::fiat_shamir_heuristic_sequential<keccak> transcript;
         auto old_transcript_1 = transcript, old_transcript_2 = transcript;
 
-        auto result = pow_type::generate(transcript, mask);
-        BOOST_ASSERT(pow_type::verify(old_transcript_1, result, mask));
+        auto result = pow_type::generate(transcript, grinding_bits);
+        BOOST_ASSERT(pow_type::verify(old_transcript_1, result, grinding_bits));
 
         // manually reimplement verify to ensure that changes in implementation didn't break it
-        std::array<std::uint8_t, 4> bytes;
-        bytes[0] = std::uint8_t((result & 0xFF000000) >> 24);
-        bytes[1] = std::uint8_t((result & 0x00FF0000) >> 16);
-        bytes[2] = std::uint8_t((result & 0x0000FF00) >> 8);
-        bytes[3] = std::uint8_t(result & 0x000000FF);
-        old_transcript_2(bytes);
+        old_transcript_2(pow_type::to_byte_array(result));
         auto chal = old_transcript_2.template int_challenge<std::uint32_t>();
-        BOOST_ASSERT((chal & mask) == 0);
+        BOOST_ASSERT( (chal & expected_mask) == 0);
 
         // check that random stuff doesn't pass verify
         using hard_pow_type = nil::crypto3::zk::commitments::proof_of_work<keccak, std::uint32_t>;
-        BOOST_ASSERT(!hard_pow_type::verify(old_transcript_1, result, mask));
+        BOOST_ASSERT(!hard_pow_type::verify(old_transcript_1, result, grinding_bits));
     }
 
 BOOST_AUTO_TEST_SUITE_END()

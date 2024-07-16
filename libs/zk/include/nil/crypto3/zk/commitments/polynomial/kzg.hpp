@@ -703,6 +703,7 @@ namespace nil {
                                            typename CommitmentSchemeType::transcript_type &transcript) {
                         /* The procedure of updating the transcript is subject to review and change
                          * #295 */
+
                         // Push commitments to transcript
 
                         transcript(_commitments[batch_ind]);

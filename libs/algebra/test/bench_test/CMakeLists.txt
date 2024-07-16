@@ -37,6 +37,7 @@ endmacro()
 set(RUNTIME_TESTS_NAMES
     "bench_curves"
     "bench_fields"
+    "bench_multiexp"
     )
 
 foreach(TEST_NAME ${RUNTIME_TESTS_NAMES})

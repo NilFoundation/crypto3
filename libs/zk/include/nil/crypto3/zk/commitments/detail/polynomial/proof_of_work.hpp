@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2023 Elena Tatuzova <e.tatuzova@nil.foundation>
+// Copyright (c) 2024 Vasiliy Olekhov <vasiliy.olekhov@nil.foundation>
 //
 // MIT License
 //
@@ -44,37 +45,40 @@ namespace nil {
                     using transcript_type = transcript::fiat_shamir_heuristic_sequential<transcript_hash_type>;
                     using output_type = OutType;
 
-                    static inline OutType generate(transcript_type &transcript, OutType mask=0xFFFF) {
+                    static inline std::array<std::uint8_t, sizeof(OutType)>
+                        to_byte_array(OutType v) {
+                            std::array<std::uint8_t, sizeof(OutType)> bytes;
+                            for(int i = sizeof(v)-1; i>=0; --i) {
+                                bytes[i] = v & 0xFF;
+                                v >>= 8;
+                            }
+                            return bytes;
+                        }
+
+                    static inline OutType generate(transcript_type &transcript, std::size_t GrindingBits = 16) {
+                        BOOST_ASSERT_MSG(GrindingBits < 64, "Grinding parameter should be bits, not mask");
+                        output_type mask = GrindingBits > 0 ? ( 1ULL << GrindingBits ) - 1 : 0;
                         output_type proof_of_work = std::rand();
                         output_type result;
-                        std::vector<std::uint8_t> bytes(4);
 
                         while( true ) {
                             transcript_type tmp_transcript = transcript;
-                            bytes[0] = std::uint8_t((proof_of_work&0xFF000000)>>24);
-                            bytes[1] = std::uint8_t((proof_of_work&0x00FF0000)>>16);
-                            bytes[2] = std::uint8_t((proof_of_work&0x0000FF00)>>8);
-                            bytes[3] = std::uint8_t(proof_of_work&0x000000FF);
-
-                            tmp_transcript(bytes);
+                            tmp_transcript(to_byte_array(proof_of_work));
                             result = tmp_transcript.template int_challenge<output_type>();
                             if ((result & mask) == 0)
                                 break;
                             proof_of_work++;
                         }
-                        transcript(bytes);
+                        transcript(to_byte_array(proof_of_work));
                         result = transcript.template int_challenge<output_type>();
                         return proof_of_work;
                     }
 
-                    static inline bool verify(transcript_type &transcript, output_type proof_of_work, OutType mask=0xFFFF) {
-                        std::vector<std::uint8_t> bytes(4);
-                        bytes[0] = std::uint8_t((proof_of_work&0xFF000000)>>24);
-                        bytes[1] = std::uint8_t((proof_of_work&0x00FF0000)>>16);
-                        bytes[2] = std::uint8_t((proof_of_work&0x0000FF00)>>8);
-                        bytes[3] = std::uint8_t(proof_of_work&0x000000FF);
-                        transcript(bytes);
+                    static inline bool verify(transcript_type &transcript, output_type proof_of_work, std::size_t GrindingBits = 16) {
+                        BOOST_ASSERT_MSG(GrindingBits < 64, "Grinding parameter should be bits, not mask");
+                        transcript(to_byte_array(proof_of_work));
                         output_type result = transcript.template int_challenge<output_type>();
+                        output_type mask = GrindingBits > 0 ? ( 1ULL << GrindingBits ) - 1 : 0;
                         return ((result & mask) == 0);
                     }
                 };
@@ -91,7 +95,7 @@ namespace nil {
                     using value_type = typename FieldType::value_type;
                     using integral_type = typename FieldType::integral_type;
 
-                    static inline value_type generate(transcript_type &transcript, std::size_t GrindingBits=16) {
+                    static inline value_type generate(transcript_type &transcript, std::size_t GrindingBits = 16) {
                         static boost::random::random_device dev;
                         static nil::crypto3::random::algebraic_engine<FieldType> random_engine(dev);
                         value_type proof_of_work = random_engine();
@@ -115,7 +119,7 @@ namespace nil {
                         return proof_of_work;
                     }
 
-                    static inline bool verify(transcript_type &transcript, value_type proof_of_work, std::size_t GrindingBits=16) {
+                    static inline bool verify(transcript_type &transcript, value_type proof_of_work, std::size_t GrindingBits = 16) {
                         transcript(proof_of_work);
                         integral_type mask =
                             (GrindingBits > 0 ?

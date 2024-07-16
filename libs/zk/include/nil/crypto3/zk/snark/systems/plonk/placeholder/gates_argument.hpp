@@ -88,7 +88,9 @@ namespace nil {
                         });
                         std::shared_ptr<math::evaluation_domain<FieldType>> extended_domain =
                             math::make_evaluation_domain<FieldType>(extended_domain_size);
+
                         visitor.visit(expr);
+
                         for (const auto& [var, count]: variable_counts) {
                             // We may have variable values in required sizes in some cases.
                             if (variable_values_out.find(var) != variable_values_out.end())

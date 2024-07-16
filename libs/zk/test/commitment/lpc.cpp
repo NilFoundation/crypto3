@@ -210,7 +210,7 @@ BOOST_AUTO_TEST_SUITE(lpc_math_polynomial_suite);
                 2, //expand_factor
                 lambda,
                 true,
-                0xFFF
+                12
         );
 
         using lpc_scheme_type = nil::crypto3::zk::commitments::lpc_commitment_scheme<lpc_type, math::polynomial<typename FieldType::value_type>>;
@@ -510,7 +510,7 @@ BOOST_AUTO_TEST_SUITE(lpc_params_test_suite)
                 2,  //expand_factor
                 lambda,
                 true,
-                0xFF
+                8
         );
 
         using lpc_scheme_type = nil::crypto3::zk::commitments::lpc_commitment_scheme<lpc_type, math::polynomial<typename FieldType::value_type>>;

@@ -35,6 +35,8 @@
 #include <iterator>
 #include <unordered_map>
 
+#include <boost/functional/hash.hpp>
+
 #include <nil/crypto3/math/algorithms/make_evaluation_domain.hpp>
 #include <nil/crypto3/math/domains/evaluation_domain.hpp>
 #include <nil/crypto3/math/polynomial/basic_operations.hpp>
