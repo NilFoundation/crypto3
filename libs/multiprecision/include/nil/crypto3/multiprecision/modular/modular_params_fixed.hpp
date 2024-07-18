@@ -122,10 +122,11 @@ namespace boost {
                     }
                 }
 
-                template<typename Backend1, typename Backend2>
-                BOOST_MP_CXX14_CONSTEXPR void mod_mul(Backend1 &result, const Backend2 &y) const {
+                template<typename Backend1>
+                BOOST_MP_CXX14_CONSTEXPR void mod_mul(Backend1 &result, const Backend1 &y) const {
                     if (is_odd_mod) {
-                        m_mod_obj.montgomery_mul(result, y);
+                        m_mod_obj.montgomery_mul(result, y,
+                            std::integral_constant<bool, is_trivial_cpp_int_modular<Backend1>::value>());
                     } else {
                         m_mod_obj.regular_mul(result, y);
                     }
