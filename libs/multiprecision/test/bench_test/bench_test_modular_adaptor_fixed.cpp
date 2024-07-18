@@ -64,13 +64,14 @@ BOOST_AUTO_TEST_CASE(modular_adaptor_montgomery_mult_perf_test) {
     auto mod_object = x_modular.mod_data().get_mod_obj();
     auto base_data = x_modular.base_data();
     for (int i = 0; i < SAMPLES; ++i) {
-        mod_object.montgomery_mul(base_data, res_modular.base_data());
+        mod_object.montgomery_mul(base_data, res_modular.base_data(),
+            std::integral_constant<bool, boost::multiprecision::backends::is_trivial_cpp_int_modular<Backend>::value>());
     }
 
     std::cout << base_data << std::endl;
     auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
         std::chrono::high_resolution_clock::now() - start);
-    std::cout << "Multiplication time: " << std::fixed << std::setprecision(3)
+    std::cout << "Multiplication time (when montgomery_mul is called directly): " << std::fixed << std::setprecision(3)
         << std::dec << elapsed.count() / SAMPLES << " ns" << std::endl;
 }
 
@@ -162,7 +163,7 @@ BOOST_AUTO_TEST_CASE(modular_adaptor_backend_mult_perf_test) {
 
     auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
         std::chrono::high_resolution_clock::now() - start);
-    std::cout << "Multiplication time: " << std::fixed << std::setprecision(3)
+    std::cout << "Multiplication time (when called from modular adaptor): " << std::fixed << std::setprecision(3)
         << elapsed.count() / SAMPLES << " ns" << std::endl;
 
     // Print something so the whole computation is not optimized out.

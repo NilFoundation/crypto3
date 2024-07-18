@@ -99,10 +99,7 @@ namespace boost {
 
                 template<unsigned Bits>
                 BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
-                    boost::multiprecision::is_unsigned_number<cpp_int_modular_backend<Bits>>::value &&
-                    !boost::multiprecision::backends::is_trivial_cpp_int_modular<cpp_int_modular_backend<Bits>>::value &&
-                    !boost::multiprecision::backends::is_trivial_cpp_int_modular<cpp_int_modular_backend<Bits>>::value>::
-                    type
+                    !boost::multiprecision::backends::is_trivial_cpp_int_modular<cpp_int_modular_backend<Bits>>::value>::type
                     eval_complement(cpp_int_modular_backend<Bits>& result, const cpp_int_modular_backend<Bits>& o) noexcept {
 
                     unsigned os = o.size();
@@ -110,7 +107,7 @@ namespace boost {
                         result.limbs()[i] = ~o.limbs()[i];
                     result.normalize();
                 }
-#ifndef TVM
+
                 // Left shift will throw away upper bits.
                 // This function must be called only when s % 8 == 0, i.e. we shift bytes.
                 template<unsigned Bits>
@@ -129,7 +126,6 @@ namespace boost {
                         std::memset(pc, 0, bytes);
                     }
                 }
-#endif
 
                 // Left shift will throw away upper bits.
                 // This function must be called only when s % limb_bits == 0, i.e. we shift limbs, which are normally 64 bit.
