@@ -3,19 +3,32 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
-    nil-crypto3 = {
-      url = "github:NilFoundation/crypto3";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     flake-utils.url = "github:numtide/flake-utils";
+    nix-3rdparty = {
+      url = "github:NilFoundation/nix-3rdparty";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        flake-utils.follows = "flake-utils";
+      };
+    };
+    nil-crypto3 = {
+      type = "github";
+      owner = "NilFoundation";
+      repo = "crypto3";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        flake-utils.follows = "flake-utils";
+        nix-3rdparty.follows = "nix-3rdparty";
+      };
+    };
   };
 
-  outputs = { self, nixpkgs, nil-crypto3, flake-utils }:
+  outputs = { self, nixpkgs, nil-crypto3, flake-utils, nix-3rdparty }:
     (flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs { inherit system; };
         stdenv = pkgs.llvmPackages_16.stdenv;
-        crypto3 = nil-crypto3.packages.${system}.default;
+        crypto3 = nil-crypto3.packages.${system}.crypto3;
       in rec {
         packages = rec {
           zkllvm-blueprint = stdenv.mkDerivation {
