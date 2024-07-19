@@ -31,16 +31,17 @@
         ]
       },
       "locked": {
-        "lastModified": 1721325480,
-        "narHash": "sha256-ZyPvRjfeLVswifsbmoUm2LIcrqIaXR4wQmA0XdpEv6g=",
+        "lastModified": 1721117852,
+        "narHash": "sha256-yFbFNBILX3hPLjKQXNh1BEjFfDRiZoCjpozcFkQ8VtQ=",
         "owner": "NilFoundation",
         "repo": "crypto3",
-        "rev": "45074e0549d46b8fa67a844111c52277134a0272",
+        "rev": "4e3ea865478cbfd44146e113ca554333626dfc9b",
         "type": "github"
       },
       "original": {
         "owner": "NilFoundation",
         "repo": "crypto3",
+        "rev": "4e3ea865478cbfd44146e113ca554333626dfc9b",
         "type": "github"
       }
     },
