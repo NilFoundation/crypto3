@@ -442,73 +442,6 @@ namespace boost {
                          std::integral_constant<bool, true>() );
                 }
 
-                //
-                // WARNING: could be errors here due to trivial backend -- more tests needed
-                // TODO(martun): optimize this function, it obviously does not need to be this long.
-                //
-                // A specialization for trivial cpp_int_modular types only.
-                template<typename Backend1>
-                BOOST_MP_CXX14_CONSTEXPR void montgomery_mul_impl(
-                        Backend1 &result, const Backend1 &y,
-                        std::integral_constant<bool, true> const&) const {
-                    BOOST_ASSERT(eval_lt(result, m_mod) && eval_lt(y, m_mod));
-
-                    Backend_padded_limbs A(internal_limb_type(0u));
-                    const size_t mod_size = m_mod.size();
-                    auto mod_last_limb = static_cast<internal_double_limb_type>(get_limb_value(m_mod, 0));
-                    auto y_last_limb = get_limb_value(y, 0);
-
-                    for (size_t i = 0; i < mod_size; i++) {
-                        auto x_i = get_limb_value(result, i);
-                        auto A_0 = A.limbs()[0];
-                        internal_limb_type u_i = (A_0 + x_i * y_last_limb) * m_montgomery_p_dash;
-
-                        // A += x[i] * y + u_i * m followed by a 1 limb-shift to the right
-                        internal_limb_type k = 0;
-                        internal_limb_type k2 = 0;
-
-                        internal_double_limb_type z = static_cast<internal_double_limb_type>(y_last_limb) *
-                                                          static_cast<internal_double_limb_type>(x_i) +
-                                                      A_0 + k;
-                        internal_double_limb_type z2 = mod_last_limb * static_cast<internal_double_limb_type>(u_i) +
-                                                       static_cast<internal_limb_type>(z) + k2;
-                        k = static_cast<internal_limb_type>(z >> std::numeric_limits<internal_limb_type>::digits);
-                        k2 = static_cast<internal_limb_type>(z2 >> std::numeric_limits<internal_limb_type>::digits);
-
-                        for (size_t j = 1; j < mod_size; ++j) {
-                            internal_double_limb_type t =
-                                static_cast<internal_double_limb_type>(get_limb_value(y, j)) *
-                                    static_cast<internal_double_limb_type>(x_i) +
-                                A.limbs()[j] + k;
-                            internal_double_limb_type t2 =
-                                static_cast<internal_double_limb_type>(get_limb_value(m_mod, j)) *
-                                    static_cast<internal_double_limb_type>(u_i) +
-                                static_cast<internal_limb_type>(t) + k2;
-                            A.limbs()[j - 1] = static_cast<internal_limb_type>(t2);
-                            k = static_cast<internal_limb_type>(t >>
-                                                                std::numeric_limits<internal_limb_type>::digits);
-                            k2 = static_cast<internal_limb_type>(t2 >>
-                                                                 std::numeric_limits<internal_limb_type>::digits);
-                        }
-                        internal_double_limb_type tmp =
-                            static_cast<internal_double_limb_type>(
-                                custom_get_limb_value<internal_limb_type>(A, mod_size)) +
-                            k + k2;
-                        custom_set_limb_value<internal_limb_type>(A, mod_size - 1,
-                                                                  static_cast<internal_limb_type>(tmp));
-                        custom_set_limb_value<internal_limb_type>(
-                            A, mod_size,
-                            static_cast<internal_limb_type>(tmp >>
-                                                            std::numeric_limits<internal_limb_type>::digits));
-                    }
-
-                    if (!eval_lt(A, m_mod)) {
-                        eval_subtract(A, m_mod);
-                    }
-
-                    result = A;
-                }
-
                 // Given a value represented in 'double_limb_type', decomposes it into
                 // two 'limb_type' variables, based on high order bits and low order bits.
                 // There 'a' receives high order bits of 'X', and 'b' receives the low order bits.
@@ -661,8 +594,8 @@ namespace boost {
                         // "t[N-1] = C + A"
                         result_limbs[N-1] = C + A;
 
-                        c = result;
                     }
+                    c = result;
                 }
 
                 // A specialization for non-trivial cpp_int_modular types only.
