@@ -58,10 +58,13 @@
 #include <nil/crypto3/algebra/curves/mnt6.hpp>
 #include <nil/crypto3/algebra/pairing/mnt6.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/mnt6.hpp>
-/*
+
+/**/
 #include <nil/crypto3/algebra/curves/alt_bn128.hpp>
+#include <nil/crypto3/algebra/pairing/alt_bn128.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/alt_bn128.hpp>
-*/
+/**/
+
 #include <nil/crypto3/algebra/curves/pallas.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/pallas.hpp>
 #include <nil/crypto3/algebra/random_element.hpp>
@@ -100,6 +103,9 @@ using namespace nil::crypto3;
 using namespace nil::crypto3::zk;
 using namespace nil::crypto3::zk::snark;
 
+/// Generates random steps in range [1..max_step], until their sum will become
+/// equal to 'r'.
+/// Returns the sequence of generated steps.
 inline std::vector<std::size_t> generate_random_step_list(const std::size_t r, const std::size_t max_step) {
     using dist_type = std::uniform_int_distribution<int>;
     static std::random_device random_engine;
@@ -122,6 +128,9 @@ inline std::vector<std::size_t> generate_random_step_list(const std::size_t r, c
     return step_list;
 }
 
+/// Prints bytes from range [iter_begin, iter_end) in hexadecimal format, into 
+/// output stream 'os'.
+/// Appends end-line in case if 'endl' is true.
 template<typename TIter>
 void print_hex_byteblob(std::ostream &os, TIter iter_begin, TIter iter_end, bool endl) {
     os << std::hex;
@@ -134,6 +143,8 @@ void print_hex_byteblob(std::ostream &os, TIter iter_begin, TIter iter_end, bool
     }
 }
 
+/// Prints bytes from range [proof_begin, proof_end) in hexadecimal format, 
+/// into file with name 'name'.
 template<typename ProofIterator>
 void print_placeholder_proof(ProofIterator proof_begin, ProofIterator proof_end, bool endl, const char *name) {
     std::ofstream out;
@@ -190,6 +201,9 @@ print_curve_point(std::ostream &os,
     os << "] )" << std::endl;
 }
 
+/// Runs placeholder proof 'proof' on specified params 'params', 
+/// checks that it is correct, then reads it back, and checks that the results 
+/// are the same.
 template<typename Endianness, typename ProofType, typename CommitmentParamsType>
 void test_placeholder_proof(const ProofType &proof, const CommitmentParamsType& params, std::string output_file = "") {
 
@@ -220,6 +234,7 @@ void test_placeholder_proof(const ProofType &proof, const CommitmentParamsType& 
     BOOST_CHECK(proof == constructed_val_read);
 }
 
+/// Checks if the Boost master test suite has "--print" argument specified.
 bool has_argv(std::string name){
     bool result = false;
     for (std::size_t i = 0; i < std::size_t(boost::unit_test::framework::master_test_suite().argc); i++) {
@@ -230,6 +245,8 @@ bool has_argv(std::string name){
     return result;
 }
 
+/// Prints placeholder proof and its params into files "proof.bin" / "params.json", 
+/// which will be created in folder 'folder_name'.
 template<typename Endianness, typename PlaceholderParams>
 void print_placeholder_proof_with_params(
     const typename placeholder_public_preprocessor<typename PlaceholderParams::field_type, PlaceholderParams>::preprocessed_data_type &preprocessed_data,
@@ -1209,48 +1226,59 @@ struct placeholder_kzg_test_fixture_v2 : public test_tools::random_test_initiali
 BOOST_AUTO_TEST_SUITE(placeholder_circuit2_kzg_v2)
 
     using TestFixtures = boost::mpl::list<
-    placeholder_kzg_test_fixture_v2<
-    algebra::curves::bls12_381,
-    hashes::keccak_1600<256>,
-    hashes::keccak_1600<256>,
-    witness_columns_t,
-    public_columns_t,
-    constant_columns_t,
-    selector_columns_t,
-    usable_rows_t,
-    true>
-    /*
-       , placeholder_kzg_test_fixture<
-       algebra::curves::alt_bn128_254,
-       hashes::keccak_1600<256>,
-       hashes::keccak_1600<256>,
-       witness_columns_t,
-       public_columns_t,
-       constant_columns_t,
-       selector_columns_t,
-       usable_rows_t,
-       4, true>
-       */
-    , placeholder_kzg_test_fixture_v2<
-    algebra::curves::mnt4_298,
-    hashes::keccak_1600<256>,
-    hashes::keccak_1600<256>,
-    witness_columns_t,
-    public_columns_t,
-    constant_columns_t,
-    selector_columns_t,
-    usable_rows_t,
-    true>
-    , placeholder_kzg_test_fixture_v2<
-    algebra::curves::mnt6_298,
-    hashes::keccak_1600<256>,
-    hashes::keccak_1600<256>,
-    witness_columns_t,
-    public_columns_t,
-    constant_columns_t,
-    selector_columns_t,
-    usable_rows_t,
-    true>
+            placeholder_kzg_test_fixture_v2<
+                    algebra::curves::bls12_381,
+                    hashes::keccak_1600<256>,
+                    hashes::keccak_1600<256>,
+                    witness_columns_t,
+                    public_columns_t,
+                    constant_columns_t,
+                    selector_columns_t,
+                    usable_rows_t,
+                    true>
+    
+            , placeholder_kzg_test_fixture_v2<
+                    algebra::curves::alt_bn128_254,
+                    hashes::keccak_1600<256>,
+                    hashes::keccak_1600<256>,
+                    witness_columns_t,
+                    public_columns_t,
+                    constant_columns_t,
+                    selector_columns_t,
+                    usable_rows_t,
+                    true>
+    
+            /*, placeholder_kzg_test_fixture<
+                    algebra::curves::alt_bn128_254,
+                    hashes::keccak_1600<256>,
+                    hashes::keccak_1600<256>,
+                    witness_columns_t,
+                    public_columns_t,
+                    constant_columns_t,
+                    selector_columns_t,
+                    usable_rows_t,
+                    4, true>*/
+       
+            , placeholder_kzg_test_fixture_v2<
+                    algebra::curves::mnt4_298,
+                    hashes::keccak_1600<256>,
+                    hashes::keccak_1600<256>,
+                    witness_columns_t,
+                    public_columns_t,
+                    constant_columns_t,
+                    selector_columns_t,
+                    usable_rows_t,
+                    true>
+            , placeholder_kzg_test_fixture_v2<
+                    algebra::curves::mnt6_298,
+                    hashes::keccak_1600<256>,
+                    hashes::keccak_1600<256>,
+                    witness_columns_t,
+                    public_columns_t,
+                    constant_columns_t,
+                    selector_columns_t,
+                    usable_rows_t,
+                    true>
     /*, -- Not yet implemented
       placeholder_kzg_test_fixture<
       algebra::curves::mnt6_298,
