@@ -339,6 +339,7 @@ namespace boost {
                 Backend exp;
                 e.mod_data().adjust_regular(exp, e.base_data());
                 eval_powm(result, b, exp);
+std::cout << "Pow of " << b << " ^ " << exp << " is " << result << " modulo " <<  b.mod_data().get_mod() << std::endl;
             }
 
             template<unsigned Bits, typename StorageType>

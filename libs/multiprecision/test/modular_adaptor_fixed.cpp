@@ -118,10 +118,14 @@ bool base_operations_test(std::array<Number, test_set_len> test_set) {
     standard_number a_powm_b_s = powm(a_cppint, b_cppint, e_cppint);
     standard_number a_bit_set_s = a_cppint;
     bit_set(a_bit_set_s, 1);
+    a_bit_set_s %= e_cppint;
     standard_number a_bit_unset_s = a_cppint;
+    a_bit_unset_s %= e_cppint;
     bit_unset(a_bit_unset_s, 2);
     standard_number a_bit_flip_s = a_cppint;
     bit_flip(a_bit_flip_s, 3);
+    a_bit_flip_s %= e_cppint;
+
     int b_msb_s = msb(b_cppint);
     int b_lsb_s = lsb(b_cppint);
 
@@ -142,6 +146,7 @@ bool base_operations_test(std::array<Number, test_set_len> test_set) {
     bit_unset(a_bit_unset, 2);
     modular_number a_bit_flip = a;
     bit_flip(a_bit_flip, 3);
+
     int b_msb = msb(b_cppint);
     int b_lsb = lsb(b_cppint);
 
