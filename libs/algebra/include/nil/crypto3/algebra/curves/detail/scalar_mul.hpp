@@ -174,7 +174,10 @@ namespace nil {
                                             GroupValueType>::type
                         operator*(const GroupValueType &left, const FieldValueType &right) {
 
-                        return left * static_cast<typename GroupValueType::params_type::scalar_field_type::integral_type>(right.data);
+                        // TODO(martun): consider deleting this function, and forcing all the callers to convert to the
+                        // required type before multiplication.
+                        return left * static_cast<typename GroupValueType::params_type::scalar_field_type::integral_type>(
+                            typename FieldValueType::integral_type(right.data));
                     }
 
                     template<typename GroupValueType, typename FieldValueType>
