@@ -38,7 +38,6 @@
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
 #include <nil/blueprint/component.hpp>
 #include <nil/blueprint/manifest.hpp>
-#include <nil/blueprint/components/systems/snark/plonk/placeholder/detail/expression_evaluation_component.hpp>
 
 namespace nil {
     namespace blueprint {

@@ -96,14 +96,14 @@ namespace nil {
                 }
             }
 
-            inline value_type get_power_helper(std::vector<value_type> &container, std::size_t index) {
+            inline const value_type& get_power_helper(std::vector<value_type> &container, std::size_t index) {
                 while (index >= container.size()) {
                     container.push_back(generate_constraint_mult());
                 }
                 return container[index];
             }
 
-            inline value_type get_value_helper(
+            inline const value_type& get_value_helper(
                     std::array<std::array<std::vector<value_type>, 3>, 2> &container,
                     std::size_t point, std::size_t index, std::size_t rotation) {
                 BOOST_ASSERT_MSG(point == 0 || point == 1, "Point must be either 0 or 1.");
@@ -117,15 +117,15 @@ namespace nil {
                 return instance;
             }
 
-            value_type get_witness(std::size_t point, std::size_t index, std::size_t rotation) {
+            const value_type& get_witness(std::size_t point, std::size_t index, std::size_t rotation) {
                 return get_value_helper(witnesses, point, index, rotation);
             }
 
-            value_type get_constant(std::size_t point, std::size_t index, std::size_t rotation) {
+            const value_type& get_constant(std::size_t point, std::size_t index, std::size_t rotation) {
                 return get_value_helper(constants, point, index, rotation);
             }
 
-            value_type get_selector(std::size_t point, std::size_t index, std::size_t rotation) {
+            const value_type& get_selector(std::size_t point, std::size_t index, std::size_t rotation) {
                 return get_value_helper(selectors, point, index, rotation);
             }
 
@@ -141,7 +141,7 @@ namespace nil {
                 return get_power_helper(lookup_table_mults, index);
             }
 
-            value_type get_var_value(std::size_t point, const var &var) {
+            const value_type& get_var_value(std::size_t point, const var &var) {
                 BOOST_ASSERT_MSG(point == 0 || point == 1, "Index must be either 0 or 1.");
                 BOOST_ASSERT_MSG(var.relative == true, "Absolute variables should not belong to a gate.");
                 switch (var.type) {
@@ -159,11 +159,11 @@ namespace nil {
                 __builtin_unreachable();
             };
 
-            value_type get_first_value(const var &var) {
+            const value_type& get_first_value(const var &var) {
                 return get_var_value(0, var);
             };
 
-            value_type get_second_value(const var &var) {
+            const value_type& get_second_value(const var &var) {
                 return get_var_value(1, var);
             };
         };
@@ -192,10 +192,11 @@ namespace nil {
             std::pair<value_type, value_type> eval_constraint(const constraint_type& constraint) const {
                 nil::crypto3::math::expression_evaluator<var> evaluator_1(
                     constraint,
-                    [this](const var &var) { return this->values.get_first_value(var); });
+                    [this](const var &var) -> const value_type& { return this->values.get_first_value(var); });
+
                 nil::crypto3::math::expression_evaluator<var> evaluator_2(
                     constraint,
-                    [this](const var &var) { return this->values.get_second_value(var); });
+                    [this](const var &var) -> const value_type& { return this->values.get_second_value(var); });
                 return {evaluator_1.evaluate(), evaluator_2.evaluate()};
             }
 
@@ -291,10 +292,14 @@ namespace nil {
                 for (std::size_t i = 0; i < constraint.lookup_input.size(); i++) {
                     nil::crypto3::math::expression_evaluator<var> evaluator_1(
                         constraint.lookup_input[i],
-                        [this](const var &var) { return this->values.get_first_value(var); });
+                        [this](const var &var) -> const value_type& { 
+                            return this->values.get_first_value(var);
+                        });
                     nil::crypto3::math::expression_evaluator<var> evaluator_2(
                         constraint.lookup_input[i],
-                        [this](const var &var) { return this->values.get_second_value(var); });
+                        [this](const var &var) -> const value_type& {
+                            return this->values.get_second_value(var);
+                        });
                     value_1 += values.get_lookup_power(i) * evaluator_1.evaluate();
                     value_2 += values.get_lookup_power(i) * evaluator_2.evaluate();
                 }
