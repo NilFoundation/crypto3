@@ -760,7 +760,7 @@ namespace boost {
 
             template<unsigned Bits>
             std::ostream& operator<<(std::ostream& os, const cpp_int_modular_backend<Bits>& value) {
-                // Conver to number and print.
+                // Convert to number and print.
                 os << std::hex << boost::multiprecision::number<cpp_int_modular_backend<Bits>>(value) << std::endl;
                 return os;
             }

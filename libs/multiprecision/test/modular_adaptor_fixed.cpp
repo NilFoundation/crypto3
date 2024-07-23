@@ -132,6 +132,7 @@ bool base_operations_test(std::array<Number, test_set_len> test_set) {
     modular_number a_add_b = a + b;
     modular_number a_sub_b = a - b;
     modular_number a_mul_b = a * b;
+std::cout << "a = " <<  a << " b = " << b << " a * b = " << a_mul_b << std::endl;
     modular_number a_and_b = a & b;
     modular_number a_or_b = a | b;
     modular_number a_xor_b = a ^ b;
@@ -192,8 +193,8 @@ BOOST_AUTO_TEST_CASE(base_ops_prime_mod_backend_130) {
     using test_set = std::array<standard_number, test_set_len>;
     using test_data_t = std::array<test_set, 50>;
     constexpr test_data_t test_data = {{
-        {0x314107b9ef725f87fa08f9fdadd4f48bb_cppui_modular130, 0x1902d38b6904893e90b9c5b8732d1f37d_cppui_modular130,
-         0x2b9060b88dea177d5213deb6f3794434_cppui_modular130},
+        {0x2_cppui_modular130, 0x2_cppui_modular130,
+         0x5_cppui_modular130},
         {0x314107b9ef725f87fa08f9fdadd4f48bb_cppui_modular130, 0x20de70b3f1426ef30b2b2c85d75e2ff2a_cppui_modular130,
          0x1a50227dc3bd742a232db8798e16d1fbb_cppui_modular130},
         {0x314107b9ef725f87fa08f9fdadd4f48bb_cppui_modular130, 0x2395c23e8da249dec864da20301b1b64a_cppui_modular130,

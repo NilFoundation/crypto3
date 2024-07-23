@@ -429,6 +429,8 @@ namespace boost {
                 // A specialization for trivial cpp_int_modular types only.
                 template<typename Backend1>
                 BOOST_MP_CXX14_CONSTEXPR void montgomery_mul_impl(Backend1 &result, const Backend1 &y, std::integral_constant<bool, true> const&) const {
+std::cout << "Multiplying " << result << " to " << y << " modulo " << m_mod << std::endl;
+
                     BOOST_ASSERT(eval_lt(result, m_mod) && eval_lt(y, m_mod));
 
                     Backend_padded_limbs A(internal_limb_type(0u));
@@ -485,12 +487,14 @@ namespace boost {
                     }
 
                     result = A;
+std::cout << "Result is " << result << std::endl;
                 }
 
                 // A specialization for non-trivial cpp_int_modular types only.
                 template<typename Backend1>
                 BOOST_MP_CXX14_CONSTEXPR void montgomery_mul_impl(Backend1 &result, const Backend1 &y,
                         std::integral_constant<bool, false> const&) const {
+std::cout << "Multiplying " << result << " to " << y << " modulo " << m_mod << std::endl;
                     BOOST_ASSERT(eval_lt(result, m_mod) && eval_lt(y, m_mod));
 
                     Backend A(internal_limb_type(0u));
@@ -600,6 +604,7 @@ namespace boost {
                     }
 
                     result = A;
+std::cout << "Result is " << result << std::endl;
                 }
 
                 template<typename Backend1, typename Backend2, typename Backend3,
@@ -665,17 +670,20 @@ namespace boost {
                         result = static_cast<internal_limb_type>(0u);
                         return;
                     }
-
+std::cout << "Modulus is " << m_mod << std::endl;
                     while (true) {
                         internal_limb_type lsb = exp.limbs()[0] & 1u;
                         custom_right_shift(exp, static_cast<internal_limb_type>(1u));
                         if (lsb) {
                             montgomery_mul(R_mod_m, base);
+std::cout << "R_mod_m = " << R_mod_m << std::endl;
                             if (eval_eq(exp, static_cast<internal_limb_type>(0u))) {
                                 break;
                             }
                         }
+std::cout << "base 1 = " << base << std::endl;
                         montgomery_mul(base, base);
+std::cout << "base 2 = " << base << std::endl;
                     }
                     result = R_mod_m;
                 }
