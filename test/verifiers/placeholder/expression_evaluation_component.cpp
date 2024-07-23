@@ -75,7 +75,7 @@ void test(std::vector<typename BlueprintFieldType::value_type> &public_input,
     component_type component_instance(witnesses, std::array<std::uint32_t, 1>(), std::array<std::uint32_t, 0>(),
                                       constraint);
 
-    std::function<value_type(const var&)> get_var_value = [&var_map, &public_input](const var &v) {
+    std::function<const value_type&(const var&)> get_var_value = [&var_map, &public_input](const var &v) -> const value_type& {
         BOOST_ASSERT(var_map.count(v) > 0);
         const var input_var = var_map[v];
         BOOST_ASSERT(input_var.type == var::column_type::public_input);

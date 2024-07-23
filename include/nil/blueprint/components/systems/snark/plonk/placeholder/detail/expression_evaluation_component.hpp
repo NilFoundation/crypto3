@@ -64,7 +64,7 @@ namespace nil {
                     expression_to_execution_simple(assignment_type &_assignment,
                                                    const std::unordered_map<var, var> &_variable_map,
                                                    bool _generate_assignment_call)
-                        : assignment(_assignment), variable_map(_variable_map),
+                        : assignment_table(_assignment), variable_map(_variable_map),
                           generate_assignment_call(_generate_assignment_call)
                     {}
 
@@ -76,12 +76,12 @@ namespace nil {
                         var result;
                         const std::size_t term_size = term.get_vars().size();
                         if (term_size == 0) {
-                            return assignment.add_batch_constant_variable(term.get_coeff());
+                            return assignment_table.add_batch_constant_variable(term.get_coeff());
                         }
                         std::size_t curr_term = 0;
                         if (term.get_coeff() != value_type::one()) {
-                            auto coeff_var = assignment.add_batch_constant_variable(term.get_coeff());
-                            result = assignment.template add_input_to_batch<multiplication_component_type>(
+                            auto coeff_var = assignment_table.add_batch_constant_variable(term.get_coeff());
+                            result = assignment_table.template add_input_to_batch<multiplication_component_type>(
                                 {coeff_var, variable_map.at(term.get_vars()[curr_term])},
                                 generate_assignment_call).output;
                         } else {
@@ -89,7 +89,7 @@ namespace nil {
                         }
                         curr_term++;
                         for (; curr_term < term_size; curr_term++) {
-                            result = assignment.template add_input_to_batch<multiplication_component_type>(
+                            result = assignment_table.template add_input_to_batch<multiplication_component_type>(
                                 {result, variable_map.at(term.get_vars()[curr_term])},
                                 generate_assignment_call).output;
                         }
@@ -103,21 +103,21 @@ namespace nil {
                         if (power == 1) {
                             return expr_res;
                         }
-                        var result = assignment.add_batch_constant_variable(value_type::one());
+                        var result = assignment_table.add_batch_constant_variable(value_type::one());
                         while (power > 1) {
                             if (power % 2 == 0) {
-                                expr_res = assignment.template add_input_to_batch<multiplication_component_type>(
+                                expr_res = assignment_table.template add_input_to_batch<multiplication_component_type>(
                                     {expr_res, expr_res},
                                     generate_assignment_call).output;
                                 power /= 2;
                             } else {
-                                result = assignment.template add_input_to_batch<multiplication_component_type>(
+                                result = assignment_table.template add_input_to_batch<multiplication_component_type>(
                                     {result, expr_res},
                                     generate_assignment_call).output;
                                 power -= 1;
                             }
                         }
-                        return assignment.template add_input_to_batch<multiplication_component_type>(
+                        return assignment_table.template add_input_to_batch<multiplication_component_type>(
                                 {result, expr_res},
                                 generate_assignment_call).output;
                     }
@@ -127,15 +127,15 @@ namespace nil {
                         auto res2 = boost::apply_visitor(*this, op.get_expr_right().get_expr());
                         switch (op.get_op()) {
                             case crypto3::math::ArithmeticOperator::ADD:
-                                return assignment.template add_input_to_batch<addition_component_type>(
+                                return assignment_table.template add_input_to_batch<addition_component_type>(
                                             {res1, res2},
                                             generate_assignment_call).output;
                             case crypto3::math::ArithmeticOperator::SUB:
-                                return assignment.template add_input_to_batch<subtraction_component_type>(
+                                return assignment_table.template add_input_to_batch<subtraction_component_type>(
                                             {res1, res2},
                                             generate_assignment_call).output;
                             case crypto3::math::ArithmeticOperator::MULT:
-                                return assignment.template add_input_to_batch<multiplication_component_type>(
+                                return assignment_table.template add_input_to_batch<multiplication_component_type>(
                                             {res1, res2},
                                             generate_assignment_call).output;
                             default:
@@ -143,7 +143,7 @@ namespace nil {
                         }
                     }
                 private:
-                    assignment_type &assignment;
+                    assignment_type &assignment_table;
                     const std::unordered_map<var, var> &variable_map;
                     bool generate_assignment_call;
                 };
@@ -257,7 +257,7 @@ namespace nil {
                 const plonk_expression_evaluation_component<BlueprintFieldType>
                     &component,
                 assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
-                    &assignment,
+                    &assignment_table,
                 const typename plonk_expression_evaluation_component<BlueprintFieldType>::input_type
                     instance_input,
                 const std::size_t start_row_index) {
@@ -265,7 +265,7 @@ namespace nil {
                 using component_type = plonk_expression_evaluation_component<BlueprintFieldType>;
                 using expression_evaluator_type = typename component_type::expression_evaluator_type;
 
-                expression_evaluator_type evaluator(assignment, instance_input.variable_mapping, true);
+                expression_evaluator_type evaluator(assignment_table, instance_input.variable_mapping, true);
                 return typename component_type::result_type(evaluator.visit(component.constraint), start_row_index);
             }
 
@@ -276,7 +276,7 @@ namespace nil {
                 circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
                     &bp,
                 assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
-                    &assignment,
+                    &assignment_table,
                 const typename plonk_expression_evaluation_component<BlueprintFieldType>::input_type
                     instance_input,
                 const std::size_t start_row_index) {
@@ -284,7 +284,7 @@ namespace nil {
                 using component_type = plonk_expression_evaluation_component<BlueprintFieldType>;
                 using expression_evaluator_type = typename component_type::expression_evaluator_type;
 
-                expression_evaluator_type evaluator(assignment, instance_input.variable_mapping, false);
+                expression_evaluator_type evaluator(assignment_table, instance_input.variable_mapping, false);
                 return typename component_type::result_type(evaluator.visit(component.constraint), start_row_index);
             }
         }    // namespace components
