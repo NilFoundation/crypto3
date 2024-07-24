@@ -246,7 +246,7 @@ namespace nil {
                         template<typename PowerType,
                                 typename = typename std::enable_if<boost::is_integral<PowerType>::value>::type>
                         constexpr element_fp pow(const PowerType pwr) const {
-                            return element_fp(boost::multiprecision::powm(data, boost::multiprecision::uint128_t(pwr)));
+                            return element_fp(boost::multiprecision::powm(data, boost::multiprecision::uint128_modular_t(pwr)));
                         }
 
                         template<typename Backend, boost::multiprecision::expression_template_option ExpressionTemplates>

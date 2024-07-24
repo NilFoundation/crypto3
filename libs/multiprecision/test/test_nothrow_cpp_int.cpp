@@ -20,8 +20,8 @@
 BOOST_STATIC_ASSERT(boost::is_nothrow_move_constructible<boost::multiprecision::cpp_int>::value);
 BOOST_STATIC_ASSERT(boost::is_nothrow_move_constructible<boost::multiprecision::int128_t>::value);
 BOOST_STATIC_ASSERT(boost::is_nothrow_move_constructible<boost::multiprecision::checked_int128_t>::value);
-BOOST_STATIC_ASSERT(boost::is_nothrow_move_constructible<boost::multiprecision::uint128_t>::value);
-BOOST_STATIC_ASSERT(boost::is_nothrow_move_constructible<boost::multiprecision::checked_uint128_t>::value);
+BOOST_STATIC_ASSERT(boost::is_nothrow_move_constructible<boost::multiprecision::uint128_modular_t>::value);
+BOOST_STATIC_ASSERT(boost::is_nothrow_move_constructible<boost::multiprecision::checked_uint128_modular_t>::value);
 BOOST_STATIC_ASSERT(boost::is_nothrow_move_constructible<boost::multiprecision::int512_t>::value);
 BOOST_STATIC_ASSERT(boost::is_nothrow_move_constructible<boost::multiprecision::checked_int512_t>::value);
 BOOST_STATIC_ASSERT(boost::is_nothrow_move_constructible<boost::multiprecision::uint512_t>::value);
@@ -36,8 +36,8 @@ BOOST_STATIC_ASSERT(boost::is_nothrow_move_constructible<boost::multiprecision::
 BOOST_STATIC_ASSERT(boost::is_nothrow_move_assignable<boost::multiprecision::cpp_int>::value);
 BOOST_STATIC_ASSERT(boost::is_nothrow_move_assignable<boost::multiprecision::int128_t>::value);
 BOOST_STATIC_ASSERT(boost::is_nothrow_move_assignable<boost::multiprecision::checked_int128_t>::value);
-BOOST_STATIC_ASSERT(boost::is_nothrow_move_assignable<boost::multiprecision::uint128_t>::value);
-BOOST_STATIC_ASSERT(boost::is_nothrow_move_assignable<boost::multiprecision::checked_uint128_t>::value);
+BOOST_STATIC_ASSERT(boost::is_nothrow_move_assignable<boost::multiprecision::uint128_modular_t>::value);
+BOOST_STATIC_ASSERT(boost::is_nothrow_move_assignable<boost::multiprecision::checked_uint128_modular_t>::value);
 BOOST_STATIC_ASSERT(boost::is_nothrow_move_assignable<boost::multiprecision::int512_t>::value);
 BOOST_STATIC_ASSERT(boost::is_nothrow_move_assignable<boost::multiprecision::checked_int512_t>::value);
 BOOST_STATIC_ASSERT(boost::is_nothrow_move_assignable<boost::multiprecision::uint512_t>::value);
@@ -52,8 +52,8 @@ BOOST_STATIC_ASSERT(boost::is_nothrow_move_assignable<boost::multiprecision::che
 BOOST_STATIC_ASSERT(boost::has_nothrow_constructor<boost::multiprecision::cpp_int>::value);
 BOOST_STATIC_ASSERT(boost::has_nothrow_constructor<boost::multiprecision::int128_t>::value);
 BOOST_STATIC_ASSERT(boost::has_nothrow_constructor<boost::multiprecision::checked_int128_t>::value);
-BOOST_STATIC_ASSERT(boost::has_nothrow_constructor<boost::multiprecision::uint128_t>::value);
-BOOST_STATIC_ASSERT(boost::has_nothrow_constructor<boost::multiprecision::checked_uint128_t>::value);
+BOOST_STATIC_ASSERT(boost::has_nothrow_constructor<boost::multiprecision::uint128_modular_t>::value);
+BOOST_STATIC_ASSERT(boost::has_nothrow_constructor<boost::multiprecision::checked_uint128_modular_t>::value);
 BOOST_STATIC_ASSERT(boost::has_nothrow_constructor<boost::multiprecision::int512_t>::value);
 BOOST_STATIC_ASSERT(boost::has_nothrow_constructor<boost::multiprecision::checked_int512_t>::value);
 BOOST_STATIC_ASSERT(boost::has_nothrow_constructor<boost::multiprecision::uint512_t>::value);
@@ -66,8 +66,8 @@ BOOST_STATIC_ASSERT(boost::has_nothrow_constructor<boost::multiprecision::checke
 BOOST_STATIC_ASSERT(!boost::has_nothrow_copy<boost::multiprecision::cpp_int>::value);
 BOOST_STATIC_ASSERT(boost::has_nothrow_copy<boost::multiprecision::int128_t>::value);
 BOOST_STATIC_ASSERT(boost::has_nothrow_copy<boost::multiprecision::checked_int128_t>::value);
-BOOST_STATIC_ASSERT(boost::has_nothrow_copy<boost::multiprecision::uint128_t>::value);
-BOOST_STATIC_ASSERT(boost::has_nothrow_copy<boost::multiprecision::checked_uint128_t>::value);
+BOOST_STATIC_ASSERT(boost::has_nothrow_copy<boost::multiprecision::uint128_modular_t>::value);
+BOOST_STATIC_ASSERT(boost::has_nothrow_copy<boost::multiprecision::checked_uint128_modular_t>::value);
 BOOST_STATIC_ASSERT(boost::has_nothrow_copy<boost::multiprecision::int512_t>::value);
 BOOST_STATIC_ASSERT(boost::has_nothrow_copy<boost::multiprecision::checked_int512_t>::value);
 BOOST_STATIC_ASSERT(boost::has_nothrow_copy<boost::multiprecision::uint512_t>::value);
@@ -80,8 +80,8 @@ BOOST_STATIC_ASSERT(boost::has_nothrow_copy<boost::multiprecision::checked_uint5
 BOOST_STATIC_ASSERT(!boost::has_nothrow_assign<boost::multiprecision::cpp_int>::value);
 BOOST_STATIC_ASSERT(boost::has_nothrow_assign<boost::multiprecision::int128_t>::value);
 BOOST_STATIC_ASSERT(boost::has_nothrow_assign<boost::multiprecision::checked_int128_t>::value);
-BOOST_STATIC_ASSERT(boost::has_nothrow_assign<boost::multiprecision::uint128_t>::value);
-BOOST_STATIC_ASSERT(boost::has_nothrow_assign<boost::multiprecision::checked_uint128_t>::value);
+BOOST_STATIC_ASSERT(boost::has_nothrow_assign<boost::multiprecision::uint128_modular_t>::value);
+BOOST_STATIC_ASSERT(boost::has_nothrow_assign<boost::multiprecision::checked_uint128_modular_t>::value);
 BOOST_STATIC_ASSERT(boost::has_nothrow_assign<boost::multiprecision::int512_t>::value);
 BOOST_STATIC_ASSERT(boost::has_nothrow_assign<boost::multiprecision::checked_int512_t>::value);
 BOOST_STATIC_ASSERT(boost::has_nothrow_assign<boost::multiprecision::uint512_t>::value);
@@ -97,9 +97,9 @@ BOOST_STATIC_ASSERT(
 BOOST_STATIC_ASSERT(noexcept(
     boost::multiprecision::checked_int128_t(std::declval<boost::multiprecision::signed_limb_type>())));
 BOOST_STATIC_ASSERT(
-    noexcept(boost::multiprecision::uint128_t(std::declval<boost::multiprecision::signed_limb_type>())));
+    noexcept(boost::multiprecision::uint128_modular_t(std::declval<boost::multiprecision::signed_limb_type>())));
 BOOST_STATIC_ASSERT(!noexcept(
-    boost::multiprecision::checked_uint128_t(std::declval<boost::multiprecision::signed_limb_type>())));
+    boost::multiprecision::checked_uint128_modular_t(std::declval<boost::multiprecision::signed_limb_type>())));
 BOOST_STATIC_ASSERT(
     noexcept(boost::multiprecision::int512_t(std::declval<boost::multiprecision::signed_limb_type>())));
 BOOST_STATIC_ASSERT(noexcept(
@@ -118,9 +118,9 @@ BOOST_STATIC_ASSERT(
 BOOST_STATIC_ASSERT(
     noexcept(boost::multiprecision::checked_int128_t(std::declval<boost::multiprecision::limb_type>())));
 BOOST_STATIC_ASSERT(
-    noexcept(boost::multiprecision::uint128_t(std::declval<boost::multiprecision::limb_type>())));
+    noexcept(boost::multiprecision::uint128_modular_t(std::declval<boost::multiprecision::limb_type>())));
 BOOST_STATIC_ASSERT(
-    noexcept(boost::multiprecision::checked_uint128_t(std::declval<boost::multiprecision::limb_type>())));
+    noexcept(boost::multiprecision::checked_uint128_modular_t(std::declval<boost::multiprecision::limb_type>())));
 BOOST_STATIC_ASSERT(
     noexcept(boost::multiprecision::int512_t(std::declval<boost::multiprecision::limb_type>())));
 BOOST_STATIC_ASSERT(
@@ -138,9 +138,9 @@ BOOST_STATIC_ASSERT(noexcept(std::declval<boost::multiprecision::int128_t>() =
                                  std::declval<boost::multiprecision::signed_limb_type>()));
 BOOST_STATIC_ASSERT(noexcept(std::declval<boost::multiprecision::checked_int128_t>() =
                                  std::declval<boost::multiprecision::signed_limb_type>()));
-BOOST_STATIC_ASSERT(noexcept(std::declval<boost::multiprecision::uint128_t>() =
+BOOST_STATIC_ASSERT(noexcept(std::declval<boost::multiprecision::uint128_modular_t>() =
                                  std::declval<boost::multiprecision::signed_limb_type>()));
-BOOST_STATIC_ASSERT(!noexcept(std::declval<boost::multiprecision::checked_uint128_t>() =
+BOOST_STATIC_ASSERT(!noexcept(std::declval<boost::multiprecision::checked_uint128_modular_t>() =
                                   std::declval<boost::multiprecision::signed_limb_type>()));
 BOOST_STATIC_ASSERT(noexcept(std::declval<boost::multiprecision::int512_t>() =
                                  std::declval<boost::multiprecision::signed_limb_type>()));
@@ -160,8 +160,8 @@ BOOST_STATIC_ASSERT(noexcept(
 BOOST_STATIC_ASSERT(noexcept(std::declval<boost::multiprecision::checked_int128_t>() =
                                  std::declval<boost::multiprecision::limb_type>()));
 BOOST_STATIC_ASSERT(noexcept(
-    std::declval<boost::multiprecision::uint128_t>() = std::declval<boost::multiprecision::limb_type>()));
-BOOST_STATIC_ASSERT(noexcept(std::declval<boost::multiprecision::checked_uint128_t>() =
+    std::declval<boost::multiprecision::uint128_modular_t>() = std::declval<boost::multiprecision::limb_type>()));
+BOOST_STATIC_ASSERT(noexcept(std::declval<boost::multiprecision::checked_uint128_modular_t>() =
                                  std::declval<boost::multiprecision::limb_type>()));
 BOOST_STATIC_ASSERT(noexcept(
     std::declval<boost::multiprecision::int512_t>() = std::declval<boost::multiprecision::limb_type>()));

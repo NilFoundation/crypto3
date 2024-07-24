@@ -41,7 +41,7 @@ int main() {
 
     i3 = -1234567;
 
-    uint128_t i5(i3);
+    uint128_modular_t i5(i3);
     BOOST_TEST(i5 == -1234567);
 
     int128_t i6(i4);
