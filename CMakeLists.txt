@@ -1,14 +1,11 @@
 cmake_minimum_required(VERSION 3.21.4)
 
-list(APPEND CMAKE_MODULE_PATH
-     "${CMAKE_CURRENT_LIST_DIR}/cmake/modules/share/modules/cmake"
-)
-
 project(crypto3_blueprint VERSION 0.1.0 LANGUAGES C CXX)
 
 option(CMAKE_ENABLE_TESTS "Enable tests" FALSE) # used by CMTest module
 option(BUILD_EXAMPLES "Build examples" FALSE)
 
+find_package(CM)
 find_package(crypto3 REQUIRED)
 find_package(Boost REQUIRED COMPONENTS container random filesystem log log_setup program_options thread system)
 
@@ -47,12 +44,6 @@ install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/ DESTINATION ${CMAKE_INSTA
 include(CMakePackageConfigHelpers)
 set(CONFIG_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/crypto3_blueprint)
 set(PACKAGE_CONFIG_NAME crypto3_blueprint-config)
-
-configure_package_config_file(
-    cmake/Config.cmake.in
-    ${PACKAGE_CONFIG_NAME}.cmake
-    INSTALL_DESTINATION ${CONFIG_DIR}
-)
 
 write_basic_config_version_file(
     ${PACKAGE_CONFIG_NAME}-version.cmake

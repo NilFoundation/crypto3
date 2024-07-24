@@ -59,7 +59,8 @@ jobs:
         run: |
           nix build -L .?submodules=1#checks.x86_64-linux.default
           results_dir="./results"
-          mkdir -p "$results_dir"
+          ls -la result/
+          mkdir -p "$results_dir/all-checks"
           cp -r ./result/* "$results_dir/all-checks"
           rm -rf result
       - name: Publish Test Results
