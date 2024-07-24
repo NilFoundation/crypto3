@@ -99,9 +99,9 @@ namespace nil {
                             h2 += (((t1 >> 24)) & 0x3ffffffffff) | hibit;
 
                             /* h *= r */
-                            uint128_t d0 = uint128_t(h0) * r0 + uint128_t(h1) * s2 + uint128_t(h2) * s1;
-                            uint128_t d1 = uint128_t(h0) * r1 + uint128_t(h1) * r0 + uint128_t(h2) * s2;
-                            uint128_t d2 = uint128_t(h0) * r2 + uint128_t(h1) * r1 + uint128_t(h2) * r0;
+                            uint128_modular_t d0 = uint128_modular_t(h0) * r0 + uint128_modular_t(h1) * s2 + uint128_modular_t(h2) * s1;
+                            uint128_modular_t d1 = uint128_modular_t(h0) * r1 + uint128_modular_t(h1) * r0 + uint128_modular_t(h2) * s2;
+                            uint128_modular_t d2 = uint128_modular_t(h0) * r2 + uint128_modular_t(h1) * r1 + uint128_modular_t(h2) * r0;
 
                             /* (partial) h %= p */
                             word_type c = carry_shift(d0, 44);

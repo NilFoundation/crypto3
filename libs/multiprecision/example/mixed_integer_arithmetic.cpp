@@ -21,7 +21,7 @@ int main()
    boost::uint64_t i = (std::numeric_limits<boost::uint64_t>::max)();
    boost::uint64_t j = 1;
 
-   uint128_t ui128;
+   uint128_modular_t ui128;
    uint256_t ui256;
    //
    // Start by performing arithmetic on 64-bit integers to yield 128-bit results:
@@ -32,7 +32,7 @@ int main()
    //
    // The try squaring a 128-bit integer to yield a 256-bit result:
    //
-   ui128 = (std::numeric_limits<uint128_t>::max)();
+   ui128 = (std::numeric_limits<uint128_modular_t>::max)();
    std::cout << std::hex << std::showbase << multiply(ui256, ui128, ui128) << std::endl;
 
    return 0;

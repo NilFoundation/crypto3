@@ -15,7 +15,7 @@ typedef boost::multiprecision::number<
     boost::multiprecision::rational_adaptor<boost::multiprecision::int128_t::backend_type>>
     rat128_t;
 typedef boost::multiprecision::number<
-    boost::multiprecision::rational_adaptor<boost::multiprecision::uint128_t::backend_type>>
+    boost::multiprecision::rational_adaptor<boost::multiprecision::uint128_modular_t::backend_type>>
     urat128_t;
 typedef boost::multiprecision::number<
     boost::multiprecision::rational_adaptor<boost::multiprecision::int512_t::backend_type>>
@@ -28,7 +28,7 @@ typedef boost::multiprecision::number<
     boost::multiprecision::rational_adaptor<boost::multiprecision::checked_int128_t::backend_type>>
     checked_rat128_t;
 typedef boost::multiprecision::number<
-    boost::multiprecision::rational_adaptor<boost::multiprecision::checked_uint128_t::backend_type>>
+    boost::multiprecision::rational_adaptor<boost::multiprecision::checked_uint128_modular_t::backend_type>>
     checked_urat128_t;
 typedef boost::multiprecision::number<
     boost::multiprecision::rational_adaptor<boost::multiprecision::checked_int512_t::backend_type>>
