@@ -172,6 +172,8 @@ struct default_zkllvm_params {
 // TODO(martun): consider moving these functions to some shared location so other tests can re-use them.
 template<typename SrcParams>
     static nil::crypto3::zk::snark::placeholder_proof<typename SrcParams::field_type, SrcParams> load_proof(std::string filename) {
+    std::cout << "Loading proof from " << filename << std::endl;
+
     using Endianness = nil::marshalling::option::big_endian;
     using TTypeBase = nil::marshalling::field_type<Endianness>;
 
@@ -179,9 +181,9 @@ template<typename SrcParams>
     iproof.open(filename);
     BOOST_ASSERT(iproof.is_open());
     std::vector<std::uint8_t> v;
-    BOOST_ASSERT(read_buffer_from_file(iproof, v));
+    if (!read_buffer_from_file(iproof, v))
+        throw "Unable to read proof from file.";
     iproof.close();
-
 
     using proof_type = nil::crypto3::zk::snark::placeholder_proof<typename SrcParams::field_type, SrcParams>;
     using proof_marshalling_type =
@@ -190,6 +192,10 @@ template<typename SrcParams>
     proof_marshalling_type marshalled_proof_data;
     auto read_iter = v.begin();
     auto status = marshalled_proof_data.read(read_iter, v.size());
+    if (status != nil::marshalling::status_type::success) {
+        std::cerr << "Status is " << make_error_code(status) << std::endl;
+        throw "Reading a marshalled object from buffer failed.";
+    }
     return nil::crypto3::marshalling::types::make_placeholder_proof<Endianness, proof_type>(
         marshalled_proof_data);
 }
@@ -277,8 +283,10 @@ gen_test_proof(
 ){
     using src_placeholder_params = typename SrcParams::placeholder_params;
     using field_type = typename SrcParams::field_type;
+    using fri_params_type = typename SrcParams::lpc_type::fri_type::params_type;
 
-    auto fri_params = create_fri_params<typename SrcParams::lpc_type::fri_type, field_type>(std::ceil(std::log2(table_description.rows_amount)), 0);
+    fri_params_type fri_params(0, std::ceil(std::log2(table_description.rows_amount)),
+        src_placeholder_params::lambda, 4 /*expand_factor*/);
     typename SrcParams::commitment_scheme_type lpc_scheme(fri_params);
 
     std::cout <<"Preprocess public data" << std::endl;
@@ -378,9 +386,13 @@ void test_multiple_arithmetizations(std::string folder_name){
 //    auto table_description = SrcParams::load_table_description(folder_name + "/assignment.tbl");
     std::cout << "Start loading" << std::endl;
     auto constraint_system = SrcParams::load_circuit(folder_name + "/circuit.crct");
-    std::cout << "Load constraint system" << std::endl;
+    std::cout << "Loaded the constraint system" << std::endl;
+
     auto common_data = load_common_data<SrcParams>(folder_name + "/common.dat");
+    std::cout << "Loaded the common data" << std::endl;
+
     auto proof = load_proof<SrcParams>(folder_name + "/proof.bin");
+    std::cout << "Loaded the proof" << std::endl;
     auto table_description = common_data.desc;
     auto fri_params = common_data.commitment_params;
 

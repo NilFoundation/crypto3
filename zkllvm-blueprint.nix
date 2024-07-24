@@ -104,6 +104,7 @@ in stdenv.mkDerivation rec {
       (if runTests then "-DCMAKE_ENABLE_TESTS=TRUE" else "")
       (if enableDebug then "-DCMAKE_BUILD_TYPE=Debug" else "-DCMAKE_BUILD_TYPE=Release")
       (if enableDebug then "-DCMAKE_CXX_FLAGS=-ggdb" else "")
+      (if enableDebug then "-DCMAKE_CXX_FLAGS=-O0" else "")
   ];
   
   ninjaFlags = lib.strings.concatStringsSep " " (["-k 0"] ++ testList);
