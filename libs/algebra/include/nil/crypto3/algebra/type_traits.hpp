@@ -54,6 +54,8 @@ namespace nil {
             BOOST_TTI_HAS_TYPE(g2_type)
             BOOST_TTI_HAS_TYPE(gt_type)
 
+            BOOST_TTI_HAS_TEMPLATE(g2_type)
+
             BOOST_TTI_HAS_TYPE(group_type)
 
             BOOST_TTI_HAS_STATIC_MEMBER_DATA(value_bits)

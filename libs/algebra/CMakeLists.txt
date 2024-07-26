@@ -46,3 +46,7 @@ cm_add_test_subdirectory(test)
 if(BUILD_EXAMPLES)
     add_subdirectory(example)
 endif()
+
+if(BUILD_BENCH_TESTS)
+    add_subdirectory(bench)
+endif()

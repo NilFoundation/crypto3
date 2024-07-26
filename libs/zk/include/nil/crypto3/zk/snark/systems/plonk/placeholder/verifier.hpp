@@ -40,6 +40,8 @@
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/preprocessor.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/table_description.hpp>
 
+#include <nil/crypto3/bench/scoped_profiler.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace zk {
@@ -67,7 +69,7 @@ namespace nil {
                         typename FieldType::value_type challenge,
                         bool _is_lookup_enabled
                     ) {
-                        PROFILE_PLACEHOLDER_SCOPE("evaluation_points_generated_time");
+                        PROFILE_SCOPE("evaluation_points_generated_time");
 
                         const std::size_t witness_columns = table_description.witness_columns;
                         const std::size_t public_input_columns = table_description.public_input_columns;

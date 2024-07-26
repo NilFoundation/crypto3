@@ -15,15 +15,11 @@ macro(define_marshalling_example name)
     add_executable(marshalling_${name}_example ${name}.cpp)
 
     target_link_libraries(marshalling_${name}_example PRIVATE
-
                           crypto3::multiprecision
                           crypto3::algebra
                           crypto3::zk
                           ${CMAKE_WORKSPACE_NAME}::marshalling-multiprecision
                           ${CMAKE_WORKSPACE_NAME}::marshalling-algebra
-                          ${CMAKE_WORKSPACE_NAME}::crypto3_zk
-                          ${CMAKE_WORKSPACE_NAME}::core
-
                           Boost::container)
 
     target_include_directories(marshalling_${name}_example PRIVATE

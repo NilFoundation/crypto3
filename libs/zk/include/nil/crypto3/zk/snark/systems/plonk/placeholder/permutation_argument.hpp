@@ -42,8 +42,9 @@
 #include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/params.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/detail/placeholder_policy.hpp>
-#include <nil/crypto3/zk/snark/systems/plonk/placeholder/detail/placeholder_scoped_profiler.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/preprocessor.hpp>
+
+#include <nil/crypto3/bench/scoped_profiler.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -76,7 +77,7 @@ namespace nil {
                         typename ParamsType::commitment_scheme_type& commitment_scheme,
                         transcript_type& transcript
                     ) {
-                        PROFILE_PLACEHOLDER_SCOPE("permutation_argument_prove_eval_time");
+                        PROFILE_SCOPE("permutation_argument_prove_eval_time");
 
                         const std::vector<math::polynomial_dfs<typename FieldType::value_type>> &S_sigma =
                             preprocessed_data.permutation_polynomials;
