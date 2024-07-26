@@ -694,14 +694,6 @@ namespace nil {
                     table[2][0] = zero;
                     table[2][1] = one;
 
-                    plonk_variable<FieldType> x0(0, 0, false, plonk_variable<FieldType>::column_type::witness);
-                    plonk_variable<FieldType> x1(0, 1, false, plonk_variable<FieldType>::column_type::witness);
-                    plonk_variable<FieldType> p0(1, 0, false, plonk_variable<FieldType>::column_type::public_input);
-                    plonk_variable<FieldType> p1(1, 1, false, plonk_variable<FieldType>::column_type::public_input);
-
-//                    test_circuit.copy_constraints.push_back(plonk_copy_constraint<FieldType>(x0, p0));
-//                    test_circuit.copy_constraints.push_back(plonk_copy_constraint<FieldType>(x1, p1));
-
                     for (std::size_t i = 2; i < test_circuit.usable_rows - 1; i++) {
                         table[0][i] = table[0][i-2] + table[0][i-1];
                         table[1][i] = zero;

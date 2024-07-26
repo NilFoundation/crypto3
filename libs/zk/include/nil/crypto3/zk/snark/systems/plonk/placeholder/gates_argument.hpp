@@ -52,6 +52,8 @@
 #include <nil/crypto3/zk/math/expression_evaluator.hpp>
 #include <nil/crypto3/zk/math/expression_visitors.hpp>
 
+#include <nil/crypto3/bench/scoped_profiler.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace zk {
@@ -112,7 +114,7 @@ namespace nil {
                             std::uint32_t max_gates_degree,
                             const polynomial_dfs_type &mask_polynomial,
                             transcript_type& transcript) {
-                        PROFILE_PLACEHOLDER_SCOPE("gate_argument_time");
+                        PROFILE_SCOPE("gate_argument_time");
 
                         // max_gates_degree that comes from the outside does not take into account multiplication
                         // by selector.

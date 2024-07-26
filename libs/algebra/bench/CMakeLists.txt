@@ -10,7 +10,7 @@ include(CMTest)
 
 add_custom_target(algebra_runtime_bench_tests)
 
-macro(define_runtime_algebra_test name)
+macro(define_algebra_benchmark name)
     set(test_name "algebra_${name}_bench_test")
     add_dependencies(algebra_runtime_bench_tests ${test_name})
 
@@ -22,7 +22,13 @@ macro(define_runtime_algebra_test name)
 
                                ${Boost_INCLUDE_DIRS})
 
-    set_target_properties(${test_name} PROPERTIES CXX_STANDARD 17
+    target_link_libraries(${test_name}
+        ${CMAKE_WORKSPACE_NAME}::benchmark_tools
+    )
+
+    set_target_properties(${test_name} 
+        PROPERTIES
+        CXX_STANDARD 17
         CXX_STANDARD_REQUIRED TRUE)
 
     if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
@@ -31,16 +37,16 @@ macro(define_runtime_algebra_test name)
         target_compile_options(${test_name} PRIVATE "-fconstexpr-ops-limit=4294967295")
     endif()
 
-    target_compile_definitions(${test_name} PRIVATE TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/data/")
 endmacro()
 
-set(RUNTIME_TESTS_NAMES
+set(BENCHMARK_NAMES
     "bench_curves"
     "bench_fields"
     "bench_multiexp"
-    )
+)
 
-foreach(TEST_NAME ${RUNTIME_TESTS_NAMES})
-    define_runtime_algebra_test(${TEST_NAME})
+foreach(BENCH_NAME ${BENCHMARK_NAMES})
+    define_algebra_benchmark(${BENCH_NAME})
 endforeach()
+
 

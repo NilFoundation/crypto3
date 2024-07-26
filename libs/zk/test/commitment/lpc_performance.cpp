@@ -27,7 +27,7 @@
 #define BOOST_TEST_MODULE lpc_test
 
 // Do it manually for all performance tests
-#define ZK_PLACEHOLDER_PROFILING_ENABLED
+#define PROFILING_ENABLED
 
 #include <string>
 
@@ -49,7 +49,8 @@
 #include <nil/crypto3/zk/commitments/polynomial/lpc.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/fri.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/params.hpp>
-#include <nil/crypto3/zk/snark/systems/plonk/placeholder/detail/placeholder_scoped_profiler.hpp>
+
+#include <nil/crypto3/bench/scoped_profiler.hpp>
 
 using namespace nil::crypto3;
 using namespace nil::crypto3::zk::snark;
@@ -127,7 +128,7 @@ BOOST_AUTO_TEST_SUITE(lpc_performance_test_suite)
 
 // TODO(martun): move this to bench folder.
 BOOST_AUTO_TEST_CASE(step_list_1, *boost::unit_test::disabled()) {
-    PROFILE_PLACEHOLDER_SCOPE("LPC step list 1 test");
+    PROFILE_SCOPE("LPC step list 1 test");
     typedef algebra::curves::bls12<381> curve_type;
     typedef typename curve_type::scalar_field_type FieldType;
 
@@ -189,7 +190,7 @@ BOOST_AUTO_TEST_CASE(step_list_1, *boost::unit_test::disabled()) {
 
         std::map<std::size_t, typename lpc_scheme_type::commitment_type> commitments;
         {
-            PROFILE_PLACEHOLDER_SCOPE("polynomial commitment");
+            PROFILE_SCOPE("polynomial commitment");
             lpc_scheme_prover.append_to_batch(0, poly);
             commitments[0] = lpc_scheme_prover.commit(0);
         }
@@ -198,7 +199,7 @@ BOOST_AUTO_TEST_CASE(step_list_1, *boost::unit_test::disabled()) {
         typename lpc_scheme_type::proof_type proof;
         std::array<std::uint8_t, 96> x_data{};
         {
-            PROFILE_PLACEHOLDER_SCOPE("proof generation");
+            PROFILE_SCOPE("proof generation");
             lpc_scheme_prover.append_eval_point(0,
                                                 algebra::fields::arithmetic_params<FieldType>::multiplicative_generator);
             zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(x_data);
@@ -206,7 +207,7 @@ BOOST_AUTO_TEST_CASE(step_list_1, *boost::unit_test::disabled()) {
         }
 
         {
-            PROFILE_PLACEHOLDER_SCOPE("verification");
+            PROFILE_SCOPE("verification");
             zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);
             lpc_scheme_verifier.set_batch_size(0, proof.z.get_batch_size(0));
 
@@ -218,7 +219,7 @@ BOOST_AUTO_TEST_CASE(step_list_1, *boost::unit_test::disabled()) {
 }
 
 BOOST_AUTO_TEST_CASE(step_list_3, *boost::unit_test::disabled()) {
-    PROFILE_PLACEHOLDER_SCOPE("LPC step list 3 test");
+    PROFILE_SCOPE("LPC step list 3 test");
     typedef algebra::curves::bls12<381> curve_type;
     typedef typename curve_type::scalar_field_type FieldType;
 
@@ -280,7 +281,7 @@ BOOST_AUTO_TEST_CASE(step_list_3, *boost::unit_test::disabled()) {
 
         std::map<std::size_t, typename lpc_scheme_type::commitment_type> commitments;
         {
-            PROFILE_PLACEHOLDER_SCOPE("polynomial commitment");
+            PROFILE_SCOPE("polynomial commitment");
             lpc_scheme_prover.append_to_batch(0, poly);
             commitments[0] = lpc_scheme_prover.commit(0);
         }
@@ -289,7 +290,7 @@ BOOST_AUTO_TEST_CASE(step_list_3, *boost::unit_test::disabled()) {
         typename lpc_scheme_type::proof_type proof;
         std::array<std::uint8_t, 96> x_data{};
         {
-            PROFILE_PLACEHOLDER_SCOPE("proof generation");
+            PROFILE_SCOPE("proof generation");
             lpc_scheme_prover.append_eval_point(0,
                                                 algebra::fields::arithmetic_params<FieldType>::multiplicative_generator);
             zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(x_data);
@@ -297,7 +298,7 @@ BOOST_AUTO_TEST_CASE(step_list_3, *boost::unit_test::disabled()) {
         }
 
         {
-            PROFILE_PLACEHOLDER_SCOPE("verification");
+            PROFILE_SCOPE("verification");
             zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);
             lpc_scheme_verifier.set_batch_size(0, proof.z.get_batch_size(0));
 
@@ -309,7 +310,7 @@ BOOST_AUTO_TEST_CASE(step_list_3, *boost::unit_test::disabled()) {
 }
 
 BOOST_AUTO_TEST_CASE(step_list_5, *boost::unit_test::disabled()) {
-    PROFILE_PLACEHOLDER_SCOPE("LPC step list 5 test");
+    PROFILE_SCOPE("LPC step list 5 test");
     typedef algebra::curves::bls12<381> curve_type;
     typedef typename curve_type::scalar_field_type FieldType;
 
@@ -370,7 +371,7 @@ BOOST_AUTO_TEST_CASE(step_list_5, *boost::unit_test::disabled()) {
 
         std::map<std::size_t, typename lpc_scheme_type::commitment_type> commitments;
         {
-            PROFILE_PLACEHOLDER_SCOPE("polynomial commitment");
+            PROFILE_SCOPE("polynomial commitment");
             lpc_scheme_prover.append_to_batch(0, poly);
             commitments[0] = lpc_scheme_prover.commit(0);
         }
@@ -379,7 +380,7 @@ BOOST_AUTO_TEST_CASE(step_list_5, *boost::unit_test::disabled()) {
         typename lpc_scheme_type::proof_type proof;
         std::array<std::uint8_t, 96> x_data{};
         {
-            PROFILE_PLACEHOLDER_SCOPE("proof generation");
+            PROFILE_SCOPE("proof generation");
             lpc_scheme_prover.append_eval_point(0,
                                                 algebra::fields::arithmetic_params<FieldType>::multiplicative_generator);
             zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(x_data);
@@ -387,7 +388,7 @@ BOOST_AUTO_TEST_CASE(step_list_5, *boost::unit_test::disabled()) {
         }
 
         {
-            PROFILE_PLACEHOLDER_SCOPE("verification");
+            PROFILE_SCOPE("verification");
             zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(x_data);
             lpc_scheme_verifier.set_batch_size(0, proof.z.get_batch_size(0));
 

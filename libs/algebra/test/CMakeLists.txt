@@ -69,7 +69,3 @@ endforeach()
 foreach(TEST_NAME ${COMPILE_TIME_TESTS_NAMES})
     define_compile_time_algebra_test(${TEST_NAME})
 endforeach()
-
-if(BUILD_BENCH_TESTS)
-    cm_add_test_subdirectory(bench_test)
-endif()

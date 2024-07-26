@@ -51,7 +51,8 @@ void coordinates_examples() {
     std::cout << "c2 value: " << (c2) << std::endl;
     std::cout << "c1 + c2 value: " << (c1 + c2) << std::endl;
     std::cout << "c1 - c2 value: " << (c1 - c2) << std::endl;
-    std::cout << "Doubled c1 value: " << (c1.doubled()) << std::endl;
+    c1.double_inplace();
+    std::cout << "Doubled c1 value: " << c1 << std::endl;
   }
 
 int main() {

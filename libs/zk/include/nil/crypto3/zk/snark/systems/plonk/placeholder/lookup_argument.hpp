@@ -46,7 +46,8 @@
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/params.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/detail/placeholder_policy.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/preprocessor.hpp>
-#include <nil/crypto3/zk/snark/systems/plonk/placeholder/detail/placeholder_scoped_profiler.hpp>
+
+#include <nil/crypto3/bench/scoped_profiler.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -151,7 +152,7 @@ namespace nil {
                     }
 
                     prover_lookup_result prove_eval() {
-                        PROFILE_PLACEHOLDER_SCOPE("Lookup argument prove eval time");
+                        PROFILE_SCOPE("Lookup argument prove eval time");
 
                         // Construct lookup gates
                         math::polynomial_dfs<typename FieldType::value_type> one_polynomial(
@@ -469,7 +470,7 @@ namespace nil {
                                     visitor.visit(expr);
 
                                     math::cached_expression_evaluator<DfsVariableType> evaluator(expr,
-                                        [&domain=basic_domain, &assignments=plonk_columns, &rotated_variable_values]
+                                        [&assignments=plonk_columns, &rotated_variable_values]
                                         (const DfsVariableType &var) -> const polynomial_dfs_type& {
                                             if (var.rotation == 0) {
                                                 return assignments.get_variable_value_without_rotation(var);

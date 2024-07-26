@@ -161,7 +161,7 @@ void run_perf_test(std::string const& field_name) {
 
     std::ofstream f(filename, std::ofstream::out);
     f << "# " << typeid(Field).name() << std::endl;
-    f << "sum,mul,sqr,inv" << std::endl;
+    f << "sum,mul,sub,sqr,inv" << std::endl;
 
     for(size_t i = 0; i < plus_results.size(); ++i) {
         f << std::fixed << std::setprecision(3) << plus_results[i].count()  << ","

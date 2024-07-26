@@ -5,14 +5,14 @@ if(NOT CMAKE_WORKSPACE_NAME OR NOT ("${CMAKE_WORKSPACE_NAME}" STREQUAL "crypto3"
     cm_workspace(crypto3)
 endif()
 
-option(ZK_PLACEHOLDER_PROFILING_ENABLED "Build with placeholder profiling" FALSE)
+option(PROFILING_ENABLED "Build with placeholder profiling" FALSE)
 option(ZK_PLACEHOLDER_DEBUG_ENABLED "Build with placeholder testing inside" FALSE)
 
-if(ZK_PLACEHOLDER_PROFILING)
-    add_definitions(-DZK_PLACEHOLDER_PROFILING_ENABLED)
+if(PROFILING_ENABLED)
+    add_definitions(-DPROFILING_ENABLED)
 endif()
 
-if(ZK_PLACEHOLDER_DEBUG)
+if(ZK_PLACEHOLDER_DEBUG_ENABLED)
     add_definitions(-DZK_PLACEHOLDER_DEBUG_ENABLED)
 endif()
 
@@ -45,6 +45,7 @@ target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
                       ${CMAKE_WORKSPACE_NAME}::multiprecision
                       ${CMAKE_WORKSPACE_NAME}::containers
                       ${CMAKE_WORKSPACE_NAME}::marshalling-zk
+                      ${CMAKE_WORKSPACE_NAME}::benchmark_tools
                     )
 
 cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}

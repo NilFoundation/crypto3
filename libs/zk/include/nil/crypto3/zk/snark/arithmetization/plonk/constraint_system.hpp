@@ -290,7 +290,7 @@ namespace nil {
                             }
                         }
                         for (const auto& table : _lookup_tables) {
-                            for( const auto &lookup_options: table.lookup_options ){
+                            for (std::size_t i = 0; i < table.lookup_options.size(); ++i) {
                                 // +3 because now any lookup option is lookup_column * lookup_selector * (1-q_last-q_blind) -- three polynomials degree rows_amount-1
                                 if( lookup_chunk + 3 >= max_quotient_chunks ){
                                     lookup_parts.push_back(lookup_part);

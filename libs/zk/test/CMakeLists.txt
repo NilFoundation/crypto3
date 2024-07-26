@@ -17,10 +17,8 @@ cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
     crypto3::marshalling-zk
     Boost::unit_test_framework)
 
-option(ZK_PLACEHOLDER_PROFILING_ENABLED "Build with placeholder profiling" FALSE)
-
-if(ZK_PLACEHOLDER_PROFILING)
-    add_definitions(-DZK_PLACEHOLDER_PROFILING_ENABLED)
+if(PROFILING_ENABLED)
+    add_definitions(-DPROFILING_ENABLED)
 endif()
 
 macro(define_zk_test test)
