@@ -57,6 +57,10 @@
 #include <nil/crypto3/algebra/pairing/mnt4.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/mnt4.hpp>
 
+#include <nil/crypto3/algebra/curves/alt_bn128.hpp>
+#include <nil/crypto3/algebra/pairing/alt_bn128.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/alt_bn128.hpp>
+
 #include <nil/crypto3/zk/commitments/polynomial/kzg.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/kzg_v2.hpp>
 
@@ -108,7 +112,8 @@ struct kzg_basic_test_runner {
 using BasicTestFixtures = boost::mpl::list<
     kzg_basic_test_runner<algebra::curves::bls12_381>,
     kzg_basic_test_runner<algebra::curves::mnt4_298>,
-    kzg_basic_test_runner<algebra::curves::mnt6_298>
+    kzg_basic_test_runner<algebra::curves::mnt6_298>, 
+    kzg_basic_test_runner<algebra::curves::alt_bn128_254>
 >;
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(kzg_basic_test, F, BasicTestFixtures) {
@@ -144,7 +149,8 @@ struct kzg_random_test_runner {
 using RandomTestFixtures = boost::mpl::list<
     kzg_random_test_runner<algebra::curves::bls12_381>,
     kzg_random_test_runner<algebra::curves::mnt4_298>,
-    kzg_random_test_runner<algebra::curves::mnt6_298>
+    kzg_random_test_runner<algebra::curves::mnt6_298>, 
+    kzg_random_test_runner<algebra::curves::alt_bn128_254> 
 >;
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(kzg_random_test, F, RandomTestFixtures) {
@@ -250,6 +256,51 @@ BOOST_AUTO_TEST_CASE(kzg_test_mnt6_accumulated) {
 }
 BOOST_AUTO_TEST_SUITE_END()
 
+/*BOOST_AUTO_TEST_CASE(kzg_test_alt_bn128_254_accumulated) {
+
+    typedef algebra::curves::alt_bn128_254 curve_type;
+    typedef typename curve_type::scalar_field_type::value_type scalar_value_type;
+
+    typedef zk::commitments::kzg<curve_type> kzg_type;
+
+    scalar_value_type alpha = 7u;
+    std::size_t n = 8;
+    scalar_value_type z = 2u;
+    const polynomial<scalar_value_type> f = {
+            0x0ed6fb07f52c1f1ef7952250702368474f20fd7af906ba3a5842cdb7946c69b603852bf1069_cppui_modular298,
+            0x14db9efba58de09f8ccb1d73fefce45393856e6a7509006561fe67ea354ec69d791b44c1476_cppui_modular298,
+            0x0e9fa83a6f8891bc7e6aa1afae85e11dd80cdef32dfcef7cedc12792cf74141c899c8fb1f98_cppui_modular298,
+            0x101cc0b43782ca40ae5bf96aabf461e1a623ab9284acac3bb6d55bff4429356dad714ee0bd0_cppui_modular298,
+            0x1310586a4d1ed251d1e4c95711fb9346a2b233649f5ce32fe1cf3aea423d131787187a13799_cppui_modular298,
+            0x0d9ed064a24e83ac6134de7cca08bdc3e31ffd4db0a004b63039f76821ec2cc53b7e6a74735_cppui_modular298,
+            0x2839e48822f55b4e487b817ddf06a6e32e0dcc0c2ced1e738d38fec15bd4717d7680dda90ec_cppui_modular298,
+    };
+
+    auto f_eval = f.evaluate(alpha);
+
+    auto params = typename kzg_type::params_type(n, alpha);
+    auto commit = zk::algorithms::commit<kzg_type>(params, f);
+    nil::marshalling::status_type status;
+    using endianness = nil::marshalling::option::big_endian;
+    std::vector<uint8_t> single_commitment_bytes =
+            nil::marshalling::pack<endianness>(commit, status);
+    dump_vector(single_commitment_bytes, "commitment");
+
+    BOOST_CHECK(curve_type::template g1_type<>::value_type::one() == params.commitment_key[0]);
+    BOOST_CHECK(alpha * curve_type::template g1_type<>::value_type::one() == params.commitment_key[1]);
+    BOOST_CHECK(alpha * alpha * curve_type::template g1_type<>::value_type::one() == params.commitment_key[2]);
+    BOOST_CHECK(alpha * alpha * alpha * curve_type::template g1_type<>::value_type::one() == params.commitment_key[3]);
+    BOOST_CHECK(alpha * curve_type::template g2_type<>::value_type::one() == params.verification_key);
+
+    BOOST_CHECK(f_eval * curve_type::template g1_type<>::value_type::one() == commit);
+
+    typename kzg_type::public_key_type pk = {commit, z, f.evaluate(z)};
+    auto proof = zk::algorithms::proof_eval<kzg_type>(params, f, pk);
+
+    BOOST_CHECK(zk::algorithms::verify_eval<kzg_type>(params, proof, pk));
+}
+BOOST_AUTO_TEST_SUITE_END()*/
+
 BOOST_AUTO_TEST_SUITE(batched_kzg_test_suite)
 
 template<typename curve_type>
@@ -298,7 +349,8 @@ struct batched_kzg_basic_test_runner {
 using BatchedBasicTestFixtures = boost::mpl::list<
     batched_kzg_basic_test_runner<algebra::curves::bls12_381>,
     batched_kzg_basic_test_runner<algebra::curves::mnt4_298>,
-    batched_kzg_basic_test_runner<algebra::curves::mnt6_298>
+    batched_kzg_basic_test_runner<algebra::curves::mnt6_298>, 
+    batched_kzg_basic_test_runner<algebra::curves::alt_bn128_254> 
 >;
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(batched_kzg_basic_test, F, BatchedBasicTestFixtures) {
@@ -360,7 +412,8 @@ struct batched_kzg_bigger_test_runner {
 using BatchedBiggerTestFixtures = boost::mpl::list<
     batched_kzg_bigger_test_runner<algebra::curves::bls12_381>,
     batched_kzg_bigger_test_runner<algebra::curves::mnt4_298>,
-    batched_kzg_bigger_test_runner<algebra::curves::mnt6_298>
+    batched_kzg_bigger_test_runner<algebra::curves::mnt6_298>, 
+    batched_kzg_bigger_test_runner<algebra::curves::alt_bn128_254> 
 >;
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(batched_kzg_bigger_test, F, BatchedBiggerTestFixtures) {

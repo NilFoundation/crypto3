@@ -41,6 +41,11 @@
 #include <nil/crypto3/algebra/curves/mnt6.hpp>
 #include <nil/crypto3/algebra/pairing/mnt6.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/mnt6.hpp>
+/**/
+#include <nil/crypto3/algebra/curves/alt_bn128.hpp>
+#include <nil/crypto3/algebra/pairing/alt_bn128.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/alt_bn128.hpp>
+/**/
 
 #include <nil/crypto3/random/algebraic_engine.hpp>
 #include <nil/crypto3/random/algebraic_random_device.hpp>
@@ -77,7 +82,8 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit2_kzg)
 
     using TestRunners = boost::mpl::list<
             placeholder_kzg_test_runner<algebra::curves::mnt4_298, hash_type>,
-            placeholder_kzg_test_runner<algebra::curves::mnt6_298, hash_type>
+            placeholder_kzg_test_runner<algebra::curves::mnt6_298, hash_type>, 
+            placeholder_kzg_test_runner<algebra::curves::alt_bn128_254, hash_type>
     >;
 
     BOOST_AUTO_TEST_CASE_TEMPLATE(kzg_test, TestRunner, TestRunners) {
@@ -99,7 +105,8 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit2_kzg_v2)
 
     using TestRunners = boost::mpl::list<
             placeholder_kzg_test_runner_v2<algebra::curves::mnt4_298, hash_type>,
-            placeholder_kzg_test_runner_v2<algebra::curves::mnt6_298, hash_type>
+            placeholder_kzg_test_runner_v2<algebra::curves::mnt6_298, hash_type>, 
+            placeholder_kzg_test_runner_v2<algebra::curves::alt_bn128_254, hash_type>
     >;
 
     BOOST_AUTO_TEST_CASE_TEMPLATE(kzg_v2_test, TestRunner, TestRunners) {
