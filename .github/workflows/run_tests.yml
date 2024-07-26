@@ -63,14 +63,6 @@ jobs:
           mkdir -p "$results_dir/all-checks"
           cp -r ./result/* "$results_dir/all-checks"
           rm -rf result
-      - name: Publish Test Results
-        uses: EnricoMi/publish-unit-test-result-action/linux@v2
-        with:
-          check_name: "Linux Test Results"
-          files: "results/**/*.xml"
-          comment_mode: ${{ github.event.pull_request.head.repo.fork && 'off' || 'always' }} # Don't create PR comment from fork runs
-          action_fail_on_inconclusive: true # fail, if no reports
-          action_fail: true
       - name: 'Upload Artifacts'
         uses: actions/upload-artifact@v4
         with:
