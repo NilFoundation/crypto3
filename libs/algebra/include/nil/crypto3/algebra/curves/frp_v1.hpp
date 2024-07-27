@@ -61,6 +61,10 @@ namespace nil {
                         0xB6B3D4C356C139EB31183D4749D423958C27D2DCAF98B70164C97A2DD98F5CFF_cppui_modular256;
                     constexpr static const integral_type y =
                         0x6142E0F7C8B204911F9271F0F3ECEF8C2701C307E8E4C9E183115A1554062CFB_cppui_modular256;
+
+                    /// Returns name of this curve.
+                    static std::string name()
+                        { return "frp_v1_" + std::to_string(base_field_bits); }
                 };
             }    // namespace curves
         }        // namespace algebra

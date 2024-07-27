@@ -71,6 +71,10 @@ namespace nil {
 
 #endif
                     typedef typename policy_type::gt_field_type gt_type;
+
+                    /// Returns name of this curve.
+                    static std::string name()
+                        { return "bls12_" + std::to_string(Version); }
                 };
 
                 typedef bls12<381> bls12_381;

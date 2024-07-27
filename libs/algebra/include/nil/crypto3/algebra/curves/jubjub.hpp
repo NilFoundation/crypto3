@@ -64,6 +64,10 @@ namespace nil {
                     //     pairing;
 
                     // constexpr static const bool has_affine_pairing = false;
+
+                    /// Returns name of this curve.
+                    static std::string name()
+                        { return "jubjub"; }
                 };
             }    // namespace curves
         }        // namespace algebra

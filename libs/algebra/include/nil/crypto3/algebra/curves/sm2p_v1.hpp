@@ -61,6 +61,10 @@ namespace nil {
                         0x32C4AE2C1F1981195F9904466A39C9948FE30BBFF2660BE1715A4589334C74C7_cppui_modular256;
                     constexpr static const integral_type y =
                         0xBC3736A2F4F6779C59BDCEE36B692153D0A9877CC62A474002DF32E52139F0A0_cppui_modular256;
+
+                    /// Returns name of this curve.
+                    static std::string name()
+                        { return "sm2p_v1_" + std::to_string(base_field_bits); }
                 };
 
                 typedef sm2p_v1<256> sm2p256v1;

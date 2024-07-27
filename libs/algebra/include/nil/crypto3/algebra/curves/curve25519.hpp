@@ -48,6 +48,10 @@ namespace nil {
                     template<typename Coordinates = coordinates::extended_with_a_minus_1,
                              typename Form = forms::montgomery>
                     using g1_type = typename detail::curve25519_g1<Form, Coordinates>;
+
+                    /// Returns name of this curve.
+                    static std::string name()
+                        { return "curve25519"; }
                 };
             }    // namespace curves
         }        // namespace algebra

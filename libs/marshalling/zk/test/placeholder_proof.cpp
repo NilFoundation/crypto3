@@ -263,6 +263,7 @@ void print_placeholder_proof_with_params(
     );
 }
 
+/// Prints specified public input into file 'filename', until the first zero value.
 template<typename ColumnType>
 void print_public_input(ColumnType &public_input, std::string filename){
     std::size_t max_non_zero = 0;
@@ -1207,7 +1208,7 @@ struct placeholder_kzg_test_fixture_v2 : public test_tools::random_test_initiali
             print_placeholder_proof_with_params<
                 Endianness, kzg_placeholder_params_type>
                 (kzg_preprocessed_public_data, kzg_proof, kzg_scheme, desc,
-                 std::string("circuit_") + typeid(curve_type).name());
+                 std::string("circuit_") + curve_type::name());
         } else {
             test_placeholder_proof<
                 Endianness, placeholder_proof<field_type, kzg_placeholder_params_type>>

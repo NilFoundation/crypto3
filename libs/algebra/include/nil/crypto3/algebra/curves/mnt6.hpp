@@ -66,6 +66,10 @@ namespace nil {
                     typedef typename policy_type::gt_field_type gt_type;
 
                     constexpr static const bool has_affine_pairing = true;
+
+                    /// Returns name of this curve.
+                    static std::string name()
+                        { return "mnt6_" + std::to_string(Version); }
                 };
 
                 typedef mnt6<298> mnt6_298;
