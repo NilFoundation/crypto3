@@ -65,6 +65,10 @@ namespace nil {
                     //    pairing::detail::alt_bn128_pairing_functions<Version>> pairing_policy;
 
                     typedef typename policy_type::gt_field_type gt_type;
+
+                    /// Returns name of this curve.
+                    static std::string name()
+                        { return "alt_bn128_" + std::to_string(Version); }
                 };
 
                 typedef alt_bn128<254> alt_bn128_254;

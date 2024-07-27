@@ -45,6 +45,10 @@ namespace nil {
 
                     constexpr static const integral_type p =
                         0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFF0000000000000000FFFFFFFF_cppui_modular384;
+
+                    /// Returns name of this curve.
+                    static std::string name()
+                        { return "p384_" + std::to_string(WordBits); }
                 };
             }    // namespace curves
         }        // namespace algebra

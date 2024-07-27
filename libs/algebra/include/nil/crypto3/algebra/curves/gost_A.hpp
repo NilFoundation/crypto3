@@ -64,6 +64,10 @@ namespace nil {
                     constexpr static const integral_type x = 0x1_cppui_modular256;
                     constexpr static const integral_type y =
                         0x8D91E471E0989CDA27DF505A453F2B7635294F2DDF23E3B122ACC99C9E9F1E14_cppui_modular256;
+
+                    /// Returns name of this curve.
+                    static std::string name()
+                        { return "gost_A_" + std::to_string(base_field_bits); }
                 };
             }    // namespace curves
         }        // namespace algebra

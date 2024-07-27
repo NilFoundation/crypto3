@@ -48,6 +48,10 @@ namespace nil {
                     template<typename Coordinates = coordinates::jacobian_with_a4_0,
                              typename Form = forms::short_weierstrass>
                     using g1_type = typename detail::pallas_g1<Form, Coordinates>;
+
+                    /// Returns name of this curve.
+                    static std::string name()
+                        { return "pallas"; }
                 };
             }    // namespace curves
         }        // namespace algebra

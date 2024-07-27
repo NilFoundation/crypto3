@@ -44,6 +44,10 @@ namespace nil {
 
                     template<typename Coordinates = coordinates::projective, typename Form = forms::short_weierstrass>
                     using g1_type = typename detail::secp_r1_g1<Version, Form, Coordinates>;
+
+                    /// Returns name of this curve.
+                    static std::string name()
+                        { return "secp_r1_" + std::to_string(Version); }
                 };
 
                 typedef secp_r1<160> secp160r1;
