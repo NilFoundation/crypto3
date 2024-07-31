@@ -58,16 +58,3 @@ jobs:
             max-jobs = 4
         run: |
           nix build -L .?submodules=1#checks.x86_64-linux.default
-          results_dir="./results"
-          ls -la result/
-          mkdir -p "$results_dir/all-checks"
-          cp -r ./result/* "$results_dir/all-checks"
-          rm -rf result
-      - name: 'Upload Artifacts'
-        uses: actions/upload-artifact@v4
-        with:
-          name: junit-test-results
-          path: "results/**/*.xml"
-          retention-days: 5
-          if-no-files-found: error
-          overwrite: true
