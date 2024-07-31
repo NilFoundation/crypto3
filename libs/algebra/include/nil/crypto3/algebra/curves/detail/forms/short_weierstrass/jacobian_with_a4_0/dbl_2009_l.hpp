@@ -35,7 +35,6 @@ namespace nil {
 
                     /** @brief A struct representing element doubling from the group G1 of short Weierstrass curve
                      *  for jacobian_with_a4_0 coordinates representation.
-                     *  NOTE: does not handle O and pts of order 2,4
                      *  http://www.hyperelliptic.org/EFD/g1p/auto-shortw-jacobian-0.html#doubling-dbl-2009-l
                      */
                     struct short_weierstrass_element_g1_jacobian_with_a4_0_dbl_2009_l {

@@ -38,7 +38,6 @@
 #include <nil/crypto3/algebra/curves/alt_bn128.hpp>
 #include <nil/crypto3/algebra/curves/bls12.hpp>
 // #include <nil/crypto3/algebra/curves/brainpool_r1.hpp>
-#include <nil/crypto3/algebra/curves/edwards.hpp>
 // #include <nil/crypto3/algebra/curves/frp_v1.hpp>
 // #include <nil/crypto3/algebra/curves/gost_A.hpp>
 #include <nil/crypto3/algebra/curves/mnt4.hpp>

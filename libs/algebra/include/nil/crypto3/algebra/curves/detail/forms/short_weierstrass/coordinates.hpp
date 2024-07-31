@@ -41,14 +41,8 @@ namespace nil {
                     struct jacobian;
                     struct jacobian_with_a4_0;
                     struct jacobian_with_a4_minus_3;
-                    struct modified_jacobian;
                     struct projective;
-                    struct projective_with_a4_minus_1;
                     struct projective_with_a4_minus_3;
-                    struct w12_with_a6_0;
-                    struct xyzz;
-                    struct xyzz_with_a4_minus_3;
-                    struct xz;
 
                 }    // namespace coordinates
             }        // namespace curves

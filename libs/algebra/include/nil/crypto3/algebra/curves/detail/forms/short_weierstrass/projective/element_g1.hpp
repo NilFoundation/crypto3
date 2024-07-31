@@ -283,7 +283,6 @@ namespace nil {
                          */
                         constexpr void mixed_add(const curve_element &other) {
 
-                            // NOTE: does not handle O and pts of order 2,4
                             // http://www.hyperelliptic.org/EFD/g1p/auto-shortw-projective.html#addition-add-1998-cmo-2
 
                             if (this->is_zero()) {

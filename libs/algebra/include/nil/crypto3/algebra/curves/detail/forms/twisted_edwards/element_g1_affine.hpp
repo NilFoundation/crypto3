@@ -186,22 +186,6 @@ namespace nil {
                         /** @brief
                          *
                          * @return return the corresponding element from affine coordinates to
-                         * inverted coordinates
-                         */
-                        constexpr curve_element<params_type, form, typename curves::coordinates::inverted>
-                            to_inverted() const {
-
-                            using result_type =
-                                curve_element<params_type, form, typename curves::coordinates::inverted>;
-
-                            return result_type(
-                                X.inversed(), Y.inversed(),
-                                result_type::field_type::value_type::one());    // X = x^(-1), Y = y^(-1), Z = 1
-                        }
-
-                        /** @brief
-                         *
-                         * @return return the corresponding element from affine coordinates to
                          * extended coordinates with a=-1
                          */
                         constexpr curve_element<params_type, form,

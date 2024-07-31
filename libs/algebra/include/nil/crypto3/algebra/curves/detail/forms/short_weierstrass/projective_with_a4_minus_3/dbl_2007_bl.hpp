@@ -35,7 +35,6 @@ namespace nil {
 
                     /** @brief A struct representing element doubling from the group G1 of short Weierstrass curve
                      *  for projective_with_a4_minus_3 coordinates representation.
-                     *  NOTE: does not handle O and pts of order 2,4
                      *  http://www.hyperelliptic.org/EFD/g1p/auto-shortw-projective-3.html#doubling-dbl-2007-bl
                      */
                     struct short_weierstrass_element_g1_projective_with_a4_minus_3_dbl_2007_bl {

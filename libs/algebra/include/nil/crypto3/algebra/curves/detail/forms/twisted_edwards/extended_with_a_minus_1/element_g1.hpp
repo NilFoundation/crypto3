@@ -94,11 +94,19 @@ namespace nil {
                                           field_value_type::one()) {}
 
                         /** @brief
-                         *    @return the selected point (X:Y:Z)
+                         *    @return the selected point (X:Y:T:Z)
                          *
                          */
                         constexpr curve_element(const field_value_type& X, const field_value_type& Y, const field_value_type& T, const field_value_type& Z) 
-                            : X(X), Y(Y), T(T), Z(Z) 
+                            : X(X), Y(Y), T(T), Z(Z)
+                        { }
+
+                        /** @brief
+                         *  constructor from affine coordinates
+                         *
+                         */
+                        constexpr curve_element(const field_value_type& X, const field_value_type& Y)
+                            : X(X), Y(Y), T(X*Y), Z(field_value_type::one())
                         { }
 
                         template<typename Backend,
@@ -170,9 +178,9 @@ namespace nil {
                         /** @brief
                          *
                          * @return true if element from group G1 lies on the elliptic curve
-                         * x=X/Z, y=Y/Z, T = X*Y/Z,
+                         * x=X/Z, y=Y/Z, T/Z = x*y, X*Y = T*Z
                          * a*x^2 + y^2 = 1 + d*x^2*y^2
-                         * a*X^2 + Y^2 = Z^2 + d*T^2*Z^2
+                         * a*X^2 + Y^2 = Z^2 + d*T^2
                          * */
                         constexpr bool is_well_formed() const {
                             if (this->is_zero()) {

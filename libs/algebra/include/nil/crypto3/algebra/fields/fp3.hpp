@@ -27,13 +27,7 @@
 #define CRYPTO3_ALGEBRA_FIELDS_FP3_EXTENSION_HPP
 
 #include <nil/crypto3/algebra/fields/detail/element/fp3.hpp>
-#include <nil/crypto3/algebra/fields/detail/extension_params/edwards/fp3.hpp>
-/*#include <nil/crypto3/algebra/fields/detail/extension_params/frp_v1.hpp>
-#include <nil/crypto3/algebra/fields/detail/extension_params/gost_A.hpp>*/
 #include <nil/crypto3/algebra/fields/detail/extension_params/mnt6/fp3.hpp>
-/*#include <nil/crypto3/algebra/fields/detail/extension_params/secp.hpp>
-#include <nil/crypto3/algebra/fields/detail/extension_params/sm2p_v1.hpp>
-#include <nil/crypto3/algebra/fields/detail/extension_params/x962_p.hpp>*/
 
 #include <nil/crypto3/algebra/fields/params.hpp>
 

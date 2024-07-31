@@ -34,12 +34,15 @@
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
+#include <boost/test/execution_monitor.hpp>
+
+#include <boost/mpl/list.hpp>
+
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
 #include <nil/crypto3/algebra/curves/alt_bn128.hpp>
 #include <nil/crypto3/algebra/curves/bls12.hpp>
-#include <nil/crypto3/algebra/curves/edwards.hpp>
 #include <nil/crypto3/algebra/curves/jubjub.hpp>
 #include <nil/crypto3/algebra/curves/babyjubjub.hpp>
 #include <nil/crypto3/algebra/curves/mnt4.hpp>
@@ -48,6 +51,8 @@
 #include <nil/crypto3/algebra/curves/secp_r1.hpp>
 #include <nil/crypto3/algebra/curves/ed25519.hpp>
 #include <nil/crypto3/algebra/curves/curve25519.hpp>
+#include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/coordinates.hpp>
+
 
 #include <nil/crypto3/algebra/curves/vesta.hpp>
 #include <nil/crypto3/algebra/curves/pallas.hpp>
@@ -493,12 +498,6 @@ BOOST_DATA_TEST_CASE(curve_operation_test_babyjubjub_montgomery_affine,
     curve_operation_test_montgomery<policy_type>(data_set, fp_curve_twisted_edwards_test_init<policy_type>);
 }
 
-BOOST_DATA_TEST_CASE(curve_operation_test_edwards_g1, string_data("curve_operation_test_edwards_g1"), data_set) {
-    using policy_type = curves::edwards<183>::g1_type<>;
-
-    curve_operation_test<policy_type>(data_set, fp_curve_test_init<policy_type>);
-}
-
 BOOST_DATA_TEST_CASE(curve_operation_test_mnt4_g1, string_data("curve_operation_test_mnt4_g1"), data_set) {
     using policy_type = curves::mnt4<298>::g1_type<>;
 
@@ -516,16 +515,6 @@ BOOST_DATA_TEST_CASE(curve_operation_test_mnt4_g2, string_data("curve_operation_
 
     curve_operation_test<policy_type>(data_set, fp2_curve_test_init<policy_type>);
 }
-
-// Disabled until params are reviewed. For current params g2::one is not well-formed
-// https://github.com/NilFoundation/crypto3-algebra/issues/161
-/*
-BOOST_DATA_TEST_CASE(curve_operation_test_edwards_g2, string_data("curve_operation_test_edwards_g2"), data_set) {
-    using policy_type = curves::edwards<183>::g2_type<>;
-
-    curve_operation_test<policy_type>(data_set, fp3_curve_test_init<policy_type>);
-}
-*/
 
 BOOST_DATA_TEST_CASE(curve_operation_test_mnt6_g2, string_data("curve_operation_test_mnt6_g2"), data_set) {
     using policy_type = curves::mnt6<298>::g2_type<>;
@@ -571,7 +560,6 @@ BOOST_DATA_TEST_CASE(curve_operation_test_alt_bn128_g2, string_data("curve_opera
 
 BOOST_DATA_TEST_CASE(curve_operation_test_secp256_r1_g1, string_data("curve_operation_test_secp256r1"), data_set) {
     using policy_type = curves::secp_r1<256>::g1_type<>;
-
     curve_operation_test<policy_type>(data_set, fp_curve_test_init<policy_type>);
 }
 
@@ -587,21 +575,94 @@ BOOST_DATA_TEST_CASE(curve_operation_test_edwards25519, string_data("curve_opera
     static_assert(std::is_same<typename curves::ed25519::g1_type<>::curve_type, curves::ed25519>::value);
     static_assert(std::is_same<typename curves::curve25519::g1_type<>::curve_type, curves::curve25519>::value);
 
-    curve_operation_test_twisted_edwards<policy_type>(data_set,
-                                                      fp_extended_curve_twisted_edwards_test_init<policy_type>);
+    curve_operation_test_twisted_edwards<policy_type>(data_set, fp_extended_curve_twisted_edwards_test_init<policy_type>);
 }
 
 BOOST_DATA_TEST_CASE(curve_operation_test_pallas, string_data("curve_operation_test_pallas"), data_set) {
     using policy_type = curves::pallas::g1_type<>;
 
-    curve_operation_test<policy_type>(data_set,
-                                                      fp_curve_test_init<policy_type>);
+    curve_operation_test<policy_type>(data_set, fp_curve_test_init<policy_type>);
 }
 BOOST_DATA_TEST_CASE(curve_operation_test_vesta, string_data("curve_operation_test_vesta"), data_set) {
     using policy_type = curves::vesta::g1_type<>;
 
-    curve_operation_test<policy_type>(data_set,
-                                                      fp_curve_test_init<policy_type>);
+    curve_operation_test<policy_type>(data_set, fp_curve_test_init<policy_type>);
+}
+
+/*
+ * Tests for "NOTE: does not handle O and pts of order 2,4"
+ * short Weierstrass forms
+ */
+template<typename coordinates>
+class bls12_377_orders_2_4_runner {
+    using curve_type = curves::bls12_377;
+    using g1_type = curve_type::g1_type<coordinates>;
+
+    // point of order 2
+    static constexpr curve_type::base_field_type::value_type
+        o2_X = curve_type::base_field_type::modulus - 1,
+        o2_Y = 0u;
+    // point of order 4
+    static constexpr curve_type::base_field_type::value_type
+        o4_X = 0x126f980765bb3d634f9d5cb49909db8af2e185fb13bdb7dc4aedcadf9d8dad86bba02eda906066c9153bdf72ddce76c_cppui_modular377,
+        o4_Y = 0x06e4b66bb23ef4bef715f597162d6662d8161cd062d6212d39392e17232444a0760b5dc479db98123ab3887aa3cb34e_cppui_modular377;
+
+    public:
+    bool static run() {
+        typename g1_type::value_type o4(o4_X, o4_Y), o2(o2_X, o2_Y), check;
+
+        BOOST_CHECK(o4.is_well_formed());
+        BOOST_CHECK(o2.is_well_formed());
+
+        check = o4 + o4 + o4 + o4;
+        BOOST_CHECK_EQUAL(check, g1_type::value_type::zero());
+        check = o2 + o2;
+        BOOST_CHECK_EQUAL(check, g1_type::value_type::zero());
+        return true;
+    }
+
+};
+
+using bls12_377_orders_2_4_runners = boost::mpl::list<
+    bls12_377_orders_2_4_runner<curves::coordinates::projective>,
+    bls12_377_orders_2_4_runner<curves::coordinates::jacobian>,
+    bls12_377_orders_2_4_runner<curves::coordinates::jacobian_with_a4_0> >;
+
+/* No tests for projective_with_a4_minus_3 and jacobian_with_a4_minus_3
+ * Only secp<Version>_r1 curves have a4 = -3, but these curves have cofactor = 1,
+ * so there are no points of order 2 and 4 */
+
+BOOST_AUTO_TEST_CASE_TEMPLATE(bls12_377_order_test, runner, bls12_377_orders_2_4_runners) {
+    BOOST_CHECK(runner::run());
+}
+
+/*
+ * Twisted Edwards forms
+ * extended coordinates
+ */
+BOOST_AUTO_TEST_CASE(twisted_edwards_extended_order_test) {
+    using curve_type = curves::ed25519;
+    using g1_type = typename curve_type::g1_type<>;
+
+    /* Point of order 2 */
+    curve_type::base_field_type::value_type
+        o2_X = 0x0_cppui_modular255,
+        o2_Y = curve_type::base_field_type::modulus - 1;
+
+    /* Point of order 4 */
+    curve_type::base_field_type::value_type
+        o4_X = 0x547cdb7fb03e20f4d4b2ff66c2042858d0bce7f952d01b873b11e4d8b5f15f3d_cppui_modular255,
+        o4_Y = 0x0_cppui_modular255;
+
+    typename g1_type::value_type o4(o4_X, o4_Y), o2(o2_X, o2_Y), check;
+
+    BOOST_CHECK(o4.is_well_formed());
+    BOOST_CHECK(o2.is_well_formed());
+
+    check = o4 + o4 + o4 + o4;
+    BOOST_CHECK_EQUAL(check, g1_type::value_type::zero());
+    check = o2 + o2;
+    BOOST_CHECK_EQUAL(check, g1_type::value_type::zero());
 }
 
 BOOST_AUTO_TEST_SUITE_END()
