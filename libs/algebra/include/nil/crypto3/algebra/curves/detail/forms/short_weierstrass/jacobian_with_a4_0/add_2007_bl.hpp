@@ -35,7 +35,6 @@ namespace nil {
 
                     /** @brief A struct representing element addition from the group G1 of short Weierstrass curve
                      *  for jacobian_with_a4_0 coordinates representation.
-                     *  NOTE: does not handle O and pts of order 2,4
                      *  http://www.hyperelliptic.org/EFD/g1p/auto-shortw-jacobian-0.html#addition-add-2007-bl
                      */
 

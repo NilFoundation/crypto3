@@ -35,7 +35,6 @@ namespace nil {
 
                     /** @brief A struct representing element addition from the group G1 of short Weierstrass curve
                      *  for projective coordinates representation.
-                     *  NOTE: does not handle O and pts of order 2,4
                      *  http://www.hyperelliptic.org/EFD/g1p/auto-shortw-projective.html#addition-add-1998-cmo-2
                      */
 
