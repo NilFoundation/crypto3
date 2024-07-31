@@ -72,6 +72,6 @@ declare -a TEST_LIST=(\
 #blueprint_mock_mocked_components_test, TODO: Enable after code and test re-written.
 
 echo "building ${TEST_LIST[*]}"
-ninja -k 0 ${TEST_LIST[*]}
+ninja -k 0 -j $NIX_BUILD_CORES ${TEST_LIST[*]}
 
 echo "finish"
