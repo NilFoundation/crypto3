@@ -292,6 +292,7 @@ namespace boost {
                     , m_barrett_mu(o.get_mu())
                     , m_montgomery_r2(o.get_r2())
                     , m_montgomery_p_dash(o.get_p_dash())
+                    , m_no_carry_montgomery_mul_allowed(is_applicable_for_no_carry_montgomery_mul())
                 {
                 }
 
@@ -464,8 +465,7 @@ namespace boost {
                     // bit in the number. I.E. if modulus is 255 bits, then we have 1 additional "unused" bit in the number.
                     // 2. Some other bit in modulus is 0.
                     // 3. The number has < 12 limbs.
-                    return m_mod.internal_limb_count < 12 && (Bits % sizeof(internal_limb_type) != 0) && 
-                        !eval_eq(m_mod_compliment, Backend(internal_limb_type(1u)));
+                    return m_mod.internal_limb_count < 12 && (Bits % sizeof(internal_limb_type) != 0) && !eval_eq(m_mod_compliment, Backend(internal_limb_type(1u)));
                 }
 
                 template<class Backend1 = Backend> 
@@ -527,67 +527,38 @@ namespace boost {
 
                         // The lower loop is unrolled. We want to do this for every 3, because normally mod_size == 4.
                         std::size_t j = 1;
+
+                        #define MONTGOMERY_MUL_NO_CARRY_LOOP_BODY(X) \
+                            /* "(A,t[X])  := t[X] + a[X]*b[i] + A" */\
+                            tmp = a_limbs[X]; \
+                            tmp *= b_limbs[i]; \
+                            tmp += result_limbs[X]; \
+                            tmp += A; \
+                            modular_functions_fixed::dbl_limb_to_limbs( tmp, A, result_limbs[X] ); \
+                            \
+                            /* "(C,t[X-1]) := t[X] + m*q[X] + C" */ \
+                            tmp = m; \
+                            tmp *= m_mod_limbs[X]; \
+                            tmp += result_limbs[X]; \
+                            tmp += C; \
+                            modular_functions_fixed::dbl_limb_to_limbs( tmp, C, result_limbs[X-1] );
+
+                        for (; j + 5 <= N; j += 5) {
+                            MONTGOMERY_MUL_NO_CARRY_LOOP_BODY(j);
+                            MONTGOMERY_MUL_NO_CARRY_LOOP_BODY(j + 1);
+                            MONTGOMERY_MUL_NO_CARRY_LOOP_BODY(j + 2);
+                            MONTGOMERY_MUL_NO_CARRY_LOOP_BODY(j + 3);
+                            MONTGOMERY_MUL_NO_CARRY_LOOP_BODY(j + 4);
+                        }
+
                         for (; j + 3 <= N; j += 3) {
-                            // For j
-                            // "(A,t[j])  := t[j] + a[j]*b[i] + A"
-                            tmp = a_limbs[j];
-                            tmp *= b_limbs[i];
-                            tmp += result_limbs[j];
-                            tmp += A;
-                            modular_functions_fixed::dbl_limb_to_limbs( tmp, A, result_limbs[j] );
-
-                            // "(C,t[j-1]) := t[j] + m*q[j] + C"
-                            tmp = m;
-                            tmp *= m_mod_limbs[j];
-                            tmp += result_limbs[j];
-                            tmp += C;
-                            modular_functions_fixed::dbl_limb_to_limbs( tmp, C, result_limbs[j-1] );
-
-                            // For j + 1
-                            // "(A,t[j])  := t[j] + a[j]*b[i] + A"
-                            tmp = a_limbs[j + 1];
-                            tmp *= b_limbs[i];
-                            tmp += result_limbs[j + 1];
-                            tmp += A;
-                            modular_functions_fixed::dbl_limb_to_limbs( tmp, A, result_limbs[j + 1] );
-
-                            // "(C,t[j-1]) := t[j] + m*q[j] + C"
-                            tmp = m;
-                            tmp *= m_mod_limbs[j + 1];
-                            tmp += result_limbs[j + 1];
-                            tmp += C;
-                            modular_functions_fixed::dbl_limb_to_limbs( tmp, C, result_limbs[j] );
-
-                            // For j + 2
-                            // "(A,t[j])  := t[j] + a[j]*b[i] + A"
-                            tmp = a_limbs[j + 2];
-                            tmp *= b_limbs[i];
-                            tmp += result_limbs[j + 2];
-                            tmp += A;
-                            modular_functions_fixed::dbl_limb_to_limbs( tmp, A, result_limbs[j + 2] );
-
-                            // "(C,t[j-1]) := t[j] + m*q[j] + C"
-                            tmp = m;
-                            tmp *= m_mod_limbs[j + 2];
-                            tmp += result_limbs[j + 2];
-                            tmp += C;
-                            modular_functions_fixed::dbl_limb_to_limbs( tmp, C, result_limbs[j + 1] );
+                            MONTGOMERY_MUL_NO_CARRY_LOOP_BODY(j);
+                            MONTGOMERY_MUL_NO_CARRY_LOOP_BODY(j + 1);
+                            MONTGOMERY_MUL_NO_CARRY_LOOP_BODY(j + 2);
                         }
 
                         for ( ; j < N; ++j ) {
-                            // "(A,t[j])  := t[j] + a[j]*b[i] + A"
-                            tmp = a_limbs[j];
-                            tmp *= b_limbs[i];
-                            tmp += result_limbs[j];
-                            tmp += A;
-                            modular_functions_fixed::dbl_limb_to_limbs( tmp, A, result_limbs[j] );
-
-                            // "(C,t[j-1]) := t[j] + m*q[j] + C"
-                            tmp = m;
-                            tmp *= m_mod_limbs[j];
-                            tmp += result_limbs[j];
-                            tmp += C;
-                            modular_functions_fixed::dbl_limb_to_limbs( tmp, C, result_limbs[j-1] );
+                            MONTGOMERY_MUL_NO_CARRY_LOOP_BODY(j);
                         }
 
                         // "t[N-1] = C + A"
@@ -604,6 +575,7 @@ namespace boost {
                 template<typename Backend1>
                 BOOST_MP_CXX14_CONSTEXPR void montgomery_mul_CIOS_impl(Backend1 &result, const Backend1 &y,
                         std::integral_constant<bool, false> const&) const {
+
                     BOOST_ASSERT(eval_lt(result, m_mod) && eval_lt(y, m_mod));
 
                     Backend A(internal_limb_type(0u));
@@ -648,51 +620,34 @@ namespace boost {
 
                         // The lower loop is unrolled. We want to do this for every 3, because normally mod_size == 4.
                         internal_double_limb_type t = 0, t2 = 0;
+
+                        #define MONTGOMERY_MUL_CIOS_LOOP_BODY(X) \
+                            t = static_cast<internal_double_limb_type>(y_limbs[X]) * \
+                                static_cast<internal_double_limb_type>(x_i) + \
+                                A_limbs[X] + k; \
+                            t2 = static_cast<internal_double_limb_type>(mod_limbs[X]) * \
+                                static_cast<internal_double_limb_type>(u_i) + \
+                                static_cast<internal_limb_type>(t) + k2; \
+                            A_limbs[X - 1] = static_cast<internal_limb_type>(t2); \
+                            k = static_cast<internal_limb_type>(t >> std::numeric_limits<internal_limb_type>::digits); \
+                            k2 = static_cast<internal_limb_type>(t2 >> std::numeric_limits<internal_limb_type>::digits); 
+
+                        for (; j + 5 <= mod_size; j += 5) {
+                            MONTGOMERY_MUL_CIOS_LOOP_BODY(j);
+                            MONTGOMERY_MUL_CIOS_LOOP_BODY(j + 1);
+                            MONTGOMERY_MUL_CIOS_LOOP_BODY(j + 2);
+                            MONTGOMERY_MUL_CIOS_LOOP_BODY(j + 3);
+                            MONTGOMERY_MUL_CIOS_LOOP_BODY(j + 4);
+                        }
+
                         for (; j + 3 <= mod_size; j += 3) {
-                            // For j
-                            t = static_cast<internal_double_limb_type>(y_limbs[j]) *
-                                static_cast<internal_double_limb_type>(x_i) +
-                                A_limbs[j] + k;
-                            t2 = static_cast<internal_double_limb_type>(mod_limbs[j]) *
-                                static_cast<internal_double_limb_type>(u_i) +
-                                static_cast<internal_limb_type>(t) + k2;
-                            A_limbs[j - 1] = static_cast<internal_limb_type>(t2);
-                            k = static_cast<internal_limb_type>(t >> std::numeric_limits<internal_limb_type>::digits);
-                            k2 = static_cast<internal_limb_type>(t2 >> std::numeric_limits<internal_limb_type>::digits);
-
-                            // For j + 1
-                            t = static_cast<internal_double_limb_type>(y_limbs[j + 1]) *
-                                static_cast<internal_double_limb_type>(x_i) +
-                                A_limbs[j + 1] + k;
-                            t2 = static_cast<internal_double_limb_type>(mod_limbs[j + 1]) *
-                                static_cast<internal_double_limb_type>(u_i) +
-                                static_cast<internal_limb_type>(t) + k2;
-                            A_limbs[j + 1 - 1] = static_cast<internal_limb_type>(t2);
-                            k = static_cast<internal_limb_type>(t >> std::numeric_limits<internal_limb_type>::digits);
-                            k2 = static_cast<internal_limb_type>(t2 >> std::numeric_limits<internal_limb_type>::digits);
-
-                            // For j + 2
-                            t = static_cast<internal_double_limb_type>(y_limbs[j + 2]) *
-                                static_cast<internal_double_limb_type>(x_i) +
-                                A_limbs[j + 2] + k;
-                            t2 = static_cast<internal_double_limb_type>(mod_limbs[j + 2]) *
-                                static_cast<internal_double_limb_type>(u_i) +
-                                static_cast<internal_limb_type>(t) + k2;
-                            A_limbs[j + 2 - 1] = static_cast<internal_limb_type>(t2);
-                            k = static_cast<internal_limb_type>(t >> std::numeric_limits<internal_limb_type>::digits);
-                            k2 = static_cast<internal_limb_type>(t2 >> std::numeric_limits<internal_limb_type>::digits);
+                            MONTGOMERY_MUL_CIOS_LOOP_BODY(j);
+                            MONTGOMERY_MUL_CIOS_LOOP_BODY(j + 1);
+                            MONTGOMERY_MUL_CIOS_LOOP_BODY(j + 2);
                         }
 
                         for (; j < mod_size; ++j) {
-                            t = static_cast<internal_double_limb_type>(y_limbs[j]) *
-                                static_cast<internal_double_limb_type>(x_i) +
-                                A_limbs[j] + k;
-                            t2 = static_cast<internal_double_limb_type>(mod_limbs[j]) *
-                                static_cast<internal_double_limb_type>(u_i) +
-                                static_cast<internal_limb_type>(t) + k2;
-                            A_limbs[j - 1] = static_cast<internal_limb_type>(t2);
-                            k = static_cast<internal_limb_type>(t >> std::numeric_limits<internal_limb_type>::digits);
-                            k2 = static_cast<internal_limb_type>(t2 >> std::numeric_limits<internal_limb_type>::digits);
+                            MONTGOMERY_MUL_CIOS_LOOP_BODY(j);
                         }
 
                         internal_double_limb_type tmp =

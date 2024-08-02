@@ -75,7 +75,6 @@ BOOST_AUTO_TEST_CASE(modular_adaptor_montgomery_mult_perf_test) {
         << std::dec << elapsed.count() / SAMPLES << " ns" << std::endl;
 }
 
-// Averge subtraction time is 37 ns.
 BOOST_AUTO_TEST_CASE(modular_adaptor_backend_sub_perf_test) {
     using namespace boost::multiprecision::default_ops;
 
@@ -107,7 +106,6 @@ BOOST_AUTO_TEST_CASE(modular_adaptor_backend_sub_perf_test) {
         << std::dec << elapsed.count() / SAMPLES << " ns" << std::endl;
 }
 
-// Averge addition time is 37 ns.
 BOOST_AUTO_TEST_CASE(modular_adaptor_backend_add_perf_test) {
     using namespace boost::multiprecision::default_ops;
 
@@ -139,7 +137,6 @@ BOOST_AUTO_TEST_CASE(modular_adaptor_backend_add_perf_test) {
         << std::dec << elapsed.count() / SAMPLES << " ns" << std::endl;
 }
 
-// Averge multiplication time is 130 ns.
 BOOST_AUTO_TEST_CASE(modular_adaptor_backend_mult_perf_test) {
     using Backend = cpp_int_modular_backend<256>;
     using standart_number = boost::multiprecision::number<Backend>;
@@ -170,7 +167,6 @@ BOOST_AUTO_TEST_CASE(modular_adaptor_backend_mult_perf_test) {
     std::cout << x_modular << std::endl;
 }
 
-// Averge multiplication time is 130 ns.
 BOOST_AUTO_TEST_CASE(modular_adaptor_number_mult_perf_test) {
     using Backend = cpp_int_modular_backend<256>;
     using standart_number = boost::multiprecision::number<Backend>;
