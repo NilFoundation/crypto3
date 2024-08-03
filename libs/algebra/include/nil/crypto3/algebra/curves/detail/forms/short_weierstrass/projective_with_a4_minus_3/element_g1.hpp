@@ -165,13 +165,13 @@ namespace nil {
                                   z y^2 = x^3  + a z^2 x + b z^3
                                   z (y^2 - b z^2) = x ( x^2 + a z^2)
 
-                                  z (y^2 - b z^2) = x ( x^2 - z^2)
+                                  z (y^2 - b z^2) = x ( x^2 - 3 z^2)
                                 */
                                 const field_value_type X2 = this->X.squared();
                                 const field_value_type Y2 = this->Y.squared();
                                 const field_value_type Z2 = this->Z.squared();
 
-                                return (this->Z * (Y2 - params_type::b * Z2) == this->X * (X2 - Z2));
+                                return (this->Z * (Y2 - params_type::b * Z2) == this->X * (X2 + params_type::a * Z2));
                             }
                         }
 
@@ -271,7 +271,6 @@ namespace nil {
                          */
                         constexpr void mixed_add(const curve_element &other) {
 
-                            // NOTE: does not handle O and pts of order 2,4
                             // http://www.hyperelliptic.org/EFD/g1p/auto-shortw-projective_with_a4_minus_3.html#addition-add-1998-cmo-2
 
                             if (this->is_zero()) {
