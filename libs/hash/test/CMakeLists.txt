@@ -60,6 +60,7 @@ set(TESTS_NAMES
     "sha1"
     "sha2"
     "sha3"
+    "shake"
     "static_digest"
     "tiger"
     "poseidon"

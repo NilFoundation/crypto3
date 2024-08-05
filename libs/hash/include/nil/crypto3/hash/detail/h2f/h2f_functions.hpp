@@ -54,9 +54,8 @@ namespace nil {
             namespace detail {
                 template<std::size_t k, std::size_t len_in_bytes, typename Hash,
                          /// Hash::digest_type is required to be uint8_t[]
-                         typename = typename std::enable_if<std::is_same<
-                             std::uint8_t,
-                             typename std::iterator_traits<typename Hash::digest_type>::value_type>::value>::type>
+                         typename = typename std::enable_if<
+                            std::is_same<std::uint8_t, typename Hash::digest_type::value_type>::value>::type>
                 class expand_message_xmd {
                     // https://tools.ietf.org/html/draft-irtf-cfrg-hash-to-curve-10#section-5.4.1
                     static_assert(Hash::block_bits % 8 == 0, "r_in_bytes is not a multiple of 8");
@@ -133,6 +132,70 @@ namespace nil {
                             bi = ::nil::crypto3::accumulators::extract::hash<Hash>(bi_acc);
                             std::copy(bi.begin(), bi.end(), uniform_bytes.begin() + (i - 1) * b_in_bytes);
                         }
+                        return uniform_bytes;
+                    }
+                };
+
+                template<std::size_t k, std::size_t len_in_bytes, typename Hash,
+                         /// Hash::digest_type is required to be uint8_t[]. 
+                         typename = typename std::enable_if<
+                            std::is_same<std::uint8_t, typename Hash::digest_type::value_type>::value>::type>
+                class expand_message_xof {
+                    // https://tools.ietf.org/html/draft-irtf-cfrg-hash-to-curve-10#section-5.4.2
+                    static_assert(Hash::block_bits % 8 == 0, "r_in_bytes is not a multiple of 8");
+                    static_assert(Hash::digest_bits % 8 == 0, "b_in_bytes is not a multiple of 8");
+                    static_assert(Hash::digest_bits >= 2 * k, "k-bit collision resistance is not fulfilled");
+                    static_assert(len_in_bytes < 0x10000, "len_in_bytes should be less than 0x10000");
+                    static_assert(Hash::digest_bits == len_in_bytes * 8, "len_in_bytes should be equal to XOF digest length");
+
+                    constexpr static std::size_t b_in_bytes = Hash::digest_bits / 8;
+                    constexpr static std::array<std::uint8_t, 2> l_i_b_str = {
+                        static_cast<std::uint8_t>(len_in_bytes >> 8u), static_cast<std::uint8_t>(len_in_bytes % 0x100)};
+                    constexpr static std::size_t ell = static_cast<std::size_t>(len_in_bytes / b_in_bytes) +
+                                                       static_cast<std::size_t>(len_in_bytes % b_in_bytes != 0);
+
+                    // https://tools.ietf.org/html/draft-irtf-cfrg-hash-to-curve-10#section-5.4.1
+                    static_assert(ell <= 255, "ell should be less than 256");
+
+                public:
+                    typedef std::array<std::uint8_t, len_in_bytes> result_type;
+                    typedef accumulator_set<Hash> internal_accumulator_type;
+
+                    static inline void init_accumulator(internal_accumulator_type &acc) {
+                        
+                    }
+
+                    template<typename InputRange>
+                    static inline void update(internal_accumulator_type &acc, const InputRange &range) {
+                        BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<InputRange>));
+
+                        hash<Hash>(range, acc);
+                    }
+
+                    template<typename InputIterator>
+                    static inline void update(internal_accumulator_type &acc, InputIterator first, InputIterator last) {
+                        BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator>));
+
+                        hash<Hash>(first, last, acc);
+                    }
+
+                    template<typename DstRange>
+                    static inline typename std::enable_if<
+                        std::is_same<std::uint8_t,
+                                     typename std::iterator_traits<typename DstRange::iterator>::value_type>::value,
+                        result_type>::type
+                        process(internal_accumulator_type &b0_acc, const DstRange &dst) {
+
+                        auto dst_size = std::distance(std::cbegin(dst), std::cend(dst));
+                        assert(dst_size >= 16 && dst_size <= 255);
+
+                        hash<Hash>(l_i_b_str, b0_acc);
+                        hash<Hash>(dst, b0_acc);
+                        hash<Hash>(std::array<std::uint8_t, 1> {static_cast<std::uint8_t>(dst_size)}, b0_acc);
+                        typename Hash::digest_type b0 = ::nil::crypto3::accumulators::extract::hash<Hash>(b0_acc);
+
+                        result_type uniform_bytes;
+                        std::copy(b0.begin(), b0.end(), uniform_bytes.begin());
                         return uniform_bytes;
                     }
                 };

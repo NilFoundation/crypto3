@@ -32,6 +32,7 @@
 #include <nil/crypto3/marshalling/algebra/types/curve_element.hpp>
 
 #include <nil/crypto3/hash/algorithm/hash.hpp>
+#include <nil/crypto3/hash/h2f.hpp>
 #include <nil/crypto3/hash/keccak.hpp>
 #include <nil/crypto3/hash/poseidon.hpp>
 #include <nil/crypto3/hash/sha2.hpp>
@@ -87,8 +88,7 @@ namespace nil {
                         if constexpr (algebra::is_field_element<typename hash_type::word_type>::value) {
                             BOOST_STATIC_ASSERT_MSG(
                                 algebra::is_field_element<TAny>::value,
-                                "Hash type consumes field elements, but provided value is not a field element"
-                            );
+                                "Hash type consumes field elements, but provided value is not a field element");
                             acc(data);
                         } else {
                             nil::marshalling::status_type status;
@@ -114,7 +114,8 @@ namespace nil {
                         return FieldType::value_type::one();
                     }
 
-                    template<typename ChallengesType::challenges_ids ChallengeId, std::size_t ChallengesAmount,
+                    template<typename ChallengesType::challenges_ids ChallengeId,
+                             std::size_t ChallengesAmount,
                              typename FieldType>
                     std::array<typename FieldType::value_type, ChallengesAmount> challenges() {
 
@@ -132,10 +133,11 @@ namespace nil {
                 };
 
                 template<typename Hash, typename Enable = void>
-                struct fiat_shamir_heuristic_sequential
-                {
+                struct fiat_shamir_heuristic_sequential {
                     typedef Hash hash_type;
-                    typedef typename boost::multiprecision::cpp_int_modular_backend<hash_type::digest_bits> modular_backend_of_hash_size;
+
+                    typedef typename boost::multiprecision::cpp_int_modular_backend<hash_type::digest_bits>
+                        modular_backend_of_hash_size;
 
                     fiat_shamir_heuristic_sequential() : state(hash<hash_type>({0})) {
                     }
@@ -150,10 +152,9 @@ namespace nil {
                     }
 
                     template<typename InputRange>
-                    typename std::enable_if_t<
-                        !algebra::is_group_element<InputRange>::value &&
-                        !algebra::is_field_element<InputRange>::value>
-                    operator()(const InputRange &r) {
+                    typename std::enable_if_t<!algebra::is_group_element<InputRange>::value &&
+                                              !algebra::is_field_element<InputRange>::value>
+                        operator()(const InputRange &r) {
                         auto acc_convertible = hash<hash_type>(state);
                         state = accumulators::extract::hash<hash_type>(
                             hash<hash_type>(r, static_cast<accumulator_set<hash_type> &>(acc_convertible)));
@@ -167,52 +168,74 @@ namespace nil {
                     }
 
                     template<typename element>
-                    typename std::enable_if_t<
-                        algebra::is_group_element<element>::value ||
-                        algebra::is_field_element<element>::value
-                        >
-                    operator()(element const& data) {
+                    typename std::enable_if_t<algebra::is_group_element<element>::value ||
+                                              algebra::is_field_element<element>::value>
+                        operator()(element const &data) {
                         nil::marshalling::status_type status;
                         std::vector<std::uint8_t> byte_data =
                             nil::marshalling::pack<nil::marshalling::option::big_endian>(data, status);
                         BOOST_ASSERT(status == nil::marshalling::status_type::success);
                         auto acc_convertible = hash<hash_type>(state);
                         state = accumulators::extract::hash<hash_type>(
-                                hash<hash_type>(byte_data, static_cast<accumulator_set<hash_type> &>(acc_convertible)));
+                            hash<hash_type>(byte_data, static_cast<accumulator_set<hash_type> &>(acc_convertible)));
                     }
 
                     template<typename Field>
-                    // typename std::enable_if<(Hash::digest_bits >= Field::modulus_bits),
-                    //                         typename Field::value_type>::type
-                    typename Field::value_type challenge() {
+                    typename std::enable_if<(Hash::digest_bits >= Field::modulus_bits),
+                                            typename Field::value_type>::type
+                        challenge() {
                         using digest_value_type = typename hash_type::digest_type::value_type;
                         const std::size_t digest_value_bits = sizeof(digest_value_type) * CHAR_BIT;
                         const std::size_t element_size = Field::number_bits / digest_value_bits +
-                            (Field::number_bits % digest_value_bits == 0 ? 0 : 1);
+                                                         (Field::number_bits % digest_value_bits == 0 ? 0 : 1);
 
                         std::array<digest_value_type, element_size> data;
                         state = hash<hash_type>(state);
-                        // TODO(martun): for now we copy 256 bits into a larger group element. For example for 
-                        // mnt6_base_field<298ul> the first 42 bits will be zero.
-                        // Use something like hash to field(h2f.hpp) for this.
+
                         std::size_t count = std::min(data.size(), state.size());
                         std::copy(state.begin(), state.begin() + count, data.begin() + data.size() - count);
-                        
+
                         nil::marshalling::status_type status;
-                        boost::multiprecision::number<modular_backend_of_hash_size> raw_result = 
+                        boost::multiprecision::number<modular_backend_of_hash_size> raw_result =
                             nil::marshalling::pack(state, status);
                         BOOST_ASSERT(status == nil::marshalling::status_type::success);
 
                         return raw_result;
                     }
 
+                    template<typename Field>
+                    typename std::enable_if<(Hash::digest_bits < Field::modulus_bits), typename Field::value_type>::type
+                        challenge() {
+
+                        // TODO: check hash is not h2f type
+                        using h2f_type =
+                            hashes::h2f<Field,
+                                        hash_type,
+                                        hashes::h2f_default_params<Field,
+                                                                   hash_type,
+                                                                   128,
+                                                                   hashes::UniformityCount::nonuniform_count,
+                                                                   hashes::ExpandMsgVariant::rfc_xmd>>;
+
+                        typename h2f_type::digest_type result = hash<h2f_type>(state);
+                        nil::marshalling::status_type status;
+                        std::vector<std::uint8_t> byte_data =
+                            nil::marshalling::pack<nil::marshalling::option::big_endian>(result[0], status);
+                        BOOST_ASSERT(status == nil::marshalling::status_type::success);
+
+                        std::size_t count = std::min(byte_data.size(), state.size());
+                        std::copy(byte_data.end() - count, byte_data.end(), state.begin());
+                        return result[0];
+                    }
+
                     template<typename Integral>
                     Integral int_challenge() {
                         state = hash<hash_type>(state);
                         nil::marshalling::status_type status;
-                        boost::multiprecision::number<modular_backend_of_hash_size> raw_result = nil::marshalling::pack(state, status);
-                        // If we remove the next line, raw_result is a much larger number, conversion to 'Integral' will overflow
-                        // and in debug mode an assert will fire. In release mode nothing will change.
+                        boost::multiprecision::number<modular_backend_of_hash_size> raw_result =
+                            nil::marshalling::pack(state, status);
+                        // If we remove the next line, raw_result is a much larger number, conversion to 'Integral' will
+                        // overflow and in debug mode an assert will fire. In release mode nothing will change.
                         raw_result &= ~Integral(0);
                         return static_cast<Integral>(raw_result);
                     }
@@ -239,12 +262,7 @@ namespace nil {
                 struct fiat_shamir_heuristic_sequential<
                     Hash,
                     typename std::enable_if_t<
-                        nil::crypto3::hashes::is_specialization_of<
-                            nil::crypto3::hashes::poseidon,
-                            Hash
-                        >::value
-                    >
-                > {
+                        nil::crypto3::hashes::is_specialization_of<nil::crypto3::hashes::poseidon, Hash>::value>> {
                     //   After refactoring an attempt to remove this Nil Poseidon specialization was made.
                     // The difference between challenge() for other hashes and for Nil Poseidon is
                     // how the second challenge is produced. For the first call things are the same:
@@ -266,7 +284,7 @@ namespace nil {
 
                     template<typename InputRange>
                     fiat_shamir_heuristic_sequential(const InputRange &r) {
-                        if(r.size() != 0) {
+                        if (r.size() != 0) {
                             sponge.absorb(static_cast<typename hash_type::digest_type>(hash<hash_type>(r)));
                         }
                     }
@@ -281,18 +299,14 @@ namespace nil {
                     }
 
                     template<typename InputRange>
-                    typename std::enable_if_t<
-                        !algebra::is_group_element<InputRange>::value
-                        >
-                    operator()(const InputRange &r) {
+                    typename std::enable_if_t<!algebra::is_group_element<InputRange>::value>
+                        operator()(const InputRange &r) {
                         sponge.absorb(static_cast<typename hash_type::digest_type>(hash<hash_type>(r)));
                     }
 
                     template<typename element>
-                    typename std::enable_if_t<
-                        algebra::is_group_element<element>::value
-                        >
-                    operator()(element const& data) {
+                    typename std::enable_if_t<algebra::is_group_element<element>::value>
+                        operator()(element const &data) {
                         auto affine = data.to_affine();
                         sponge.absorb(affine.X);
                         sponge.absorb(affine.Y);
@@ -346,8 +360,8 @@ namespace nil {
                 };
 
             }    // namespace transcript
-        }        // namespace zk
-    }            // namespace crypto3
+        }    // namespace zk
+    }    // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_ZK_TRANSCRIPT_FIAT_SHAMIR_HEURISTIC_HPP
