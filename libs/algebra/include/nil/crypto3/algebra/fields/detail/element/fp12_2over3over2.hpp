@@ -145,7 +145,7 @@ namespace nil {
 
                         element_fp12_2over3over2 sqrt() const {
 
-                            // compute squared root with Tonelli--Shanks
+                            // TODO: compute squared root with Tonelli--Shanks
                         }
 
                         element_fp12_2over3over2 squared() const {

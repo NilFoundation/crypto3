@@ -121,7 +121,6 @@ namespace nil {
                     BOOST_ASSERT_MSG(val.size() == detail::power_of_two(val.size()),
                                      "DFS optimal polynomial size must be a power of two");
                 }
-                // TODO: add constructor with omega
 
                 polynomial_dfs(polynomial_dfs&& x)
                     BOOST_NOEXCEPT(std::is_nothrow_move_constructible<allocator_type>::value)
