@@ -182,7 +182,6 @@ namespace boost {
                 return eval_is_zero(val.base_data());
             }
  
-            // TODO: check returned value
             template<class Backend, typename ModularParamsType>
             BOOST_MP_CXX14_CONSTEXPR int eval_get_sign(const modular_adaptor<Backend, ModularParamsType> &) {
                 return 1;

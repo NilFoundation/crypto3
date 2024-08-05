@@ -80,7 +80,6 @@ constexpr void pow_test(const boost::multiprecision::number<Backend, ExpressionT
     BOOST_ASSERT_MSG(standard_number(a_m_powm_b.backend().convert_to_cpp_int()) == a_powm_b, "powm error");
 }
 
-// TODO: test_set is not ref because of constexpr error in gcc-10
 // This test case uses normal boost::cpp_int for comparison to our modular_adaptor with cpp_int_modular_backend.
 template<typename Number>
 bool base_operations_test(std::array<Number, test_set_len> test_set) {

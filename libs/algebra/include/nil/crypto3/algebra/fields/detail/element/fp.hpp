@@ -121,16 +121,12 @@ namespace nil {
                         }
 
                         constexpr element_fp &operator-=(const element_fp &B) {
-                            // TODO(martun): consider directly taking the backend and calling
-                            // eval_add to improve performance.
                             data -= B.data;
 
                             return *this;
                         }
 
                         constexpr element_fp &operator+=(const element_fp &B) {
-                            // TODO(martun): consider directly taking the backend and calling
-                            // eval_add to improve performance.
                             data += B.data;
 
                             return *this;
@@ -222,10 +218,6 @@ namespace nil {
 
                         constexpr element_fp inversed() const {
                             return element_fp(inverse_mod(data));
-                        }
-
-                        // TODO: complete method
-                        constexpr element_fp _2z_add_3x() {
                         }
 
                         constexpr element_fp squared() const {
