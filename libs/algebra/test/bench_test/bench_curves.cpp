@@ -25,6 +25,7 @@
 
 //#define BOOST_TEST_MODULE algebra_curves_bench_test
 
+#include <iomanip>
 #include <iostream>
 #include <chrono>
 #include <ratio>
@@ -64,41 +65,54 @@
 #include <nil/crypto3/bench/benchmark.hpp>
 
 using namespace nil::crypto3::algebra;
+using namespace nil::crypto3::bench;
+
+template <typename curve_type>
+void benchmark_curve_operations(std::string const& curve_name)
+{
+    using g1_type = typename curve_type::template g1_type<>;
+    using g2_type = typename curve_type::template g2_type<>;
+    using scalar_type = typename curve_type::scalar_field_type;
+
+    double b;
+    b = run_benchmark<g1_type, g1_type>(
+        [](typename g1_type::value_type& A, typename g1_type::value_type const& B) {
+            A += B;
+        });
+    std::cout << curve_name << " G1 point addition inplace : " << std::fixed << std::setprecision(3) << b << " ns" << std::endl;
+
+    b = run_benchmark<g2_type, g2_type>(
+        [](typename g2_type::value_type& A, typename g2_type::value_type const& B) {
+            A += B;
+        });
+    std::cout << curve_name << " G2 point addition inplace : " << std::fixed << std::setprecision(3) << b << " ns" << std::endl;
+
+    b = run_benchmark<g1_type, scalar_type>(
+        [](typename g1_type::value_type& A, typename scalar_type::value_type const& B) {
+            A *= B;
+        });
+    std::cout << curve_name << " G1 scalar multiplication inplace : " << std::fixed << std::setprecision(3) << b << " ns" << std::endl;
+
+    b = run_benchmark<g2_type, scalar_type>(
+        [](typename g2_type::value_type& A, typename scalar_type::value_type const& B) {
+            A *= B;
+        });
+    std::cout << curve_name << " G2 scalar multiplication inplace : " << std::fixed << std::setprecision(3) << b << " ns" << std::endl;
+
+
+
+/*
+    CRYPTO3_RUN_BENCHMARK(curve_name + " point addition",
+            typename bench_type_A, typename bench_type_B, typename bench_type_C,
+            A = B+C
+            );
+*/
+}
+
 
 int main(int argc, char* argv[])
 {
-    std::cout << "Hello, world" << std::endl;
-
-    using curve_type = nil::crypto3::algebra::curves::bls12_381;
-    using bench_type_A = nil::crypto3::bench::bench_type<curve_type::base_field_type>;
-    using bench_type_B = bench_type_A;
-    using bench_type_C = bench_type_A;
-
-    CRYPTO3_RUN_BENCHMARK("BLS12-381 Point addition",
-            bench_type_A, bench_type_B, bench_type_C,
-            A = B+C
-            );
-    CRYPTO3_RUN_BENCHMARK("BLS12-381 Point addition",
-            bench_type_A, bench_type_B, bench_type_C,
-            A = B+C
-            );
-    CRYPTO3_RUN_BENCHMARK("BLS12-381 Point addition",
-            bench_type_A, bench_type_B, bench_type_C,
-            A = B+C
-            );
-    CRYPTO3_RUN_BENCHMARK("BLS12-381 Point addition",
-            bench_type_A, bench_type_B, bench_type_C,
-            A = B+C
-            );
-    CRYPTO3_RUN_BENCHMARK("BLS12-381 Point addition",
-            bench_type_A, bench_type_B, bench_type_C,
-            A = B+C
-            );
-    CRYPTO3_RUN_BENCHMARK("BLS12-381 Point addition",
-            bench_type_A, bench_type_B, bench_type_C,
-            A = B+C
-            );
-    return 0;
+    benchmark_curve_operations<nil::crypto3::algebra::curves::bls12_381>("bls12_381");
 }
 #if 0
 BOOST_AUTO_TEST_SUITE(curves_manual_tests)
