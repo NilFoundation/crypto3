@@ -366,6 +366,7 @@ namespace nil {
                         const plonk_constraint_system<FieldType> &constraint_system,
                         const plonk_table_description<FieldType> &table_description
                     ) {
+                        using var = plonk_variable<typename FieldType::value_type>;
                         std::vector<std::set<int>> result(table_description.table_width());
 
                         for (auto & s : result) {
@@ -402,11 +403,23 @@ namespace nil {
                                 ].insert(1);
                                 for( const auto &option:table.lookup_options){
                                     for( const auto &column:option){
-                                        result[
-                                            table_description.witness_columns +
-                                            table_description.public_input_columns +
-                                            column.index
-                                        ].insert(1);
+                                        switch( column.type ){
+                                        case var::column_type::witness:
+                                            result[column.index].insert(1);
+                                            break;
+                                        case var::column_type::public_input:
+                                            result[ table_description.witness_columns + column.index].insert(1);
+                                            break;
+                                        case var::column_type::constant:
+                                            result[ table_description.witness_columns + table_description.public_input_columns + column.index ].insert(1);
+                                            break;
+                                        case var::column_type::selector:
+                                            result[ table_description.witness_columns + table_description.public_input_columns + table_description.constant_columns + column.index].insert(1);
+                                            break;
+                                        case var::column_type::uninitialized:
+                                            break;
+                                        }
+
                                     }
                                 }
                             }

@@ -169,6 +169,7 @@ namespace nil {
                             prepare_lookup_input();
                         auto& lookup_input = *lookup_input_ptr;
 
+
                         // 3. Lookup_input and lookup_value are ready
                         //    Now sort them!
                         //    Reduce value and input:
@@ -184,6 +185,7 @@ namespace nil {
                         for( std::size_t i = 0; i < lookup_input.size(); i++ ){
                             reduced_input.push_back(reduce_dfs_polynomial_domain(lookup_input[i], basic_domain->m));
                         }
+
                         //    Sort
                         auto sorted = sort_polynomials(reduced_input, reduced_value, basic_domain->m,
                             preprocessed_data.common_data.desc.usable_rows_amount);
@@ -419,7 +421,9 @@ namespace nil {
                                 math::polynomial_dfs<typename FieldType::value_type> v = (typename FieldType::value_type(t_id + 1)) * lookup_tag;
                                 theta_acc = theta;
                                 for (std::size_t i = 0; i < l_table.columns_number; i++) {
-                                    v += theta_acc * lookup_tag * plonk_columns.constant(l_table.lookup_options[o_id][i].index);
+                                    math::polynomial_dfs<typename FieldType::value_type> c;
+                                    c = plonk_columns.get_variable_value_without_rotation(l_table.lookup_options[o_id][i]);
+                                    v += theta_acc * lookup_tag * c;
                                     theta_acc *= theta;
                                 }
                                 v *= mask_assignment;
@@ -464,7 +468,7 @@ namespace nil {
                                     );
                                     visitor.visit(expr);
 
-                                    math::cached_expression_evaluator<DfsVariableType> evaluator(expr, 
+                                    math::cached_expression_evaluator<DfsVariableType> evaluator(expr,
                                         [&domain=basic_domain, &assignments=plonk_columns, &rotated_variable_values]
                                         (const DfsVariableType &var) -> const polynomial_dfs_type& {
                                             if (var.rotation == 0) {
@@ -701,8 +705,8 @@ namespace nil {
                                 theta_acc = theta;
                                 BOOST_ASSERT(table.lookup_options[o_id].size() == table.columns_number);
                                 for( std::size_t i = 0; i < table.lookup_options[o_id].size(); i++){
-                                    auto key1 = std::tuple(table.lookup_options[o_id][i].index, 0, plonk_variable<typename FieldType::value_type>::column_type::constant);
-                                    auto shifted_key1 = std::tuple(table.lookup_options[o_id][i].index, 1, plonk_variable<typename FieldType::value_type>::column_type::constant);
+                                    auto key1 = std::tuple(table.lookup_options[o_id][i].index, 0, table.lookup_options[o_id][i].type);
+                                    auto shifted_key1 = std::tuple(table.lookup_options[o_id][i].index, 1, table.lookup_options[o_id][i].type);
                                     v += theta_acc * evaluations[key1] * selector_value;
                                     shifted_v += theta_acc * evaluations[shifted_key1]* shifted_selector_value;
                                     theta_acc *= theta;

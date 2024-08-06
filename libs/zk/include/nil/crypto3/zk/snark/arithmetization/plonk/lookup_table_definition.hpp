@@ -69,6 +69,27 @@ namespace nil {
                 };
 
                 template<typename FieldType>
+                class dynamic_table_definition {
+                protected:
+                    bool defined;
+                public:
+                    plonk_lookup_table<FieldType> lookup_table;
+                    std::string name;
+
+                    dynamic_table_definition(std::string _name): name(_name), defined(false) {}
+
+                    void define(const plonk_lookup_table<FieldType> &table){
+                        BOOST_ASSERT(!defined);
+                        lookup_table = table;
+                        defined = true;
+                    }
+                    bool is_defined(){
+                        return defined;
+                    }
+                    virtual ~dynamic_table_definition() {};
+                };
+
+                template<typename FieldType>
                 std::vector<std::string>
                 get_tables_ordered_by_rows_number(const std::map<std::string, std::shared_ptr<lookup_table_definition<FieldType>>> &tables){
                     std::vector<std::pair<std::size_t, std::string>> before;
@@ -107,12 +128,12 @@ namespace nil {
                 std::size_t pack_lookup_tables(
                     const TableIdsMapType &lookup_table_ids,
                     const std::map<std::string, std::shared_ptr<lookup_table_definition<FieldType>>> &lookup_tables,
+                    const std::map<std::string, std::shared_ptr<dynamic_table_definition<FieldType>>> &dynamic_tables,
                     plonk_constraint_system<FieldType> &bp,
                     plonk_assignment_table<FieldType> &assignment,
                     const std::vector<std::size_t> &constant_columns_ids,
                     std::size_t usable_rows
                 ){
-                    // std::cout << "Packing lookup tables" << std::endl;
                     // std::cout << "Usable rows before: " << usable_rows << std::endl;
                     std::size_t usable_rows_after = usable_rows;
 
@@ -176,6 +197,10 @@ namespace nil {
                         }
                         start_row += table->get_rows_number();
                     }
+                    for( const auto&[k, table]:dynamic_tables ){
+                        BOOST_ASSERT(table->is_defined());
+                        bp_lookup_tables[lookup_table_ids.at(k) - 1] = table->lookup_table;
+                    }
                     for(std::size_t i = 0; i < bp_lookup_tables.size(); i++){
                         bp.add_lookup_table(std::move(bp_lookup_tables[i]));
                     }
@@ -190,6 +215,7 @@ namespace nil {
                 std::size_t pack_lookup_tables_horizontal(
                     const LookupTableIds &lookup_table_ids,
                     const std::map<std::string, std::shared_ptr<lookup_table_definition<FieldType>>> &lookup_tables,
+                    const std::map<std::string, std::shared_ptr<dynamic_table_definition<FieldType>>> &dynamic_tables,
                     plonk_constraint_system<FieldType> &bp,
                     plonk_assignment_table<FieldType> &assignment,
                     const std::vector<std::size_t> &constant_columns_ids,
@@ -329,6 +355,10 @@ namespace nil {
                             cur_selector_id++;
                         }
                         start_row += table->get_rows_number();
+                    }
+                    for( const auto&[k, table]:dynamic_tables ){
+                        BOOST_ASSERT(table->is_defined());
+                        bp_lookup_tables[lookup_table_ids.at(k) - 1] = table->lookup_table;
                     }
                     for(std::size_t i = 0; i < bp_lookup_tables.size(); i++){
                         bp.add_lookup_table(std::move(bp_lookup_tables[i]));

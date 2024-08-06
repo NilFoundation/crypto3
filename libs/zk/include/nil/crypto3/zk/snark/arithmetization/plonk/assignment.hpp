@@ -339,15 +339,16 @@ namespace nil {
                         , _public_table(public_inputs_amount, constants_amount, selectors_amount) {
                     }
 
-                    const ColumnType& get_variable_value_without_rotation(const VariableType& var) const {
+                    template <typename InputVariableType>
+                    const ColumnType& get_variable_value_without_rotation(const InputVariableType& var) const {
                         switch (var.type) {
-                            case VariableType::column_type::witness:
+                            case InputVariableType::column_type::witness:
                                 return witness(var.index);
-                            case VariableType::column_type::public_input:
+                            case InputVariableType::column_type::public_input:
                                 return public_input(var.index);
-                            case VariableType::column_type::constant:
+                            case InputVariableType::column_type::constant:
                                 return constant(var.index);
-                            case VariableType::column_type::selector:
+                            case InputVariableType::column_type::selector:
                                 return selector(var.index);
                             default:
                                 std::cerr << "Invalid column type" << std::endl;

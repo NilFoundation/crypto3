@@ -205,7 +205,6 @@ namespace nil {
 
                         // 8. Run evaluation proofs
                         _proof.eval_proof.challenge = transcript.template challenge<FieldType>();
-
                         generate_evaluation_points();
 
                         {
@@ -283,7 +282,7 @@ namespace nil {
                     }
 
                     typename placeholder_lookup_argument_prover<FieldType, commitment_scheme_type, ParamsType>::prover_lookup_result
-                        lookup_argument() {
+                    lookup_argument() {
                         PROFILE_PLACEHOLDER_SCOPE("lookup_argument_time");
 
                         typename placeholder_lookup_argument_prover<
