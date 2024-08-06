@@ -68,6 +68,36 @@ namespace nil {
         }
 
         template<typename BlueprintFieldType>
+        std::set<std::vector<typename BlueprintFieldType::value_type>>
+        load_dynamic_lookup(
+            const circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
+            const assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &assignments,
+            std::size_t table_id
+        ){
+            std::set<std::vector<typename BlueprintFieldType::value_type>> result;
+            auto &table = bp.lookup_tables()[table_id-1];
+
+            crypto3::zk::snark::plonk_column<BlueprintFieldType> selector =
+                assignments.crypto3::zk::snark::
+                    template plonk_assignment_table<BlueprintFieldType>::selector(table.tag_index);
+
+            for( std::size_t selector_row = 0; selector_row < assignments.rows_amount(); selector_row++ ){
+                if( selector_row < selector.size() && !selector[selector_row].is_zero() ){
+                    for( std::size_t op = 0; op < table.lookup_options.size(); op++){
+                        std::vector<typename BlueprintFieldType::value_type> item(table.lookup_options[op].size());
+                        for( std::size_t i = 0; i < table.lookup_options[op].size(); i++){
+                            crypto3::zk::snark::plonk_constraint<BlueprintFieldType> expr = table.lookup_options[op][i];;
+                            item[i] = expr.evaluate(selector_row, assignments);
+                        }
+                        result.insert(item);
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        template<typename BlueprintFieldType>
         bool is_satisfied(
             const circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
             const assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &assignments,
@@ -81,6 +111,8 @@ namespace nil {
             const auto &copy_constraints = bp.copy_constraints();
 
             const auto &lookup_gates = bp.lookup_gates();
+
+            std::map<std::string, std::set<std::vector<typename BlueprintFieldType::value_type>>> used_dynamic_tables;
 
             for (const auto& i : used_gates) {
                 crypto3::zk::snark::plonk_column<BlueprintFieldType> selector =
@@ -128,9 +160,33 @@ namespace nil {
                             const auto table_name =
                                 bp.get_reserved_indices_right().at(lookup_gates[i].constraints[j].table_id);
                             try {
+                                if( bp.get_reserved_dynamic_tables().find(table_name) != bp.get_reserved_dynamic_tables().end() ){
+                                    if( used_dynamic_tables.find(table_name) == used_dynamic_tables.end()){
+                                        used_dynamic_tables[table_name] = load_dynamic_lookup(bp, assignments, lookup_gates[i].constraints[j].table_id);
+                                    }
+                                    if( used_dynamic_tables[table_name].find(input_values) == used_dynamic_tables[table_name].end() ) {
+                                        for (std::size_t k = 0; k < input_values.size(); k++) {
+                                            std::cout << input_values[k] << " ";
+                                        }
+                                        std::cout << std::endl;
+                                        std::cout << "Constraint " << j << " from lookup gate " << i << " from table "
+                                                << table_name << " on row " << selector_row << " is not satisfied."
+                                                << std::endl;
+                                        std::cout << "Offending Lookup Gate: " << std::endl;
+                                        for (const auto &constraint : lookup_gates[i].constraints) {
+                                            std::cout << "Table id: " << constraint.table_id << std::endl;
+                                            for (auto &lookup_input : constraint.lookup_input) {
+                                                std::cout << lookup_input << std::endl;
+                                            }
+                                        }
+                                        return false;
+                                    }
+                                    continue;
+                                }
                                 std::string main_table_name = table_name.substr(0, table_name.find("/"));
                                 std::string subtable_name =
                                     table_name.substr(table_name.find("/") + 1, table_name.size() - 1);
+
                                 const auto &table = bp.get_reserved_tables().at(main_table_name)->get_table();
                                 const auto &subtable =
                                     bp.get_reserved_tables().at(main_table_name)->subtables.at(subtable_name);
@@ -174,6 +230,7 @@ namespace nil {
                                 }
                             } catch (std::out_of_range &e) {
                                 std::cout << "Lookup table " << table_name << " not found." << std::endl;
+                                std::cout << "Table_id = " << lookup_gates[i].constraints[j].table_id << " table_name " << table_name << std::endl;
                                 return false;
                             }
                         }

@@ -66,10 +66,13 @@ namespace nil {
         template <typename BlueprintFieldType>
         class lookup_library {
             using lookup_table_definition = typename nil::crypto3::zk::snark::lookup_table_definition<BlueprintFieldType>;
+            using dynamic_table_definition = typename nil::crypto3::zk::snark::dynamic_table_definition<BlueprintFieldType>;
             using filled_lookup_table_definition = typename nil::crypto3::zk::snark::filled_lookup_table_definition<BlueprintFieldType>;
 
             class byte_range_table_type: public lookup_table_definition{
             public:
+                using lookup_table_definition = typename nil::crypto3::zk::snark::lookup_table_definition<BlueprintFieldType>;
+
                 byte_range_table_type(): lookup_table_definition("byte_range_table"){
                     this->subtables["full"] = {{0}, 0, 255};
                 }
@@ -345,16 +348,22 @@ namespace nil {
                 tables["sha256_maj"] = std::shared_ptr<lookup_table_definition>(new maj_function_table());
                 tables["sha256_ch"] = std::shared_ptr<lookup_table_definition>(new ch_function_table());
                 tables["byte_range_table"] = std::shared_ptr<lookup_table_definition>(new byte_range_table_type());
-                tables["zkevm_opcodes"] = std::shared_ptr<lookup_table_definition>(new zkevm_opcode_table);
+                tables["zkevm_opcodes"] = std::shared_ptr<lookup_table_definition>(new zkevm_opcode_table());
             }
 
             void register_lookup_table(std::shared_ptr<lookup_table_definition> table){
                 tables[table->table_name] = table;
             }
 
+            void register_dynamic_table(std::string table_name){
+                BOOST_ASSERT(tables.find(table_name) == tables.end());
+                dynamic_tables[table_name] = std::shared_ptr<dynamic_table_definition>(new dynamic_table_definition(table_name));
+            }
+
             void reserve_table(std::string name){
                 BOOST_ASSERT(!reserved_all);
                 std::string table_name = name.substr(0, name.find("/"));
+                // Necessary for dynamic and for fixed tables
                 BOOST_ASSERT(tables.find(table_name) != tables.end());
                 std::string subtable_name = name.substr(name.find("/")+1, name.size());
                 BOOST_ASSERT(tables[table_name]->subtables.find(subtable_name) != tables[table_name]->subtables.end());
@@ -362,26 +371,54 @@ namespace nil {
                 reserved_tables_indices.left.insert(std::make_pair(name, reserved_tables.size()));
             }
 
+            void reserve_dynamic_table(std::string name){
+                BOOST_ASSERT(tables.find(name) == tables.end());
+                BOOST_ASSERT(!reserved_all);
+
+                register_dynamic_table(name);
+                reserved_tables.insert(name);
+                reserved_tables_indices.left.insert(std::make_pair(name, reserved_tables.size()));
+            }
+
+            void define_dynamic_table(std::string table_name, const crypto3::zk::snark::plonk_lookup_table<BlueprintFieldType> &lookup_table){
+                register_dynamic_table(table_name);
+                auto table = dynamic_tables[table_name];
+                BOOST_ASSERT(!table->is_defined());
+                table->define(lookup_table);
+                BOOST_ASSERT(table->is_defined());
+            }
+
+            std::shared_ptr<dynamic_table_definition> get_dynamic_table_definition(std::string table_name){
+                auto table = dynamic_tables[table_name];
+                BOOST_ASSERT(table->is_defined());
+                return std::shared_ptr<dynamic_table_definition>(table);
+            }
+
             void reservation_done() const {
                 if(reserved_all) return;
 
                 reserved_all = true;
                 for (auto &name : reserved_tables){
-                    auto slash_pos = name.find("/");
-                    std::string table_name = name.substr(0, slash_pos);
-                    BOOST_ASSERT(tables.find(table_name) != tables.end());
-                    std::string subtable_name = name.substr(slash_pos + 1, name.size());
-                    auto const &table = tables.at(table_name);
-                    BOOST_ASSERT(table->subtables.find(subtable_name) !=
-                                 table->subtables.end());
+                    if( dynamic_tables.find(name) != dynamic_tables.end() ){
+                        reserved_dynamic_tables_map[name] = dynamic_tables.at(name);
+                    } else {
+                        auto slash_pos = name.find("/");
+                        std::string table_name = name.substr(0, slash_pos);
+                        BOOST_ASSERT(tables.find(table_name) != tables.end());
+                        auto const &table = tables.at(table_name);
 
-                    if( reserved_tables_map.find(table_name) == reserved_tables_map.end() ){
-                        filled_lookup_table_definition *filled_definition =
-                            new filled_lookup_table_definition(*(table));
-                        reserved_tables_map[table_name] = std::shared_ptr<lookup_table_definition>(filled_definition);
+                        std::string subtable_name = name.substr(slash_pos + 1, name.size());
+                        BOOST_ASSERT(table->subtables.find(subtable_name) !=
+                                    table->subtables.end());
+
+                        if( reserved_tables_map.find(table_name) == reserved_tables_map.end() ){
+                            filled_lookup_table_definition *filled_definition =
+                                new filled_lookup_table_definition(*(table));
+                            reserved_tables_map[table_name] = std::shared_ptr<lookup_table_definition>(filled_definition);
+                        }
+                        reserved_tables_map[table_name]->subtables[subtable_name] =
+                            table->subtables[subtable_name];
                     }
-                    reserved_tables_map[table_name]->subtables[subtable_name] =
-                        table->subtables[subtable_name];
                 }
             }
 
@@ -393,13 +430,20 @@ namespace nil {
                 reservation_done();
                 return reserved_tables_map;
             }
+
+            const std::map<std::string, std::shared_ptr<dynamic_table_definition>> &get_reserved_dynamic_tables() const {
+                reservation_done();
+                return reserved_dynamic_tables_map;
+            }
         protected:
             mutable bool reserved_all;
 
-            std::map<std::string, std::shared_ptr<lookup_table_definition>> tables;
             std::set<std::string> reserved_tables;
             bimap_type reserved_tables_indices;
+            std::map<std::string, std::shared_ptr<lookup_table_definition>> tables;
             mutable std::map<std::string, std::shared_ptr<lookup_table_definition>> reserved_tables_map;
+            std::map<std::string, std::shared_ptr<dynamic_table_definition>> dynamic_tables;
+            mutable std::map<std::string, std::shared_ptr<dynamic_table_definition>> reserved_dynamic_tables_map;
         };
     }        // namespace blueprint
 }    // namespace nil

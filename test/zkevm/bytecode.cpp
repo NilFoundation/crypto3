@@ -66,7 +66,7 @@ void test_zkevm_bytecode(
     std::vector<std::vector<std::uint8_t>> bytecodes
 ){
     constexpr std::size_t PublicInputColumns = 1;
-    constexpr std::size_t ConstantColumns = 4;
+    constexpr std::size_t ConstantColumns = 6;
     constexpr std::size_t SelectorColumns = 3;
     zk::snark::plonk_table_description<BlueprintFieldType> desc(
         WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns);
@@ -89,7 +89,6 @@ void test_zkevm_bytecode(
         for (std::size_t j = 0; j < bytecodes[i].size(); j++, cur++) {
             bytecode.push_back(var(0, cur, false, var::column_type::public_input));
         }
-        std::cout << "Bytecode " << i << " size: " << bytecode.size() << std::endl;
         bytecode_vars.push_back(bytecode);
     }
     std::vector<std::pair<var, var>> bytecode_hash_vars;
@@ -116,13 +115,87 @@ void test_zkevm_bytecode(
         value_type hash_lo;
         for( std::size_t j = 0; j < str_hi.size(); j++ ){hash_hi *=16; hash_hi += str_hi[j] >= '0' && str_hi[j] <= '9'? str_hi[j] - '0' : str_hi[j] - 'a' + 10;}
         for( std::size_t j = 0; j < str_lo.size(); j++ ){hash_lo *=16; hash_lo += str_lo[j] >= '0' && str_lo[j] <= '9'? str_lo[j] - '0' : str_lo[j] - 'a' + 10;}
-        std::cout << std::hex <<  "Contract hash = " << hash << " h:" << hash_hi << " l:" << hash_lo << std::dec << std::endl;
         public_input.push_back(hash_hi);
         public_input.push_back(hash_lo);
     }
     nil::crypto3::random::algebraic_engine<BlueprintFieldType> rnd(0);
     value_type rlc_challenge = rnd();
-    std::cout << std::hex << "rlc_challenge = " << rlc_challenge << std::dec << std::endl;
+    public_input.push_back(rlc_challenge);
+
+    auto result_check = [](AssignmentType &assignment,
+	    typename component_type::result_type &real_res) {
+    };
+
+    std::array<std::uint32_t, WitnessColumns> witnesses;
+    for (std::uint32_t i = 0; i < WitnessColumns; i++) {
+        witnesses[i] = i;
+    }
+
+    component_type component_instance = component_type(witnesses, std::array<std::uint32_t, 1>{0},
+                                                       std::array<std::uint32_t, 1>{0}, 2046);
+    nil::crypto3::test_component<component_type, BlueprintFieldType, hash_type, Lambda>
+        (component_instance, desc, public_input, result_check, instance_input,
+         nil::blueprint::connectedness_check_type::type::NONE, 2046);
+}
+
+template <typename BlueprintFieldType, std::size_t WitnessColumns>
+void test_zkevm_bytecode_dynamic_table(
+    std::vector<std::vector<std::uint8_t>> bytecodes
+){
+    constexpr std::size_t PublicInputColumns = 1;
+    constexpr std::size_t ConstantColumns = 4;
+    constexpr std::size_t SelectorColumns = 6;
+    zk::snark::plonk_table_description<BlueprintFieldType> desc(
+        WitnessColumns, PublicInputColumns, ConstantColumns, SelectorColumns);
+    using ArithmetizationType = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>;
+    using hash_type = nil::crypto3::hashes::keccak_1600<256>;
+    constexpr std::size_t Lambda = 5;
+    using AssignmentType = nil::blueprint::assignment<ArithmetizationType>;
+
+    using value_type = typename BlueprintFieldType::value_type;
+    using var = crypto3::zk::snark::plonk_variable<value_type>;
+
+    using component_type = blueprint::components::bytecode_table_tester<ArithmetizationType, BlueprintFieldType>;
+
+    std::vector<std::vector<var>> bytecode_vars;
+    std::size_t cur = 0;
+    for (std::size_t i = 0; i < bytecodes.size(); i++) {
+        std::vector<var> bytecode;
+        bytecode.push_back(var(0, cur, false, var::column_type::public_input)); // length
+        cur++;
+        for (std::size_t j = 0; j < bytecodes[i].size(); j++, cur++) {
+            bytecode.push_back(var(0, cur, false, var::column_type::public_input));
+        }
+        bytecode_vars.push_back(bytecode);
+    }
+    std::vector<std::pair<var, var>> bytecode_hash_vars;
+    for( std::size_t i = 0; i < bytecodes.size(); i++, cur+=2){
+        bytecode_hash_vars.push_back({var(0, cur, false, var::column_type::public_input), var(0, cur+1, false, var::column_type::public_input)});
+    }
+    typename component_type::input_type instance_input(bytecode_vars, bytecode_hash_vars);
+
+    std::vector<value_type> public_input;
+    cur = 0;
+    for( std::size_t i = 0; i < bytecodes.size(); i++){
+        public_input.push_back(bytecodes[i].size());
+        cur++;
+        for( std::size_t j = 0; j < bytecodes[i].size(); j++, cur++){
+            public_input.push_back(bytecodes[i][j]);
+        }
+    }
+    for( std::size_t i = 0; i < bytecodes.size(); i++){
+        std::string hash = nil::crypto3::hash<nil::crypto3::hashes::keccak_1600<256>>(bytecodes[i].begin(), bytecodes[i].end());
+        std::string str_hi = hash.substr(0, hash.size()-32);
+        std::string str_lo = hash.substr(hash.size()-32, 32);
+        value_type hash_hi;
+        value_type hash_lo;
+        for( std::size_t j = 0; j < str_hi.size(); j++ ){hash_hi *=16; hash_hi += str_hi[j] >= '0' && str_hi[j] <= '9'? str_hi[j] - '0' : str_hi[j] - 'a' + 10;}
+        for( std::size_t j = 0; j < str_lo.size(); j++ ){hash_lo *=16; hash_lo += str_lo[j] >= '0' && str_lo[j] <= '9'? str_lo[j] - '0' : str_lo[j] - 'a' + 10;}
+        public_input.push_back(hash_hi);
+        public_input.push_back(hash_lo);
+    }
+    nil::crypto3::random::algebraic_engine<BlueprintFieldType> rnd(0);
+    value_type rlc_challenge = rnd();
     public_input.push_back(rlc_challenge);
 
     auto result_check = [](AssignmentType &assignment,
@@ -170,3 +243,14 @@ BOOST_AUTO_TEST_CASE(two_small_contracts){
     test_zkevm_bytecode<field_type, 14>({hex_string_to_bytes(bytecode_addition),hex_string_to_bytes(bytecode_for)});
 }
 BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(dynamic_table_test_suite)
+    using field_type = typename crypto3::algebra::curves::vesta::base_field_type;
+BOOST_AUTO_TEST_CASE(one_small_contract){
+    test_zkevm_bytecode_dynamic_table<field_type, 14>({hex_string_to_bytes(bytecode_addition)});
+}
+BOOST_AUTO_TEST_CASE(two_small_contracts){
+    test_zkevm_bytecode_dynamic_table<field_type, 14>({hex_string_to_bytes(bytecode_addition), hex_string_to_bytes(bytecode_for)});
+}
+BOOST_AUTO_TEST_SUITE_END()
+
