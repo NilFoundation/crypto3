@@ -382,6 +382,7 @@ BOOST_AUTO_TEST_CASE(blueprint_proxy_call_pack_lookup_tables_test) {
     nil::crypto3::zk::snark::pack_lookup_tables_horizontal(
         bp.get_reserved_indices(),
         bp.get_reserved_tables(),
+        bp.get_reserved_dynamic_tables(),
         bp.get(), assignment.get(), lookup_columns_indices, min_selector_index,
         usable_rows_amount);
 

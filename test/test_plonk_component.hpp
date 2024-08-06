@@ -170,7 +170,10 @@ namespace nil {
             if constexpr( nil::blueprint::use_lookups<component_type>() ){
                 auto lookup_tables = component_instance.component_lookup_tables();
                 for(auto &[k,v]:lookup_tables){
-                    bp.reserve_table(k);
+                    if( v == 1 )
+                        bp.reserve_dynamic_table(k);
+                    else
+                        bp.reserve_table(k);
                 }
             };
 
@@ -279,6 +282,7 @@ namespace nil {
                 desc.usable_rows_amount = zk::snark::pack_lookup_tables_horizontal(
                     bp.get_reserved_indices(),
                     bp.get_reserved_tables(),
+                    bp.get_reserved_dynamic_tables(),
                     bp, assignment, lookup_columns_indices, cur_selector_id,
                     desc.usable_rows_amount,
                     500000
