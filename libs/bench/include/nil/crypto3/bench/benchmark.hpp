@@ -17,6 +17,144 @@ namespace nil {
     namespace crypto3 {
         namespace bench {
 
+constexpr std::size_t SAMPLES_COUNT = 10000;
+
+template<typename T>
+std::array<typename T::value_type, SAMPLES_COUNT> generate_samples()
+{
+    std::array<typename T::value_type, SAMPLES_COUNT> samples;
+    for(std::size_t i = 0; i < samples.size(); ++i) {
+        samples[i] = algebra::random_element<T>();
+        std::cout << "Sample generated: " << samples[i] << std::endl;
+    }
+    return samples;
+}
+
+template<typename... A>
+std::tuple<std::array<typename A::value_type, SAMPLES_COUNT>...> allocate_samples()
+{
+    return std::make_tuple(generate_samples<A>()...);
+}
+
+
+template<typename... A>
+constexpr std::array<std::size_t, sizeof...(A)> calculate_strides()
+{
+    // assume cache line is 64 bytes
+    return {(1+64/sizeof(typename A::value_type)) ...};
+}
+
+template<typename... A, std::size_t... I>
+auto make_slice_impl(
+    std::tuple<std::array<typename A::value_type, SAMPLES_COUNT>...>& samples,
+    const std::array<std::size_t, sizeof...(A)>& strides,
+    std::size_t i,
+    std::index_sequence<I...>
+) -> std::tuple<typename A::value_type&...>
+{
+    return std::tuple<typename A::value_type&...>(
+        std::get<I>(samples)[i * strides[I] % SAMPLES_COUNT]...
+    );
+}
+
+template<typename... A>
+auto make_slice(
+    std::tuple<std::array<typename A::value_type, SAMPLES_COUNT>...>& samples,
+    const std::array<std::size_t, sizeof...(A)>& strides,
+    std::size_t i
+) -> std::tuple<typename A::value_type&...>
+{
+    return make_slice_impl<A...>(
+        samples, strides, i, std::index_sequence_for<A...>{}
+    );
+}
+
+
+template<typename...A, typename F >
+void benchmark_function(std::string const& name, F && func)
+{
+    using duration = std::chrono::duration<double, std::nano>;
+
+    // allocate arrays of args
+    auto samples = allocate_samples<A...>();
+    auto strides = calculate_strides<A...>();
+
+    auto run_at_least = [&] (duration const& dur) {
+        std::size_t BATCH_SIZE = 1000, total_runs = 0;
+        auto start = std::chrono::high_resolution_clock::now();
+        while (std::chrono::high_resolution_clock::now() - start < dur) {
+            for(std::size_t i = 0; i < BATCH_SIZE; ++i) {
+                auto args = make_slice<A...>(samples, strides, i);
+                volatile auto r = std::apply(func, args);
+            }
+            total_runs += BATCH_SIZE;
+        }
+        return total_runs;
+    };
+
+    std::size_t MEASUREMENTS = 100;
+    std::size_t BATCH_SIZE = run_at_least(std::chrono::seconds(5))/MEASUREMENTS;
+
+    std::vector<double> durations(MEASUREMENTS) ;
+    for(std::size_t m = 0; m < MEASUREMENTS; ++m) {
+        auto start = std::chrono::high_resolution_clock::now();
+        for(std::size_t i = 0; i < BATCH_SIZE; ++i) {
+            auto args = make_slice<A...>(samples, strides, i);
+            volatile auto r = std::apply(func, args);
+        }
+        auto finish = std::chrono::high_resolution_clock::now();
+        durations[m] = (finish - start).count()*1.0/ BATCH_SIZE;
+    }
+
+    std::sort(durations.begin(), durations.end());
+
+    // discard top 20% outliers
+    durations.resize(MEASUREMENTS * 0.8);
+    double median = durations[durations.size()/2];
+    double mean = 0, stddiv = 0;
+
+    for(auto &dur : durations) {
+        mean += dur;
+        stddiv += dur*dur;
+    }
+
+    mean /= durations.size();
+    stddiv = sqrt(stddiv / durations.size() - mean * mean);
+
+    // https://en.wikipedia.org/wiki/Mean_absolute_percentage_error
+    for(auto &dur : durations) {
+        dur = (dur - median) / dur;
+        if ( dur < 0 ) {
+            dur = -dur;
+        }
+    }
+
+    std::sort(durations.begin(), durations.end());
+    double MdAPE = durations[durations.size()/2];
+
+    std::cout << std::fixed << std::setprecision(3);
+    std::cout << name <<
+        " mean: " << mean << " err: " << (MdAPE*100) <<
+        "% median: " << median << " stddiv: " << stddiv <<
+        std::endl;
+}
+
+
+/*
+
+struct benchmark_results {
+    std::string name;
+    double mean, stddiv;
+};
+
+template<typename... A>
+benchmark_results run_benchmark(std::string name, std::function<void(typename A::value_type...)> const& expression)
+{
+
+}
+*/
+
+#if 0
 template<typename type_A, typename type_B>
 double run_benchmark(std::function<void(typename type_A::value_type &, typename type_B::value_type const&)> expression)
 {
@@ -41,7 +179,7 @@ double run_benchmark(std::function<void(typename type_A::value_type &, typename 
         }
         finish = std::chrono::high_resolution_clock::now();
         std::cout << "finished in " << std::fixed << std::setprecision(3) << (finish-start).count()*1e-9 << " s" << std::endl;
-        long_batch = 1+1e6*warmup_batch/(finish-start).count();
+        long_batch = 1+5e5*warmup_batch/(finish-start).count();
 //        if (long_batch < 100) long_batch = 100;
 //        long_batch = 1e9*ESTIMATION_BATCH/ESTIMATION_BATCH/sample.count();
     }
@@ -98,6 +236,7 @@ double run_benchmark(std::function<void(typename type_A::value_type &, typename 
     double b = xy/x2;
     return b;
 }
+#endif
 
 #define CRYPTO3_RUN_BENCHMARK(bench_name, bench_type_A, bench_type_B, bench_type_C, expression) \
     do { \

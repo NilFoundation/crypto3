@@ -64,6 +64,10 @@
 
 #include <nil/crypto3/bench/benchmark.hpp>
 
+//#define ANKERL_NANOBENCH_IMPLEMENT
+//#define ANKERL_NANOBENCH_LOG_ENABLED
+//#include "nanobench.h"
+
 using namespace nil::crypto3::algebra;
 using namespace nil::crypto3::bench;
 
@@ -71,10 +75,82 @@ template <typename curve_type>
 void benchmark_curve_operations(std::string const& curve_name)
 {
     using g1_type = typename curve_type::template g1_type<>;
+    using base_field = typename curve_type::base_field_type;
     using g2_type = typename curve_type::template g2_type<>;
-    using scalar_type = typename curve_type::scalar_field_type;
-
+    using scalar_field = typename curve_type::scalar_field_type;
     double b;
+/*
+    run_benchmark<g1_type, g1_type>(
+            curve_name + " G1 point addition inplace",
+            [](typename g1_type::value_type& A, typename g1_type::value_type const& B) {
+            A += B;
+        });
+        */
+    /*
+    b = run_benchmark<scalar_type, scalar_type>(
+        [](typename scalar_type::value_type& A, typename scalar_type::value_type const& B) {
+            A += B;
+        });
+    std::cout << curve_name << " scalar addition inplace : " << std::fixed << std::setprecision(3) << b << " ns" << std::endl;
+*/
+    /*
+    benchmark_function<base_field, base_field>(
+        "BLS12-381 Fp addition",
+        [](typename base_field::value_type& A, typename base_field::value_type const& B) {
+            return A += B;
+        });
+    benchmark_function<scalar_field, scalar_field>(
+        "BLS12-381 Fq addition",
+        [](typename scalar_field::value_type& A, typename scalar_field::value_type const& B) {
+            return A += B;
+        });
+    benchmark_function<g1_type, g1_type>(
+        "BLS12-381 G1 addition",
+        [](typename g1_type::value_type& A, typename g1_type::value_type const& B) {
+            return A += B;
+        });
+    benchmark_function<g1_type, scalar_field>(
+        "BLS12-381 G1 scalar multiplication",
+        [](typename g1_type::value_type& A, typename scalar_field::value_type const& B) {
+            return A *= B;
+        });
+        */
+    benchmark_function<g2_type, g2_type>(
+        "BLS12-381 G2 addition",
+        [](typename g2_type::value_type& A, typename g2_type::value_type const& B) {
+            return A += B;
+        });
+/*        
+    benchmark_function<g2_type, scalar_field>(
+        "BLS12-381 G2 scalar multiplication",
+        [](typename g2_type::value_type& A, typename scalar_field::value_type const& B) {
+            return A *= B;
+        });
+*/
+
+#if 0
+    std::size_t BATCH_SIZE = 32768;
+    std::vector<typename scalar_type::value_type> A(BATCH_SIZE);
+    std::vector<typename scalar_type::value_type> B(BATCH_SIZE);
+
+    for(std::size_t i = 0; i< A.size(); ++i) {
+        A[i] = random_element<scalar_type>();
+        B[i] = random_element<scalar_type>();
+    }
+    std::size_t STRIDE_A = 1 + sysconf(_SC_LEVEL1_DCACHE_LINESIZE)*2 / sizeof(typename scalar_type::value_type);
+    std::size_t STRIDE_B = 1 + sysconf(_SC_LEVEL1_DCACHE_LINESIZE)*2 / sizeof(typename scalar_type::value_type);
+    std::size_t A_idx = 0, B_idx = 0;
+
+    ankerl::nanobench::Bench().run("microbench results", [&] {
+            A[A_idx %BATCH_SIZE] += B[B_idx % BATCH_SIZE];
+            A_idx +=  STRIDE_A;
+            B_idx +=  STRIDE_B;
+        ankerl::nanobench::doNotOptimizeAway(A);
+    });
+
+#endif
+
+#if 0
     b = run_benchmark<g1_type, g1_type>(
         [](typename g1_type::value_type& A, typename g1_type::value_type const& B) {
             A += B;
@@ -99,7 +175,38 @@ void benchmark_curve_operations(std::string const& curve_name)
         });
     std::cout << curve_name << " G2 scalar multiplication inplace : " << std::fixed << std::setprecision(3) << b << " ns" << std::endl;
 
+#endif
 
+#if 0
+    constexpr std::size_t SAMPLES = 32768;
+#if 1
+    std::vector<typename g1_type::value_type> A(SAMPLES);
+    std::vector<typename scalar_type::value_type> B(SAMPLES);
+#else
+    std::array<typename g1_type::value_type, SAMPLES> A;
+    std::array<typename scalar_type::value_type, SAMPLES> B;
+#endif
+
+    for(int i=0;i<SAMPLES; ++i) {
+        A[i] = random_element<g1_type>();
+        B[i] = random_element<scalar_type>();
+    }
+    std::size_t STRIDE_A = 1 + sysconf(_SC_LEVEL1_DCACHE_LINESIZE)*2 / sizeof(typename g1_type::value_type);
+    std::size_t STRIDE_B = 1 + sysconf(_SC_LEVEL1_DCACHE_LINESIZE)*2 / sizeof(typename scalar_type::value_type);
+
+    std::size_t A_idx = 0, B_idx = 0;
+    constexpr std::size_t BATCH_SIZE = 10000;
+    auto start = std::chrono::high_resolution_clock::now();
+    for(int i = 0; i < BATCH_SIZE; ++i) {
+        A[A_idx % SAMPLES] *= B[B_idx % SAMPLES];
+        A_idx += STRIDE_A;
+        B_idx += STRIDE_B;
+    }
+    auto finish = std::chrono::high_resolution_clock::now();
+
+    double perf = (finish-start).count() * 1.0/BATCH_SIZE;
+    std::cout << "Scalar mul inplace: " << std::fixed << std::setprecision(3) << perf << " ns" << std::endl;
+#endif
 
 /*
     CRYPTO3_RUN_BENCHMARK(curve_name + " point addition",
