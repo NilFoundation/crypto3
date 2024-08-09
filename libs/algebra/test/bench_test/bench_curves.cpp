@@ -23,26 +23,7 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-//#define BOOST_TEST_MODULE algebra_curves_bench_test
-
-#include <iomanip>
 #include <iostream>
-#include <chrono>
-#include <ratio>
-#include <type_traits>
-
-//#include <boost/test/unit_test.hpp>
-//#include <boost/test/data/test_case.hpp>
-//#include <boost/test/data/monomorphic.hpp>
-
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/json_parser.hpp>
-
-#include <boost/multiprecision/cpp_int.hpp>
-
-#include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/coordinates.hpp>
-#include <nil/crypto3/algebra/curves/detail/forms/twisted_edwards/coordinates.hpp>
-#include <nil/crypto3/algebra/curves/forms.hpp>
 
 #include <nil/crypto3/algebra/curves/alt_bn128.hpp>
 #include <nil/crypto3/algebra/curves/bls12.hpp>
@@ -54,19 +35,10 @@
 #include <nil/crypto3/algebra/curves/secp_r1.hpp>
 #include <nil/crypto3/algebra/curves/ed25519.hpp>
 #include <nil/crypto3/algebra/curves/curve25519.hpp>
-
 #include <nil/crypto3/algebra/curves/vesta.hpp>
 #include <nil/crypto3/algebra/curves/pallas.hpp>
-#include <nil/crypto3/algebra/fields/fp2.hpp>
-#include <nil/crypto3/algebra/fields/fp3.hpp>
-
-#include <nil/crypto3/algebra/random_element.hpp>
-
+#include <nil/crypto3/algebra/type_traits.hpp>
 #include <nil/crypto3/bench/benchmark.hpp>
-
-//#define ANKERL_NANOBENCH_IMPLEMENT
-//#define ANKERL_NANOBENCH_LOG_ENABLED
-//#include "nanobench.h"
 
 using namespace nil::crypto3::algebra;
 using namespace nil::crypto3::bench;
@@ -76,340 +48,84 @@ void benchmark_curve_operations(std::string const& curve_name)
 {
     using g1_type = typename curve_type::template g1_type<>;
     using base_field = typename curve_type::base_field_type;
-    using g2_type = typename curve_type::template g2_type<>;
     using scalar_field = typename curve_type::scalar_field_type;
-    double b;
-/*
-    run_benchmark<g1_type, g1_type>(
-            curve_name + " G1 point addition inplace",
-            [](typename g1_type::value_type& A, typename g1_type::value_type const& B) {
-            A += B;
-        });
-        */
-    /*
-    b = run_benchmark<scalar_type, scalar_type>(
-        [](typename scalar_type::value_type& A, typename scalar_type::value_type const& B) {
-            A += B;
-        });
-    std::cout << curve_name << " scalar addition inplace : " << std::fixed << std::setprecision(3) << b << " ns" << std::endl;
-*/
-    /*
-    benchmark_function<base_field, base_field>(
-        "BLS12-381 Fp addition",
+
+    run_benchmark<base_field, base_field>(
+        curve_name + " Fp addition",
         [](typename base_field::value_type& A, typename base_field::value_type const& B) {
             return A += B;
         });
-    benchmark_function<scalar_field, scalar_field>(
-        "BLS12-381 Fq addition",
+    run_benchmark<base_field, base_field>(
+        curve_name + " Fp multiplication",
+        [](typename base_field::value_type& A, typename base_field::value_type const& B) {
+            return A *= B;
+        });
+    run_benchmark<base_field>(
+        curve_name + " Fp inverse",
+        [](typename base_field::value_type& A) {
+            return A.inversed();
+        });
+    run_benchmark<scalar_field, scalar_field>(
+        curve_name + " Fq addition",
         [](typename scalar_field::value_type& A, typename scalar_field::value_type const& B) {
             return A += B;
         });
-    benchmark_function<g1_type, g1_type>(
-        "BLS12-381 G1 addition",
+    run_benchmark<scalar_field, scalar_field>(
+        curve_name + " Fq multiplication",
+        [](typename scalar_field::value_type& A, typename scalar_field::value_type const& B) {
+            return A *= B;
+        });
+    run_benchmark<scalar_field>(
+        curve_name + " Fq inverse",
+        [](typename scalar_field::value_type& A) {
+            return A.inversed();
+        });
+    run_benchmark<g1_type, g1_type>(
+        curve_name + " G1 addition",
         [](typename g1_type::value_type& A, typename g1_type::value_type const& B) {
             return A += B;
         });
-    benchmark_function<g1_type, scalar_field>(
-        "BLS12-381 G1 scalar multiplication",
+    run_benchmark<g1_type>(
+        curve_name + " G1 doubling",
+        [](typename g1_type::value_type& A) {
+            A.double_inplace();// += A;
+            return A;
+        });
+    run_benchmark<g1_type, scalar_field>(
+        curve_name + " G1 scalar multiplication",
         [](typename g1_type::value_type& A, typename scalar_field::value_type const& B) {
             return A *= B;
         });
-        */
-    benchmark_function<g2_type, g2_type>(
-        "BLS12-381 G2 addition",
-        [](typename g2_type::value_type& A, typename g2_type::value_type const& B) {
-            return A += B;
-        });
-/*        
-    benchmark_function<g2_type, scalar_field>(
-        "BLS12-381 G2 scalar multiplication",
-        [](typename g2_type::value_type& A, typename scalar_field::value_type const& B) {
-            return A *= B;
-        });
-*/
 
-#if 0
-    std::size_t BATCH_SIZE = 32768;
-    std::vector<typename scalar_type::value_type> A(BATCH_SIZE);
-    std::vector<typename scalar_type::value_type> B(BATCH_SIZE);
-
-    for(std::size_t i = 0; i< A.size(); ++i) {
-        A[i] = random_element<scalar_type>();
-        B[i] = random_element<scalar_type>();
+    if constexpr (has_template_g2_type<curve_type>::value) {
+        using g2_type = typename curve_type::template g2_type<>;
+        run_benchmark<g2_type, g2_type>(
+                curve_name + " G2 addition",
+                [](typename g2_type::value_type& A, typename g2_type::value_type const& B) {
+                return A += B;
+                });
+        run_benchmark<g2_type>(
+                curve_name + " G2 doubling",
+                [](typename g2_type::value_type& A) {
+                A.double_inplace();
+                return A;
+                //return A += A;
+                });
+        run_benchmark<g2_type, scalar_field>(
+                curve_name + " G2 scalar multiplication",
+                [](typename g2_type::value_type& A, typename scalar_field::value_type const& B) {
+                return A *= B;
+                });
+    } else {
+        std::cout << "Curve " << curve_name << " has no G2, skipping benchmarks" << std::endl;
     }
-    std::size_t STRIDE_A = 1 + sysconf(_SC_LEVEL1_DCACHE_LINESIZE)*2 / sizeof(typename scalar_type::value_type);
-    std::size_t STRIDE_B = 1 + sysconf(_SC_LEVEL1_DCACHE_LINESIZE)*2 / sizeof(typename scalar_type::value_type);
-    std::size_t A_idx = 0, B_idx = 0;
-
-    ankerl::nanobench::Bench().run("microbench results", [&] {
-            A[A_idx %BATCH_SIZE] += B[B_idx % BATCH_SIZE];
-            A_idx +=  STRIDE_A;
-            B_idx +=  STRIDE_B;
-        ankerl::nanobench::doNotOptimizeAway(A);
-    });
-
-#endif
-
-#if 0
-    b = run_benchmark<g1_type, g1_type>(
-        [](typename g1_type::value_type& A, typename g1_type::value_type const& B) {
-            A += B;
-        });
-    std::cout << curve_name << " G1 point addition inplace : " << std::fixed << std::setprecision(3) << b << " ns" << std::endl;
-
-    b = run_benchmark<g2_type, g2_type>(
-        [](typename g2_type::value_type& A, typename g2_type::value_type const& B) {
-            A += B;
-        });
-    std::cout << curve_name << " G2 point addition inplace : " << std::fixed << std::setprecision(3) << b << " ns" << std::endl;
-
-    b = run_benchmark<g1_type, scalar_type>(
-        [](typename g1_type::value_type& A, typename scalar_type::value_type const& B) {
-            A *= B;
-        });
-    std::cout << curve_name << " G1 scalar multiplication inplace : " << std::fixed << std::setprecision(3) << b << " ns" << std::endl;
-
-    b = run_benchmark<g2_type, scalar_type>(
-        [](typename g2_type::value_type& A, typename scalar_type::value_type const& B) {
-            A *= B;
-        });
-    std::cout << curve_name << " G2 scalar multiplication inplace : " << std::fixed << std::setprecision(3) << b << " ns" << std::endl;
-
-#endif
-
-#if 0
-    constexpr std::size_t SAMPLES = 32768;
-#if 1
-    std::vector<typename g1_type::value_type> A(SAMPLES);
-    std::vector<typename scalar_type::value_type> B(SAMPLES);
-#else
-    std::array<typename g1_type::value_type, SAMPLES> A;
-    std::array<typename scalar_type::value_type, SAMPLES> B;
-#endif
-
-    for(int i=0;i<SAMPLES; ++i) {
-        A[i] = random_element<g1_type>();
-        B[i] = random_element<scalar_type>();
-    }
-    std::size_t STRIDE_A = 1 + sysconf(_SC_LEVEL1_DCACHE_LINESIZE)*2 / sizeof(typename g1_type::value_type);
-    std::size_t STRIDE_B = 1 + sysconf(_SC_LEVEL1_DCACHE_LINESIZE)*2 / sizeof(typename scalar_type::value_type);
-
-    std::size_t A_idx = 0, B_idx = 0;
-    constexpr std::size_t BATCH_SIZE = 10000;
-    auto start = std::chrono::high_resolution_clock::now();
-    for(int i = 0; i < BATCH_SIZE; ++i) {
-        A[A_idx % SAMPLES] *= B[B_idx % SAMPLES];
-        A_idx += STRIDE_A;
-        B_idx += STRIDE_B;
-    }
-    auto finish = std::chrono::high_resolution_clock::now();
-
-    double perf = (finish-start).count() * 1.0/BATCH_SIZE;
-    std::cout << "Scalar mul inplace: " << std::fixed << std::setprecision(3) << perf << " ns" << std::endl;
-#endif
-
-/*
-    CRYPTO3_RUN_BENCHMARK(curve_name + " point addition",
-            typename bench_type_A, typename bench_type_B, typename bench_type_C,
-            A = B+C
-            );
-*/
 }
-
 
 int main(int argc, char* argv[])
 {
-    benchmark_curve_operations<nil::crypto3::algebra::curves::bls12_381>("bls12_381");
+    benchmark_curve_operations<nil::crypto3::algebra::curves::pallas>("Pallas");
+    benchmark_curve_operations<nil::crypto3::algebra::curves::vesta>("Vesta");
+    benchmark_curve_operations<nil::crypto3::algebra::curves::bls12<381>>("BLS12-381");
+    benchmark_curve_operations<nil::crypto3::algebra::curves::mnt4<298>>("MNT4-298");
+    benchmark_curve_operations<nil::crypto3::algebra::curves::mnt6<298>>("MNT6-298");
 }
-#if 0
-BOOST_AUTO_TEST_SUITE(curves_manual_tests)
-/**/
-
-template<typename CurveGroup, typename AffineCurveGroup>
-void curve_operations_perf_test(std::string const& curve_name) {
-    using namespace nil::crypto3;
-    using namespace nil::crypto3::algebra;
-
-    typedef typename AffineCurveGroup::value_type affine_value_type;
-    typedef typename CurveGroup::value_type value_type;
-    typedef typename CurveGroup::curve_type::scalar_field_type::value_type scalar_type;
-
-    std::vector<value_type> points1;
-    std::vector<affine_value_type> points2;
-    std::vector<scalar_type> constants;
-
-    size_t SAMPLE_POINTS = 1000;
-    for (int i = 0; i < SAMPLE_POINTS; ++i) {
-        auto p1 = algebra::random_element<CurveGroup>();
-        auto p1a = p1.to_affine();
-
-        points1.push_back(value_type::from_affine(p1a));
-        points2.push_back(algebra::random_element<AffineCurveGroup>());
-        constants.push_back(algebra::random_element<typename CurveGroup::curve_type::scalar_field_type>());
-    }
-
-    using duration = std::chrono::duration<double, std::nano>;
-
-    auto run_batched_test = [&](
-        std::string const& test_name,
-        std::size_t BATCHES,
-        std::size_t samples_per_batch,
-        std::vector<value_type> const& B,
-        std::function<void (value_type & A, value_type const& B)> opfunc)
-    {
-        std::vector<duration> batch_duration;
-        batch_duration.resize(BATCHES);
-
-        auto res = B[0];
-
-        for(size_t b = 0; b < BATCHES; ++b) {
-            if (b % (BATCHES/10) == 0) std::cerr << "Batch progress:" << b << std::endl;
-            auto start = std::chrono::high_resolution_clock::now();
-            for(size_t i = 0; i < samples_per_batch; ++i) {
-                opfunc(res, B[i*i % SAMPLE_POINTS]);
-            }
-
-            auto finish = std::chrono::high_resolution_clock::now();
-            batch_duration[b] = (finish - start) * 1.0 / samples_per_batch;
-        }
-
-        std::cout << res << std::endl;
-
-        /* To filter 10% outliers, sort results and set margin to BATCHES/20 = 5% */
-        // sort(batch_duration.begin(), batch_duration.end());
-        std::size_t margin = 0; // BATCHES/20;
-        auto s = batch_duration[margin];
-        for(size_t b = margin+1; b < batch_duration.size()-margin; ++b) {
-            s += batch_duration[b];
-        }
-
-
-        s /= batch_duration.size() - margin*2;
-        std::cout << test_name << ": " << std::fixed << std::setprecision(3) << s.count() << std::endl;
-
-        return batch_duration;
-    };
-
-    size_t SAMPLES_PER_BATCH = 10000;
-    size_t BATCHES = 1000;
-
-    for(int MULTIPLICATOR = 1; MULTIPLICATOR <= 10; ++MULTIPLICATOR) {
-        std::cout << "MULT: " << MULTIPLICATOR << std::endl;
-
-        auto madd_res = run_batched_test(
-                "madd",
-                BATCHES, SAMPLES_PER_BATCH / MULTIPLICATOR,
-                points1,
-                [&]( value_type & A, value_type const& B) {
-                for(int m = 0; m < MULTIPLICATOR; ++m)
-                A.mixed_add(B);
-                } );
-
-        auto add_res = run_batched_test(
-                "add",
-                BATCHES, SAMPLES_PER_BATCH / MULTIPLICATOR,
-                points1,
-                [&]( value_type & A, value_type const& B) {
-                for(int m = 0; m < MULTIPLICATOR; ++m)
-                A += B;
-                } );
-
-        auto dbl_res = run_batched_test(
-                "dbl",
-                BATCHES, SAMPLES_PER_BATCH / MULTIPLICATOR,
-                points1,
-                [&]( value_type & A, value_type const& B) {
-                for(int m = 0; m < MULTIPLICATOR; ++m)
-                A.double_inplace();
-                } );
-
-        auto smul_res = run_batched_test(
-                "smul",
-                BATCHES, SAMPLES_PER_BATCH / 256 / MULTIPLICATOR,
-                points1,
-                [&]( value_type & A, value_type const& B) {
-                for(int m = 0; m < MULTIPLICATOR; ++m)
-                A = A * constants[0];
-                } );
-
-        char filename[200]= {0};
-        sprintf(filename,"%s-curve-ops-%03d.csv", curve_name.c_str(), MULTIPLICATOR);
-
-        std::ofstream f(filename, std::ofstream::out);
-        f << "# " << typeid(CurveGroup).name() << std::endl;
-        f << "madd,add,dbl,smul" << std::endl;
-        std::size_t prec = 4;
-        for(std::size_t i = 0; i < BATCHES; ++i) {
-            f
-                << std::fixed << std::setprecision(prec) << madd_res[i].count() << ","
-                << std::fixed << std::setprecision(prec) << add_res[i].count() << ","
-                << std::fixed << std::setprecision(prec) << dbl_res[i].count() << ","
-                << std::fixed << std::setprecision(prec) << smul_res[i].count()
-                << std::endl;
-        }
-
-    }
-}
-
-BOOST_AUTO_TEST_CASE(perf_test_bls12_381_g1) {
-    using policy_type = nil::crypto3::algebra::curves::bls12<381>::g1_type<
-        nil::crypto3::algebra::curves::coordinates::jacobian_with_a4_0,
-        nil::crypto3::algebra::curves::forms::short_weierstrass>;
-
-    using affine_policy_type = nil::crypto3::algebra::curves::bls12<381>::g1_type<nil::crypto3::algebra::curves::coordinates::affine,
-                                                           nil::crypto3::algebra::curves::forms::short_weierstrass>;
-
-    curve_operations_perf_test<policy_type, affine_policy_type>("bls12-381-j0");
-}
-
-BOOST_AUTO_TEST_CASE(perf_test_pallas) {
-    using policy_type = nil::crypto3::algebra::curves::pallas::g1_type<
-        nil::crypto3::algebra::curves::coordinates::jacobian_with_a4_0, 
-        nil::crypto3::algebra::curves::forms::short_weierstrass>;
-
-    using affine_policy_type = nil::crypto3::algebra::curves::pallas::g1_type<nil::crypto3::algebra::curves::coordinates::affine,
-                                                           nil::crypto3::algebra::curves::forms::short_weierstrass>;
-
-    curve_operations_perf_test<policy_type, affine_policy_type>("pallas-j0");
-}
-
-BOOST_AUTO_TEST_CASE(perf_test_mnt4) {
-    using policy_type = nil::crypto3::algebra::curves::mnt4<298>::g1_type<
-        nil::crypto3::algebra::curves::coordinates::projective,
-        nil::crypto3::algebra::curves::forms::short_weierstrass>;
-
-    using affine_policy_type = nil::crypto3::algebra::curves::mnt4<298>::g1_type<
-        nil::crypto3::algebra::curves::coordinates::affine,
-        nil::crypto3::algebra::curves::forms::short_weierstrass>;
-
-    curve_operations_perf_test<policy_type, affine_policy_type>("mnt4-p");
-}
-
-BOOST_AUTO_TEST_CASE(perf_test_mnt6) {
-    using policy_type = nil::crypto3::algebra::curves::mnt6<298>::g1_type<
-        nil::crypto3::algebra::curves::coordinates::projective,
-        nil::crypto3::algebra::curves::forms::short_weierstrass>;
-
-    using affine_policy_type = nil::crypto3::algebra::curves::mnt6<298>::g1_type<
-        nil::crypto3::algebra::curves::coordinates::affine,
-        nil::crypto3::algebra::curves::forms::short_weierstrass>;
-
-    curve_operations_perf_test<policy_type, affine_policy_type>("mnt6-p");
-}
-
-BOOST_AUTO_TEST_CASE(perf_test_ed25519) {
-    using policy_type = nil::crypto3::algebra::curves::ed25519::g1_type<
-        nil::crypto3::algebra::curves::coordinates::extended_with_a_minus_1,
-        nil::crypto3::algebra::curves::forms::twisted_edwards>;
-
-    using affine_policy_type = nil::crypto3::algebra::curves::ed25519::g1_type<
-        nil::crypto3::algebra::curves::coordinates::affine,
-        nil::crypto3::algebra::curves::forms::twisted_edwards>;
-
-    curve_operations_perf_test<policy_type, affine_policy_type>("ed25519-ex-1");
-}
-
-
-BOOST_AUTO_TEST_SUITE_END()
-
-#endif

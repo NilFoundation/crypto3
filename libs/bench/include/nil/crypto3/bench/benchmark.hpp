@@ -17,36 +17,44 @@ namespace nil {
     namespace crypto3 {
         namespace bench {
 
-constexpr std::size_t SAMPLES_COUNT = 10000;
+/* Amount of elements that will not fit into L1D cache.
+ * Goldilocks field is the smallest object to benchmark, 64 bits, 8 bytes,
+ * so 8192 samples take 64kb, that is twice as large as L1D cache (32kb)
+ * Largest object to benchmark is BLS12-381 Fp12, 2over3over2, 72 bytes each,
+ * This will take 589kb
+ * */
+constexpr std::size_t SAMPLES_COUNT = 8192;
 
 template<typename T>
-std::array<typename T::value_type, SAMPLES_COUNT> generate_samples()
+std::vector<typename T::value_type> generate_samples()
 {
-    std::array<typename T::value_type, SAMPLES_COUNT> samples;
-    for(std::size_t i = 0; i < samples.size(); ++i) {
-        samples[i] = algebra::random_element<T>();
-        std::cout << "Sample generated: " << samples[i] << std::endl;
+    std::vector<typename T::value_type> samples;
+    for(std::size_t i = 0; i < SAMPLES_COUNT; ++i) {
+        samples.emplace_back(algebra::random_element<T>());
     }
     return samples;
 }
 
 template<typename... A>
-std::tuple<std::array<typename A::value_type, SAMPLES_COUNT>...> allocate_samples()
+std::tuple<std::vector<typename A::value_type>...> allocate_samples()
 {
     return std::make_tuple(generate_samples<A>()...);
 }
 
 
 template<typename... A>
-constexpr std::array<std::size_t, sizeof...(A)> calculate_strides()
+std::array<std::size_t, sizeof...(A)> calculate_strides()
 {
-    // assume cache line is 64 bytes
-    return {(1+64/sizeof(typename A::value_type)) ...};
+    /* For each type of argument calculate stride used to traverse array of samples
+     * Stride is twice larger than a cache line to ensure values for benchmarked
+     * operation are not cached */
+    return { (1 + sysconf(_SC_LEVEL1_DCACHE_LINESIZE)*2 / sizeof(typename A::value_type)) ... };
 }
+
 
 template<typename... A, std::size_t... I>
 auto make_slice_impl(
-    std::tuple<std::array<typename A::value_type, SAMPLES_COUNT>...>& samples,
+    std::tuple<std::vector<typename A::value_type>...>& samples,
     const std::array<std::size_t, sizeof...(A)>& strides,
     std::size_t i,
     std::index_sequence<I...>
@@ -57,9 +65,10 @@ auto make_slice_impl(
     );
 }
 
+
 template<typename... A>
 auto make_slice(
-    std::tuple<std::array<typename A::value_type, SAMPLES_COUNT>...>& samples,
+    std::tuple<std::vector<typename A::value_type>...>& samples,
     const std::array<std::size_t, sizeof...(A)>& strides,
     std::size_t i
 ) -> std::tuple<typename A::value_type&...>
@@ -71,45 +80,50 @@ auto make_slice(
 
 
 template<typename...A, typename F >
-void benchmark_function(std::string const& name, F && func)
+void run_benchmark(std::string const& name, F && func)
 {
     using duration = std::chrono::duration<double, std::nano>;
 
-    // allocate arrays of args
     auto samples = allocate_samples<A...>();
     auto strides = calculate_strides<A...>();
 
+    auto run_batch = [&] (std::size_t batch_size) {
+        for(std::size_t i = 0; i < batch_size; ++i) {
+            auto args = make_slice<A...>(samples, strides, i);
+            /* volatile hints to compiler that it has important side effects
+             * and call should not be optimized out */
+            volatile auto r = std::apply(func, args);
+        }
+    };
+
     auto run_at_least = [&] (duration const& dur) {
-        std::size_t BATCH_SIZE = 1000, total_runs = 0;
+        std::size_t WARMUP_BATCH_SIZE = 1000, total_runs = 0;
         auto start = std::chrono::high_resolution_clock::now();
         while (std::chrono::high_resolution_clock::now() - start < dur) {
-            for(std::size_t i = 0; i < BATCH_SIZE; ++i) {
-                auto args = make_slice<A...>(samples, strides, i);
-                volatile auto r = std::apply(func, args);
-            }
-            total_runs += BATCH_SIZE;
+            run_batch(WARMUP_BATCH_SIZE);
+            total_runs += WARMUP_BATCH_SIZE;
         }
         return total_runs;
     };
 
     std::size_t MEASUREMENTS = 100;
-    std::size_t BATCH_SIZE = run_at_least(std::chrono::seconds(5))/MEASUREMENTS;
+    auto WARMUP_DURATION = std::chrono::seconds(3);
 
-    std::vector<double> durations(MEASUREMENTS) ;
+    std::size_t BATCH_SIZE = 1+run_at_least(WARMUP_DURATION)/MEASUREMENTS/10;
+
+    std::vector<double> durations(MEASUREMENTS);
     for(std::size_t m = 0; m < MEASUREMENTS; ++m) {
         auto start = std::chrono::high_resolution_clock::now();
-        for(std::size_t i = 0; i < BATCH_SIZE; ++i) {
-            auto args = make_slice<A...>(samples, strides, i);
-            volatile auto r = std::apply(func, args);
-        }
+        run_batch(BATCH_SIZE);
         auto finish = std::chrono::high_resolution_clock::now();
-        durations[m] = (finish - start).count()*1.0/ BATCH_SIZE;
+        durations[m] = (finish - start).count()*1.0 / BATCH_SIZE;
     }
 
     std::sort(durations.begin(), durations.end());
 
     // discard top 20% outliers
     durations.resize(MEASUREMENTS * 0.8);
+
     double median = durations[durations.size()/2];
     double mean = 0, stddiv = 0;
 
@@ -119,207 +133,25 @@ void benchmark_function(std::string const& name, F && func)
     }
 
     mean /= durations.size();
+    // stddiv^2 = E x^2 -  (E x)^2
     stddiv = sqrt(stddiv / durations.size() - mean * mean);
 
-    // https://en.wikipedia.org/wiki/Mean_absolute_percentage_error
+    // https://support.numxl.com/hc/en-us/articles/115001223503-MdAPE-Median-Absolute-Percentage-Error
     for(auto &dur : durations) {
         dur = (dur - median) / dur;
         if ( dur < 0 ) {
             dur = -dur;
         }
     }
-
     std::sort(durations.begin(), durations.end());
     double MdAPE = durations[durations.size()/2];
 
     std::cout << std::fixed << std::setprecision(3);
     std::cout << name <<
-        " mean: " << mean << " err: " << (MdAPE*100) <<
-        "% median: " << median << " stddiv: " << stddiv <<
+        " mean: " << mean << "ns err: " << (MdAPE*100) <<
+        "% median: " << median << "ns stddiv: " << stddiv <<
         std::endl;
 }
-
-
-/*
-
-struct benchmark_results {
-    std::string name;
-    double mean, stddiv;
-};
-
-template<typename... A>
-benchmark_results run_benchmark(std::string name, std::function<void(typename A::value_type...)> const& expression)
-{
-
-}
-*/
-
-#if 0
-template<typename type_A, typename type_B>
-double run_benchmark(std::function<void(typename type_A::value_type &, typename type_B::value_type const&)> expression)
-{
-    using duration = std::chrono::duration<double, std::nano>;
-    std::size_t long_batch;
-    {
-        typename type_A::value_type A =  nil::crypto3::algebra::random_element<type_A>();
-        typename type_B::value_type B =  nil::crypto3::algebra::random_element<type_B>();
-        auto start = std::chrono::high_resolution_clock::now();
-        std::size_t ESTIMATION_BATCH = 1000;
-        for(std::size_t i = 0; i < ESTIMATION_BATCH; ++i) {
-            expression(A,B);
-        }
-        auto finish = std::chrono::high_resolution_clock::now();
-        duration sample = finish - start;
-        std::size_t WARMUP = 5;
-        std::size_t warmup_batch = 1e9*ESTIMATION_BATCH*WARMUP/sample.count();
-        std::cout << "warmup batch: " << warmup_batch << std::endl;
-        start = std::chrono::high_resolution_clock::now();
-        for(std::size_t i = 0; i < warmup_batch; ++i) {
-            expression(A,B);
-        }
-        finish = std::chrono::high_resolution_clock::now();
-        std::cout << "finished in " << std::fixed << std::setprecision(3) << (finish-start).count()*1e-9 << " s" << std::endl;
-        long_batch = 1+5e5*warmup_batch/(finish-start).count();
-//        if (long_batch < 100) long_batch = 100;
-//        long_batch = 1e9*ESTIMATION_BATCH/ESTIMATION_BATCH/sample.count();
-    }
-    std::cout << "samples for long batch: " << long_batch << std::endl;
-    constexpr std::size_t MEASUREMENTS = 100;
-    constexpr std::size_t START_MULT = 5, FINISH_MULT = 15;
-    std::array<std::pair<std::size_t, duration>, (FINISH_MULT - START_MULT) * MEASUREMENTS> durs;
-    {
-        /* CAPACITY_X - create arrays that do not fit into L1 cache */
-        constexpr std::size_t CAPACITY_B = 32768 /*sysconf(_SC_LEVEL1_DCACHE_SIZE)*/*2/sizeof(typename type_B::value_type);
-        /* STRIDE_X - stride through array so each time it misses the cache line */
-        std::size_t STRIDE_A = 1 + sysconf(_SC_LEVEL1_DCACHE_LINESIZE)*2 / sizeof(typename type_A::value_type);
-        std::size_t STRIDE_B = 1 + sysconf(_SC_LEVEL1_DCACHE_LINESIZE)*2 / sizeof(typename type_B::value_type);
-        std::array<typename type_B::value_type, CAPACITY_B> B_array;
-        for(std::size_t i = 0 ; i < CAPACITY_B; ++i ) {
-            B_array[i] = nil::crypto3::algebra::random_element<type_B>();
-        }
-        std::vector<typename type_A::value_type> acc(long_batch);
-        for(std::size_t i = 0 ; i < long_batch; ++i ) {
-            acc[i] = nil::crypto3::algebra::random_element<type_A>();
-        }
-        std::size_t A_idx = 0, B_idx = 0;
-        std::size_t m = 0;
-        for(std::size_t d = START_MULT; d < FINISH_MULT; ++d) {
-            for(std::size_t b = 0 ; b < MEASUREMENTS; ++b) {
-                auto start = std::chrono::high_resolution_clock::now();
-                for(std::size_t i = 0; i < d*long_batch; ++i) {
-                    typename type_A::value_type &A = acc[A_idx % long_batch];
-                    typename type_B::value_type &B = B_array[B_idx % CAPACITY_B];
-                    /* ### */ expression(A,B); /* ### */
-                    A_idx += STRIDE_A;
-                    B_idx += STRIDE_B;
-                }
-                auto finish = std::chrono::high_resolution_clock::now();
-                durs[m++] = std::make_pair(d*long_batch, finish - start);
-//                std::cout << "batch " << d << ":" << std::fixed << std::setprecision(3) << durs[m-1].second.count() << std::endl;
-            }
-        }
-    }
-    std::sort(durs.begin(), durs.end(),
-        [](auto const& a, auto const& b) {
-            return a.first == b.first ? a.second < b.second : a.first < b.first;
-        });
-    double xy = 0, x2 = 0;
-    for(std::size_t i = 0; i < FINISH_MULT - START_MULT; ++i) {
-        for(std::size_t m = 0; m < MEASUREMENTS; ++m) {
-            /* discard top 30% outliers */
-            if ( m < MEASUREMENTS*0.7 ) {
-                xy += durs[i*MEASUREMENTS+m].first * durs[i*MEASUREMENTS+m].second.count();
-                x2 += durs[i*MEASUREMENTS+m].first * durs[i*MEASUREMENTS+m].first;
-            }
-        }
-    }
-    double b = xy/x2;
-    return b;
-}
-#endif
-
-#define CRYPTO3_RUN_BENCHMARK(bench_name, bench_type_A, bench_type_B, bench_type_C, expression) \
-    do { \
-        std::cout << "# " << bench_name << " " /*<< std::endl*/; \
-        using duration = std::chrono::duration<double, std::nano>; \
-        std::size_t long_batch; \
-        { \
-            bench_type_A::type_name::value_type A; bench_type_B::type_name::value_type B; bench_type_C::type_name::value_type C; \
-            B = bench_type_B::sample_random_element(); \
-            C = bench_type_C::sample_random_element(); \
-            auto start = std::chrono::high_resolution_clock::now(); \
-            std::size_t ESTIMATION_BATCH = 1000; \
-            for(std::size_t i = 0; i < ESTIMATION_BATCH; ++i) { expression; } \
-            auto finish = std::chrono::high_resolution_clock::now(); \
-            duration sample = finish - start; \
-            std::size_t WARMUP = 5; \
-            std::size_t warmup_batch = 1e9*ESTIMATION_BATCH*WARMUP/sample.count(); \
-            /*std::cout << "Warming up.." << std::endl;*/ \
-            for(std::size_t i = 0; i < warmup_batch; ++i) { expression; } \
-            long_batch = 1e9*ESTIMATION_BATCH/ESTIMATION_BATCH/sample.count(); \
-        } \
-        /* std::cout << "long_batch: " << long_batch << std::endl; */ \
-        /* std::cout << "Measuring.. " << std::endl; */ \
-        constexpr std::size_t MEASUREMENTS = 100; \
-        constexpr std::size_t START_MULT = 5, FINISH_MULT = 15; \
-        std::array<std::pair<std::size_t, duration>, (FINISH_MULT - START_MULT) * MEASUREMENTS> durs; \
-        { \
-            /* CAPACITY_X - create arrays that do not fit into L1 cache */ \
-            constexpr std::size_t CAPACITY_B = 32768 /*sysconf(_SC_LEVEL1_DCACHE_SIZE)*/*2/sizeof(bench_type_B::type_name::value_type); \
-            constexpr std::size_t CAPACITY_C = 32768 /*sysconf(_SC_LEVEL1_DCACHE_SIZE)*/*2/sizeof(bench_type_C::type_name::value_type); \
-            /* STRIDE_X - stride through array so each time it misses the cache line */ \
-            std::size_t STRIDE_B = 1 + sysconf(_SC_LEVEL1_DCACHE_LINESIZE)*2 / sizeof(bench_type_B::type_name::value_type); \
-            std::size_t STRIDE_C = 1 + sysconf(_SC_LEVEL1_DCACHE_LINESIZE)*2 / sizeof(bench_type_C::type_name::value_type); \
-            std::array<bench_type_B::type_name::value_type, CAPACITY_B> B_array; \
-            std::array<bench_type_C::type_name::value_type, CAPACITY_C> C_array; \
-            for(std::size_t i = 0 ; i < CAPACITY_B; ++i ) { B_array[i] = bench_type_B::sample_random_element(); } \
-            for(std::size_t i = 0 ; i < CAPACITY_C; ++i ) { C_array[i] = bench_type_C::sample_random_element(); } \
-            /*std::cout << "Random elements sampled.." << std::endl;*/ \
-            std::vector<bench_type_A::type_name::value_type> acc(long_batch); \
-            std::size_t B_idx = 0, C_idx = 0; \
-            std::size_t m = 0; \
-            for(std::size_t d = START_MULT; d < FINISH_MULT; ++d) { \
-                for(std::size_t b = 0 ; b < MEASUREMENTS; ++b) { \
-                    auto start = std::chrono::high_resolution_clock::now(); \
-                    for(std::size_t i = 0; i < d*long_batch; ++i) { \
-                        bench_type_A::type_name::value_type &A = acc[i % long_batch]; \
-                        bench_type_B::type_name::value_type &B = B_array[B_idx % CAPACITY_B]; \
-                        bench_type_C::type_name::value_type &C = C_array[C_idx % CAPACITY_C]; \
-                        /* ### */ expression; /* ### */ \
-                        B_idx += STRIDE_B; C_idx += STRIDE_C; \
-                    } \
-                    auto finish = std::chrono::high_resolution_clock::now(); \
-                    durs[m++] = std::make_pair(d*long_batch, finish - start); \
-                } \
-                /*std::cout << "batch " << d << ":" << std::fixed << std::setprecision(3) << durs[d].count() << std::endl;*/ \
-            } \
-        } \
-        std::sort(durs.begin(), durs.end(), [](auto const& a, auto const& b) { \
-                return a.first == b.first ? a.second < b.second : a.first < b.first; \
-                }); \
-        double xy = 0, x2 = 0; \
-        for(std::size_t i = 0; i < FINISH_MULT - START_MULT; ++i) { \
-            for(std::size_t m = 0; m < MEASUREMENTS; ++m) { \
-                /* discard top 30% outliers */ \
-                if ( m < MEASUREMENTS*0.7 ) { \
-                    xy += durs[i*MEASUREMENTS+m].first * durs[i*MEASUREMENTS+m].second.count(); \
-                    x2 += durs[i*MEASUREMENTS+m].first * durs[i*MEASUREMENTS+m].first; \
-                } \
-            } \
-        } \
-        double b = xy/x2; \
-        std::cout << std::fixed << std::setprecision(3) << b << " ns" << std::endl; \
-    } while(0);
-
-
-            template<typename A>
-                class bench_type {
-                    public:
-                        typedef A type_name;
-                        static typename A::value_type sample_random_element() {
-                            return nil::crypto3::algebra::random_element<A>();
-                        }
-                };
 
         }
     }
