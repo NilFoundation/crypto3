@@ -11,12 +11,6 @@ include(CMTest)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 
-find_package(Boost REQUIRED COMPONENTS random unit_test_framework)
-
-cm_test_link_libraries(blueprint
-                       crypto3::all
-                       ${Boost_LIBRARIES})
-
 option(ZK_PLACEHOLDER_PROFILING "Build with placeholder profiling" FALSE)
 option(ZK_PLACEHOLDER_DEBUG "Build with placeholder debug output" FALSE)
 
@@ -53,10 +47,9 @@ macro(define_blueprint_test test)
     cm_test(NAME ${full_test_name} SOURCES ${test}.cpp ARGS ${additional_args})
 
     target_include_directories(${full_test_name} PRIVATE
-                               "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
-                               "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>"
-
                                ${Boost_INCLUDE_DIRS})
+
+    target_link_libraries(${full_test_name} crypto3::blueprint crypto3::algebra crypto3::zk)
 
     set_target_properties(${full_test_name} PROPERTIES CXX_STANDARD 17)
 

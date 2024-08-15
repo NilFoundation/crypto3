@@ -6,7 +6,6 @@ option(CMAKE_ENABLE_TESTS "Enable tests" FALSE) # used by CMTest module
 option(BUILD_EXAMPLES "Build examples" FALSE)
 
 find_package(CM)
-find_package(crypto3 REQUIRED)
 find_package(Boost REQUIRED COMPONENTS container random filesystem log log_setup program_options thread system)
 
 
@@ -21,7 +20,6 @@ target_include_directories(blueprint INTERFACE
 
 target_link_libraries(blueprint INTERFACE
                       ${Boost_LIBRARIES}
-                      crypto3::all
 )
 
 include(CMTest)
