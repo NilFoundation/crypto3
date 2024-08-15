@@ -217,12 +217,10 @@ BOOST_AUTO_TEST_CASE(bls12_381)
     benchmark_curve_operations<nil::crypto3::algebra::curves::bls12<381>>("BLS12-381");
 }
 
-/*
 BOOST_AUTO_TEST_CASE(bls12_377)
 {
     benchmark_curve_operations<nil::crypto3::algebra::curves::bls12<377>>("BLS12-377");
 }
-*/
 
 BOOST_AUTO_TEST_CASE(mnt4_298)
 {
