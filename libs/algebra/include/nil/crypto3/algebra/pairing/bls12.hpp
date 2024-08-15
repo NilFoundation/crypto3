@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2024 Vasiliy Olekhov <vasiliy.olekhov@nil.foundation>
 //
 // MIT License
 //
@@ -29,6 +30,7 @@
 #include <nil/crypto3/algebra/curves/jubjub.hpp>
 #include <nil/crypto3/algebra/curves/bls12.hpp>
 #include <nil/crypto3/algebra/pairing/detail/bls12/381/params.hpp>
+#include <nil/crypto3/algebra/pairing/detail/bls12/377/params.hpp>
 #include <nil/crypto3/algebra/pairing/forms/short_weierstrass/jacobian_with_a4_0/ate_double_miller_loop.hpp>
 #include <nil/crypto3/algebra/pairing/forms/short_weierstrass/jacobian_with_a4_0/ate_miller_loop.hpp>
 #include <nil/crypto3/algebra/pairing/forms/short_weierstrass/jacobian_with_a4_0/ate_precompute_g1.hpp>
@@ -45,7 +47,21 @@ namespace nil {
                 struct pairing_policy<curves::bls12<381>> {
                     using curve_type = curves::bls12<381>;
 
-                    using chained_curve_type = curves::jubjub;
+                    using precompute_g1 = pairing::short_weierstrass_jacobian_with_a4_0_ate_precompute_g1<curve_type>;
+                    using precompute_g2 = pairing::short_weierstrass_jacobian_with_a4_0_ate_precompute_g2<curve_type>;
+                    using miller_loop = pairing::short_weierstrass_jacobian_with_a4_0_ate_miller_loop<curve_type>;
+                    using double_miller_loop =
+                        pairing::short_weierstrass_jacobian_with_a4_0_ate_double_miller_loop<curve_type>;
+                    using final_exponentiation =
+                        pairing::short_weierstrass_jacobian_with_a4_0_final_exponentiation<curve_type>;
+
+                    using g1_precomputed_type = typename precompute_g1::g1_precomputed_type;
+                    using g2_precomputed_type = typename precompute_g2::g2_precomputed_type;
+                };
+
+                template<>
+                struct pairing_policy<curves::bls12<377>> {
+                    using curve_type = curves::bls12<377>;
 
                     using precompute_g1 = pairing::short_weierstrass_jacobian_with_a4_0_ate_precompute_g1<curve_type>;
                     using precompute_g2 = pairing::short_weierstrass_jacobian_with_a4_0_ate_precompute_g2<curve_type>;
@@ -58,6 +74,7 @@ namespace nil {
                     using g1_precomputed_type = typename precompute_g1::g1_precomputed_type;
                     using g2_precomputed_type = typename precompute_g2::g2_precomputed_type;
                 };
+
 
             }    // namespace pairing
         }        // namespace algebra
