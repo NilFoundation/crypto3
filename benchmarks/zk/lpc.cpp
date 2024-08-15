@@ -55,25 +55,6 @@
 using namespace nil::crypto3;
 using namespace nil::crypto3::zk::snark;
 
-namespace boost {
-    namespace test_tools {
-        namespace tt_detail {
-            template<>
-            struct print_log_value<nil::crypto3::math::polynomial<
-                    algebra::fields::detail::element_fp < algebra::fields::params < algebra::fields::bls12_base_field <
-                    381>>>>> {
-            void operator()(std::ostream &,
-                            const nil::crypto3::math::polynomial<algebra::fields::detail::element_fp <
-                                                                 algebra::fields::params <
-                                                                 algebra::fields::bls12_base_field < 381>>
-
-            >> &) {
-        }
-    };
-}    // namespace tt_detail
-}        // namespace test_tools
-}    // namespace boost
-
 template<typename FieldType, typename NumberType>
 std::vector<math::polynomial<typename FieldType::value_type>> generate(NumberType degree) {
     typedef boost::random::independent_bits_engine<boost::random::mt19937,
