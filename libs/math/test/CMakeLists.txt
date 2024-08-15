@@ -42,7 +42,3 @@ set(TESTS_NAMES
 foreach(TEST_NAME ${TESTS_NAMES})
     define_math_test(${TEST_NAME})
 endforeach()
-
-if(ENABLE_BENCHMARKS)
-    add_subdirectory(benchmarks)
-endif()

@@ -39,12 +39,10 @@
 
 #include <nil/crypto3/algebra/curves/alt_bn128.hpp>
 #include <nil/crypto3/algebra/curves/bls12.hpp>
-#include <nil/crypto3/algebra/curves/edwards.hpp>
 #include <nil/crypto3/algebra/curves/mnt4.hpp>
 #include <nil/crypto3/algebra/curves/mnt6.hpp>
 #include <nil/crypto3/algebra/curves/params/multiexp/alt_bn128.hpp>
 #include <nil/crypto3/algebra/curves/params/multiexp/bls12.hpp>
-#include <nil/crypto3/algebra/curves/params/multiexp/edwards.hpp>
 #include <nil/crypto3/algebra/curves/params/multiexp/mnt4.hpp>
 #include <nil/crypto3/algebra/curves/params/multiexp/mnt6.hpp>
 #include <nil/crypto3/algebra/curves/params/wnaf/bls12.hpp>

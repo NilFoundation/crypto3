@@ -107,7 +107,4 @@ endforeach()
 
 # string(CONCAT TEST_DATA ${CMAKE_CURRENT_SOURCE_DIR} "/systems/plonk/pickles/data/kimchi")
 # target_compile_definitions(crypto3_zk_systems_plonk_pickles_kimchi_test PRIVATE TEST_DATA="${TEST_DATA}")
-if(BUILD_BENCH_TESTS)
-    cm_add_test_subdirectory(bench_test)
-endif()
 

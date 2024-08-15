@@ -23,7 +23,7 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#define BOOST_TEST_MODULE algebra_curves_bench_test
+#define BOOST_TEST_MODULE algebra_benchmark
 
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
@@ -50,6 +50,12 @@
 #include <nil/crypto3/algebra/type_traits.hpp>
 #include <nil/crypto3/bench/benchmark.hpp>
 
+#include <nil/crypto3/algebra/algorithms/pair.hpp>
+#include <nil/crypto3/algebra/pairing/mnt4.hpp>
+#include <nil/crypto3/algebra/pairing/mnt6.hpp>
+#include <nil/crypto3/algebra/pairing/bls12.hpp>
+#include <nil/crypto3/algebra/pairing/alt_bn128.hpp>
+
 using namespace nil::crypto3::algebra;
 using namespace nil::crypto3::bench;
 
@@ -61,7 +67,7 @@ void benchmark_curve_operations(std::string const& curve_name)
     using scalar_field = typename curve_type::scalar_field_type;
 
     run_benchmark<base_field, base_field>(
-            curve_name + " Fp addition",
+        curve_name + " Fp addition",
             [](typename base_field::value_type& A, typename base_field::value_type const& B) {
             return A += B;
             });
@@ -109,11 +115,33 @@ void benchmark_curve_operations(std::string const& curve_name)
 
     if constexpr (has_template_g2_type<curve_type>::value) {
         using g2_type = typename curve_type::template g2_type<>;
+
+        using g2_field = typename g2_type::field_type;
+
+        run_benchmark<g2_field, g2_field>(
+                curve_name + " G2 Fp addition",
+                [](typename g2_field::value_type& A, typename g2_field::value_type const& B) {
+                return A += B;
+                });
+
+        run_benchmark<g2_field, g2_field>(
+                curve_name + " G2 Fp multiplication",
+                [](typename g2_field::value_type& A, typename g2_field::value_type const& B) {
+                return A *= B;
+                });
+
+        run_benchmark<g2_field>(
+                curve_name + " G2 Fp inverse",
+                [](typename g2_field::value_type& A) {
+                return A.inversed();
+                });
+
         run_benchmark<g2_type, g2_type>(
                 curve_name + " G2 addition",
                 [](typename g2_type::value_type& A, typename g2_type::value_type const& B) {
                 return A += B;
                 });
+
         run_benchmark<g2_type>(
                 curve_name + " G2 doubling",
                 [](typename g2_type::value_type& A) {
@@ -126,8 +154,49 @@ void benchmark_curve_operations(std::string const& curve_name)
                 [](typename g2_type::value_type& A, typename scalar_field::value_type const& B) {
                 return A *= B;
                 });
+
     } else {
         std::cout << "Curve " << curve_name << " does not have G2, skipping benchmarks" << std::endl;
+    }
+
+    if constexpr (has_type_gt_type<curve_type>::value) {
+
+        using gt_type = typename curve_type::gt_type;
+
+        run_benchmark<gt_type, gt_type>(
+                curve_name + " GT addition",
+                [](typename gt_type::value_type& A, typename gt_type::value_type const& B) {
+                return A += B;
+                });
+
+        run_benchmark<gt_type, gt_type>(
+                curve_name + " GT multiplication",
+                [](typename gt_type::value_type& A, typename gt_type::value_type const& B) {
+                return A *= B;
+                });
+
+        run_benchmark<gt_type>(
+                curve_name + " GT inverse",
+                [](typename gt_type::value_type& A) {
+                return A.inversed();
+                });
+
+        using g2_type = typename curve_type::template g2_type<>;
+
+        run_benchmark<g1_type, g2_type>(
+                curve_name + " pairing",
+                [](typename g1_type::value_type& A, typename g2_type::value_type const& B) {
+                return pair<curve_type>(A, B);
+                });
+
+        run_benchmark<gt_type>(
+                curve_name + " final_exponentiation",
+                [](typename gt_type::value_type& A) {
+                return final_exponentiation<curve_type>(A);
+                });
+
+    } else {
+        std::cout << "Curve " << curve_name << " does not have GT, skipping benchmarks" << std::endl;
     }
 }
 
@@ -147,6 +216,13 @@ BOOST_AUTO_TEST_CASE(bls12_381)
 {
     benchmark_curve_operations<nil::crypto3::algebra::curves::bls12<381>>("BLS12-381");
 }
+
+/*
+BOOST_AUTO_TEST_CASE(bls12_377)
+{
+    benchmark_curve_operations<nil::crypto3::algebra::curves::bls12<377>>("BLS12-377");
+}
+*/
 
 BOOST_AUTO_TEST_CASE(mnt4_298)
 {
