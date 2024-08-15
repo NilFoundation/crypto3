@@ -126,7 +126,7 @@ void run_benchmark(std::string const& name, F && func)
     };
 
     auto run_at_least = [&] (duration const& dur) {
-        std::size_t WARMUP_BATCH_SIZE = 1000, total_runs = 0;
+        std::size_t WARMUP_BATCH_SIZE = 10, total_runs = 0;
         auto start = std::chrono::high_resolution_clock::now();
         while (std::chrono::high_resolution_clock::now() - start < dur) {
             run_batch(WARMUP_BATCH_SIZE);
@@ -175,10 +175,37 @@ void run_benchmark(std::string const& name, F && func)
     std::sort(durations.begin(), durations.end());
     double MdAPE = durations[durations.size()/2];
 
+    std::size_t multiplier = 1;
+    std::string unit;
+
+    while (mean > 10e3) {
+        ++multiplier;
+        mean /= 1e3;
+        median /= 1e3;
+        stddiv /= 1e3;
+    }
+
+    switch(multiplier) {
+        case 1:
+            unit = "ns";
+            break;
+        case 2:
+            unit = "µs";
+            break;
+        case 3:
+            unit = "ms";
+            break;
+        case 4:
+            unit = "s";
+            break;
+        default:
+            unit = "??";
+    }
+
     std::cout << std::fixed << std::setprecision(3);
     std::cout << name <<
-        " mean: " << mean << "ns err: " << (MdAPE*100) <<
-        "% median: " << median << "ns stddiv: " << stddiv <<
+        " mean: " << mean << unit << " err: " << (MdAPE*100) <<
+        "% median: " << median << unit << " stddiv: " << stddiv <<
         std::endl;
 }
 

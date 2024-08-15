@@ -66,7 +66,3 @@ endforeach()
 foreach(TEST_NAME ${MODULAR_TESTS_NAMES})
     define_modular_cpp_int_test(${TEST_NAME})
 endforeach()
-
-if(BUILD_BENCH_TESTS)
-    cm_add_test_subdirectory(bench_test)
-endif()
