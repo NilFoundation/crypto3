@@ -6,8 +6,6 @@ option(CMAKE_ENABLE_TESTS "Enable tests" FALSE) # used by CMTest module
 option(BUILD_EXAMPLES "Build examples" FALSE)
 
 find_package(CM)
-find_package(Boost REQUIRED COMPONENTS container random filesystem log log_setup program_options thread system)
-
 
 add_library(blueprint INTERFACE)
 add_library(crypto3::blueprint ALIAS blueprint)
