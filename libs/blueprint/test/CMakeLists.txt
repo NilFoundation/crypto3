@@ -70,8 +70,8 @@ endmacro()
 set(COMMON_TEST_FILES
     "manifest"
     "detail/huang_lu"
-    #"gate_id"
-    #"utils/connectedness_check"
+    "gate_id"
+    "utils/connectedness_check"
     "private_input"
     "proxy"
     #"mock/mocked_components"
