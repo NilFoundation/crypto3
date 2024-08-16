@@ -26,34 +26,3 @@ cm_add_test_subdirectory(test)
 if(BUILD_EXAMPLES)
     add_subdirectory(example)
 endif()
-
-# Install phase
-
-set(EXPORT_NAME crypto3_blueprint-targets)
-# Install target
-install(TARGETS blueprint EXPORT ${EXPORT_NAME})
-# Install headers
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-
-# Generate and install package config files
-
-include(CMakePackageConfigHelpers)
-set(CONFIG_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/crypto3_blueprint)
-set(PACKAGE_CONFIG_NAME crypto3_blueprint-config)
-
-write_basic_config_version_file(
-    ${PACKAGE_CONFIG_NAME}-version.cmake
-    VERSION ${crypto3_blueprint_VERSION}
-    COMPATIBILITY SameMajorVersion
-)
-
-install(
-    FILES
-    ${CMAKE_CURRENT_BINARY_DIR}/${PACKAGE_CONFIG_NAME}.cmake
-    ${CMAKE_CURRENT_BINARY_DIR}/${PACKAGE_CONFIG_NAME}-version.cmake
-    DESTINATION ${CONFIG_DIR}
-)
-
-install(EXPORT ${EXPORT_NAME}
-        NAMESPACE crypto3::
-        DESTINATION ${CONFIG_DIR})
