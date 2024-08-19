@@ -9,8 +9,10 @@
 include(CMTest)
 
 cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
-
-                      crypto3::all
+                      crypto3::algebra
+                      crypto3::math
+                      crypto3::multiprecision
+                      crypto3::zk
                       ${Boost_LIBRARIES})
 
 add_custom_target(compile_and_run_transpiler_tests)
