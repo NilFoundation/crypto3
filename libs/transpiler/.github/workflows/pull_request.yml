@@ -1,0 +1,18 @@
+name: Handle pull request event
+
+on:
+  pull_request:
+
+concurrency:
+  group: ${{
+    ( github.ref == 'refs/heads/master' && 'master' ) ||
+    format('{0}/{1}', github.workflow, github.ref) }}
+  cancel-in-progress: true
+
+jobs:
+  handle-syncwith:
+    name: Call Reusable SyncWith Handler
+    uses: NilFoundation/ci-cd/.github/workflows/reusable-handle-syncwith.yml@v1.1.2
+    with:
+      ci-cd-ref: 'v1.1.2'
+    secrets: inherit
