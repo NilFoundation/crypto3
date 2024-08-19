@@ -78,8 +78,8 @@ namespace nil {
                         math::polynomial_dfs<typename FieldType::value_type> f_folded(
                                 domain->size() / 2 - 1, domain->size() / 2, FieldType::value_type::zero());
 
-                        typename FieldType::value_type two_inversed = 2u;
-                        two_inversed = two_inversed.inversed();
+                        constexpr typename FieldType::value_type two_inversed =
+                            typename FieldType::value_type(2u).inversed();
                         typename FieldType::value_type omega_inversed = domain->get_domain_element(domain->size() - 1);
 
                         typename FieldType::value_type acc = alpha;

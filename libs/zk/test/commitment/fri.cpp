@@ -4,6 +4,7 @@
 // Copyright (c) 2022 Ilia Shirobokov <i.shirobokov@nil.foundation>
 // Copyright (c) 2022 Ilias Khairullin <ilias@nil.foundation>
 // Copyright (c) 2022 Aleksei Moskvin <alalmoskvin@nil.foundation>
+// Copyright (c) 2024 Vasiliy Olekhov <vasiliy.olekhov@nil.foundation>
 //
 // MIT License
 //
@@ -134,16 +135,112 @@ BOOST_AUTO_TEST_SUITE(fri_test_suite)
         std::vector<std::uint8_t> init_blob{0u, 1u, 2u, 3u, 4u, 5u, 6u, 7u, 8u, 9u};
         zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(init_blob);
 
-        proof_type proof = zk::algorithms::proof_eval<fri_type>(f, tree, params, transcript);
+        proof_type proof;
+        {
+            PROFILE_SCOPE("FRI proof_eval");
+            proof = zk::algorithms::proof_eval<fri_type>(f, tree, params, transcript);
+        }
 
         // verify
         zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(init_blob);
 
+        {
+            PROFILE_SCOPE("FRI verify_eval");
         BOOST_CHECK(zk::algorithms::verify_eval<fri_type>(proof, root, params, transcript_verifier));
+        }
 
         typename FieldType::value_type verifier_next_challenge = transcript_verifier.template challenge<FieldType>();
         typename FieldType::value_type prover_next_challenge = transcript.template challenge<FieldType>();
         BOOST_CHECK(verifier_next_challenge == prover_next_challenge);
     }
+
+template<typename FieldType>
+inline math::polynomial_dfs<typename FieldType::value_type> generate_random_polynomial(
+        std::size_t degree,
+        nil::crypto3::random::algebraic_engine<FieldType> &rnd
+) {
+    std::vector<typename FieldType::value_type> coefficients(degree+1);
+    std::generate(std::begin(coefficients), std::end(coefficients), [&rnd]() { return rnd(); });
+    math::polynomial_dfs<typename FieldType::value_type> result;
+    result.from_coefficients(coefficients);
+    return result;
+}
+
+
+    BOOST_AUTO_TEST_CASE(fri_basic_test_dfs) {
+
+        // setup
+        using curve_type = algebra::curves::pallas;
+        using FieldType = typename curve_type::base_field_type;
+
+        typedef hashes::sha2<256> merkle_hash_type;
+        typedef hashes::sha2<256> transcript_hash_type;
+
+        constexpr static const std::size_t d = 16;
+
+        constexpr static const std::size_t r = boost::static_log2<d>::value;
+        constexpr static const std::size_t m = 2;
+        constexpr static const std::size_t lambda = 40;
+
+        typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m> fri_type;
+
+        static_assert(zk::is_commitment<fri_type>::value);
+        static_assert(!zk::is_commitment<merkle_hash_type>::value);
+
+        typedef typename fri_type::proof_type proof_type;
+        typedef typename fri_type::params_type params_type;
+
+
+        constexpr static const std::size_t d_extended = d;
+        std::size_t extended_log = boost::static_log2<d_extended>::value;
+        std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
+                math::calculate_domain_set<FieldType>(extended_log, r);
+
+        params_type params(
+                d - 1, // max_degree
+                D,
+                generate_random_step_list(r, 3),
+                2, //expand_factor
+                lambda,
+                true,
+                20
+        );
+
+        BOOST_CHECK(D[1]->m == D[0]->m / 2);
+        BOOST_CHECK(D[1]->get_domain_element(1) == D[0]->get_domain_element(1).squared());
+
+        auto rnd = nil::crypto3::random::algebraic_engine<FieldType>(0x1337);
+
+        // commit
+        math::polynomial_dfs<typename FieldType::value_type>
+            f = generate_random_polynomial(d, rnd);
+
+        typename fri_type::merkle_tree_type tree = zk::algorithms::precommit<fri_type>(f, params.D[0],
+                                                                                       params.step_list[0]);
+        auto root = zk::algorithms::commit<fri_type>(tree);
+
+        // eval
+        std::vector<std::uint8_t> init_blob{0u, 1u, 2u, 3u, 4u, 5u, 6u, 7u, 8u, 9u};
+        zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(init_blob);
+
+        proof_type proof;
+        {
+            PROFILE_SCOPE("FRI proof_eval");
+            proof = zk::algorithms::proof_eval<fri_type>(f, tree, params, transcript);
+        }
+
+        // verify
+        zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript_verifier(init_blob);
+
+        {
+            PROFILE_SCOPE("FRI verify_eval");
+        BOOST_CHECK(zk::algorithms::verify_eval<fri_type>(proof, root, params, transcript_verifier));
+        }
+
+        typename FieldType::value_type verifier_next_challenge = transcript_verifier.template challenge<FieldType>();
+        typename FieldType::value_type prover_next_challenge = transcript.template challenge<FieldType>();
+        BOOST_CHECK(verifier_next_challenge == prover_next_challenge);
+    }
+
 
 BOOST_AUTO_TEST_SUITE_END()
