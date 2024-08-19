@@ -1,24 +1,28 @@
-cmake_minimum_required(VERSION 3.21.4)
+include(CMConfig)
+include(CMSetupVersion)
 
-project(crypto3_blueprint VERSION 0.1.0 LANGUAGES C CXX)
+cm_project(blueprint WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME} LANGUAGES C CXX)
 
-option(CMAKE_ENABLE_TESTS "Enable tests" FALSE) # used by CMTest module
-option(BUILD_EXAMPLES "Build examples" FALSE)
+include(CMDeploy)
 
-find_package(CM)
+cm_setup_version(VERSION 0.1.0 PREFIX ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME})
 
-add_library(blueprint INTERFACE)
-add_library(crypto3::blueprint ALIAS blueprint)
+add_library(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE)
 
-include(GNUInstallDirs)
-target_include_directories(blueprint INTERFACE
-                           "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
-                           "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
-)
+set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
+        EXPORT_NAME ${CURRENT_PROJECT_NAME})
 
-target_link_libraries(blueprint INTERFACE
+target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>)
+
+target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
                       ${Boost_LIBRARIES}
 )
+
+cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
+        INCLUDE include
+        NAMESPACE ${CMAKE_WORKSPACE_NAME}::)
 
 include(CMTest)
 cm_add_test_subdirectory(test)
@@ -26,3 +30,4 @@ cm_add_test_subdirectory(test)
 if(BUILD_EXAMPLES)
     add_subdirectory(example)
 endif()
+
