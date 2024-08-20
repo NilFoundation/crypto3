@@ -8,8 +8,11 @@
 #---------------------------------------------------------------------------#
 
 macro(define_blueprint_example name)
-    add_executable(blueprint_${name}_example ${name}.cpp)
-    target_link_libraries(blueprint_${name}_example PRIVATE
+
+    string(REPLACE "/" "_" full_example_name blueprint_${name}_example)
+
+    add_executable(${full_example_name} ${name}.cpp)
+    target_link_libraries(${full_example_name} PRIVATE
                           ${CMAKE_WORKSPACE_NAME}_blueprint
 
                           ${CMAKE_WORKSPACE_NAME}::algebra
@@ -18,10 +21,9 @@ macro(define_blueprint_example name)
                           ${CMAKE_WORKSPACE_NAME}::hash
                           ${CMAKE_WORKSPACE_NAME}::multiprecision
                           ${CMAKE_WORKSPACE_NAME}::zk
-                          marshalling::crypto3_zk
 
                           ${Boost_LIBRARIES})
-    set_target_properties(blueprint_${name}_example PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED TRUE)
+    set_target_properties(${full_example_name} PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED TRUE)
 endmacro()
 
 
