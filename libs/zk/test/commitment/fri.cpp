@@ -117,7 +117,7 @@ BOOST_AUTO_TEST_SUITE(fri_test_suite)
                 2, //expand_factor
                 lambda,
                 true,
-                20
+                16
         );
 
         BOOST_CHECK(D[1]->m == D[0]->m / 2);
@@ -203,7 +203,7 @@ inline math::polynomial_dfs<typename FieldType::value_type> generate_random_poly
                 2, //expand_factor
                 lambda,
                 true,
-                20
+                16
         );
 
         BOOST_CHECK(D[1]->m == D[0]->m / 2);
