@@ -33,6 +33,7 @@
 #include <limits>
 #include <iterator>
 
+#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
 #include <nil/marshalling/endianness.hpp>
 
 namespace nil {
