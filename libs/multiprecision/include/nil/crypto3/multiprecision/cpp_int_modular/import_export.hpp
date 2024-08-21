@@ -9,7 +9,6 @@
 #include <climits>
 #include <cstring>
 
-#include <boost/predef/os/macos.h>
 #include <boost/multiprecision/traits/std_integer_traits.hpp>
 #include <boost/multiprecision/detail/endian.hpp>
 #include <boost/multiprecision/cpp_int/import_export.hpp> // For 'extract_bits'.
@@ -18,6 +17,10 @@ namespace boost {
     namespace multiprecision {
         namespace detail {
 
+            /* This specialization is used when assigning `chunk_bits`
+             * of `bits` into `val` at `bit_location` in case where `val`
+             * is larger than one limb (machine word).
+             */
             template<unsigned Bits, class Unsigned>
             void assign_bits(boost::multiprecision::backends::cpp_int_modular_backend<Bits>& val,
                              Unsigned bits, std::size_t bit_location, std::size_t chunk_bits,
@@ -37,29 +40,21 @@ namespace boost {
                         val.limbs()[limb] |= value;
                 }
 
+                /* If some extra bits need to be assigned to the next limb */
                 if (chunk_bits > sizeof(limb_type) * CHAR_BIT - shift) {
                     shift = sizeof(limb_type) * CHAR_BIT - shift;
                     chunk_bits -= shift;
                     bit_location += shift;
-                    bits >>= shift;
-                    if (bits)
-                        assign_bits(val, bits, bit_location, chunk_bits, tag);
+                    auto extra_bits = bits >> shift;
+                    if (extra_bits)
+                        assign_bits(val, extra_bits, bit_location, chunk_bits, tag);
                 }
             }
 
-#ifdef BOOST_OS_MACOS_AVAILABLE
-            // Especially for mac, for the case when a vector<bool> is being converted to a number.
-            // When you dereference an iterator to std::vector<bool> you will receive 
-            // std::__bit_const_reference<std::vector<bool>>>.
-            template<unsigned Bits>
-            void assign_bits(boost::multiprecision::backends::cpp_int_modular_backend<Bits>& val,
-                             std::__bit_const_reference<std::vector<bool>> bits,
-                            std::size_t bit_location, std::size_t chunk_bits,
-                             const std::integral_constant<bool, false>& tag) {
-               assign_bits(val, static_cast<bool>(bits), bit_location, chunk_bits, tag);
-            }
-#endif
-
+            /* This specialization is used when assigning `chunk_bits`
+             * of `bits` into `val` at `bit_location` in case where `val`
+             * fits into one limb (machine word).
+             */
             template<unsigned Bits, class Unsigned>
             void assign_bits(boost::multiprecision::backends::cpp_int_modular_backend<Bits>& val,
                              Unsigned bits, std::size_t bit_location, std::size_t chunk_bits,
@@ -113,8 +108,8 @@ namespace boost {
                 while (i != j)
                 {
                     assign_bits(
-                      newval, *i,
-                      static_cast<std::size_t>(bit_location), chunk_size, tag_type());
+                        newval, *i,
+                        static_cast<std::size_t>(bit_location), chunk_size, tag_type());
                     ++i;
                     bit_location += bit_location_change;
                 }

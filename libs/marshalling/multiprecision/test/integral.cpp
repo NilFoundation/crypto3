@@ -53,7 +53,7 @@ T generate_random() {
     static boost::random::uniform_int_distribution<unsigned> ui(0, limbs);
     static boost::random::mt19937 gen;
     T val = gen();
-    unsigned lim = ui(gen); 
+    unsigned lim = ui(gen);
     for (unsigned i = 0; i < lim; ++i) {
         val *= (gen.max)();
         val += gen();
