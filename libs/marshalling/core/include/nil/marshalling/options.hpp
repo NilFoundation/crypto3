@@ -43,6 +43,12 @@
 
 namespace nil {
     namespace marshalling {
+        namespace types {
+            // We cannot include integral.hpp, it includes this file. So just declare the class.
+            template<typename TFieldBase, typename T, typename... TOptions>
+            class integral;
+        }
+
         namespace option {
             namespace detail {
 
@@ -285,6 +291,10 @@ namespace nil {
             /// @headerfile nil/marshalling/options.hpp
             template<typename TField>
             struct sequence_size_field_prefix { };
+
+            template <typename TTypeBase>
+                using size_t_sequence_size_field_prefix = sequence_size_field_prefix<
+                    nil::marshalling::types::integral<TTypeBase, std::size_t>>;
 
             /// @brief Option that modifies the default behaviour of collection fields to
             ///     prepend the serialized data with number of @b bytes information.

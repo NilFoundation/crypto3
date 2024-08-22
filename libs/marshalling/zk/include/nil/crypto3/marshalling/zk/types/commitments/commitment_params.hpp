@@ -137,7 +137,7 @@ namespace nil {
                                 integral_type,
 //                              constexpr static std::size_t m;
                                 integral_type,
-//                              constexpr static std::uint32_t grinding_type::mask; If use_grinding==false, this will be 0.
+//                              constexpr static std::uint32_t grinding_parameters; If use_grinding==false, this will be 0.
                                 integral_type,
 //                              const std::size_t max_degree;
                                 integral_type,
@@ -188,21 +188,25 @@ namespace nil {
                 make_commitment_params(const typename commitment_params<nil::marshalling::field_type<Endianness>, CommitmentSchemeType, std::enable_if_t<nil::crypto3::zk::is_lpc<CommitmentSchemeType>>>::type &filled_params) {
                     using CommitmentParamsType = typename CommitmentSchemeType::params_type;
 
-                    auto step_list = make_integer_vector<Endianness, std::size_t>(std::get<5>(filled_params.value()));
                     std::size_t lambda = std::get<0>(filled_params.value()).value();
-                    std::size_t r = std::accumulate(step_list.begin(), step_list.end(), 0);
-                    std::size_t max_degree = std::get<3>(filled_params.value()).value();
-                    std::size_t expand_factor = std::get<6>(filled_params.value()).value();
+                    // We skip value #1 which is 'm'. It's a static value, cannot be set from a marshalling.
+                    // We still need to include it when converting to a marshalling structure, to include it
+                    // in the transcript value intialization.
                     std::size_t grinding_parameter = std::get<2>(filled_params.value()).value();
-                    auto D =  math::calculate_domain_set<typename CommitmentParamsType::field_type>(r + expand_factor + 1, r);
-                    // TODO: check generators correctness
+                    std::size_t max_degree = std::get<3>(filled_params.value()).value();
+                    std::size_t degree_log = std::ceil(std::log2(max_degree));
+
+                    // We skip value #4, which is unity roots. They will be generated again.
+
+                    auto step_list = make_integer_vector<Endianness, std::size_t>(std::get<5>(filled_params.value()));
+                    std::size_t expand_factor = std::get<6>(filled_params.value()).value();
+                    std::size_t r = std::accumulate(step_list.begin(), step_list.end(), 0);
 
                     return CommitmentParamsType(
-                        max_degree,
-                        D,
                         step_list,
-                        expand_factor,
+                        degree_log,
                         lambda,
+                        expand_factor,
                         (grinding_parameter != 0),
                         grinding_parameter
                     );

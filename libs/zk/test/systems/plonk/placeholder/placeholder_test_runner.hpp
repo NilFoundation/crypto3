@@ -104,8 +104,11 @@ struct placeholder_test_runner {
                 lpc_preprocessed_public_data, std::move(lpc_preprocessed_private_data), desc, constraint_system,
                 lpc_scheme);
 
+        // We must not use the same instance of lpc_scheme.
+        lpc_scheme_type verifier_lpc_scheme(fri_params);
+
         bool verifier_res = placeholder_verifier<field_type, lpc_placeholder_params_type>::process(
-                lpc_preprocessed_public_data.common_data, lpc_proof, desc, constraint_system, lpc_scheme);
+                lpc_preprocessed_public_data.common_data, lpc_proof, desc, constraint_system, verifier_lpc_scheme);
         return verifier_res;
     }
 

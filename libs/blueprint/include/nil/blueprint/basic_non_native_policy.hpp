@@ -29,6 +29,8 @@
 #include <nil/crypto3/algebra/curves/pallas.hpp>
 #include <nil/crypto3/algebra/curves/vesta.hpp>
 #include <nil/crypto3/algebra/curves/ed25519.hpp>
+#include <nil/crypto3/algebra/fields/bls12/base_field.hpp>
+#include <nil/crypto3/algebra/fields/bls12/scalar_field.hpp>
 
 #include <boost/multiprecision/cpp_int.hpp>
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
@@ -250,8 +252,6 @@ namespace nil {
                 using var = crypto3::zk::snark::plonk_variable<typename crypto3::algebra::fields::bls12_base_field<381>>;
                 typedef std::array<var, ratio> non_native_var_type;
             };
-
-
 
             /*
              * Native element type.

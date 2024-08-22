@@ -28,6 +28,8 @@
 
 #include <vector>
 
+#include <nil/crypto3/algebra/fields/arithmetic_params/bls12.hpp>
+
 #include <nil/crypto3/math/detail/field_utils.hpp>
 
 #include <nil/crypto3/math/domains/evaluation_domain.hpp>

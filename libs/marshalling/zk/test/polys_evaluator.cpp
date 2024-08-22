@@ -1,8 +1,5 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2021 Nikita Kaskov <nbering@nil.foundation>
-// Copyright (c) 2021 Ilias Khairullin <ilias@nil.foundation>
-// Copyright (c) 2022-2023 Elena Tatuzova <e.tatuzova@nil.foundation>
+// Copyright (c) 2024 Martun Karapetyan <martun@nil.foundation>
 //
 // MIT License
 //
@@ -25,10 +22,13 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#define BOOST_TEST_MODULE crypto3_marshalling_lpc_commitment_test
+#define BOOST_TEST_MODULE crypto3_marshalling_polys_evaluator_test
 
 #include <boost/test/unit_test.hpp>
 #include <boost/algorithm/string/case_conv.hpp>
+
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/random/uniform_int.hpp>
 
 #include <iostream>
 #include <iomanip>
@@ -39,6 +39,10 @@
 #include <nil/marshalling/field_type.hpp>
 #include <nil/marshalling/endianness.hpp>
 
+#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
+#include <boost/multiprecision/number.hpp>
+
+#include <nil/crypto3/algebra/random_element.hpp>
 #include <nil/crypto3/algebra/curves/bls12.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/bls12.hpp>
 #include <nil/crypto3/algebra/curves/alt_bn128.hpp>
@@ -61,10 +65,11 @@
 #include <nil/crypto3/hash/type_traits.hpp>
 #include <nil/crypto3/hash/sha2.hpp>
 #include <nil/crypto3/hash/keccak.hpp>
-#include <nil/crypto3/marshalling/zk/types/commitments/lpc.hpp>
+#include <nil/crypto3/marshalling/zk/types/commitments/polys_evaluator.hpp>
 
 #include <nil/crypto3/zk/commitments/polynomial/fri.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/lpc.hpp>
+#include <nil/crypto3/zk/commitments/batched_commitment.hpp> // contains class polys_evaluator
 #include "random_test_data_generation.hpp"
 
 using namespace nil::crypto3;
@@ -73,92 +78,29 @@ using namespace nil::crypto3;
 // * Test marshalling function
 // ******************************************************************************* /
 
-template<typename Endianness, typename LPC>
-void test_lpc_proof(typename LPC::proof_type &proof, typename LPC::fri_type::params_type fri_params) {
+template<typename Endianness, typename PolysEvaluator>
+void test_polys_evaluator_marshalling(PolysEvaluator &evaluator) {
     using TTypeBase = nil::marshalling::field_type<Endianness>;
 
-    auto filled_proof = nil::crypto3::marshalling::types::fill_eval_proof<Endianness, LPC>(proof, fri_params);
-    auto _proof = nil::crypto3::marshalling::types::make_eval_proof<Endianness, LPC>(filled_proof);
-    BOOST_CHECK(proof == _proof);
+    auto filled_evaluator = nil::crypto3::marshalling::types::fill_polys_evaluator<Endianness, PolysEvaluator>(evaluator);
+    auto _evaluator = nil::crypto3::marshalling::types::make_polys_evaluator<Endianness, PolysEvaluator>(filled_evaluator);
+    BOOST_CHECK(evaluator == _evaluator);
 
     std::vector<std::uint8_t> cv;
-    cv.resize(filled_proof.length(), 0x00);
+    cv.resize(filled_evaluator.length(), 0x00);
     auto write_iter = cv.begin();
-    auto status = filled_proof.write(write_iter, cv.size());
+    auto status = filled_evaluator.write(write_iter, cv.size());
     BOOST_CHECK(status == nil::marshalling::status_type::success);
 
-    typename nil::crypto3::marshalling::types::eval_proof<TTypeBase, LPC>::type test_val_read;
+    nil::crypto3::marshalling::types::polys_evaluator<TTypeBase, PolysEvaluator> test_val_read;
     auto read_iter = cv.begin();
     test_val_read.read(read_iter, cv.size());
     BOOST_CHECK(status == nil::marshalling::status_type::success);
-    typename LPC::proof_type constructed_val_read =
-            nil::crypto3::marshalling::types::make_eval_proof<Endianness, LPC>(test_val_read);
-    BOOST_CHECK(proof == constructed_val_read);
+
+    PolysEvaluator constructed_val_read =
+            nil::crypto3::marshalling::types::make_polys_evaluator<Endianness, PolysEvaluator>(test_val_read);
+    BOOST_CHECK(evaluator == constructed_val_read);
 }
-
-// This function will test saving and restoring LPC commitment scheme state to a file/buffer.
-template<typename Endianness, typename LPC>
-void test_lpc_state_recovery(const LPC& lpc_commitment_scheme) {
-    using TTypeBase = nil::marshalling::field_type<Endianness>;
-
-    auto filled_lpc_scheme = nil::crypto3::marshalling::types::fill_commitment_scheme<Endianness, LPC>(lpc_commitment_scheme);
-    auto _lpc_commitment_scheme = nil::crypto3::marshalling::types::make_commitment_scheme<Endianness, LPC>(filled_lpc_scheme);
-    BOOST_CHECK(lpc_commitment_scheme == _lpc_commitment_scheme);
-
-    std::vector<std::uint8_t> cv;
-    cv.resize(filled_lpc_scheme.length(), 0x00);
-    auto write_iter = cv.begin();
-    auto status = filled_lpc_scheme.write(write_iter, cv.size());
-    BOOST_CHECK(status == nil::marshalling::status_type::success);
-
-    typename nil::crypto3::marshalling::types::commitment_scheme_state<TTypeBase, LPC>::type test_val_read;
-    auto read_iter = cv.begin();
-    test_val_read.read(read_iter, cv.size());
-    BOOST_CHECK(status == nil::marshalling::status_type::success);
-    LPC constructed_val_read =
-            nil::crypto3::marshalling::types::make_commitment_scheme<Endianness, LPC>(test_val_read);
-    BOOST_CHECK(lpc_commitment_scheme == constructed_val_read);
-}
-
-BOOST_AUTO_TEST_SUITE(marshalling_random)
-    // setup
-    static constexpr std::size_t lambda = 40;
-    static constexpr std::size_t m = 2;
-
-    constexpr static const std::size_t d = 16;
-    constexpr static const std::size_t final_polynomial_degree = 1; // final polynomial degree
-    constexpr static const std::size_t r = boost::static_log2<(d - final_polynomial_degree)>::value;
-
-    using curve_type = nil::crypto3::algebra::curves::bls12<381>;
-    using field_type = typename curve_type::scalar_field_type;
-    using value_type = typename field_type::value_type;
-    using hash_type = nil::crypto3::hashes::keccak_1600<256>;
-
-    using Endianness = nil::marshalling::option::big_endian;
-    using TTypeBase = nil::marshalling::field_type<Endianness>;
-    using FRI = typename nil::crypto3::zk::commitments::detail::basic_batched_fri<field_type, hash_type, hash_type, m>;
-    using lpc_params_type = typename nil::crypto3::zk::commitments::list_polynomial_commitment_params<
-            hash_type, hash_type, m
-    >;
-    using LPC = typename nil::crypto3::zk::commitments::batched_list_polynomial_commitment<field_type, lpc_params_type>;
-    using lpc_scheme_type = nil::crypto3::zk::commitments::lpc_commitment_scheme<LPC, math::polynomial<typename field_type::value_type>>;
-
-BOOST_FIXTURE_TEST_CASE(lpc_proof_test, zk::test_tools::random_test_initializer<field_type>) {
-
-    typename FRI::params_type fri_params(1, r + 1, lambda, 4);
-
-    auto proof = generate_random_lpc_proof<LPC>(
-            final_polynomial_degree, 5,
-            fri_params.step_list,
-            lambda,
-            false,
-            alg_random_engines.template get_alg_engine<field_type>(),
-            generic_random_engine
-    );
-    test_lpc_proof<Endianness, lpc_scheme_type>(proof, fri_params);
-}
-
-BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(marshalling_real)
     // Setup common types.
@@ -202,7 +144,10 @@ BOOST_FIXTURE_TEST_CASE(batches_num_3_test, zk::test_tools::random_test_initiali
         2 /*expand_factor*/
     );
 
-    using lpc_scheme_type = nil::crypto3::zk::commitments::lpc_commitment_scheme<lpc_type, math::polynomial<typename field_type::value_type>>;
+    using lpc_scheme_type = nil::crypto3::zk::commitments::lpc_commitment_scheme<
+        lpc_type, math::polynomial<typename field_type::value_type>>;
+    using polys_evaluator_type = typename lpc_scheme_type::polys_evaluator_type;
+
     lpc_scheme_type lpc_scheme_prover(fri_params);
 
     // Generate polynomials
@@ -221,7 +166,6 @@ BOOST_FIXTURE_TEST_CASE(batches_num_3_test, zk::test_tools::random_test_initiali
     auto filled_commitment = nil::crypto3::marshalling::types::fill_commitment<Endianness, lpc_scheme_type>(commitments[0]);
     auto _commitment = nil::crypto3::marshalling::types::make_commitment<Endianness, lpc_scheme_type>(filled_commitment);
 
-
     // Generate evaluation points. Generate points outside of the basic domain
     // Generate evaluation points. Choose poin1ts outside the domain
     auto point = algebra::fields::arithmetic_params<field_type>::multiplicative_generator;
@@ -231,12 +175,8 @@ BOOST_FIXTURE_TEST_CASE(batches_num_3_test, zk::test_tools::random_test_initiali
 
     std::array<std::uint8_t, 96> x_data {};
 
-    // Prove
-    zk::transcript::fiat_shamir_heuristic_sequential<transcript_hash_type> transcript(x_data);
-    auto proof = lpc_scheme_prover.proof_eval(transcript);
-
-    test_lpc_proof<Endianness, lpc_scheme_type>(proof, fri_params);
-    test_lpc_state_recovery<Endianness, lpc_scheme_type>(lpc_scheme_prover);
+    polys_evaluator_type evaluator = static_cast<polys_evaluator_type>(lpc_scheme_prover);
+    test_polys_evaluator_marshalling<Endianness, polys_evaluator_type>(evaluator);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

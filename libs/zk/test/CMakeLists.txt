@@ -15,7 +15,9 @@ target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTER
 cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
     ${CMAKE_WORKSPACE_NAME}::random
     crypto3::marshalling-zk
-    Boost::unit_test_framework)
+    Boost::unit_test_framework
+    Boost::log
+    )
 
 if(PROFILING_ENABLED)
     add_definitions(-DPROFILING_ENABLED)

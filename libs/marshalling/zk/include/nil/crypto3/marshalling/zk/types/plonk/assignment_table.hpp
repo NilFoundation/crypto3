@@ -43,6 +43,60 @@ namespace nil {
         namespace marshalling {
             namespace types {
 
+                /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                /////////   Marshalling the assignment table description.
+                /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+                // TODO(we may consider to use this construct when marshalling the assignment table.)
+                template<typename TTypeBase>
+                using plonk_assignment_table_description = nil::marshalling::types::bundle<
+                    TTypeBase, std::tuple<
+                        nil::marshalling::types::integral<TTypeBase, std::size_t>, // witness_amount
+                        nil::marshalling::types::integral<TTypeBase, std::size_t>, // public_input_amount
+                        nil::marshalling::types::integral<TTypeBase, std::size_t>, // constant_amount
+                        nil::marshalling::types::integral<TTypeBase, std::size_t>, // selector_amount
+
+                        nil::marshalling::types::integral<TTypeBase, std::size_t>, // usable_rows
+                        nil::marshalling::types::integral<TTypeBase, std::size_t> // rows_amount
+                    >
+                >;
+
+                template<typename Endianness, typename FieldType>
+                plonk_assignment_table_description<nil::marshalling::field_type<Endianness>> fill_assignment_table_description(
+                    const zk::snark::plonk_table_description<FieldType>& desc
+                ) {
+                    using TTypeBase = nil::marshalling::field_type<Endianness>;
+                    using result_type = plonk_assignment_table_description<nil::marshalling::field_type<Endianness>>;
+                    using value_type = typename FieldType::value_type;
+
+                    return result_type(std::move(std::make_tuple(
+                        nil::marshalling::types::integral<TTypeBase, std::size_t>(desc.witness_columns),
+                        nil::marshalling::types::integral<TTypeBase, std::size_t>(desc.public_input_columns),
+                        nil::marshalling::types::integral<TTypeBase, std::size_t>(desc.constant_columns),
+                        nil::marshalling::types::integral<TTypeBase, std::size_t>(desc.selector_columns),
+                        nil::marshalling::types::integral<TTypeBase, std::size_t>(desc.usable_rows_amount),
+                        nil::marshalling::types::integral<TTypeBase, std::size_t>(desc.rows_amount))));
+                }
+
+                template<typename Endianness, typename FieldType>
+                zk::snark::plonk_table_description<FieldType> make_assignment_table_description(
+                        const plonk_assignment_table_description<nil::marshalling::field_type<Endianness>> &filled_description) {
+
+                    zk::snark::plonk_table_description<FieldType> desc(
+                        std::get<0>(filled_description.value()).value(),
+                        std::get<1>(filled_description.value()).value(),
+                        std::get<2>(filled_description.value()).value(),
+                        std::get<3>(filled_description.value()).value(),
+                        std::get<4>(filled_description.value()).value(),
+                        std::get<5>(filled_description.value()).value()
+                    );
+                    return desc;
+                }
+
+                /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                /////////   Marshalling the assignment table.
+                /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
                 template<typename TTypeBase, typename PlonkTable>
                 using plonk_assignment_table = nil::marshalling::types::bundle<
                     TTypeBase, std::tuple<
@@ -143,7 +197,7 @@ namespace nil {
                 plonk_assignment_table<nil::marshalling::field_type<Endianness>, PlonkTable> fill_assignment_table(
                     std::size_t usable_rows,
                     const PlonkTable &assignments
-                ){
+                ) {
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
                     using result_type = plonk_assignment_table<nil::marshalling::field_type<Endianness>, PlonkTable>;
                     using value_type = typename PlonkTable::field_type::value_type;
@@ -228,6 +282,8 @@ namespace nil {
                         typename PlonkTable::public_table_type(public_inputs, constants, selectors)
                     ));
                 }
+
+   
             } //namespace types
         } // namespace marshalling
     } // namespace crypto3

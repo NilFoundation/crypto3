@@ -26,13 +26,16 @@
 #ifndef MARSHALLING_ARRAY_LIST_HPP
 #define MARSHALLING_ARRAY_LIST_HPP
 
+#include <functional>
 #include <vector>
+#include <map>
 
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/types/array_list/behaviour.hpp>
 #include <nil/marshalling/types/detail/options_parser.hpp>
 
 #include <nil/marshalling/types/tag.hpp>
+#include <nil/detail/type_traits.hpp>
 
 namespace nil {
     namespace marshalling {
@@ -402,6 +405,79 @@ namespace nil {
             inline const array_list<TFieldBase, TElement, TOptions...> &
                 to_field_base(const array_list<TFieldBase, TElement, TOptions...> &field) {
                 return field;
+            }
+
+            // We use this type of array_list waay too often, so this is a shortcut, not to copy-paste it all the time.
+            template<typename TFieldBase, typename TElement>
+            using standard_array_list = array_list<
+                TFieldBase,
+                TElement,
+                nil::marshalling::option::size_t_sequence_size_field_prefix<TFieldBase>>;
+
+            // Very often we just need an array list of std::size_t, so here's another shortcut.
+            template<typename TFieldBase>
+            using standard_size_t_array_list = array_list<
+                TFieldBase,
+                nil::marshalling::types::integral<TFieldBase, std::size_t>,
+                nil::marshalling::option::size_t_sequence_size_field_prefix<TFieldBase>>;
+
+            // Helper functions to convert to/from an arraylist.
+            template<typename TFieldBase, typename TMarshalledElement, typename Range>
+            typename std::enable_if<
+                nil::detail::is_range<Range>::value, 
+                standard_array_list<TFieldBase, TMarshalledElement>>::type 
+            fill_standard_array_list(
+                    const Range& input_range,
+                    std::function<TMarshalledElement(const typename Range::value_type&)> element_marshalling) {
+                standard_array_list<TFieldBase, TMarshalledElement> result;
+                for (const auto& v: input_range) {
+                    result.value().push_back(element_marshalling(v));
+                }
+                return result;
+            }
+
+            template<typename TFieldBase, typename TElement, typename TMarshalledElement> 
+            std::vector<TElement> make_standard_array_list(
+                    const standard_array_list<TFieldBase, TMarshalledElement>& filled_array,
+                    std::function<TElement(const TMarshalledElement&)> element_de_marshalling) {
+                std::vector<TElement> result;
+                for (const auto& v: filled_array.value()) {
+                    result.push_back(element_de_marshalling(v));
+                }
+                return result;
+            }
+
+            // Helper functions to marshall an std::map.
+            // We keep TKey, TValue at the end, because they can be decuded from the map type, but the other 3
+            // arguments must be provided explicitly.
+            template<typename TFieldBase, typename TMarshalledKey, typename TMarshalledValue, typename TKey, typename TValue>
+            std::pair<standard_array_list<TFieldBase, TMarshalledKey>, standard_array_list<TFieldBase, TMarshalledValue>>
+            fill_std_map(
+                    const std::map<TKey, TValue>& input_map,
+                    std::function<TMarshalledKey(const TKey&)> key_marshalling,
+                    std::function<TMarshalledValue(const TValue&)> value_marshalling) {
+                standard_array_list<TFieldBase, TMarshalledKey> result_keys;
+                standard_array_list<TFieldBase, TMarshalledValue> result_values;
+                for (const auto& [k, v]: input_map) {
+                    result_keys.value().push_back(key_marshalling(k));
+                    result_values.value().push_back(value_marshalling(v));
+                }
+                return {result_keys, result_values};
+            }
+
+            template<typename TFieldBase, typename TKey, typename TValue, typename TMarshalledKey, typename TMarshalledValue>
+            std::map<TKey, TValue> make_std_map(
+                    const standard_array_list<TFieldBase, TMarshalledKey>& filled_keys,
+                    const standard_array_list<TFieldBase, TMarshalledValue>& filled_values,
+                    std::function<TKey(const TMarshalledKey&)> key_de_marshalling,
+                    std::function<TValue(const TMarshalledValue&)> value_de_marshalling) {
+                assert(filled_keys.value().size() == filled_values.value().size());
+
+                std::map<TKey, TValue> result;
+                for (std::size_t i = 0; i < filled_keys.value().size(); ++i) {
+                    result[key_de_marshalling(filled_keys.value()[i])] = value_de_marshalling(filled_values.value()[i]);
+                }
+                return result;
             }
 
         }    // namespace types

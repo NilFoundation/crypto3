@@ -115,8 +115,6 @@ namespace nil {
                     using TTypeBase = typename nil::marshalling::field_type<Endianness>;
                     using result_type = placeholder_common_data<TTypeBase, CommonDataType>;
 
-                    result_type result;
-
                     using array_int_marshalling_type = nil::marshalling::types::array_list <TTypeBase,
                         nil::marshalling::types::integral<TTypeBase, int>,
                         nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, std::size_t>>
@@ -200,7 +198,6 @@ namespace nil {
                         filled_commitment_params,   // 14
                         filled_commitment_preprocessed_data  // 15
                     ));
-                    return result;
                 }
 
                 template<typename Endianness, typename CommonDataType>

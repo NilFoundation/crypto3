@@ -39,6 +39,7 @@
 #include <nil/crypto3/zk/commitments/batched_commitment.hpp>
 #include <nil/crypto3/zk/commitments/detail/polynomial/basic_fri.hpp>
 
+
 namespace nil {
     namespace crypto3 {
         namespace zk {
@@ -66,6 +67,8 @@ namespace nil {
                     using lpc = LPCScheme;
                     using eval_storage_type = typename LPCScheme::eval_storage_type;
                     using preprocessed_data_type = std::map<std::size_t, std::vector<value_type>>;
+                    using polys_evaluator_type = polys_evaluator<typename LPCScheme::params_type,
+                        typename LPCScheme::commitment_type, PolynomialType>;
 
                 private:
                     std::map<std::size_t, precommitment_type> _trees;
@@ -75,6 +78,34 @@ namespace nil {
                     preprocessed_data_type _fixed_polys_values;
 
                 public:
+                    // Getters for the upper fields. Used from marshalling only so far.
+                    const std::map<std::size_t, precommitment_type>& get_trees() const {return _trees;}
+                    const typename fri_type::params_type& get_fri_params() const {return _fri_params;}
+                    const value_type& get_etha() const {return _etha;}
+                    const std::map<std::size_t, bool>& get_batch_fixed() const {return _batch_fixed;}
+                    const preprocessed_data_type& get_fixed_polys_values() const {return _fixed_polys_values;}
+
+                    // We must set it in verifier, taking this value from common data.
+                    void set_fixed_polys_values(const preprocessed_data_type& value) {_fixed_polys_values = value;}
+
+                    // This constructor is normally used from marshalling, to recover the LPC state from a file.
+                    // Maybe we want the move variant of this constructor.
+                    lpc_commitment_scheme(
+                            const polys_evaluator_type& polys_evaluator,
+                            const std::map<std::size_t, precommitment_type>& trees,
+                            const typename fri_type::params_type& fri_params,
+                            const value_type& etha,
+                            const std::map<std::size_t, bool>& batch_fixed,
+                            const preprocessed_data_type& fixed_polys_values)
+                        : polys_evaluator_type(polys_evaluator)
+                        , _trees(trees)
+                        , _fri_params(fri_params)
+                        , _etha(etha)
+                        , _batch_fixed(batch_fixed)
+                        , _fixed_polys_values(fixed_polys_values)
+                    {
+                    }
+
                     lpc_commitment_scheme(const typename fri_type::params_type &fri_params)
                         : _fri_params(fri_params), _etha(0u) {
                     }
@@ -84,7 +115,8 @@ namespace nil {
 
                         preprocessed_data_type result;
                         for(auto const&[index, fixed]: _batch_fixed) {
-                            if(!fixed) continue;
+                            if (!fixed)
+                                continue;
                             result[index] = {};
                             for (const auto& poly: this->_polys.at(index)){
                                 result[index].push_back(poly.evaluate(etha));
@@ -153,28 +185,32 @@ namespace nil {
                             combined_Q_normal += Q_normal;
                         }
 
-                        for(std::size_t i: this->_z.get_batches()){
-                            if( !_batch_fixed[i] )continue;
+                        for (std::size_t i: this->_z.get_batches()) {
+                            if (!_batch_fixed[i])
+                                continue;
+
                             math::polynomial<value_type> Q_normal;
                             auto point = _etha;
                             V = {-point, 1u};
-                            for(std::size_t j = 0; j < this->_z.get_batch_size(i); j++){
+                            for (std::size_t j = 0; j < this->_z.get_batch_size(i); j++) {
                                 math::polynomial<value_type> g_normal;
-                                if constexpr(std::is_same<math::polynomial_dfs<value_type>, PolynomialType>::value ) {
+                                if constexpr(std::is_same<math::polynomial_dfs<value_type>, PolynomialType>::value) {
                                     g_normal = math::polynomial<value_type>(this->_polys[i][j].coefficients());
                                 } else {
                                     g_normal = this->_polys[i][j];
                                 }
+
                                 g_normal *= theta_acc;
                                 Q_normal += g_normal;
                                 Q_normal -= _fixed_polys_values[i][j] * theta_acc;
                                 theta_acc *= theta;
                             }
+
                             Q_normal = Q_normal / V;
                             combined_Q_normal += Q_normal;
                         }
 
-                        if constexpr (std::is_same<math::polynomial_dfs<value_type>, PolynomialType>::value ) {
+                        if constexpr (std::is_same<math::polynomial_dfs<value_type>, PolynomialType>::value) {
                             combined_Q.from_coefficients(combined_Q_normal);
                         } else {
                             combined_Q = std::move(combined_Q_normal);
@@ -213,7 +249,8 @@ namespace nil {
 
                         // List of unique eval points set. [id=>points]
                         std::size_t total_points = points.size();
-                        if (std::any_of(_batch_fixed.begin(), _batch_fixed.end(), [](auto i){return i.second != false;})) total_points++;
+                        if (std::any_of(_batch_fixed.begin(), _batch_fixed.end(), [](auto i){return i.second != false;}))
+                            total_points++;
 
                         typename std::vector<typename field_type::value_type> U(total_points);
                         // V is product of (x - eval_point) polynomial for each eval_point
@@ -238,12 +275,13 @@ namespace nil {
                             }
                         }
 
-                        if( total_points > points.size()){
+                        if (total_points > points.size()) {
                             std::size_t p = points.size();
                             V[p] = {-_etha, 1u};
-                            for(std::size_t i:this->_z.get_batches()){
-                                if( !_batch_fixed[i] )continue;
-                                for(std::size_t j = 0; j < this->_z.get_batch_size(i); j++){
+                            for (std::size_t i:this->_z.get_batches()) {
+                                if (!_batch_fixed[i])
+                                    continue;
+                                for (std::size_t j = 0; j < this->_z.get_batch_size(i); j++) {
                                     U[p] += _fixed_polys_values[i][j] * theta_acc;
                                     poly_map[p].push_back(std::make_tuple(i, j));
                                     theta_acc *= theta;
@@ -296,6 +334,14 @@ namespace nil {
                         params.add_child("D_omegas", D_omegas_node);
                         return params;
                     }
+
+                    bool operator==(const lpc_commitment_scheme& other) const {
+                        return _trees == other._trees &&
+                            _fri_params == other._fri_params &&
+                            _etha == other._etha &&
+                            _batch_fixed == other._batch_fixed &&
+                            _fixed_polys_values == other._fixed_polys_values;
+                    }
                 };
 
                 template<typename MerkleTreeHashType, typename TranscriptHashType,
@@ -307,6 +353,7 @@ namespace nil {
                     constexpr static const std::size_t m = M;
                     typedef GrindingType grinding_type;
                 };
+
                 /**
                  * @brief Based on the FRI Commitment description from \[RedShift].
                  * @tparam d ...

@@ -21,7 +21,7 @@ macro(define_block_cipher_test name)
                                ${Boost_INCLUDE_DIRS})
 
     if(NOT CMAKE_CXX_STANDARD)
-        set_target_properties(${test_name} PROPERTIES CXX_STANDARD 14)
+        set_target_properties(${test_name} PROPERTIES CXX_STANDARD 17)
     endif()
 
     string(CONCAT TEST_DATA ${CMAKE_CURRENT_SOURCE_DIR} "/data/" "${name}" ".json")

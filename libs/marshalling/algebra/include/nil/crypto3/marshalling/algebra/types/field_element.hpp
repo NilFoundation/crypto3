@@ -686,12 +686,16 @@ namespace nil {
                 //     return field;
                 // }
 
-                template<typename FieldValueType, typename Endianness>
-                nil::marshalling::types::array_list<
-                    nil::marshalling::field_type<Endianness>,
-                    field_element<nil::marshalling::field_type<Endianness>, FieldValueType>,
+                
+                template<typename FieldValueType, typename TTypeBase>
+                using field_element_vector = nil::marshalling::types::array_list<
+                    TTypeBase,
+                    field_element<TTypeBase, FieldValueType>,
                     nil::marshalling::option::sequence_size_field_prefix<
-                        nil::marshalling::types::integral<nil::marshalling::field_type<Endianness>, std::size_t>>>
+                        nil::marshalling::types::integral<TTypeBase, std::size_t>>>;
+
+                template<typename FieldValueType, typename Endianness>
+                field_element_vector<FieldValueType, nil::marshalling::field_type<Endianness>>
                     fill_field_element_vector(const std::vector<FieldValueType> &field_elem_vector) {
 
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
@@ -711,12 +715,7 @@ namespace nil {
 
                 template<typename FieldValueType, typename Endianness>
                 std::vector<FieldValueType> make_field_element_vector(
-                    const nil::marshalling::types::array_list<
-                        nil::marshalling::field_type<Endianness>,
-                        field_element<nil::marshalling::field_type<Endianness>, FieldValueType>,
-                        nil::marshalling::option::sequence_size_field_prefix<
-                            nil::marshalling::types::integral<nil::marshalling::field_type<Endianness>, std::size_t>>>
-                        &field_elem_vector) {
+                    const field_element_vector<FieldValueType, nil::marshalling::field_type<Endianness>>& field_elem_vector) {
 
                     std::vector<FieldValueType> result;
                     result.reserve(field_elem_vector.value().size());

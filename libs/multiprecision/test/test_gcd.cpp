@@ -15,7 +15,7 @@
 #include <map>
 #include <tuple>
 //
-// clang in c++14 mode only has a problem with this file: it's an order of instantiation
+// clang in c++17 mode only has a problem with this file: it's an order of instantiation
 // issue caused by us using cpp_int within the gcd algorithm as an error check.
 // Just exclude that combination from testing for now as it's purely a testing issue
 // and we have other compilers that cover this sanity check...

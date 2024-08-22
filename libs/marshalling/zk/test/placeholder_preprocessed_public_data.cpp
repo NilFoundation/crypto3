@@ -1,122 +1,166 @@
-#define BOOST_TEST_MODULE crypto3_marshalling_plonk_assignment_table_test
+#define BOOST_TEST_MODULE crypto3_marshalling_placeholder_preprocessed_public_data_test
 
 #include <boost/test/unit_test.hpp>
+#include <boost/algorithm/string/case_conv.hpp>
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/random/uniform_int.hpp>
 #include <iostream>
-#include <iomanip>
-#include <random>
-#include <regex>
-#include <fstream>
 #include <filesystem>
+#include <iomanip>
+#include <fstream>
+#include <algorithm>
+#include <regex>
 
 #include <nil/marshalling/status_type.hpp>
 #include <nil/marshalling/field_type.hpp>
 #include <nil/marshalling/endianness.hpp>
 
-#include <nil/crypto3/algebra/curves/alt_bn128.hpp>
-#include <nil/crypto3/algebra/fields/arithmetic_params/alt_bn128.hpp>
+#include <nil/crypto3/multiprecision/cpp_int_modular.hpp>
+#include <boost/multiprecision/number.hpp>
+
+#include <nil/crypto3/algebra/random_element.hpp>
 #include <nil/crypto3/algebra/curves/pallas.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/pallas.hpp>
+#include <nil/crypto3/algebra/random_element.hpp>
+
+
+#include <nil/crypto3/algebra/curves/mnt4.hpp>
+#include <nil/crypto3/algebra/pairing/mnt4.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/mnt4.hpp>
+
+#include <nil/crypto3/algebra/curves/mnt6.hpp>
+#include <nil/crypto3/algebra/pairing/mnt6.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/mnt6.hpp>
+
 #include <nil/crypto3/algebra/curves/bls12.hpp>
+#include <nil/crypto3/algebra/pairing/bls12.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/bls12.hpp>
 
-#include <nil/crypto3/random/algebraic_random_device.hpp>
-#include <nil/crypto3/marshalling/zk/types/plonk/variable.hpp>
-#include <nil/crypto3/marshalling/zk/types/plonk/assignment_table.hpp>
 
-#include <nil/crypto3/zk/snark/systems/plonk/placeholder/detail/placeholder_policy.hpp>
+#include <nil/crypto3/hash/type_traits.hpp>
+#include <nil/crypto3/hash/sha2.hpp>
+#include <nil/crypto3/hash/keccak.hpp>
+#include <nil/crypto3/hash/poseidon.hpp>
+
+#include <nil/crypto3/zk/commitments/type_traits.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/placeholder/preprocessor.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/placeholder/prover.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/placeholder/verifier.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/params.hpp>
-#include <nil/crypto3/zk/snark/arithmetization/plonk/variable.hpp>
+#include <nil/crypto3/zk/snark/arithmetization/plonk/params.hpp>
+#include <nil/crypto3/zk/snark/systems/plonk/placeholder/detail/profiling.hpp>
 #include <nil/crypto3/zk/test_tools/random_test_initializer.hpp>
 
-#include <nil/crypto3/random/algebraic_random_device.hpp>
-#include <nil/crypto3/random/algebraic_engine.hpp>
+#include <nil/crypto3/math/algorithms/unity_root.hpp>
+#include <nil/crypto3/math/polynomial/lagrange_interpolation.hpp>
+#include <nil/crypto3/math/algorithms/calculate_domain_set.hpp>
 
-#include "detail/circuits.hpp"
+#include <nil/crypto3/marshalling/zk/types/commitments/eval_storage.hpp>
+#include <nil/crypto3/marshalling/zk/types/commitments/kzg.hpp>
+#include <nil/crypto3/marshalling/zk/types/commitments/lpc.hpp>
+#include <nil/crypto3/marshalling/zk/types/placeholder/preprocessed_public_data.hpp>
+#include "./detail/circuits.hpp"
+#include "random_test_data_generation.hpp"
+
 
 using namespace nil::crypto3;
-using namespace nil::crypto3::marshalling;
 using namespace nil::crypto3::zk;
 using namespace nil::crypto3::zk::snark;
 
-bool has_argv(std::string name){
-    bool result = false;
-    for (std::size_t i = 0; i < std::size_t(boost::unit_test::framework::master_test_suite().argc); i++) {
-        if (std::string(boost::unit_test::framework::master_test_suite().argv[i]) == "--print") {
-            result = true;
-        }
-    }
-    return result;
-}
 
-template<typename TIter>
-void print_hex_byteblob(std::ostream &os, TIter iter_begin, TIter iter_end, bool endl) {
-    os << std::hex;
-    for (TIter it = iter_begin; it != iter_end; it++) {
-        os << std::setfill('0') << std::setw(2) << std::right << int(*it);
-    }
-    os << std::dec;
-    if (endl) {
-        os << std::endl;
-    }
-}
-
-template<typename Endianness, typename PlonkTableDescription>
-void test_assignment_table_description(const PlonkTableDescription& val) {
+template<typename PreprocessedPublicDataType>
+void test_placeholder_public_preprocessed_data_marshalling(
+        PreprocessedPublicDataType preprocessed_data) {
+    using Endianness = nil::marshalling::option::big_endian;
     using TTypeBase = nil::marshalling::field_type<Endianness>;
-    using FieldType = typename PlonkTableDescription::field_type;
-    using value_marshalling_type = nil::crypto3::marshalling::types::plonk_assignment_table_description<TTypeBase>;
 
-    auto filled_val = types::fill_assignment_table_description<Endianness, FieldType>(val);
-    auto table_desc = types::make_assignment_table_description<Endianness, FieldType>(filled_val);
-    BOOST_CHECK(val == table_desc);
-
-    std::vector<std::uint8_t> cv;
-    cv.resize(filled_val.length(), 0x00);
-
-    auto write_iter = cv.begin();
-    nil::marshalling::status_type status = filled_val.write(write_iter, cv.size());
-    value_marshalling_type test_val_read;
-    auto read_iter = cv.begin();
-    status = test_val_read.read(read_iter, cv.size());
-    BOOST_CHECK(status == nil::marshalling::status_type::success);
-    table_desc = types::make_assignment_table_description<Endianness, FieldType>(test_val_read);
-
-    BOOST_CHECK(val == table_desc);
+    auto filled_preprocessed_data = nil::crypto3::marshalling::types::fill_placeholder_preprocessed_public_data<Endianness, PreprocessedPublicDataType>(preprocessed_data);
+//    auto _preprocessed_data = nil::crypto3::marshalling::types::make_placeholder_preprocessed_public_data<Endianness, PreprocessedPublicDataType>(filled_preprocessed_data);
+//    BOOST_CHECK(preprocessed_data == _preprocessed_data);
+//
+//    std::vector<std::uint8_t> cv;
+//    cv.resize(filled_preprocessed_data.length(), 0x00);
+//    auto write_iter = cv.begin();
+//    auto status = filled_preprocessed_data.write(write_iter, cv.size());
+//    BOOST_CHECK(status == nil::marshalling::status_type::success);
+//
+//    nil::crypto3::marshalling::types::placeholder_preprocessed_public_data<TTypeBase, PreprocessedPublicDataType> test_val_read;
+//    auto read_iter = cv.begin();
+//    test_val_read.read(read_iter, cv.size());
+//    BOOST_CHECK(status == nil::marshalling::status_type::success);
+//    auto constructed_val_read = nil::crypto3::marshalling::types::make_placeholder_preprocessed_public_data<Endianness, PreprocessedPublicDataType>(
+//            test_val_read
+//    );
+//    BOOST_CHECK(preprocessed_data == constructed_val_read);
 }
 
-template<typename Endianness, typename PlonkTable>
-void test_assignment_table(std::size_t usable_rows, PlonkTable val, std::string folder_name = "") {
+BOOST_AUTO_TEST_SUITE(placeholder_circuit1_poseidon)
+    using Endianness = nil::marshalling::option::big_endian;
     using TTypeBase = nil::marshalling::field_type<Endianness>;
-    using value_marshalling_type = nil::crypto3::marshalling::types::plonk_assignment_table<TTypeBase, PlonkTable>;
 
-    auto filled_val = nil::crypto3::marshalling::types::fill_assignment_table<Endianness, PlonkTable>(usable_rows, val);
-    auto table_desc_pair = types::make_assignment_table<Endianness, PlonkTable>(filled_val);
-    BOOST_CHECK(val == table_desc_pair.second);
-    BOOST_CHECK(usable_rows == table_desc_pair.first.usable_rows_amount);
+    using curve_type = algebra::curves::pallas;
+    using field_type = typename curve_type::base_field_type;
+    using poseidon_type = hashes::poseidon<nil::crypto3::hashes::detail::mina_poseidon_policy<field_type>>;
+    using merkle_hash_type = poseidon_type;
+    using transcript_hash_type = poseidon_type;
 
-    std::vector<std::uint8_t> cv;
-    cv.resize(filled_val.length(), 0x00);
+    struct placeholder_test_params {
+        constexpr static const std::size_t witness_columns = witness_columns_1;
+        constexpr static const std::size_t public_input_columns = public_columns_1;
+        constexpr static const std::size_t constant_columns = constant_columns_1;
+        constexpr static const std::size_t selector_columns = selector_columns_1;
 
-    auto write_iter = cv.begin();
-    nil::marshalling::status_type status = filled_val.write(write_iter, cv.size());
-    value_marshalling_type test_val_read;
-    auto read_iter = cv.begin();
-    status = test_val_read.read(read_iter, cv.size());
-    BOOST_CHECK(status == nil::marshalling::status_type::success);
-    table_desc_pair = types::make_assignment_table<Endianness, PlonkTable>(test_val_read);
+        constexpr static const std::size_t lambda = 40;
+        constexpr static const std::size_t m = 2;
+    };
+    typedef placeholder_circuit_params<field_type> circuit_params;
+    using transcript_type = typename transcript::fiat_shamir_heuristic_sequential<transcript_hash_type>;
 
-    BOOST_CHECK(val == table_desc_pair.second);
-    BOOST_CHECK(usable_rows == table_desc_pair.first.usable_rows_amount);
+    using lpc_params_type = commitments::list_polynomial_commitment_params<
+        merkle_hash_type,
+        transcript_hash_type,
+        placeholder_test_params::m
+    >;
 
-    if(folder_name != "") {
-        std::filesystem::create_directory(folder_name);
-        std::ofstream out;
-        out.open(folder_name + "/assignment.tbl");
-        out << "0x";
-        print_hex_byteblob(out, cv.begin(), cv.end(), false);
-        out.close();
-    }
+    using lpc_type = commitments::list_polynomial_commitment<field_type, lpc_params_type>;
+    using lpc_scheme_type = typename commitments::lpc_commitment_scheme<lpc_type>;
+    using lpc_placeholder_params_type = nil::crypto3::zk::snark::placeholder_params<circuit_params, lpc_scheme_type>;
+    using policy_type = zk::snark::detail::placeholder_policy<field_type, lpc_placeholder_params_type>;
+
+BOOST_AUTO_TEST_CASE(prover_test) {
+    auto circuit = circuit_test_1<field_type>();
+
+    plonk_table_description<field_type> desc(
+        placeholder_test_params::witness_columns,
+        placeholder_test_params::public_input_columns,
+        placeholder_test_params::constant_columns,
+        placeholder_test_params::selector_columns
+    );
+
+    desc.rows_amount = circuit.table_rows;
+    desc.usable_rows_amount = circuit.usable_rows;
+    std::size_t table_rows_log = std::ceil(std::log2(circuit.table_rows));
+
+    typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints, circuit.lookup_gates);
+    typename policy_type::variable_assignment_type assignments = circuit.table;
+
+    std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
+
+
+    typename lpc_type::fri_type::params_type fri_params(
+        1, table_rows_log, placeholder_test_params::lambda, 4, true
+    );
+    lpc_scheme_type lpc_scheme(fri_params);
+
+    typename placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::preprocessed_data_type
+        lpc_preprocessed_public_data = placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::process(
+            constraint_system, assignments.public_table(), desc, lpc_scheme, columns_with_copy_constraints.size()
+        );
+
+    using preprocessed_data_type = placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::preprocessed_data_type;
+    test_placeholder_public_preprocessed_data_marshalling<preprocessed_data_type>(lpc_preprocessed_public_data);
 }
+BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(placeholder_circuit1)
     using Endianness = nil::marshalling::option::big_endian;
@@ -150,11 +194,8 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit1)
     using lpc_placeholder_params_type = nil::crypto3::zk::snark::placeholder_params<circuit_params, lpc_scheme_type>;
     using policy_type = zk::snark::detail::placeholder_policy<field_type, lpc_placeholder_params_type>;
 
-BOOST_FIXTURE_TEST_CASE(assignment_table_marshalling_test, test_tools::random_test_initializer<field_type>) {
-    auto circuit = circuit_test_1<field_type>(
-        alg_random_engines.template get_alg_engine<field_type>(),
-        generic_random_engine
-    );
+BOOST_AUTO_TEST_CASE(prover_test) {
+    auto circuit = circuit_test_1<field_type>();
 
     plonk_table_description<field_type> desc(
         placeholder_test_params::witness_columns,
@@ -165,15 +206,25 @@ BOOST_FIXTURE_TEST_CASE(assignment_table_marshalling_test, test_tools::random_te
 
     desc.rows_amount = circuit.table_rows;
     desc.usable_rows_amount = circuit.usable_rows;
+    std::size_t table_rows_log = std::ceil(std::log2(circuit.table_rows));
 
+    typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints, circuit.lookup_gates);
     typename policy_type::variable_assignment_type assignments = circuit.table;
 
-    if(has_argv("--print"))
-        test_assignment_table<Endianness, typename policy_type::variable_assignment_type>(desc.usable_rows_amount, assignments, "circuit1");
-    else
-        test_assignment_table<Endianness, typename policy_type::variable_assignment_type>(desc.usable_rows_amount, assignments);
+    std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
 
-    test_assignment_table_description<Endianness, plonk_table_description<field_type>>(desc);
+    typename lpc_type::fri_type::params_type fri_params(
+        1, table_rows_log, placeholder_test_params::lambda, 4, true
+    );
+    lpc_scheme_type lpc_scheme(fri_params);
+
+    typename placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::preprocessed_data_type
+        lpc_preprocessed_public_data = placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::process(
+            constraint_system, assignments.public_table(), desc, lpc_scheme, columns_with_copy_constraints.size()
+        );
+
+    using preprocessed_data_type = placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::preprocessed_data_type;
+    test_placeholder_public_preprocessed_data_marshalling<preprocessed_data_type>(lpc_preprocessed_public_data);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -213,8 +264,8 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit2)
 
     using policy_type = zk::snark::detail::placeholder_policy<field_type, circuit_t_params>;
 
-BOOST_FIXTURE_TEST_CASE(assignment_table_marshalling_test, test_tools::random_test_initializer<field_type>) {
-    auto pi0 = alg_random_engines.template get_alg_engine<field_type>()();
+BOOST_FIXTURE_TEST_CASE(preprocessed_data_marshalling_test, test_tools::random_test_initializer<field_type>) {
+    auto pi0 = nil::crypto3::algebra::random_element<field_type>();
     auto circuit = circuit_test_t<field_type>(
         pi0,
         alg_random_engines.template get_alg_engine<field_type>(),
@@ -229,17 +280,30 @@ BOOST_FIXTURE_TEST_CASE(assignment_table_marshalling_test, test_tools::random_te
     );
     desc.rows_amount = circuit.table_rows;
     desc.usable_rows_amount = circuit.usable_rows;
+    std::size_t table_rows_log = std::ceil(std::log2(circuit.table_rows));
 
+    typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints, circuit.lookup_gates);
     typename policy_type::variable_assignment_type assignments = circuit.table;
 
-    if(has_argv("--print"))
-        test_assignment_table<Endianness, typename policy_type::variable_assignment_type>(desc.usable_rows_amount, assignments, "circuit2");
-    else
-        test_assignment_table<Endianness, typename policy_type::variable_assignment_type>(desc.usable_rows_amount, assignments);
-    
-    test_assignment_table_description<Endianness, plonk_table_description<field_type>>(desc);
+    std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
+
+    // LPC commitment scheme
+    typename lpc_type::fri_type::params_type fri_params(
+        1, table_rows_log, placeholder_test_params::lambda, 4
+    );
+    lpc_scheme_type lpc_scheme(fri_params);
+
+    typename placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::preprocessed_data_type
+        lpc_preprocessed_public_data = placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::process(
+            constraint_system, assignments.public_table(), desc, lpc_scheme, columns_with_copy_constraints.size()
+        );
+
+    using preprocessed_data_type = placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::preprocessed_data_type;
+    test_placeholder_public_preprocessed_data_marshalling<preprocessed_data_type>(lpc_preprocessed_public_data);
 }
+
 BOOST_AUTO_TEST_SUITE_END()
+
 
 BOOST_AUTO_TEST_SUITE(placeholder_circuit3)
     using Endianness = nil::marshalling::option::big_endian;
@@ -273,7 +337,7 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit3)
     using lpc_placeholder_params_type = nil::crypto3::zk::snark::placeholder_params<circuit_params, lpc_scheme_type>;
     using policy_type = zk::snark::detail::placeholder_policy<field_type, circuit_params>;
 
-BOOST_FIXTURE_TEST_CASE(assignment_table_marshalling_test, test_tools::random_test_initializer<field_type>) {
+BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_tools::random_test_initializer<field_type>) {
     auto circuit = circuit_test_3<field_type>(
         alg_random_engines.template get_alg_engine<field_type>(),
         generic_random_engine
@@ -288,16 +352,31 @@ BOOST_FIXTURE_TEST_CASE(assignment_table_marshalling_test, test_tools::random_te
 
     desc.rows_amount = circuit.table_rows;
     desc.usable_rows_amount = circuit.usable_rows;
+    std::size_t table_rows_log = std::ceil(std::log2(circuit.table_rows));
 
+    typename policy_type::constraint_system_type constraint_system(
+        circuit.gates,
+        circuit.copy_constraints,
+        circuit.lookup_gates,
+        circuit.lookup_tables
+    );
     typename policy_type::variable_assignment_type assignments = circuit.table;
 
-    if(has_argv("--print"))
-        test_assignment_table<Endianness, typename policy_type::variable_assignment_type>(desc.usable_rows_amount, assignments, "circuit3");
-    else
-        test_assignment_table<Endianness, typename policy_type::variable_assignment_type>(desc.usable_rows_amount, assignments);
-    
-    test_assignment_table_description<Endianness, plonk_table_description<field_type>>(desc);
+    typename lpc_type::fri_type::params_type fri_params(
+        1, table_rows_log, placeholder_test_params::lambda, 4
+    );
+    lpc_scheme_type lpc_scheme(fri_params);
+
+    std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
+
+    typename placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::preprocessed_data_type
+        preprocessed_public_data = placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::process(
+            constraint_system, assignments.public_table(), desc, lpc_scheme, columns_with_copy_constraints.size());
+
+    using preprocessed_data_type = placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::preprocessed_data_type;
+    test_placeholder_public_preprocessed_data_marshalling<preprocessed_data_type>(preprocessed_public_data);
 }
+
 BOOST_AUTO_TEST_SUITE_END()
 
 
@@ -333,7 +412,7 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit4)
     using lpc_placeholder_params_type = nil::crypto3::zk::snark::placeholder_params<circuit_params, lpc_scheme_type>;
     using policy_type = zk::snark::detail::placeholder_policy<field_type, circuit_params>;
 
-BOOST_FIXTURE_TEST_CASE(assignment_table_marshalling_test, test_tools::random_test_initializer<field_type>) {
+BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_tools::random_test_initializer<field_type>) {
     auto circuit = circuit_test_4<field_type>(
         alg_random_engines.template get_alg_engine<field_type>(),
         generic_random_engine
@@ -348,17 +427,31 @@ BOOST_FIXTURE_TEST_CASE(assignment_table_marshalling_test, test_tools::random_te
 
     desc.rows_amount = circuit.table_rows;
     desc.usable_rows_amount = circuit.usable_rows;
+    std::size_t table_rows_log = std::ceil(std::log2(circuit.table_rows));
 
+    typename policy_type::constraint_system_type constraint_system(
+        circuit.gates,
+        circuit.copy_constraints,
+        circuit.lookup_gates,
+        circuit.lookup_tables
+    );
     typename policy_type::variable_assignment_type assignments = circuit.table;
 
+    typename lpc_type::fri_type::params_type fri_params(
+        1, table_rows_log, placeholder_test_params::lambda, 4, true
+    );
+    lpc_scheme_type lpc_scheme(fri_params);
 
-    if(has_argv("--print"))
-        test_assignment_table<Endianness, typename policy_type::variable_assignment_type>(desc.usable_rows_amount, assignments, "circuit4");
-    else
-        test_assignment_table<Endianness, typename policy_type::variable_assignment_type>(desc.usable_rows_amount, assignments);
-    
-    test_assignment_table_description<Endianness, plonk_table_description<field_type>>(desc);
+    std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
+
+    typename placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::preprocessed_data_type
+        preprocessed_public_data = placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::process(
+            constraint_system, assignments.public_table(), desc, lpc_scheme, columns_with_copy_constraints.size());
+
+    using preprocessed_data_type = placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::preprocessed_data_type;
+    test_placeholder_public_preprocessed_data_marshalling<preprocessed_data_type>(preprocessed_public_data);
 }
+
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(placeholder_circuit5)
@@ -375,7 +468,7 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit5)
         constexpr static const std::size_t witness_columns = witness_columns_5;
         constexpr static const std::size_t public_input_columns = public_columns_5;
         constexpr static const std::size_t constant_columns = constant_columns_5;
-        constexpr static const std::size_t selector_columns =  selector_columns_5;
+        constexpr static const std::size_t selector_columns = selector_columns_5;
 
         constexpr static const std::size_t lambda = 1;
         constexpr static const std::size_t m = 2;
@@ -396,8 +489,8 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit5)
 
     using policy_type = zk::snark::detail::placeholder_policy<field_type, circuit_t_params>;
 
-BOOST_FIXTURE_TEST_CASE(assignment_table_marshalling_test, test_tools::random_test_initializer<field_type>) {
-    auto pi0 = alg_random_engines.template get_alg_engine<field_type>()();
+BOOST_FIXTURE_TEST_CASE(preprocessed_data_marshalling_test, test_tools::random_test_initializer<field_type>) {
+    auto pi0 = nil::crypto3::algebra::random_element<field_type>();
     auto circuit = circuit_test_t<field_type>(
         pi0,
         alg_random_engines.template get_alg_engine<field_type>(),
@@ -412,16 +505,27 @@ BOOST_FIXTURE_TEST_CASE(assignment_table_marshalling_test, test_tools::random_te
     );
     desc.rows_amount = circuit.table_rows;
     desc.usable_rows_amount = circuit.usable_rows;
+    std::size_t table_rows_log = std::ceil(std::log2(circuit.table_rows));
 
+    typename policy_type::constraint_system_type constraint_system(circuit.gates, circuit.copy_constraints, circuit.lookup_gates);
     typename policy_type::variable_assignment_type assignments = circuit.table;
 
-    if(has_argv("--print"))
-        test_assignment_table<Endianness, typename policy_type::variable_assignment_type>(desc.usable_rows_amount, assignments, "circuit5");
-    else
-        test_assignment_table<Endianness, typename policy_type::variable_assignment_type>(desc.usable_rows_amount, assignments);
+    bool verifier_res;
 
-    test_assignment_table_description<Endianness, plonk_table_description<field_type>>(desc);
+    // LPC commitment scheme
+    typename lpc_type::fri_type::params_type fri_params(
+        1, table_rows_log, placeholder_test_params::lambda, 4
+    );
+    lpc_scheme_type lpc_scheme(fri_params);
+
+    using preprocessed_data_type = placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::preprocessed_data_type;
+    preprocessed_data_type lpc_preprocessed_public_data = placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::process(
+            constraint_system, assignments.public_table(), desc, lpc_scheme, 10
+        );
+
+    test_placeholder_public_preprocessed_data_marshalling<preprocessed_data_type>(lpc_preprocessed_public_data);
 }
+
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(placeholder_circuit6)
@@ -456,7 +560,7 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit6)
     using lpc_placeholder_params_type = nil::crypto3::zk::snark::placeholder_params<circuit_params, lpc_scheme_type>;
     using policy_type = zk::snark::detail::placeholder_policy<field_type, circuit_params>;
 
-BOOST_FIXTURE_TEST_CASE(assignment_table_marshalling_test, test_tools::random_test_initializer<field_type>) {
+BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_tools::random_test_initializer<field_type>) {
     auto circuit = circuit_test_6<field_type>(
         alg_random_engines.template get_alg_engine<field_type>(),
         generic_random_engine
@@ -471,15 +575,31 @@ BOOST_FIXTURE_TEST_CASE(assignment_table_marshalling_test, test_tools::random_te
 
     desc.rows_amount = circuit.table_rows;
     desc.usable_rows_amount = circuit.usable_rows;
+    std::size_t table_rows_log = std::ceil(std::log2(circuit.table_rows));
 
+    typename policy_type::constraint_system_type constraint_system(
+        circuit.gates,
+        circuit.copy_constraints,
+        circuit.lookup_gates,
+        circuit.lookup_tables
+    );
     typename policy_type::variable_assignment_type assignments = circuit.table;
-    if(has_argv("--print"))
-        test_assignment_table<Endianness, typename policy_type::variable_assignment_type>(desc.usable_rows_amount, assignments, "circuit6");
-    else
-        test_assignment_table<Endianness, typename policy_type::variable_assignment_type>(desc.usable_rows_amount, assignments);
-    
-    test_assignment_table_description<Endianness, plonk_table_description<field_type>>(desc);
+
+    typename lpc_type::fri_type::params_type fri_params(
+        1, table_rows_log, placeholder_test_params::lambda, 4, true
+    );
+    lpc_scheme_type lpc_scheme(fri_params);
+
+    std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
+
+    typename placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::preprocessed_data_type
+        preprocessed_public_data = placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::process(
+            constraint_system, assignments.public_table(), desc, lpc_scheme, columns_with_copy_constraints.size());
+
+    using preprocessed_data_type = placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::preprocessed_data_type;
+    test_placeholder_public_preprocessed_data_marshalling<preprocessed_data_type>(preprocessed_public_data);
 }
+
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(placeholder_circuit7)
@@ -514,7 +634,7 @@ BOOST_AUTO_TEST_SUITE(placeholder_circuit7)
     using lpc_placeholder_params_type = nil::crypto3::zk::snark::placeholder_params<circuit_params, lpc_scheme_type>;
     using policy_type = zk::snark::detail::placeholder_policy<field_type, circuit_params>;
 
-BOOST_FIXTURE_TEST_CASE(assignment_table_marshalling_test, test_tools::random_test_initializer<field_type>) {
+BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_tools::random_test_initializer<field_type>) {
     auto circuit = circuit_test_7<field_type>(
         alg_random_engines.template get_alg_engine<field_type>(),
         generic_random_engine
@@ -528,14 +648,30 @@ BOOST_FIXTURE_TEST_CASE(assignment_table_marshalling_test, test_tools::random_te
 
     desc.rows_amount = circuit.table_rows;
     desc.usable_rows_amount = circuit.usable_rows;
+    std::size_t table_rows_log = std::ceil(std::log2(circuit.table_rows));
 
+    typename policy_type::constraint_system_type constraint_system(
+        circuit.gates,
+        circuit.copy_constraints,
+        circuit.lookup_gates,
+        circuit.lookup_tables
+    );
     typename policy_type::variable_assignment_type assignments = circuit.table;
 
-    if(has_argv("--print"))
-        test_assignment_table<Endianness, typename policy_type::variable_assignment_type>(desc.usable_rows_amount, assignments, "circuit7");
-    else
-        test_assignment_table<Endianness, typename policy_type::variable_assignment_type>(desc.usable_rows_amount, assignments);
-    
-    test_assignment_table_description<Endianness, plonk_table_description<field_type>>(desc);
+    typename lpc_type::fri_type::params_type fri_params(
+        1, table_rows_log, placeholder_test_params::lambda, 4, true
+    );
+    lpc_scheme_type lpc_scheme(fri_params);
+
+    std::vector<std::size_t> columns_with_copy_constraints = {0, 1, 2, 3};
+
+    typename placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::preprocessed_data_type
+        preprocessed_public_data = placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::process(
+            constraint_system, assignments.public_table(), desc, lpc_scheme, columns_with_copy_constraints.size());
+
+    using preprocessed_data_type = placeholder_public_preprocessor<field_type, lpc_placeholder_params_type>::preprocessed_data_type;
+    test_placeholder_public_preprocessed_data_marshalling<preprocessed_data_type>(preprocessed_public_data);
 }
+
 BOOST_AUTO_TEST_SUITE_END()
+

@@ -323,7 +323,12 @@ BOOST_FIXTURE_TEST_CASE(proof_marshalling_test, test_tools::random_test_initiali
     typename policy_type::variable_assignment_type assignments = circuit.table;
 
     typename lpc_type::fri_type::params_type fri_params(
-        1, table_rows_log, placeholder_test_params::lambda, 4, true, 0xFFFF8000
+        1, /*max_step*/
+        table_rows_log,
+        placeholder_test_params::lambda,
+        4, // expand_factor
+        true, // use_grinding
+        19 // grinding_parameter
     );
     lpc_scheme_type lpc_scheme(fri_params);
 
