@@ -32,6 +32,7 @@
 namespace nil {
     namespace marshalling {
         namespace types {
+
             namespace adapter {
 
                 template<typename TSizeField, typename TBase>
@@ -129,7 +130,6 @@ namespace nil {
                         base_impl_type::write_no_status(iter);
                     }
                 };
-
             }    // namespace adapter
         }        // namespace types
     }            // namespace marshalling

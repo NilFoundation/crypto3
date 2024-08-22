@@ -28,6 +28,8 @@
 #ifndef CRYPTO3_ZK_PLONK_PLACEHOLDER_VERIFIER_HPP
 #define CRYPTO3_ZK_PLONK_PLACEHOLDER_VERIFIER_HPP
 
+#include <boost/log/trivial.hpp>
+
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
 
 #include <nil/crypto3/zk/commitments/polynomial/lpc.hpp>
@@ -61,6 +63,8 @@ namespace nil {
                     constexpr static const std::size_t f_parts = 8;
 
                 public:
+
+                    // TODO(martun): this function is pretty similar to the one in prover, we should de-duplicate it.
                     static void generate_evaluation_points(
                         commitment_scheme_type &_commitment_scheme,
                         const typename public_preprocessor_type::preprocessed_data_type::common_data_type &common_data,
@@ -69,7 +73,6 @@ namespace nil {
                         typename FieldType::value_type challenge,
                         bool _is_lookup_enabled
                     ) {
-                        PROFILE_SCOPE("evaluation_points_generated_time");
 
                         const std::size_t witness_columns = table_description.witness_columns;
                         const std::size_t public_input_columns = table_description.public_input_columns;
@@ -116,7 +119,7 @@ namespace nil {
                         std::size_t i = 0;
                         std::size_t start_index = common_data.permuted_columns.size() * 2 + 2;
 
-                        for( i = 0; i < start_index; i++){
+                        for( i = 0; i < start_index; i++) {
                             _commitment_scheme.append_eval_point(FIXED_VALUES_BATCH, i, challenge);
                         }
 
@@ -156,11 +159,13 @@ namespace nil {
                         numerator *= typename FieldType::value_type(table_description.rows_amount).inversed();
 
                         // If public input sizes are set, all of them should be set.
-                        if(constraint_system.public_input_sizes_num() != 0 && constraint_system.public_input_sizes_num() != table_description.public_input_columns){
+                        if (constraint_system.public_input_sizes_num() != 0 &&
+                            constraint_system.public_input_sizes_num() != table_description.public_input_columns) {
+                            BOOST_LOG_TRIVIAL(info) << "Verification failed because: If public input sizes are set, all of them should be set.";
                             return false;
                         }
 
-                        for( std::size_t i = 0; i < public_input.size(); ++i ){
+                        for (std::size_t i = 0; i < public_input.size(); ++i) {
                             typename FieldType::value_type value = FieldType::value_type::zero();
                             std::size_t max_size = public_input[i].size();
                             if (constraint_system.public_input_sizes_num() != 0)
@@ -171,8 +176,9 @@ namespace nil {
                                 omega_pow = omega_pow * omega;
                             }
                             value *= numerator;
-                            if( value != proof.eval_proof.eval_proof.z.get(VARIABLE_VALUES_BATCH, table_description.witness_columns + i, 0) )
+                            if (value != proof.eval_proof.eval_proof.z.get(VARIABLE_VALUES_BATCH, table_description.witness_columns + i, 0) )
                             {
+                                BOOST_LOG_TRIVIAL(info) << "Verification failed because: evaluation proof failed.";
                                 return false;
                             }
                         }
@@ -186,6 +192,17 @@ namespace nil {
                         const plonk_constraint_system<FieldType> &constraint_system,
                         commitment_scheme_type commitment_scheme
                     ) {
+
+                        // We cannot add eval points unless everything is committed, so when verifying assume it's committed.
+                        commitment_scheme.state_commited(FIXED_VALUES_BATCH);
+                        commitment_scheme.state_commited(VARIABLE_VALUES_BATCH);
+                        commitment_scheme.state_commited(PERMUTATION_BATCH);
+                        commitment_scheme.state_commited(QUOTIENT_BATCH);
+                        commitment_scheme.state_commited(LOOKUP_BATCH);
+                        commitment_scheme.mark_batch_as_fixed(FIXED_VALUES_BATCH);
+
+                        commitment_scheme.set_fixed_polys_values(common_data.commitment_scheme_data);
+
                         const std::size_t witness_columns = table_description.witness_columns;
                         const std::size_t public_input_columns = table_description.public_input_columns;
                         const std::size_t constant_columns = table_description.constant_columns;
@@ -204,13 +221,15 @@ namespace nil {
 
                         std::vector<typename FieldType::value_type> special_selector_values(3);
                         special_selector_values[0] = common_data.lagrange_0.evaluate(proof.eval_proof.challenge);
-                        special_selector_values[1] = proof.eval_proof.eval_proof.z.get(FIXED_VALUES_BATCH, 2*common_data.permuted_columns.size(), 0);
-                        special_selector_values[2] = proof.eval_proof.eval_proof.z.get(FIXED_VALUES_BATCH, 2*common_data.permuted_columns.size() + 1, 0);
+                        special_selector_values[1] = proof.eval_proof.eval_proof.z.get(
+                            FIXED_VALUES_BATCH, 2*common_data.permuted_columns.size(), 0);
+                        special_selector_values[2] = proof.eval_proof.eval_proof.z.get(
+                            FIXED_VALUES_BATCH, 2*common_data.permuted_columns.size() + 1, 0);
 
                         // 4. prepare evaluaitons of the polynomials that are copy-constrained
                         std::array<typename FieldType::value_type, f_parts> F;
                         std::size_t permutation_size = (proof.eval_proof.eval_proof.z.get_batch_size(FIXED_VALUES_BATCH) - 2 - constant_columns - selector_columns) / 2;
-                        if( constraint_system.copy_constraints().size() > 0 ){
+                        if (constraint_system.copy_constraints().size() > 0) {
                             // Permutation polys
                             std::vector<std::size_t> permuted_polys_global_indices = common_data.permuted_columns;
                             std::vector<typename FieldType::value_type> f(permutation_size);
@@ -360,18 +379,29 @@ namespace nil {
                         auto challenge = transcript.template challenge<FieldType>();
                         BOOST_ASSERT(challenge == proof.eval_proof.challenge);
 
-                        commitment_scheme.set_batch_size(VARIABLE_VALUES_BATCH, proof.eval_proof.eval_proof.z.get_batch_size(VARIABLE_VALUES_BATCH));
-                        if( is_lookup_enabled || constraint_system.copy_constraints().size())
-                            commitment_scheme.set_batch_size(PERMUTATION_BATCH, proof.eval_proof.eval_proof.z.get_batch_size(PERMUTATION_BATCH));
-                        commitment_scheme.set_batch_size(QUOTIENT_BATCH, proof.eval_proof.eval_proof.z.get_batch_size(QUOTIENT_BATCH));
+                        commitment_scheme.set_batch_size(VARIABLE_VALUES_BATCH,
+                            proof.eval_proof.eval_proof.z.get_batch_size(VARIABLE_VALUES_BATCH));
+                        commitment_scheme.set_batch_size(FIXED_VALUES_BATCH,
+                            proof.eval_proof.eval_proof.z.get_batch_size(FIXED_VALUES_BATCH));
+
+                        if (is_lookup_enabled || constraint_system.copy_constraints().size())
+                            commitment_scheme.set_batch_size(PERMUTATION_BATCH,
+                                proof.eval_proof.eval_proof.z.get_batch_size(PERMUTATION_BATCH));
+
+                        commitment_scheme.set_batch_size(QUOTIENT_BATCH,
+                            proof.eval_proof.eval_proof.z.get_batch_size(QUOTIENT_BATCH));
+
                         if (is_lookup_enabled)
-                            commitment_scheme.set_batch_size(LOOKUP_BATCH, proof.eval_proof.eval_proof.z.get_batch_size(LOOKUP_BATCH));
+                            commitment_scheme.set_batch_size(LOOKUP_BATCH,
+                                proof.eval_proof.eval_proof.z.get_batch_size(LOOKUP_BATCH));
+
                         generate_evaluation_points(commitment_scheme, common_data, constraint_system,
                                                    table_description, challenge, is_lookup_enabled);
 
                         std::map<std::size_t, typename commitment_scheme_type::commitment_type> commitments = proof.commitments;
                         commitments[FIXED_VALUES_BATCH] = common_data.commitments.fixed_values;
                         if (!commitment_scheme.verify_eval( proof.eval_proof.eval_proof, commitments, transcript )) {
+                            BOOST_LOG_TRIVIAL(info) << "Verification failed because: commitment scheme verification failed.";
                             return false;
                         }
 
@@ -396,6 +426,7 @@ namespace nil {
                         // Z is polynomial -1, 0 ...., 0, 1
                         typename FieldType::value_type Z_at_challenge = common_data.Z.evaluate(challenge);
                         if (F_consolidated != Z_at_challenge * T_consolidated) {
+                            BOOST_LOG_TRIVIAL(info) << "Verification failed because: F consoludated polynomial does not match.";
                             return false;
                         }
                         return true;

@@ -203,15 +203,15 @@ BOOST_AUTO_TEST_SUITE(lpc_math_polynomial_suite);
 
 
         // Setup params
+        std::size_t degree_log = std::ceil(std::log2(d - 1));
         typename fri_type::params_type fri_params(
-                d - 1, // max_degree
-                D,
-                generate_random_step_list(r, 1, test_global_rnd_engine),
-                2, //expand_factor
+                1, /*max_step*/
+                degree_log,
                 lambda,
-                true,
-                12
-        );
+                2, //expand_factor
+                true, // use_grinding
+                12 // grinding_parameter
+                );
 
         using lpc_scheme_type = nil::crypto3::zk::commitments::lpc_commitment_scheme<lpc_type, math::polynomial<typename FieldType::value_type>>;
         lpc_scheme_type lpc_scheme_prover(fri_params);
@@ -304,13 +304,13 @@ BOOST_AUTO_TEST_SUITE(lpc_math_polynomial_suite);
         typedef zk::commitments::fri<FieldType, merkle_hash_type, transcript_hash_type, m> fri_type;
 
         // Setup params
+        std::size_t degree_log = std::ceil(std::log2(d - 1));
         typename fri_type::params_type fri_params(
-                d - 1, // max_degree
-                D,
-                generate_random_step_list(r, 5, test_global_rnd_engine),
-                2, //expand_factor
-                lambda
-        );
+                5, /*max_step*/
+                degree_log,
+                lambda,
+                2 //expand_factor
+                );
 
         using lpc_scheme_type = nil::crypto3::zk::commitments::lpc_commitment_scheme<lpc_type, math::polynomial<typename FieldType::value_type>>;
         lpc_scheme_type lpc_scheme_prover(fri_params);
@@ -396,20 +396,14 @@ BOOST_AUTO_TEST_SUITE(lpc_math_polynomial_suite);
         static_assert(!zk::is_commitment<std::size_t>::value);
 
         // Setup params
-        constexpr static const std::size_t d_extended = d;
-        std::size_t extended_log = boost::static_log2<d_extended>::value;
-        std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
-                math::calculate_domain_set<FieldType>(extended_log, r + 1);
-
-        // Setup params
+        std::size_t degree_log = std::ceil(std::log2(d - 1));
         typename fri_type::params_type fri_params(
-                d - 1, // max_degree
-                D,
-                generate_random_step_list(r, 1, test_global_rnd_engine),
-                2, //expand_factor
+                1, /*max_step*/
+                degree_log,
                 lambda,
-                true
-        );
+                2, //expand_factor
+                true // use_grinding
+                );
 
         using lpc_scheme_type = nil::crypto3::zk::commitments::lpc_commitment_scheme<lpc_type>;
         lpc_scheme_type lpc_scheme_prover(fri_params);
@@ -498,20 +492,16 @@ BOOST_AUTO_TEST_SUITE(lpc_params_test_suite)
         static_assert(!zk::is_commitment<merkle_tree_type>::value);
         static_assert(!zk::is_commitment<std::size_t>::value);
 
-        constexpr static const std::size_t d_extended = d;
-        std::size_t extended_log = boost::static_log2<d_extended>::value;
-        std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
-                math::calculate_domain_set<FieldType>(extended_log, r);
-
+        // Setup params
+        std::size_t degree_log = std::ceil(std::log2(d - 1));
         typename fri_type::params_type fri_params(
-                d - 1, // max_degree
-                D,
-                generate_random_step_list(r, 1, test_global_rnd_engine),
-                2,  //expand_factor
+                1, /*max_step*/
+                degree_log,
                 lambda,
-                true,
+                2, // expand_factor
+                true, // use_grinding
                 8
-        );
+                );
 
         using lpc_scheme_type = nil::crypto3::zk::commitments::lpc_commitment_scheme<lpc_type, math::polynomial<typename FieldType::value_type>>;
         lpc_scheme_type lpc_scheme_prover(fri_params);
@@ -595,13 +585,14 @@ BOOST_AUTO_TEST_SUITE(lpc_params_test_suite)
         std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D =
                 math::calculate_domain_set<FieldType>(extended_log, r);
 
+        // Setup params
+        std::size_t degree_log = std::ceil(std::log2(d - 1));
         typename fri_type::params_type fri_params(
-                d - 1, // max_degree
-                D,
-                generate_random_step_list(r, 1, test_global_rnd_engine),
-                2, //expand_factor
-                lambda
-        );
+                1, /*max_step*/
+                degree_log,
+                lambda,
+                2 //expand_factor
+                );
 
         using lpc_scheme_type = nil::crypto3::zk::commitments::lpc_commitment_scheme<lpc_type, math::polynomial<typename FieldType::value_type>>;
         lpc_scheme_type lpc_scheme_prover(fri_params);

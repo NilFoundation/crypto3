@@ -36,68 +36,27 @@
 #include <nil/crypto3/math/domains/step_radix2_domain.hpp>
 
 #include <nil/crypto3/math/detail/field_utils.hpp>
+#include <nil/crypto3/math/polynomial/polynomial.hpp>
+#include <nil/crypto3/math/polynomial/polynomial_dfs.hpp>
+
 #include <nil/crypto3/algebra/fields/arithmetic_params/bls12.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace math {
-            namespace detail {
+            // Type trait to check if a given structure is math::polynomial.
+            template<typename T>
+            struct is_polynomial : std::integral_constant<bool, false> {};
 
-            /*!
-            @brief
-             A convenience method for choosing an evaluation domain
-             Returns an evaluation domain object in which the domain S has size
-             |S| >= MinSize.
-             The function get_evaluation_domain is chosen from different supported domains,
-             depending on MinSize.
-            */
-                using namespace nil::crypto3::algebra;
+            template<typename FieldValueType>
+            struct is_polynomial<nil::crypto3::math::polynomial<FieldValueType>> : std::integral_constant<bool, true> { };
 
-                template<typename FieldType>
-                bool is_basic_radix2_domain(std::size_t m) {
-                    const std::size_t log_m = static_cast<std::size_t>(std::ceil(std::log2(m)));
+            template<typename T>
+            struct is_polynomial_dfs : std::integral_constant<bool, false> {};
 
-                    return (m > 1) && (log_m <= fields::arithmetic_params<FieldType>::s) && (m == (1ul << log_m));
-                }
+            template<typename FieldValueType>
+            struct is_polynomial_dfs<nil::crypto3::math::polynomial_dfs<FieldValueType>> : std::integral_constant<bool, true> { };
 
-                template<typename FieldType>
-                bool is_extended_radix2_domain(std::size_t m) {
-                    const std::size_t log_m = static_cast<std::size_t>(std::ceil(std::log2(m)));
-                    const std::size_t small_m = m / 2;
-                    const std::size_t log_small_m = static_cast<std::size_t>(std::ceil(std::log2(small_m)));
-
-                    return (m > 1) && (log_m == fields::arithmetic_params<FieldType>::s + 1) &&
-                           (small_m == (1ul << log_small_m)) &&
-                           (log_small_m <= fields::arithmetic_params<FieldType>::s);
-                }
-
-                template<typename FieldType>
-                bool is_step_radix2_domain(std::size_t m) {
-                    const std::size_t log_m = static_cast<std::size_t>(std::ceil(std::log2(m)));
-                    const std::size_t shift_log_m = (1ul << log_m);
-                    const std::size_t log_shift_log_m = static_cast<std::size_t>(std::ceil(std::log2(shift_log_m)));
-                    const std::size_t small_m = m - (1ul << (static_cast<std::size_t>(std::ceil(std::log2(m))) - 1));
-                    const std::size_t log_small_m = static_cast<std::size_t>(std::ceil(std::log2(small_m)));
-
-                    return (m > 1) && (small_m == (1ul << log_small_m)) && (shift_log_m == (1ul << log_shift_log_m)) &&
-                           (log_shift_log_m <= fields::arithmetic_params<FieldType>::s);
-                }
-
-                template<typename FieldType>
-                bool is_geometric_sequence_domain(std::size_t m) {
-                    return (m > 1) &&
-                           (typename FieldType::value_type(fields::arithmetic_params<FieldType>::geometric_generator) !=
-                            FieldType::value_type::zero());
-                }
-
-                template<typename FieldType>
-                bool is_arithmetic_sequence_domain(std::size_t m) {
-                    return (m > 1) && (typename FieldType::value_type(
-                                           fields::arithmetic_params<FieldType>::arithmetic_generator) !=
-                                       FieldType::value_type::zero());
-                }
-
-            }    // namespace detail
         }    // namespace math
     }        // namespace crypto3
 }    // namespace nil

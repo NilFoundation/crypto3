@@ -65,8 +65,7 @@ namespace nil {
                             std::size_t M = 2>
                     struct basic_batched_fri_runtime_size {
 
-                        constexpr static const std::size_t
-                        m = M;
+                        constexpr static const std::size_t m = M;
 
                         typedef FieldType field_type;
                         typedef MerkleTreeHashType merkle_tree_hash_type;

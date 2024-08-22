@@ -24,7 +24,7 @@ macro(define_codec_test name)
 
     if(NOT CMAKE_CXX_STANDARD)
         set_target_properties(codec_${name}_test PROPERTIES
-                              CXX_STANDARD 14
+                              CXX_STANDARD 17
                               CXX_STANDARD_REQUIRED TRUE)
     endif()
 

@@ -375,8 +375,9 @@ namespace nil {
                         if( constraint_system.copy_constraints().size() > 0 )
                             _commitment_scheme.append_eval_point(PERMUTATION_BATCH, 0, _proof.eval_proof.challenge * _omega);
 
-                        if(_is_lookup_enabled){
-                            _commitment_scheme.append_eval_point(PERMUTATION_BATCH, preprocessed_public_data.common_data.permutation_parts , _proof.eval_proof.challenge * _omega);
+                        if(_is_lookup_enabled) {
+                            _commitment_scheme.append_eval_point(PERMUTATION_BATCH, preprocessed_public_data.common_data.permutation_parts,
+                                _proof.eval_proof.challenge * _omega);
                             _commitment_scheme.append_eval_point(LOOKUP_BATCH, _proof.eval_proof.challenge);
                             _commitment_scheme.append_eval_point(LOOKUP_BATCH, _proof.eval_proof.challenge * _omega);
                             _commitment_scheme.append_eval_point(LOOKUP_BATCH, _proof.eval_proof.challenge *
@@ -391,7 +392,7 @@ namespace nil {
                         std::size_t start_index = preprocessed_public_data.identity_polynomials.size() +
                             preprocessed_public_data.permutation_polynomials.size() + 2;
 
-                        for( i = 0; i < start_index; i++){
+                        for( i = 0; i < start_index; i++) {
                             _commitment_scheme.append_eval_point(FIXED_VALUES_BATCH, i, _proof.eval_proof.challenge);
                         }
 

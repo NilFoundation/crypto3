@@ -33,7 +33,7 @@ namespace nil {
         namespace zk {
             namespace commitments {
                 template<typename FieldType>
-                class eval_storage{
+                class eval_storage {
                 private:
                     std::map<std::size_t, std::vector<std::vector<typename FieldType::value_type>>> z;
                 public:

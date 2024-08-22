@@ -67,10 +67,10 @@ namespace nil {
 
                     using TTypeBase = nil::marshalling::field_type<Endianness>;
 
-                    using field_marhsalling_type = field_element<TTypeBase, typename Proof::field_type::value_type>;
+                    using field_marshalling_type = field_element<TTypeBase, typename Proof::field_type::value_type>;
 
                     // typename FieldType::value_type challenge
-                    field_marhsalling_type filled_challenge = field_marhsalling_type(proof.challenge);
+                    field_marshalling_type filled_challenge = field_marshalling_type(proof.challenge);
 
                     // typename commitment_scheme_type::proof_type eval_proof;
                     auto filled_eval_proof =

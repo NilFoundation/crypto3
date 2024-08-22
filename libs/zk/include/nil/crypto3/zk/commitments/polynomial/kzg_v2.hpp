@@ -174,8 +174,12 @@ namespace nil {
                     }
 
                 public:
-                    // Interface function. Isn't useful here.
+                    using preprocessed_data_type = bool;
+
+                    // Interface functions, not useful here. Added for compatibility with LPC.
                     void mark_batch_as_fixed(std::size_t index) {
+                    }
+                    void set_fixed_polys_values(const preprocessed_data_type& value) {
                     }
 
                     static params_type
@@ -209,8 +213,6 @@ namespace nil {
                         _commitments[index] = result;
                         return result;
                     }
-
-                    using preprocessed_data_type = bool;
 
                     preprocessed_data_type preprocess(transcript_type &transcript) const {
                         return true;

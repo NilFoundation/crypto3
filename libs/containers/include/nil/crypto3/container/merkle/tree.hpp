@@ -175,6 +175,7 @@ namespace nil {
 
                     typedef typename node_type::value_type value_type;
                     constexpr static const std::size_t value_bits = node_type::value_bits;
+                    constexpr static const std::size_t arity = Arity;
 
                     typedef std::vector<value_type> container_type;
 
@@ -253,7 +254,7 @@ namespace nil {
                     }
 
                     bool operator==(const merkle_tree_impl &rhs) const {
-                        return _hashes == rhs.val;
+                        return _hashes == rhs._hashes;
                     }
 
                     bool operator!=(const merkle_tree_impl &rhs) const {
@@ -261,7 +262,7 @@ namespace nil {
                     }
 
                     allocator_type get_allocator() const BOOST_NOEXCEPT {
-                        return this->val.__alloc();
+                        return this->_hashes.__alloc();
                     }
 
                     iterator begin() BOOST_NOEXCEPT {

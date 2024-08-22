@@ -34,6 +34,8 @@
 #include <string>
 #include <map>
 
+#include <nil/crypto3/algebra/fields/arithmetic_params/bls12.hpp>
+
 #include <nil/crypto3/math/algorithms/unity_root.hpp>
 #include <nil/crypto3/math/detail/field_utils.hpp>
 #include <nil/crypto3/math/polynomial/polynomial.hpp>
@@ -65,10 +67,11 @@ namespace nil {
 
                 template<typename FieldType, typename ParamsType>
                 class placeholder_public_preprocessor {
-                    typedef detail::placeholder_policy<FieldType, ParamsType> policy_type;
-                    typedef typename plonk_constraint<FieldType>::variable_type variable_type;
-                    typedef typename math::polynomial<typename FieldType::value_type> polynomial_type;
-                    typedef typename math::polynomial_dfs<typename FieldType::value_type> polynomial_dfs_type;
+                    using policy_type = detail::placeholder_policy<FieldType, ParamsType>;
+                    using variable_type = typename plonk_constraint<FieldType>::variable_type;
+                    using value_type = typename FieldType::value_type;
+                    using polynomial_type = typename math::polynomial<value_type>;
+                    using polynomial_dfs_type = typename math::polynomial_dfs<value_type>;
                     using params_type = ParamsType;
                     using commitment_scheme_type = typename params_type::commitment_scheme_type;
                     using commitment_type = typename commitment_scheme_type::commitment_type;
@@ -79,15 +82,21 @@ namespace nil {
                     static std::size_t permutation_partitions_num(
                         std::size_t permutation_size,
                         std::size_t max_quotient_chunks
-                    ){
-                        if( permutation_size == 0 ) return 0;
-                        if( max_quotient_chunks == 0 ){
+                    ) {
+                        if (permutation_size == 0) return 0;
+                        if (max_quotient_chunks == 0) {
                             return 1;
                         }
-                        return (permutation_size % (max_quotient_chunks - 1) == 0)? permutation_size / (max_quotient_chunks - 1) : permutation_size / (max_quotient_chunks - 1) + 1;
+                        return (permutation_size % (max_quotient_chunks - 1) == 0) ?
+                            permutation_size / (max_quotient_chunks - 1) :
+                            permutation_size / (max_quotient_chunks - 1) + 1;
                     }
 
                     struct preprocessed_data_type {
+                        // Used in marshalling.
+                        using plonk_public_polynomial_dfs_table_type = plonk_public_polynomial_dfs_table<FieldType>;
+                        using polynomial_dfs_type = typename math::polynomial_dfs<typename FieldType::value_type>;
+
                         struct public_commitments_type {
                             commitment_type fixed_values;
 
@@ -154,6 +163,8 @@ namespace nil {
                             std::uint32_t max_quotient_chunks;
                             std::uint32_t permutation_parts;
                             std::uint32_t lookup_parts;
+
+                            common_data_type(const common_data_type& other) = default;
 
                             // Constructor with pregenerated domain
                             common_data_type(
@@ -253,17 +264,30 @@ namespace nil {
                             }
                         };
 
-                        plonk_public_polynomial_dfs_table<FieldType> public_polynomial_table;
+                        bool operator==(const preprocessed_data_type &rhs) const {
+                            return public_polynomial_table == rhs.public_polynomial_table &&
+                                permutation_polynomials == rhs.permutation_polynomials &&
+                                identity_polynomials == rhs.identity_polynomials &&
+                                q_last == rhs.q_last &&
+                                q_blind == rhs.q_blind &&
+                                common_data == rhs.common_data;
+                        }
+
+                        bool operator!=(const preprocessed_data_type &rhs) const {
+                            return !(rhs == *this);
+                        }
+
+                        plonk_public_polynomial_dfs_table_type public_polynomial_table;
 
                         // S_sigma
                         std::vector<polynomial_dfs_type>  permutation_polynomials;
                         // S_id
                         std::vector<polynomial_dfs_type>  identity_polynomials;
 
-                        polynomial_dfs_type               q_last;
-                        polynomial_dfs_type               q_blind;
+                        polynomial_dfs_type q_last;
+                        polynomial_dfs_type q_blind;
 
-                        common_data_type                  common_data;
+                        common_data_type common_data;
                     };
 
                 private:
@@ -499,7 +523,8 @@ namespace nil {
                         commitment_scheme.append_to_batch(FIXED_VALUES_BATCH, public_table.constants());
                         commitment_scheme.append_to_batch(FIXED_VALUES_BATCH, public_table.selectors());
 
-                        auto result = typename preprocessed_data_type::public_commitments_type({commitment_scheme.commit(FIXED_VALUES_BATCH)});
+                        typename preprocessed_data_type::public_commitments_type result(
+                            {commitment_scheme.commit(FIXED_VALUES_BATCH)});
                         commitment_scheme.mark_batch_as_fixed(FIXED_VALUES_BATCH);
                         return result;
                     }

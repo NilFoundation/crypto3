@@ -66,10 +66,8 @@ namespace nil {
                             std::size_t BatchSize = 1>
                     struct basic_batched_fri_compile_time_size {
 
-                        constexpr static const std::size_t
-                        m = M;
-                        constexpr static const std::size_t
-                        leaf_size = BatchSize;
+                        constexpr static const std::size_t m = M;
+                        constexpr static const std::size_t leaf_size = BatchSize;
 
                         typedef FieldType field_type;
                         typedef MerkleTreeHashType merkle_tree_hash_type;

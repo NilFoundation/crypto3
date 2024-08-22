@@ -31,6 +31,8 @@
 #ifndef CRYPTO3_ZK_COMMITMENTS_BASIC_FRI_HPP
 #define CRYPTO3_ZK_COMMITMENTS_BASIC_FRI_HPP
 
+#include <boost/log/trivial.hpp>
+
 #include <memory>
 #include <unordered_map>
 #include <map>
@@ -121,10 +123,6 @@ namespace nil {
                             // needs to be marshalled is a part of params_type.
                             using grinding_type = GrindingType;
 
-                            std::size_t lambda;
-                            bool use_grinding;
-                            std::size_t grinding_parameter;
-                            constexpr static std::size_t m = M;
 
                             static std::vector<std::size_t> generate_random_step_list(const std::size_t r, const int max_step) {
                                 using dist_type = std::uniform_int_distribution<int>;
@@ -148,8 +146,6 @@ namespace nil {
                                 return step_list;
                             }
 
-                            //params_type(const params_type &other){}
-                            // TODO when marshalling will be fine
                             params_type(
                                 std::size_t max_step,
                                 std::size_t degree_log,
@@ -162,71 +158,61 @@ namespace nil {
                               , grinding_parameter(grinding_parameter)
                               , max_degree((1 << degree_log) - 1)
                               , D(math::calculate_domain_set<FieldType>(degree_log + expand_factor, degree_log - 1))
-                              , r( degree_log - 1 )
+                              , r(degree_log - 1)
                               , step_list(generate_random_step_list(r, max_step))
                               , expand_factor(expand_factor)
                             { }
 
                             params_type(
-                                std::vector<std::size_t> step_list_in,
+                                const std::vector<std::size_t>& step_list_in,
                                 std::size_t degree_log,
                                 std::size_t lambda,
                                 std::size_t expand_factor,
                                 bool use_grinding = false,
                                 std::size_t grinding_parameter = 16
-                            ): lambda(lambda)
+                            ) : lambda(lambda)
                               , use_grinding(use_grinding)
                               , grinding_parameter(grinding_parameter)
                               , max_degree((1 << degree_log) - 1)
-                              , D(math::calculate_domain_set<FieldType>(degree_log + expand_factor, std::accumulate(step_list_in.begin(), step_list_in.end(), 0)))
+                              , D(math::calculate_domain_set<FieldType>(
+                                    degree_log + expand_factor,
+                                    std::accumulate(step_list_in.begin(), step_list_in.end(), 0)))
                               , r(std::accumulate(step_list_in.begin(), step_list_in.end(), 0))
                               , step_list(step_list_in)
                               , expand_factor(expand_factor)
                             { }
 
-                            params_type(
-                                std::size_t max_degree,
-                                std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D,
-                                std::vector<std::size_t> step_list_in,
-                                std::size_t expand_factor,
-                                std::size_t lambda,
-                                bool use_grinding = false,
-                                std::size_t grinding_parameter = 16
-                            ) : lambda(lambda)
-                              , use_grinding(use_grinding)
-                              , grinding_parameter(grinding_parameter)
-                              , max_degree(max_degree)
-                              , D(D)
-                              , r(std::accumulate(step_list_in.begin(), step_list_in.end(), 0))
-                              , step_list(step_list_in)
-                              , expand_factor(expand_factor)
-                            {}
-
                             bool operator==(const params_type &rhs) const {
-                                if( D.size() != rhs.D.size() ){
+                                if (D.size() != rhs.D.size()) {
                                     return false;
                                 }
-                                for( std::size_t i = 0; i < D.size(); i++){
-                                    if( D[i]->get_domain_element(1) != rhs.D[i]->get_domain_element(1) ){
+                                for (std::size_t i = 0; i < D.size(); i++) {
+                                    if (D[i]->get_domain_element(1) != rhs.D[i]->get_domain_element(1)) {
                                         return false;
                                     }
                                 }
-                                if(use_grinding && rhs.use_grinding && grinding_parameter != rhs.grinding_parameter){
+                                if (use_grinding != rhs.use_grinding) {
+                                    return false;
+                                }
+                                if (use_grinding && grinding_parameter != rhs.grinding_parameter) {
                                     return false;
                                 }
                                 return r == rhs.r
                                     && max_degree == rhs.max_degree
                                     && step_list == rhs.step_list
                                     && expand_factor == rhs.expand_factor
-                                    && lambda == rhs.lambda
-                                    && use_grinding == rhs.use_grinding
-                                ;
+                                    && lambda == rhs.lambda;
                             }
 
                             bool operator!=(const params_type &rhs) const {
                                 return !(rhs == *this);
                             }
 
+                            constexpr static std::size_t m = M;
+
+                            const std::size_t lambda;
+                            const bool use_grinding;
+                            const std::size_t grinding_parameter;
                             const std::size_t max_degree;
                             const std::vector<std::shared_ptr<math::evaluation_domain<FieldType>>> D;
 
@@ -249,8 +235,12 @@ namespace nil {
                             }
 
                             // For the last round it's final_polynomial's values
-                            polynomial_values_type               y;                         // Values for the next round.
-                            merkle_proof_type                    p;                         // Merkle proof(values[i-1], T_i)
+                            
+                            // Values for the next round.
+                            polynomial_values_type y;
+
+                            // Merkle proof(values[i-1], T_i).
+                            merkle_proof_type p;
                         };
 
                         struct initial_proof_type {
@@ -280,6 +270,7 @@ namespace nil {
 
                         struct proof_type {
                             bool operator==(const proof_type &rhs) const {
+                                // TODO(martun): check if the following comment can be deleted.
 //                                if( FRI::use_grinding && proof_of_work != rhs.proof_of_work ){
 //                                    return false;
 //                                }
@@ -1054,7 +1045,8 @@ namespace nil {
                         }
                     }
 
-                    if(fri_params.use_grinding && !FRI::grinding_type::verify(transcript, proof.proof_of_work, fri_params.grinding_parameter)){
+                    if (fri_params.use_grinding && !FRI::grinding_type::verify(
+                            transcript, proof.proof_of_work, fri_params.grinding_parameter)){
                         return false;
                     }
                     for (std::size_t query_id = 0; query_id < fri_params.lambda; query_id++) {
@@ -1084,7 +1076,8 @@ namespace nil {
                                 return false;
                             }
 
-                            detail::fri_field_element_consumer<FRI> leaf_data(coset_size * query_proof.initial_proof.at(k).values.size());
+                            detail::fri_field_element_consumer<FRI> leaf_data(
+                                coset_size * query_proof.initial_proof.at(k).values.size());
 
                             for (std::size_t i = 0; i < query_proof.initial_proof.at(k).values.size(); i++) {
                                 for (auto [idx, pair_idx] : correct_order_idx) {
@@ -1093,12 +1086,12 @@ namespace nil {
                                 }
                             }
                             if (!query_proof.initial_proof.at(k).p.validate(leaf_data)) {
-                                std::cout << "Wrong initial proof" << std::endl;
+                                BOOST_LOG_TRIVIAL(info) << "Wrong initial proof";
                                 return false;
                             }
                         }
 
-                        //Calculate combinedQ values
+                        // Calculate combinedQ values
                         typename FRI::field_type::value_type theta_acc = FRI::field_type::value_type::one();
                         typename FRI::polynomial_values_type y;
                         typename FRI::polynomial_values_type combined_eval_values;
@@ -1134,7 +1127,8 @@ namespace nil {
                         typename FRI::polynomial_values_type y_next;
                         for (std::size_t i = 0; i < fri_params.step_list.size(); i++) {
                             coset_size = 1 << fri_params.step_list[i];
-                            if (query_proof.round_proofs[i].p.root() != proof.fri_roots[i]) return false;
+                            if (query_proof.round_proofs[i].p.root() != proof.fri_roots[i])
+                                return false;
 
                             std::tie(s, s_indices) = calculate_s<FRI>(x_index, fri_params.step_list[i],
                                                                       fri_params.D[t]);
@@ -1146,7 +1140,7 @@ namespace nil {
                                 leaf_data.consume(y[idx][1]);
                             }
                             if (!query_proof.round_proofs[i].p.validate(leaf_data)) {
-                                std::cout << "Wrong round merkle proof on " << i << "-th round" << std::endl;
+                                BOOST_LOG_TRIVIAL(info) << "Wrong round merkle proof on " << i << "-th round";
                                 return false;
                             }
 

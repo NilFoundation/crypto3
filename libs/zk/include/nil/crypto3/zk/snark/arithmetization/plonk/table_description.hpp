@@ -36,8 +36,12 @@ namespace nil {
         namespace zk {
             namespace snark {
 
+                // TODO(martun): this class actually does not depend on the FieldType.
                 template<typename FieldType>
                 struct plonk_table_description {
+                    // Needed for marshalling.
+                    using field_type = FieldType;
+
                     std::size_t witness_columns;
                     std::size_t public_input_columns;
                     std::size_t constant_columns;

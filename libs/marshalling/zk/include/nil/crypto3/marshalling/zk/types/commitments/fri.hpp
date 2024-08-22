@@ -42,48 +42,12 @@
 
 #include <nil/crypto3/marshalling/algebra/types/field_element.hpp>
 #include <nil/crypto3/marshalling/containers/types/merkle_proof.hpp>
+#include <nil/crypto3/marshalling/math/types/polynomial.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace marshalling {
             namespace types {
-                template <typename TTypeBase, typename FieldElementType>
-                using field_element_vector_type = nil::marshalling::types::array_list<
-                    TTypeBase,
-                    field_element<TTypeBase, FieldElementType>,
-                    nil::marshalling::option::sequence_size_field_prefix<nil::marshalling::types::integral<TTypeBase, std::size_t>>
-                >;
-
-                ///////////////////////////////////////////////
-                // math::polynomial marshalling
-                ///////////////////////////////////////////////
-                template<typename TTypeBase, typename PolynomialType>
-                using fri_math_polynomial =  field_element_vector_type<TTypeBase, typename PolynomialType::value_type>;
-
-                template<typename Endianness, typename PolynomialType, typename Range>
-                fri_math_polynomial<nil::marshalling::field_type<Endianness>, PolynomialType>
-                fill_fri_math_polynomial(const Range &f){
-                    std::vector<typename PolynomialType::value_type> val;
-                    for( auto it=f.begin(); it != f.end(); it++){ val.push_back(*it); }
-
-                    return nil::crypto3::marshalling::types::fill_field_element_vector<
-                        typename PolynomialType::value_type,
-                        Endianness
-                    >(val);
-                }
-
-                template<typename Endianness, typename PolynomialType>
-                PolynomialType
-                make_fri_math_polynomial( const fri_math_polynomial<nil::marshalling::field_type<Endianness>, PolynomialType> &filled_polynomial){
-                    auto val = nil::crypto3::marshalling::types::make_field_element_vector<
-                        typename PolynomialType::value_type,
-                        Endianness
-                    >(filled_polynomial);
-
-                    return PolynomialType(val);
-                }
-
-
 
                 ///////////////////////////////////////////////////
                 // fri::merkle_proofs marshalling
@@ -182,8 +146,7 @@ namespace nil {
 
                             // std::select_container<math::polynomial> final_polynomials
                             // May be different size, because real degree may be less than before. So put int in the end
-                            fri_math_polynomial<TTypeBase, typename FRI::polynomial_type>,
-
+                            typename polynomial<TTypeBase, typename FRI::polynomial_type>::type,
 
                             // proof of work. TODO: how to do it optional?
                             nil::marshalling::types::integral<TTypeBase, typename FRI::grinding_type::output_type>  //proof of work*/
@@ -290,7 +253,7 @@ namespace nil {
                         }
                     }
 
-                    auto filled_final_polynomial = fill_fri_math_polynomial<Endianness, typename FRI::polynomial_type>(
+                    auto filled_final_polynomial = fill_polynomial<Endianness, typename FRI::polynomial_type>(
                         proof.final_polynomial
                     );
 
@@ -380,7 +343,7 @@ namespace nil {
                     }
 
                     // final_polynomial
-                    proof.final_polynomial = make_fri_math_polynomial<Endianness, typename FRI::polynomial_type>(
+                    proof.final_polynomial = make_polynomial<Endianness, typename FRI::polynomial_type>(
                         std::get<6>(filled_proof.value())
                     );
                     // proof_of_work

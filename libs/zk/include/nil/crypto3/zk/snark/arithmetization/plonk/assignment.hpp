@@ -56,6 +56,7 @@ namespace nil {
                 template<typename FieldType, typename ColumnType>
                 class plonk_private_table {
                 public:
+                    using column_type = ColumnType;
                     using witnesses_container_type = std::vector<ColumnType>;
                     using VariableType = plonk_variable<ColumnType>;
 
@@ -151,6 +152,7 @@ namespace nil {
                 template<typename FieldType, typename ColumnType>
                 class plonk_public_table {
                 public:
+                    using column_type = ColumnType;
                     using public_input_container_type = std::vector<ColumnType>;
                     using constant_container_type = std::vector<ColumnType>;
                     using selector_container_type = std::vector<ColumnType>;

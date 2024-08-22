@@ -439,6 +439,19 @@ namespace nil {
                 return field;
             }
 
+            // This is a helper, frequently used to convert size_t. It just shortens our code.
+            template<typename TFieldBase>
+            integral<TFieldBase, std::size_t> fill_size_t(const std::size_t& v) {
+                integral<TFieldBase, std::size_t> result;
+                result.value() = v;
+                return result;
+            }
+
+            template<typename TFieldBase>
+            std::size_t make_size_t(const integral<TFieldBase, std::size_t>& v) {
+                return v.value();
+            }
+
         }    // namespace types
     }        // namespace marshalling
 }    // namespace nil
