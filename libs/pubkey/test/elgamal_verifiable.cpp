@@ -232,6 +232,7 @@ struct marshalling_verification_data_groth16_encrypted_input {
         std::vector<std::uint8_t> blob(filled_val.length());
         auto it = std::begin(blob);
         nil::marshalling::status_type status = filled_val.write(it, blob.size());
+        THROW_IF_ERROR_STATUS(status, "marshalling_verification_data_groth16_encrypted_input::serialize_obj");
         return blob;
     }
 
@@ -299,6 +300,7 @@ struct marshalling_verification_data_groth16_encrypted_input {
         MarshallingType marshalling_obj;
         auto it = std::cbegin(blob);
         nil::marshalling::status_type status = marshalling_obj.read(it, blob.size());
+        THROW_IF_ERROR_STATUS(status, "marshalling_verification_data_groth16_encrypted_input::read_obj");
         return f(marshalling_obj);
     }
 

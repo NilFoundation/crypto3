@@ -456,14 +456,17 @@ namespace nil {
                 typename BlueprintFieldType::value_type h = input_state[7];
 
                 std::array<typename BlueprintFieldType::integral_type, 8> sparse_values {};
+                nil::marshalling::status_type status;
+
                 for (std::size_t i = 0; i < 4; i++) {
                     assignment.witness(component.W(i), row) = input_state[i];
                     typename BlueprintFieldType::integral_type integral_input_state_sparse =
                         typename BlueprintFieldType::integral_type(input_state[i].data);
                     std::vector<bool> input_state_sparse(64);
                     {
-                        nil::marshalling::status_type status;
                         std::array<bool, BlueprintFieldType::value_bits> input_state_sparse_all = nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_input_state_sparse, status);
+                        THROW_IF_ERROR_STATUS(status, "plonk_sha512_process::generate_assignments");
+
                         std::copy(input_state_sparse_all.end() - 64, input_state_sparse_all.end(), input_state_sparse.begin());
                     }
 
@@ -480,8 +483,8 @@ namespace nil {
                         typename BlueprintFieldType::integral_type(input_state[i].data);
                     std::vector<bool> input_state_sparse(64);
                     {
-                        nil::marshalling::status_type status;
                         std::array<bool, BlueprintFieldType::value_bits> input_state_sparse_all = nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_input_state_sparse, status);
+                        THROW_IF_ERROR_STATUS(status, "plonk_sha512_process::generate_assignments");
                         std::copy(input_state_sparse_all.end() - 64, input_state_sparse_all.end(), input_state_sparse.begin());
                     }
 
@@ -506,8 +509,8 @@ namespace nil {
                     assignment.witness(component.W(0), i) = message_scheduling_words[(i - row) / 6 + 1];
                     std::vector<bool> a(64);
                     {
-                        nil::marshalling::status_type status;
                         std::array<bool, BlueprintFieldType::value_bits> a_all = nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_a, status);
+                        THROW_IF_ERROR_STATUS(status, "plonk_sha512_process::generate_assignments");
                         std::copy(a_all.end() - 64, a_all.end(), a.begin());
                     }
 
@@ -560,8 +563,8 @@ namespace nil {
                             message_scheduling_words[(i - row) / 6 + 14].data);
                     std::vector<bool> b(64);
                     {
-                        nil::marshalling::status_type status;
                         std::array<bool, BlueprintFieldType::value_bits> b_all = nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_b, status);
+                        THROW_IF_ERROR_STATUS(status, "plonk_sha512_process::generate_assignments");
                         std::copy(b_all.end() - 64, b_all.end(), b.begin());
                     }
 
@@ -627,8 +630,8 @@ namespace nil {
                         typename BlueprintFieldType::integral_type(e.data);
                     std::vector<bool> e_bits(64);
                     {
-                        nil::marshalling::status_type status;
                         std::array<bool, BlueprintFieldType::value_bits> e_bits_all = nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_e, status);
+                        THROW_IF_ERROR_STATUS(status, "plonk_sha512_process::generate_assignments");
                         std::copy(e_bits_all.end() - 64, e_bits_all.end(), e_bits.begin());
                     }
 
@@ -730,8 +733,8 @@ namespace nil {
                         typename BlueprintFieldType::integral_type(a.data);
                     std::vector<bool> a_bits(64);
                     {
-                        nil::marshalling::status_type status;
                         std::array<bool, BlueprintFieldType::value_bits> a_bits_all = nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_a, status);
+                        THROW_IF_ERROR_STATUS(status, "plonk_sha512_process::generate_assignments");
                         std::copy(a_bits_all.end() - 64, a_bits_all.end(), a_bits.begin());
                     }
 

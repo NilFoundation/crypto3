@@ -133,11 +133,13 @@ namespace nil {
                         if (status == nil::marshalling::status_type::success) {
                             break;
                         }
-                        // TODO: return status
-                        assert(i < 256);
+
+                        if (i >= 256) {
+                            THROW_IF_ERROR_STATUS(status, "find_group_hash::process");
+                        }
                     }
                     point = typename curve_type::scalar_field_type::value_type(group_type::params_type::cofactor) * point;
-                    // TODO: return status
+
                     assert(!point.is_zero());
                     assert(point.is_well_formed());
 

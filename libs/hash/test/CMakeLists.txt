@@ -69,13 +69,10 @@ set(TESTS_NAMES
 
 if(CRYPTO3_HASH_PEDERSEN)
     list(APPEND TESTS_NAMES
-         find_group_hash
-         h2c
-         h2f)
-
-    if(CRYPTO3_HASH_PEDERSEN)
-        list(APPEND TESTS_NAMES pedersen)
-    endif()
+        pedersen
+        find_group_hash
+        h2c
+        h2f)
 endif()
 
 foreach(TEST_NAME ${TESTS_NAMES})

@@ -203,7 +203,7 @@ namespace nil {
                             nil::marshalling::status_type status;
                             std::vector<uint8_t> single_commitment_bytes =
                                     nil::marshalling::pack<endianness>(single_commitment, status);
-                            BOOST_ASSERT(status == nil::marshalling::status_type::success);
+                            THROW_IF_ERROR_STATUS(status, "kzg_v2::commit");
                             result.insert(result.end(), single_commitment_bytes.begin(), single_commitment_bytes.end());
                         }
                         _commitments[index] = result;
@@ -321,7 +321,7 @@ namespace nil {
                                 }
                                 typename curve_type::template g1_type<>::value_type
                                         cm_i = nil::marshalling::pack(byteblob, status);
-                                BOOST_ASSERT(status == nil::marshalling::status_type::success);
+                                THROW_IF_ERROR_STATUS(status, "kzg_v2::verify_eval");
                                 auto Z_T_S_i = set_difference_polynom(_merged_points, this->_points.at(k)[i]).evaluate(
                                         theta_2);
                                 F += theta_i * Z_T_S_i * cm_i;

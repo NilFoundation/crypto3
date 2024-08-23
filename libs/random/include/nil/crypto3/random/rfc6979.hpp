@@ -172,8 +172,10 @@ namespace nil {
                 template<typename InputRange>
                 static inline modulus_octets_container_type bits2octets(const InputRange& range) {
                     nil::marshalling::status_type status;
-                    return ::nil::marshalling::pack<::nil::marshalling::option::big_endian>(
+                    auto result = ::nil::marshalling::pack<::nil::marshalling::option::big_endian>(
                         field_value_type(bits2int(range)), status);
+                    THROW_IF_ERROR_STATUS(status, "rfc6979::bits2octets");
+                    return result;
                 }
 
                 inline void seed(const result_type& x, const digest_type& h1) {
@@ -190,6 +192,7 @@ namespace nil {
                     nil::marshalling::status_type status;
                     modulus_octets_container_type int2octets_x =
                         ::nil::marshalling::pack<::nil::marshalling::option::big_endian>(x, status);
+                    THROW_IF_ERROR_STATUS(status, "rfc6979::seed");
 
                     auto bits2octets_h1 = bits2octets(h1);
                     compute<hmac_policy>(V, acc_d);

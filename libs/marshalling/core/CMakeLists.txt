@@ -11,6 +11,14 @@ include(CMSetupVersion)
 
 option(BUILD_WITH_NO_WARNINGS "Build threading warnings as errors" FALSE)
 
+# When set, the code always throws on invalid data.
+# If not set, the code is using BOOST_VERIFY - noop in release and stop in debug
+option(CRYPTO3_MARSHALLING_THROWS "Throw exceptions when marshalling invalid data" TRUE)
+
+if(CRYPTO3_MARSHALLING_THROWS)
+    add_definitions(-DCRYPTO3_MARSHALLING_THROWS)
+endif()
+
 cm_setup_version(VERSION 0.1.0 PREFIX ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME})
 
 add_library(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE)

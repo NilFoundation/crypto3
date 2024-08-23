@@ -746,7 +746,7 @@ namespace nil {
                             nil::marshalling::status_type status;
                             std::vector<uint8_t> single_commitment_bytes =
                                     nil::marshalling::pack<endianness>(single_commitment, status);
-                            BOOST_ASSERT(status == nil::marshalling::status_type::success);
+                            THROW_IF_ERROR_STATUS(status, "kzg::commit");
                             result.insert(result.end(), single_commitment_bytes.begin(), single_commitment_bytes.end());
                         }
                         _commitments[index] = result;
@@ -835,7 +835,7 @@ namespace nil {
                                 nil::marshalling::status_type status;
                                 typename curve_type::template g1_type<>::value_type
                                         i_th_commitment = nil::marshalling::pack(byteblob, status);
-                                BOOST_ASSERT(status == nil::marshalling::status_type::success);
+                                THROW_IF_ERROR_STATUS(status, "kzg::verify_eval");
                                 auto U_commit = nil::crypto3::zk::algorithms::commit_one<CommitmentSchemeType>(_params,
                                                                                                                this->get_U(
                                                                                                                        k,

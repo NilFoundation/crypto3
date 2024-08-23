@@ -94,6 +94,7 @@ namespace nil {
                             nil::marshalling::status_type status;
                             typename hash_type::construction::type::block_type byte_data =
                                 nil::marshalling::pack(data, status);
+                            THROW_IF_ERROR_STATUS(status, "fiat_shamir_heuristic_accumulative::operator()");
                             acc(byte_data);
                         }
                     }
@@ -175,7 +176,7 @@ namespace nil {
                         nil::marshalling::status_type status;
                         std::vector<std::uint8_t> byte_data =
                             nil::marshalling::pack<nil::marshalling::option::big_endian>(data, status);
-                        BOOST_ASSERT(status == nil::marshalling::status_type::success);
+                        THROW_IF_ERROR_STATUS(status, "fiat_shamir_heuristic_sequential::operator()");
                         auto acc_convertible = hash<hash_type>(state);
                         state = accumulators::extract::hash<hash_type>(
                                 hash<hash_type>(byte_data, static_cast<accumulator_set<hash_type> &>(acc_convertible)));
@@ -201,8 +202,7 @@ namespace nil {
                         nil::marshalling::status_type status;
                         boost::multiprecision::number<modular_backend_of_hash_size> raw_result = 
                             nil::marshalling::pack(state, status);
-                        BOOST_ASSERT(status == nil::marshalling::status_type::success);
-
+                        THROW_IF_ERROR_STATUS(status, "fiat_shamir_heuristic_sequential::challenge");
                         return raw_result;
                     }
 
