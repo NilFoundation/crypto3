@@ -22,7 +22,12 @@ function(cm_deploy)
         cm_install_targets(TARGETS ${PARSE_TARGETS} INCLUDE ${PARSE_INCLUDE})
     endif()
 
-    cm_auto_pkgconfig(TARGET ${PARSE_TARGETS})
+    get_property(isMultiConfig GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+
+    if(NOT isMultiConfig)
+        cm_auto_pkgconfig(TARGET ${PARSE_TARGETS})
+    endif()
+
     cm_auto_export(TARGETS ${PARSE_TARGETS} NAMESPACE ${PARSE_NAMESPACE} COMPATIBILITY ${PARSE_COMPATIBILITY})
 
     foreach(TARGET ${PARSE_TARGETS})
