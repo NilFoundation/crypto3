@@ -44,42 +44,6 @@
 using namespace nil::crypto3;
 using namespace nil::crypto3::algebra;
 
-template<typename FieldParams>
-void print_field_element(std::ostream &os, const typename fields::detail::element_fp<FieldParams> &e) {
-    std::cout << e.data << std::endl;
-}
-
-template<typename CurveParams, typename Form>
-void print_curve_point(std::ostream &os,
-                       const curves::detail::curve_element<CurveParams, Form, curves::coordinates::affine> &p) {
-    os << "( X: [";
-    print_field_element(os, p.X);
-    os << "], Y: [";
-    print_field_element(os, p.Y);
-    os << "] )" << std::endl;
-}
-
-namespace boost {
-    namespace test_tools {
-        namespace tt_detail {
-            template<typename CurveParams, typename Form, typename Coordinates>
-            struct print_log_value<curves::detail::curve_element<CurveParams, Form, Coordinates>> {
-                void operator()(std::ostream &os,
-                                const curves::detail::curve_element<CurveParams, Form, Coordinates> &p) {
-                    print_curve_point(os, p);
-                }
-            };
-
-            template<template<typename, typename> class P, typename K, typename V>
-            struct print_log_value<P<K, V>> {
-                void operator()(std::ostream &, P<K, V> const &) {
-                }
-            };
-
-        }    // namespace tt_detail
-    }        // namespace test_tools
-}    // namespace boost
-
 BOOST_AUTO_TEST_SUITE(hash_pedersen_manual_test_suite)
 
 BOOST_AUTO_TEST_CASE(hash_pedersen_jubjub_sha256_default_params_manual_test) {

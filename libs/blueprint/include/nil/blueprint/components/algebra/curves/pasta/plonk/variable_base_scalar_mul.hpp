@@ -248,6 +248,7 @@ namespace nil {
                 nil::marshalling::status_type status;
                 std::array<bool, scalar_size> bits =
                     nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_b, status);
+                THROW_IF_ERROR_STATUS(status, "curve_element_variable_base_scalar_mul::generate_assignments");
 
                 typename BlueprintFieldType::value_type z_n2;
                 typename BlueprintFieldType::value_type aux;
@@ -267,6 +268,7 @@ namespace nil {
                 const std::size_t base_size = 255;
                 std::array<bool, base_size> aux_bits =
                     nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_aux, status);
+                THROW_IF_ERROR_STATUS(status, "curve_element_variable_base_scalar_mul::generate_assignments");
 
                 typename BlueprintFieldType::value_type n = 0;
                 typename BlueprintFieldType::value_type n_next = 0;

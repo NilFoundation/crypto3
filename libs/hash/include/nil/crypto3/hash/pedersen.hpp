@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2021 Ilias Khairullin <ilias@nil.foundation>
+// Copyright (c) 2024 Vasiliy Olekhov <vasiliy.olekhov@nil.foundation>
 //
 // MIT License
 //
@@ -25,8 +26,6 @@
 
 #ifndef CRYPTO3_HASH_PEDERSEN_HPP
 #define CRYPTO3_HASH_PEDERSEN_HPP
-
-#include <tuple>
 
 #include <nil/crypto3/hash/accumulators/hash.hpp>
 #include <nil/crypto3/hash/algorithm/hash.hpp>
@@ -241,9 +240,9 @@ namespace nil {
                 static inline result_type process(internal_accumulator_type &acc) {
                     auto result_point = nil::crypto3::accumulators::extract::hash<base_hash_type>(acc);
                     nil::marshalling::status_type status;
-                    // TODO: check status
                     result_type result =
                         nil::marshalling::pack<typename construction::params_type::digest_endian>(result_point, status);
+                    THROW_IF_ERROR_STATUS(status, "Pedersen hash processing");
                     return result;
                 }
             };

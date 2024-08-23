@@ -101,7 +101,6 @@ namespace nil {
                         using group_type = typename GroupAffineElement::group_type;
                         using group_affine_value_type = GroupAffineElement;
 
-                        // TODO: throw catchable error, for example return status
                         if (y_int >= base_field_type::modulus) {
                             return nil::marshalling::status_type::invalid_msg_data;
                         }

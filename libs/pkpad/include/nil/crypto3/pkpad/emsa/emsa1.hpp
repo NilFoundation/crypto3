@@ -89,7 +89,9 @@ namespace nil {
                                 ::nil::crypto3::accumulators::extract::hash<hash_type>(acc);
 
                             nil::marshalling::status_type status;
-                            return ::nil::marshalling::pack<::nil::marshalling::option::big_endian>(digest, status);
+                            result_type result = ::nil::marshalling::pack<::nil::marshalling::option::big_endian>(digest, status);
+                            THROW_IF_ERROR_STATUS(status, "emsa1_encoding_policy::process");
+                            return result;
                         }
 
                         template<std::size_t DigistBits = digest_bits, std::size_t ModulusBits = modulus_bits,
@@ -105,8 +107,10 @@ namespace nil {
                             std::copy(std::crbegin(digest), std::crend(digest), std::rbegin(modulus_octets_container));
 
                             nil::marshalling::status_type status;
-                            return ::nil::marshalling::pack<::nil::marshalling::option::big_endian>(
+                            result_type result = ::nil::marshalling::pack<::nil::marshalling::option::big_endian>(
                                 modulus_octets_container, status);
+                            THROW_IF_ERROR_STATUS(status, "emsa_encoding_policy::process");
+                            return result;
                         }
                     };
 

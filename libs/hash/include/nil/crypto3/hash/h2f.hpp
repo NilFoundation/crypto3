@@ -142,6 +142,7 @@ namespace nil {
                             nil::marshalling::status_type status;
                             boost::multiprecision::number<boost::multiprecision::cpp_int_modular_backend<L * CHAR_BIT>> tmp =
                                 nil::marshalling::pack<nil::marshalling::option::big_endian>(imported_octets, status);
+                            THROW_IF_ERROR_STATUS(status, "h2f::process");
                             coordinates[j] = modular_type(typename modular_type::backend_type(tmp.backend()));
                         }
                         result[i] = coordinates[0];
@@ -170,6 +171,7 @@ namespace nil {
                             nil::marshalling::status_type status;
                             boost::multiprecision::number<boost::multiprecision::cpp_int_modular_backend<L * CHAR_BIT>> tmp =
                                 nil::marshalling::pack<nil::marshalling::option::big_endian>(imported_octets, status);
+                            THROW_IF_ERROR_STATUS(status, "h2f::process");
                             coordinates[j] = modular_type(typename modular_type::backend_type(tmp.backend()));
                         }
                         result[i] = field_value_type(coordinates[0], coordinates[1]);
