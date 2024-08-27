@@ -13,7 +13,7 @@ endfunction()
 
 function(add_subdirectories curdir)
     file(GLOB children RELATIVE ${curdir} ${curdir}/*)
-    set(dirlist "")
+    list(SORT children)
     foreach(child ${children})
         if(IS_DIRECTORY ${curdir}/${child})
             file(GLOB is_subproject ${curdir}/${child}/*CMakeLists.txt)
