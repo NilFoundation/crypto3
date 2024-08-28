@@ -37,19 +37,8 @@
 
 #include <nil/crypto3/algebra/curves/alt_bn128.hpp>
 #include <nil/crypto3/algebra/curves/bls12.hpp>
-// #include <nil/crypto3/algebra/curves/brainpool_r1.hpp>
-// #include <nil/crypto3/algebra/curves/frp_v1.hpp>
-// #include <nil/crypto3/algebra/curves/gost_A.hpp>
 #include <nil/crypto3/algebra/curves/mnt4.hpp>
 #include <nil/crypto3/algebra/curves/mnt6.hpp>
-// #include <nil/crypto3/algebra/curves/p192.hpp>
-// #include <nil/crypto3/algebra/curves/p224.hpp>
-// #include <nil/crypto3/algebra/curves/p256.hpp>
-// #include <nil/crypto3/algebra/curves/p384.hpp>
-// #include <nil/crypto3/algebra/curves/p521.hpp>
-// #include <nil/crypto3/algebra/curves/secp.hpp>
-// #include <nil/crypto3/algebra/curves/sm2p_v1.hpp>
-// #include <nil/crypto3/algebra/curves/x962_p.hpp>
 
 using namespace nil::crypto3::algebra;
 
