@@ -31,11 +31,6 @@
 #include <nil/crypto3/algebra/fields/detail/extension_params/alt_bn128/fp6_3over2.hpp>
 #include <nil/crypto3/algebra/fields/detail/extension_params/bls12/fp6_3over2.hpp>
 #include <nil/crypto3/algebra/fields/detail/extension_params/bn128/fp6_3over2.hpp>
-//#include <nil/crypto3/algebra/fields/detail/extension_params/frp_v1.hpp>
-//#include <nil/crypto3/algebra/fields/detail/extension_params/gost_A.hpp>
-/*#include <nil/crypto3/algebra/fields/detail/extension_params/secp.hpp>
-#include <nil/crypto3/algebra/fields/detail/extension_params/sm2p_v1.hpp>
-#include <nil/crypto3/algebra/fields/detail/extension_params/x962_p.hpp>*/
 
 #include <nil/crypto3/algebra/fields/params.hpp>
 

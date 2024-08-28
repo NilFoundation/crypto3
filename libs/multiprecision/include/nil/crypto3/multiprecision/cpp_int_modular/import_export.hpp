@@ -133,7 +133,7 @@ namespace boost {
                    ++limb_len;
 
                 boost::multiprecision::backends::cpp_int_modular_backend<Bits>& result = val.backend();
-                BOOST_ASSERT(result.size() > limb_len);
+                BOOST_VERIFY(result.size() > limb_len);
 
                 result.limbs()[result.size() - 1] = 0u;
                 std::memcpy(result.limbs(), i, (std::min)(byte_len, result.size() * sizeof(limb_type)));
@@ -154,7 +154,7 @@ namespace boost {
                 std::size_t limb_len = byte_len / sizeof(result.limbs()[0]);
                 if (byte_len % sizeof(result.limbs()[0]))
                    ++limb_len;
-                BOOST_ASSERT(result.size() > limb_len);
+                BOOST_VERIFY(result.size() > limb_len);
 
                 result.limbs()[0] = 0u;
                 std::memcpy(result.limbs(), i, (std::min)(byte_len, result.size() * sizeof(result.limbs()[0])));

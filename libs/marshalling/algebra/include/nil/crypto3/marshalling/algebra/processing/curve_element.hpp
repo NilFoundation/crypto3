@@ -561,8 +561,6 @@ namespace nil {
                             *iter |= I_bit;
                         }
 
-                        auto y2_mod = point_affine.Y.squared();
-
                         if (detail::sign_gf_p<g2_field_type>(point_affine.Y)) {
                             *iter |= S_bit;
                         }
@@ -680,7 +678,7 @@ namespace nil {
                         constexpr static const chunk_type S_bit = 0x20;
 
                         if (m_unit & I_bit) {
-                            BOOST_ASSERT(iter + sizeof_field_element_chunks_count ==
+                            BOOST_VERIFY(iter + sizeof_field_element_chunks_count ==
                                          std::find(iter, iter + sizeof_field_element_chunks_count, true));
                             point = g1_value_type();    // point at infinity
                             return nil::marshalling::status_type::success;
