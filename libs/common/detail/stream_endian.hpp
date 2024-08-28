@@ -25,6 +25,7 @@
 #ifndef CRYPTO3_STREAM_ENDIAN_HPP
 #define CRYPTO3_STREAM_ENDIAN_HPP
 
+#include <boost/predef/other/endian.h>
 #include <boost/static_assert.hpp>
 
 #include <climits>
@@ -35,6 +36,7 @@ namespace nil {
 
             // General versions; There should be no need to use these directly
 
+            // TODO: int -> std::size_t
             template<int UnitBits>
             struct big_unit_big_bit { };
             template<int UnitBits>
@@ -66,9 +68,21 @@ namespace nil {
 
             typedef host_unit<CHAR_BIT> host_byte;
 
-        }    // namespace stream_endian
+            using host_endian =
+                #ifdef BOOST_ENDIAN_BIG_BYTE_AVAILABLE
+                    stream_endian::big_octet_big_bit;
+                #elif defined(BOOST_ENDIAN_LITTLE_BYTE_AVAILABLE)
+                    stream_endian::little_octet_big_bit;
+                #elif defined(BOOST_ENDIAN_BIG_WORD_AVAILABLE)
+                    stream_endian::big_unit_big_bit<BOOST_ARCH_CURRENT_WORD_BITS>;
+                #elif defined(BOOST_ENDIAN_LITTLE_WORD_AVAILABLE)
+                    stream_endian::little_unit_big_bit<BOOST_ARCH_CURRENT_WORD_BITS>;
+                #else
+                    #error "Unknown endianness"
+                #endif
 
-    }    // namespace crypto3
+        }    // namespace stream_endian
+    }        // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_BLOCK_STREAM_ENDIAN_HPP
+#endif    // CRYPTO3_STREAM_ENDIAN_HPP
