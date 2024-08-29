@@ -25,6 +25,8 @@
 #ifndef CRYPTO3_DETAIL_POLY_DBL_HPP
 #define CRYPTO3_DETAIL_POLY_DBL_HPP
 
+#include <algorithm>
+
 namespace nil {
     namespace crypto3 {
         namespace detail {
@@ -43,7 +45,7 @@ namespace nil {
                 P1024 = 0x80043,
             };
 
-            template<size_t LIMBS, min_weight_polynomial P>
+            template<std::size_t LIMBS, min_weight_polynomial P>
             void poly_double(uint8_t out[], const uint8_t in[]) {
                 uint64_t W[LIMBS];
                 load_be(W, in, LIMBS);
@@ -51,7 +53,7 @@ namespace nil {
                 const uint64_t POLY = static_cast<uint64_t>(P);
 
                 const uint64_t carry = POLY * (W[0] >> 63);
-                for (size_t i = 0; i != LIMBS - 1; ++i) {
+                for (std::size_t i = 0; i != LIMBS - 1; ++i) {
                     W[i] = (W[i] << 1) ^ (W[i + 1] >> 63);
                 }
                 W[LIMBS - 1] = (W[LIMBS - 1] << 1) ^ carry;
@@ -59,7 +61,7 @@ namespace nil {
                 copy_out_be(out, LIMBS * 8, W);
             }
 
-            template<size_t LIMBS, min_weight_polynomial P, typename InputIterator>
+            template<std::size_t LIMBS, min_weight_polynomial P, typename InputIterator>
             void poly_double_le(uint8_t out[], InputIterator first, InputIterator last) {
                 uint64_t W[LIMBS];
                 load_le(W, &*first, LIMBS);
@@ -67,7 +69,7 @@ namespace nil {
                 const uint64_t POLY = static_cast<uint64_t>(P);
 
                 const uint64_t carry = POLY * (W[LIMBS - 1] >> 63);
-                for (size_t i = 0; i != LIMBS - 1; ++i) {
+                for (std::size_t i = 0; i != LIMBS - 1; ++i) {
                     W[LIMBS - 1 - i] = (W[LIMBS - 1 - i] << 1) ^ (W[LIMBS - 2 - i] >> 63);
                 }
                 W[0] = (W[0] << 1) ^ carry;
@@ -108,7 +110,7 @@ namespace nil {
 
         template<typename Container>
         inline void poly_double_n(const Container &c) {
-            return poly_double_n(buf, buf, n);
+            return poly_double_n(c, c, c.size());
         }
 
         /*
