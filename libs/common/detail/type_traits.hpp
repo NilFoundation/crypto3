@@ -205,6 +205,9 @@ namespace nil {
             GENERATE_HAS_MEMBER_TYPE(block_type)
             GENERATE_HAS_MEMBER_TYPE(digest_type)
             GENERATE_HAS_MEMBER_TYPE(key_type)
+            GENERATE_HAS_MEMBER_TYPE(secret_type)
+            GENERATE_HAS_MEMBER_TYPE(salt_type)
+            GENERATE_HAS_MEMBER_TYPE(label_type)
             GENERATE_HAS_MEMBER_TYPE(key_schedule_type)
             GENERATE_HAS_MEMBER_TYPE(word_type)
 
@@ -218,6 +221,9 @@ namespace nil {
             GENERATE_HAS_MEMBER(key_bits)
             GENERATE_HAS_MEMBER(min_key_bits)
             GENERATE_HAS_MEMBER(max_key_bits)
+            GENERATE_HAS_MEMBER(secret_bits)
+            GENERATE_HAS_MEMBER(salt_bits)
+            GENERATE_HAS_MEMBER(label_bits)
             GENERATE_HAS_MEMBER(key_schedule_bits)
             GENERATE_HAS_MEMBER(word_bits)
 
@@ -231,6 +237,12 @@ namespace nil {
 
             GENERATE_HAS_MEMBER_RETURN_FUNCTION(encrypt, block_type);
             GENERATE_HAS_MEMBER_RETURN_FUNCTION(decrypt, block_type);
+            
+            //GENERATE_HAS_MEMBER_RETURN_FUNCTION(encode, block_type)
+            //GENERATE_HAS_MEMBER_RETURN_FUNCTION(decode, block_type)
+
+            //GENERATE_HAS_MEMBER_RETURN_FUNCTION(encrypt, block_type)
+            //GENERATE_HAS_MEMBER_RETURN_FUNCTION(decrypt, block_type)
 
             GENERATE_HAS_MEMBER_FUNCTION(generate)
             GENERATE_HAS_MEMBER_CONST_FUNCTION(check)
@@ -319,11 +331,10 @@ namespace nil {
 
             template<typename T>
             struct is_kdf {
-                static const bool value =
-                        has_digest_type<T>::value && has_digest_bits<T>::value &&
-                        has_key_type<T>::value && has_max_key_bits<T>::value &&
-                        has_min_key_bits<T>::value;
-
+                static const bool value = has_digest_type<T>::value && has_digest_bits<T>::value &&
+                                          has_secret_bits<T>::value && has_secret_type<T>::value &&
+                                          has_salt_bits<T>::value && has_salt_type<T>::value &&
+                                          has_label_bits<T>::value && has_label_type<T>::value;
                 typedef T type;
             };
 
