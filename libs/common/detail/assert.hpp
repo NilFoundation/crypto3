@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2020-2021 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2022 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2022 Nikita Kaskov <nbering@nil.foundation>
 //
 // MIT License
 //
@@ -109,4 +110,5 @@ namespace nil {
             todo_with_link(msg.c_str(), link.c_str(), filename, line);
         }
     }
+}
 #endif    // CRYPTO3_DETAIL_ASSERT_H_
