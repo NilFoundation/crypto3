@@ -46,7 +46,10 @@ namespace nil {
 
                     // Choose which constants we want, original or kimchi. We may later add
                     // other sets of constants here.
-                    typedef typename std::conditional<PolicyType::mina_version, poseidon_kimchi_constants_data<policy_type>, poseidon_original_constants_data<policy_type>>::type constants_data_type;
+                    typedef
+                        typename std::conditional<PolicyType::mina_version, poseidon_kimchi_constants_data<policy_type>,
+                                                  poseidon_original_constants_data<policy_type>>::type
+                            constants_data_type;
 
                     poseidon_constants() {
                         // Transpose the matrix.
@@ -57,9 +60,11 @@ namespace nil {
                         }
                     }
 
-                    inline const element_type &get_round_constant(
-                            std::size_t round, std::size_t i) const {
-                        return constants_data_type::round_constants[round][i];
+                    inline const element_type &get_round_constant(std::size_t round, std::size_t i) const {
+                        if (round > constants_data_type::round_constants_1.size()) {
+                            return constants_data_type::round_constants_2[round][i];
+                        }
+                        return constants_data_type::round_constants_1[round][i];
                     }
 
                     inline void product_with_mds_matrix(state_vector_type &A_vector) const {
@@ -69,8 +74,8 @@ namespace nil {
                     mds_matrix_type mds_matrix;
                 };
             }    // namespace detail
-        }        // namespace hashes
-    }            // namespace crypto3
+        }    // namespace hashes
+    }    // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_HASH_POSEIDON_CONSTANTS_HPP
