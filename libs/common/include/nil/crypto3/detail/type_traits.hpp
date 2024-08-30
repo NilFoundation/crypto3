@@ -318,10 +318,6 @@ namespace nil {
 
             GENERATE_HAS_MEMBER_FUNCTION(is_special)
 
-            GENERATE_HAS_MEMBER_FUNCTION(to_special)
-
-            GENERATE_HAS_MEMBER_FUNCTION(is_special)
-
             template<typename T>
             struct is_iterator {
                 static char test(...);
