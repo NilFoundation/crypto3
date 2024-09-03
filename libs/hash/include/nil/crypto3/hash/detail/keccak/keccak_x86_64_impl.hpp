@@ -27,6 +27,9 @@
 #define CRYPTO3_KECCAK_X86_64_IMPL_HPP
 
 #include <nil/crypto3/hash/detail/keccak/keccak_policy.hpp>
+#if defined(_MSC_VER)
+#include <intrin.h>
+#endif
 
 namespace nil {
     namespace crypto3 {
@@ -57,6 +60,51 @@ namespace nil {
                     static inline void permute(state_type &A) {
                         std::array<word_type, 10> C;
                         std::array<word_type, 25> B;
+#if defined(_MSC_VER)
+                        for (std::size_t i = 0; i < 24; ++i) {
+                            // Calculate C
+                            for (std::size_t x = 0; x < 5; ++x) {
+                                C[x] = A[x] ^ A[x + 5] ^ A[x + 10] ^ A[x + 15] ^ A[x + 20];
+                            }
+
+                            // Calculate D
+                            for (std::size_t x = 0; x < 5; ++x) {
+                                C[x + 5] = _rotl64(C[(x + 1) % 5], 1) ^ C[(x + 4) % 5];
+                            }
+
+                            // Apply D to A
+                            for (std::size_t x = 0; x < 5; ++x) {
+                                for (std::size_t y = 0; y < 5; ++y) {
+                                    A[x + 5 * y] ^= C[x + 5];
+                                }
+                            }
+
+                            // rho and pi steps
+                            static constexpr std::array<int, 25> rho_offsets = {
+                                0, 1, 62, 28, 27,
+                                36, 44, 6, 55, 20,
+                                3, 10, 43, 25, 39,
+                                41, 45, 15, 21, 8,
+                                18, 2, 61, 56, 14
+                            };
+
+                            for (std::size_t x = 0; x < 5; ++x) {
+                                for (std::size_t y = 0; y < 5; ++y) {
+                                    B[y + 5 * ((2 * x + 3 * y) % 5)] = _rotl64(A[x + 5 * y], rho_offsets[x + 5 * y]);
+                                }
+                            }
+
+                            // chi step
+                            for (std::size_t y = 0; y < 5; ++y) {
+                                for (std::size_t x = 0; x < 5; ++x) {
+                                    A[x + 5 * y] = B[x + 5 * y] ^ (~B[(x + 1) % 5 + 5 * y] & B[(x + 2) % 5 + 5 * y]);
+                                }
+                            }
+
+                            // iota step
+                            A[0] ^= round_constants[i];
+                        }
+#else
                         __asm__(
                             "mov $24, %%r13 \n\t"
                             "1:\n\t"
@@ -404,6 +452,7 @@ namespace nil {
                               "%r13",                                                  // Circle
                               "%r15"                                                   // tmp
                         );
+#endif
                     }
                 };
 
