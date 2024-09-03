@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2017-2021 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020-2021 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2024 Vasiliy Olekhov <vasiliy.olekhov@nil.foundation>
 //
 // MIT License
 //
@@ -88,6 +89,16 @@ namespace nil {
                         return result;
                     }
 
+                    /** @brief Recover X coordinate from Y coordinate and given sign
+                     * This is specific to Ed25519 Twisted Edwards curve, but could be used for
+                     * any other curve in twisted edwards form.
+                     *
+                     * The curve equation in twisted edwards form is A*x^2+y^2=1+D*x^2*y^2
+                     * Given Y, we compute
+                     * X^2 = ( 1 - Y^2 ) / ( A - D*Y^2 )
+                     * If X^2 is not a square, then there is no such point and input should be rejected
+                     * Otherwise X or -X are chosen by the sign parameter
+                     */
                     template<typename GroupAffineElement>
                     static inline typename 
                     std::enable_if<
@@ -106,12 +117,12 @@ namespace nil {
                         }
                         base_field_value_type y(y_int);
                         base_field_value_type y2 = y * y;
-                        base_field_value_type y2dp1 = y2 * group_type::params_type::d + base_integral_type(1);
+                        base_field_value_type y2dp1 = group_type::params_type::a - y2 * group_type::params_type::d;
                         if (y2dp1.is_zero()) {
                             return nil::marshalling::status_type::invalid_msg_data;
                         }
                         base_field_value_type x2 =
-                            (y2 - base_integral_type(1)) * y2dp1.inversed();
+                            (base_integral_type(1) - y2) * y2dp1.inversed();
                         if (x2.is_zero()) {
                             return group_affine_value_type(base_field_value_type::zero(), y);
                         }
@@ -120,7 +131,7 @@ namespace nil {
                         }
                         base_field_value_type x = x2.sqrt();
                         auto x_int = static_cast<base_integral_type>(x.data);
-                        if (static_cast<bool>(x_int & 1) != sign) {
+                        if (sign_gf_p<base_field_type>(x_int) != sign) {
                             x_int = base_field_type::modulus - x_int;
                         }
                         return group_affine_value_type(x_int, y);

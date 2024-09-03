@@ -63,25 +63,32 @@
 #include <nil/crypto3/algebra/curves/secp_k1.hpp>
 #include <nil/crypto3/algebra/curves/secp_r1.hpp>
 #include <nil/crypto3/algebra/curves/ed25519.hpp>
-#include <nil/crypto3/algebra/curves/curve25519.hpp>
 
 #include <nil/marshalling/algorithms/pack.hpp>
 
 #include <nil/crypto3/marshalling/algebra/types/curve_element.hpp>
 
-template<typename TIter>
-void print_byteblob(TIter iter_begin, TIter iter_end) {
-    for (TIter it = iter_begin; it != iter_end; it++) {
-        std::cout << std::hex << std::setw(2) << std::setfill('0') << int(*it);
-    }
-    std::cout << std::endl;
-}
+#include <nil/crypto3/marshalling/algebra/processing/mnt4.hpp>
+#include <nil/crypto3/marshalling/algebra/processing/mnt6.hpp>
 
-template<typename T>
-void test_group_element_big_endian(T val) {
+#include <nil/crypto3/marshalling/algebra/processing/bls12.hpp>
+#include <nil/crypto3/marshalling/algebra/processing/alt_bn128.hpp>
+
+#include <nil/crypto3/marshalling/algebra/processing/jubjub.hpp>
+#include <nil/crypto3/marshalling/algebra/processing/babyjubjub.hpp>
+
+#include <nil/crypto3/marshalling/algebra/processing/ed25519.hpp>
+
+#include <nil/crypto3/marshalling/algebra/processing/pallas.hpp>
+#include <nil/crypto3/marshalling/algebra/processing/vesta.hpp>
+
+#include <nil/crypto3/marshalling/algebra/processing/secp_k1.hpp>
+#include <nil/crypto3/marshalling/algebra/processing/secp_r1.hpp>
+
+template<typename T, typename endianness>
+void test_group_element(T val) {
     using namespace nil::crypto3::marshalling;
 
-    using Endianness = nil::marshalling::option::big_endian;
 
     using unit_type = unsigned char;
 
@@ -94,21 +101,21 @@ void test_group_element_big_endian(T val) {
     static_assert(nil::marshalling::is_compatible<T>::value);
     nil::marshalling::status_type status;
 
-    std::vector<unit_type> cv = nil::marshalling::pack<Endianness>(val, status);
+    std::vector<unit_type> cv = nil::marshalling::pack<endianness>(val, status);
     BOOST_CHECK(status == nil::marshalling::status_type::success);
 
-    T test_val = nil::marshalling::pack<Endianness>(cv, status);
+    T test_val = nil::marshalling::pack<endianness>(cv, status);
     BOOST_CHECK(status == nil::marshalling::status_type::success);
 
-    BOOST_CHECK(val == test_val);
+    BOOST_CHECK_EQUAL(val.to_affine(), test_val.to_affine());
 }
 
-template<typename group_type>
-void test_group_element() {
+template<typename group_type, typename endianness>
+void test_group_element_set() {
 
     /* test default element - zero for GT and infinity for G1/G2 */
     typename group_type::value_type val = typename group_type::value_type();
-    test_group_element_big_endian(val);
+    test_group_element<typename group_type::value_type, endianness>(val);
 
     /* test 128 random points */
     for (std::size_t i = 0; i < 128; ++i) {
@@ -116,34 +123,34 @@ void test_group_element() {
             std::cout << std::dec << i << " tested" << std::endl;
         }
         val = nil::crypto3::algebra::random_element<group_type>();
-        test_group_element_big_endian(val);
+        test_group_element<typename group_type::value_type, endianness>(val);
     }
 }
 
-template<typename curve_type>
+template<typename curve_type, typename endianness>
 void test_curve(std::string curve_name)
 {
     std::cout << "Testing curve: " << curve_name << std::endl;
 
     std::cout << "Marshaling of G1 group elements" << std::endl;
-    test_group_element<typename curve_type::template g1_type<>>();
+    test_group_element_set<typename curve_type::template g1_type<>, endianness>();
 
     std::cout << "Testing of " << curve_name << " finished" << std::endl;
 
 }
 
-template<typename curve_type>
+template<typename curve_type, typename endianness>
 void test_pairing_curve(std::string curve_name)
 {
     std::cout << "Testing curve: " << curve_name << std::endl;
 
     std::cout << "Marshaling of G1 group elements" << std::endl;
-    test_group_element<typename curve_type::template g1_type<>>();
+    test_group_element_set<typename curve_type::template g1_type<>, endianness>();
 
     std::cout << "Marshaling of G2 group elements" << std::endl;
-    test_group_element<typename curve_type::template g2_type<>>();
+    test_group_element_set<typename curve_type::template g2_type<>, endianness>();
 
-    /* TODO: do we really need to marshal GT elements? 
+    /* TODO: do we really need to marshal GT elements?
     std::cout << "Marshaling of GT group elements" << std::endl;
     test_group_element<typename curve_type::gt_type>();
     */
@@ -154,68 +161,61 @@ void test_pairing_curve(std::string curve_name)
 
 BOOST_AUTO_TEST_SUITE(curve_element_test_suite)
 
+using big_endian = nil::marshalling::option::big_endian;
+using little_endian = nil::marshalling::option::little_endian;
+
 BOOST_AUTO_TEST_CASE(curve_element_mnt4) {
-    test_pairing_curve<nil::crypto3::algebra::curves::mnt4_298>("mnt4_298");
+    test_pairing_curve<nil::crypto3::algebra::curves::mnt4_298, big_endian>("mnt4_298");
 }
 
 BOOST_AUTO_TEST_CASE(curve_element_mnt6) {
-    test_pairing_curve<nil::crypto3::algebra::curves::mnt6_298>("mnt6_298");
+    test_pairing_curve<nil::crypto3::algebra::curves::mnt6_298, big_endian>("mnt6_298");
 }
 
 BOOST_AUTO_TEST_CASE(curve_element_bls12_381) {
-    test_pairing_curve<nil::crypto3::algebra::curves::bls12_381>("bls12_381");
+    test_pairing_curve<nil::crypto3::algebra::curves::bls12_381, big_endian>("bls12_381");
 }
 
-// TODO: implement marshalling for bls12<377>
-#if 0
 BOOST_AUTO_TEST_CASE(curve_element_bls12_377) {
-    test_curve<nil::crypto3::algebra::curves::bls12_377>("bls12_377");
+    test_pairing_curve<nil::crypto3::algebra::curves::bls12_377, big_endian>("bls12_377");
 }
-#endif
 
 BOOST_AUTO_TEST_CASE(curve_element_bn254) {
-    test_pairing_curve<nil::crypto3::algebra::curves::alt_bn128_254>("alt_bn128_254");
+    test_pairing_curve<nil::crypto3::algebra::curves::alt_bn128_254, big_endian>("alt_bn128_254");
 }
 
-// TODO: implement marshalling for pasta curves
-#if 0
 BOOST_AUTO_TEST_CASE(curve_element_pallas) {
-    test_curve<nil::crypto3::algebra::curves::pallas>("pallas");
+    test_curve<nil::crypto3::algebra::curves::pallas, big_endian>("pallas");
 }
 
 BOOST_AUTO_TEST_CASE(curve_element_vesta) {
-    test_curve<nil::crypto3::algebra::curves::vesta>("vesta");
+    test_curve<nil::crypto3::algebra::curves::vesta, big_endian>("vesta");
 }
-#endif
 
-// TODO: implement marshalling for secp_k1/secp_r1 curves
-#if 0
 BOOST_AUTO_TEST_CASE(curve_element_secp_k1) {
-    test_curve<nil::crypto3::algebra::curves::secp_k1<160>>("secp_k1<160>");
+    test_curve<nil::crypto3::algebra::curves::secp_k1<160>, big_endian>("secp_k1<160>");
+    test_curve<nil::crypto3::algebra::curves::secp_k1<192>, big_endian>("secp_k1<192>");
+    test_curve<nil::crypto3::algebra::curves::secp_k1<224>, big_endian>("secp_k1<224>");
+    test_curve<nil::crypto3::algebra::curves::secp_k1<256>, big_endian>("secp_k1<256>");
 }
 
 BOOST_AUTO_TEST_CASE(curve_element_secp_r1) {
-    test_curve<nil::crypto3::algebra::curves::secp_r1<160>>("secp_r1<160>");
+    test_curve<nil::crypto3::algebra::curves::secp_r1<160>, big_endian>("secp_r1<160>");
+    test_curve<nil::crypto3::algebra::curves::secp_r1<192>, big_endian>("secp_r1<192>");
+    test_curve<nil::crypto3::algebra::curves::secp_r1<224>, big_endian>("secp_r1<224>");
+    test_curve<nil::crypto3::algebra::curves::secp_r1<256>, big_endian>("secp_r1<256>");
 }
-#endif
 
-/* TODO: add marshalling for jubjub/babyjubjub/ed25519/curve25519, it is broken for now */
-#if 0
 BOOST_AUTO_TEST_CASE(curve_element_jubjub) {
-    test_curve<nil::crypto3::algebra::curves::jubjub>("jubjub");
+    test_curve<nil::crypto3::algebra::curves::jubjub, little_endian>("jubjub");
 }
 
 BOOST_AUTO_TEST_CASE(curve_element_babyjubjub) {
-    test_curve<nil::crypto3::algebra::curves::jubjub>("babyjubjub");
+    test_curve<nil::crypto3::algebra::curves::babyjubjub, little_endian>("babyjubjub");
 }
 
 BOOST_AUTO_TEST_CASE(curve_element_ed25519) {
-    test_curve<nil::crypto3::algebra::curves::ed25519>("ed25519");
+    test_curve<nil::crypto3::algebra::curves::ed25519, little_endian>("ed25519");
 }
-
-BOOST_AUTO_TEST_CASE(curve_element_curve25519) {
-    test_curve<nil::crypto3::algebra::curves::curve25519>("curve25519");
-}
-#endif
 
 BOOST_AUTO_TEST_SUITE_END()

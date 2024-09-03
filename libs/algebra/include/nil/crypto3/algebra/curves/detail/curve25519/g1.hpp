@@ -31,7 +31,6 @@
 #include <nil/crypto3/algebra/curves/detail/forms/twisted_edwards/coordinates.hpp>
 #ifdef __ZKLLVM__
 #else
-// #include <nil/crypto3/algebra/curves/detail/forms/montgomery/xz/element_g1.hpp>
 #include <nil/crypto3/algebra/curves/detail/forms/twisted_edwards/extended_with_a_minus_1/element_g1.hpp>
 #endif
 
