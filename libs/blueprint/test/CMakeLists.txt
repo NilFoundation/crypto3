@@ -76,6 +76,7 @@ set(COMMON_TEST_FILES
     "proxy"
     #"mock/mocked_components"
     "component_batch"
+    "bbf/bbf_wrapper"
     )
 
 set(NON_NATIVE_TESTS_FILES
