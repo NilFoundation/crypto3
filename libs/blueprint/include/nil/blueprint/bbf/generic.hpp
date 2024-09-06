@@ -32,7 +32,7 @@
 #include <boost/log/trivial.hpp>
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/constraint_system.hpp>
-// #include <nil/crypto3/zk/snark/arithmetization/plonk/copy_constraint.hpp> // NB: part of the privious include
+// #include <nil/crypto3/zk/snark/arithmetization/plonk/copy_constraint.hpp> // NB: part of the previous include
 
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
@@ -50,75 +50,137 @@ namespace nil {
 
             enum column_type { witness, public_input, constant, COLUMN_TYPES };
 
-            template<typename FieldType, GenerationStage stage> class context {
-                using bool_field = crypto3::algebra::fields::bool_field;
-                using allocation_log_type = assignment<crypto3::zk::snark::plonk_constraint_system<bool_field>>;
-
-                private:
-                    allocation_log_type al;
-
-                public:
-                    std::size_t current_row[COLUMN_TYPES];
-                    std::pair<std::size_t, std::size_t> next_free_cell(column_type t);
-            };
+            std::ostream &operator<<(std::ostream &os, const column_type &t) {
+                std::map<column_type, std::string> type_map = {
+                    {column_type::witness, "witness"},
+                    {column_type::public_input, "public input"},
+                    {column_type::constant, "constant"},
+                    {column_type::COLUMN_TYPES, " "}
+                };
+                os << type_map[t];
+                return os;
+            }
 
             template<typename FieldType>
-            class context<FieldType, GenerationStage::ASSIGNMENT> { // assignment-specific definition
+            class basic_context {
                 using bool_field = crypto3::algebra::fields::bool_field;
-
-                using TYPE = typename FieldType::value_type;
                 using assignment_type = assignment<crypto3::zk::snark::plonk_constraint_system<FieldType>>;
                 using allocation_log_type = assignment<crypto3::zk::snark::plonk_constraint_system<bool_field>>;
 
                 private:
-                    // reference to actual assignment table
-                    assignment_type &at;
-                    // to track the allocation process
                     allocation_log_type al;
-
-
-                public:
                     std::size_t current_row[COLUMN_TYPES];
 
-                    std::pair<std::size_t, std::size_t> next_free_cell(column_type t);
-
-                    void allocate(TYPE &C, size_t col, size_t row, column_type t) {
+                public:
+                    bool is_allocated(std::size_t col, std::size_t row, column_type t) {
+                        bool_field::value_type cell;
                         switch (t) {
                             case column_type::witness:
-                                if (al.witness(col,row) == 1) {
-                                    BOOST_LOG_TRIVIAL(warning) << "Witness RE-allocation at col = " << col << ", row = " << row << ".";
-                                }
-                                at.witness(col, row) = C;
-                                al.witness(col, row) = 1;
-                                break;
+                                 cell = al.witness(col,row);
+                                 break;
                             case column_type::public_input:
-                                if (al.public_input(col,row) == 1) {
-                                    BOOST_LOG_TRIVIAL(warning) << "Public input RE-allocation at col = " << col << ", row = " << row << ".";
-                                }
-                                at.public_input(col, row) = C;
-                                al.public_input(col, row) = 1;
-                                break;
+                                 cell = al.public_input(col,row);
+                                 break;
                             case column_type::constant:
-                                if (al.constant(col,row) == 1) {
-                                    BOOST_LOG_TRIVIAL(warning) << "Constant RE-allocation at col = " << col << ", row = " << row << ".";
-                                }
-                                at.constant(col, row) = C;
-                                al.constant(col, row) = 1;
-                                break;
+                                 cell = al.constant(col,row);
+                                 break;
+                        }
+                        return (cell == bool_field::value_type::one());
+                    }
+
+                    void mark_allocated(std::size_t col, std::size_t row, column_type t) {
+                        switch (t) {
+                            case column_type::witness:
+                                 al.witness(col,row) = 1;
+                                 break;
+                            case column_type::public_input:
+                                 al.public_input(col,row) = 1;
+                                 break;
+                            case column_type::constant:
+                                 al.constant(col,row) = 1;
+                                 break;
                         }
                     }
 
-                    context(assignment_type &assignment_table) :
-                        at(assignment_table),
+                    std::size_t columns_amount(column_type t) {
+                        switch (t) {
+                            case column_type::witness:
+                                 return al.witnesses_amount();
+                                 break;
+                            case column_type::public_input:
+                                 return al.public_inputs_amount();
+                                 break;
+                            case column_type::constant:
+                                 return al.constants_amount();
+                                 break;
+                        }
+                        return 0;
+                    }
+
+                    std::pair<std::size_t, std::size_t> next_free_cell(column_type t) {
+                        std::size_t col = 0, row = 0, hsize = 0;
+                        bool found = false;
+
+                        hsize = columns_amount(t);
+
+                        row = current_row[t];
+                        col = 0;
+
+                        while(!found) { // TODO: number of rows can be exceeded?
+                            if (col > hsize) {
+                                current_row[t]++;
+                                row = current_row[t];
+                                col = 0;
+                            }
+
+                            found = !is_allocated(col,row,t);
+
+                            if (!found) {
+                                col++;
+                            }
+                        }
+
+                        return {col, row};
+                    }
+
+                    basic_context(assignment_type &at) :
                         al(at.witnesses_amount(), at.public_inputs_amount(), at.constants_amount(), at.selectors_amount()),
                         current_row{0, 0, 0} // For all types of columns start from 0. TODO: this might not be a good idea
-                    {
-                    };
+                    { };
+            };
+
+            template<typename FieldType, GenerationStage stage> class context;
+
+            template<typename FieldType>
+            class context<FieldType, GenerationStage::ASSIGNMENT> : public basic_context<FieldType> { // assignment-specific definition
+                using assignment_type = assignment<crypto3::zk::snark::plonk_constraint_system<FieldType>>;
+                public:
+                    using TYPE = typename FieldType::value_type;
+                    using basic_context<FieldType>::is_allocated;
+                    using basic_context<FieldType>::mark_allocated;
+
+                private:
+                    // reference to actual assignment table
+                    assignment_type &at;
+
+                public:
+                    void allocate(TYPE &C, size_t col, size_t row, column_type t) {
+                        if (is_allocated(col, row, t)) {
+                            BOOST_LOG_TRIVIAL(warning) << "Cell of " << t << " RE-allocation at col = " << col << ", row = " << row << ".";
+                        }
+                        switch (t) {
+                            case column_type::witness:      at.witness(col, row) = C;      break;
+                            case column_type::public_input: at.public_input(col, row) = C; break;
+                            case column_type::constant:     at.constant(col, row) = C;     break;
+                        }
+                        mark_allocated(col,row,t);
+                    }
+
+                    context(assignment_type &assignment_table) : basic_context<FieldType>(assignment_table), at(assignment_table) { };
             };
 
             template<typename FieldType>
-            class context<FieldType, GenerationStage::CIRCUIT> { // circuit-specific definition
-                using bool_field = crypto3::algebra::fields::bool_field;
+            class context<FieldType, GenerationStage::CIRCUIT> : public basic_context<FieldType> { // circuit-specific definition
                 using constraint_id_type = gate_id<FieldType>;
                 using constraint_type = crypto3::zk::snark::plonk_constraint<FieldType>;
                 using plonk_copy_constraint = crypto3::zk::snark::plonk_copy_constraint<FieldType>;
@@ -126,79 +188,20 @@ namespace nil {
 
                 using TYPE = constraint_type;
                 using assignment_type = assignment<crypto3::zk::snark::plonk_constraint_system<FieldType>>;
-                using allocation_log_type = assignment<crypto3::zk::snark::plonk_constraint_system<bool_field>>;
 
                 private:
-                    // to track the allocation process
-                    allocation_log_type al;
-
                     // constraints (with unique id), and the rows they are applied to
                     std::map<constraint_id_type, std::pair<constraint_type, std::vector<std::size_t>>> constraints;
                     copy_constraints_container_type copy_constraints;
 
                 public:
-                    std::size_t current_row[COLUMN_TYPES];
-
-                    std::pair<std::size_t, std::size_t> next_free_cell(column_type t);
-
                     void allocate(TYPE &C, size_t col, size_t row, column_type t) {
                     }
 
-                    context(assignment_type &at) :
-                        al(at.witnesses_amount(), at.public_inputs_amount(), at.constants_amount(), at.selectors_amount()),
-                        current_row{0, 0, 0} // For all types of columns start from 0. TODO: this might not be a good idea
-                    {
-                    };
+                    context(assignment_type &at) : basic_context<FieldType>(at) { };
             };
 
-            template<typename FieldType, GenerationStage stage>
-            std::pair<std::size_t, std::size_t> context<FieldType,stage>::next_free_cell(column_type t) {
-                std::size_t col = 0, row = 0, hsize = 0;
-                bool found = false;
 
-                std::cout << "In NFC func\n";
-/*
-                switch (t) {
-                    case column_type::witness:
-                         hsize = al.witnesses_amount();
-                         break;
-                    case column_type::public_input:
-                         hsize = al.public_inputs_amount();
-                         break;
-                    case column_type::constant:
-                         hsize = al.constants_amount();
-                         break;
-                    }
-
-                row = current_row[t];
-                col = 0;
-
-                std::cout << "hsize = " << hsize << "\n";
-
-                while(!found) {
-                    if (col > hsize) {
-                        current_row[t]++;
-                        row = current_row[t];
-                        col = 0;
-                    }
-                    switch (t) {
-                        case column_type::witness:
-                             found = (al.witness(col,row) == 0);
-                             break;
-                        case column_type::public_input:
-                             found = (al.public_input(col,row) == 0);
-                             break;
-                        case column_type::constant:
-                             found = (al.constant(col,row) == 0);
-                             break;
-                    }
-                    if (!found) {
-                        col++;
-                    }
-                }
-*/
-                return {col, row};
-            }
 
             template<typename FieldType, GenerationStage stage>
             class generic_component {
@@ -214,7 +217,6 @@ namespace nil {
                 public:
                     void allocate(TYPE &C, column_type t = column_type::witness) {
                         auto [col, row] = ct.next_free_cell(t);
-                        std::cout << "NFC col = " << col << ", row = " << row << "\n";
                         ct.allocate(C,col,row,t);
                     }
 
@@ -225,7 +227,7 @@ namespace nil {
                     generic_component(context_type &context_object, // context object, created outside
                                       bool crlf = true              // do we assure a component starts on a new row? Default is "yes"
                                      ) : ct(context_object) {
-
+                        // TODO: Implement crlf parameter consequences
                     };
             };
 
