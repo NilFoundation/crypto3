@@ -234,9 +234,8 @@ namespace nil {
                                 return !(rhs == *this);
                             }
 
-                            // For the last round it's final_polynomial's values
-                           
                             // Values for the next round.
+                            // For the last round it's final_polynomial's values
                             polynomial_values_type y;
 
                             // Merkle proof(values[i-1], T_i).
@@ -329,18 +328,55 @@ namespace nil {
 //                                    return false;
 //                                }
                                 return fri_roots == rhs.fri_roots &&
-                                       query_proofs == rhs.query_proofs &&
                                        final_polynomial == rhs.final_polynomial;
+                            }
+
+                            bool operator!=(const partial_proof_type &rhs) const {
+                                return !(rhs == *this);
+                            }
+
+                            std::vector<commitment_type>                      fri_roots;    // 0..step_list.size()
+                            math::polynomial<typename field_type::value_type> final_polynomial;
+                            typename GrindingType::output_type                proof_of_work;
+                        };
+
+                        struct proof_type : public partial_proof_type {
+                            proof_type() = default;
+
+                            proof_type(const partial_proof_type &partial_proof)
+                                : partial_proof_type(partial_proof) {}
+
+                            virtual ~proof_type() = default;
+
+                            bool operator==(const proof_type &rhs) const {
+                                return partial_proof_type::operator==(rhs) &&
+                                       query_proofs == rhs.query_proofs;
                             }
 
                             bool operator!=(const proof_type &rhs) const {
                                 return !(rhs == *this);
                             }
 
-                            std::vector<commitment_type>                        fri_roots;        // 0,..step_list.size()
-                            math::polynomial<typename field_type::value_type>   final_polynomial;
-                            std::vector<query_proof_type>                       query_proofs;     // 0...lambda - 1
-                            typename GrindingType::output_type                  proof_of_work;
+                            std::vector<query_proof_type> query_proofs;     // 0..lambda - 1
+                        };
+
+                        struct aggregated_proof_type {
+                            aggregated_proof_type() = default;
+                            aggregated_proof_type(const std::vector <partial_proof_type> &partial_proofs,
+                                                  const std::vector <query_proof_type> &query_proofs)
+                                : partial_proofs(partial_proofs), query_proofs(query_proofs) {}
+
+                            bool operator==(const aggregated_proof_type &rhs) const {
+                                return partial_proofs == rhs.partial_proofs &&
+                                       query_proofs == rhs.query_proofs;
+                            }
+
+                            bool operator!=(const aggregated_proof_type &rhs) const {
+                                return !(rhs == *this);
+                            }
+
+                            std::vector<partial_proof_type> partial_proofs;
+                            std::vector<query_proof_type> query_proofs;
                         };
                     };
                 }    // namespace detail
@@ -415,7 +451,7 @@ namespace nil {
                     if (f.size() != D->size()) {
                         throw std::runtime_error("Polynomial size does not match the domain size in FRI precommit.");
                     }
-                    
+
                     std::size_t domain_size = D->size();
                     std::size_t coset_size = 1 << fri_step;
                     std::size_t leafs_number = domain_size / coset_size;
@@ -1051,11 +1087,11 @@ namespace nil {
                     const std::vector<PolynomialType> &fs,
                     const math::polynomial<typename FRI::field_type::value_type> &final_polynomial)
                 {
-                    typename FRI::initial_proofs_batch_type initial_proofs = 
+                    typename FRI::initial_proofs_batch_type initial_proofs =
                         query_phase_initial_proofs<FRI, PolynomialType>(
                             precommitments, fri_params, g, challenges);
-                        
-                    typename FRI::round_proofs_batch_type round_proofs = 
+
+                    typename FRI::round_proofs_batch_type round_proofs =
                         query_phase_round_proofs<FRI, PolynomialType>(
                             fri_params, fri_trees, fs, final_polynomial, challenges);
 
@@ -1063,7 +1099,7 @@ namespace nil {
                     std::vector<typename FRI::query_proof_type> query_proofs(fri_params.lambda);
 
                     for (std::size_t query_id = 0; query_id < fri_params.lambda; query_id++) {
-                        query_proofs[query_id] = {std::move(initial_proofs.initial_proofs[query_id]), 
+                        query_proofs[query_id] = {std::move(initial_proofs.initial_proofs[query_id]),
                                                   std::move(round_proofs.round_proofs[query_id])};
                     }
                     return query_proofs;
@@ -1117,10 +1153,10 @@ namespace nil {
 
                     std::vector<typename FRI::precommitment_type> fri_trees;
                     std::vector<PolynomialType> fs;
-                    math::polynomial<typename FRI::field_type::value_type> final_polynomial; 
+                    math::polynomial<typename FRI::field_type::value_type> final_polynomial;
 
                     // Contains fri_roots and final_polynomial.
-                    typename FRI::commitments_part_of_proof commitments_proof; 
+                    typename FRI::commitments_part_of_proof commitments_proof;
 
                     std::tie(fs, fri_trees, commitments_proof) =
                         commit_phase<FRI, PolynomialType>(
