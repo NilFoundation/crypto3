@@ -61,6 +61,10 @@ namespace nil {
                 push(a);
                 push(a);
             }
+
+            std::size_t size() {
+                return stack.size();
+            }
         private:
             std::stack<word_type> stack;
         };

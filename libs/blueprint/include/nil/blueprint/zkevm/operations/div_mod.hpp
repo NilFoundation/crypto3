@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2024 Dmitrii Tabalin <d.tabalin@nil.foundation>
+// Copyright (c) 2024 Alexey Yashunsky <a.yashunsky@nil.foundation>
 //
 // MIT License
 //
@@ -34,17 +35,20 @@ namespace nil {
     namespace blueprint {
 
         template<typename BlueprintFieldType>
-        class zkevm_div_operation : public zkevm_operation<BlueprintFieldType> {
+        class zkevm_div_mod_operation : public zkevm_operation<BlueprintFieldType> {
         public:
             using op_type = zkevm_operation<BlueprintFieldType>;
             using gate_class = typename op_type::gate_class;
             using constraint_type = typename op_type::constraint_type;
+            using lookup_constraint_type = crypto3::zk::snark::plonk_lookup_constraint<BlueprintFieldType>;
             using zkevm_circuit_type = typename op_type::zkevm_circuit_type;
             using assignment_type = typename op_type::assignment_type;
             using value_type = typename BlueprintFieldType::value_type;
             using var = typename op_type::var;
 
-            zkevm_div_operation() {}
+            zkevm_div_mod_operation(bool _is_div) : is_div(_is_div) {}
+
+            bool is_div;
 
             constexpr static const std::size_t carry_amount = 16 / 3 + 1;
             constexpr static const value_type two_16 = 65536;
@@ -62,7 +66,7 @@ namespace nil {
             }
 
                         template<typename T>
-            T first_carryless_consrtruct(
+            T first_carryless_construct(
                 const std::vector<T> &a_64_chunks, const std::vector<T> &b_64_chunks,
                 const std::vector<T> &r_64_chunks, const std::vector<T> &q_64_chunks
             ) const {
@@ -85,16 +89,47 @@ namespace nil {
                               q_64_chunks[3] - a_64_chunks[3]);
             }
 
-            std::map<gate_class, std::vector<constraint_type>> generate_gates(zkevm_circuit_type &zkevm_circuit) override {
-                std::vector<constraint_type> constraints;
+            template<typename T>
+            T third_carryless_construct(
+                const std::vector<T> &b_64_chunks, const std::vector<T> &r_64_chunks
+            ) const {
+                return
+                    (r_64_chunks[1] * b_64_chunks[3] + r_64_chunks[2] * b_64_chunks[2] +
+                     r_64_chunks[3] * b_64_chunks[1]) +
+                    two_64 * (r_64_chunks[2] * b_64_chunks[3] + r_64_chunks[3] * b_64_chunks[2]);
+            }
+
+            std::map<gate_class, std::pair<
+                std::vector<std::pair<std::size_t, constraint_type>>,
+                std::vector<std::pair<std::size_t, lookup_constraint_type>>
+                >>
+                generate_gates(zkevm_circuit_type &zkevm_circuit) override {
+
+                std::vector<std::pair<std::size_t, constraint_type>> constraints;
+
                 constexpr const std::size_t chunk_amount = 16;
                 const std::vector<std::size_t> &witness_cols = zkevm_circuit.get_opcode_cols();
                 auto var_gen = [&witness_cols](std::size_t i, int32_t offset = 0) {
                     return zkevm_operation<BlueprintFieldType>::var_gen(witness_cols, i, offset);
                 };
-                const std::size_t range_check_table_index =
-                    zkevm_circuit.get_circuit().get_reserved_indices().at("chunk_16_bits/full");
-                constraint_type position_1 = zkevm_circuit.get_opcode_row_constraint(2, this->rows_amount());
+
+                // The central relation is a = br + q, q < b.
+                // For b = 0 we must assure r = 0. For the MOD operation we should
+                // have q = 0 if b = 0, so we use a special q_out value.
+                //
+                // Table layout:                                                Internal row #:
+                // +--------------------------------+--------+--+--------------------+---+
+                // |                a               |   c1   |c2|                    |   | 3
+                // +--------------------------------+--------+--+---+--------+-------+---+
+                // |                b               |               |   t    |       |1/B| 2
+                // +--------------------------------+---------------+--------+-------+---+
+                // |                r               |                 q              |   | 1
+                // +--------------------------------+--------------------------------+---+
+                // |                v               |  q_out (optional, for MOD)     |   | 0
+                // +--------------------------------+--------------------------------+---+
+
+                std::size_t position_1 = 2;
+
                 std::vector<var> a_chunks;
                 std::vector<var> b_chunks_1;
                 // we have two different constraints at two different positions
@@ -108,14 +143,12 @@ namespace nil {
                     q_chunks_1.push_back(var_gen(i + chunk_amount, +1));
                 }
                 std::vector<var> c_1_chunks;
-                std::vector<var> c_3_chunks;
                 for (std::size_t i = chunk_amount; i < chunk_amount + 4; i++) {
                     c_1_chunks.push_back(var_gen(i, -1));
-                    c_3_chunks.push_back(var_gen(i, 0));
                 }
                 var c_2 = var_gen(chunk_amount + 4, -1);
-                var c_4 = var_gen(chunk_amount + 4, 0);
-                var b_sum_inverse_1 = var_gen(chunk_amount + 5, 0);
+                var b_sum_inverse_1 = var_gen(2*chunk_amount, 0);
+
                 std::vector<constraint_type> a_64_chunks = {
                     chunk_sum_64<constraint_type, var>(a_chunks, 0),
                     chunk_sum_64<constraint_type, var>(a_chunks, 1),
@@ -141,76 +174,114 @@ namespace nil {
                     chunk_sum_64<constraint_type, var>(q_chunks_1, 3)
                 };
                 constraint_type c_1_64 = chunk_sum_64<constraint_type, var>(c_1_chunks, 0);
-                constraint_type c_3_64 = chunk_sum_64<constraint_type, var>(c_3_chunks, 0);
                 // inverse or zero for b_sum_inverse
                 constraint_type b_sum_1;
                 for (std::size_t i = 0; i < chunk_amount; i++) {
                     b_sum_1 += b_chunks_1[i];
                 }
-                constraints.push_back(position_1 * b_sum_inverse_1 * (b_sum_inverse_1 * b_sum_1 - 1));
-                constraints.push_back(position_1 * b_sum_1 * (b_sum_inverse_1 * b_sum_1 - 1));
+                constraints.push_back({position_1, b_sum_inverse_1 * (b_sum_inverse_1 * b_sum_1 - 1)});
+                constraints.push_back({position_1, b_sum_1 * (b_sum_inverse_1 * b_sum_1 - 1)});
                 // prove that the multiplication + addition is correct
-                constraint_type first_carryless = first_carryless_consrtruct<constraint_type>(
+                constraint_type first_carryless = first_carryless_construct<constraint_type>(
                     a_64_chunks, b_64_chunks_1, r_64_chunks_1, q_64_chunks_1);
-                constraints.push_back(position_1 * (first_carryless - c_1_64 * two128 - c_2 * two192));
+                constraints.push_back({position_1, (first_carryless - c_1_64 * two128 - c_2 * two192)});
                 constraint_type second_carryless = second_carryless_construct<constraint_type>(
                     a_64_chunks, b_64_chunks_1, r_64_chunks_1, q_64_chunks_1);
-                constraints.push_back(
-                    position_1 * (second_carryless + c_1_64 + c_2 * two_64 - c_3_64 * two128 - c_4 * two192));
-                // add constraints for c_2/c_4: c_2 is 0/1, c_4 is 0/1/2/3
-                constraints.push_back(position_1 * c_2 * (c_2 - 1));
-                constraints.push_back(position_1 * c_4 * (c_4 - 1) * (c_4 - 2) * (c_4 - 3));
-                // TODO: figure out how to add lookup constraints to constrain chunks of q
+                constraints.push_back({position_1, (second_carryless + c_1_64 + c_2 * two_64)});
+                // add constraints: c_2 is 0/1
+                constraints.push_back({position_1, c_2 * (c_2 - 1)});
+
+                constraint_type third_carryless = third_carryless_construct<constraint_type>(b_64_chunks_1, r_64_chunks_1);
+                constraints.push_back({position_1, third_carryless});
+                constraints.push_back({position_1, b_64_chunks_1[3] * r_64_chunks_1[3]}); // forth_carryless
+
                 // force r = 0 if b = 0
                 constraint_type b_zero = 1 - b_sum_inverse_1 * b_sum_1;
                 for (std::size_t i = 0; i < chunk_amount; i++) {
-                    constraints.push_back(position_1 * b_zero * r_chunks_1[i]);
+                    constraints.push_back({position_1, b_zero * r_chunks_1[i]});
                 }
 
-                // prove that q < result or b = r = 0
-                // note that in this case we do not care about the value of q in this case and can
-                // just set it to be equal to a
-                constraint_type position_2 = zkevm_circuit.get_opcode_row_constraint(1, this->rows_amount());
+                // prove that (q < b) or (b = r = 0)
+                // note that in the latter case we have q = a to satisfy a = br + q
+                std::size_t position_2 = 1;
                 std::vector<var> b_chunks_2;
                 std::vector<var> q_chunks_2;
                 for (std::size_t i = 0; i < chunk_amount; i++) {
                     b_chunks_2.push_back(var_gen(i, -1));
                 }
-                var b_sum_inverse_2 = var_gen(chunk_amount + 5, -1);
+                var b_sum_inverse_2 = var_gen(2*chunk_amount, -1);
                 for (std::size_t i = chunk_amount; i < 2 * chunk_amount; i++) {
                     q_chunks_2.push_back(var_gen(i, 0));
                 }
+                std::vector<var> v_chunks_2;
                 std::vector<var> t;
-                std::vector<var> v;
                 for (std::size_t i = 0; i < chunk_amount; i++) {
-                    t.push_back(var_gen(i, +1));
+                    v_chunks_2.push_back(var_gen(i, +1));
                 }
-                for (std::size_t i = chunk_amount; i < 2 * chunk_amount; i++) {
-                    v.push_back(var_gen(i, +1));
+                for (std::size_t i = chunk_amount + 6; i < chunk_amount + 6 + carry_amount; i++) {
+                    t.push_back(var_gen(i, -1));
                 }
                 constraint_type b_sum_2;
                 for (std::size_t i = 0; i < chunk_amount; i++) {
                     b_sum_2 += b_chunks_2[i];
                 }
                 constraint_type b_nonzero = b_sum_inverse_2 * b_sum_2;
-                // t_i = t_{i+1} + (1 - t_{i+1}) * v_i * (r_i - q_i)
-                // and v_i is inverse or zero of b_i - q_i
-                // first constraint is special as we start from zero: t_{-1} = 0
-                // TODO: figure out how to add lookup constraints to constrain delta
-                constraint_type delta = b_chunks_2[chunk_amount - 1] - q_chunks_2[chunk_amount - 1];
-                constraints.push_back(position_2 * b_nonzero * (t[chunk_amount - 1] - v[chunk_amount - 1] * delta));
-                constraints.push_back(position_2 * b_nonzero * v[chunk_amount - 1] * (v[chunk_amount - 1] * delta - 1));
-                constraints.push_back(position_2 * b_nonzero * delta * (v[chunk_amount - 1] * delta - 1));
-                for (int32_t i = chunk_amount - 2; i >= 0; i--) {
-                    delta = b_chunks_2[i] - q_chunks_2[i];
-                    constraints.push_back(position_2 * b_nonzero * (t[i] - t[i + 1] - (1 - t[i + 1]) * v[i] * delta));
-                    constraints.push_back(position_2 * b_nonzero * (v[i] * (v[i] * delta - 1)));
-                    constraints.push_back(position_2 * b_nonzero * (delta * (v[i] * delta - 1)));
-                }
-                // last t should be 1, as we have a strict inequality
-                constraints.push_back(position_2 * b_nonzero * (t[0] - 1));
 
-                return {{gate_class::MIDDLE_OP, constraints}};
+                // q < b <=> b + v = q + 2^T, i.e. the last carry is 1.
+                // We use t to store the addition carries and enforce the above constraint
+                // if b != 0
+                auto carry_on_addition_constraint = [](var a_0, var a_1, var a_2,
+                                                       var b_0, var b_1, var b_2,
+                                                       var r_0, var r_1, var r_2,
+                         var last_carry, var result_carry, bool first_constraint = false) {
+                    constraint_type res;
+                    if (first_constraint) {
+                        // no last carry for first constraint
+                        res = (a_0 + b_0) + (a_1 + b_1) * two_16 + (a_2 + b_2) * two_32
+                                - r_0 - r_1 * two_16 - r_2 * two_32 - result_carry * two_48;
+                    } else {
+                        res = last_carry + (a_0 + b_0) + (a_1 + b_1) * two_16 + (a_2 + b_2) * two_32
+                                - r_0 - r_1 * two_16 - r_2 * two_32 - result_carry * two_48;
+                    }
+                    return res;
+                };
+                auto last_carry_on_addition_constraint = [](var a_0, var b_0, var r_0, var last_carry, var result_carry) {
+                    constraint_type res = (last_carry + a_0 + b_0 - r_0 - result_carry * two_16);
+                    return res;
+                };
+                constraints.push_back({position_2, carry_on_addition_constraint(b_chunks_2[0], b_chunks_2[1], b_chunks_2[2],
+                                                                                v_chunks_2[0], v_chunks_2[1], v_chunks_2[2],
+                                                                                q_chunks_2[0], q_chunks_2[1], q_chunks_2[2],
+                                                                                t[0],t[0],true)});
+                constraints.push_back({position_2, t[0] * (1 - t[0])}); // t[0] is 0 or 1
+                for (std::size_t i = 1; i < carry_amount - 1; i++) {
+                     constraints.push_back({position_2, carry_on_addition_constraint(
+                                                                   b_chunks_2[3*i], b_chunks_2[3*i + 1], b_chunks_2[3*i + 2],
+                                                                   v_chunks_2[3*i], v_chunks_2[3*i + 1], v_chunks_2[3*i + 2],
+                                                                   q_chunks_2[3*i], q_chunks_2[3*i + 1], q_chunks_2[3*i + 2],
+                                                                   t[i-1],t[i])});
+                     constraints.push_back({position_2, t[i] * (1 - t[i])}); // t[i] is 0 or 1
+                }
+                constraints.push_back({position_2, last_carry_on_addition_constraint(
+                                                                        b_chunks_2[3*(carry_amount-1)],
+                                                                        v_chunks_2[3*(carry_amount-1)],
+                                                                        q_chunks_2[3*(carry_amount-1)],
+                                                                        t[carry_amount - 2], t[carry_amount - 1])});
+                // t[carry_amount-1] is 0 or 1, but should be 1 if b_nonzero = 1
+                constraints.push_back({position_2, (b_nonzero  + (1 - b_nonzero)* t[carry_amount-1]) * (1 - t[carry_amount-1])});
+
+                // for MOD only
+                if (!is_div) {
+                    std::vector<var> q_out_chunks;
+                    for (std::size_t i = chunk_amount; i < 2 * chunk_amount; i++) {
+                        q_out_chunks.push_back(var_gen(i, +1));
+                    }
+                    for (std::size_t i = 0; i < chunk_amount; i++) {
+                        constraints.push_back({position_2, (b_nonzero*(q_chunks_2[i] - q_out_chunks[i]) + (1-b_nonzero)*q_out_chunks[i])});
+                    }
+                }
+
+                return {{gate_class::MIDDLE_OP, {constraints, {}}}};
             }
 
             void generate_assignments(zkevm_circuit_type &zkevm_circuit, zkevm_machine_interface &machine) override {
@@ -220,14 +291,23 @@ namespace nil {
                 word_type b = stack.pop();
                 using integral_type = boost::multiprecision::number<
                     boost::multiprecision::backends::cpp_int_modular_backend<257>>;
-                integral_type result_integral = b != 0u ? integral_type(a) / integral_type(b) : 0u;
-                word_type result = word_type::backend_type(result_integral.backend());
+                integral_type r_integral = b != 0u ? integral_type(a) / integral_type(b) : 0u;
+                word_type r = word_type::backend_type(r_integral.backend());
                 word_type q = b != 0u ? a % b : a;
+                word_type q_out = b != 0u ? q : 0; // according to EVM spec a % 0 = 0
+
+                bool t_last = integral_type(q) < integral_type(b);
+                word_type v = word_type(integral_type(q) + integral_type(t_last)*zkevm_modulus - integral_type(b));
+
+                word_type result = is_div ? r : q_out;
 
                 const std::vector<value_type> a_chunks = zkevm_word_to_field_element<BlueprintFieldType>(a);
                 const std::vector<value_type> b_chunks = zkevm_word_to_field_element<BlueprintFieldType>(b);
-                const std::vector<value_type> r_chunks = zkevm_word_to_field_element<BlueprintFieldType>(result);
+                const std::vector<value_type> r_chunks = zkevm_word_to_field_element<BlueprintFieldType>(r);
                 const std::vector<value_type> q_chunks = zkevm_word_to_field_element<BlueprintFieldType>(q);
+                const std::vector<value_type> v_chunks = zkevm_word_to_field_element<BlueprintFieldType>(v);
+                const std::vector<value_type> q_out_chunks = zkevm_word_to_field_element<BlueprintFieldType>(q_out);
+
                 const std::size_t chunk_amount = a_chunks.size();
                 // note that we don't assign 64-chunks for a/b, as we can build them from 16-chunks with constraints
                 // under the same logic we only assign the 16-bit chunks for carries
@@ -243,17 +323,12 @@ namespace nil {
                 const std::size_t curr_row = zkevm_circuit.get_current_row();
                 // caluclate first row carries
                 auto first_row_carries =
-                    first_carryless_consrtruct(a_64_chunks, b_64_chunks, r_64_chunks, q_64_chunks).data >> 128;
+                    first_carryless_construct(a_64_chunks, b_64_chunks, r_64_chunks, q_64_chunks).data >> 128;
                 value_type c_1 = static_cast<value_type>(first_row_carries & (two_64 - 1).data);
                 value_type c_2 = static_cast<value_type>(first_row_carries >> 64);
                 std::vector<value_type> c_1_chunks = chunk_64_to_16<BlueprintFieldType>(c_1);
                 // no need for c_2 chunks as there is only a single chunk
-                auto second_row_carries =
-                    (second_carryless_construct(a_64_chunks, b_64_chunks, r_64_chunks, q_64_chunks)
-                     + c_1 + c_2 * two_64).data >> 128;
-                value_type c_3 = static_cast<value_type>(second_row_carries & (two_64 - 1).data);
-                value_type c_4 = static_cast<value_type>(second_row_carries >> 64);
-                std::vector<value_type> c_3_chunks = chunk_64_to_16<BlueprintFieldType>(c_3);
+
                 value_type b_sum = std::accumulate(b_chunks.begin(), b_chunks.end(), value_type(0));
                 // TODO: replace with memory access, which would also do range checks!
                 // also we can pack slightly more effectively
@@ -268,12 +343,7 @@ namespace nil {
                 for (std::size_t i = 0; i < chunk_amount; i++) {
                     assignment.witness(witness_cols[i], curr_row + 1) = b_chunks[i];
                 }
-                for (std::size_t i = 0; i < 4; i++) {
-                    assignment.witness(witness_cols[i + chunk_amount], curr_row + 1) = c_3_chunks[i];
-                }
-                assignment.witness(witness_cols[4 + chunk_amount], curr_row + 1) = c_4;
-                assignment.witness(witness_cols[5 + chunk_amount], curr_row + 1) =
-                    b_sum == 0 ? 0 : b_sum.inversed();
+                assignment.witness(witness_cols[2*chunk_amount], curr_row + 1) = b_sum == 0 ? 0 : b_sum.inversed();
 
                 for (std::size_t i = 0; i < chunk_amount; i++) {
                     assignment.witness(witness_cols[i], curr_row + 2) = r_chunks[i];
@@ -281,23 +351,29 @@ namespace nil {
                 for (std::size_t i = 0; i < chunk_amount; i++) {
                     assignment.witness(witness_cols[i + chunk_amount], curr_row + 2) = q_chunks[i];
                 }
-                // comparison bit calculations
-                bool t_val = false;
-                for (int32_t i = chunk_amount - 1; i >= 0; i--) {
-                    assignment.witness(witness_cols[i], curr_row + 3) =
-                        t_val = t_val || (b_chunks[i] > q_chunks[i]);
-                }
-                // inverse calculations
                 for (std::size_t i = 0; i < chunk_amount; i++) {
-                    assignment.witness(witness_cols[i + chunk_amount], curr_row + 3) =
-                        (b_chunks[i] - q_chunks[i]) != 0 ?
-                            1 * (b_chunks[i] - q_chunks[i]).inversed()
-                            : 0;
+                    assignment.witness(witness_cols[i], curr_row + 3) = v_chunks[i];
+                }
+                bool carry = 0;
+                for (std::size_t i = 0; i < carry_amount - 1; i++) {
+                    carry = (carry + b_chunks[3 * i    ] + v_chunks[3 * i    ] +
+                                    (b_chunks[3 * i + 1] + v_chunks[3 * i + 1]) * two_16 +
+                                    (b_chunks[3 * i + 2] + v_chunks[3 * i + 2]) * two_32 ) >= two_48;
+                    assignment.witness(witness_cols[chunk_amount + 6 + i], curr_row + 1) = carry;
+                }
+                carry = (carry + b_chunks[3 * (carry_amount - 1)] + v_chunks[3 * (carry_amount - 1)]) >= two_16;
+                assignment.witness(witness_cols[chunk_amount + 6 + carry_amount - 1], curr_row + 1) = carry;
+
+                // optional part, for MOD only
+                if (!is_div) {
+                    for (std::size_t i = 0; i < chunk_amount; i++) {
+                        assignment.witness(witness_cols[i + chunk_amount], curr_row + 3) = q_out_chunks[i];
+                    }
                 }
 
-                // reset the machine state; hope that we won't have to do this manually
-                stack.push(b);
-                stack.push(a);
+                // stack.push(b);
+                // stack.push(a);
+                stack.push(result);
             }
 
             std::size_t rows_amount() override {

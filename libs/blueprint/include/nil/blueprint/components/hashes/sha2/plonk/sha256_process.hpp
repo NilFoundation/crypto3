@@ -205,17 +205,16 @@ namespace nil {
                     typename BlueprintFieldType::value_type g = input_state[6];
                     typename BlueprintFieldType::value_type h = input_state[7];
 
-                    nil::marshalling::status_type status;
                     std::array<typename BlueprintFieldType::integral_type, 8> sparse_values {};
                     for (std::size_t i = 0; i < 4; i++) {
                         typename BlueprintFieldType::integral_type integral_input_state_sparse =
                             typename BlueprintFieldType::integral_type(input_state[i].data);
                         std::vector<bool> input_state_sparse(32);
                         {
+                            nil::marshalling::status_type status;
                             std::vector<bool> input_state_sparse_all =
                                 nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_input_state_sparse,
                                                                                             status);
-                            THROW_IF_ERROR_STATUS(status, "sha256_process::calculate");
                             std::copy(input_state_sparse_all.end() - 32, input_state_sparse_all.end(),
                                     input_state_sparse.begin());
                         }
@@ -231,10 +230,10 @@ namespace nil {
                             typename BlueprintFieldType::integral_type(input_state[i].data);
                         std::vector<bool> input_state_sparse(32);
                         {
+                            nil::marshalling::status_type status;
                             std::vector<bool> input_state_sparse_all =
                                 nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_input_state_sparse,
                                                                                             status);
-                            THROW_IF_ERROR_STATUS(status, "sha256_process::calculate");
                             std::copy(input_state_sparse_all.end() - 32, input_state_sparse_all.end(),
                                     input_state_sparse.begin());
                         }
@@ -255,9 +254,9 @@ namespace nil {
                             typename BlueprintFieldType::integral_type(message_scheduling_words[(i - row) / 5 + 1].data);
                         std::vector<bool> a(32);
                         {
+                            nil::marshalling::status_type status;
                             std::vector<bool> a_all =
                                 nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_a, status);
-                            THROW_IF_ERROR_STATUS(status, "sha256_process::calculate");
                             std::copy(a_all.end() - 32, a_all.end(), a.begin());
                         }
 
@@ -277,9 +276,9 @@ namespace nil {
                             typename BlueprintFieldType::integral_type(message_scheduling_words[(i - row) / 5 + 14].data);
                         std::vector<bool> b(32);
                         {
+                            nil::marshalling::status_type status;
                             std::vector<bool> b_all =
                                 nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_b, status);
-                            THROW_IF_ERROR_STATUS(status, "sha256_process::calculate");
                             std::copy(b_all.end() - 32, b_all.end(), b.begin());
                         }
 
@@ -314,9 +313,9 @@ namespace nil {
                             typename BlueprintFieldType::integral_type(e.data);
                         std::vector<bool> e_bits(32);
                         {
+                            nil::marshalling::status_type status;
                             std::vector<bool> e_bits_all =
                                 nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_e, status);
-                            THROW_IF_ERROR_STATUS(status, "sha256_process::calculate");
                             std::copy(e_bits_all.end() - 32, e_bits_all.end(), e_bits.begin());
                         }
 
@@ -371,9 +370,9 @@ namespace nil {
                             typename BlueprintFieldType::integral_type(a.data);
                         std::vector<bool> a_bits(32);
                         {
+                            nil::marshalling::status_type status;
                             std::vector<bool> a_bits_all =
                                 nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_a, status);
-                            THROW_IF_ERROR_STATUS(status, "sha256_process::calculate");
                             std::copy(a_bits_all.end() - 32, a_bits_all.end(), a_bits.begin());
                         }
 
@@ -1387,7 +1386,6 @@ namespace nil {
                 typename BlueprintFieldType::value_type g = input_state[6];
                 typename BlueprintFieldType::value_type h = input_state[7];
 
-                nil::marshalling::status_type status;
                 std::array<typename BlueprintFieldType::integral_type, 8> sparse_values {};
                 for (std::size_t i = 0; i < 4; i++) {
                     assignment.witness(component.W(i), row) = input_state[i];
@@ -1395,10 +1393,10 @@ namespace nil {
                         typename BlueprintFieldType::integral_type(input_state[i].data);
                     std::vector<bool> input_state_sparse(32);
                     {
+                        nil::marshalling::status_type status;
                         std::vector<bool> input_state_sparse_all =
                             nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_input_state_sparse,
                                                                                          status);
-                        THROW_IF_ERROR_STATUS(status, "sha256_process::generate_assignments");
                         std::copy(input_state_sparse_all.end() - 32, input_state_sparse_all.end(),
                                   input_state_sparse.begin());
                     }
@@ -1417,10 +1415,10 @@ namespace nil {
                         typename BlueprintFieldType::integral_type(input_state[i].data);
                     std::vector<bool> input_state_sparse(32);
                     {
+                        nil::marshalling::status_type status;
                         std::vector<bool> input_state_sparse_all =
                             nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_input_state_sparse,
                                                                                          status);
-                        THROW_IF_ERROR_STATUS(status, "sha256_process::generate_assignments");
                         std::copy(input_state_sparse_all.end() - 32, input_state_sparse_all.end(),
                                   input_state_sparse.begin());
                     }
@@ -1446,9 +1444,9 @@ namespace nil {
                     assignment.witness(component.W(0), i) = message_scheduling_words[(i - row) / 5 + 1];
                     std::vector<bool> a(32);
                     {
+                        nil::marshalling::status_type status;
                         std::vector<bool> a_all =
                             nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_a, status);
-                        THROW_IF_ERROR_STATUS(status, "sha256_process::generate_assignments");
                         std::copy(a_all.end() - 32, a_all.end(), a.begin());
                     }
 
@@ -1488,9 +1486,9 @@ namespace nil {
                         typename BlueprintFieldType::integral_type(message_scheduling_words[(i - row) / 5 + 14].data);
                     std::vector<bool> b(32);
                     {
+                        nil::marshalling::status_type status;
                         std::vector<bool> b_all =
                             nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_b, status);
-                        THROW_IF_ERROR_STATUS(status, "sha256_process::generate_assignments");
                         std::copy(b_all.end() - 32, b_all.end(), b.begin());
                     }
 
@@ -1557,9 +1555,9 @@ namespace nil {
                         typename BlueprintFieldType::integral_type(e.data);
                     std::vector<bool> e_bits(32);
                     {
+                        nil::marshalling::status_type status;
                         std::vector<bool> e_bits_all =
                             nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_e, status);
-                        THROW_IF_ERROR_STATUS(status, "sha256_process::generate_assignments");
                         std::copy(e_bits_all.end() - 32, e_bits_all.end(), e_bits.begin());
                     }
 
@@ -1657,9 +1655,9 @@ namespace nil {
                         typename BlueprintFieldType::integral_type(a.data);
                     std::vector<bool> a_bits(32);
                     {
+                        nil::marshalling::status_type status;
                         std::vector<bool> a_bits_all =
                             nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_a, status);
-                        THROW_IF_ERROR_STATUS(status, "sha256_process::generate_assignments");
                         std::copy(a_bits_all.end() - 32, a_bits_all.end(), a_bits.begin());
                     }
 

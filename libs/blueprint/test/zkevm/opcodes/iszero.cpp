@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2024 Dmitrii Tabalin <d.tabalin@nil.foundation>
+// Copyright (c) 2024 Alexey Yashunsky <a.yashunsky@nil.foundation>
 //
 // MIT License
 //
@@ -26,7 +27,8 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include <nil/crypto3/algebra/fields/arithmetic_params/goldilocks64.hpp>
+//#include <nil/crypto3/algebra/fields/arithmetic_params/goldilocks64.hpp>
+#include "nil/crypto3/algebra/fields/pallas/base_field.hpp"
 
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
@@ -34,15 +36,14 @@
 #include <nil/blueprint/zkevm/zkevm_circuit.hpp>
 #include "../opcode_tester.hpp"
 
-#include <nil/blueprint/zkevm/operations/iszero.hpp>
-
 using namespace nil::blueprint;
 using namespace nil::crypto3::algebra;
 
 BOOST_AUTO_TEST_SUITE(zkevm_iszero_test_suite)
 
 BOOST_AUTO_TEST_CASE(zkevm_iszero_test) {
-    using field_type = fields::goldilocks64;
+    // using field_type = fields::goldilocks64;
+    using field_type = fields::pallas_base_field;
     using arithmentization_type = nil::crypto3::zk::snark::plonk_constraint_system<field_type>;
     using assignment_type = assignment<arithmentization_type>;
     using circuit_type = circuit<arithmentization_type>;
@@ -51,11 +52,9 @@ BOOST_AUTO_TEST_CASE(zkevm_iszero_test) {
     circuit_type circuit;
     zkevm_circuit<field_type> zkevm_circuit(assignment, circuit);
     zkevm_machine_type machine = get_empty_machine();
-    // incorrect test logic, but we have no memory operations so
-    machine.stack.push(1234567890);
-    machine.stack.push(0);
+    zkevm_circuit.assign_opcode(zkevm_opcode::PUSH32, machine, 1234567890);
     zkevm_circuit.assign_opcode(zkevm_opcode::ISZERO, machine);
-    machine.stack.pop();
+    zkevm_circuit.assign_opcode(zkevm_opcode::PUSH32, machine, 0);
     zkevm_circuit.assign_opcode(zkevm_opcode::ISZERO, machine);
     zkevm_circuit.finalize_test();
     // assignment.export_table(std::cout);

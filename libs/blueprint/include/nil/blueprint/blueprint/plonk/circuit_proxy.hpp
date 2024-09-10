@@ -73,7 +73,20 @@ namespace nil {
 
             circuit_proxy(std::shared_ptr<circuit<ArithmetizationType>> circuit, std::uint32_t _id) :
                     circuit_ptr(circuit),
-                    id(_id) {}
+                    id(_id) {
+                for (std::uint32_t i = 0; i < circuit->num_gates(); ++i)
+                    used_gates.insert(i);
+std::cout << "In constructor of circuit_proxy adding " << circuit->num_gates() << " gates" << std::endl;
+                for (std::uint32_t i = 0; i < circuit->num_lookup_gates(); ++i)
+                    used_lookup_gates.insert(i);
+std::cout << "In constructor of circuit_proxy adding " << circuit->num_lookup_gates() << " lookup gates" << std::endl;
+                for (std::uint32_t i = 0; i < circuit->lookup_tables().size(); ++i)
+                    used_lookup_tables.insert(i);
+std::cout << "In constructor of circuit_proxy adding " << circuit->lookup_tables().size() << " lookup tables" << std::endl;
+                for (std::uint32_t i = 0; i < circuit->copy_constraints().size(); ++i)
+                    used_copy_constraints.insert(i);
+std::cout << "In constructor of circuit_proxy adding " << circuit->copy_constraints().size() << " copy constraints" << std::endl;
+            }
 
             circuit_proxy() = delete;
 

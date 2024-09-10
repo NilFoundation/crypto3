@@ -220,7 +220,7 @@ namespace nil {
                             std::array<bool, BlueprintFieldType::modulus_bits> bits_msb_all =
                                 nil::marshalling::pack<nil::marshalling::option::big_endian>(integral_scalar, status);
 
-                            THROW_IF_ERROR_STATUS(status, "plonk_endo_scalar::generate_assignments");
+                            assert(status == nil::marshalling::status_type::success);
 
                             std::copy(bits_msb_all.end() - component.scalar_size, bits_msb_all.end(), bits_msb.begin());
 

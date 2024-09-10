@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2024 Dmitrii Tabalin <d.tabalin@nil.foundation>
+// Copyright (c) 2024 Alexey Yashunsky <a.yashunsky@nil.foundation>
 //
 // MIT License
 //
@@ -39,6 +40,7 @@ namespace nil {
             using op_type = zkevm_operation<BlueprintFieldType>;
             using gate_class = typename op_type::gate_class;
             using constraint_type = typename op_type::constraint_type;
+            using lookup_constraint_type = crypto3::zk::snark::plonk_lookup_constraint<BlueprintFieldType>;
             using zkevm_circuit_type = typename op_type::zkevm_circuit_type;
             using assignment_type = typename op_type::assignment_type;
             using value_type = typename BlueprintFieldType::value_type;
@@ -46,27 +48,37 @@ namespace nil {
 
             zkevm_iszero_operation() = default;
 
-            std::map<gate_class, std::vector<constraint_type>> generate_gates(zkevm_circuit_type &zkevm_circuit) override {
-                std::vector<constraint_type> constraints;
+            std::map<gate_class, std::pair<
+                std::vector<std::pair<std::size_t, constraint_type>>,
+                std::vector<std::pair<std::size_t, lookup_constraint_type>>
+                >>
+                generate_gates(zkevm_circuit_type &zkevm_circuit) override {
+
+                std::vector<std::pair<std::size_t, constraint_type>> constraints;
+
                 constexpr const std::size_t chunk_amount = 16;
                 const std::vector<std::size_t> &witness_cols = zkevm_circuit.get_opcode_cols();
                 auto var_gen = [&witness_cols](std::size_t i, int32_t offset = 0) {
                     return zkevm_operation<BlueprintFieldType>::var_gen(witness_cols, i, offset);
                 };
-                constraint_type chunk_sum = var_gen(0);
-                std::size_t i = 1;
-                for (; i < chunk_amount; i++) {
+
+                // Table layout                                             Row #
+                // +------------------+-+----------------+---+--------------+
+                // |        a         |r|                |1/A|              | 0
+                // +------------------+-+----------------+---+--------------+
+
+                std::size_t position = 0;
+
+                constraint_type chunk_sum;
+
+                for (std::size_t i = 0; i < chunk_amount; i++) {
                     chunk_sum += var_gen(i);
                 }
-                var result = var_gen(i++);
-                for (; i < 2 * chunk_amount; i++) {
-                    // force other chunks to be zero
-                    constraints.emplace_back(var_gen(i));
-                }
-                var chunk_sum_inverse = var_gen(i);
-                constraints.emplace_back(chunk_sum * chunk_sum_inverse + result - 1);
-                constraints.emplace_back(chunk_sum * result);
-                return {{gate_class::MIDDLE_OP, constraints}};
+                var result = var_gen(chunk_amount);
+                var chunk_sum_inverse = var_gen(2*chunk_amount);
+                constraints.push_back({position, (chunk_sum * chunk_sum_inverse + result - 1)});
+                constraints.push_back({position, (chunk_sum * result)});
+                return {{gate_class::MIDDLE_OP, {constraints, {}}}};
             }
 
             void generate_assignments(zkevm_circuit_type &zkevm_circuit, zkevm_machine_interface &machine) override {
@@ -76,26 +88,19 @@ namespace nil {
                 const std::vector<value_type> chunks = zkevm_word_to_field_element<BlueprintFieldType>(a);
                 const std::vector<std::size_t> &witness_cols = zkevm_circuit.get_opcode_cols();
                 assignment_type &assignment = zkevm_circuit.get_assignment();
-                std::size_t i = 0;
                 const std::size_t curr_row = zkevm_circuit.get_current_row();
+                std::size_t chunk_amount = 16;
+
                 // TODO: replace with memory access
-                for (; i < chunks.size(); i++) {
+                for (std::size_t i = 0; i < chunk_amount; i++) {
                     assignment.witness(witness_cols[i], curr_row) = chunks[i];
                 }
-                if (a == 0u) {
-                    assignment.witness(witness_cols[i], curr_row) = 1;
-                } else {
-                    assignment.witness(witness_cols[i], curr_row) = 0;
-                }
-                i++;
-                for (; i < 2 * chunks.size(); i++) {
-                    assignment.witness(witness_cols[i], curr_row) = 0;
-                }
+                assignment.witness(witness_cols[chunk_amount], curr_row) = (a == 0u);
                 const value_type chunk_sum = std::accumulate(chunks.begin(), chunks.end(), value_type::zero());
-                assignment.witness(witness_cols[i], curr_row) =
+                assignment.witness(witness_cols[2*chunk_amount], curr_row) =
                     chunk_sum == 0 ? value_type::zero() : value_type::one() * chunk_sum.inversed();
-                // reset the machine state; hope that we won't have to do this manually
-                stack.push(a);
+                //stack.push(a);
+                stack.push(word_type(a == 0u));
             }
 
             std::size_t rows_amount() override {

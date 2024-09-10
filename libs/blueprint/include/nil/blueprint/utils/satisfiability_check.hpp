@@ -130,10 +130,14 @@ namespace nil {
                             if (!constraint_result.is_zero()) {
                                 std::cout << "Constraint " << j << " from gate " << i << " on row " << selector_row
                                           << " is not satisfied." << std::endl;
+                                std::cout << "Constraint: " << gates[i].constraints[j] << std::endl;
                                 std::cout << "Constraint result: " << constraint_result << std::endl;
                                 std::cout << "Offending gate:" << std::endl;
+
+                                std::size_t k = 0;
                                 for (const auto &constraint : gates[i].constraints) {
-                                    std::cout << constraint << std::endl;
+                                    k ++;
+                                    std::cout << k << ": " << constraint << std::endl;
                                 }
                                 return false;
                             }
@@ -166,7 +170,7 @@ namespace nil {
                                     }
                                     if( used_dynamic_tables[table_name].find(input_values) == used_dynamic_tables[table_name].end() ) {
                                         for (std::size_t k = 0; k < input_values.size(); k++) {
-                                            std::cout << input_values[k] << " ";
+                                            std::cout << std::hex << input_values[k] << std::dec << " ";
                                         }
                                         std::cout << std::endl;
                                         std::cout << "Constraint " << j << " from lookup gate " << i << " from table "
@@ -178,6 +182,13 @@ namespace nil {
                                             for (auto &lookup_input : constraint.lookup_input) {
                                                 std::cout << lookup_input << std::endl;
                                             }
+                                        }
+                                        std::cout << "Possible values: " << std::endl;
+                                        for( auto &value : used_dynamic_tables[table_name]){
+                                            for (std::size_t k = 0; k < value.size(); k++) {
+                                                std::cout << std::hex << value[k] << std::dec << " ";
+                                            }
+                                            std::cout << std::endl;
                                         }
                                         return false;
                                     }
@@ -213,7 +224,7 @@ namespace nil {
                                 if (!found) {
                                     std::cout << "Input values:";
                                     for (std::size_t k = 0; k < input_values.size(); k++) {
-                                        std::cout << input_values[k] << " ";
+                                        std::cout << std::hex <<  input_values[k] << std::dec <<  " ";
                                     }
                                     std::cout << std::endl;
                                     std::cout << "Constraint " << j << " from lookup gate " << i << " from table "

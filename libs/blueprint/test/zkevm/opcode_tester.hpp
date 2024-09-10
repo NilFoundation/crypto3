@@ -32,8 +32,8 @@
 
 namespace nil {
     namespace blueprint {
-        zkevm_machine_interface get_empty_machine() {
-            return zkevm_machine_interface();
+        zkevm_machine_interface get_empty_machine(unsigned long int init_gas = 65537) { // just some default value for initial gas
+            return zkevm_machine_interface(init_gas);
         }
     }   // namespace blueprint
 }    // namespace nil

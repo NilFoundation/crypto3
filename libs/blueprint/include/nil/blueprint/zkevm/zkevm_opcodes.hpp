@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2024 Dmitrii Tabalin <d.tabalin@nil.foundation>
+// Copyright (c) 2024 Alexey Yashunsky <a.yashunsky@nil.foundation>
 //
 // MIT License
 //
@@ -180,7 +181,8 @@ namespace nil {
             X(STATICCALL) \
             X(REVERT) \
             X(INVALID) \
-            X(SELFDESTRUCT) // ! please update LAST_ZKEVM_OPCODE below if changing this !
+            X(SELFDESTRUCT) \
+            X(err0)
 
         enum zkevm_opcode {
             #define ENUM_DEF(name) name,
@@ -202,9 +204,39 @@ namespace nil {
                 return it->second;
             }
 
+            std::size_t get_opcode_number(const zkevm_opcode& opcode) const {
+                auto it = opcode_to_number_map.left.find(opcode);
+                BOOST_ASSERT(it != opcode_to_number_map.left.end());
+                return it->second;
+            }
+
             zkevm_opcode get_opcode_from_value(const std::size_t& value) const {
                 auto it = opcode_to_byte_map.right.find(value);
                 BOOST_ASSERT(it != opcode_to_byte_map.right.end());
+                return it->second;
+            }
+
+            zkevm_opcode get_opcode_from_number(const std::size_t& value) const {
+                auto it = opcode_to_number_map.right.find(value);
+                BOOST_ASSERT(it != opcode_to_number_map.right.end());
+                return it->second;
+            }
+
+            std::size_t get_opcode_cost(const zkevm_opcode& opcode) const {
+                auto it = opcode_cost_map.find(opcode);
+                BOOST_ASSERT(it != opcode_cost_map.end());
+                return it->second;
+            }
+
+            std::size_t get_opcode_stack_input(const zkevm_opcode& opcode) const {
+                auto it = opcode_stack_input_map.find(opcode);
+                BOOST_ASSERT(it != opcode_stack_input_map.end());
+                return it->second;
+            }
+
+            std::size_t get_opcode_stack_output(const zkevm_opcode& opcode) const {
+                auto it = opcode_stack_output_map.find(opcode);
+                BOOST_ASSERT(it != opcode_stack_output_map.end());
                 return it->second;
             }
 
@@ -212,159 +244,175 @@ namespace nil {
                 return opcode_to_byte_map.size();
             }
 
-            boost::bimap<boost::bimaps::set_of<zkevm_opcode>, boost::bimaps::set_of<std::size_t>>
-                opcode_to_byte_map;
+            boost::bimap<boost::bimaps::set_of<zkevm_opcode>, boost::bimaps::set_of<std::size_t>> opcode_to_byte_map;
+            boost::bimap<boost::bimaps::set_of<zkevm_opcode>, boost::bimaps::set_of<std::size_t>> opcode_to_number_map;
+            std::map<zkevm_opcode, std::size_t> opcode_cost_map;
+            std::map<zkevm_opcode, std::size_t> opcode_stack_input_map;
+            std::map<zkevm_opcode, std::size_t> opcode_stack_output_map;
         private:
             opcodes_info() {
-                opcode_to_byte_map.insert({zkevm_opcode::STOP, 0x00});
-                opcode_to_byte_map.insert({zkevm_opcode::ADD, 0x01});
-                opcode_to_byte_map.insert({zkevm_opcode::MUL, 0x02});
-                opcode_to_byte_map.insert({zkevm_opcode::SUB, 0x03});
-                opcode_to_byte_map.insert({zkevm_opcode::DIV, 0x04});
-                opcode_to_byte_map.insert({zkevm_opcode::SDIV, 0x05});
-                opcode_to_byte_map.insert({zkevm_opcode::MOD, 0x06});
-                opcode_to_byte_map.insert({zkevm_opcode::SMOD, 0x07});
-                opcode_to_byte_map.insert({zkevm_opcode::ADDMOD, 0x08});
-                opcode_to_byte_map.insert({zkevm_opcode::MULMOD, 0x09});
-                opcode_to_byte_map.insert({zkevm_opcode::EXP, 0x0a});
-                opcode_to_byte_map.insert({zkevm_opcode::SIGNEXTEND, 0x0b});
-                opcode_to_byte_map.insert({zkevm_opcode::LT, 0x10});
-                opcode_to_byte_map.insert({zkevm_opcode::GT, 0x11});
-                opcode_to_byte_map.insert({zkevm_opcode::SLT, 0x12});
-                opcode_to_byte_map.insert({zkevm_opcode::SGT, 0x13});
-                opcode_to_byte_map.insert({zkevm_opcode::EQ, 0x14});
-                opcode_to_byte_map.insert({zkevm_opcode::ISZERO, 0x15});
-                opcode_to_byte_map.insert({zkevm_opcode::AND, 0x16});
-                opcode_to_byte_map.insert({zkevm_opcode::OR, 0x17});
-                opcode_to_byte_map.insert({zkevm_opcode::XOR, 0x18});
-                opcode_to_byte_map.insert({zkevm_opcode::NOT, 0x19});
-                opcode_to_byte_map.insert({zkevm_opcode::BYTE, 0x1a});
-                opcode_to_byte_map.insert({zkevm_opcode::SHL, 0x1b});
-                opcode_to_byte_map.insert({zkevm_opcode::SHR, 0x1c});
-                opcode_to_byte_map.insert({zkevm_opcode::SAR, 0x1d});
-                opcode_to_byte_map.insert({zkevm_opcode::KECCAK256, 0x20});
-                opcode_to_byte_map.insert({zkevm_opcode::ADDRESS, 0x30});
-                opcode_to_byte_map.insert({zkevm_opcode::BALANCE, 0x31});
-                opcode_to_byte_map.insert({zkevm_opcode::ORIGIN, 0x32});
-                opcode_to_byte_map.insert({zkevm_opcode::CALLER, 0x33});
-                opcode_to_byte_map.insert({zkevm_opcode::CALLVALUE, 0x34});
-                opcode_to_byte_map.insert({zkevm_opcode::CALLDATALOAD, 0x35});
-                opcode_to_byte_map.insert({zkevm_opcode::CALLDATASIZE, 0x36});
-                opcode_to_byte_map.insert({zkevm_opcode::CALLDATACOPY, 0x37});
-                opcode_to_byte_map.insert({zkevm_opcode::CODESIZE, 0x38});
-                opcode_to_byte_map.insert({zkevm_opcode::CODECOPY, 0x39});
-                opcode_to_byte_map.insert({zkevm_opcode::GASPRICE, 0x3a});
-                opcode_to_byte_map.insert({zkevm_opcode::EXTCODESIZE, 0x3b});
-                opcode_to_byte_map.insert({zkevm_opcode::EXTCODECOPY, 0x3c});
-                opcode_to_byte_map.insert({zkevm_opcode::RETURNDATASIZE, 0x3d});
-                opcode_to_byte_map.insert({zkevm_opcode::RETURNDATACOPY, 0x3e});
-                opcode_to_byte_map.insert({zkevm_opcode::EXTCODEHASH, 0x3f});
-                opcode_to_byte_map.insert({zkevm_opcode::BLOCKHASH, 0x40});
-                opcode_to_byte_map.insert({zkevm_opcode::COINBASE, 0x41});
-                opcode_to_byte_map.insert({zkevm_opcode::TIMESTAMP, 0x42});
-                opcode_to_byte_map.insert({zkevm_opcode::NUMBER, 0x43});
-                opcode_to_byte_map.insert({zkevm_opcode::PREVRANDAO, 0x44});
-                opcode_to_byte_map.insert({zkevm_opcode::GASLIMIT, 0x45});
-                opcode_to_byte_map.insert({zkevm_opcode::CHAINID, 0x46});
-                opcode_to_byte_map.insert({zkevm_opcode::SELFBALANCE, 0x47});
-                opcode_to_byte_map.insert({zkevm_opcode::BASEFEE, 0x48});
-                opcode_to_byte_map.insert({zkevm_opcode::BLOBHASH, 0x49});
-                opcode_to_byte_map.insert({zkevm_opcode::BLOBBASEFEE, 0x4a});
-                opcode_to_byte_map.insert({zkevm_opcode::POP, 0x50});
-                opcode_to_byte_map.insert({zkevm_opcode::MLOAD, 0x51});
-                opcode_to_byte_map.insert({zkevm_opcode::MSTORE, 0x52});
-                opcode_to_byte_map.insert({zkevm_opcode::MSTORE8, 0x53});
-                opcode_to_byte_map.insert({zkevm_opcode::SLOAD, 0x54});
-                opcode_to_byte_map.insert({zkevm_opcode::SSTORE, 0x55});
-                opcode_to_byte_map.insert({zkevm_opcode::JUMP, 0x56});
-                opcode_to_byte_map.insert({zkevm_opcode::JUMPI, 0x57});
-                opcode_to_byte_map.insert({zkevm_opcode::PC, 0x58});
-                opcode_to_byte_map.insert({zkevm_opcode::MSIZE, 0x59});
-                opcode_to_byte_map.insert({zkevm_opcode::GAS, 0x5a});
-                opcode_to_byte_map.insert({zkevm_opcode::JUMPDEST, 0x5b});
-                opcode_to_byte_map.insert({zkevm_opcode::TLOAD, 0x5c});
-                opcode_to_byte_map.insert({zkevm_opcode::TSTORE, 0x5d});
-                opcode_to_byte_map.insert({zkevm_opcode::MCOPY, 0x5e});
-                opcode_to_byte_map.insert({zkevm_opcode::PUSH0, 0x5f});
-                opcode_to_byte_map.insert({zkevm_opcode::PUSH1, 0x60});
-                opcode_to_byte_map.insert({zkevm_opcode::PUSH2, 0x61});
-                opcode_to_byte_map.insert({zkevm_opcode::PUSH3, 0x62});
-                opcode_to_byte_map.insert({zkevm_opcode::PUSH4, 0x63});
-                opcode_to_byte_map.insert({zkevm_opcode::PUSH5, 0x64});
-                opcode_to_byte_map.insert({zkevm_opcode::PUSH6, 0x65});
-                opcode_to_byte_map.insert({zkevm_opcode::PUSH7, 0x66});
-                opcode_to_byte_map.insert({zkevm_opcode::PUSH8, 0x67});
-                opcode_to_byte_map.insert({zkevm_opcode::PUSH9, 0x68});
-                opcode_to_byte_map.insert({zkevm_opcode::PUSH10, 0x69});
-                opcode_to_byte_map.insert({zkevm_opcode::PUSH11, 0x6a});
-                opcode_to_byte_map.insert({zkevm_opcode::PUSH12, 0x6b});
-                opcode_to_byte_map.insert({zkevm_opcode::PUSH13, 0x6c});
-                opcode_to_byte_map.insert({zkevm_opcode::PUSH14, 0x6d});
-                opcode_to_byte_map.insert({zkevm_opcode::PUSH15, 0x6e});
-                opcode_to_byte_map.insert({zkevm_opcode::PUSH16, 0x6f});
-                opcode_to_byte_map.insert({zkevm_opcode::PUSH17, 0x70});
-                opcode_to_byte_map.insert({zkevm_opcode::PUSH18, 0x71});
-                opcode_to_byte_map.insert({zkevm_opcode::PUSH19, 0x72});
-                opcode_to_byte_map.insert({zkevm_opcode::PUSH20, 0x73});
-                opcode_to_byte_map.insert({zkevm_opcode::PUSH21, 0x74});
-                opcode_to_byte_map.insert({zkevm_opcode::PUSH22, 0x75});
-                opcode_to_byte_map.insert({zkevm_opcode::PUSH23, 0x76});
-                opcode_to_byte_map.insert({zkevm_opcode::PUSH24, 0x77});
-                opcode_to_byte_map.insert({zkevm_opcode::PUSH25, 0x78});
-                opcode_to_byte_map.insert({zkevm_opcode::PUSH26, 0x79});
-                opcode_to_byte_map.insert({zkevm_opcode::PUSH27, 0x7a});
-                opcode_to_byte_map.insert({zkevm_opcode::PUSH28, 0x7b});
-                opcode_to_byte_map.insert({zkevm_opcode::PUSH29, 0x7c});
-                opcode_to_byte_map.insert({zkevm_opcode::PUSH30, 0x7d});
-                opcode_to_byte_map.insert({zkevm_opcode::PUSH31, 0x7e});
-                opcode_to_byte_map.insert({zkevm_opcode::PUSH32, 0x7f});
-                opcode_to_byte_map.insert({zkevm_opcode::DUP1, 0x80});
-                opcode_to_byte_map.insert({zkevm_opcode::DUP2, 0x81});
-                opcode_to_byte_map.insert({zkevm_opcode::DUP3, 0x82});
-                opcode_to_byte_map.insert({zkevm_opcode::DUP4, 0x83});
-                opcode_to_byte_map.insert({zkevm_opcode::DUP5, 0x84});
-                opcode_to_byte_map.insert({zkevm_opcode::DUP6, 0x85});
-                opcode_to_byte_map.insert({zkevm_opcode::DUP7, 0x86});
-                opcode_to_byte_map.insert({zkevm_opcode::DUP8, 0x87});
-                opcode_to_byte_map.insert({zkevm_opcode::DUP9, 0x88});
-                opcode_to_byte_map.insert({zkevm_opcode::DUP10, 0x89});
-                opcode_to_byte_map.insert({zkevm_opcode::DUP11, 0x8a});
-                opcode_to_byte_map.insert({zkevm_opcode::DUP12, 0x8b});
-                opcode_to_byte_map.insert({zkevm_opcode::DUP13, 0x8c});
-                opcode_to_byte_map.insert({zkevm_opcode::DUP14, 0x8d});
-                opcode_to_byte_map.insert({zkevm_opcode::DUP15, 0x8e});
-                opcode_to_byte_map.insert({zkevm_opcode::DUP16, 0x8f});
-                opcode_to_byte_map.insert({zkevm_opcode::SWAP1, 0x90});
-                opcode_to_byte_map.insert({zkevm_opcode::SWAP2, 0x91});
-                opcode_to_byte_map.insert({zkevm_opcode::SWAP3, 0x92});
-                opcode_to_byte_map.insert({zkevm_opcode::SWAP4, 0x93});
-                opcode_to_byte_map.insert({zkevm_opcode::SWAP5, 0x94});
-                opcode_to_byte_map.insert({zkevm_opcode::SWAP6, 0x95});
-                opcode_to_byte_map.insert({zkevm_opcode::SWAP7, 0x96});
-                opcode_to_byte_map.insert({zkevm_opcode::SWAP8, 0x97});
-                opcode_to_byte_map.insert({zkevm_opcode::SWAP9, 0x98});
-                opcode_to_byte_map.insert({zkevm_opcode::SWAP10, 0x99});
-                opcode_to_byte_map.insert({zkevm_opcode::SWAP11, 0x9a});
-                opcode_to_byte_map.insert({zkevm_opcode::SWAP12, 0x9b});
-                opcode_to_byte_map.insert({zkevm_opcode::SWAP13, 0x9c});
-                opcode_to_byte_map.insert({zkevm_opcode::SWAP14, 0x9d});
-                opcode_to_byte_map.insert({zkevm_opcode::SWAP15, 0x9e});
-                opcode_to_byte_map.insert({zkevm_opcode::SWAP16, 0x9f});
-                opcode_to_byte_map.insert({zkevm_opcode::LOG0, 0xa0});
-                opcode_to_byte_map.insert({zkevm_opcode::LOG1, 0xa1});
-                opcode_to_byte_map.insert({zkevm_opcode::LOG2, 0xa2});
-                opcode_to_byte_map.insert({zkevm_opcode::LOG3, 0xa3});
-                opcode_to_byte_map.insert({zkevm_opcode::LOG4, 0xa4});
-                opcode_to_byte_map.insert({zkevm_opcode::CREATE, 0xf0});
-                opcode_to_byte_map.insert({zkevm_opcode::CALL, 0xf1});
-                opcode_to_byte_map.insert({zkevm_opcode::CALLCODE, 0xf2});
-                opcode_to_byte_map.insert({zkevm_opcode::RETURN, 0xf3});
-                opcode_to_byte_map.insert({zkevm_opcode::DELEGATECALL, 0xf4});
-                opcode_to_byte_map.insert({zkevm_opcode::CREATE2, 0xf5});
-                opcode_to_byte_map.insert({zkevm_opcode::STATICCALL, 0xfa});
-                opcode_to_byte_map.insert({zkevm_opcode::REVERT, 0xfd});
-                opcode_to_byte_map.insert({zkevm_opcode::INVALID, 0xfe});
-                opcode_to_byte_map.insert({zkevm_opcode::SELFDESTRUCT, 0xff});
+                // <opcode, byte value, static cost, has dynamic cost, stack input, stack output>
+                std::vector<std::tuple<zkevm_opcode, std::size_t, std::size_t, bool, std::size_t, std::size_t>> opcode_data = {
+                    {zkevm_opcode::STOP, 0x00, 0, 0, 0, 0},
+                    {zkevm_opcode::ADD,  0x01, 3, 0, 2, 1},
+                    {zkevm_opcode::MUL,  0x02, 5, 0, 2, 1},
+                    {zkevm_opcode::SUB,  0x03, 3, 0, 2, 1},
+                    {zkevm_opcode::DIV,  0x04, 5, 0, 2, 1},
+                    {zkevm_opcode::SDIV, 0x05, 5, 0, 2, 1},
+                    {zkevm_opcode::MOD,  0x06, 5, 0, 2, 1},
+                    {zkevm_opcode::SMOD, 0x07, 5, 0, 2, 1},
+                    {zkevm_opcode::ADDMOD, 0x08, 8, 0, 3, 1},
+                    {zkevm_opcode::MULMOD, 0x09, 8, 0, 3, 1},
+                    {zkevm_opcode::EXP, 0x0a, 10, 1, 2, 1},
+                    {zkevm_opcode::SIGNEXTEND, 0x0b, 5, 0, 2, 1},
+                    {zkevm_opcode::LT,  0x10, 3, 0, 2, 1},
+                    {zkevm_opcode::GT,  0x11, 3, 0, 2, 1},
+                    {zkevm_opcode::SLT, 0x12, 3, 0, 2, 1},
+                    {zkevm_opcode::SGT, 0x13, 3, 0, 2, 1},
+                    {zkevm_opcode::EQ,  0x14, 3, 0, 2, 1},
+                    {zkevm_opcode::ISZERO, 0x15, 3, 0, 1, 1},
+                    {zkevm_opcode::AND, 0x16, 3, 0, 2, 1},
+                    {zkevm_opcode::OR,  0x17, 3, 0, 2, 1},
+                    {zkevm_opcode::XOR, 0x18, 3, 0, 2, 1},
+                    {zkevm_opcode::NOT, 0x19, 3, 0, 1, 1},
+                    {zkevm_opcode::BYTE, 0x1a, 3, 0, 2, 1},
+                    {zkevm_opcode::SHL, 0x1b, 3, 0, 2, 1},
+                    {zkevm_opcode::SHR, 0x1c, 3, 0, 2, 1},
+                    {zkevm_opcode::SAR, 0x1d, 3, 0, 2, 1},
+                    {zkevm_opcode::KECCAK256, 0x20, 30, 1, 2, 1},
+                    {zkevm_opcode::ADDRESS, 0x30, 2, 0, 0, 1},
+                    {zkevm_opcode::BALANCE, 0x31, 100, 1, 1, 1},
+                    {zkevm_opcode::ORIGIN, 0x32, 2, 0, 0, 1},
+                    {zkevm_opcode::CALLER, 0x33, 2, 0, 0, 1},
+                    {zkevm_opcode::CALLVALUE, 0x34, 2, 0, 0, 1},
+                    {zkevm_opcode::CALLDATALOAD, 0x35, 3, 0, 1, 1},
+                    {zkevm_opcode::CALLDATASIZE, 0x36, 2, 0, 0, 1},
+                    {zkevm_opcode::CALLDATACOPY, 0x37, 3, 1, 3, 0},
+                    {zkevm_opcode::CODESIZE, 0x38, 2, 0, 0, 1},
+                    {zkevm_opcode::CODECOPY, 0x39, 3, 1, 3, 0},
+                    {zkevm_opcode::GASPRICE, 0x3a, 2, 0, 0, 1},
+                    {zkevm_opcode::EXTCODESIZE, 0x3b, 100, 1, 1, 1},
+                    {zkevm_opcode::EXTCODECOPY, 0x3c, 100, 1, 4, 0},
+                    {zkevm_opcode::RETURNDATASIZE, 0x3d, 2, 0, 0, 1},
+                    {zkevm_opcode::RETURNDATACOPY, 0x3e, 3, 1, 3, 0},
+                    {zkevm_opcode::EXTCODEHASH, 0x3f, 100, 1, 1, 1},
+                    {zkevm_opcode::BLOCKHASH, 0x40, 20, 0, 1, 1},
+                    {zkevm_opcode::COINBASE, 0x41, 2, 0, 0, 1},
+                    {zkevm_opcode::TIMESTAMP, 0x42, 2, 0, 0, 1},
+                    {zkevm_opcode::NUMBER, 0x43, 2, 0, 0, 1},
+                    {zkevm_opcode::PREVRANDAO, 0x44, 2, 0, 0, 1},
+                    {zkevm_opcode::GASLIMIT, 0x45, 2, 0, 0, 1},
+                    {zkevm_opcode::CHAINID, 0x46, 2, 0, 0, 1},
+                    {zkevm_opcode::SELFBALANCE, 0x47, 5, 0, 0, 1},
+                    {zkevm_opcode::BASEFEE, 0x48, 2, 0, 0, 1},
+                    {zkevm_opcode::BLOBHASH, 0x49, 3, 0, 1, 1},
+                    {zkevm_opcode::BLOBBASEFEE, 0x4a, 2, 0, 0, 1},
+                    {zkevm_opcode::POP, 0x50, 2, 0, 1, 0},
+                    {zkevm_opcode::MLOAD, 0x51, 3, 1, 1, 1},
+                    {zkevm_opcode::MSTORE, 0x52, 3, 1, 2, 0},
+                    {zkevm_opcode::MSTORE8, 0x53, 3, 1, 2, 0},
+                    {zkevm_opcode::SLOAD, 0x54, 100, 1, 1, 1},
+                    {zkevm_opcode::SSTORE, 0x55, 100, 1, 2, 0},
+                    {zkevm_opcode::JUMP, 0x56, 8, 0, 1, 0},
+                    {zkevm_opcode::JUMPI, 0x57, 10, 0, 2, 0},
+                    {zkevm_opcode::PC, 0x58, 2, 0, 0, 1},
+                    {zkevm_opcode::MSIZE, 0x59, 2, 0, 0, 1},
+                    {zkevm_opcode::GAS, 0x5a, 2, 0, 0, 1},
+                    {zkevm_opcode::JUMPDEST, 0x5b, 1, 0, 0, 0},
+                    {zkevm_opcode::TLOAD, 0x5c, 100, 0, 1, 1},
+                    {zkevm_opcode::TSTORE, 0x5d, 100, 0, 2, 0},
+                    {zkevm_opcode::MCOPY, 0x5e, 3, 1, 3, 0},
+                    {zkevm_opcode::PUSH0, 0x5f, 2, 0, 0, 1},
+                    {zkevm_opcode::PUSH1, 0x60, 3, 0, 0, 1},
+                    {zkevm_opcode::PUSH2, 0x61, 3, 0, 0, 1},
+                    {zkevm_opcode::PUSH3, 0x62, 3, 0, 0, 1},
+                    {zkevm_opcode::PUSH4, 0x63, 3, 0, 0, 1},
+                    {zkevm_opcode::PUSH5, 0x64, 3, 0, 0, 1},
+                    {zkevm_opcode::PUSH6, 0x65, 3, 0, 0, 1},
+                    {zkevm_opcode::PUSH7, 0x66, 3, 0, 0, 1},
+                    {zkevm_opcode::PUSH8, 0x67, 3, 0, 0, 1},
+                    {zkevm_opcode::PUSH9, 0x68, 3, 0, 0, 1},
+                    {zkevm_opcode::PUSH10, 0x69, 3, 0, 0, 1},
+                    {zkevm_opcode::PUSH11, 0x6a, 3, 0, 0, 1},
+                    {zkevm_opcode::PUSH12, 0x6b, 3, 0, 0, 1},
+                    {zkevm_opcode::PUSH13, 0x6c, 3, 0, 0, 1},
+                    {zkevm_opcode::PUSH14, 0x6d, 3, 0, 0, 1},
+                    {zkevm_opcode::PUSH15, 0x6e, 3, 0, 0, 1},
+                    {zkevm_opcode::PUSH16, 0x6f, 3, 0, 0, 1},
+                    {zkevm_opcode::PUSH17, 0x70, 3, 0, 0, 1},
+                    {zkevm_opcode::PUSH18, 0x71, 3, 0, 0, 1},
+                    {zkevm_opcode::PUSH19, 0x72, 3, 0, 0, 1},
+                    {zkevm_opcode::PUSH20, 0x73, 3, 0, 0, 1},
+                    {zkevm_opcode::PUSH21, 0x74, 3, 0, 0, 1},
+                    {zkevm_opcode::PUSH22, 0x75, 3, 0, 0, 1},
+                    {zkevm_opcode::PUSH23, 0x76, 3, 0, 0, 1},
+                    {zkevm_opcode::PUSH24, 0x77, 3, 0, 0, 1},
+                    {zkevm_opcode::PUSH25, 0x78, 3, 0, 0, 1},
+                    {zkevm_opcode::PUSH26, 0x79, 3, 0, 0, 1},
+                    {zkevm_opcode::PUSH27, 0x7a, 3, 0, 0, 1},
+                    {zkevm_opcode::PUSH28, 0x7b, 3, 0, 0, 1},
+                    {zkevm_opcode::PUSH29, 0x7c, 3, 0, 0, 1},
+                    {zkevm_opcode::PUSH30, 0x7d, 3, 0, 0, 1},
+                    {zkevm_opcode::PUSH31, 0x7e, 3, 0, 0, 1},
+                    {zkevm_opcode::PUSH32, 0x7f, 3, 0, 0, 1},
+                    {zkevm_opcode::DUP1, 0x80, 3, 0, 1, 2},
+                    {zkevm_opcode::DUP2, 0x81, 3, 0, 2, 3},
+                    {zkevm_opcode::DUP3, 0x82, 3, 0, 3, 4},
+                    {zkevm_opcode::DUP4, 0x83, 3, 0, 4, 5},
+                    {zkevm_opcode::DUP5, 0x84, 3, 0, 5, 6},
+                    {zkevm_opcode::DUP6, 0x85, 3, 0, 6, 7},
+                    {zkevm_opcode::DUP7, 0x86, 3, 0, 7, 8},
+                    {zkevm_opcode::DUP8, 0x87, 3, 0, 8, 9},
+                    {zkevm_opcode::DUP9, 0x88, 3, 0, 9, 10},
+                    {zkevm_opcode::DUP10, 0x89, 3, 0, 10, 11},
+                    {zkevm_opcode::DUP11, 0x8a, 3, 0, 11, 12},
+                    {zkevm_opcode::DUP12, 0x8b, 3, 0, 12, 13},
+                    {zkevm_opcode::DUP13, 0x8c, 3, 0, 13, 14},
+                    {zkevm_opcode::DUP14, 0x8d, 3, 0, 14, 15},
+                    {zkevm_opcode::DUP15, 0x8e, 3, 0, 15, 16},
+                    {zkevm_opcode::DUP16, 0x8f, 3, 0, 16, 17},
+                    {zkevm_opcode::SWAP1, 0x90, 3, 0, 2, 2},
+                    {zkevm_opcode::SWAP2, 0x91, 3, 0, 3, 3},
+                    {zkevm_opcode::SWAP3, 0x92, 3, 0, 4, 4},
+                    {zkevm_opcode::SWAP4, 0x93, 3, 0, 5, 5},
+                    {zkevm_opcode::SWAP5, 0x94, 3, 0, 6, 6},
+                    {zkevm_opcode::SWAP6, 0x95, 3, 0, 7, 7},
+                    {zkevm_opcode::SWAP7, 0x96, 3, 0, 8, 8},
+                    {zkevm_opcode::SWAP8, 0x97, 3, 0, 9, 9},
+                    {zkevm_opcode::SWAP9, 0x98, 3, 0, 10, 10},
+                    {zkevm_opcode::SWAP10, 0x99, 3, 0, 11, 11},
+                    {zkevm_opcode::SWAP11, 0x9a, 3, 0, 12, 12},
+                    {zkevm_opcode::SWAP12, 0x9b, 3, 0, 13, 13},
+                    {zkevm_opcode::SWAP13, 0x9c, 3, 0, 14, 14},
+                    {zkevm_opcode::SWAP14, 0x9d, 3, 0, 15, 15},
+                    {zkevm_opcode::SWAP15, 0x9e, 3, 0, 16, 16},
+                    {zkevm_opcode::SWAP16, 0x9f, 3, 0, 17, 17},
+                    {zkevm_opcode::LOG0, 0xa0, 375, 1, 2, 0},
+                    {zkevm_opcode::LOG1, 0xa1, 750, 1, 3, 0},
+                    {zkevm_opcode::LOG2, 0xa2, 1125, 1, 4, 0},
+                    {zkevm_opcode::LOG3, 0xa3, 1500, 1, 5, 0},
+                    {zkevm_opcode::LOG4, 0xa4, 1875, 1, 6, 0},
+                    {zkevm_opcode::CREATE, 0xf0, 32000, 1, 3, 1},
+                    {zkevm_opcode::CALL, 0xf1, 100, 1, 7, 1},
+                    {zkevm_opcode::CALLCODE, 0xf2, 100, 1, 7, 1},
+                    {zkevm_opcode::RETURN, 0xf3, 0, 1, 2, 0},
+                    {zkevm_opcode::DELEGATECALL, 0xf4, 100, 1, 6, 1},
+                    {zkevm_opcode::CREATE2, 0xf5, 32000, 1, 4, 1},
+                    {zkevm_opcode::STATICCALL, 0xfa, 100, 1, 6, 1},
+                    {zkevm_opcode::REVERT, 0xfd, 0, 1, 2, 0},
+                    {zkevm_opcode::INVALID, 0xfe, 0, 1, 0, 0},
+                    {zkevm_opcode::SELFDESTRUCT, 0xff, 5000, 1, 1, 0},
+                    // these are not real opcodes, they are for exception processing
+                    {zkevm_opcode::err0, 0x100, 0, 0, 0, 0} // not enough static gas or incorrect stack size
+                };
+                for(std::size_t i = 0; i < opcode_data.size(); i++) {
+                    auto [opcode_mnemo, opcode_byte, opcode_cost, opcode_dynamic, stack_input, stack_output] = opcode_data[i];
+                    opcode_to_byte_map.insert({opcode_mnemo, opcode_byte});
+                    opcode_to_number_map.insert({opcode_mnemo, i});
+                    opcode_cost_map.insert({opcode_mnemo, opcode_cost});
+                    opcode_stack_input_map.insert({opcode_mnemo, stack_input});
+                    opcode_stack_output_map.insert({opcode_mnemo, stack_output});
+                }
             }
         };
 

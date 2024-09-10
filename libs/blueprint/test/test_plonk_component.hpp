@@ -121,6 +121,7 @@ namespace nil {
                 const typename ComponentType::input_type &instance_input,
                 const std::uint32_t start_row_index) const override {
 
+                std::cout << "Generate assignments" << std::endl;
                 return blueprint::components::generate_assignments<BlueprintFieldType>(
                             component, assignment, instance_input, start_row_index);
             }
@@ -195,14 +196,22 @@ namespace nil {
                 }
             }
 
+            std::cout << "Generate circuit" << std::endl;
             blueprint::components::generate_circuit<BlueprintFieldType>(
                 component_instance, bp, assignment, instance_input, start_row);
+            std::cout << "Assigner" << std::endl;
             auto component_result = boost::get<typename component_type::result_type>(
                 assigner(component_instance, assignment, instance_input, start_row));
 
             // Stretched components do not have a manifest, as they are dynamically generated.
             if constexpr (!blueprint::components::is_component_stretcher<
                                     BlueprintFieldType, ComponentType>::value) {
+                if(bp.num_gates() + bp.num_lookup_gates() !=
+                                component_type::get_gate_manifest(component_instance.witness_amount(),
+                                                                  component_static_info_args...).get_gates_amount()){
+                    std::cout << bp.num_gates() + bp.num_lookup_gates() << " != " << component_type::get_gate_manifest(component_instance.witness_amount(),
+                                                                  component_static_info_args...).get_gates_amount() << std::endl;
+                }
                 BOOST_ASSERT_MSG(bp.num_gates() + bp.num_lookup_gates() ==
                                 component_type::get_gate_manifest(component_instance.witness_amount(),
                                                                   component_static_info_args...).get_gates_amount(),
@@ -210,6 +219,8 @@ namespace nil {
             }
 
             if (start_row + component_instance.rows_amount >= public_input.size()) {
+                if ( assignment.rows_amount() - start_row != component_instance.rows_amount )
+                    std::cout << assignment.rows_amount() << " != " << component_instance.rows_amount << std::endl;
                 BOOST_ASSERT_MSG(assignment.rows_amount() - start_row == component_instance.rows_amount,
                                 "Component rows amount does not match actual rows amount.");
                 // Stretched components do not have a manifest, as they are dynamically generated.
@@ -255,10 +266,11 @@ namespace nil {
                 // blueprint::detail::export_connectedness_zones(
                 //      zones, assignment, instance_input.all_vars(), start_row, rows_after_batching - start_row, std::cout);
 
-                // BOOST_ASSERT_MSG(is_connected,
-                //   "Component disconnected! See comment above this assert for a way to output a visual representation of the connectedness graph.");
+                BOOST_ASSERT_MSG(is_connected,
+                  "Component disconnected! See comment above this assert for a way to output a visual representation of the connectedness graph.");
             }
             desc.usable_rows_amount = assignment.rows_amount();
+            std::cout << "Use lookups" << std::endl;
 
             if constexpr (nil::blueprint::use_lookups<component_type>()) {
                 // Components with lookups may use constant columns.
@@ -299,7 +311,9 @@ namespace nil {
             // assignment.export_table(std::cout);
             // bp.export_circuit(std::cout);
 
+            std::cout << "Satisfiability check starts" << std::endl;
             assert(blueprint::is_satisfied(bp, assignment) == expected_to_pass);
+            std::cout << "Satisfiability check ends" << std::endl << std::endl;
             return std::make_tuple(desc, bp, assignment);
         }
 

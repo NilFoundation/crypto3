@@ -92,6 +92,11 @@ namespace nil {
                 return used_selector_rows;
             }
 
+            void make_all_rows_used() {
+                for (std::uint32_t i = 0; i < rows_amount(); ++i) {
+                    used_rows.insert(i);
+                }
+            }
             std::uint32_t rows_amount() const override {
                 return assignment_ptr->rows_amount();
             }

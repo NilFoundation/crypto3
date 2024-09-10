@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2024 Dmitrii Tabalin <d.tabalin@nil.foundation>
+// Copyright (c) 2024 Alexey Yashunsky <a.yashunsky@nil.foundation>
 //
 // MIT License
 //
@@ -34,7 +35,11 @@ namespace nil {
         class zkevm_machine_interface {
         public:
             using word_type = zkevm_word_type;
+
+            zkevm_machine_interface(unsigned long int _init_gas) : gas(_init_gas) {}
+
             zkevm_stack stack;
+            unsigned long int gas;
         };
     }
 }
