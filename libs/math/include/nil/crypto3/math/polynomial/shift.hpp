@@ -39,7 +39,7 @@ namespace nil {
                 polynomial<FieldValueType> f_shifted(f);
                 FieldValueType x_power = x;
                 for (std::size_t i = 1; i < f.size(); i++) {
-                    f_shifted[i] = f_shifted[i] * x_power;
+                    f_shifted[i] *= x_power;
                     x_power *= x;
                 }
 

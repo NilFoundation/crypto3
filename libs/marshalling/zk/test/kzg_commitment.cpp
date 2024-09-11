@@ -25,7 +25,6 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#include "nil/crypto3/zk/commitments/batched_commitment.hpp"
 #define BOOST_TEST_MODULE crypto3_marshalling_kzg_commitment_test
 
 #include <boost/test/unit_test.hpp>
@@ -53,7 +52,8 @@
 #include <nil/crypto3/algebra/fields/arithmetic_params/mnt6.hpp>
 
 #include <nil/crypto3/algebra/curves/bls12.hpp>
-#include <nil/crypto3/algebra/pairing/bls12.hpp> 
+#include <nil/crypto3/algebra/pairing/bls12.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/bls12.hpp>
 
 /*
 #include <nil/crypto3/algebra/curves/alt_bn128.hpp>
@@ -75,6 +75,7 @@
 #include <nil/crypto3/zk/commitments/polynomial/kzg.hpp>
 #include <nil/crypto3/zk/commitments/polynomial/kzg_v2.hpp>
 #include <nil/crypto3/marshalling/zk/types/commitments/kzg.hpp>
+#include <nil/crypto3/zk/commitments/batched_commitment.hpp>
 
 #include <nil/crypto3/zk/snark/arithmetization/plonk/params.hpp>
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/params.hpp>

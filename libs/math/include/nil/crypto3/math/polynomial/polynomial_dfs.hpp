@@ -73,11 +73,11 @@ namespace nil {
                 polynomial_dfs() : val(1, FieldValueType::zero()), _d(0) {
                 }
 
-                explicit polynomial_dfs(size_t d, size_type n) : val(n), _d(d) {
+                explicit polynomial_dfs(size_t d, size_type n) : val(n, FieldValueType::zero()), _d(d) {
                     BOOST_ASSERT_MSG(n == detail::power_of_two(n), "DFS optimal polynomial size must be a power of two");
                 }
 
-                explicit polynomial_dfs(size_t d, size_type n, const allocator_type& a) : val(n, a), _d(d) {
+                explicit polynomial_dfs(size_t d, size_type n, const allocator_type& a) : val(n, FieldValueType::zero(), a), _d(d) {
                     BOOST_ASSERT_MSG(n == detail::power_of_two(n), "DFS optimal polynomial size must be a power of two");
                 }
 
@@ -340,6 +340,7 @@ namespace nil {
                         return;
                     }
                     BOOST_ASSERT_MSG(_sz >= _d, "Resizing DFS polynomial to a size less than degree is prohibited: can't restore the polynomial in the future.");
+
                     if (this->degree() == 0) {
                         // Here we cannot write this->val.resize(_sz, this->val[0]), it will segfault.
                         auto value = this->val[0];
@@ -436,6 +437,7 @@ namespace nil {
                         this->resize(other.size());
                     }
                     this->_d = std::max(this->_d, other._d);
+
                     if (this->size() > other.size()) {
                         polynomial_dfs tmp(other);
                         tmp.resize(this->size());
@@ -512,7 +514,6 @@ namespace nil {
                 polynomial_dfs operator*(const polynomial_dfs& other) const {
                     polynomial_dfs result = *this;
                     result *= other;
-
                     return result;
                 }
 
@@ -711,7 +712,7 @@ namespace nil {
             polynomial_dfs<FieldValueType, Allocator> operator*(const polynomial_dfs<FieldValueType, Allocator>& A,
                                                             const FieldValueType& B) {
                 polynomial_dfs<FieldValueType> result(A);
-                for( auto it = result.begin(); it != result.end(); it++ ){
+                for ( auto it = result.begin(); it != result.end(); ++it) {
                     *it *= B;
                 }
                 return result;
@@ -731,7 +732,7 @@ namespace nil {
                                                             const FieldValueType& B) {
                 polynomial_dfs<FieldValueType> result(A);
                 FieldValueType B_inversed = B.inversed();
-                for( auto it = result.begin(); it != result.end(); it++ ){
+                for ( auto it = result.begin(); it != result.end(); ++it) {
                     *it *= B_inversed;
                 }
                 return result;

@@ -308,7 +308,6 @@ namespace nil {
              */
             template<typename Range>
             void division(Range &q, Range &r, const Range &a, const Range &b) {
-
                 typedef
                 typename std::iterator_traits<decltype(std::begin(std::declval<Range>()))>::value_type value_type;
 

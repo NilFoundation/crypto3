@@ -235,7 +235,7 @@ namespace nil {
                             }
 
                             // For the last round it's final_polynomial's values
-                            
+                           
                             // Values for the next round.
                             polynomial_values_type y;
 
@@ -441,6 +441,7 @@ namespace nil {
                 ) {
                     PROFILE_SCOPE("Basic FRI Precommit time");
 
+                    // Resize uses low level thread pool, so we need to use the high level one here.
                     for (std::size_t i = 0; i < poly.size(); ++i) {
                         if (poly[i].size() != D->size()) {
                             poly[i].resize(D->size(), nullptr, D);
@@ -743,6 +744,7 @@ namespace nil {
                             }
                         }
                     }
+
                     return std::move(g_coeffs);
                 }
 
@@ -911,6 +913,7 @@ namespace nil {
                     return std::move(round_proofs);
                 }
 
+
                 template<typename FRI, typename PolynomialType>
                 static std::vector<typename FRI::query_proof_type>
                 query_phase(
@@ -957,8 +960,10 @@ namespace nil {
                         typename FRI::query_proof_type query_proof = {std::move(initial_proof), std::move(round_proofs)};
                         query_proofs[query_id] = std::move(query_proof);
                     }
+
                     return std::move(query_proofs);
                 }
+
 
                 template<typename FRI, typename PolynomialType,
                     typename std::enable_if<
@@ -977,6 +982,7 @@ namespace nil {
                     const typename FRI::params_type &fri_params,
                     typename FRI::transcript_type &transcript
                 ) {
+                    PROFILE_SCOPE("Basic FRI proof_eval time");
                     typename FRI::proof_type proof;
 
                     BOOST_ASSERT(check_step_list<FRI>(fri_params));

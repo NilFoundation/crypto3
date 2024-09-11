@@ -1,7 +1,7 @@
 # Zero-Knowledge Cryptography Schemes for =nil; Foundation's Cryptography Suite
 
-Zero-Knowledge cryptography schemes for =nil; Foundation's cryptography suite. 
-SNARK-alike schemes for now. More trivial Pedersen commitment schemes, STARKs, 
+Zero-Knowledge cryptography schemes for =nil; Foundation's cryptography suite.
+SNARK-alike schemes for now. More trivial Pedersen commitment schemes, STARKs,
 IOP-based SNARKs, Bulletproofs etc in future.
 
 [![Run tests](https://github.com/NilFoundation/crypto3-zk/actions/workflows/run_tests.yml/badge.svg)](https://github.com/NilFoundation/crypto3-zk/actions/workflows/run_tests.yml)

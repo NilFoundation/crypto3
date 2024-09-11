@@ -39,15 +39,18 @@ target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
                       Boost::container
                       Boost::log
 
-                      ${CMAKE_WORKSPACE_NAME}::algebra
-                      ${CMAKE_WORKSPACE_NAME}::block
-                      ${CMAKE_WORKSPACE_NAME}::math
-                      ${CMAKE_WORKSPACE_NAME}::hash
-                      ${CMAKE_WORKSPACE_NAME}::multiprecision
+                      # Containers and math implementation could be replaced with namespace change
                       ${CMAKE_WORKSPACE_NAME}::containers
-                      ${CMAKE_WORKSPACE_NAME}::marshalling-zk
-                      ${CMAKE_WORKSPACE_NAME}::benchmark_tools
-                    )
+                      ${CMAKE_WORKSPACE_NAME}::math
+
+                      crypto3::algebra
+                      crypto3::block
+                      crypto3::hash
+                      crypto3::multiprecision
+                      crypto3::marshalling-zk
+
+                      crypto3::benchmark_tools
+)
 
 cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
           INCLUDE include

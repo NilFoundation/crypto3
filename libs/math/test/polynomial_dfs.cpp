@@ -1246,7 +1246,7 @@ BOOST_AUTO_TEST_CASE(polynomial_dfs_pow_eq_test) {
         }};
 
     polynomial_dfs<typename FieldType::value_type> res = a;
-    for (int i = 1; i < 7; ++i)
+    for (std::size_t i = 1; i < 7; ++i)
         res *= a;
 
     BOOST_CHECK_EQUAL(res, a.pow(7));
@@ -1345,7 +1345,7 @@ BOOST_AUTO_TEST_CASE(polynomial_dfs_multiplication_perf_test, *boost::unit_test:
             poly4[i] *= poly;
     }
 
-    for (int i = 1; i < poly4.size(); ++i) {
+    for (std::size_t i = 1; i < poly4.size(); ++i) {
         BOOST_CHECK(poly4[i] == poly4[0]);
     }
 
@@ -1360,8 +1360,8 @@ BOOST_AUTO_TEST_CASE(polynomial_dfs_multiplication_perf_test, *boost::unit_test:
 
 BOOST_AUTO_TEST_CASE(polynomial_dfs_resize_perf_test, *boost::unit_test::disabled()) {
     std::vector<typename FieldType::value_type> values;
-    size_t size = 131072 * 16;
-    for (int i = 0; i < size; i++) {
+    std::size_t size = 131072 * 16;
+    for (std::size_t i = 0; i < size; i++) {
         values.push_back(nil::crypto3::algebra::random_element<FieldType>());
     }
 
@@ -1369,10 +1369,9 @@ BOOST_AUTO_TEST_CASE(polynomial_dfs_resize_perf_test, *boost::unit_test::disable
         size - 1, values};
 
     auto start = std::chrono::high_resolution_clock::now();
-    for (int i = 0; i < 10; ++i) {
+    for (std::size_t i = 0; i < 10; ++i) {
         auto poly2 = poly;
         poly2.resize(8 * size);
-
         BOOST_CHECK(poly2.size() == 8 * size);
     }
 

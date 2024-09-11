@@ -26,8 +26,6 @@
 #ifndef CRYPTO3_MATH_MAKE_EVALUATION_DOMAIN_HPP
 #define CRYPTO3_MATH_MAKE_EVALUATION_DOMAIN_HPP
 
-#include <nil/crypto3/algebra/fields/arithmetic_params/bls12.hpp>
-
 #include <nil/crypto3/math/domains/evaluation_domain.hpp>
 #include <nil/crypto3/math/domains/arithmetic_sequence_domain.hpp>
 #include <nil/crypto3/math/domains/basic_radix2_domain.hpp>
