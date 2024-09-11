@@ -110,7 +110,8 @@ namespace nil {
                         typename private_preprocessor_type::preprocessed_data_type preprocessed_private_data,
                         const plonk_table_description<FieldType> &table_description,
                         const plonk_constraint_system<FieldType> &constraint_system,
-                        const commitment_scheme_type &commitment_scheme
+                        const commitment_scheme_type &commitment_scheme,
+                        bool skip_commitment_scheme_eval_proofs=false
                     )
                             : preprocessed_public_data(preprocessed_public_data)
                             , table_description(table_description)
@@ -122,6 +123,7 @@ namespace nil {
                             , transcript(std::vector<std::uint8_t>({}))
                             , _is_lookup_enabled(constraint_system.lookup_gates().size() > 0)
                             , _commitment_scheme(commitment_scheme)
+                            , _skip_commitment_scheme_eval_proofs(skip_commitment_scheme_eval_proofs)
                     {
                         // Initialize transcript.
                         transcript(preprocessed_public_data.common_data.vk.constraint_system_with_params_hash);
@@ -204,13 +206,15 @@ namespace nil {
                         }
                         transcript(_proof.commitments[QUOTIENT_BATCH]);
 
-                        // 8. Run evaluation proofs
-                        _proof.eval_proof.challenge = transcript.template challenge<FieldType>();
-                        generate_evaluation_points();
+                        if (!_skip_commitment_scheme_eval_proofs) {
+                            // 8. Run evaluation proofs
+                            _proof.eval_proof.challenge = transcript.template challenge<FieldType>();
+                            generate_evaluation_points();
 
-                        {
-                            PROFILE_SCOPE("commitment scheme proof eval time");
-                            _proof.eval_proof.eval_proof = _commitment_scheme.proof_eval(transcript);
+                            {
+                                PROFILE_SCOPE("commitment scheme proof eval time");
+                                _proof.eval_proof.eval_proof = _commitment_scheme.proof_eval(transcript);
+                            }
                         }
 
                         return _proof;
@@ -369,14 +373,14 @@ namespace nil {
                             }
                         }
 
-                        if(_is_lookup_enabled||constraint_system.copy_constraints().size() > 0){
+                        if (_is_lookup_enabled||constraint_system.copy_constraints().size() > 0) {
                             _commitment_scheme.append_eval_point(PERMUTATION_BATCH, _proof.eval_proof.challenge);
                         }
 
-                        if( constraint_system.copy_constraints().size() > 0 )
+                        if (constraint_system.copy_constraints().size() > 0)
                             _commitment_scheme.append_eval_point(PERMUTATION_BATCH, 0, _proof.eval_proof.challenge * _omega);
 
-                        if(_is_lookup_enabled) {
+                        if (_is_lookup_enabled) {
                             _commitment_scheme.append_eval_point(PERMUTATION_BATCH, preprocessed_public_data.common_data.permutation_parts,
                                 _proof.eval_proof.challenge * _omega);
                             _commitment_scheme.append_eval_point(LOOKUP_BATCH, _proof.eval_proof.challenge);
@@ -386,7 +390,6 @@ namespace nil {
                         }
 
                         _commitment_scheme.append_eval_point(QUOTIENT_BATCH, _proof.eval_proof.challenge);
-
 
                         // fixed values' rotations (table columns)
                         std::size_t i = 0;
@@ -479,6 +482,7 @@ namespace nil {
                     typename FieldType::value_type _omega;
                     std::vector<typename FieldType::value_type> _challenge_point;
                     commitment_scheme_type _commitment_scheme;
+                    bool _skip_commitment_scheme_eval_proofs;
                 };
             }    // namespace snark
         }        // namespace zk

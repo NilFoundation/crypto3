@@ -51,7 +51,7 @@ namespace nil {
                 struct placeholder_proof {
                     static constexpr std::size_t FIXED_VALUES_BATCH = 0;
                     static constexpr std::size_t VARIABLE_VALUES_BATCH = 1;
-                    static constexpr std::size_t PERMUTATION_BATCH =2;
+                    static constexpr std::size_t PERMUTATION_BATCH = 2;
                     static constexpr std::size_t QUOTIENT_BATCH = 3;
                     static constexpr std::size_t LOOKUP_BATCH = 4;
 

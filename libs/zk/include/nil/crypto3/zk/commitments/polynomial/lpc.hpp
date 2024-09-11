@@ -110,7 +110,7 @@ namespace nil {
                         : _fri_params(fri_params), _etha(0u) {
                     }
 
-                    preprocessed_data_type preprocess(transcript_type& transcript) const{
+                    preprocessed_data_type preprocess(transcript_type& transcript) const {
                         auto etha = transcript.template challenge<field_type>();
 
                         preprocessed_data_type result;
@@ -149,24 +149,61 @@ namespace nil {
                         BOOST_ASSERT(this->_points.size() == this->_polys.size());
                         BOOST_ASSERT(this->_points.size() == this->_z.get_batches_num());
 
-                        for(auto const& it: this->_trees) {
+                        // For each batch we have a merkle tree.
+                        for (auto const& it: this->_trees) {
                             transcript(it.second.root());
                         }
 
                         // Prepare z-s and combined_Q;
                         auto theta = transcript.template challenge<field_type>();
-                        typename field_type::value_type theta_acc = field_type::value_type::one();
+                        polynomial_type combined_Q = prepare_combined_Q(theta);
+
+                        auto fri_proof = commit_and_fri_proof(combined_Q);
+                        return proof_type({this->_z, fri_proof});
+                    }
+                    
+                    typename fri_type::proof_type commit_and_fri_proof(const polynomial_type& combined_Q) {
+
+                        precommitment_type combined_Q_precommitment = nil::crypto3::zk::algorithms::precommit<fri_type>(
+                            combined_Q,
+                            _fri_params.D[0],
+                            _fri_params.step_list.front()
+                        );
+
+                        typename fri_type::proof_type fri_proof = nil::crypto3::zk::algorithms::proof_eval<
+                            fri_type, polynomial_type
+                        >(
+                            this->_polys,
+                            combined_Q,
+                            this->_trees,
+                            combined_Q_precommitment,
+                            this->_fri_params,
+                            transcript
+                        );
+                        return fri_proof;
+                    }
+
+                    /** \brief 
+                     *  \param theta The value of challenge. When called from aggregated FRI, this values is sent from
+                                the "main prover" machine.
+                     *  \param starting_power When aggregated FRI is used, the value is not zero, it's the total degree of all
+                                the polynomials in all the provers with indices lower than the current one.
+                     */
+                    polynomial_type prepare_combined_Q(
+                            const typename field_type::value_type& theta,
+                            std::size_t starting_power = 0) {
+                        typename field_type::value_type theta_acc = theta.pow(starting_power);
                         polynomial_type combined_Q;
                         math::polynomial<value_type> V;
 
                         auto points = this->get_unique_points();
                         math::polynomial<value_type> combined_Q_normal;
 
-                        for (auto const &point: points){
+                        for (auto const &point: points) {
                             V = {-point, 1u};
                             math::polynomial<value_type> Q_normal;
-                            for(std::size_t i: this->_z.get_batches()){
-                                for(std::size_t j = 0; j < this->_z.get_batch_size(i); j++){
+                            for (std::size_t i: this->_z.get_batches()) {
+                                for (std::size_t j = 0; j < this->_z.get_batch_size(i); j++) {
                                     auto it = std::find(this->_points[i][j].begin(), this->_points[i][j].end(), point);
                                     if( it == this->_points[i][j].end()) continue;
                                     math::polynomial<value_type> g_normal;
@@ -185,6 +222,7 @@ namespace nil {
                             combined_Q_normal += Q_normal;
                         }
 
+                        // TODO(martun): the following code is the same as above with point = _etha, de-duplicate it.
                         for (std::size_t i: this->_z.get_batches()) {
                             if (!_batch_fixed[i])
                                 continue;
@@ -215,24 +253,7 @@ namespace nil {
                         } else {
                             combined_Q = std::move(combined_Q_normal);
                         }
-
-                        precommitment_type combined_Q_precommitment = nil::crypto3::zk::algorithms::precommit<fri_type>(
-                            combined_Q,
-                            _fri_params.D[0],
-                            _fri_params.step_list.front()
-                        );
-
-                        typename fri_type::proof_type fri_proof = nil::crypto3::zk::algorithms::proof_eval<
-                            fri_type, polynomial_type
-                        >(
-                            this->_polys,
-                            combined_Q,
-                            this->_trees,
-                            combined_Q_precommitment,
-                            this->_fri_params,
-                            transcript
-                        );
-                        return proof_type({this->_z, fri_proof});
+                        return combined_Q;
                     }
 
                     bool verify_eval(
