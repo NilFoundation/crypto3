@@ -73,10 +73,10 @@ BOOST_AUTO_TEST_SUITE(proof_of_knowledge_test_suite)
     BOOST_AUTO_TEST_CASE(pow_basic_test) {
         using keccak = nil::crypto3::hashes::keccak_1600<512>;
 
-        const std::uint32_t grinding_bits = 20;
-        const uint64_t expected_mask = (1ULL << grinding_bits) - 1;
+        const std::uint64_t grinding_bits = 16;
+        const uint64_t expected_mask = (1ull << grinding_bits) - 1;
 
-        using pow_type = nil::crypto3::zk::commitments::proof_of_work<keccak, std::uint32_t>;
+        using pow_type = nil::crypto3::zk::commitments::proof_of_work<keccak, std::uint64_t>;
 
         nil::crypto3::zk::transcript::fiat_shamir_heuristic_sequential<keccak> transcript;
         auto old_transcript_1 = transcript, old_transcript_2 = transcript;
@@ -85,7 +85,8 @@ BOOST_AUTO_TEST_SUITE(proof_of_knowledge_test_suite)
         BOOST_ASSERT(pow_type::verify(old_transcript_1, result, grinding_bits));
 
         // manually reimplement verify to ensure that changes in implementation didn't break it
-        old_transcript_2(pow_type::to_byte_array(result));
+        auto bytes = pow_type::to_byte_array(result);
+        old_transcript_2(bytes);
         auto chal = old_transcript_2.template int_challenge<std::uint32_t>();
         BOOST_ASSERT( (chal & expected_mask) == 0);
 

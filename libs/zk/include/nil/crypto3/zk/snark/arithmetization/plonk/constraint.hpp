@@ -180,7 +180,9 @@ namespace nil {
                         return evaluator.evaluate();
                     }
 
-                    typename VariableType::assignment_type evaluate(detail::plonk_evaluation_map<VariableType> &assignments) const  {
+                    typename VariableType::assignment_type
+                        evaluate(detail::plonk_evaluation_map<VariableType> &assignments) const {
+
                         math::expression_evaluator<VariableType> evaluator(
                             *this,
                             [&assignments](const VariableType &var) -> const typename VariableType::assignment_type& {

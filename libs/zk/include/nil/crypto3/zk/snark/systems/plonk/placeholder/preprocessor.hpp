@@ -34,8 +34,6 @@
 #include <string>
 #include <map>
 
-#include <nil/crypto3/algebra/fields/arithmetic_params/bls12.hpp>
-
 #include <nil/crypto3/math/algorithms/unity_root.hpp>
 #include <nil/crypto3/math/detail/field_utils.hpp>
 #include <nil/crypto3/math/polynomial/polynomial.hpp>

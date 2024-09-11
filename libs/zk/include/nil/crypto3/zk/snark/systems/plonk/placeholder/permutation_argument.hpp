@@ -105,6 +105,7 @@ namespace nil {
                         std::vector<math::polynomial_dfs<typename FieldType::value_type>> h_v = S_sigma;
                         BOOST_ASSERT(global_indices.size() == S_id.size());
                         BOOST_ASSERT(global_indices.size() == S_sigma.size());
+
                         for (std::size_t i = 0; i < S_id.size(); i++) {
                             BOOST_ASSERT(column_polynomials[global_indices[i]].size() == basic_domain->size());
                             BOOST_ASSERT(S_id[i].size() == basic_domain->size());
@@ -122,6 +123,7 @@ namespace nil {
                         }
 
                         V_P[0] = FieldType::value_type::one();
+
                         for (std::size_t j = 1; j < basic_domain->size(); j++) {
                             typename FieldType::value_type nom = FieldType::value_type::one();
                             typename FieldType::value_type denom = FieldType::value_type::one();
@@ -191,16 +193,19 @@ namespace nil {
                             F_dfs[1] -= preprocessed_data.q_blind;
                             F_dfs[1] *= V_P_shifted;
                         } else {
+                            PROFILE_SCOPE("PERMUTATION ARGUMENT else block");
                             math::polynomial_dfs<typename FieldType::value_type> previous_poly = V_P;
                             math::polynomial_dfs<typename FieldType::value_type> current_poly = V_P;
                             for( std::size_t i = 0; i < preprocessed_data.common_data.permutation_parts-1; i++ ){
-                                auto g = gs[i];
-                                auto h = hs[i];
+                                const auto& g = gs[i];
+                                const auto& h = hs[i];
                                 auto reduced_g = reduce_dfs_polynomial_domain(g, basic_domain->m);
                                 auto reduced_h = reduce_dfs_polynomial_domain(h, basic_domain->m);
+
                                 for(std::size_t j = 0; j < preprocessed_data.common_data.desc.usable_rows_amount; j++){
                                     current_poly[j] = (previous_poly[j] * reduced_g[j]) * reduced_h[j].inversed();
                                 }
+
                                 commitment_scheme.append_to_batch(PERMUTATION_BATCH, current_poly);
                                 auto part = permutation_alphas[i] * (previous_poly * g - current_poly * h);
                                 F_dfs[1] += part;

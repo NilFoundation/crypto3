@@ -36,6 +36,7 @@
 #include <boost/test/data/monomorphic.hpp>
 
 #include <nil/crypto3/algebra/curves/bls12.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/bls12.hpp>
 #include <nil/crypto3/hash/poseidon.hpp>
 
 #include <nil/crypto3/zk/snark/systems/plonk/placeholder/prover.hpp>

@@ -218,12 +218,12 @@ namespace nil {
 
                 private:
                     std::vector<polynomial_dfs_type> quotient_polynomial_split_dfs() {
+                        PROFILE_SCOPE("quotient_polynomial_split_dfs");
+
                         // TODO: pass max_degree parameter placeholder
                         std::vector<polynomial_type> T_splitted = detail::split_polynomial<FieldType>(
                             quotient_polynomial(), table_description.rows_amount - 1
                         );
-
-                        PROFILE_SCOPE("split_polynomial_dfs_conversion_time");
 
                         std::size_t split_polynomial_size = std::max(
                             (preprocessed_public_data.identity_polynomials.size() + 2) * (preprocessed_public_data.common_data.desc.rows_amount -1 ),
@@ -237,7 +237,8 @@ namespace nil {
                             (split_polynomial_size / preprocessed_public_data.common_data.desc.rows_amount + 1):
                             (split_polynomial_size / preprocessed_public_data.common_data.desc.rows_amount);
 
-                        if( preprocessed_public_data.common_data.max_quotient_chunks != 0 && split_polynomial_size > preprocessed_public_data.common_data.max_quotient_chunks){
+                        if (preprocessed_public_data.common_data.max_quotient_chunks != 0 &&
+                            split_polynomial_size > preprocessed_public_data.common_data.max_quotient_chunks) {
                             split_polynomial_size = preprocessed_public_data.common_data.max_quotient_chunks;
                         }
 
@@ -312,7 +313,7 @@ namespace nil {
                     }
 
                     commitment_type T_commit(const std::vector<polynomial_dfs_type>& T_splitted_dfs) {
-                        PROFILE_SCOPE("T_splitted_precommit_time");
+                        PROFILE_SCOPE("T_split_precommit_time");
                         _commitment_scheme.append_to_batch(QUOTIENT_BATCH, T_splitted_dfs);
                         return _commitment_scheme.commit(QUOTIENT_BATCH);
                     }
@@ -392,7 +393,7 @@ namespace nil {
                         std::size_t start_index = preprocessed_public_data.identity_polynomials.size() +
                             preprocessed_public_data.permutation_polynomials.size() + 2;
 
-                        for( i = 0; i < start_index; i++) {
+                        for (i = 0; i < start_index; i++) {
                             _commitment_scheme.append_eval_point(FIXED_VALUES_BATCH, i, _proof.eval_proof.challenge);
                         }
 

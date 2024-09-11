@@ -350,7 +350,6 @@ namespace nil {
                     return *this;
                 }
 
-//                polynomial_view operator-() const {
                 void neg() {
                     std::transform(this->begin(), this->end(), this->begin(), std::negate<FieldValueType>());
                 }

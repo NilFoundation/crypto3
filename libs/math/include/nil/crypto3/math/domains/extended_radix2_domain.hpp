@@ -28,8 +28,6 @@
 
 #include <vector>
 
-#include <nil/crypto3/algebra/fields/arithmetic_params/bls12.hpp>
-
 #include <nil/crypto3/math/domains/evaluation_domain.hpp>
 #include <nil/crypto3/math/domains/basic_radix2_domain.hpp>
 #include <nil/crypto3/math/domains/detail/basic_radix2_domain_aux.hpp>

@@ -73,6 +73,7 @@ namespace nil {
                         typename FieldType::value_type challenge,
                         bool _is_lookup_enabled
                     ) {
+                        PROFILE_SCOPE("evaluation_points_generated_time");
 
                         const std::size_t witness_columns = table_description.witness_columns;
                         const std::size_t public_input_columns = table_description.public_input_columns;
@@ -119,7 +120,7 @@ namespace nil {
                         std::size_t i = 0;
                         std::size_t start_index = common_data.permuted_columns.size() * 2 + 2;
 
-                        for( i = 0; i < start_index; i++) {
+                        for (i = 0; i < start_index; i++) {
                             _commitment_scheme.append_eval_point(FIXED_VALUES_BATCH, i, challenge);
                         }
 
@@ -426,7 +427,7 @@ namespace nil {
                         // Z is polynomial -1, 0 ...., 0, 1
                         typename FieldType::value_type Z_at_challenge = common_data.Z.evaluate(challenge);
                         if (F_consolidated != Z_at_challenge * T_consolidated) {
-                            BOOST_LOG_TRIVIAL(info) << "Verification failed because: F consoludated polynomial does not match.";
+                            BOOST_LOG_TRIVIAL(info) << "Verification failed because: F consolidated polynomial does not match.";
                             return false;
                         }
                         return true;

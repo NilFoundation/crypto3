@@ -134,6 +134,7 @@ namespace nil {
                     const std::vector<std::size_t> &constant_columns_ids,
                     std::size_t usable_rows
                 ){
+                    // std::cout << "Packing lookup tables" << std::endl;
                     // std::cout << "Usable rows before: " << usable_rows << std::endl;
                     std::size_t usable_rows_after = usable_rows;
 

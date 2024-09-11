@@ -81,7 +81,7 @@ BOOST_AUTO_TEST_CASE(expression_evaluation_test) {
     variable_type w3(6, 2, variable_type::column_type::constant);
 
     expression<variable_type> expr = (w0 + w1) * (w2 + w3);
-   
+
     variable_type::assignment_type w0_value(1u);
     variable_type::assignment_type w1_value(2u);
     variable_type::assignment_type w2_value(3u);
@@ -115,7 +115,7 @@ BOOST_AUTO_TEST_CASE(expression_max_degree_visitor_test) {
     variable_type w3(6, 2, variable_type::column_type::constant);
 
     expression<variable_type> expr = (w0 + w1) * (w2 + w3) + w0 * w1 * (w2 + w3);
-   
+
     expression_max_degree_visitor<variable_type> visitor;
 
     BOOST_CHECK_EQUAL(visitor.compute_max_degree(expr), 3);
@@ -134,7 +134,7 @@ BOOST_AUTO_TEST_CASE(expression_for_each_variable_visitor_test) {
     variable_type w3(6, 2, variable_type::column_type::constant);
 
     expression<variable_type> expr = (w0 + w1) * (w2 + w3) + w0 * w1 * (w2 + w3);
-   
+
     std::set<int> variable_indices;
     std::set<int> variable_rotations;
 
