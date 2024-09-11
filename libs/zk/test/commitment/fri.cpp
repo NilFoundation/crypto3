@@ -130,6 +130,9 @@ void fri_basic_test()
     if constexpr (std::is_same<math::polynomial_dfs<typename FieldType::value_type>,
             PolynomialType>::value) {
         f.from_coefficients(coefficients);
+        if (f.size() != params.D[0]->size()) {
+            f.resize(params.D[0]->size(), nullptr, params.D[0]);
+        }
     } else {
         f = PolynomialType(coefficients);
     }
