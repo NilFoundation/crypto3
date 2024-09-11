@@ -97,11 +97,12 @@ namespace nil {
                         typename private_preprocessor_type::preprocessed_data_type preprocessed_private_data,
                         const plonk_table_description<FieldType> &table_description,
                         const plonk_constraint_system<FieldType> &constraint_system,
-                        commitment_scheme_type commitment_scheme
+                        commitment_scheme_type commitment_scheme,
+                        bool skip_commitment_scheme_eval_proofs = false
                     ) {
                         auto prover = placeholder_prover<FieldType, ParamsType>(
                             preprocessed_public_data, std::move(preprocessed_private_data), table_description,
-                            constraint_system, commitment_scheme);
+                            constraint_system, commitment_scheme, skip_commitment_scheme_eval_proofs);
                         return prover.process();
                     }
 
@@ -111,7 +112,7 @@ namespace nil {
                         const plonk_table_description<FieldType> &table_description,
                         const plonk_constraint_system<FieldType> &constraint_system,
                         const commitment_scheme_type &commitment_scheme,
-                        bool skip_commitment_scheme_eval_proofs=false
+                        bool skip_commitment_scheme_eval_proofs = false
                     )
                             : preprocessed_public_data(preprocessed_public_data)
                             , table_description(table_description)
@@ -211,10 +212,7 @@ namespace nil {
                             _proof.eval_proof.challenge = transcript.template challenge<FieldType>();
                             generate_evaluation_points();
 
-                            {
-                                PROFILE_SCOPE("commitment scheme proof eval time");
-                                _proof.eval_proof.eval_proof = _commitment_scheme.proof_eval(transcript);
-                            }
+                            _proof.eval_proof.eval_proof = _commitment_scheme.proof_eval(transcript);
                         }
 
                         return _proof;
