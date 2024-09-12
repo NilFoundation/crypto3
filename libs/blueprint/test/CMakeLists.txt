@@ -167,6 +167,7 @@ set(PLONK_TESTS_FILES
     "verifiers/placeholder/f3_loop"
     "verifiers/placeholder/fri_cosets"
     "verifiers/placeholder/fri_lin_inter"
+    "verifiers/placeholder/dfri_linear_check"
     "verifiers/placeholder/fri_array_swap"
     "verifiers/placeholder/expression_evaluation_component"
     "verifiers/placeholder/final_polynomial_check"
