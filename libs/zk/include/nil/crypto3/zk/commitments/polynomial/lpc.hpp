@@ -46,6 +46,7 @@ namespace nil {
             namespace commitments {
 
                 // Placeholder-friendly class.
+                // LPCScheme is usually 'batched_list_polynomial_commitment<...>'.
                 template<typename LPCScheme, typename PolynomialType = typename math::polynomial_dfs<
                     typename LPCScheme::params_type::field_type::value_type>>
                 class lpc_commitment_scheme : public polys_evaluator<typename LPCScheme::params_type,
@@ -61,6 +62,9 @@ namespace nil {
                     using fri_type = typename LPCScheme::fri_type;
                     using basic_fri = typename LPCScheme::fri_type;
                     using proof_type = typename LPCScheme::proof_type;
+                    using aggregated_proof_type = typename LPCScheme::aggregated_proof_type;
+                    using lpc_proof_type = typename LPCScheme::lpc_proof_type;
+                    using fri_proof_type = typename LPCScheme::fri_proof_type;
                     using transcript_type = typename LPCScheme::transcript_type;
                     using transcript_hash_type = typename LPCScheme::transcript_hash_type;
                     using polynomial_type = PolynomialType;
@@ -110,7 +114,7 @@ namespace nil {
                         : _fri_params(fri_params), _etha(0u) {
                     }
 
-                    preprocessed_data_type preprocess(transcript_type& transcript) const{
+                    preprocessed_data_type preprocess(transcript_type& transcript) const {
                         auto etha = transcript.template challenge<field_type>();
 
                         preprocessed_data_type result;
@@ -132,6 +136,7 @@ namespace nil {
 
                     commitment_type commit(std::size_t index) {
                         this->state_commited(index);
+
                         _trees[index] = nil::crypto3::zk::algorithms::precommit<fri_type>(
                             this->_polys[index], _fri_params.D[0], _fri_params.step_list.front());
                         return _trees[index].root();
@@ -149,24 +154,142 @@ namespace nil {
                         BOOST_ASSERT(this->_points.size() == this->_polys.size());
                         BOOST_ASSERT(this->_points.size() == this->_z.get_batches_num());
 
-                        for(auto const& it: this->_trees) {
+                        // For each batch we have a merkle tree.
+                        for (auto const& it: this->_trees) {
                             transcript(it.second.root());
                         }
 
                         // Prepare z-s and combined_Q;
                         auto theta = transcript.template challenge<field_type>();
-                        typename field_type::value_type theta_acc = field_type::value_type::one();
+                        polynomial_type combined_Q = prepare_combined_Q(theta);
+
+                        auto fri_proof = commit_and_fri_proof(combined_Q, transcript);
+                        return proof_type({this->_z, fri_proof});
+                    }
+
+                    /** This function must be called for the cases where we want to skip the 
+                     * round proof for FRI. Must be called once per instance of prover for the aggregated FRI.
+                     * \param[in] combined_Q - Polynomial combined_Q was already computed by the current 
+                            prover in the previous step of the aggregated FRI protocol.
+                     * \param[in] transcript - This transcript is initialized from a challenge sent from the "Main" prover,
+                            on which the round proof was created for the polynomial F(x) = Sum(combined_Q).
+                     */
+                    lpc_proof_type proof_eval_lpc_proof(
+                            const polynomial_type& combined_Q, transcript_type &transcript) {
+
+                        this->eval_polys();
+
+                        BOOST_ASSERT(this->_points.size() == this->_polys.size());
+                        BOOST_ASSERT(this->_points.size() == this->_z.get_batches_num());
+
+                        // For each batch we have a merkle tree.
+                        for (auto const& it: this->_trees) {
+                            transcript(it.second.root());
+                        }
+
+                        std::vector<typename fri_type::field_type::value_type> challenges =
+                            transcript.template challenges<typename fri_type::field_type>(this->_fri_params.lambda);
+
+                        typename fri_type::initial_proofs_batch_type initial_proofs =
+                            nil::crypto3::zk::algorithms::query_phase_initial_proofs<fri_type, polynomial_type>(
+                            this->_trees, this->_fri_params, this->_polys, challenges);
+                        return {this->_z, initial_proofs};
+                    }
+
+                    /** This function must be called once for the aggregated FRI, to proof that polynomial 
+                        'sum_poly' has low degree.
+                     * \param[in] sum_poly - polynomial F(x) = Sum(combined_Q).
+                     * \param[in] transcript - This transcript is initialized on the main prover, which has digested 
+                            challenges from all the other provers.
+                     */
+                    fri_proof_type proof_eval_FRI_proof(const polynomial_type& sum_poly, transcript_type &transcript) {
+                        // TODO(martun): this function belongs to FRI, not here, will move later.
+                        // Precommit to sum_poly.
+                        if (sum_poly.size() != _fri_params.D[0]->size()) {
+                            sum_poly.resize(_fri_params.D[0]->size(), nullptr, _fri_params.D[0]);
+                        }
+                        precommitment_type sum_poly_precommitment = nil::crypto3::zk::algorithms::precommit<fri_type>(
+                            sum_poly,
+                            _fri_params.D[0],
+                            _fri_params.step_list.front()
+                        );
+
+                        std::vector<typename fri_type::precommitment_type> fri_trees;
+                        std::vector<polynomial_type> fs;
+                        math::polynomial<typename fri_type::field_type::value_type> final_polynomial;
+
+                        // Contains fri_roots and final_polynomial. 
+                        typename fri_type::commitments_part_of_proof commitments_proof;
+
+                        // Commit to sum_poly.
+                        std::tie(fs, fri_trees, commitments_proof) =
+                            nil::crypto3::zk::algorithms::commit_phase<fri_type, polynomial_type>(
+                                sum_poly,
+                                sum_poly_precommitment,
+                                _fri_params, transcript);
+
+                        std::vector<typename fri_type::field_type::value_type> challenges =
+                            transcript.template challenges<typename fri_type::field_type>(this->_fri_params.lambda);
+
+                        fri_proof_type result;
+
+                        result.fri_round_proof = nil::crypto3::zk::algorithms::query_phase_round_proofs<
+                                fri_type, polynomial_type>(
+                            _fri_params,
+                            fri_trees,
+                            fs,
+                            sum_poly,
+                            challenges);
+
+                        result.fri_commitments_proof_part.fri_roots = std::move(commitments_proof.fri_roots);
+                        result.fri_commitments_proof_part.final_polynomial = std::move(final_polynomial);
+                        
+                        return result; 
+                    }
+
+                    typename fri_type::proof_type commit_and_fri_proof(
+                            const polynomial_type& combined_Q, transcript_type &transcript) {
+
+
+                        precommitment_type combined_Q_precommitment = nil::crypto3::zk::algorithms::precommit<fri_type>(
+                            combined_Q,
+                            _fri_params.D[0],
+                            _fri_params.step_list.front()
+                        );
+
+                        typename fri_type::proof_type fri_proof = nil::crypto3::zk::algorithms::proof_eval<
+                                fri_type, polynomial_type>(
+                            this->_polys,
+                            combined_Q,
+                            this->_trees,
+                            combined_Q_precommitment,
+                            this->_fri_params,
+                            transcript
+                        );
+                        return fri_proof;
+                    }
+
+                    /** \brief 
+                     *  \param theta The value of challenge. When called from aggregated FRI, this values is sent from
+                                the "main prover" machine.
+                     *  \param starting_power When aggregated FRI is used, the value is not zero, it's the total degree of all
+                                the polynomials in all the provers with indices lower than the current one.
+                     */
+                    polynomial_type prepare_combined_Q(
+                            const typename field_type::value_type& theta,
+                            std::size_t starting_power = 0) {
+                        typename field_type::value_type theta_acc = theta.pow(starting_power);
                         polynomial_type combined_Q;
                         math::polynomial<value_type> V;
 
                         auto points = this->get_unique_points();
                         math::polynomial<value_type> combined_Q_normal;
 
-                        for (auto const &point: points){
+                        for (auto const &point: points) {
                             V = {-point, 1u};
                             math::polynomial<value_type> Q_normal;
-                            for(std::size_t i: this->_z.get_batches()){
-                                for(std::size_t j = 0; j < this->_z.get_batch_size(i); j++){
+                            for (std::size_t i: this->_z.get_batches()) {
+                                for (std::size_t j = 0; j < this->_z.get_batch_size(i); j++) {
                                     auto it = std::find(this->_points[i][j].begin(), this->_points[i][j].end(), point);
                                     if( it == this->_points[i][j].end()) continue;
                                     math::polynomial<value_type> g_normal;
@@ -185,6 +308,7 @@ namespace nil {
                             combined_Q_normal += Q_normal;
                         }
 
+                        // TODO(martun): the following code is the same as above with point = _etha, de-duplicate it.
                         for (std::size_t i: this->_z.get_batches()) {
                             if (!_batch_fixed[i])
                                 continue;
@@ -212,27 +336,14 @@ namespace nil {
 
                         if constexpr (std::is_same<math::polynomial_dfs<value_type>, PolynomialType>::value) {
                             combined_Q.from_coefficients(combined_Q_normal);
+                            if (combined_Q.size() != _fri_params.D[0]->size()) {
+                                combined_Q.resize(_fri_params.D[0]->size(), nullptr, _fri_params.D[0]);
+                            }
                         } else {
                             combined_Q = std::move(combined_Q_normal);
                         }
 
-                        precommitment_type combined_Q_precommitment = nil::crypto3::zk::algorithms::precommit<fri_type>(
-                            combined_Q,
-                            _fri_params.D[0],
-                            _fri_params.step_list.front()
-                        );
-
-                        typename fri_type::proof_type fri_proof = nil::crypto3::zk::algorithms::proof_eval<
-                            fri_type, polynomial_type
-                        >(
-                            this->_polys,
-                            combined_Q,
-                            this->_trees,
-                            combined_Q_precommitment,
-                            this->_fri_params,
-                            transcript
-                        );
-                        return proof_type({this->_z, fri_proof});
+                        return combined_Q;
                     }
 
                     bool verify_eval(
@@ -420,6 +531,60 @@ namespace nil {
 
                         eval_storage_type z;
                         typename basic_fri::proof_type fri_proof;
+                    };
+
+                    // Represents an initial proof, which must be created for each of the N provers.
+                    struct lpc_proof_type {
+                        bool operator==(const lpc_proof_type &rhs) const {
+                            return initial_fri_proofs == rhs.initial_fri_proofs && z == rhs.z;
+                        }
+
+                        bool operator!=(const lpc_proof_type &rhs) const {
+                            return !(rhs == *this);
+                        }
+
+                        eval_storage_type z;
+                        typename basic_fri::initial_proofs_batch_type initial_fri_proofs;
+                    };
+
+                    // Represents a round proof, which must be created just once on the main prover.
+                    struct fri_proof_type {
+                        bool operator==(const fri_proof_type &rhs) const {
+                            return fri_round_proof == rhs.fri_round_proof &&
+                                fri_commitments_proof_part == rhs.fri_commitments_proof_part;
+                        }
+
+                        bool operator!=(const fri_proof_type &rhs) const {
+                            return !(rhs == *this);
+                        }
+
+                        // We have a single round proof for checking that F(X) is a low degree polynomial.
+                        typename basic_fri::round_proofs_batch_type fri_round_proof;
+
+                        // Contains fri_roots and final_polynomial that correspond to the polynomial F(x).
+                        typename basic_fri::commitments_part_of_proof fri_commitments_proof_part;
+                    };
+
+                    // A single instance of this class will store all the LPC proofs for a group of provers
+                    // when aggregated FRI is used.
+                    struct aggregated_proof_type {
+                        bool operator==(const aggregated_proof_type &rhs) const {
+                            return fri_proof == rhs.fri_proof &&
+                                intial_proofs_per_prover == rhs.intial_proofs_per_prover &&
+                                proof_of_work == rhs.proof_of_work;
+                        }
+
+                        bool operator!=(const proof_type &rhs) const {
+                            return !(rhs == *this);
+                        }
+
+                        // We have a single round proof for checking that F(X) is a low degree polynomial.
+                        fri_proof_type fri_proof;
+
+                        // For each prover we have an initial proof.
+                        std::vector<lpc_proof_type> intial_proofs_per_prover;
+
+                        typename LPCParams::grinding_type::output_type proof_of_work;
                     };
                 };
 

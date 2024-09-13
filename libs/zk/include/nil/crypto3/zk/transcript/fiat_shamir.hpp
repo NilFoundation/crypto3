@@ -230,6 +230,17 @@ namespace nil {
                         return result;
                     }
 
+                    template<typename Field>
+                    std::vector<typename Field::value_type> challenges(std::size_t N) {
+
+                        std::vector<typename Field::value_type> result;
+                        for (std::size_t i = 0; i < N; ++i) {
+                            result.push_back(challenge<Field>());
+                        }
+
+                        return result;
+                    }
+
                 private:
                     typename hash_type::digest_type state;
                 };
@@ -336,6 +347,17 @@ namespace nil {
                         std::array<typename Field::value_type, N> result;
                         for (auto &ch : result) {
                             ch = challenge<Field>();
+                        }
+
+                        return result;
+                    }
+
+                    template<typename Field>
+                    std::vector<typename Field::value_type> challenges(std::size_t N) {
+
+                        std::vector<typename Field::value_type> result;
+                        for (std::size_t i = 0; i < N; ++i) {
+                            result.push_back(challenge<Field>());
                         }
 
                         return result;

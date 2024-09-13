@@ -112,6 +112,46 @@ void test_fri_proof(typename FRI::proof_type &proof, typename nil::crypto3::mars
     BOOST_CHECK(proof == constructed_val_read);
 }
 
+template<typename Endianness, typename FRI>
+void test_fri_aggregated_proof(
+    std::vector<typename FRI::partial_proof_type> &partial_proofs,
+    std::vector<typename FRI::query_proof_type> &query_proofs,
+    typename nil::crypto3::marshalling::types::batch_info_type batch_info,
+    const typename FRI::params_type& params
+) {
+    using TTypeBase = nil::marshalling::field_type<Endianness>;
+
+    auto og_proof = typename FRI::aggregated_proof_type{partial_proofs, query_proofs};
+
+    auto filled_proof = nil::crypto3::marshalling::types::fill_fri_aggregated_proof<Endianness, FRI>(
+        og_proof, params
+    );
+    auto _proof = nil::crypto3::marshalling::types::make_fri_aggregated_proof<Endianness, FRI>(
+        filled_proof, batch_info
+    );
+    BOOST_CHECK(partial_proofs == _proof.partial_proofs);
+    BOOST_CHECK(query_proofs == _proof.query_proofs);
+    BOOST_CHECK(og_proof == _proof);
+
+    std::vector<std::uint8_t> cv;
+    cv.resize(filled_proof.length(), 0x00);
+    auto write_iter = cv.begin();
+    auto status = filled_proof.write(write_iter, cv.size());
+    BOOST_CHECK(status == nil::marshalling::status_type::success);
+
+    typename nil::crypto3::marshalling::types::fri_aggregated_proof_type<TTypeBase, FRI> test_val_read;
+    auto read_iter = cv.begin();
+    status = test_val_read.read(read_iter, cv.size());
+    BOOST_CHECK(status == nil::marshalling::status_type::success);
+    typename FRI::aggregated_proof_type constructed_val_read =
+        nil::crypto3::marshalling::types::make_fri_aggregated_proof<Endianness, FRI>(
+            test_val_read, batch_info
+        );
+    BOOST_CHECK(partial_proofs == constructed_val_read.partial_proofs);
+    BOOST_CHECK(query_proofs == constructed_val_read.query_proofs);
+    BOOST_CHECK(og_proof == constructed_val_read);
+}
+
 BOOST_FIXTURE_TEST_SUITE(marshalling_fri_proof_elements, zk::test_tools::random_test_initializer<algebra::curves::bls12<381>::scalar_field_type>)
     static constexpr std::size_t lambda = 40;
     static constexpr std::size_t m = 2;
@@ -184,13 +224,13 @@ BOOST_FIXTURE_TEST_SUITE(marshalling_fri_proof_elements, zk::test_tools::random_
         );
 
         auto proof = generate_random_fri_proof<FRI>(
-                2, 5,
-                fri_params.step_list,
-                lambda,
-                false,
-                batch_info,
-                alg_random_engines.template get_alg_engine<field_type>(),
-                generic_random_engine
+            2, 5,
+            fri_params.step_list,
+            lambda,
+            false,
+            batch_info,
+            alg_random_engines.template get_alg_engine<field_type>(),
+            generic_random_engine
         );
         test_fri_proof<Endianness, FRI>(proof, batch_info, fri_params);
     }
@@ -205,6 +245,29 @@ BOOST_FIXTURE_TEST_SUITE(marshalling_fri_proof_elements, zk::test_tools::random_
         typename FRI::params_type fri_params(1, 11, lambda, 4, true);
 
         auto proof = generate_random_fri_proof<FRI>(
+            2, 5,
+            fri_params.step_list,
+            lambda,
+            true,
+            batch_info,
+            alg_random_engines.template get_alg_engine<field_type>(),
+            generic_random_engine
+        );
+        test_fri_proof<Endianness, FRI>(proof, batch_info, fri_params);
+    }
+
+    BOOST_AUTO_TEST_CASE(fri_aggregated_proof_Test) {
+        nil::crypto3::marshalling::types::batch_info_type batch_info;
+        batch_info[0] = 1;
+        batch_info[1] = 5;
+        batch_info[3] = 6;
+        batch_info[4] = 3;
+
+        typename FRI::params_type fri_params(1, 11, lambda, 4, true);
+        // we just generate a vector of random proofs for this test
+        std::vector<typename FRI::proof_type> proofs;
+        for (std::size_t i = 0; i < 10; i++) {
+            proofs.push_back(generate_random_fri_proof<FRI>(
                 2, 5,
                 fri_params.step_list,
                 lambda,
@@ -212,9 +275,21 @@ BOOST_FIXTURE_TEST_SUITE(marshalling_fri_proof_elements, zk::test_tools::random_
                 batch_info,
                 alg_random_engines.template get_alg_engine<field_type>(),
                 generic_random_engine
-        );
-        test_fri_proof<Endianness, FRI>(proof, batch_info, fri_params);
+            ));
+        }
+        std::vector<typename FRI::partial_proof_type> partial_proofs;
+        for (std::size_t i = 0; i < 10; i++) {
+            partial_proofs.push_back(proofs[i]);
+        }
+        std::vector<typename FRI::query_proof_type> query_proofs;
+        for (std::size_t i = 0; i < 10; i++) {
+            for (std::size_t j = 0; j < proofs[i].query_proofs.size(); j++) {
+                query_proofs.push_back(proofs[i].query_proofs[j]);
+            }
+        }
+        test_fri_aggregated_proof<Endianness, FRI>(partial_proofs, query_proofs, batch_info, fri_params);
     }
+
 BOOST_AUTO_TEST_SUITE_END()
 
 
@@ -246,11 +321,11 @@ BOOST_AUTO_TEST_CASE(marshalling_fri_basic_test) {
     // Setup params
     std::size_t degree_log = std::ceil(std::log2(d - 1));
     typename fri_type::params_type fri_params(
-            3, /*max_step*/
-            degree_log,
-            lambda,
-            2 //expand_factor
-            );
+        3, /*max_step*/
+        degree_log,
+        lambda,
+        2 //expand_factor
+    );
 
     // commit
     math::polynomial<typename field_type::value_type> f = {{
