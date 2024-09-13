@@ -56,6 +56,7 @@ BOOST_AUTO_TEST_CASE(zkevm_iszero_test) {
     zkevm_circuit.assign_opcode(zkevm_opcode::ISZERO, machine);
     zkevm_circuit.assign_opcode(zkevm_opcode::PUSH32, machine, 0);
     zkevm_circuit.assign_opcode(zkevm_opcode::ISZERO, machine);
+    zkevm_circuit.assign_opcode(zkevm_opcode::RETURN, machine);
     zkevm_circuit.finalize_test();
     // assignment.export_table(std::cout);
     // circuit.export_circuit(std::cout);

@@ -208,6 +208,12 @@ set(ZKEVM_TESTS_FILES
     "zkevm/opcodes/add_sub"
     "zkevm/opcodes/mul"
     "zkevm/opcodes/div"
+    "zkevm/opcodes/cmp"
+    "zkevm/opcodes/pushx"
+    "zkevm/opcodes/not"
+    "zkevm/opcodes/mod_ops"
+    "zkevm/opcodes/byte_ops"
+    "zkevm/opcodes/bitwise"
     )
 
 #set(CURVES_TESTS_FILES

@@ -66,7 +66,6 @@ void test_zkevm_rw(
 
     std::ifstream ss;
     ss.open(path);
-
     boost::property_tree::ptree pt;
     boost::property_tree::read_json(ss, pt);
     ss.close();

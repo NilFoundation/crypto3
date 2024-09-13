@@ -58,6 +58,19 @@
 #include <nil/blueprint/zkevm/operations/mulmod.hpp>
 #include <nil/blueprint/zkevm/operations/pushx.hpp>
 #include <nil/blueprint/zkevm/operations/err0.hpp>
+#include <nil/blueprint/zkevm/operations/memory.hpp>
+#include <nil/blueprint/zkevm/operations/storage.hpp>
+#include <nil/blueprint/zkevm/operations/callvalue.hpp>
+#include <nil/blueprint/zkevm/operations/calldatasize.hpp>
+#include <nil/blueprint/zkevm/operations/calldataload.hpp>
+#include <nil/blueprint/zkevm/operations/dupx.hpp>
+#include <nil/blueprint/zkevm/operations/swapx.hpp>
+#include <nil/blueprint/zkevm/operations/jump.hpp>
+#include <nil/blueprint/zkevm/operations/pop.hpp>
+#include <nil/blueprint/zkevm/operations/padding.hpp>
+#include <nil/blueprint/zkevm/operations/return.hpp>
+
+#include <nil/blueprint/zkevm/bytecode.hpp>
 
 namespace nil {
     namespace blueprint {
@@ -65,7 +78,7 @@ namespace nil {
         // selectors are already tracked by circuit object by default
         // we implement only automatic extension of the amount of colunmns taken for convinience
         template<typename BlueprintFieldType>
-        class selector_manager {
+        class columns_manager {
         public:
             using arithmetization_type = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>;
             using assignment_type = nil::blueprint::assignment<arithmetization_type>;
@@ -73,11 +86,11 @@ namespace nil {
             using constraint_type = crypto3::zk::snark::plonk_constraint<BlueprintFieldType>;
             using lookup_constraint_type = crypto3::zk::snark::plonk_lookup_constraint<BlueprintFieldType>;
 
-            selector_manager(assignment_type &assignment_, circuit_type &circuit_)
+            columns_manager(assignment_type &assignment_, circuit_type &circuit_)
                 : assignment(assignment_), circuit(circuit_),
                   witness_index(0), constant_index(0) {}
 
-            std::size_t allocate_witess_column() {
+            std::size_t allocate_witness_column() {
                 if (witness_index >= assignment.witnesses_amount()) {
                     assignment.resize_witnesses(witness_index + 1);
                 }
@@ -105,6 +118,7 @@ namespace nil {
                 circuit.add_lookup_gate(selector_id, args);
                 return selector_id;
             }
+
         private:
             assignment_type &assignment;
             circuit_type &circuit;
@@ -123,7 +137,7 @@ namespace nil {
             using circuit_type = nil::blueprint::circuit<arithmetization_type>;
             using state_var_type = state_var<BlueprintFieldType>;
             using zkevm_state_type = zkevm_state<BlueprintFieldType>;
-            using selector_manager_type = selector_manager<BlueprintFieldType>;
+            using columns_manager_type = columns_manager<BlueprintFieldType>;
             using zkevm_operation_type = zkevm_operation<BlueprintFieldType>;
             using zkevm_opcode_gate_class = typename zkevm_operation<BlueprintFieldType>::gate_class;
             using state_selector_type = components::state_selector<arithmetization_type, BlueprintFieldType>;
@@ -135,29 +149,55 @@ namespace nil {
             std::map<std::string, std::size_t> zkevm_circuit_lookup_tables() const {
                 std::map<std::string, std::size_t> lookup_tables;
                 lookup_tables["chunk_16_bits/full"] = 0;
-                lookup_tables["byte_and_xor_table/and"] = 1;
-                lookup_tables["byte_and_xor_table/xor"] = 2;
+                lookup_tables["byte_and_xor_table/and"] = 0;
+                lookup_tables["byte_and_xor_table/xor"] = 0;
+                lookup_tables["zkevm_bytecode"] = 1;
                 return lookup_tables;
             }
 
-            zkevm_circuit(assignment_type &assignment_, circuit_type &circuit_, std::size_t start_row_index_ = 1)
-                :assignment(assignment_), circuit(circuit_), opcodes_info_instance(opcodes_info::instance()),
-                 sel_manager(assignment_, circuit_),
-                 curr_row(start_row_index_), start_row_index(start_row_index_) {
+            zkevm_circuit(assignment_type &assignment_, circuit_type &circuit, std::size_t _max_rows = 249, std::size_t start_row_index_ = 1)
+                :assignment(assignment_), opcodes_info_instance(opcodes_info::instance()),
+                 curr_row(start_row_index_), start_row_index(start_row_index_), max_rows(_max_rows),
+                 lookup_tables_indices(circuit.get_reserved_indices()
+            ){
+                columns_manager_type col_manager(assignment, circuit);
 
                 // 5(?) constant columns. I'm not sure we really need them: satisfiability check passes even without them
                 for(std::size_t i = 0; i < 5; i++) {
-                    sel_manager.allocate_constant_column();
+                    col_manager.allocate_constant_column();
                 }
+
+                for (auto &lookup_table : zkevm_circuit_lookup_tables()) {
+                    if( lookup_table.second == 0 ){
+                        std::cout << "Static table " << lookup_table.first << std::endl;
+                        circuit.reserve_table(lookup_table.first);
+                    }else{
+                        std::cout << "Dynamic table " << lookup_table.first << std::endl;
+                        circuit.reserve_dynamic_table(lookup_table.first);
+                    }
+                }
+                lookup_tables_indices = circuit.get_reserved_indices();
 
                 BOOST_ASSERT_MSG(start_row_index > 0,
                     "Start row index must be greater than zero, otherwise some gates would access non-existent rows.");
-                for (auto &lookup_table : zkevm_circuit_lookup_tables()) {
-                    circuit.reserve_table(lookup_table.first);
-                }
-                init_state();
-                init_opcodes();
-                assignment.resize_selectors(assignment.selectors_amount() + 2); // for lookup table packing
+                init_state(col_manager);
+                init_opcodes(circuit, col_manager);
+                assignment.resize_selectors(assignment.selectors_amount() + 2 + dynamic_tables_amount); // for lookup table packing
+
+                allocate_dynamic_tables_columns(col_manager);
+                // Add for dynamic lookup tables for the constraint system
+                bytecode_table_component bytecode_table({
+                    bytecode_witnesses[0], bytecode_witnesses[1], bytecode_witnesses[2],
+                    bytecode_witnesses[3], bytecode_witnesses[4], bytecode_witnesses[5]
+                }, {}, {}, 10);
+                typename bytecode_table_component::input_type input({},{});// Add input variables
+                generate_circuit(bytecode_table, circuit, assignment, input, 0);
+                assignment.enable_selector(end_selector, start_row_index + max_rows - 1);
+                assignment.enable_selector(start_selector, start_row_index);
+                assignment.enable_selector(middle_selector, start_row_index, max_rows-1);
+                std::cout << "Start selector = " << start_selector << "; Middle selector = " << middle_selector << "; End selector = " << end_selector << std::endl;
+
+                lookup_tables_indices = circuit.get_reserved_indices();
             }
 
             void assign_state() {
@@ -169,12 +209,26 @@ namespace nil {
                 // this is done in order for the vizualiser export to work correctly before padding the circuit.
                 // otherwise constraints try to access non-existent rows
                 assignment.witness(state_selector->W(0), curr_row) = value_type(0xC0FFEE);
+                std::cout << "Assignment rows amount = " << assignment.rows_amount() << std::endl;
             }
 
             void finalize() {
                 BOOST_ASSERT_MSG(curr_row != 0, "Row underflow in finalization");
-                assignment.enable_selector(end_selector, curr_row);
+
+                zkevm_machine_interface empty_machine(0);
+                while(curr_row - start_row_index < max_rows-1){
+                    assign_opcode(zkevm_opcode::padding, empty_machine, 0);
+                }
+
                 assignment.witness(state.last_row_indicator.selector, curr_row - 1) = 1;
+
+                // Assign dynamic lookup tables
+                bytecode_table_component bytecode_table({
+                    bytecode_witnesses[0], bytecode_witnesses[1], bytecode_witnesses[2],
+                    bytecode_witnesses[3], bytecode_witnesses[4], bytecode_witnesses[5]
+                }, {}, {}, 10);
+                typename bytecode_table_component::input_type input({},{});// Add input variables
+                generate_assignments(bytecode_table, assignment, input, 0);
             }
 
             void assign_opcode(const zkevm_opcode opcode, zkevm_machine_interface &machine, zkevm_word_type additional_input = 0) {
@@ -189,7 +243,7 @@ namespace nil {
 
                 std::size_t opcode_height = opcode_it->second->rows_amount();
                 // for opcodes with odd height skip one row
-                if (opcode_it->second->rows_amount() % 2) {
+                if (opcode_it->second->rows_amount() % 2 ) {
                     state.rows_until_next_op_inv.value = value_type(opcode_height).inversed();
                     advance_rows(opcode, 1, opcode_height);
                 } else {
@@ -226,12 +280,27 @@ namespace nil {
                 state.stack_size.value -= opcodes_info_instance.get_opcode_stack_input(opcode);
                 state.stack_size.value += opcodes_info_instance.get_opcode_stack_output(opcode);
                 machine.gas -= opcodes_info_instance.get_opcode_cost(opcode);
+
+                BOOST_ASSERT(curr_row - start_row_index < max_rows);
+            }
+
+
+            using bytecode_table_component = typename components::plonk_zkevm_bytecode_table<BlueprintFieldType>;
+
+            // May be reviewed somehow. Now I'll do the most straight way
+            // Each table has its separate columns and selectors.
+            // They definitely may be packed more effectively
+            void allocate_dynamic_tables_columns(columns_manager_type &col_manager){
+                // Bytecode table
+                for( std::size_t i = 0; i < bytecode_table_component::witness_amount; i++){
+                    bytecode_witnesses.push_back(col_manager.allocate_witness_column());
+                }
             }
 
             void advance_rows(const zkevm_opcode opcode, std::size_t rows, std::size_t internal_start_row, std::size_t shift = 0) {
                 std::size_t current_internal_row = internal_start_row;
 
-                assignment.enable_selector(middle_selector, curr_row, curr_row + rows - 1);
+                //assignment.enable_selector(middle_selector, curr_row, curr_row + rows - 1);
                 // TODO: figure out what is going to happen on state change
                 value_type opcode_num = opcodes_info_instance.get_opcode_number(opcode);
                 for (std::size_t i = 0 + shift; i < rows + shift; i++) {
@@ -268,10 +337,6 @@ namespace nil {
                 return state;
             }
 
-            selector_manager_type &get_selector_manager() {
-                return sel_manager;
-            }
-
             const std::vector<std::size_t> &get_state_selector_cols() {
                 return state_selector_cols;
             }
@@ -287,11 +352,15 @@ namespace nil {
             assignment_type &get_assignment() {
                 return assignment;
             }
-
+/*
             circuit_type &get_circuit() {
                 return circuit;
             }
+*/
 
+            const typename lookup_library<BlueprintFieldType>::left_reserved_type &get_reserved_indices() const{
+                return lookup_tables_indices;
+            }
             // for opcode constraints at certain row of opcode execution
             // note that rows are counted "backwards", starting from opcode rows amount minus one
             // and ending in zero
@@ -315,21 +384,21 @@ namespace nil {
             }
 
         private:
-            void init_state() {
+            void init_state(columns_manager_type &col_manager) {
                 state.pc = state_var_type(
-                   sel_manager.allocate_witess_column(), state_var_type::column_type::witness, 1);
+                   col_manager.allocate_witness_column(), state_var_type::column_type::witness, 1);
                 state.stack_size = state_var_type(
-                   sel_manager.allocate_witess_column(), state_var_type::column_type::witness, 0);
+                   col_manager.allocate_witness_column(), state_var_type::column_type::witness, 0);
                 state.memory_size = state_var_type(
-                   sel_manager.allocate_witess_column(), state_var_type::column_type::witness, 0);
+                   col_manager.allocate_witness_column(), state_var_type::column_type::witness, 0);
                 state.curr_gas = state_var_type(
-                   sel_manager.allocate_witess_column(), state_var_type::column_type::witness, 0);
+                   col_manager.allocate_witness_column(), state_var_type::column_type::witness, 0);
                 state.rows_until_next_op_inv = state_var_type(
-                   sel_manager.allocate_witess_column(), state_var_type::column_type::witness, 0);
+                   col_manager.allocate_witness_column(), state_var_type::column_type::witness, 0);
                 state.step_selection = state_var_type(
-                   sel_manager.allocate_witess_column(), state_var_type::column_type::witness, 1);
+                   col_manager.allocate_witness_column(), state_var_type::column_type::witness, 1);
                 state.last_row_indicator = state_var_type(
-                   sel_manager.allocate_witess_column(), state_var_type::column_type::witness, 0);
+                   col_manager.allocate_witness_column(), state_var_type::column_type::witness, 0);
             }
 
             std::vector<constraint_type> generate_generic_transition_constraints(
@@ -379,7 +448,7 @@ namespace nil {
                 return constraints;
             }
 
-            void init_opcodes() {
+            void init_opcodes(circuit_type &circuit, columns_manager_type &col_manager) {
                 // add all the implemented opcodes here
                 // STOP
                 opcodes[zkevm_opcode::ADD] = std::make_shared<zkevm_add_sub_operation<BlueprintFieldType>>(true);
@@ -407,6 +476,24 @@ namespace nil {
                 opcodes[zkevm_opcode::SHL] = std::make_shared<zkevm_shl_operation<BlueprintFieldType>>();
                 opcodes[zkevm_opcode::SHR] = std::make_shared<zkevm_shr_operation<BlueprintFieldType>>();
                 opcodes[zkevm_opcode::SAR] = std::make_shared<zkevm_sar_operation<BlueprintFieldType>>();
+
+                // Memory operations
+                opcodes[zkevm_opcode::MSTORE] = std::make_shared<zkevm_mstore_operation<BlueprintFieldType>>();
+                opcodes[zkevm_opcode::MLOAD] = std::make_shared<zkevm_mload_operation<BlueprintFieldType>>();
+
+                // Storage operations
+                opcodes[zkevm_opcode::SLOAD] = std::make_shared<zkevm_sstore_operation<BlueprintFieldType>>();
+                opcodes[zkevm_opcode::SSTORE] = std::make_shared<zkevm_sload_operation<BlueprintFieldType>>();
+
+                // CALL operaitions
+                opcodes[zkevm_opcode::CALLVALUE] = std::make_shared<zkevm_callvalue_operation<BlueprintFieldType>>();
+                opcodes[zkevm_opcode::CALLDATASIZE] = std::make_shared<zkevm_calldatasize_operation<BlueprintFieldType>>();
+                opcodes[zkevm_opcode::CALLDATALOAD] = std::make_shared<zkevm_calldataload_operation<BlueprintFieldType>>();
+
+                // PC operations
+                opcodes[zkevm_opcode::JUMPI] = std::make_shared<zkevm_jumpi_operation<BlueprintFieldType>>();
+                opcodes[zkevm_opcode::JUMP] = std::make_shared<zkevm_jumpi_operation<BlueprintFieldType>>();
+                opcodes[zkevm_opcode::JUMPDEST] = std::make_shared<zkevm_jumpdest_operation<BlueprintFieldType>>();
 
                 opcodes[zkevm_opcode::PUSH0] = std::make_shared<zkevm_pushx_operation<BlueprintFieldType>>(0);
                 opcodes[zkevm_opcode::PUSH1] = std::make_shared<zkevm_pushx_operation<BlueprintFieldType>>(1);
@@ -441,10 +528,50 @@ namespace nil {
                 opcodes[zkevm_opcode::PUSH30] = std::make_shared<zkevm_pushx_operation<BlueprintFieldType>>(30);
                 opcodes[zkevm_opcode::PUSH31] = std::make_shared<zkevm_pushx_operation<BlueprintFieldType>>(31);
                 opcodes[zkevm_opcode::PUSH32] = std::make_shared<zkevm_pushx_operation<BlueprintFieldType>>(32);
-                // fake opcodes for errors
-                opcodes[zkevm_opcode::err0] = std::make_shared<zkevm_err0_operation<BlueprintFieldType>>();
 
-                const std::size_t range_check_table_index = this->get_circuit().get_reserved_indices().at("chunk_16_bits/full");
+                opcodes[zkevm_opcode::POP] = std::make_shared<zkevm_pop_operation<BlueprintFieldType>>();
+                opcodes[zkevm_opcode::RETURN] = std::make_shared<zkevm_return_operation<BlueprintFieldType>>();
+
+                // DUP
+                opcodes[zkevm_opcode::DUP1] = std::make_shared<zkevm_dupx_operation<BlueprintFieldType>>(1);
+                opcodes[zkevm_opcode::DUP2] = std::make_shared<zkevm_dupx_operation<BlueprintFieldType>>(2);
+                opcodes[zkevm_opcode::DUP3] = std::make_shared<zkevm_dupx_operation<BlueprintFieldType>>(3);
+                opcodes[zkevm_opcode::DUP4] = std::make_shared<zkevm_dupx_operation<BlueprintFieldType>>(4);
+                opcodes[zkevm_opcode::DUP5] = std::make_shared<zkevm_dupx_operation<BlueprintFieldType>>(5);
+                opcodes[zkevm_opcode::DUP6] = std::make_shared<zkevm_dupx_operation<BlueprintFieldType>>(6);
+                opcodes[zkevm_opcode::DUP7] = std::make_shared<zkevm_dupx_operation<BlueprintFieldType>>(7);
+                opcodes[zkevm_opcode::DUP8] = std::make_shared<zkevm_dupx_operation<BlueprintFieldType>>(8);
+                opcodes[zkevm_opcode::DUP9] = std::make_shared<zkevm_dupx_operation<BlueprintFieldType>>(9);
+                opcodes[zkevm_opcode::DUP10] = std::make_shared<zkevm_dupx_operation<BlueprintFieldType>>(10);
+                opcodes[zkevm_opcode::DUP11] = std::make_shared<zkevm_dupx_operation<BlueprintFieldType>>(11);
+                opcodes[zkevm_opcode::DUP12] = std::make_shared<zkevm_dupx_operation<BlueprintFieldType>>(12);
+                opcodes[zkevm_opcode::DUP13] = std::make_shared<zkevm_dupx_operation<BlueprintFieldType>>(13);
+                opcodes[zkevm_opcode::DUP14] = std::make_shared<zkevm_dupx_operation<BlueprintFieldType>>(14);
+                opcodes[zkevm_opcode::DUP15] = std::make_shared<zkevm_dupx_operation<BlueprintFieldType>>(15);
+                opcodes[zkevm_opcode::DUP16] = std::make_shared<zkevm_dupx_operation<BlueprintFieldType>>(16);
+
+                // SWAP
+                opcodes[zkevm_opcode::SWAP1] = std::make_shared<zkevm_swapx_operation<BlueprintFieldType>>(1);
+                opcodes[zkevm_opcode::SWAP2] = std::make_shared<zkevm_swapx_operation<BlueprintFieldType>>(2);
+                opcodes[zkevm_opcode::SWAP3] = std::make_shared<zkevm_swapx_operation<BlueprintFieldType>>(3);
+                opcodes[zkevm_opcode::SWAP4] = std::make_shared<zkevm_swapx_operation<BlueprintFieldType>>(4);
+                opcodes[zkevm_opcode::SWAP5] = std::make_shared<zkevm_swapx_operation<BlueprintFieldType>>(5);
+                opcodes[zkevm_opcode::SWAP6] = std::make_shared<zkevm_swapx_operation<BlueprintFieldType>>(6);
+                opcodes[zkevm_opcode::SWAP7] = std::make_shared<zkevm_swapx_operation<BlueprintFieldType>>(7);
+                opcodes[zkevm_opcode::SWAP8] = std::make_shared<zkevm_swapx_operation<BlueprintFieldType>>(8);
+                opcodes[zkevm_opcode::SWAP9] = std::make_shared<zkevm_swapx_operation<BlueprintFieldType>>(9);
+                opcodes[zkevm_opcode::SWAP10] = std::make_shared<zkevm_swapx_operation<BlueprintFieldType>>(10);
+                opcodes[zkevm_opcode::SWAP11] = std::make_shared<zkevm_swapx_operation<BlueprintFieldType>>(11);
+                opcodes[zkevm_opcode::SWAP13] = std::make_shared<zkevm_swapx_operation<BlueprintFieldType>>(13);
+                opcodes[zkevm_opcode::SWAP14] = std::make_shared<zkevm_swapx_operation<BlueprintFieldType>>(14);
+                opcodes[zkevm_opcode::SWAP15] = std::make_shared<zkevm_swapx_operation<BlueprintFieldType>>(15);
+                opcodes[zkevm_opcode::SWAP16] = std::make_shared<zkevm_swapx_operation<BlueprintFieldType>>(16);
+
+                // fake opcodes for errors and padding
+                opcodes[zkevm_opcode::err0] = std::make_shared<zkevm_err0_operation<BlueprintFieldType>>();
+                opcodes[zkevm_opcode::padding] = std::make_shared<zkevm_padding_operation<BlueprintFieldType>>();
+
+                const std::size_t range_check_table_index = circuit.get_reserved_indices().at("chunk_16_bits/full");
 
                 std::vector<constraint_type> middle_constraints;
                 std::vector<constraint_type> first_constraints;
@@ -456,7 +583,7 @@ namespace nil {
                                                                           // NB: no need for range checks before first real transition,
                                                                           // it's all ensured by "frozen" transition constraints.
                 first_constraints.push_back(state.step_selection.variable() - 1); // first step is step selection
-                start_selector = sel_manager.add_gate(first_constraints);
+                start_selector = col_manager.add_gate(first_constraints);
 
                 middle_constraints.push_back(state.last_row_indicator.variable(-1));
                 // ensure that stack_size is always between 0 and max_stack_size.
@@ -464,7 +591,7 @@ namespace nil {
                 middle_lookup_constraints.push_back({range_check_table_index, { state.stack_size.variable() } });
                 middle_lookup_constraints.push_back({range_check_table_index, { state.stack_size.variable() + 65535 - max_stack_size } });
 
-                // TODO: proper end constraints
+                // TODO: proper end constraints zkevm_padding_operation
                 last_constraints.push_back(state.last_row_indicator.variable(-1) - 1);
                 end_selector = circuit.add_gate(last_constraints);
 
@@ -475,16 +602,16 @@ namespace nil {
                     state_selector_type::get_manifest(opcodes_amount,true).witness_amount->max_value_if_sat();
 
                 for (std::size_t i = 0; i < state_selector_cols_amount; i++) {
-                    state_selector_cols.push_back(sel_manager.allocate_witess_column());
+                    state_selector_cols.push_back(col_manager.allocate_witness_column());
                 }
                 for(std::size_t i = 0; i < opcode_range_checked_cols_amount; i++) {
-                    opcode_range_checked_cols.push_back(sel_manager.allocate_witess_column());
+                    opcode_range_checked_cols.push_back(col_manager.allocate_witness_column());
                 }
 
                 opcode_cols = opcode_range_checked_cols; // range-checked columns are the first part of opcode columns
 
                 for (std::size_t i = 0; i < opcode_other_cols_amount; i++) { // followed by some non-range-checked columns
-                    opcode_cols.push_back(sel_manager.allocate_witess_column());
+                    opcode_cols.push_back(col_manager.allocate_witness_column());
                 }
                 state_selector = std::make_shared<state_selector_type>(
                     state_selector_cols, std::array<std::uint32_t, 0>({}), std::array<std::uint32_t, 0>({}),
@@ -495,7 +622,7 @@ namespace nil {
                 const std::size_t opcode_row_selection_cols_amount =
                     state_selector_type::get_manifest(max_opcode_height,false).witness_amount->max_value_if_sat();
                 for (std::size_t i = 0; i < opcode_row_selection_cols_amount; i++) {
-                    opcode_row_selection_cols.push_back(sel_manager.allocate_witess_column());
+                    opcode_row_selection_cols.push_back(col_manager.allocate_witness_column());
                 }
                 opcode_row_selector = std::make_shared<state_selector_type>(
                     opcode_row_selection_cols, std::array<std::uint32_t, 0>({}), std::array<std::uint32_t, 0>({}),
@@ -545,8 +672,8 @@ namespace nil {
 
                     std::size_t opcode_num = opcodes_info_instance.get_opcode_number(opcode_it.first);
                     auto // curr_opt_constraint = state_selector->option_constraint(opcode_num),
-                         curr_opt_constraint_even = state_selector->option_constraint_even(opcode_num),
-                         curr_opt_constraint_odd = state_selector->option_constraint_odd(opcode_num);
+                        curr_opt_constraint_even = state_selector->option_constraint_even(opcode_num),
+                        curr_opt_constraint_odd = state_selector->option_constraint_odd(opcode_num);
 
                     // save constraints to ensure later that internal row number has proper value at the start of the opcode
                     opcode_first_line_constraint +=
@@ -562,9 +689,11 @@ namespace nil {
                     // curr_opt_constraint is in _even_ version because it's applied at row with internal number 0
 
                     // save constraints to ensure correct updates of remaining gas NB: only static costs now! TODO: include dynamic costs
-                    curr_gas_transitions += curr_opt_constraint_even * (state.curr_gas.variable(0)
-                                                                        - opcodes_info_instance.get_opcode_cost(opcode_it.first)
-                                                                        - state.curr_gas.variable(+1));
+                    if( !opcodes_info_instance.is_opcode_dynamic(opcode_it.first) ) {
+                        curr_gas_transitions += curr_opt_constraint_even * (state.curr_gas.variable(0)
+                            - opcodes_info_instance.get_opcode_cost(opcode_it.first)
+                            - state.curr_gas.variable(+1));
+                    }
                     // curr_opt_constraint is in _even_ version because it's applied at row with internal number 0
 
                     auto opcode_gates = opcode_it.second->generate_gates(*this);
@@ -657,22 +786,20 @@ namespace nil {
                     middle_constraints.push_back(constraint * c.second);
                 }
 
-                middle_selector = sel_manager.add_gate(middle_constraints);
-                sel_manager.add_lookup_gate(middle_selector, middle_lookup_constraints);
+                middle_selector = col_manager.add_gate(middle_constraints);
+                col_manager.add_lookup_gate(middle_selector, middle_lookup_constraints);
 
-                assignment.enable_selector(start_selector, curr_row);
-                assignment.enable_selector(middle_selector, curr_row);
+//                assignment.enable_selector(start_selector, curr_row);
+//                assignment.enable_selector(middle_selector, curr_row);
             }
 
             zkevm_state_type state;
-            // static selectors used to mark the places where the circuit starts/ends
+            // static selectors used to mark the places where the circuit starts/ends and when the circuit is acitve
             std::size_t start_selector;
             std::size_t end_selector;
-            // dynamic selector: indicates when the circuit is acitve
-            // currently represented as a selector column; hopefully this is possible to do in practice
             std::size_t middle_selector;
-            // added for lookups
-            std::size_t lookup_selector;
+            // selectors for dynamic tables
+            std::size_t bytecode_selector;
             // witness columns for opcodes
             std::vector<std::size_t> opcode_cols;
             // dynamic selectors for the state selector circuit
@@ -683,11 +810,11 @@ namespace nil {
             // |Variables below this point are internal to the object and do not go into the actual circuit|
             // ---------------------------------------------------------------------------------------------
             // reference to the assignment/circuit objects
+            std::vector<std::uint32_t> bytecode_witnesses;
+
             assignment_type &assignment;
-            circuit_type &circuit;
             // information about opcode metadata (mapping, etc.)
             const opcodes_info &opcodes_info_instance;
-            selector_manager_type sel_manager;
             std::shared_ptr<state_selector_type> state_selector;
             std::shared_ptr<state_selector_type> opcode_row_selector;
             // opcode objects
@@ -695,19 +822,21 @@ namespace nil {
             // current row maintained between different calls to the circuit object
             std::size_t curr_row;
             // start and end rows for the circuit; both have to be fixed
+            std::size_t max_rows; // Should be odd number because all opcodes has even rows amount and last row is also used by last_row selector
             std::size_t start_row_index;
             std::size_t end_row_index;
+            typename lookup_library<BlueprintFieldType>::left_reserved_type lookup_tables_indices;
 
             static const std::size_t opcode_range_checked_cols_amount = 32;
             static const std::size_t opcode_other_cols_amount = 16;
             static const std::size_t max_opcode_cols = opcode_range_checked_cols_amount + opcode_other_cols_amount;
             static const std::size_t max_opcode_height = 8;
             static const std::size_t max_stack_size = 1024;
+            static const std::size_t dynamic_tables_amount = 1;
         };
         template<typename BlueprintFieldType>
         const std::size_t zkevm_circuit<BlueprintFieldType>::max_opcode_height;
         template<typename BlueprintFieldType>
-        const std::size_t zkevm_circuit<BlueprintFieldType>::max_stack_size;
-
+        const std::size_t zkevm_circuit<BlueprintFieldType>::max_stack_size;\
     }   // namespace blueprint
 }   // namespace nil

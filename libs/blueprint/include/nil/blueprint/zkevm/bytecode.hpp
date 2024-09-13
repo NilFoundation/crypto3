@@ -61,6 +61,7 @@ namespace nil {
                 using manifest_type = plonk_component_manifest;
 
                 std::size_t max_bytecode_size;
+                static const std::size_t witness_amount = 6; // It is the only supported value
 
                 class gate_manifest_type : public component_gate_manifest {
                 public:
@@ -76,7 +77,7 @@ namespace nil {
 
                 static manifest_type get_manifest() {
                     static manifest_type manifest = manifest_type(
-                        std::shared_ptr<manifest_param>(new manifest_single_value_param(6)),
+                        std::shared_ptr<manifest_param>(new manifest_single_value_param(zkevm_bytecode_table::witness_amount)),
                         false
                     );
                     return manifest;

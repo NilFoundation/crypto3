@@ -182,7 +182,8 @@ namespace nil {
             X(REVERT) \
             X(INVALID) \
             X(SELFDESTRUCT) \
-            X(err0)
+            X(err0) \
+            X(padding)
 
         enum zkevm_opcode {
             #define ENUM_DEF(name) name,
@@ -222,6 +223,12 @@ namespace nil {
                 return it->second;
             }
 
+            std::size_t is_opcode_dynamic(const zkevm_opcode& opcode) const {
+                auto it = opcode_is_dynamic_map.find(opcode);
+                BOOST_ASSERT(it != opcode_is_dynamic_map.end());
+                return it->second;
+            }
+
             std::size_t get_opcode_cost(const zkevm_opcode& opcode) const {
                 auto it = opcode_cost_map.find(opcode);
                 BOOST_ASSERT(it != opcode_cost_map.end());
@@ -247,6 +254,7 @@ namespace nil {
             boost::bimap<boost::bimaps::set_of<zkevm_opcode>, boost::bimaps::set_of<std::size_t>> opcode_to_byte_map;
             boost::bimap<boost::bimaps::set_of<zkevm_opcode>, boost::bimaps::set_of<std::size_t>> opcode_to_number_map;
             std::map<zkevm_opcode, std::size_t> opcode_cost_map;
+            std::map<zkevm_opcode, bool> opcode_is_dynamic_map;
             std::map<zkevm_opcode, std::size_t> opcode_stack_input_map;
             std::map<zkevm_opcode, std::size_t> opcode_stack_output_map;
         private:
@@ -403,13 +411,15 @@ namespace nil {
                     {zkevm_opcode::INVALID, 0xfe, 0, 1, 0, 0},
                     {zkevm_opcode::SELFDESTRUCT, 0xff, 5000, 1, 1, 0},
                     // these are not real opcodes, they are for exception processing
-                    {zkevm_opcode::err0, 0x100, 0, 0, 0, 0} // not enough static gas or incorrect stack size
+                    {zkevm_opcode::err0, 0x100, 0, 0, 0, 0}, // not enough static gas or incorrect stack size
+                    {zkevm_opcode::padding, 0x101, 0, 1, 0, 0} // empty opcode for the fixed circuit size
                 };
                 for(std::size_t i = 0; i < opcode_data.size(); i++) {
                     auto [opcode_mnemo, opcode_byte, opcode_cost, opcode_dynamic, stack_input, stack_output] = opcode_data[i];
                     opcode_to_byte_map.insert({opcode_mnemo, opcode_byte});
                     opcode_to_number_map.insert({opcode_mnemo, i});
                     opcode_cost_map.insert({opcode_mnemo, opcode_cost});
+                    opcode_is_dynamic_map.insert({opcode_mnemo, opcode_dynamic});
                     opcode_stack_input_map.insert({opcode_mnemo, stack_input});
                     opcode_stack_output_map.insert({opcode_mnemo, stack_output});
                 }

@@ -88,6 +88,7 @@ BOOST_AUTO_TEST_CASE(zkevm_bitwise_test) {
     zkevm_circuit.assign_opcode(zkevm_opcode::PUSH32, machine,zwordc(0x1b70726fb8d3a24da9ff9647225a18412b8f010425938504d73ebc8801e2e016_cppui_modular257));
     zkevm_circuit.assign_opcode(zkevm_opcode::PUSH32, machine,zwordc(0x1234567890_cppui_modular257));
     zkevm_circuit.assign_opcode(zkevm_opcode::XOR, machine);
+    zkevm_circuit.assign_opcode(zkevm_opcode::RETURN, machine);
     zkevm_circuit.finalize_test();
     // assignment.export_table(std::cout);
     // circuit.export_circuit(std::cout);

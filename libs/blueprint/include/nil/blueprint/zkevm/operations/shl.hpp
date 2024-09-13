@@ -98,7 +98,7 @@ namespace nil {
                 auto var_gen = [&witness_cols](std::size_t i, int32_t offset = 0) {
                     return zkevm_operation<BlueprintFieldType>::var_gen(witness_cols, i, offset);
                 };
-                const std::size_t range_check_table_index = zkevm_circuit.get_circuit().get_reserved_indices().at("chunk_16_bits/full");
+                const std::size_t range_check_table_index = zkevm_circuit.get_reserved_indices().at("chunk_16_bits/full");
 
                 // Table layout
                 // (construct b = 1 << input_b, then do multiplication)

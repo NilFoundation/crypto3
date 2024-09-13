@@ -108,7 +108,7 @@ namespace nil {
                 auto var_gen = [&witness_cols](std::size_t i, int32_t offset = 0) {
                     return zkevm_operation<BlueprintFieldType>::var_gen(witness_cols, i, offset);
                 };
-                const std::size_t range_check_table_index = zkevm_circuit.get_circuit().get_reserved_indices().at("chunk_16_bits/full");
+                const std::size_t range_check_table_index = zkevm_circuit.get_reserved_indices().at("chunk_16_bits/full");
 
                 // constraint generators for carry-on addition
                 auto carry_on_addition_constraint = [](constraint_type a_0, constraint_type a_1, constraint_type a_2,

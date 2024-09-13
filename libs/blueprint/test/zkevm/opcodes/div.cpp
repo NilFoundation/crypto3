@@ -126,6 +126,7 @@ BOOST_AUTO_TEST_CASE(zkevm_mul_test) {
     zkevm_circuit.assign_opcode(zkevm_opcode::PUSH32, machine, zwordc(0x8000000000000000000000000000000000000000000000000000000000000000_cppui_modular257));
     zkevm_circuit.assign_opcode(zkevm_opcode::PUSH32, machine, zwordc(0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff_cppui_modular257));
     zkevm_circuit.assign_opcode(zkevm_opcode::SMOD, machine);
+    zkevm_circuit.assign_opcode(zkevm_opcode::RETURN, machine);
     zkevm_circuit.finalize_test();
     // assignment.export_table(std::cout);
     // circuit.export_circuit(std::cout);

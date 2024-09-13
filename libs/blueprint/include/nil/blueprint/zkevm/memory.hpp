@@ -1259,9 +1259,6 @@ namespace nil {
                 call_id = _call_id;
 
                 boost::property_tree::ptree ptrace = pt.get_child("result.structLogs");
-                boost::property_tree::ptree pstack;
-                boost::property_tree::ptree pmemory;
-
                 std::cout << "PT = " << ptrace.size() << std::endl;
 
                 std::vector<zkevm_word_type> stack = zkevm_word_vector_from_ptree(ptrace.begin()->second.get_child("stack"));

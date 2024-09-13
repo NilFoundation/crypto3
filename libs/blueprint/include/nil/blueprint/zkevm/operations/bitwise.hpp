@@ -65,8 +65,8 @@ namespace nil {
                 auto var_gen = [&witness_cols](std::size_t i, int32_t offset = 0) {
                     return zkevm_operation<BlueprintFieldType>::var_gen(witness_cols, i, offset);
                 };
-                const std::size_t byte_and_table_index = zkevm_circuit.get_circuit().get_reserved_indices().at("byte_and_xor_table/and");
-                const std::size_t byte_xor_table_index = zkevm_circuit.get_circuit().get_reserved_indices().at("byte_and_xor_table/xor");
+                const std::size_t byte_and_table_index = zkevm_circuit.get_reserved_indices().at("byte_and_xor_table/and");
+                const std::size_t byte_xor_table_index = zkevm_circuit.get_reserved_indices().at("byte_and_xor_table/xor");
 
                 // Table layout
                 // +-----+------+
