@@ -278,6 +278,8 @@ namespace nil {
                     polynomial_type prepare_combined_Q(
                             const typename field_type::value_type& theta,
                             std::size_t starting_power = 0) {
+                        this->build_points_map();
+
                         typename field_type::value_type theta_acc = theta.pow(starting_power);
                         polynomial_type combined_Q;
                         math::polynomial<value_type> V;
@@ -290,8 +292,10 @@ namespace nil {
                             math::polynomial<value_type> Q_normal;
                             for (std::size_t i: this->_z.get_batches()) {
                                 for (std::size_t j = 0; j < this->_z.get_batch_size(i); j++) {
-                                    auto it = std::find(this->_points[i][j].begin(), this->_points[i][j].end(), point);
-                                    if( it == this->_points[i][j].end()) continue;
+                                    auto iter = this->_points_map[i][j].find(point);
+                                    if (iter == this->_points_map[i][j].end())
+                                        continue;
+
                                     math::polynomial<value_type> g_normal;
                                     if constexpr(std::is_same<math::polynomial_dfs<value_type>, PolynomialType>::value ) {
                                         g_normal = math::polynomial<value_type>(this->_polys[i][j].coefficients());
@@ -300,7 +304,7 @@ namespace nil {
                                     }
                                     g_normal *= theta_acc;
                                     Q_normal += g_normal;
-                                    Q_normal -= this->_z.get(i, j, it - this->_points[i][j].begin()) * theta_acc;
+                                    Q_normal -= this->_z.get(i, j, iter->second) * theta_acc;
                                     theta_acc *= theta;
                                 }
                             }
