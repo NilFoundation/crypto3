@@ -50,7 +50,6 @@
 #include <nil/crypto3/algebra/curves/secp_k1.hpp>
 #include <nil/crypto3/algebra/curves/secp_r1.hpp>
 #include <nil/crypto3/algebra/curves/ed25519.hpp>
-#include <nil/crypto3/algebra/curves/curve25519.hpp>
 #include <nil/crypto3/algebra/curves/detail/forms/short_weierstrass/coordinates.hpp>
 
 
@@ -573,7 +572,6 @@ BOOST_DATA_TEST_CASE(curve_operation_test_edwards25519, string_data("curve_opera
     using policy_type = curves::ed25519::g1_type<>;
 
     static_assert(std::is_same<typename curves::ed25519::g1_type<>::curve_type, curves::ed25519>::value);
-    static_assert(std::is_same<typename curves::curve25519::g1_type<>::curve_type, curves::curve25519>::value);
 
     curve_operation_test_twisted_edwards<policy_type>(data_set, fp_extended_curve_twisted_edwards_test_init<policy_type>);
 }
