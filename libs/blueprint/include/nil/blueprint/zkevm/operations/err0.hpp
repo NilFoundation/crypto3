@@ -41,6 +41,7 @@ namespace nil {
             using constraint_type = typename op_type::constraint_type;
             using lookup_constraint_type = crypto3::zk::snark::plonk_lookup_constraint<BlueprintFieldType>;
             using zkevm_circuit_type = typename op_type::zkevm_circuit_type;
+            using zkevm_table_type = typename op_type::zkevm_table_type;
             using assignment_type = typename op_type::assignment_type;
             using value_type = typename BlueprintFieldType::value_type;
             using var = typename op_type::var;
@@ -74,11 +75,11 @@ namespace nil {
                 //    b = parity bit for virtual selector
                 //
                 // stack_read, stack_write, cost: defined by constraints based on virtual selector
-                // stack_size, curr_gas: taken from state
+                // stack_size, gas: taken from state
                 //
                 // stack_input + d1 = stack_size + si*2^16   <=>   si = [stack_input > stack_size]
                 // stack_size + stack_output + d2 = stack_input + 1024 + so*2^16  <=>  so = [stack_size + stack_output > 1024 + stack_input]
-                // cost + d3 = curr_gas + g*2^32   <=>   g = [cost > curr_gas]
+                // cost + d3 = gas + g*2^32   <=>   g = [cost > gas]
                 //
                 // Ensure there is an error: (si-1)(so-1)(g-1) = 0
 
@@ -92,8 +93,8 @@ namespace nil {
                     g_var   = var_gen(2,-1),
                     b_var   = var_gen(3,-1);
 
-                var stack_size_var = zkevm_circuit.get_state().stack_size.variable(0),
-                    curr_gas_var = zkevm_circuit.get_state().curr_gas.variable(0);
+                var stack_size_var = zkevm_circuit.get_state().stack_size,
+                    gas_var = zkevm_circuit.get_state().gas;
 
                 constraint_type stack_input,
                                 stack_output,
@@ -115,14 +116,14 @@ namespace nil {
                 // stack_size + stack_output + d2 = stack_input + 1024 + so*2^16
                 constraints.push_back({position, stack_size_var + stack_output + d2_var - stack_input - 1024 - so_var*65536});
 
-                // cost + d3 = curr_gas + g*2^32   <=>   g = [cost > curr_gas]
-                constraints.push_back({position, cost + d30_var + 65536*d31_var - curr_gas_var - g_var*(circuit_integral_type(1) << 32)});
+                // cost + d3 = gas + g*2^32   <=>   g = [cost > gas]
+                constraints.push_back({position, cost + d30_var + 65536*d31_var - gas_var - g_var*(circuit_integral_type(1) << 32)});
 
                 constraints.push_back({position, (si_var - 1)*(so_var - 1)*(g_var - 1)});
                 return {{gate_class::MIDDLE_OP, {constraints, {}}}};
             }
 
-            void generate_assignments(zkevm_circuit_type &zkevm_circuit, zkevm_machine_interface &machine,
+            void generate_assignments(zkevm_table_type &zkevm_table, zkevm_machine_interface &machine,
                                       zkevm_word_type opcode_num) {
 
                 zkevm_stack &stack = machine.stack;
@@ -138,26 +139,26 @@ namespace nil {
                             n = static_cast<std::size_t>(opcode / 2),
                             col = n % 44,
                             row = n / 44;
-                value_type curr_gas   = zkevm_circuit.get_state().curr_gas.value,
-                           stack_size = zkevm_circuit.get_state().stack_size.value;
+                value_type gas   = machine.gas,
+                           stack_size = machine.stack.size();
 
-                auto opcode_mnemo = zkevm_circuit.get_opcodes_info().get_opcode_from_number(static_cast<std::size_t>(opcode));
-                std::size_t cost = zkevm_circuit.get_opcodes_info().get_opcode_cost(opcode_mnemo),
-                           stack_input = zkevm_circuit.get_opcodes_info().get_opcode_stack_input(opcode_mnemo),
-                           stack_output = zkevm_circuit.get_opcodes_info().get_opcode_stack_output(opcode_mnemo);
+                auto opcode_mnemo = zkevm_table.get_opcodes_info().get_opcode_from_number(static_cast<std::size_t>(opcode));
+                std::size_t cost = zkevm_table.get_opcodes_info().get_opcode_cost(opcode_mnemo),
+                           stack_input = zkevm_table.get_opcodes_info().get_opcode_stack_input(opcode_mnemo),
+                           stack_output = zkevm_table.get_opcodes_info().get_opcode_stack_output(opcode_mnemo);
 
                 value_type si = (stack_input > circuit_integral_type(stack_size.data)),
                            so = (circuit_integral_type(stack_size.data) + stack_output > 1024 + stack_input),
-                           g  = (cost > circuit_integral_type(curr_gas.data)),
+                           g  = (cost > circuit_integral_type(gas.data)),
                            d1 = stack_size + 65536*si - stack_input,
                            d2 = stack_input + 1024 + 65536*so - stack_output - stack_size,
-                           d3 = curr_gas + (circuit_integral_type(1) << 32)*g - cost,
+                           d3 = gas + (circuit_integral_type(1) << 32)*g - cost,
                            d3_0 = circuit_integral_type(d3.data) % 65536,
                            d3_1 = circuit_integral_type(d3.data) / 65536;
 
-                const std::vector<std::size_t> &witness_cols = zkevm_circuit.get_opcode_cols();
-                assignment_type &assignment = zkevm_circuit.get_assignment();
-                const std::size_t curr_row = zkevm_circuit.get_current_row();
+                const std::vector<std::size_t> &witness_cols = zkevm_table.get_opcode_cols();
+                assignment_type &assignment = zkevm_table.get_assignment();
+                const std::size_t curr_row = zkevm_table.get_current_row();
 
                 assignment.witness(witness_cols[0], curr_row) = d3_0;
                 assignment.witness(witness_cols[1], curr_row) = d3_1;
@@ -175,8 +176,8 @@ namespace nil {
                 assignment.witness(witness_cols[2], curr_row + 1) = d2;
                 assignment.witness(witness_cols[3], curr_row + 1) = so;
             }
-            void generate_assignments(zkevm_circuit_type &zkevm_circuit, zkevm_machine_interface &machine) override {
-                 generate_assignments(zkevm_circuit, machine, 0); // just to have a default
+            void generate_assignments(zkevm_table_type &zkevm_table, zkevm_machine_interface &machine) override {
+                 generate_assignments(zkevm_table, machine, 0); // just to have a default
             }
 
             std::size_t rows_amount() override {

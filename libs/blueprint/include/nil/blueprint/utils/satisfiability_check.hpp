@@ -105,6 +105,7 @@ namespace nil {
             const std::set<std::uint32_t> &used_lookup_gates,
             const std::set<std::uint32_t> &used_copy_constraints,
             const std::set<std::uint32_t> &selector_rows){
+            std::cout << "Satisfiability check" << std::endl;
 
             const auto &gates = bp.gates();
 

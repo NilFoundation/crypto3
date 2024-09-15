@@ -33,14 +33,18 @@
 
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
-#include <nil/blueprint/zkevm/zkevm_circuit.hpp>
 #include <nil/blueprint/zkevm/zkevm_machine_interface.hpp>
+#include <nil/blueprint/zkevm/zkevm_circuit.hpp>
+#include <nil/blueprint/zkevm/zkevm_table.hpp>
 
 namespace nil {
     namespace blueprint {
 
         template<typename BlueprintFieldType>
         class zkevm_circuit;
+
+        template<typename BlueprintFieldType>
+        class zkevm_table;
 
         // interface class for generic zkevm operation
         template<typename BlueprintFieldType>
@@ -58,6 +62,7 @@ namespace nil {
             };
 
             using zkevm_circuit_type = zkevm_circuit<BlueprintFieldType>;
+            using zkevm_table_type = zkevm_table<BlueprintFieldType>;
             using constraint_type = nil::crypto3::zk::snark::plonk_constraint<BlueprintFieldType>;
             using lookup_constraint_type = crypto3::zk::snark::plonk_lookup_constraint<BlueprintFieldType>;
             using assignment_type = assignment<nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>;
@@ -74,7 +79,7 @@ namespace nil {
                 >>
                 generate_gates(zkevm_circuit_type &zkevm_circuit) = 0;
 
-            virtual void generate_assignments(zkevm_circuit_type &zkevm_circuit, zkevm_machine_interface &machine) = 0;
+            virtual void generate_assignments(zkevm_table_type &zkevm_circuit, zkevm_machine_interface &machine) = 0;
             // should return the same rows amount for everyс operation right now
             // here in case we would make it dynamic in the future
             virtual std::size_t rows_amount() = 0;

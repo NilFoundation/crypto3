@@ -36,20 +36,20 @@ namespace nil {
             using word_type = zkevm_word_type;
 
             void push(const word_type& word) {
-                stack.push(word);
+                stack.push_back(word);
             }
 
             word_type pop() {
-                word_type word = stack.top();
-                stack.pop();
+                word_type word = stack.back();
+                stack.pop_back();
                 return word;
             }
 
             word_type top() {
-                return stack.top();
+                return stack.back();
             }
 
-            void swap() {
+/*          void swap() {
                 word_type a = pop();
                 word_type b = pop();
                 push(a);
@@ -61,12 +61,19 @@ namespace nil {
                 push(a);
                 push(a);
             }
-
-            std::size_t size() {
+*/
+            std::size_t size() const {
                 return stack.size();
             }
+
+            zkevm_stack(): stack({}){
+            }
+
+            zkevm_stack(std::vector<word_type> _stack){
+                stack = _stack;
+            }
         private:
-            std::stack<word_type> stack;
+            std::vector<word_type> stack;
         };
     }   // namespace blueprint
 }   // namespace nil

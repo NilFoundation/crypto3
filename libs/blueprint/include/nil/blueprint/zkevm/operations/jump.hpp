@@ -32,6 +32,11 @@
 
 namespace nil {
     namespace blueprint {
+        template<typename BlueprintFieldType>
+        class zkevm_operation;
+
+        template<typename BlueprintFieldType>
+        class zkevm_table;
 
         template<typename BlueprintFieldType>
         class zkevm_jumpi_operation : public zkevm_operation<BlueprintFieldType> {
@@ -41,6 +46,7 @@ namespace nil {
             using constraint_type = typename op_type::constraint_type;
             using lookup_constraint_type = crypto3::zk::snark::plonk_lookup_constraint<BlueprintFieldType>;
             using zkevm_circuit_type = typename op_type::zkevm_circuit_type;
+            using zkevm_table_type = typename op_type::zkevm_table_type;
             using assignment_type = typename op_type::assignment_type;
             using value_type = typename BlueprintFieldType::value_type;
             using var = typename op_type::var;
@@ -63,7 +69,7 @@ namespace nil {
                 return {{gate_class::MIDDLE_OP, {{}, {}}}};
             }
 
-            void generate_assignments(zkevm_circuit_type &zkevm_circuit, zkevm_machine_interface &machine) override {
+            void generate_assignments(zkevm_table_type &zkevm_table, zkevm_machine_interface &machine) override {
                 zkevm_stack &stack = machine.stack;
                 std::cout << "Generate assignments and gates for JUMPI" << std::endl;
                 stack.pop();
@@ -83,6 +89,7 @@ namespace nil {
             using constraint_type = typename op_type::constraint_type;
             using lookup_constraint_type = crypto3::zk::snark::plonk_lookup_constraint<BlueprintFieldType>;
             using zkevm_circuit_type = typename op_type::zkevm_circuit_type;
+            using zkevm_table_type = typename op_type::zkevm_table_type;
             using assignment_type = typename op_type::assignment_type;
             using value_type = typename BlueprintFieldType::value_type;
             using var = typename op_type::var;
@@ -105,7 +112,7 @@ namespace nil {
                 return {{gate_class::MIDDLE_OP, {{}, {}}}};
             }
 
-            void generate_assignments(zkevm_circuit_type &zkevm_circuit, zkevm_machine_interface &machine) override {
+            void generate_assignments(zkevm_table_type &zkevm_table, zkevm_machine_interface &machine) override {
                 zkevm_stack &stack = machine.stack;
                 std::cout << "Generate assignments and gates for JUMP" << std::endl;
                 stack.pop();
@@ -124,6 +131,7 @@ namespace nil {
             using constraint_type = typename op_type::constraint_type;
             using lookup_constraint_type = crypto3::zk::snark::plonk_lookup_constraint<BlueprintFieldType>;
             using zkevm_circuit_type = typename op_type::zkevm_circuit_type;
+            using zkevm_table_type = typename op_type::zkevm_table_type;
             using assignment_type = typename op_type::assignment_type;
             using value_type = typename BlueprintFieldType::value_type;
             using var = typename op_type::var;
@@ -146,7 +154,7 @@ namespace nil {
                 return {{gate_class::MIDDLE_OP, {{}, {}}}};
             }
 
-            void generate_assignments(zkevm_circuit_type &zkevm_circuit, zkevm_machine_interface &machine) override {
+            void generate_assignments(zkevm_table_type &zkevm_table, zkevm_machine_interface &machine) override {
                 zkevm_stack &stack = machine.stack;
                 std::cout << "Generate assignments and gates for JUMPDEST" << std::endl;
             }

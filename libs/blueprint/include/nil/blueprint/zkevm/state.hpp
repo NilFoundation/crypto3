@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2024 Dmitrii Tabalin <d.tabalin@nil.foundation>
 // Copyright (c) 2024 Alexey Yashunsky <a.yashunsky@nil.foundation>
+// Copyright (c) 2024 Elena Tatuzova <e.tatuzova@nil.foundation>
 //
 // MIT License
 //
@@ -37,19 +38,20 @@ namespace nil {
     namespace blueprint {
 
         // we use value_type as a default here in order to have easier time testing weird assignments like -1
-        template<typename BlueprintFieldType, typename T = typename BlueprintFieldType::value_type>
+        // I don't like this because value is directly connected with variable
+/*      template<typename BlueprintFieldType, typename T = typename BlueprintFieldType::value_type>
         struct state_var {
             using arithmetization_type = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>;
             using assignment_type = nil::blueprint::assignment<arithmetization_type>;
             using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
             using column_type = typename var::column_type;
 
-            std::size_t selector;
+            std::size_t column_id;
             column_type type;
             T value;
 
-            state_var(const std::size_t selector_, const column_type type_, const T& value_)
-                : selector(selector_), type(type_), value(value_) {}
+            state_var(const std::size_t column_id_, const column_type type_, const T& value_)
+                : column_id(column_id_), type(type_), value(value_) {}
 
             state_var() = default;
 
@@ -60,13 +62,15 @@ namespace nil {
             void assign_value(assignment_type &assignment, std::size_t row) const {
                 switch (type) {
                     case column_type::witness:
-                        assignment.witness(selector, row) = value;
+                        assignment.witness(column_id, row) = value;
                         break;
                     case column_type::constant:
-                        assignment.constant(selector, row) = value;
+                        assignment.constant(column_id, row) = value;
+                        BOOST_ASSERT("We should not assign a state value to constant column");
                         break;
                     case column_type::selector:
-                        assignment.selector(selector, row) = value;
+                        assignment.selector(column_id, row) = value;
+                        BOOST_ASSERT("We should not assign a state value to selector column");
                         break;
                     case column_type::public_input:
                         BOOST_ASSERT("We should not assign a state value to public input column");
@@ -82,7 +86,7 @@ namespace nil {
 
             var variable(int32_t offset = 0) const {
                 BOOST_ASSERT(offset == 0 || offset == -1 || offset == 1);
-                return var(selector, offset, true, type);
+                return var(column_id, offset, true, type);
             }
         };
 
@@ -90,7 +94,7 @@ namespace nil {
             X(pc) \
             X(stack_size) \
             X(memory_size) \
-            X(curr_gas) \
+            X(gas) \
 
         // Every variable which should be tracked between rows
         template<typename BlueprintFieldType>
@@ -227,7 +231,7 @@ namespace nil {
         }
 
         template<typename BlueprintFieldType>
-        crypto3::zk::snark::plonk_constraint<BlueprintFieldType> handle_curr_gas_default(
+        crypto3::zk::snark::plonk_constraint<BlueprintFieldType> handle_gas_default(
             const state_var<BlueprintFieldType> &var,
             const transition_type &transition
         ) {
@@ -251,6 +255,47 @@ namespace nil {
             zkevm_STATE_LIST_FOR_TRANSITIONS(X)
             #undef X
             return result;
-        }
+        }*/
+
+        // It is really simplified state variable. We assume that each state position uses the whole column.
+        // In this case variable is defined only by witness column id.
+        // It's useful to have some convenient functions for rotations for circuit construction and absolute variables for assignment.
+        template<typename BlueprintFieldType>
+        struct state_var:public crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>{
+            using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
+            state_var(std::uint32_t witness_id = 0): var(witness_id, 0, true, var::column_type::witness){}
+            var operator() () const {
+                return var(this->index, 0, true, var::column_type::witness);
+            }
+            var next() const {
+                return var(this->index, 1, true, var::column_type::witness);
+            }
+            var prev() const {
+                return var(this->index, -1, true, var::column_type::witness);
+            }
+            var abs(std::size_t row) const {
+                return var(this->index, row, false, var::column_type::witness);
+            }
+        };
+        // This class just contains state variables zkEVM state and next state
+        // We'll write all state transition constraints directly in zkevm circuit.
+        // All variables are named.
+        // This data structure is filled only once by
+        //     zkevm_circuit
+        //     zkevm_table has it as a constant input.
+        template<typename BlueprintFieldType>
+        struct zkevm_vars {
+            using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
+            using state_var = state_var<BlueprintFieldType>;
+        public:
+            state_var pc;
+            state_var stack_size;
+            state_var memory_size;
+            state_var gas;
+            state_var step_selection; // 1 in first line of new opcode, 0 otherwise
+            state_var rows_counter_inv;
+            state_var last_row_indicator;  // Do we really need it?
+            state_var option;
+        };
     }    // namespace blueprint
 }    // namespace nil

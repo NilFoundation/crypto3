@@ -30,12 +30,13 @@
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
 #include <nil/blueprint/component.hpp>
 #include <nil/blueprint/manifest.hpp>
+#include <nil/blueprint/zkevm/state.hpp>
 
 namespace nil {
     namespace blueprint {
         namespace components {
             // activates a witness column based on an input value
-            // is used to achive dynamic selector behavior
+            // is used to achieve dynamic selector behavior
             // actual implementation
             template<typename ArithmetizationType, typename FieldType>
             class state_selector;
@@ -51,6 +52,7 @@ namespace nil {
                 using var = typename component_type::var;
                 using manifest_type = plonk_component_manifest;
                 using constraint_type = crypto3::zk::snark::plonk_constraint<BlueprintFieldType>;
+                using state_var = state_var<BlueprintFieldType>;
 
                 std::size_t options_amount;
                 bool is_compressed;
@@ -223,11 +225,11 @@ namespace nil {
                     return option_constraint(option,false);
                 }
 
-                var option_variable(std::int32_t offset = 0) const {
-                    return var(this->W(0), offset, true, var::column_type::witness);
+                state_var option_variable() const {
+                    return state_var(this->W(0));
                 }
-                var parity_variable(std::int32_t offset = 0) const {
-                    return var(this->W(this->witness_amount() - 1), offset, true, var::column_type::witness);
+                state_var parity_variable() const {
+                    return state_var(this->W(this->witness_amount() - 1));
                 }
 
             };
@@ -251,6 +253,7 @@ namespace nil {
                 using integral_type = typename BlueprintFieldType::integral_type;
 
                 value_type index = var_value(assignment, instance_input.item_index);
+                //if( index >= component.options_amount ) std::cout << index << ">=" << component.options_amount << std::endl;
                 BOOST_ASSERT(index < component.options_amount);
 
                 // calculating this is somehow very unintuitive
@@ -299,6 +302,7 @@ namespace nil {
 
                 using component_type = plonk_state_selector<BlueprintFieldType>;
                 using var = typename component_type::var;
+                using state_var = state_var<BlueprintFieldType>;
 
                 bp.add_copy_constraint(
                     {instance_input.item_index,
@@ -316,6 +320,7 @@ namespace nil {
                 const std::size_t start_row_index) {
 
                 using component_type = plonk_state_selector<BlueprintFieldType>;
+                using state_var = state_var<BlueprintFieldType>;
 
                 std::size_t selector_index = generate_gates(component, bp, assignment, instance_input);
                 assignment.enable_selector(selector_index, start_row_index, start_row_index);

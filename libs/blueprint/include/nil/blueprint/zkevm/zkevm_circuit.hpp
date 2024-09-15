@@ -86,9 +86,8 @@ namespace nil {
             using constraint_type = crypto3::zk::snark::plonk_constraint<BlueprintFieldType>;
             using lookup_constraint_type = crypto3::zk::snark::plonk_lookup_constraint<BlueprintFieldType>;
 
-            columns_manager(assignment_type &assignment_, circuit_type &circuit_)
-                : assignment(assignment_), circuit(circuit_),
-                  witness_index(0), constant_index(0) {}
+            columns_manager(assignment_type &assignment_)
+                : assignment(assignment_), witness_index(0), constant_index(0), selector_index(0) {}
 
             std::size_t allocate_witness_column() {
                 if (witness_index >= assignment.witnesses_amount()) {
@@ -104,26 +103,17 @@ namespace nil {
                 return constant_index++;
             }
 
-            template<typename T>
-            std::size_t add_gate(const T &args) {
-                std::size_t selector = circuit.add_gate(args);
-                if (selector >= assignment.selectors_amount()) {
-                    assignment.resize_selectors(selector + 1);
+            std::size_t allocate_selector_column(){
+                if (selector_index >= assignment.selectors_amount()) {
+                    assignment.resize_selectors(selector_index + 1);
                 }
-                return selector;
+                return selector_index++;
             }
-
-            template<typename T>
-            std::size_t add_lookup_gate(std::size_t selector_id, const T &args) {
-                circuit.add_lookup_gate(selector_id, args);
-                return selector_id;
-            }
-
         private:
             assignment_type &assignment;
-            circuit_type &circuit;
             std::size_t witness_index;
             std::size_t constant_index;
+            std::size_t selector_index;
         };
 
         template<typename BlueprintFieldType>
@@ -135,8 +125,8 @@ namespace nil {
             using arithmetization_type = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>;
             using assignment_type = nil::blueprint::assignment<arithmetization_type>;
             using circuit_type = nil::blueprint::circuit<arithmetization_type>;
-            using state_var_type = state_var<BlueprintFieldType>;
-            using zkevm_state_type = zkevm_state<BlueprintFieldType>;
+//            using state_var_type = state_var<BlueprintFieldType>;
+            using zkevm_state_type = zkevm_vars<BlueprintFieldType>;
             using columns_manager_type = columns_manager<BlueprintFieldType>;
             using zkevm_operation_type = zkevm_operation<BlueprintFieldType>;
             using zkevm_opcode_gate_class = typename zkevm_operation<BlueprintFieldType>::gate_class;
@@ -145,22 +135,14 @@ namespace nil {
             using lookup_constraint_type = crypto3::zk::snark::plonk_lookup_constraint<BlueprintFieldType>;
             using value_type = typename BlueprintFieldType::value_type;
             using var = typename crypto3::zk::snark::plonk_variable<value_type>;
-
-            std::map<std::string, std::size_t> zkevm_circuit_lookup_tables() const {
-                std::map<std::string, std::size_t> lookup_tables;
-                lookup_tables["chunk_16_bits/full"] = 0;
-                lookup_tables["byte_and_xor_table/and"] = 0;
-                lookup_tables["byte_and_xor_table/xor"] = 0;
-                lookup_tables["zkevm_bytecode"] = 1;
-                return lookup_tables;
-            }
+            using bytecode_table_component = typename components::plonk_zkevm_bytecode_table<BlueprintFieldType>;
 
             zkevm_circuit(assignment_type &assignment_, circuit_type &circuit, std::size_t _max_rows = 249, std::size_t start_row_index_ = 1)
                 :assignment(assignment_), opcodes_info_instance(opcodes_info::instance()),
-                 curr_row(start_row_index_), start_row_index(start_row_index_), max_rows(_max_rows),
+                 start_row_index(start_row_index_), max_rows(_max_rows),
                  lookup_tables_indices(circuit.get_reserved_indices()
             ){
-                columns_manager_type col_manager(assignment, circuit);
+                columns_manager_type col_manager(assignment); // Just helps us to deal with assignment table columns
 
                 // 5(?) constant columns. I'm not sure we really need them: satisfiability check passes even without them
                 for(std::size_t i = 0; i < 5; i++) {
@@ -182,6 +164,9 @@ namespace nil {
                     "Start row index must be greater than zero, otherwise some gates would access non-existent rows.");
                 init_state(col_manager);
                 init_opcodes(circuit, col_manager);
+
+                col_manager.allocate_selector_column();
+                col_manager.allocate_selector_column();
                 assignment.resize_selectors(assignment.selectors_amount() + 2 + dynamic_tables_amount); // for lookup table packing
 
                 allocate_dynamic_tables_columns(col_manager);
@@ -191,101 +176,25 @@ namespace nil {
                     bytecode_witnesses[3], bytecode_witnesses[4], bytecode_witnesses[5]
                 }, {}, {}, 10);
                 typename bytecode_table_component::input_type input({},{});// Add input variables
+
+                col_manager.allocate_selector_column(); // Bytecode_table needs only one selector
                 generate_circuit(bytecode_table, circuit, assignment, input, 0);
+
                 assignment.enable_selector(end_selector, start_row_index + max_rows - 1);
                 assignment.enable_selector(start_selector, start_row_index);
                 assignment.enable_selector(middle_selector, start_row_index, max_rows-1);
-                std::cout << "Start selector = " << start_selector << "; Middle selector = " << middle_selector << "; End selector = " << end_selector << std::endl;
 
                 lookup_tables_indices = circuit.get_reserved_indices();
             }
 
-            void assign_state() {
-                state.assign_state(assignment, curr_row);
+            std::map<std::string, std::size_t> zkevm_circuit_lookup_tables() const {
+                std::map<std::string, std::size_t> lookup_tables;
+                lookup_tables["chunk_16_bits/full"] = 0;
+                lookup_tables["byte_and_xor_table/and"] = 0;
+                lookup_tables["byte_and_xor_table/xor"] = 0;
+                lookup_tables["zkevm_bytecode"] = 1;
+                return lookup_tables;
             }
-
-            void finalize_test() {
-                finalize();
-                // this is done in order for the vizualiser export to work correctly before padding the circuit.
-                // otherwise constraints try to access non-existent rows
-                assignment.witness(state_selector->W(0), curr_row) = value_type(0xC0FFEE);
-                std::cout << "Assignment rows amount = " << assignment.rows_amount() << std::endl;
-            }
-
-            void finalize() {
-                BOOST_ASSERT_MSG(curr_row != 0, "Row underflow in finalization");
-
-                zkevm_machine_interface empty_machine(0);
-                while(curr_row - start_row_index < max_rows-1){
-                    assign_opcode(zkevm_opcode::padding, empty_machine, 0);
-                }
-
-                assignment.witness(state.last_row_indicator.selector, curr_row - 1) = 1;
-
-                // Assign dynamic lookup tables
-                bytecode_table_component bytecode_table({
-                    bytecode_witnesses[0], bytecode_witnesses[1], bytecode_witnesses[2],
-                    bytecode_witnesses[3], bytecode_witnesses[4], bytecode_witnesses[5]
-                }, {}, {}, 10);
-                typename bytecode_table_component::input_type input({},{});// Add input variables
-                generate_assignments(bytecode_table, assignment, input, 0);
-            }
-
-            void assign_opcode(const zkevm_opcode opcode, zkevm_machine_interface &machine, zkevm_word_type additional_input = 0) {
-                auto opcode_it = opcodes.find(opcode);
-                if (opcode_it == opcodes.end()) {
-                    BOOST_ASSERT_MSG(false, (std::string("Unimplemented opcode: ") + opcode_to_string(opcode)) != "");
-                }
-                // state management
-                state.step_selection.value = 1;
-                state.last_row_indicator.value = 0;
-                state.curr_gas.value = machine.gas;
-
-                std::size_t opcode_height = opcode_it->second->rows_amount();
-                // for opcodes with odd height skip one row
-                if (opcode_it->second->rows_amount() % 2 ) {
-                    state.rows_until_next_op_inv.value = value_type(opcode_height).inversed();
-                    advance_rows(opcode, 1, opcode_height);
-                } else {
-                    state.rows_until_next_op_inv.value = value_type(opcode_height - 1).inversed();
-                }
-
-                std::set<zkevm_opcode> opcodes_with_args = { zkevm_opcode::PUSH0, zkevm_opcode::PUSH1, zkevm_opcode::PUSH2,
-                 zkevm_opcode::PUSH3, zkevm_opcode::PUSH4, zkevm_opcode::PUSH5, zkevm_opcode::PUSH6, zkevm_opcode::PUSH7,
-                 zkevm_opcode::PUSH8, zkevm_opcode::PUSH9, zkevm_opcode::PUSH10, zkevm_opcode::PUSH11, zkevm_opcode::PUSH12,
-                 zkevm_opcode::PUSH13, zkevm_opcode::PUSH14, zkevm_opcode::PUSH15, zkevm_opcode::PUSH16, zkevm_opcode::PUSH17,
-                 zkevm_opcode::PUSH18, zkevm_opcode::PUSH19, zkevm_opcode::PUSH20, zkevm_opcode::PUSH21, zkevm_opcode::PUSH22,
-                 zkevm_opcode::PUSH23, zkevm_opcode::PUSH24, zkevm_opcode::PUSH25, zkevm_opcode::PUSH26, zkevm_opcode::PUSH27,
-                 zkevm_opcode::PUSH28, zkevm_opcode::PUSH29, zkevm_opcode::PUSH30, zkevm_opcode::PUSH31, zkevm_opcode::PUSH32,
-                 zkevm_opcode::err0
-                };
-                if (opcodes_with_args.find(opcode) == opcodes_with_args.end()) {
-                    opcode_it->second->generate_assignments(*this, machine);
-                } else {
-                    // for push opcodes we use the additional argument
-                    using pushx_op_type = zkevm_pushx_operation<BlueprintFieldType>;
-                    using err0_op_type = zkevm_err0_operation<BlueprintFieldType>;
-                    if (opcode == zkevm_opcode::err0) {
-                        auto err0_implementation = std::static_pointer_cast<err0_op_type>(opcode_it->second);
-                        err0_implementation->generate_assignments(*this, machine, additional_input);
-                    } else {
-                        auto pushx_implementation = std::static_pointer_cast<pushx_op_type>(opcode_it->second);
-                        pushx_implementation->generate_assignments(*this, machine, additional_input);
-                    }
-                }
-                advance_rows(opcode, opcode_height, opcode_height - 1, opcode_height % 2);
-                // post-opcode state management
-                state.pc.value++;
-                // NB: we don't need to control stack size values here, because in a valid circuit they should alway be within the range
-                state.stack_size.value -= opcodes_info_instance.get_opcode_stack_input(opcode);
-                state.stack_size.value += opcodes_info_instance.get_opcode_stack_output(opcode);
-                machine.gas -= opcodes_info_instance.get_opcode_cost(opcode);
-
-                BOOST_ASSERT(curr_row - start_row_index < max_rows);
-            }
-
-
-            using bytecode_table_component = typename components::plonk_zkevm_bytecode_table<BlueprintFieldType>;
 
             // May be reviewed somehow. Now I'll do the most straight way
             // Each table has its separate columns and selectors.
@@ -297,66 +206,45 @@ namespace nil {
                 }
             }
 
-            void advance_rows(const zkevm_opcode opcode, std::size_t rows, std::size_t internal_start_row, std::size_t shift = 0) {
-                std::size_t current_internal_row = internal_start_row;
-
-                //assignment.enable_selector(middle_selector, curr_row, curr_row + rows - 1);
-                // TODO: figure out what is going to happen on state change
-                value_type opcode_num = opcodes_info_instance.get_opcode_number(opcode);
-                for (std::size_t i = 0 + shift; i < rows + shift; i++) {
-                    if (i % state_selector->rows_amount == 0) {
-                        // TODO: switch to real bytecode
-                        assignment.witness(state_selector->W(0), curr_row) = opcode_num;
-                        components::generate_assignments(
-                            *state_selector, assignment,
-                            {var(state_selector->W(0), curr_row, false, var::column_type::witness)}, curr_row);
-                    }
-                    assignment.witness(opcode_row_selector->W(0), curr_row) = current_internal_row;
-                    components::generate_assignments(
-                        *opcode_row_selector, assignment,
-                        {var(opcode_row_selector->W(0), curr_row, false, var::column_type::witness)}, curr_row);
-                    assign_state();
-                    if (i == 0) {
-                        state.step_selection.value = 0;
-                    }
-                    assignment.witness(state_selector->W(0), curr_row) = opcode_num;
-
-                    current_internal_row--;
-                    state.rows_until_next_op_inv.value = current_internal_row == 0 ?
-                        0 : value_type(current_internal_row).inversed();
-
-                    curr_row++;
-                }
+            const std::shared_ptr<state_selector_type> get_opcode_row_selector() const{
+                return opcode_row_selector;
             }
 
-            opcodes_info get_opcodes_info() {
+            const std::shared_ptr<state_selector_type> get_state_selector() const{
+                return state_selector;
+            }
+
+            const opcodes_info get_opcodes_info() const{
                 return opcodes_info_instance;
             }
 
-            zkevm_state_type &get_state() {
+            const std::map<zkevm_opcode, std::shared_ptr<zkevm_operation<BlueprintFieldType>>> &get_opcodes() const{
+                return opcodes;
+            }
+
+            const zkevm_state_type &get_state() const{
                 return state;
             }
 
-            const std::vector<std::size_t> &get_state_selector_cols() {
+            const std::vector<std::size_t> &get_state_selector_cols() const{
                 return state_selector_cols;
             }
 
-            const std::vector<std::size_t> &get_opcode_cols() {
+            const std::vector<std::size_t> &get_opcode_cols() const{
                 return opcode_cols;
             }
 
-            std::size_t get_current_row() const {
-                return curr_row;
+            std::size_t get_start_row_index() const {
+                return start_row_index;
+            }
+
+            std::size_t get_max_rows() const{
+                return max_rows;
             }
 
             assignment_type &get_assignment() {
                 return assignment;
             }
-/*
-            circuit_type &get_circuit() {
-                return circuit;
-            }
-*/
 
             const typename lookup_library<BlueprintFieldType>::left_reserved_type &get_reserved_indices() const{
                 return lookup_tables_indices;
@@ -368,13 +256,13 @@ namespace nil {
                 BOOST_ASSERT(row < opcode_height);
 
                 var height_var = opcode_row_selector->option_variable();
-                var height_var_inv = state.rows_until_next_op_inv.variable();
+                var height_var_inv = state.rows_counter_inv;
                 // ordering here is important: minimising the degree when possible
                 if (row == opcode_height - 1) {
-                    return state.step_selection.variable();
+                    return state.step_selection;
                 }
                 if (row == opcode_height - 2) {
-                    return state.step_selection.variable(-1);
+                    return state.step_selection.prev();
                 }
                 if (row == 0) {
                     return 1 - height_var * height_var_inv;
@@ -383,22 +271,19 @@ namespace nil {
                 return opcode_row_selector->option_constraint(row);
             }
 
+            const std::vector<std::uint32_t> &get_bytecode_witnesses() const{
+                return bytecode_witnesses;
+            }
+
         private:
             void init_state(columns_manager_type &col_manager) {
-                state.pc = state_var_type(
-                   col_manager.allocate_witness_column(), state_var_type::column_type::witness, 1);
-                state.stack_size = state_var_type(
-                   col_manager.allocate_witness_column(), state_var_type::column_type::witness, 0);
-                state.memory_size = state_var_type(
-                   col_manager.allocate_witness_column(), state_var_type::column_type::witness, 0);
-                state.curr_gas = state_var_type(
-                   col_manager.allocate_witness_column(), state_var_type::column_type::witness, 0);
-                state.rows_until_next_op_inv = state_var_type(
-                   col_manager.allocate_witness_column(), state_var_type::column_type::witness, 0);
-                state.step_selection = state_var_type(
-                   col_manager.allocate_witness_column(), state_var_type::column_type::witness, 1);
-                state.last_row_indicator = state_var_type(
-                   col_manager.allocate_witness_column(), state_var_type::column_type::witness, 0);
+                state.pc = typename zkevm_state_type::state_var(col_manager.allocate_witness_column());
+                state.stack_size = typename zkevm_state_type::state_var(col_manager.allocate_witness_column());
+                state.memory_size = typename zkevm_state_type::state_var(col_manager.allocate_witness_column());
+                state.gas = typename zkevm_state_type::state_var(col_manager.allocate_witness_column());
+                state.rows_counter_inv = typename zkevm_state_type::state_var(col_manager.allocate_witness_column());
+                state.step_selection = typename zkevm_state_type::state_var(col_manager.allocate_witness_column());
+                state.last_row_indicator = typename zkevm_state_type::state_var(col_manager.allocate_witness_column());
             }
 
             std::vector<constraint_type> generate_generic_transition_constraints(
@@ -407,35 +292,33 @@ namespace nil {
             ) {
                 std::vector<constraint_type> constraints;
 
-                auto rows_until_next_op_var = opcode_row_selector->option_variable(0);
-                auto rows_until_next_op_prev_var = opcode_row_selector->option_variable(-1);
-                auto rows_until_next_op_next_var = opcode_row_selector->option_variable(+1);
+                state_var rows_counter = opcode_row_selector->option_variable();
+                state_var rows_counter_inv = state.rows_counter_inv;
+                state_var step_selection = state.step_selection;
+                state_var option = state.option;
 
-                auto rows_until_next_op_inv_var = state.rows_until_next_op_inv.variable();
-                auto rows_until_next_op_inv_prev_var = state.rows_until_next_op_inv.variable(-1);
-                auto step_selection_var = state.step_selection.variable();
-                auto step_selection_next_var = state.step_selection.variable(+1);
-                auto option_variable = state_selector->option_variable(0);
-                auto option_variable_prev = state_selector->option_variable(-1);
-                auto last_row_indicator_var = state.last_row_indicator.variable();
-                // inverse or zero for rows_until_next_op/rows_until_next_op_inv
-                constraints.push_back(
-                    rows_until_next_op_var * rows_until_next_op_var * rows_until_next_op_inv_var
-                    - rows_until_next_op_var);
-                constraints.push_back(
-                    (rows_until_next_op_var * rows_until_next_op_inv_var - 1) * rows_until_next_op_inv_var);
-                // rows_until_next_op decrementing (unless we are at the last row of opcode)
-                constraints.push_back(
-                    rows_until_next_op_var * (rows_until_next_op_next_var - rows_until_next_op_var + 1));
+                constraints.push_back(rows_counter() * (rows_counter() * rows_counter_inv() - 1 ));                  //GEN1
+                constraints.push_back(rows_counter_inv() * (rows_counter() * rows_counter_inv() - 1));               //GEN2
+                // rows_counter decrementing (unless we are at the last row of opcode)
+                constraints.push_back(rows_counter() * (rows_counter.next() - rows_counter() + 1));                  //GEN3
+                // step_selection is 0 or 1
+                constraints.push_back((1 - step_selection()) * step_selection());                                    //GEN4
+                // step_selection = 1 if previous row_counter is 0
+                constraints.push_back(step_selection() * rows_counter.prev());                                       //GEN5
                 // step is copied unless new opcode is next
-                constraints.push_back(
-                    (1 - step_selection_var) * (option_variable - option_variable_prev));
+                constraints.push_back((1 - step_selection()) * (option() - option.prev()));                          //GEN6
                 // new opcode selection is forced if new opcode is next
-                constraints.push_back(
-                    (1 - rows_until_next_op_inv_prev_var * rows_until_next_op_prev_var) * (1 - step_selection_var));
-                // freeze some of the the state variables unless new opcode is next
+                constraints.push_back((1 - rows_counter_inv.prev() * rows_counter.prev()) * (1 - step_selection())); //GEN7
+
+                // Other state variables does not changed inside one opcode change it if necessary.
+                constraints.push_back((1 - step_selection()) * (state.pc() - state.pc.prev()));                      //GEN8
+                constraints.push_back((1 - step_selection()) * (state.gas() - state.gas.prev()));                    //GEN9
+                constraints.push_back((1 - step_selection()) * (state.stack_size() - state.stack_size.prev()));      //GEN10
+                constraints.push_back((1 - step_selection()) * (state.memory_size() - state.memory_size.prev()));    //GEN11
+
+                // All transitions between states will be done in opcodes
                 // or we are at the end of the circuit
-                auto partial_state_transition_constraints = generate_transition_constraints(
+/*              auto partial_state_transition_constraints = generate_transition_constraints(
                     state, generate_frozen_state_transition());
                 // the initially problematic constraints are here \/ \/ \/
                 for (auto constraint : partial_state_transition_constraints) {
@@ -444,7 +327,7 @@ namespace nil {
                         // ^^^ this fixes the problem from the commented line below
 //                        (1 - var(end_selector, 0, true, var::column_type::selector)) *
                         (1 - step_selection_next_var) * constraint);
-                }
+                }*/
                 return constraints;
             }
 
@@ -579,20 +462,28 @@ namespace nil {
 
                 std::vector<lookup_constraint_type> middle_lookup_constraints;
 
-                first_constraints.push_back(state.stack_size.variable()); // stack size at start is 0.
+                // TODO: This should be checked for all transactions' first opcode. Not only for the first row.
+                first_constraints.push_back(state.stack_size); // stack size at start is 0.
                                                                           // NB: no need for range checks before first real transition,
                                                                           // it's all ensured by "frozen" transition constraints.
-                first_constraints.push_back(state.step_selection.variable() - 1); // first step is step selection
-                start_selector = col_manager.add_gate(first_constraints);
+                first_constraints.push_back(state.step_selection - 1); // first step is step selection
 
-                middle_constraints.push_back(state.last_row_indicator.variable(-1));
+                col_manager.allocate_selector_column(); // Start
+                col_manager.allocate_selector_column(); // End
+                col_manager.allocate_selector_column(); // Middle
+
+                start_selector = circuit.add_gate(first_constraints);
+
+//                middle_constraints.push_back(state.last_row_indicator.prev());
                 // ensure that stack_size is always between 0 and max_stack_size.
                 // This allows simpler transitions of stack size without the need to control validity of updated stack size
-                middle_lookup_constraints.push_back({range_check_table_index, { state.stack_size.variable() } });
-                middle_lookup_constraints.push_back({range_check_table_index, { state.stack_size.variable() + 65535 - max_stack_size } });
+
+                // TODO: stack size validity will be checked by RW table.
+//                middle_lookup_constraints.push_back({range_check_table_index, { state.stack_size } });
+//                middle_lookup_constraints.push_back({range_check_table_index, { state.stack_size + 65535 - max_stack_size } });
 
                 // TODO: proper end constraints zkevm_padding_operation
-                last_constraints.push_back(state.last_row_indicator.variable(-1) - 1);
+                last_constraints.push_back(state.last_row_indicator.prev() - 1);
                 end_selector = circuit.add_gate(last_constraints);
 
                 std::vector<std::size_t> opcode_range_checked_cols;
@@ -615,7 +506,9 @@ namespace nil {
                 }
                 state_selector = std::make_shared<state_selector_type>(
                     state_selector_cols, std::array<std::uint32_t, 0>({}), std::array<std::uint32_t, 0>({}),
-                    opcodes_amount,true);
+                    opcodes_amount,true
+                );
+                state.option = state_selector->option_variable();
 
                 auto state_selector_constraints = state_selector->generate_constraints();
 
@@ -636,8 +529,7 @@ namespace nil {
                         middle_constraints.push_back(constraint * parity_var);
                     }
                 } else {
-                    middle_constraints.insert(middle_constraints.end(), state_selector_constraints.begin(),
-                                              state_selector_constraints.end());
+                    middle_constraints.insert(middle_constraints.end(), state_selector_constraints.begin(), state_selector_constraints.end());
                 }
 
                 middle_constraints.insert(middle_constraints.end(), opcode_row_selector_constraints.begin(),
@@ -645,8 +537,9 @@ namespace nil {
 
                 auto generic_state_transition_constraints = generate_generic_transition_constraints(
                     start_selector, end_selector);
-                middle_constraints.insert(middle_constraints.end(), generic_state_transition_constraints.begin(),
-                                          generic_state_transition_constraints.end());
+                middle_constraints.insert(
+                    middle_constraints.end(), generic_state_transition_constraints.begin(), generic_state_transition_constraints.end()
+                );
 
                 // "unconditional" range checks for some opcode columns
                 for(std::size_t i = 0; i < opcode_range_checked_cols_amount; i++) {
@@ -660,10 +553,12 @@ namespace nil {
 
                 constraint_type opcode_first_line_constraint;
                 constraint_type stack_size_transitions;
-                constraint_type curr_gas_transitions;
+                constraint_type gas_transitions;
 
                 for (auto opcode_it : opcodes) {
                     std::size_t opcode_height = opcode_it.second->rows_amount();
+                    std::cout << "Gates for " << opcode_to_string(opcode_it.first) << std::endl;
+
                     if (opcode_height > max_opcode_height) {
                         BOOST_ASSERT("Opcode height exceeds maximum, please update max_opcode_height constant.");
                     }
@@ -671,29 +566,33 @@ namespace nil {
                     std::size_t adj_opcode_height = opcode_height + (opcode_height % 2);
 
                     std::size_t opcode_num = opcodes_info_instance.get_opcode_number(opcode_it.first);
-                    auto // curr_opt_constraint = state_selector->option_constraint(opcode_num),
-                        curr_opt_constraint_even = state_selector->option_constraint_even(opcode_num),
-                        curr_opt_constraint_odd = state_selector->option_constraint_odd(opcode_num);
+                    auto  curr_opt_constraint = state_selector->option_constraint(opcode_num),
+                        curr_opt_constraint_even = state_selector->option_constraint_even(opcode_num), // Why do we need it?
+                        curr_opt_constraint_odd = state_selector->option_constraint_odd(opcode_num);   // Why do we need it?
 
                     // save constraints to ensure later that internal row number has proper value at the start of the opcode
                     opcode_first_line_constraint +=
-                        curr_opt_constraint_odd * (opcode_row_selector->option_variable() - (adj_opcode_height - 1));
+                        curr_opt_constraint * (opcode_row_selector->option_variable() - (adj_opcode_height - 1));
                     // ^^^ curr_opt_constraint is in _odd_ version because it's applied
                     // at row with internal number adj_opcode_height-1, that always odd
 
                     // save constraints to ensure correct updates of stack size
-                    stack_size_transitions += curr_opt_constraint_even * (state.stack_size.variable(0)
+                    // TODO: Done for each opcode individually
+                    // Static case will be hardcoded in zkevm_operatoin
+                    /* stack_size_transitions += curr_opt_constraint_even * (state.stack_size
                                                     - opcodes_info_instance.get_opcode_stack_input(opcode_it.first)
                                                     + opcodes_info_instance.get_opcode_stack_output(opcode_it.first)
-                                                    - state.stack_size.variable(+1));
+                                                    - state.stack_size.next());*/
                     // curr_opt_constraint is in _even_ version because it's applied at row with internal number 0
 
                     // save constraints to ensure correct updates of remaining gas NB: only static costs now! TODO: include dynamic costs
-                    if( !opcodes_info_instance.is_opcode_dynamic(opcode_it.first) ) {
-                        curr_gas_transitions += curr_opt_constraint_even * (state.curr_gas.variable(0)
+                    // TODO: Done for each opcode individually
+                    // Static case will be hardcoded in zkevm_operatoin
+                    /*if( !opcodes_info_instance.is_opcode_dynamic(opcode_it.first) ) {
+                        gas_transitions += curr_opt_constraint_even * (state.gas
                             - opcodes_info_instance.get_opcode_cost(opcode_it.first)
-                            - state.curr_gas.variable(+1));
-                    }
+                            - state.gas.next());
+                    }*/
                     // curr_opt_constraint is in _even_ version because it's applied at row with internal number 0
 
                     auto opcode_gates = opcode_it.second->generate_gates(*this);
@@ -728,11 +627,15 @@ namespace nil {
                                 }
                                 break;
                             case zkevm_opcode_gate_class::MIDDLE_OP:
+                                std::cout << "Middle constraints from " << opcode_to_string(opcode_it.first) << std::endl;
                                 for (auto constraint_pair : gate_it.second.first) {
+                                    std::cout << "\t" << constraint_pair.first << ": " << constraint_pair.second << std::endl;
                                     std::size_t local_row = constraint_pair.first;
-                                    constraint_type curr_opt_constraint =
-                                        (local_row % 2 == 0) ? curr_opt_constraint_even : curr_opt_constraint_odd;
-                                    constraint_type constraint = get_opcode_row_constraint(local_row, adj_opcode_height)
+                                    if(local_row > 1) continue;
+                                    if( opcode_it.second->rows_amount() % 2 ) local_row++;
+                                    //constraint_type curr_opt_constraint =
+                                    //    (local_row % 2 == 0) ? curr_opt_constraint_odd : curr_opt_constraint_even;
+                                    constraint_type row_constraint = get_opcode_row_constraint(local_row, adj_opcode_height)
                                                                     * constraint_pair.second;
 
                                     constraint_list[gate_id_type(constraint_pair.second)] = constraint_pair.second;
@@ -741,8 +644,8 @@ namespace nil {
                                 }
                                 for (auto lookup_constraint_pair : gate_it.second.second) {
                                     std::size_t local_row = lookup_constraint_pair.first;
-                                    constraint_type curr_opt_constraint =
-                                        (local_row % 2 == 0) ? curr_opt_constraint_even : curr_opt_constraint_odd;
+                                    //constraint_type curr_opt_constraint =
+                                    //    (local_row % 2 == 0) ? curr_opt_constraint_even : curr_opt_constraint_odd;
                                     lookup_constraint_type lookup_constraint = lookup_constraint_pair.second;
                                     auto lookup_table = lookup_constraint.table_id;
                                     auto lookup_expressions = lookup_constraint.lookup_input;
@@ -767,17 +670,17 @@ namespace nil {
                     }
                 }
                 // ensure first line of each opcode has correct internal row number
-                middle_constraints.push_back(opcode_first_line_constraint * state.step_selection.variable());
+                middle_constraints.push_back(opcode_first_line_constraint * state.step_selection());
 
-                // ensure the last line of each opcode updates stack_size and curr_gas correctly
-                middle_constraints.push_back(stack_size_transitions * state.step_selection.variable(+1));
-                middle_constraints.push_back(curr_gas_transitions * state.step_selection.variable(+1));
+                // ensure the last line of each opcode updates stack_size and gas correctly
+//                middle_constraints.push_back(stack_size_transitions * state.step_selection.next());
+//                middle_constraints.push_back(gas_transitions * state.step_selection.next());
 
                 // increase program counter, unless the opcode is JUMP or JUMPI
-                middle_constraints.push_back((state.pc.variable(0) + 1 - state.pc.variable(+1))
-                    * (1 - state_selector->option_constraint_even(opcodes_info_instance.get_opcode_number(zkevm_opcode::JUMP))
-                         - state_selector->option_constraint_even(opcodes_info_instance.get_opcode_number(zkevm_opcode::JUMPI)))
-                    * state.step_selection.variable(+1));
+//                middle_constraints.push_back((state.pc() + 1 - state.pc.next())
+//                    * (1 - state_selector->option_constraint_even(opcodes_info_instance.get_opcode_number(zkevm_opcode::JUMP))
+//                         - state_selector->option_constraint_even(opcodes_info_instance.get_opcode_number(zkevm_opcode::JUMPI)))
+//                    * state.step_selection.next());
                 // TODO: JUMP and JUMPI need special constraints for program counter
                 // we also need to check that they are followed by either JUMPDEST or an error opcode
 
@@ -786,11 +689,8 @@ namespace nil {
                     middle_constraints.push_back(constraint * c.second);
                 }
 
-                middle_selector = col_manager.add_gate(middle_constraints);
-                col_manager.add_lookup_gate(middle_selector, middle_lookup_constraints);
-
-//                assignment.enable_selector(start_selector, curr_row);
-//                assignment.enable_selector(middle_selector, curr_row);
+                middle_selector = circuit.add_gate(middle_constraints);
+                circuit.add_lookup_gate(middle_selector, middle_lookup_constraints);
             }
 
             zkevm_state_type state;
@@ -810,7 +710,6 @@ namespace nil {
             // |Variables below this point are internal to the object and do not go into the actual circuit|
             // ---------------------------------------------------------------------------------------------
             // reference to the assignment/circuit objects
-            std::vector<std::uint32_t> bytecode_witnesses;
 
             assignment_type &assignment;
             // information about opcode metadata (mapping, etc.)
@@ -819,8 +718,6 @@ namespace nil {
             std::shared_ptr<state_selector_type> opcode_row_selector;
             // opcode objects
             std::map<zkevm_opcode, std::shared_ptr<zkevm_operation<BlueprintFieldType>>> opcodes;
-            // current row maintained between different calls to the circuit object
-            std::size_t curr_row;
             // start and end rows for the circuit; both have to be fixed
             std::size_t max_rows; // Should be odd number because all opcodes has even rows amount and last row is also used by last_row selector
             std::size_t start_row_index;
@@ -833,10 +730,11 @@ namespace nil {
             static const std::size_t max_opcode_height = 8;
             static const std::size_t max_stack_size = 1024;
             static const std::size_t dynamic_tables_amount = 1;
+            std::vector<std::uint32_t> bytecode_witnesses;
         };
         template<typename BlueprintFieldType>
         const std::size_t zkevm_circuit<BlueprintFieldType>::max_opcode_height;
         template<typename BlueprintFieldType>
-        const std::size_t zkevm_circuit<BlueprintFieldType>::max_stack_size;\
+        const std::size_t zkevm_circuit<BlueprintFieldType>::max_stack_size;
     }   // namespace blueprint
 }   // namespace nil

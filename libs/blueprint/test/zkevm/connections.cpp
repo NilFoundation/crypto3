@@ -33,6 +33,7 @@
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
 
 #include <nil/blueprint/zkevm/zkevm_circuit.hpp>
+#include <nil/blueprint/zkevm/zkevm_table.hpp>
 #include <nil/blueprint/zkevm/util/ptree.hpp>
 #include "./opcode_tester.hpp"
 
@@ -41,6 +42,7 @@ using namespace nil::crypto3::algebra;
 
 // This is circuit connection test
 // How it'll work.
+
 // It will have Ethereum RPC trace, parse it and generate RW and EVM circuit
 // We have bytecode -- so can generate bytecode circuit
 // And then check connections
@@ -217,6 +219,7 @@ void test_zkevm(std::string path){
     assignment_type assignment(0, 0, 0, 0);
     circuit_type circuit;
     zkevm_circuit<field_type> zkevm_circuit(assignment, circuit, 499);
+    zkevm_table<field_type> zkevm_table(zkevm_circuit, assignment);
     zkevm_machine_type machine = get_empty_machine();
 
     boost::property_tree::ptree ptrace = trace.get_child("result.structLogs");
@@ -236,8 +239,15 @@ void test_zkevm(std::string path){
             memory_next = byte_vector_from_ptree(std::next(it)->second.get_child("memory"));
             storage_next = key_value_storage_from_ptree(it->second.get_child("storage"));
         }
-        std::cout << "Assign opcode " << opcode_str << std::endl;
-        zkevm_circuit.assign_opcode(opcode_from_str(opcode_str), machine, opcode_str.substr(0,4) == "PUSH"? stack_next[stack_next.size() - 1]: 0);
+        machine.update_state(
+            opcode_from_str(opcode_str),
+            stack,
+            memory,
+            atoi(it->second.get_child("gas").data().c_str()),
+            atoi(it->second.get_child("pc").data().c_str()),
+            opcode_str.substr(0,4) == "PUSH"? stack_next[stack_next.size() - 1]: 0
+        );
+        zkevm_table.assign_opcode(machine);
 
         storage = storage_next;
         stack = stack_next;
@@ -246,7 +256,7 @@ void test_zkevm(std::string path){
 
     using value_type = typename BlueprintFieldType::value_type;
     using var = typename nil::crypto3::zk::snark::plonk_variable<value_type>;
-    zkevm_circuit.finalize_test();
+    zkevm_table.finalize_test();
 
     std::ofstream myfile;
     myfile.open("test_assignment.txt");

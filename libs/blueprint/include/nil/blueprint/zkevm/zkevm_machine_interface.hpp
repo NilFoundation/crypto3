@@ -32,14 +32,56 @@ namespace nil {
     namespace blueprint {
         // at the time I am writing this there is no interface to the zkevm machine
         // this is a placeholder
+
+        // Hi! I added to this placeholder a bit more funtionality that shouldn't be in test assigner and in zkevm_state
         class zkevm_machine_interface {
         public:
             using word_type = zkevm_word_type;
 
-            zkevm_machine_interface(unsigned long int _init_gas) : gas(_init_gas) {}
+            zkevm_machine_interface(unsigned long int _init_gas) : gas(_init_gas), pc(1) {}
 
+            // It is not a part of an interface. Real machine will really run here.
+            // But we just read a trace from file and completely update our state.
+            // This function is for work with trace
+            void update_state(
+                zkevm_opcode _opcode,
+                std::vector<word_type> _stack,
+                std::vector<uint8_t> _memory,
+                std::size_t _gas,
+                std::size_t _pc,
+                word_type   _additional_input
+            ){
+                opcode = _opcode;
+                stack = zkevm_stack(_stack);
+                memory = _memory;
+                gas = _gas;
+                pc = _pc;
+                additional_input = _additional_input;
+            }
+
+            // This function will be used for small tests.
+            void apply_opcode(
+                zkevm_opcode _opcode,
+                word_type   param
+            ){
+                opcode = _opcode;
+                additional_input  = param;
+            }
+
+            void padding_state(){
+                opcode = zkevm_opcode::padding;
+                stack = {};
+                memory = {};
+                gas = 0;
+                pc = 0;
+            }
+
+            zkevm_opcode opcode;
             zkevm_stack stack;
-            unsigned long int gas;
+            std::vector<uint8_t> memory;
+            std::size_t gas;
+            std::size_t pc;
+            word_type   additional_input;
         };
     }
 }

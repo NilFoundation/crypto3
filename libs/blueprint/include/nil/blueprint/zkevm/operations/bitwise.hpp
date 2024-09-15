@@ -32,6 +32,8 @@
 
 namespace nil {
     namespace blueprint {
+        template<typename BlueprintFieldType>
+        class zkevm_operation;
 
         enum bitwise_type { B_AND, B_OR, B_XOR };
 
@@ -43,6 +45,7 @@ namespace nil {
             using constraint_type = typename op_type::constraint_type;
             using lookup_constraint_type = crypto3::zk::snark::plonk_lookup_constraint<BlueprintFieldType>;
             using zkevm_circuit_type = typename op_type::zkevm_circuit_type;
+            using zkevm_table_type = typename op_type::zkevm_table_type;
             using assignment_type = typename op_type::assignment_type;
             using value_type = typename BlueprintFieldType::value_type;
             using var = typename op_type::var;
@@ -97,7 +100,7 @@ namespace nil {
                 return { {gate_class::MIDDLE_OP, {constraints, lookup_constraints}} };
             }
 
-            void generate_assignments(zkevm_circuit_type &zkevm_circuit, zkevm_machine_interface &machine) override {
+            void generate_assignments(zkevm_table_type &zkevm_table, zkevm_machine_interface &machine) override {
                 zkevm_stack &stack = machine.stack;
                 using word_type = typename zkevm_stack::word_type;
                 using integral_type = typename BlueprintFieldType::integral_type;
@@ -115,9 +118,9 @@ namespace nil {
                 const std::vector<value_type> a_chunks = zkevm_word_to_field_element<BlueprintFieldType>(a);
                 const std::vector<value_type> b_chunks = zkevm_word_to_field_element<BlueprintFieldType>(b);
                 const std::vector<value_type> r_chunks = zkevm_word_to_field_element<BlueprintFieldType>(result);
-                const std::vector<std::size_t> &witness_cols = zkevm_circuit.get_opcode_cols();
-                assignment_type &assignment = zkevm_circuit.get_assignment();
-                const std::size_t curr_row = zkevm_circuit.get_current_row();
+                const std::vector<std::size_t> &witness_cols = zkevm_table.get_opcode_cols();
+                assignment_type &assignment = zkevm_table.get_assignment();
+                const std::size_t curr_row = zkevm_table.get_current_row();
 
                 size_t chunk_amount = a_chunks.size();
 
