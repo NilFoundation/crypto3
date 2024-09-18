@@ -50,7 +50,10 @@ namespace nil {
             using value_type = typename BlueprintFieldType::value_type;
             using var = typename op_type::var;
 
-            zkevm_cmp_operation(cmp_type _cmp_operation) : cmp_operation(_cmp_operation) {}
+            zkevm_cmp_operation(cmp_type _cmp_operation) : cmp_operation(_cmp_operation) {
+                this->stack_input = 2;
+                this->stack_output = 1;
+            }
 
             cmp_type cmp_operation;
 
@@ -170,8 +173,8 @@ namespace nil {
                 return {{gate_class::MIDDLE_OP, {constraints, {}}}};
             }
 
-            void generate_assignments(zkevm_table_type &zkevm_table, zkevm_machine_interface &machine) override {
-                zkevm_stack &stack = machine.stack;
+            void generate_assignments(zkevm_table_type &zkevm_table, const zkevm_machine_interface &machine) override {
+                zkevm_stack stack = machine.stack;
                 using word_type = typename zkevm_stack::word_type;
                 using integral_type = boost::multiprecision::number<
                     boost::multiprecision::backends::cpp_int_modular_backend<257>>;

@@ -48,7 +48,11 @@ namespace nil {
             using value_type = typename BlueprintFieldType::value_type;
             using var = typename op_type::var;
 
-            zkevm_sstore_operation() {}
+            zkevm_sstore_operation() {
+                this->stack_input = 2;
+                this->stack_output = 0;
+                this->gas_cost = 100;
+            }
 
             constexpr static const value_type two_16 = 65536;
             constexpr static const value_type two_32 = 4294967296;
@@ -66,8 +70,8 @@ namespace nil {
                 return {{gate_class::MIDDLE_OP, {{}, {}}}};
             }
 
-            void generate_assignments(zkevm_table_type &zkevm_table, zkevm_machine_interface &machine) override {
-                zkevm_stack &stack = machine.stack;
+            void generate_assignments(zkevm_table_type &zkevm_table, const zkevm_machine_interface &machine) override {
+                zkevm_stack stack = machine.stack;
                 std::cout << "Generate assignments and gates for SSTORE" << std::endl;
                 stack.pop();
                 stack.pop();
@@ -92,7 +96,11 @@ namespace nil {
             using value_type = typename BlueprintFieldType::value_type;
             using var = typename op_type::var;
 
-            zkevm_sload_operation() {}
+            zkevm_sload_operation() {
+                this->stack_input = 1;
+                this->stack_output = 1;
+                this->gas_cost = 100;
+            }
 
             constexpr static const value_type two_16 = 65536;
             constexpr static const value_type two_32 = 4294967296;
@@ -110,8 +118,8 @@ namespace nil {
                 return {{gate_class::MIDDLE_OP, {{}, {}}}};
             }
 
-            void generate_assignments(zkevm_table_type &zkevm_table, zkevm_machine_interface &machine) override {
-                zkevm_stack &stack = machine.stack;
+            void generate_assignments(zkevm_table_type &zkevm_table, const zkevm_machine_interface &machine) override {
+                zkevm_stack stack = machine.stack;
                 std::cout << "Generate assignments and gates for SLOAD" << std::endl;
                 stack.pop();
             }

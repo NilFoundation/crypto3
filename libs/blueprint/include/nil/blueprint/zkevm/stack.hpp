@@ -45,23 +45,10 @@ namespace nil {
                 return word;
             }
 
-            word_type top() {
-                return stack.back();
+            word_type top(std::size_t depth=0) const{
+                return stack[stack.size() - 1 - depth];
             }
 
-/*          void swap() {
-                word_type a = pop();
-                word_type b = pop();
-                push(a);
-                push(b);
-            }
-
-            void dup() {
-                word_type a = pop();
-                push(a);
-                push(a);
-            }
-*/
             std::size_t size() const {
                 return stack.size();
             }

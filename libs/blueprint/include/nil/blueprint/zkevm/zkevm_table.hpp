@@ -37,7 +37,7 @@
 #include <nil/blueprint/gate_id.hpp>
 
 #include <nil/blueprint/zkevm/state.hpp>
-#include <nil/blueprint/zkevm/state_selector.hpp>
+#include <nil/blueprint/zkevm/index_selector.hpp>
 #include <nil/blueprint/zkevm/zkevm_opcodes.hpp>
 #include <nil/blueprint/zkevm/zkevm_word.hpp>
 #include <nil/blueprint/zkevm/zkevm_operation.hpp>
@@ -92,7 +92,7 @@ namespace nil {
             using columns_manager_type = columns_manager<BlueprintFieldType>;
             using zkevm_operation_type = zkevm_operation<BlueprintFieldType>;
             using zkevm_opcode_gate_class = typename zkevm_operation<BlueprintFieldType>::gate_class;
-            using state_selector_type = components::state_selector<arithmetization_type, BlueprintFieldType>;
+            using index_selector_type = components::index_selector<arithmetization_type, BlueprintFieldType>;
             using constraint_type = crypto3::zk::snark::plonk_constraint<BlueprintFieldType>;
             using lookup_constraint_type = crypto3::zk::snark::plonk_lookup_constraint<BlueprintFieldType>;
             using value_type = typename BlueprintFieldType::value_type;
@@ -102,22 +102,8 @@ namespace nil {
                 circuit(circuit_), assignment(assignment_), curr_row(circuit.get_start_row_index()){
             }
 
-/*          void assign_state(const zkevm_machine_interface &machine) {
-                assignment.witness(circuit.get_state().pc.index, curr_row) = machine.pc;
-                assignment.witness(circuit.get_state().gas.index, curr_row) = machine.gas;
-                assignment.witness(circuit.get_state().stack_size.index, curr_row) = machine.stack_size;
-                assignment.witness(circuit.get_state().memory_size.index, curr_row) = machine.memory_size;
-                assignment.witness(circuit.get_state().step_selection.index, curr_row);
-                assignment.witness(circuit.get_state().rows_counter_inv.index, curr_row);
-                assignment.witness(circuit.get_state().last_row_indicator.index, curr_row);
-                //circuit.state.assign_state(assignment, curr_row); Yes. We have to do it using machine.
-            }*/
-
             void finalize_test() {
                 finalize();
-                // this is done in order for the vizualiser export to work correctly before padding the circuit.
-                // otherwise constraints try to access non-existent rows
-                assignment.witness(circuit.get_state_selector()->W(0), curr_row) = value_type(0xC0FFEE); // Don't understand it
                 std::cout << "Assignment rows amount = " << assignment.rows_amount() << std::endl;
             }
 
@@ -130,8 +116,6 @@ namespace nil {
                     assign_opcode(empty_machine);
                 }
 
-                assignment.witness(circuit.get_state().last_row_indicator.index, curr_row - 1) = 1;
-
                 // Assign dynamic lookup tables
                 typename zkevm_circuit<BlueprintFieldType>::bytecode_table_component bytecode_table({
                     circuit.get_bytecode_witnesses()[0], circuit.get_bytecode_witnesses()[1], circuit.get_bytecode_witnesses()[2],
@@ -143,7 +127,12 @@ namespace nil {
 
             void assign_opcode(zkevm_machine_interface &machine) {
                 auto opcode = machine.opcode;
-                std::cout << "Assign opcode " << opcode_to_string(machine.opcode) << " on row " << curr_row << std::endl;
+                std::cout << "Assign opcode " << opcode_to_string(machine.opcode)
+                    << " on row " << curr_row
+                    << " pc = " << machine.pc
+                    << " stack_size = " << machine.stack.size()
+                    << " gas = " << machine.gas
+                    << std::endl;
                 const auto &opcodes = circuit.get_opcodes();
                 auto opcode_it = opcodes.find(opcode);
                 if (opcode_it == opcodes.end()) {
@@ -162,7 +151,7 @@ namespace nil {
                     zkevm_opcode::err0
                 };
                 if (opcodes_with_args.find(opcode) == opcodes_with_args.end()) {
-                    opcode_it->second->generate_assignments(*this, machine);
+                     opcode_it->second->generate_assignments(*this, machine);
                 } else {
                     // for push opcodes we use the additional argument
                     using pushx_op_type = zkevm_pushx_operation<BlueprintFieldType>;
@@ -176,19 +165,11 @@ namespace nil {
                     }
                 }
                 curr_row += opcode_it->second->rows_amount() + opcode_it->second->rows_amount() % 2;
-                // post-opcode state management
-                // circuit.state.pc.value++; -- it's machine's business
-                // NB: we don't need to control stack size values here, because in a valid circuit they should alway be within the range
-                // machine.gas -= circuit.opcodes_info_instance.get_opcode_cost(opcode); -- machine can do it itself
-
                 BOOST_ASSERT(curr_row - circuit.get_start_row_index() < circuit.get_max_rows());
             }
 
             void advance_rows(
                 const zkevm_machine_interface &machine
-//                std::size_t opcode_height
-//                std::size_t internal_start_row,
-//                std::size_t shift = 0
             ) {
                 const auto &opcodes = circuit.get_opcodes();
                 auto opcode = machine.opcode;
@@ -197,51 +178,47 @@ namespace nil {
                     BOOST_ASSERT_MSG(false, (std::string("Unimplemented opcode: ") + opcode_to_string(opcode)) != "");
                 }
                 std::size_t opcode_height = opcode_it->second->rows_amount();
-                std::size_t local_row = curr_row;
 
                 const auto &state = circuit.get_state();
                 // state management
-                value_type step_selection = 1;          // internal variables
-                value_type last_row_indicator = 0;      // internal variables
-                value_type rows_counter_inv;
+                value_type step_start = 1;          // internal variables
+                value_type row_counter_inv;
 
                 // for opcodes with odd height append one row
                 if (opcode_it->second->rows_amount() % 2 ) {
                     opcode_height++;
                 }
-                rows_counter_inv = value_type(opcode_height - 1).inversed();
+                row_counter_inv = value_type(opcode_height - 1).inversed();
 
                 std::size_t current_internal_row = opcode_height - 1;
                 auto &opcodes_info_instance = circuit.get_opcodes_info();
 
                 // TODO: figure out what is going to happen on state change
-                value_type opcode_num = opcodes_info_instance.get_opcode_number(opcode);
+                std::size_t local_row = curr_row;
+                std::size_t opcode_num = opcodes_info_instance.get_opcode_number(opcode);
+                std::size_t opcode_half = ((opcode_num % 4 == 3) || (opcode_num % 4 == 2));
                 for (std::size_t i = 0; i < opcode_height; i++) {
-                   if (i % circuit.get_state_selector()->rows_amount == 0) {
-                        // TODO: switch to real bytecode
-                        assignment.witness(circuit.get_state_selector()->W(0), local_row) = opcode_num;
-                        components::generate_assignments(
-                            *circuit.get_state_selector(), assignment,
-                            {var(circuit.get_state_selector()->W(0), local_row, false, var::column_type::witness)}, local_row);
+                    assignment.witness(state.opcode.index, local_row) = opcode_num;
+                    if (i % 2 == opcode_half) {
+                        components::generate_assignments(*circuit.get_opcode_selector(), assignment, {opcode_num/4}, local_row);
                     }
-                    assignment.witness(circuit.get_opcode_row_selector()->W(0), local_row) = current_internal_row;
-                    components::generate_assignments(
-                        *(circuit.get_opcode_row_selector()), assignment,
-                        {var(circuit.get_opcode_row_selector()->W(0), local_row, false, var::column_type::witness)}, local_row);
+                    assignment.witness(state.opcode_parity.index, local_row) = opcode_num%2;
+
+                    assignment.witness(state.row_counter.index, local_row) = current_internal_row;
+                    components::generate_assignments(*(circuit.get_row_selector()), assignment, {current_internal_row/2}, local_row);
 
                     assignment.witness(state.pc.index, local_row) = machine.pc;
                     assignment.witness(state.gas.index, local_row) = machine.gas;
                     assignment.witness(state.stack_size.index, local_row) = machine.stack.size();
                     assignment.witness(state.memory_size.index, local_row) = machine.memory.size();
-                    assignment.witness(state.step_selection.index, local_row) = step_selection;
-                    assignment.witness(state.rows_counter_inv.index, local_row) = rows_counter_inv;
-                    assignment.witness(state.last_row_indicator.index, local_row) = last_row_indicator;
 
-                    if (i == 0) step_selection = 0;
-                    assignment.witness(circuit.get_state_selector()->W(0), local_row) = opcode_num;
+                    assignment.witness(state.step_start.index, local_row) = step_start;
+                    assignment.witness(state.row_counter_inv.index, local_row) = row_counter_inv;
+
+                    if (i == 0) step_start = 0;
 
                     current_internal_row--;
-                    rows_counter_inv = current_internal_row == 0 ? 0 : value_type(current_internal_row).inversed();
+                    row_counter_inv = current_internal_row == 0 ? 0 : value_type(current_internal_row).inversed();
                     local_row++;
                 }
             }
@@ -252,6 +229,10 @@ namespace nil {
 
             const std::vector<std::size_t> &get_opcode_cols() const{
                 return circuit.get_opcode_cols();
+            }
+
+            const std::size_t get_opcode_range_checked_cols_amount() const {
+                return circuit.get_opcode_range_checked_cols_amount();
             }
 
             assignment_type &get_assignment(){

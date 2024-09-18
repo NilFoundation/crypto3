@@ -50,6 +50,8 @@ namespace nil {
 
             zkevm_swapx_operation(std::size_t _x) : byte_count(_x) {
                 BOOST_ASSERT(_x <= 16); // the maximum possible swap
+                this->stack_input = _x+1;
+                this->stack_output = _x+1;
             }
 
             std::size_t byte_count;
@@ -63,8 +65,8 @@ namespace nil {
                 return {{gate_class::MIDDLE_OP, {{}, {}}}};
             }
 
-            void generate_assignments(zkevm_table_type &zkevm_table, zkevm_machine_interface &machine) override{
-                zkevm_stack &stack = machine.stack;
+            void generate_assignments(zkevm_table_type &zkevm_table, const zkevm_machine_interface &machine) override{
+                zkevm_stack stack = machine.stack;
                 std::cout << "Generate assignments for SWAPx opcodes" << std::endl;
                 stack.push(0);
             }

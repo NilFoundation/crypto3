@@ -37,7 +37,7 @@
 #include <nil/blueprint/gate_id.hpp>
 
 #include <nil/blueprint/zkevm/state.hpp>
-#include <nil/blueprint/zkevm/state_selector.hpp>
+#include <nil/blueprint/zkevm/index_selector.hpp>
 #include <nil/blueprint/zkevm/zkevm_opcodes.hpp>
 #include <nil/blueprint/zkevm/zkevm_word.hpp>
 
@@ -66,6 +66,7 @@
 #include <nil/blueprint/zkevm/operations/dupx.hpp>
 #include <nil/blueprint/zkevm/operations/swapx.hpp>
 #include <nil/blueprint/zkevm/operations/jump.hpp>
+#include <nil/blueprint/zkevm/operations/jumpi.hpp>
 #include <nil/blueprint/zkevm/operations/pop.hpp>
 #include <nil/blueprint/zkevm/operations/padding.hpp>
 #include <nil/blueprint/zkevm/operations/return.hpp>
@@ -125,12 +126,12 @@ namespace nil {
             using arithmetization_type = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>;
             using assignment_type = nil::blueprint::assignment<arithmetization_type>;
             using circuit_type = nil::blueprint::circuit<arithmetization_type>;
-//            using state_var_type = state_var<BlueprintFieldType>;
+            using state_var_type = state_var<BlueprintFieldType>;
             using zkevm_state_type = zkevm_vars<BlueprintFieldType>;
             using columns_manager_type = columns_manager<BlueprintFieldType>;
             using zkevm_operation_type = zkevm_operation<BlueprintFieldType>;
             using zkevm_opcode_gate_class = typename zkevm_operation<BlueprintFieldType>::gate_class;
-            using state_selector_type = components::state_selector<arithmetization_type, BlueprintFieldType>;
+            using index_selector_type = components::index_selector<arithmetization_type, BlueprintFieldType>;
             using constraint_type = crypto3::zk::snark::plonk_constraint<BlueprintFieldType>;
             using lookup_constraint_type = crypto3::zk::snark::plonk_lookup_constraint<BlueprintFieldType>;
             using value_type = typename BlueprintFieldType::value_type;
@@ -145,6 +146,7 @@ namespace nil {
                 columns_manager_type col_manager(assignment); // Just helps us to deal with assignment table columns
 
                 // 5(?) constant columns. I'm not sure we really need them: satisfiability check passes even without them
+                // We really need them to run lookup argument. Should be removed when we'll use logUp.
                 for(std::size_t i = 0; i < 5; i++) {
                     col_manager.allocate_constant_column();
                 }
@@ -184,6 +186,10 @@ namespace nil {
                 assignment.enable_selector(start_selector, start_row_index);
                 assignment.enable_selector(middle_selector, start_row_index, max_rows-1);
 
+                // It is a public column, we shouldn't prove that it is correct;
+                for(std::size_t i = 0; i < max_rows; i++ ){
+                    assignment.constant(state.is_even().index, i + start_row_index) = 1 - i%2;
+                }
                 lookup_tables_indices = circuit.get_reserved_indices();
             }
 
@@ -195,7 +201,7 @@ namespace nil {
                 lookup_tables["zkevm_bytecode"] = 1;
                 return lookup_tables;
             }
-
+        protected:
             // May be reviewed somehow. Now I'll do the most straight way
             // Each table has its separate columns and selectors.
             // They definitely may be packed more effectively
@@ -206,12 +212,38 @@ namespace nil {
                 }
             }
 
-            const std::shared_ptr<state_selector_type> get_opcode_row_selector() const{
-                return opcode_row_selector;
+            // Constraint for all rows for given opcode
+            constraint_type opcode_selector_constraint(std::size_t opcode_num){
+                std::size_t bit1 = (opcode_num % 4 == 3) ||  (opcode_num % 4 == 2);
+                state_var o4 = opcode_selector->index(opcode_num/4);
+                constraint_type o2_constraint = bit1 ? state.is_even() * o4.next() + state.is_even.prev() * o4() : state.is_even() * o4() + state.is_even.prev() * o4.prev();
+                constraint_type opcode_parity = opcode_num%2 ? state.opcode_parity(): 1 - state.opcode_parity();
+                return o2_constraint * opcode_parity;// Degree 3
             }
 
-            const std::shared_ptr<state_selector_type> get_state_selector() const{
-                return state_selector;
+            // Constraint for given row for opcode
+            constraint_type opcode_row_selector_constraint(std::size_t opcode_num, std::size_t row){
+                std::size_t bit1 = (opcode_num % 4 == 3) ||  (opcode_num % 4 == 2);
+                state_var row_var = row_selector->index(row/2);
+                state_var o4 = opcode_selector->index(opcode_num/4);
+                constraint_type o2_constraint;
+                if(row % 2)
+                    o2_constraint = bit1 ? state.is_even() * o4.next() : state.is_even() * o4();
+                else
+                    o2_constraint = bit1 ? state.is_even.prev() * o4() : state.is_even.prev() * o4.prev();
+                constraint_type opcode_parity = opcode_num%2 ? state.opcode_parity(): 1 - state.opcode_parity();
+                return o2_constraint * opcode_parity * row_var();// Degree 3
+            }
+        public:
+            const std::size_t get_opcode_range_checked_cols_amount() const {
+                return opcode_range_checked_cols_amount;
+            }
+            const std::shared_ptr<index_selector_type> get_row_selector() const{
+                return row_selector;
+            }
+
+            const std::shared_ptr<index_selector_type> get_opcode_selector() const{
+                return opcode_selector;
             }
 
             const opcodes_info get_opcodes_info() const{
@@ -226,8 +258,8 @@ namespace nil {
                 return state;
             }
 
-            const std::vector<std::size_t> &get_state_selector_cols() const{
-                return state_selector_cols;
+            const std::vector<std::size_t> &get_opcode_selector_cols() const{
+                return opcode_selector_cols;
             }
 
             const std::vector<std::size_t> &get_opcode_cols() const{
@@ -252,24 +284,24 @@ namespace nil {
             // for opcode constraints at certain row of opcode execution
             // note that rows are counted "backwards", starting from opcode rows amount minus one
             // and ending in zero
-            constraint_type get_opcode_row_constraint(std::size_t row, std::size_t opcode_height) const {
+            /*constraint_type get_opcode_row_constraint(std::size_t row, std::size_t opcode_height) const {
                 BOOST_ASSERT(row < opcode_height);
 
                 var height_var = opcode_row_selector->option_variable();
-                var height_var_inv = state.rows_counter_inv;
+                var height_var_inv = state.row_counter_inv;
                 // ordering here is important: minimising the degree when possible
                 if (row == opcode_height - 1) {
-                    return state.step_selection;
+                    return state.step_start;
                 }
                 if (row == opcode_height - 2) {
-                    return state.step_selection.prev();
+                    return state.step_start.prev();
                 }
                 if (row == 0) {
                     return 1 - height_var * height_var_inv;
                 }
                 // TODO: this is probably possible to optimise
                 return opcode_row_selector->option_constraint(row);
-            }
+            }*/
 
             const std::vector<std::uint32_t> &get_bytecode_witnesses() const{
                 return bytecode_witnesses;
@@ -281,9 +313,18 @@ namespace nil {
                 state.stack_size = typename zkevm_state_type::state_var(col_manager.allocate_witness_column());
                 state.memory_size = typename zkevm_state_type::state_var(col_manager.allocate_witness_column());
                 state.gas = typename zkevm_state_type::state_var(col_manager.allocate_witness_column());
-                state.rows_counter_inv = typename zkevm_state_type::state_var(col_manager.allocate_witness_column());
-                state.step_selection = typename zkevm_state_type::state_var(col_manager.allocate_witness_column());
-                state.last_row_indicator = typename zkevm_state_type::state_var(col_manager.allocate_witness_column());
+
+                state.row_counter = typename zkevm_state_type::state_var(col_manager.allocate_witness_column());
+                state.row_counter_inv = typename zkevm_state_type::state_var(col_manager.allocate_witness_column());
+                state.step_start = typename zkevm_state_type::state_var(col_manager.allocate_witness_column());
+                //state.last_row_indicator = typename zkevm_state_type::state_var(col_manager.allocate_witness_column());
+                state.opcode = typename zkevm_state_type::state_var(col_manager.allocate_witness_column());
+                state.opcode_parity = typename zkevm_state_type::state_var(col_manager.allocate_witness_column());
+                state.is_even = typename zkevm_state_type::state_var(col_manager.allocate_constant_column(), var::column_type::constant);
+            }
+
+            std::vector<constraint_type> generate_selectors_constraints(){
+                return {};
             }
 
             std::vector<constraint_type> generate_generic_transition_constraints(
@@ -292,42 +333,30 @@ namespace nil {
             ) {
                 std::vector<constraint_type> constraints;
 
-                state_var rows_counter = opcode_row_selector->option_variable();
-                state_var rows_counter_inv = state.rows_counter_inv;
-                state_var step_selection = state.step_selection;
-                state_var option = state.option;
+                state_var row_counter = state.row_counter;
+                state_var row_counter_inv = state.row_counter_inv;
+                state_var step_start = state.step_start;
+                state_var opcode = state.opcode;
 
-                constraints.push_back(rows_counter() * (rows_counter() * rows_counter_inv() - 1 ));                  //GEN1
-                constraints.push_back(rows_counter_inv() * (rows_counter() * rows_counter_inv() - 1));               //GEN2
-                // rows_counter decrementing (unless we are at the last row of opcode)
-                constraints.push_back(rows_counter() * (rows_counter.next() - rows_counter() + 1));                  //GEN3
-                // step_selection is 0 or 1
-                constraints.push_back((1 - step_selection()) * step_selection());                                    //GEN4
-                // step_selection = 1 if previous row_counter is 0
-                constraints.push_back(step_selection() * rows_counter.prev());                                       //GEN5
+                constraints.push_back(row_counter() * (row_counter() * row_counter_inv() - 1 ));                  //GEN1
+                constraints.push_back(row_counter_inv() * (row_counter() * row_counter_inv() - 1));               //GEN2
+                // row_counter decrementing (unless we are at the last row of opcode)
+                constraints.push_back(row_counter() * (row_counter.next() - row_counter() + 1));                  //GEN3
+                // step_start is 0 or 1
+                constraints.push_back((1 - step_start()) * step_start());                                         //GEN4
+                // step_start = 1 if previous row_counter is 0
+                constraints.push_back(step_start() * row_counter.prev());                                         //GEN5
                 // step is copied unless new opcode is next
-                constraints.push_back((1 - step_selection()) * (option() - option.prev()));                          //GEN6
+                constraints.push_back((1 - step_start()) * (opcode() - opcode.prev()));                          //GEN6
                 // new opcode selection is forced if new opcode is next
-                constraints.push_back((1 - rows_counter_inv.prev() * rows_counter.prev()) * (1 - step_selection())); //GEN7
+                constraints.push_back((1 - row_counter_inv.prev() * row_counter.prev()) * (1 - step_start()));   //GEN7
+                constraints.push_back((1 - step_start()) * (state.opcode_parity() - state.opcode_parity.prev()));
 
                 // Other state variables does not changed inside one opcode change it if necessary.
-                constraints.push_back((1 - step_selection()) * (state.pc() - state.pc.prev()));                      //GEN8
-                constraints.push_back((1 - step_selection()) * (state.gas() - state.gas.prev()));                    //GEN9
-                constraints.push_back((1 - step_selection()) * (state.stack_size() - state.stack_size.prev()));      //GEN10
-                constraints.push_back((1 - step_selection()) * (state.memory_size() - state.memory_size.prev()));    //GEN11
-
-                // All transitions between states will be done in opcodes
-                // or we are at the end of the circuit
-/*              auto partial_state_transition_constraints = generate_transition_constraints(
-                    state, generate_frozen_state_transition());
-                // the initially problematic constraints are here \/ \/ \/
-                for (auto constraint : partial_state_transition_constraints) {
-                    constraints.push_back(
-                        (1 - last_row_indicator_var) *
-                        // ^^^ this fixes the problem from the commented line below
-//                        (1 - var(end_selector, 0, true, var::column_type::selector)) *
-                        (1 - step_selection_next_var) * constraint);
-                }*/
+                constraints.push_back((1 - step_start()) * (state.pc() - state.pc.prev()));                     //GEN8
+                constraints.push_back((1 - step_start()) * (state.gas() - state.gas.prev()));                     //GEN9
+                constraints.push_back((1 - step_start()) * (state.stack_size() - state.stack_size.prev()));       //GEN10
+                constraints.push_back((1 - step_start()) * (state.memory_size() - state.memory_size.prev()));     //GEN11
                 return constraints;
             }
 
@@ -365,8 +394,8 @@ namespace nil {
                 opcodes[zkevm_opcode::MLOAD] = std::make_shared<zkevm_mload_operation<BlueprintFieldType>>();
 
                 // Storage operations
-                opcodes[zkevm_opcode::SLOAD] = std::make_shared<zkevm_sstore_operation<BlueprintFieldType>>();
-                opcodes[zkevm_opcode::SSTORE] = std::make_shared<zkevm_sload_operation<BlueprintFieldType>>();
+                opcodes[zkevm_opcode::SLOAD] = std::make_shared<zkevm_sload_operation<BlueprintFieldType>>();
+                opcodes[zkevm_opcode::SSTORE] = std::make_shared<zkevm_sstore_operation<BlueprintFieldType>>();
 
                 // CALL operaitions
                 opcodes[zkevm_opcode::CALLVALUE] = std::make_shared<zkevm_callvalue_operation<BlueprintFieldType>>();
@@ -375,7 +404,7 @@ namespace nil {
 
                 // PC operations
                 opcodes[zkevm_opcode::JUMPI] = std::make_shared<zkevm_jumpi_operation<BlueprintFieldType>>();
-                opcodes[zkevm_opcode::JUMP] = std::make_shared<zkevm_jumpi_operation<BlueprintFieldType>>();
+                opcodes[zkevm_opcode::JUMP] = std::make_shared<zkevm_jump_operation<BlueprintFieldType>>();
                 opcodes[zkevm_opcode::JUMPDEST] = std::make_shared<zkevm_jumpdest_operation<BlueprintFieldType>>();
 
                 opcodes[zkevm_opcode::PUSH0] = std::make_shared<zkevm_pushx_operation<BlueprintFieldType>>(0);
@@ -466,11 +495,59 @@ namespace nil {
                 first_constraints.push_back(state.stack_size); // stack size at start is 0.
                                                                           // NB: no need for range checks before first real transition,
                                                                           // it's all ensured by "frozen" transition constraints.
-                first_constraints.push_back(state.step_selection - 1); // first step is step selection
+                first_constraints.push_back(state.step_start - 1); // first step is step selection
 
+                // Allocate all necessary columns. Selectors
                 col_manager.allocate_selector_column(); // Start
                 col_manager.allocate_selector_column(); // End
                 col_manager.allocate_selector_column(); // Middle
+
+                const std::size_t opcodes_amount = opcodes_info_instance.get_opcodes_amount();
+                const std::size_t opcode_selector_cols_amount = std::ceil(float(opcodes_amount)/4);
+                for (std::size_t i = 0; i < opcode_selector_cols_amount; i++) {
+                    opcode_selector_cols.push_back(col_manager.allocate_witness_column());
+                }
+                opcode_selector = std::make_shared<index_selector_type>(
+                    opcode_selector_cols, std::array<std::uint32_t, 0>({}), std::array<std::uint32_t, 0>({}),
+                    std::ceil(float(opcodes_amount)/4)
+                );
+                auto opcode_selector_constraints = opcode_selector->generate_constraints();
+                middle_constraints.insert(
+                    middle_constraints.end(), opcode_selector_constraints.begin(), opcode_selector_constraints.end()
+                );
+                middle_constraints.push_back( state.is_even() * (1 - opcode_selector->sum_constraint() - opcode_selector->sum_constraint(1)));
+                middle_constraints.push_back(
+                    state.opcode
+                          -  4 * ( state.is_even() * (opcode_selector->index_constraint() + opcode_selector->index_constraint(1)) +
+                                 state.is_even.prev()  * (opcode_selector->index_constraint(-1) + opcode_selector->index_constraint()) )
+                          -  2 * state.is_even.prev() * opcode_selector->sum_constraint()
+                          -  2 * state.is_even() * opcode_selector->sum_constraint(1)
+                          -  state.opcode_parity()
+                );
+
+                std::vector<std::size_t> opcode_range_checked_cols;
+                for(std::size_t i = 0; i < opcode_range_checked_cols_amount; i++) {
+                    opcode_range_checked_cols.push_back(col_manager.allocate_witness_column());
+                }
+                opcode_cols = opcode_range_checked_cols; // range-checked columns are the first part of opcode columns
+
+                for (std::size_t i = 0; i < opcode_other_cols_amount; i++) { // followed by some non-range-checked columns
+                    opcode_cols.push_back(col_manager.allocate_witness_column());
+                }
+
+                const std::size_t row_selector_cols_amount = (max_opcode_height + max_opcode_height%2)/2;
+                for (std::size_t i = 0; i < row_selector_cols_amount; i++) {
+                    row_selector_cols.push_back(col_manager.allocate_witness_column());
+                }
+                row_selector = std::make_shared<index_selector_type>(
+                    row_selector_cols, std::array<std::uint32_t, 0>({}), std::array<std::uint32_t, 0>({}),
+                    std::ceil(float(max_opcode_height)/2));
+                auto row_selector_constraints = row_selector->generate_constraints();
+                middle_constraints.insert(
+                    middle_constraints.end(), row_selector_constraints.begin(), row_selector_constraints.end()
+                );
+                middle_constraints.push_back(1 - row_selector->sum_constraint());
+                middle_constraints.push_back(state.row_counter() - row_selector->index_constraint() * 2 - state.is_even());
 
                 start_selector = circuit.add_gate(first_constraints);
 
@@ -483,57 +560,8 @@ namespace nil {
 //                middle_lookup_constraints.push_back({range_check_table_index, { state.stack_size + 65535 - max_stack_size } });
 
                 // TODO: proper end constraints zkevm_padding_operation
-                last_constraints.push_back(state.last_row_indicator.prev() - 1);
+//                last_constraints.push_back(state.last_row_indicator.prev() - 1);
                 end_selector = circuit.add_gate(last_constraints);
-
-                std::vector<std::size_t> opcode_range_checked_cols;
-
-                const std::size_t opcodes_amount = opcodes_info_instance.get_opcodes_amount();
-                const std::size_t state_selector_cols_amount =
-                    state_selector_type::get_manifest(opcodes_amount,true).witness_amount->max_value_if_sat();
-
-                for (std::size_t i = 0; i < state_selector_cols_amount; i++) {
-                    state_selector_cols.push_back(col_manager.allocate_witness_column());
-                }
-                for(std::size_t i = 0; i < opcode_range_checked_cols_amount; i++) {
-                    opcode_range_checked_cols.push_back(col_manager.allocate_witness_column());
-                }
-
-                opcode_cols = opcode_range_checked_cols; // range-checked columns are the first part of opcode columns
-
-                for (std::size_t i = 0; i < opcode_other_cols_amount; i++) { // followed by some non-range-checked columns
-                    opcode_cols.push_back(col_manager.allocate_witness_column());
-                }
-                state_selector = std::make_shared<state_selector_type>(
-                    state_selector_cols, std::array<std::uint32_t, 0>({}), std::array<std::uint32_t, 0>({}),
-                    opcodes_amount,true
-                );
-                state.option = state_selector->option_variable();
-
-                auto state_selector_constraints = state_selector->generate_constraints();
-
-                const std::size_t opcode_row_selection_cols_amount =
-                    state_selector_type::get_manifest(max_opcode_height,false).witness_amount->max_value_if_sat();
-                for (std::size_t i = 0; i < opcode_row_selection_cols_amount; i++) {
-                    opcode_row_selection_cols.push_back(col_manager.allocate_witness_column());
-                }
-                opcode_row_selector = std::make_shared<state_selector_type>(
-                    opcode_row_selection_cols, std::array<std::uint32_t, 0>({}), std::array<std::uint32_t, 0>({}),
-                    max_opcode_height,false);
-                auto opcode_row_selector_constraints = opcode_row_selector->generate_constraints();
-
-                if (state_selector->is_compressed) {
-                    // for a compressed state selector we rely upon opcode_row_selector parity data to apply constraints once in 2 rows
-                    var parity_var = opcode_row_selector->parity_variable();
-                    for(auto constraint : state_selector_constraints) {
-                        middle_constraints.push_back(constraint * parity_var);
-                    }
-                } else {
-                    middle_constraints.insert(middle_constraints.end(), state_selector_constraints.begin(), state_selector_constraints.end());
-                }
-
-                middle_constraints.insert(middle_constraints.end(), opcode_row_selector_constraints.begin(),
-                                          opcode_row_selector_constraints.end());
 
                 auto generic_state_transition_constraints = generate_generic_transition_constraints(
                     start_selector, end_selector);
@@ -553,11 +581,18 @@ namespace nil {
 
                 constraint_type opcode_first_line_constraint;
                 constraint_type stack_size_transitions;
+                constraint_type memory_size_transitions;
                 constraint_type gas_transitions;
 
                 for (auto opcode_it : opcodes) {
+                    if( opcode_it.second->stack_input != opcodes_info_instance.get_opcode_stack_input(opcode_it.first))
+                        std::cout << "WRONG stack_input for " << opcode_to_string(opcode_it.first) << ": " <<  opcode_it.second->stack_input << " != " << opcodes_info_instance.get_opcode_stack_input(opcode_it.first) << std::endl;
+                    if( opcode_it.second->stack_output != opcodes_info_instance.get_opcode_stack_output(opcode_it.first))
+                        std::cout << "WRONG stack_output for " << opcode_to_string(opcode_it.first) << ": " <<  opcode_it.second->stack_output << " != " << opcodes_info_instance.get_opcode_stack_output(opcode_it.first) << std::endl;
+                    if( opcode_it.second->gas_cost != opcodes_info_instance.get_opcode_cost(opcode_it.first))
+                        std::cout << "WRONG gas_cost for " << opcode_to_string(opcode_it.first)  << ": " <<  opcode_it.second->gas_cost << " != " << opcodes_info_instance.get_opcode_cost(opcode_it.first) << std::endl;
                     std::size_t opcode_height = opcode_it.second->rows_amount();
-                    std::cout << "Gates for " << opcode_to_string(opcode_it.first) << std::endl;
+                    //std::cout << "Gates for " << opcode_to_string(opcode_it.first) << std::endl;
 
                     if (opcode_height > max_opcode_height) {
                         BOOST_ASSERT("Opcode height exceeds maximum, please update max_opcode_height constant.");
@@ -566,24 +601,13 @@ namespace nil {
                     std::size_t adj_opcode_height = opcode_height + (opcode_height % 2);
 
                     std::size_t opcode_num = opcodes_info_instance.get_opcode_number(opcode_it.first);
-                    auto  curr_opt_constraint = state_selector->option_constraint(opcode_num),
-                        curr_opt_constraint_even = state_selector->option_constraint_even(opcode_num), // Why do we need it?
-                        curr_opt_constraint_odd = state_selector->option_constraint_odd(opcode_num);   // Why do we need it?
 
                     // save constraints to ensure later that internal row number has proper value at the start of the opcode
+                    // We can use opcode_row_selector_constraint, but it has similar degree.
                     opcode_first_line_constraint +=
-                        curr_opt_constraint * (opcode_row_selector->option_variable() - (adj_opcode_height - 1));
+                        opcode_selector_constraint(opcode_num) * ( state.row_counter() - adj_opcode_height + 1);
                     // ^^^ curr_opt_constraint is in _odd_ version because it's applied
                     // at row with internal number adj_opcode_height-1, that always odd
-
-                    // save constraints to ensure correct updates of stack size
-                    // TODO: Done for each opcode individually
-                    // Static case will be hardcoded in zkevm_operatoin
-                    /* stack_size_transitions += curr_opt_constraint_even * (state.stack_size
-                                                    - opcodes_info_instance.get_opcode_stack_input(opcode_it.first)
-                                                    + opcodes_info_instance.get_opcode_stack_output(opcode_it.first)
-                                                    - state.stack_size.next());*/
-                    // curr_opt_constraint is in _even_ version because it's applied at row with internal number 0
 
                     // save constraints to ensure correct updates of remaining gas NB: only static costs now! TODO: include dynamic costs
                     // TODO: Done for each opcode individually
@@ -599,25 +623,21 @@ namespace nil {
                     for (auto gate_it : opcode_gates) {
                         switch (gate_it.first) {
                             case zkevm_opcode_gate_class::FIRST_OP:
-                                for (auto constraint_pair : gate_it.second.first) {
-                                    std::size_t local_row = constraint_pair.first;
-                                    constraint_type curr_opt_constraint =
-                                        (local_row % 2 == 0) ? curr_opt_constraint_even : curr_opt_constraint_odd;
-                                    constraint_type constraint = get_opcode_row_constraint(local_row, adj_opcode_height)
+                                std::cout << "Not implemented" << std::endl;
+/*                              for (auto constraint_pair : gate_it.second.first) {
+                                    constraint_type constraint = opcode_row_selector_constraint(opcode_num, adj_opcode_height - 1)
                                                                      * constraint_pair.second;
 
                                     constraint_list[gate_id_type(constraint_pair.second)] = constraint_pair.second;
                                     virtual_selector[gate_id_type(constraint_pair.second)] +=
-                                        get_opcode_row_constraint(local_row, adj_opcode_height) * curr_opt_constraint * start_selector;
+                                        constraint * start_selector;
                                 }
                                 for (auto lookup_constraint_pair : gate_it.second.second) {
                                     std::size_t local_row = lookup_constraint_pair.first;
-                                    constraint_type curr_opt_constraint =
-                                        (local_row % 2 == 0) ? curr_opt_constraint_even : curr_opt_constraint_odd;
                                     lookup_constraint_type lookup_constraint = lookup_constraint_pair.second;
                                     auto lookup_table = lookup_constraint.table_id;
                                     auto lookup_expressions = lookup_constraint.lookup_input;
-                                    constraint_type row_selector = get_opcode_row_constraint(local_row, adj_opcode_height);
+                                    constraint_type row_selector = get_opcode_row_constraint(local_row, adj_opcode_height - 1);
                                     std::vector<constraint_type> new_lookup_expressions;
 
                                     for(auto lookup_expr : lookup_expressions) {
@@ -625,35 +645,29 @@ namespace nil {
                                     }
                                     middle_lookup_constraints.push_back({lookup_table, new_lookup_expressions});
                                 }
-                                break;
+                                break;*/
                             case zkevm_opcode_gate_class::MIDDLE_OP:
-                                std::cout << "Middle constraints from " << opcode_to_string(opcode_it.first) << std::endl;
+                                //std::cout << "Middle constraints from " << opcode_to_string(opcode_it.first) << std::endl;
                                 for (auto constraint_pair : gate_it.second.first) {
-                                    std::cout << "\t" << constraint_pair.first << ": " << constraint_pair.second << std::endl;
+                                    //std::cout << "\t" << constraint_pair.first << ": " << constraint_pair.second << std::endl;
                                     std::size_t local_row = constraint_pair.first;
-                                    if(local_row > 1) continue;
                                     if( opcode_it.second->rows_amount() % 2 ) local_row++;
-                                    //constraint_type curr_opt_constraint =
-                                    //    (local_row % 2 == 0) ? curr_opt_constraint_odd : curr_opt_constraint_even;
-                                    constraint_type row_constraint = get_opcode_row_constraint(local_row, adj_opcode_height)
-                                                                    * constraint_pair.second;
 
                                     constraint_list[gate_id_type(constraint_pair.second)] = constraint_pair.second;
                                     virtual_selector[gate_id_type(constraint_pair.second)] +=
-                                        get_opcode_row_constraint(local_row, adj_opcode_height) * curr_opt_constraint;
+                                        opcode_row_selector_constraint(opcode_num, local_row);
                                 }
                                 for (auto lookup_constraint_pair : gate_it.second.second) {
+                                    // TODO:: do same trick with polynomial constraints for lookup constraints with similar lookup tables.
                                     std::size_t local_row = lookup_constraint_pair.first;
-                                    //constraint_type curr_opt_constraint =
-                                    //    (local_row % 2 == 0) ? curr_opt_constraint_even : curr_opt_constraint_odd;
+                                    if( opcode_it.second->rows_amount() % 2 ) local_row++;
                                     lookup_constraint_type lookup_constraint = lookup_constraint_pair.second;
                                     auto lookup_table = lookup_constraint.table_id;
                                     auto lookup_expressions = lookup_constraint.lookup_input;
-                                    constraint_type row_selector = get_opcode_row_constraint(local_row, adj_opcode_height);
                                     std::vector<constraint_type> new_lookup_expressions;
 
                                     for(auto lookup_expr : lookup_expressions) {
-                                        new_lookup_expressions.push_back(curr_opt_constraint * lookup_expr * row_selector);
+                                        new_lookup_expressions.push_back( opcode_row_selector_constraint(opcode_num, local_row) * lookup_expr );
                                     }
                                     middle_lookup_constraints.push_back({lookup_table, new_lookup_expressions});
                                 }
@@ -668,21 +682,17 @@ namespace nil {
                                 BOOST_ASSERT("Unknown gate class");
                         }
                     }
+                    gas_transitions += opcode_row_selector_constraint(opcode_num, 0) * opcode_it.second->gas_transition(*this);
+                    pc_transitions += opcode_row_selector_constraint(opcode_num, 0) * opcode_it.second->pc_transition(*this);
+                    stack_size_transitions += opcode_row_selector_constraint(opcode_num, 0) * opcode_it.second->stack_size_transition(*this);
                 }
                 // ensure first line of each opcode has correct internal row number
-                middle_constraints.push_back(opcode_first_line_constraint * state.step_selection());
+                middle_constraints.push_back(opcode_first_line_constraint * state.step_start());
 
-                // ensure the last line of each opcode updates stack_size and gas correctly
-//                middle_constraints.push_back(stack_size_transitions * state.step_selection.next());
-//                middle_constraints.push_back(gas_transitions * state.step_selection.next());
 
-                // increase program counter, unless the opcode is JUMP or JUMPI
-//                middle_constraints.push_back((state.pc() + 1 - state.pc.next())
-//                    * (1 - state_selector->option_constraint_even(opcodes_info_instance.get_opcode_number(zkevm_opcode::JUMP))
-//                         - state_selector->option_constraint_even(opcodes_info_instance.get_opcode_number(zkevm_opcode::JUMPI)))
-//                    * state.step_selection.next());
-                // TODO: JUMP and JUMPI need special constraints for program counter
-                // we also need to check that they are followed by either JUMPDEST or an error opcode
+                middle_constraints.push_back(stack_size_transitions);
+                middle_constraints.push_back(pc_transitions);
+                //middle_constraints.push_back(gas_transitions);
 
                 for(const auto c : virtual_selector) {
                     constraint_type constraint = constraint_list[c.first];
@@ -692,6 +702,11 @@ namespace nil {
                 middle_selector = circuit.add_gate(middle_constraints);
                 circuit.add_lookup_gate(middle_selector, middle_lookup_constraints);
             }
+
+            constraint_type gas_transitions;
+            constraint_type pc_transitions;
+            constraint_type stack_size_transitions;
+            constraint_type opcode_transitions;
 
             zkevm_state_type state;
             // static selectors used to mark the places where the circuit starts/ends and when the circuit is acitve
@@ -703,9 +718,9 @@ namespace nil {
             // witness columns for opcodes
             std::vector<std::size_t> opcode_cols;
             // dynamic selectors for the state selector circuit
-            std::vector<std::size_t> state_selector_cols;
+            std::vector<std::size_t> opcode_selector_cols;
             // columns for selecting specific rows from the opcode
-            std::vector<std::size_t> opcode_row_selection_cols;
+            std::vector<std::size_t> row_selector_cols;
             // ---------------------------------------------------------------------------------------------
             // |Variables below this point are internal to the object and do not go into the actual circuit|
             // ---------------------------------------------------------------------------------------------
@@ -714,8 +729,8 @@ namespace nil {
             assignment_type &assignment;
             // information about opcode metadata (mapping, etc.)
             const opcodes_info &opcodes_info_instance;
-            std::shared_ptr<state_selector_type> state_selector;
-            std::shared_ptr<state_selector_type> opcode_row_selector;
+            std::shared_ptr<index_selector_type> opcode_selector; // Selects opcode_id/4
+            std::shared_ptr<index_selector_type> row_selector;    // Selects row_selector/2
             // opcode objects
             std::map<zkevm_opcode, std::shared_ptr<zkevm_operation<BlueprintFieldType>>> opcodes;
             // start and end rows for the circuit; both have to be fixed

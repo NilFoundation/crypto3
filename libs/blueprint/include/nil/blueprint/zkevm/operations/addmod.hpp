@@ -56,6 +56,12 @@ namespace nil {
             constexpr static const value_type two128 = 0x100000000000000000000000000000000_cppui_modular254;
             constexpr static const value_type two192 = 0x1000000000000000000000000000000000000000000000000_cppui_modular254;
 
+            zkevm_addmod_operation(){
+                this->stack_input = 3;
+                this->stack_output = 1;
+                this->gas_cost = 8;
+            }
+
             template<typename T, typename V = T>
             T chunk_sum_64(const std::vector<V> &chunks, const unsigned char chunk_idx) const {
                 BOOST_ASSERT(chunk_idx < 4);
@@ -318,12 +324,12 @@ namespace nil {
                 return { {gate_class::MIDDLE_OP, {constraints, {} }} };
             }
 
-            void generate_assignments(zkevm_table_type &zkevm_table, zkevm_machine_interface &machine) override {
+            void generate_assignments(zkevm_table_type &zkevm_table, const zkevm_machine_interface &machine) override {
                 using word_type = typename zkevm_stack::word_type;
                 using integral_type = boost::multiprecision::number<
                     boost::multiprecision::backends::cpp_int_modular_backend<257>>;
 
-                zkevm_stack &stack = machine.stack;
+                zkevm_stack stack = machine.stack;
 
                 word_type a = stack.pop();
                 word_type b = stack.pop();

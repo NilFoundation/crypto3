@@ -46,6 +46,10 @@ namespace nil {
             using value_type = typename BlueprintFieldType::value_type;
             using var = typename op_type::var;
 
+            zkevm_err0_operation(){
+                this->gas_cost = 0;
+            }
+
             std::map<gate_class, std::pair<
                 std::vector<std::pair<std::size_t, constraint_type>>,
                 std::vector<std::pair<std::size_t, lookup_constraint_type>>
@@ -123,10 +127,10 @@ namespace nil {
                 return {{gate_class::MIDDLE_OP, {constraints, {}}}};
             }
 
-            void generate_assignments(zkevm_table_type &zkevm_table, zkevm_machine_interface &machine,
+            void generate_assignments(zkevm_table_type &zkevm_table, const zkevm_machine_interface &machine,
                                       zkevm_word_type opcode_num) {
 
-                zkevm_stack &stack = machine.stack;
+                zkevm_stack stack = machine.stack;
                 using word_type = typename zkevm_stack::word_type;
                 using integral_type = boost::multiprecision::number<boost::multiprecision::backends::cpp_int_modular_backend<257>>;
                 using circuit_integral_type = typename BlueprintFieldType::integral_type;
@@ -176,7 +180,7 @@ namespace nil {
                 assignment.witness(witness_cols[2], curr_row + 1) = d2;
                 assignment.witness(witness_cols[3], curr_row + 1) = so;
             }
-            void generate_assignments(zkevm_table_type &zkevm_table, zkevm_machine_interface &machine) override {
+            void generate_assignments(zkevm_table_type &zkevm_table, const zkevm_machine_interface &machine) override {
                  generate_assignments(zkevm_table, machine, 0); // just to have a default
             }
 

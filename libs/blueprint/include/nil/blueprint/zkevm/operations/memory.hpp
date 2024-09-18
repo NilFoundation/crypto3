@@ -48,7 +48,10 @@ namespace nil {
             using value_type = typename BlueprintFieldType::value_type;
             using var = typename op_type::var;
 
-            zkevm_mstore_operation() {}
+            zkevm_mstore_operation() {
+                this->stack_input = 2;
+                this->stack_output = 0;
+            }
 
             constexpr static const value_type two_16 = 65536;
             constexpr static const value_type two_32 = 4294967296;
@@ -66,15 +69,18 @@ namespace nil {
                 return {{gate_class::MIDDLE_OP, {{}, {}}}};
             }
 
-            void generate_assignments(zkevm_table_type &zkevm_table, zkevm_machine_interface &machine) override {
-                zkevm_stack &stack = machine.stack;
+            void generate_assignments(zkevm_table_type &zkevm_table, const zkevm_machine_interface &machine) override {
                 std::cout << "Generate assignments and gates for MSTORE" << std::endl;
-                stack.pop();
-                stack.pop();
             }
 
             std::size_t rows_amount() override {
                 return 3;
+            }
+
+            virtual constraint_type gas_transition(const zkevm_circuit_type &zkevm_circuit) override {
+                std::cout << "Implement MLOAD dynamic gas transition" << std::endl;
+                constraint_type c;
+                return c;
             }
         };
 
@@ -92,7 +98,10 @@ namespace nil {
             using value_type = typename BlueprintFieldType::value_type;
             using var = typename op_type::var;
 
-            zkevm_mload_operation() {}
+            zkevm_mload_operation() {
+                this->stack_input = 1;
+                this->stack_output = 1;
+            }
 
             constexpr static const value_type two_16 = 65536;
             constexpr static const value_type two_32 = 4294967296;
@@ -110,10 +119,16 @@ namespace nil {
                 return {{gate_class::MIDDLE_OP, {{}, {}}}};
             }
 
-            void generate_assignments(zkevm_table_type &zkevm_table, zkevm_machine_interface &machine) override {
-                zkevm_stack &stack = machine.stack;
+            void generate_assignments(zkevm_table_type &zkevm_table, const zkevm_machine_interface &machine) override {
+                zkevm_stack stack = machine.stack;
                 std::cout << "Generate assignments and gates for MLOAD" << std::endl;
                 stack.pop();
+            }
+
+            virtual constraint_type gas_transition(const zkevm_circuit_type &zkevm_circuit) override {
+                std::cout << "Implement MLOAD dynamic gas transition" << std::endl;
+                constraint_type c;
+                return c;
             }
 
             std::size_t rows_amount() override {

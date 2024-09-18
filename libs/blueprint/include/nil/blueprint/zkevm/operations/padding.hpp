@@ -48,7 +48,9 @@ namespace nil {
             using value_type = typename BlueprintFieldType::value_type;
             using var = typename op_type::var;
 
-            zkevm_padding_operation() {}
+            zkevm_padding_operation() {
+                this->gas_cost  = 0;
+            }
 
             constexpr static const value_type two_16 = 65536;
             constexpr static const value_type two_32 = 4294967296;
@@ -68,11 +70,16 @@ namespace nil {
 
             void generate_assignments(zkevm_circuit_type &zkevm_circuit) {}
 
-            void generate_assignments(zkevm_table_type &zkevm_table, zkevm_machine_interface &machine) override {
+            void generate_assignments(zkevm_table_type &zkevm_table, const zkevm_machine_interface &machine) override {
             }
 
             std::size_t rows_amount() override {
                 return 1;
+            }
+
+            constraint_type pc_transition(const zkevm_circuit_type &zkevm_circuit) override {
+                constraint_type c;
+                return c;
             }
         };
     }   // namespace blueprint

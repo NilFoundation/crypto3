@@ -49,7 +49,11 @@ namespace nil {
             using value_type = typename BlueprintFieldType::value_type;
             using var = typename op_type::var;
 
-            zkevm_div_mod_operation(bool _is_div) : is_div(_is_div) {}
+            zkevm_div_mod_operation(bool _is_div) : is_div(_is_div) {
+                this->stack_input = 2;
+                this->stack_output = 1;
+                this->gas_cost = 5;
+            }
 
             bool is_div;
 
@@ -287,9 +291,9 @@ namespace nil {
                 return {{gate_class::MIDDLE_OP, {constraints, {}}}};
             }
 
-            void generate_assignments(zkevm_table_type &zkevm_table, zkevm_machine_interface &machine) override {
+            void generate_assignments(zkevm_table_type &zkevm_table, const zkevm_machine_interface &machine) override {
                 using word_type = typename zkevm_stack::word_type;
-                zkevm_stack &stack = machine.stack;
+                zkevm_stack stack = machine.stack;
                 word_type a = stack.pop();
                 word_type b = stack.pop();
                 using integral_type = boost::multiprecision::number<

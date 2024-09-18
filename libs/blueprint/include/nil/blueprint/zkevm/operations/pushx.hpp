@@ -49,6 +49,10 @@ namespace nil {
             using var = typename op_type::var;
 
             zkevm_pushx_operation(std::size_t _x) : byte_count(_x) {
+                this->pc_gap = _x + 1;
+                this->stack_input = 0;
+                this->stack_output = 1;
+                if(_x == 0) this->gas_cost = 2;
                 BOOST_ASSERT(_x < 33); // the maximum push is 32 bytes
             }
 
@@ -85,9 +89,9 @@ namespace nil {
                 return {{gate_class::MIDDLE_OP, {constraints, {}}}};
             }
 
-            void generate_assignments(zkevm_table_type &zkevm_table, zkevm_machine_interface &machine,
+            void generate_assignments(zkevm_table_type &zkevm_table, const zkevm_machine_interface &machine,
                                       zkevm_word_type bytecode_input) {
-                zkevm_stack &stack = machine.stack;
+                zkevm_stack stack = machine.stack;
                 using word_type = typename zkevm_stack::word_type;
                 using integral_type = boost::multiprecision::number<
                     boost::multiprecision::backends::cpp_int_modular_backend<257>>;
@@ -105,10 +109,8 @@ namespace nil {
                 for (std::size_t i = 0; i < chunk_amount; i++) {
                     assignment.witness(witness_cols[i], curr_row) = chunks[i];
                 }
-                // really push into stack for now
-                stack.push(a);
             }
-            void generate_assignments(zkevm_table_type &zkevm_table, zkevm_machine_interface &machine) override {
+            void generate_assignments(zkevm_table_type &zkevm_table, const zkevm_machine_interface &machine) override {
                  generate_assignments(zkevm_table, machine, 0);
             }
 

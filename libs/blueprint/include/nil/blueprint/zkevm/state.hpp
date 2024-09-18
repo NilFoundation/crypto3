@@ -36,245 +36,24 @@
 
 namespace nil {
     namespace blueprint {
-
-        // we use value_type as a default here in order to have easier time testing weird assignments like -1
-        // I don't like this because value is directly connected with variable
-/*      template<typename BlueprintFieldType, typename T = typename BlueprintFieldType::value_type>
-        struct state_var {
-            using arithmetization_type = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>;
-            using assignment_type = nil::blueprint::assignment<arithmetization_type>;
-            using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
-            using column_type = typename var::column_type;
-
-            std::size_t column_id;
-            column_type type;
-            T value;
-
-            state_var(const std::size_t column_id_, const column_type type_, const T& value_)
-                : column_id(column_id_), type(type_), value(value_) {}
-
-            state_var() = default;
-
-            void set_value(const T &new_value) {
-                value = new_value;
-            }
-
-            void assign_value(assignment_type &assignment, std::size_t row) const {
-                switch (type) {
-                    case column_type::witness:
-                        assignment.witness(column_id, row) = value;
-                        break;
-                    case column_type::constant:
-                        assignment.constant(column_id, row) = value;
-                        BOOST_ASSERT("We should not assign a state value to constant column");
-                        break;
-                    case column_type::selector:
-                        assignment.selector(column_id, row) = value;
-                        BOOST_ASSERT("We should not assign a state value to selector column");
-                        break;
-                    case column_type::public_input:
-                        BOOST_ASSERT("We should not assign a state value to public input column");
-                    default:
-                        BOOST_ASSERT("Unknown column type");
-                }
-            }
-
-            void set_and_assign_value(assignment_type &assignment, std::size_t row, const T &new_value) {
-                set_value(new_value);
-                assign_value(assignment, row);
-            }
-
-            var variable(int32_t offset = 0) const {
-                BOOST_ASSERT(offset == 0 || offset == -1 || offset == 1);
-                return var(column_id, offset, true, type);
-            }
-        };
-
-        #define zkevm_STATE_LIST_FOR_TRANSITIONS(X) \
-            X(pc) \
-            X(stack_size) \
-            X(memory_size) \
-            X(gas) \
-
-        // Every variable which should be tracked between rows
-        template<typename BlueprintFieldType>
-        struct zkevm_state {
-            using state_var_type = state_var<BlueprintFieldType>;
-            using arithmetization_type = crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>;
-            using assignment_type = nil::blueprint::assignment<arithmetization_type>;
-            // variables which have custom state transitions
-            #define X(name) state_var_type name;
-            zkevm_STATE_LIST_FOR_TRANSITIONS(X)
-            #undef X
-            // variables which have generic transition rules and are not handled via
-            // state transition mechanism
-            state_var_type step_selection; // 1 in first line of new opcode, 0 otherwise
-            state_var_type rows_until_next_op_inv;
-            state_var_type last_row_indicator;
-
-            void assign_state(assignment_type &assignment, std::size_t row) const {
-                #define X(name) name.assign_value(assignment, row);
-                zkevm_STATE_LIST_FOR_TRANSITIONS(X)
-                #undef X
-                step_selection.assign_value(assignment, row);
-                rows_until_next_op_inv.assign_value(assignment, row);
-                last_row_indicator.assign_value(assignment, row);
-            }
-        };
-
-        struct transition_type {
-            enum type {
-                DEFAULT,
-                ANY,
-                SAME_VALUE,
-                DELTA,
-                NEW_VALUE,
-            };
-            transition_type()
-                :t(DEFAULT),
-                 value(0){}
-
-            type t;
-            // either new value or delta; optional
-            // technically we could do arbirary field values here, but unlikely to be actually required
-            std::int64_t value;
-        };
-
-        std::ostream& operator<<(std::ostream &os, const transition_type &t) {
-            switch (t.t) {
-                case transition_type::DEFAULT:
-                    os << "DEFAULT";
-                    break;
-                case transition_type::ANY:
-                    os << "ANY";
-                    break;
-                case transition_type::SAME_VALUE:
-                    os << "SAME_VALUE";
-                    break;
-                case transition_type::DELTA:
-                    os << "DELTA(" << t.value << ")";
-                    break;
-                case transition_type::NEW_VALUE:
-                    os << "NEW_VALUE(" << t.value << ")";
-                    break;
-            }
-            return os;
-        }
-
-        struct zkevm_state_transition {
-            #define X(name) transition_type name;
-            zkevm_STATE_LIST_FOR_TRANSITIONS(X)
-            #undef X
-        };
-
-        zkevm_state_transition generate_frozen_state_transition() {
-            zkevm_state_transition transition;
-            #define X(name) transition.name.t = transition_type::SAME_VALUE;
-            zkevm_STATE_LIST_FOR_TRANSITIONS(X)
-            #undef X
-            return transition;
-        }
-
-        std::ostream& operator<<(std::ostream &os, const zkevm_state_transition &t) {
-            #define X(name) os << #name << ": " << t.name << std::endl;
-            zkevm_STATE_LIST_FOR_TRANSITIONS(X)
-            #undef X
-            return os;
-        }
-
-        template<typename BlueprintFieldType>
-        std::optional<crypto3::zk::snark::plonk_constraint<BlueprintFieldType>> handle_transition(
-            const state_var<BlueprintFieldType> &var,
-            const transition_type &transition,
-            std::function<crypto3::zk::snark::plonk_constraint<BlueprintFieldType>(
-                const state_var<BlueprintFieldType>&, const transition_type&)> default_handler
-        ) {
-            switch (transition.t) {
-                case transition_type::SAME_VALUE:
-                    return var.variable(+1) - var.variable();
-                case transition_type::DELTA:
-                    return var.variable(+1) - var.variable() - transition.value;
-                case transition_type::NEW_VALUE:
-                    return var.variable(+1) - transition.value;
-                case transition_type::DEFAULT:
-                    return default_handler(var, transition);
-                case transition_type::ANY:
-                    return std::nullopt;
-            }
-        }
-
-        template<typename BlueprintFieldType>
-        crypto3::zk::snark::plonk_constraint<BlueprintFieldType> handle_pc_default(
-            const state_var<BlueprintFieldType> &var,
-            const transition_type &transition
-        ) {
-            // same as DELTA(1)
-            return var.variable(+1) - var.variable() - 1;
-        }
-
-        template<typename BlueprintFieldType>
-        crypto3::zk::snark::plonk_constraint<BlueprintFieldType> handle_stack_size_default(
-            const state_var<BlueprintFieldType> &var,
-            const transition_type &transition
-        ) {
-            // same as SAME
-            return var.variable(+1) - var.variable();
-        }
-
-        template<typename BlueprintFieldType>
-        crypto3::zk::snark::plonk_constraint<BlueprintFieldType> handle_memory_size_default(
-            const state_var<BlueprintFieldType> &var,
-            const transition_type &transition
-        ) {
-            // same as SAME
-            return var.variable(+1) - var.variable();
-        }
-
-        template<typename BlueprintFieldType>
-        crypto3::zk::snark::plonk_constraint<BlueprintFieldType> handle_gas_default(
-            const state_var<BlueprintFieldType> &var,
-            const transition_type &transition
-        ) {
-            // we shouldn't do this? maybe in error cases or testing?
-            // later should assert this out, currently SAME
-            return var.variable(+1) - var.variable();
-        }
-
-        template<typename BlueprintFieldType>
-        std::vector<crypto3::zk::snark::plonk_constraint<BlueprintFieldType>> generate_transition_constraints(
-            const zkevm_state<BlueprintFieldType> &state,
-            const zkevm_state_transition &transition
-        ) {
-            using constraint_type = crypto3::zk::snark::plonk_constraint<BlueprintFieldType>;
-            std::vector<constraint_type> result;
-            #define X(name) \
-                if (auto constraint = handle_transition<BlueprintFieldType>( \
-                        state.name, transition.name, handle_##name##_default<BlueprintFieldType>)) { \
-                    result.push_back(*constraint); \
-                }
-            zkevm_STATE_LIST_FOR_TRANSITIONS(X)
-            #undef X
-            return result;
-        }*/
-
         // It is really simplified state variable. We assume that each state position uses the whole column.
         // In this case variable is defined only by witness column id.
         // It's useful to have some convenient functions for rotations for circuit construction and absolute variables for assignment.
         template<typename BlueprintFieldType>
         struct state_var:public crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>{
             using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
-            state_var(std::uint32_t witness_id = 0): var(witness_id, 0, true, var::column_type::witness){}
+            state_var(std::uint32_t witness_id = 0, typename var::column_type t = var::column_type::witness): var(witness_id, 0, true, t){}
             var operator() () const {
-                return var(this->index, 0, true, var::column_type::witness);
+                return var(this->index, 0, true, this->type);
             }
             var next() const {
-                return var(this->index, 1, true, var::column_type::witness);
+                return var(this->index, 1, true, this->type);
             }
             var prev() const {
-                return var(this->index, -1, true, var::column_type::witness);
+                return var(this->index, -1, true, this->type);
             }
             var abs(std::size_t row) const {
-                return var(this->index, row, false, var::column_type::witness);
+                return var(this->index, row, false, this->type);
             }
         };
         // This class just contains state variables zkEVM state and next state
@@ -292,10 +71,14 @@ namespace nil {
             state_var stack_size;
             state_var memory_size;
             state_var gas;
-            state_var step_selection; // 1 in first line of new opcode, 0 otherwise
-            state_var rows_counter_inv;
-            state_var last_row_indicator;  // Do we really need it?
-            state_var option;
+            state_var opcode;
+
+            state_var row_counter;           // Decreasing row counter
+            state_var step_start;             // 1 in first line of new opcode, 0 otherwise
+            state_var row_counter_inv;
+            state_var last_row_indicator;   // Do we really need it? I don't think so. Last opcode should be RETURN, err or padding.
+            state_var opcode_parity;        // opcode%2
+            state_var is_even;              // TODO: Do it constant column
         };
     }    // namespace blueprint
 }    // namespace nil

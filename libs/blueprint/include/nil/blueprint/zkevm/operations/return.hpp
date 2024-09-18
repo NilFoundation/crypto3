@@ -48,7 +48,10 @@ namespace nil {
             using value_type = typename BlueprintFieldType::value_type;
             using var = typename op_type::var;
 
-            zkevm_return_operation() {}
+            zkevm_return_operation() {
+                this->stack_input = 2;
+                this->gas_cost  = 0;
+            }
 
             constexpr static const value_type two_16 = 65536;
             constexpr static const value_type two_32 = 4294967296;
@@ -66,14 +69,29 @@ namespace nil {
                 return {{gate_class::MIDDLE_OP, {{}, {}}}};
             }
 
-            void generate_assignments(zkevm_table_type &zkevm_table, zkevm_machine_interface &machine) override {
-                zkevm_stack &stack = machine.stack;
+            void generate_assignments(zkevm_table_type &zkevm_table, const zkevm_machine_interface &machine) override {
+                zkevm_stack stack = machine.stack;
                 std::cout << "Generate assignments and gates for RETURN" << std::endl;
                 stack.pop();
             }
 
+            constraint_type pc_transition(const zkevm_circuit_type &zkevm_circuit) override {
+                constraint_type c;
+                return c;
+            }
+
+            constraint_type gas_transition(const zkevm_circuit_type &zkevm_circuit) override {
+                constraint_type c;
+                return c;
+            }
+
+            constraint_type stack_size_transition(const zkevm_circuit_type &zkevm_circuit) override {
+                constraint_type c;
+                return c;
+            }
+
             std::size_t rows_amount() override {
-                return 3;
+                return 1;
             }
         };
     }   // namespace blueprint

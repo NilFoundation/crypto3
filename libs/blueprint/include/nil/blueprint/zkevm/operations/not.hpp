@@ -48,7 +48,10 @@ namespace nil {
             using value_type = typename BlueprintFieldType::value_type;
             using var = typename op_type::var;
 
-            zkevm_not_operation() {}
+            zkevm_not_operation() {
+                this->stack_input = 1;
+                this->stack_output = 1;
+            }
 
             constexpr static const std::size_t carry_amount = 16 / 3 + 1;
             constexpr static const value_type two_16 = 65536;
@@ -117,8 +120,8 @@ namespace nil {
                 return {{gate_class::MIDDLE_OP, {constraints, {}}}};
             }
 
-            void generate_assignments(zkevm_table_type &zkevm_table, zkevm_machine_interface &machine) override {
-                zkevm_stack &stack = machine.stack;
+            void generate_assignments(zkevm_table_type &zkevm_table, const zkevm_machine_interface &machine) override {
+                zkevm_stack stack = machine.stack;
                 using word_type = typename zkevm_stack::word_type;
                 using integral_type = boost::multiprecision::number<
                     boost::multiprecision::backends::cpp_int_modular_backend<257>>;

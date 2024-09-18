@@ -68,8 +68,6 @@ namespace nil {
             using assignment_type = assignment<nil::crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>;
             using var = nil::crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
-            zkevm_operation() {}
-
             virtual ~zkevm_operation() = default;
             // note that some parts of the map may be empty
             // we expect that most of the operations would only use MIDDLE_OP
@@ -79,14 +77,35 @@ namespace nil {
                 >>
                 generate_gates(zkevm_circuit_type &zkevm_circuit) = 0;
 
-            virtual void generate_assignments(zkevm_table_type &zkevm_circuit, zkevm_machine_interface &machine) = 0;
+            virtual void generate_assignments(zkevm_table_type &zkevm_table, const zkevm_machine_interface &machine) = 0;
             // should return the same rows amount for everyс operation right now
             // here in case we would make it dynamic in the future
             virtual std::size_t rows_amount() = 0;
+
+            virtual constraint_type pc_transition(const zkevm_circuit_type &zkevm_circuit) {
+                const auto &state = zkevm_circuit.get_state();
+                return state.pc.next() - state.pc() - pc_gap;
+            }
+
+            virtual constraint_type gas_transition(const zkevm_circuit_type &zkevm_circuit) {
+                const auto &state = zkevm_circuit.get_state();
+                return state.gas.next() - state.gas() + gas_cost;
+            }
+
+            virtual constraint_type stack_size_transition(const zkevm_circuit_type &zkevm_circuit) {
+                const auto &state = zkevm_circuit.get_state();
+                return state.stack_size.next() - state.stack_size() + stack_input - stack_output;
+            }
+
             // utility funciton
             static var var_gen(const std::vector<std::size_t> &witness_cols, std::size_t i, int32_t offset = 0) {
                 return var(witness_cols[i], offset, true, var::column_type::witness);
             };
+        public:
+            std::size_t pc_gap = 1;
+            std::size_t stack_input = 0;
+            std::size_t stack_output = 0;
+            std::size_t gas_cost = 3;
         };
     }   // namespace blueprint
 }   // namespace nil

@@ -38,6 +38,11 @@ namespace nil {
         template<typename BlueprintFieldType>
         class zkevm_shr_operation : public zkevm_operation<BlueprintFieldType> {
         public:
+            zkevm_shr_operation(){
+                this->stack_input = 2;
+                this->stack_output = 1;
+            }
+
             using op_type = zkevm_operation<BlueprintFieldType>;
             using gate_class = typename op_type::gate_class;
             using constraint_type = typename op_type::constraint_type;
@@ -322,9 +327,8 @@ namespace nil {
                 return {{gate_class::MIDDLE_OP, {constraints, lookup_constraints}}};
             }
 
-            void generate_assignments(zkevm_table_type &zkevm_table, zkevm_machine_interface &machine) override {
-                std::cout << "SHR assignmetns cur_row =" << zkevm_table.get_current_row() << std::endl;
-                zkevm_stack &stack = machine.stack;
+            void generate_assignments(zkevm_table_type &zkevm_table, const zkevm_machine_interface &machine) override {
+                zkevm_stack stack = machine.stack;
                 using word_type = typename zkevm_stack::word_type;
                 using integral_type = boost::multiprecision::number<
                     boost::multiprecision::backends::cpp_int_modular_backend<257>>;
