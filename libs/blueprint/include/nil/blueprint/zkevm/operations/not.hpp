@@ -134,7 +134,7 @@ namespace nil {
                 const std::vector<std::size_t> &witness_cols = zkevm_table.get_opcode_cols();
                 assignment_type &assignment = zkevm_table.get_assignment();
                 const std::size_t curr_row = zkevm_table.get_current_row();
-                // TODO: replace with memory access, which would also do range checks!
+                // TODO: replace with memory access, which would also do range checks
                 for (std::size_t i = 0; i < a_chunks.size(); i++) {
                     assignment.witness(witness_cols[i], curr_row) = a_chunks[i];
                 }

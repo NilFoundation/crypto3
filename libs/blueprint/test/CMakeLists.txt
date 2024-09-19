@@ -214,7 +214,8 @@ set(ZKEVM_TESTS_FILES
     "zkevm/opcodes/mod_ops"
     "zkevm/opcodes/byte_ops"
     "zkevm/opcodes/bitwise"
-    )
+    "zkevm/opcodes/err0"
+)
 
 #set(CURVES_TESTS_FILES
     #"algebra/curves/r1cs/montgomery"

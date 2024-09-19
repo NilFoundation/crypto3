@@ -44,29 +44,31 @@ using namespace nil::crypto3::algebra;
 BOOST_AUTO_TEST_SUITE(zkevm_mul_test_suite)
 
 BOOST_AUTO_TEST_CASE(zkevm_mul_test) {
-    using field_type = curves::alt_bn128<254>::base_field_type;
+    using field_type = fields::pallas_base_field;
     using arithmentization_type = nil::crypto3::zk::snark::plonk_constraint_system<field_type>;
     using assignment_type = assignment<arithmentization_type>;
     using circuit_type = circuit<arithmentization_type>;
     using zkevm_machine_type = zkevm_machine_interface;
     assignment_type assignment(0, 0, 0, 0);
     circuit_type circuit;
-    zkevm_circuit<field_type> zkevm_circuit(assignment, circuit);
+    zkevm_circuit<field_type> zkevm_circuit(assignment, circuit, 75);
+    zkevm_table<field_type> zkevm_table(zkevm_circuit, assignment);
     zkevm_machine_type machine = get_empty_machine();
-    zkevm_circuit.assign_opcode(zkevm_opcode::PUSH32, machine, zwordc(0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff_cppui_modular257));
-    zkevm_circuit.assign_opcode(zkevm_opcode::PUSH32, machine, zwordc(0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff_cppui_modular257));
-    zkevm_circuit.assign_opcode(zkevm_opcode::MUL, machine);
-    zkevm_circuit.assign_opcode(zkevm_opcode::PUSH32, machine, 1234567890);
-    zkevm_circuit.assign_opcode(zkevm_opcode::PUSH32, machine, zwordc(0x1b70726fb8d3a24da9ff9647225a18412b8f010425938504d73ebc8801e2e016_cppui_modular257));
-    zkevm_circuit.assign_opcode(zkevm_opcode::MUL, machine);
-    zkevm_circuit.assign_opcode(zkevm_opcode::PUSH32, machine, zwordc(0xFb70726fb8d3a24da9ff9647225a18412b8f010425938504d73ebc8801e2e016_cppui_modular257));
-    zkevm_circuit.assign_opcode(zkevm_opcode::PUSH32, machine, zwordc(0xFb70726fb8d3a24da9ff9647225a18412b8f010425938504d73ebc8801e2e016_cppui_modular257));
-    zkevm_circuit.assign_opcode(zkevm_opcode::MUL, machine);
-    zkevm_circuit.assign_opcode(zkevm_opcode::PUSH32, machine, zwordc(0x1b70726fb8d3a24da9ff9647225a18412b8f010425938504d73ebc8801e2e016_cppui_modular257));
-    zkevm_circuit.assign_opcode(zkevm_opcode::PUSH32, machine, 1234567890);
-    zkevm_circuit.assign_opcode(zkevm_opcode::MUL, machine);
-    zkevm_circuit.assign_opcode(zkevm_opcode::RETURN, machine);
-    zkevm_circuit.finalize_test();
+
+    machine.apply_opcode(zkevm_opcode::PUSH32, zwordc(0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff_cppui_modular257)); zkevm_table.assign_opcode(machine);
+    machine.apply_opcode(zkevm_opcode::PUSH32, zwordc(0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff_cppui_modular257)); zkevm_table.assign_opcode(machine);
+    machine.apply_opcode(zkevm_opcode::MUL); zkevm_table.assign_opcode(machine);
+    machine.apply_opcode(zkevm_opcode::PUSH32, 1234567890); zkevm_table.assign_opcode(machine);
+    machine.apply_opcode(zkevm_opcode::PUSH32, zwordc(0x1b70726fb8d3a24da9ff9647225a18412b8f010425938504d73ebc8801e2e016_cppui_modular257)); zkevm_table.assign_opcode(machine);
+    machine.apply_opcode(zkevm_opcode::MUL); zkevm_table.assign_opcode(machine);
+    machine.apply_opcode(zkevm_opcode::PUSH32, zwordc(0xFb70726fb8d3a24da9ff9647225a18412b8f010425938504d73ebc8801e2e016_cppui_modular257)); zkevm_table.assign_opcode(machine);
+    machine.apply_opcode(zkevm_opcode::PUSH32, zwordc(0xFb70726fb8d3a24da9ff9647225a18412b8f010425938504d73ebc8801e2e016_cppui_modular257)); zkevm_table.assign_opcode(machine);
+    machine.apply_opcode(zkevm_opcode::MUL); zkevm_table.assign_opcode(machine);
+    machine.apply_opcode(zkevm_opcode::PUSH32, zwordc(0x1b70726fb8d3a24da9ff9647225a18412b8f010425938504d73ebc8801e2e016_cppui_modular257)); zkevm_table.assign_opcode(machine);
+    machine.apply_opcode(zkevm_opcode::PUSH32, 1234567890); zkevm_table.assign_opcode(machine);
+    machine.apply_opcode(zkevm_opcode::MUL); zkevm_table.assign_opcode(machine);
+    machine.apply_opcode(zkevm_opcode::RETURN); zkevm_table.assign_opcode(machine);
+    zkevm_table.finalize_test();
 
     // assignment.export_table(std::cout);
     // circuit.export_circuit(std::cout);

@@ -80,6 +80,13 @@ namespace nil {
             std::size_t rows_amount() override {
                 return 3;
             }
+
+            virtual constraint_type gas_transition(const zkevm_circuit_type &zkevm_circuit) override {
+                constraint_type c;
+
+                std::cout << "Implement gas transition constraint for SSTORE" << std::endl;
+                return c;
+            }
         };
 
 
@@ -126,6 +133,13 @@ namespace nil {
 
             std::size_t rows_amount() override {
                 return 3;
+            }
+
+            virtual constraint_type gas_transition(const zkevm_circuit_type &zkevm_circuit) override {
+                constraint_type c;
+
+                std::cout << "Implement gas transition constraint for SLOAD" << std::endl;
+                return c;
             }
         };
     }   // namespace blueprint

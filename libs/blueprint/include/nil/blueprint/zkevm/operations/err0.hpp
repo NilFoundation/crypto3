@@ -187,6 +187,19 @@ namespace nil {
             std::size_t rows_amount() override {
                 return 2;
             }
+
+            constraint_type stack_size_transition(const zkevm_circuit_type &zkevm_circuit) override {
+                constraint_type c;
+                return c;
+            }
+            constraint_type gas_transition(const zkevm_circuit_type &zkevm_circuit) override {
+                constraint_type c;
+                return c;
+            }
+            constraint_type pc_transition(const zkevm_circuit_type &zkevm_circuit) override {
+                constraint_type c;
+                return c;
+            }
         };
     }   // namespace blueprint
 }   // namespace nil

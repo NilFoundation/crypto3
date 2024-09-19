@@ -662,6 +662,13 @@ namespace nil {
                         assignment.witness(witness_cols[i + chunk_amount], curr_row + 6) = q_out_chunks[i];
                     }
                 }
+
+                // Just for testing. May be removed or commented
+                if(is_div){
+                    BOOST_ASSERT(result == std::get<0>(eth_signed_div(a, b)));
+                } else {
+                    BOOST_ASSERT(result == std::get<1>(eth_signed_div(a, b)));
+                }
                 // stack.push(b_input);
                 // stack.push(a);
                 stack.push(result);

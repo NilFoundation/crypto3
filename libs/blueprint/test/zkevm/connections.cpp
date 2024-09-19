@@ -254,14 +254,12 @@ void test_zkevm(std::string path){
         memory = memory_next;
     }
 
-    using value_type = typename BlueprintFieldType::value_type;
-    using var = typename nil::crypto3::zk::snark::plonk_variable<value_type>;
     zkevm_table.finalize_test();
 
-    std::ofstream myfile;
-    myfile.open("test_assignment.txt");
-    assignment.export_table(myfile);
-    myfile.close();
+//  std::ofstream myfile;
+//    myfile.open("test_assignment.txt");
+//    assignment.export_table(myfile);
+//    myfile.close();
 
     // assignment.export_table(std::cout);
     // circuit.export_circuit(std::cout);

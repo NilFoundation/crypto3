@@ -692,7 +692,7 @@ namespace nil {
 
                 middle_constraints.push_back(stack_size_transitions);
                 middle_constraints.push_back(pc_transitions);
-                //middle_constraints.push_back(gas_transitions);
+                middle_constraints.push_back(gas_transitions);
 
                 for(const auto c : virtual_selector) {
                     constraint_type constraint = constraint_list[c.first];

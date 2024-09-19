@@ -380,6 +380,11 @@ namespace nil {
 
                 // stack.push(b);
                 // stack.push(a);
+                // TODO: Just for testing purposes. May be removed or commented.
+                if( is_div)
+                    BOOST_ASSERT(result == std::get<0>(eth_div(a,b)));
+                else
+                    BOOST_ASSERT(result == std::get<1>(eth_div(a,b)));
                 stack.push(result);
             }
 

@@ -33,7 +33,7 @@
 #include <nil/blueprint/blueprint/plonk/circuit.hpp>
 #include <nil/blueprint/blueprint/plonk/assignment.hpp>
 
-#include <nil/blueprint/zkevm/zkevm_circuit.hpp>
+#include <nil/blueprint/zkevm/zkevm_table.hpp>
 #include "../opcode_tester.hpp"
 
 using namespace nil::blueprint;
@@ -50,14 +50,16 @@ BOOST_AUTO_TEST_CASE(zkevm_iszero_test) {
     using zkevm_machine_type = zkevm_machine_interface;
     assignment_type assignment(0, 0, 0, 0);
     circuit_type circuit;
-    zkevm_circuit<field_type> zkevm_circuit(assignment, circuit);
+    zkevm_circuit<field_type> zkevm_circuit(assignment, circuit, 25);
+    zkevm_table<field_type> zkevm_table(zkevm_circuit, assignment);
     zkevm_machine_type machine = get_empty_machine();
-    zkevm_circuit.assign_opcode(zkevm_opcode::PUSH32, machine, 1234567890);
-    zkevm_circuit.assign_opcode(zkevm_opcode::ISZERO, machine);
-    zkevm_circuit.assign_opcode(zkevm_opcode::PUSH32, machine, 0);
-    zkevm_circuit.assign_opcode(zkevm_opcode::ISZERO, machine);
-    zkevm_circuit.assign_opcode(zkevm_opcode::RETURN, machine);
-    zkevm_circuit.finalize_test();
+
+    machine.apply_opcode(zkevm_opcode::PUSH32, 1234567890); zkevm_table.assign_opcode(machine);
+    machine.apply_opcode(zkevm_opcode::ISZERO); zkevm_table.assign_opcode(machine);
+    machine.apply_opcode(zkevm_opcode::PUSH32, 0); zkevm_table.assign_opcode(machine);
+    machine.apply_opcode(zkevm_opcode::ISZERO); zkevm_table.assign_opcode(machine);
+    machine.apply_opcode(zkevm_opcode::RETURN); zkevm_table.assign_opcode(machine);
+    zkevm_table.finalize_test();
     // assignment.export_table(std::cout);
     // circuit.export_circuit(std::cout);
     nil::crypto3::zk::snark::basic_padding(assignment);

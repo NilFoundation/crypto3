@@ -140,5 +140,48 @@ namespace nil {
             result[1] = w_lo;
             return result;
         }
+
+        // Return a/b, a%b
+        std::pair<zkevm_word_type, zkevm_word_type> eth_div(const zkevm_word_type &a, const zkevm_word_type &b){
+            using integral_type = boost::multiprecision::number < boost::multiprecision::backends::cpp_int_modular_backend<257>>;
+            integral_type r_integral = b != 0u ? integral_type(a) / integral_type(b) : 0u;
+            zkevm_word_type r = zkevm_word_type::backend_type(r_integral.backend());
+            zkevm_word_type q = b != 0u ? a % b : 0;
+            return {r, q};
+        }
+
+        bool is_negative(zkevm_word_type x){
+            using integral_type = boost::multiprecision::number < boost::multiprecision::backends::cpp_int_modular_backend<257>>;
+            return (integral_type(x) > zkevm_modulus/2 - 1);
+        }
+
+        zkevm_word_type negate_word(zkevm_word_type x){
+            using integral_type = boost::multiprecision::number < boost::multiprecision::backends::cpp_int_modular_backend<257>>;
+            return zkevm_word_type(zkevm_modulus - integral_type(x));
+        }
+
+        zkevm_word_type abs_word(zkevm_word_type x){
+            using integral_type = boost::multiprecision::number < boost::multiprecision::backends::cpp_int_modular_backend<257>>;
+            return is_negative(x)? negate_word(x) : x;
+        }
+
+        // Return a/b, a%b
+        std::pair<zkevm_word_type, zkevm_word_type> eth_signed_div(const zkevm_word_type &a, const zkevm_word_type &b_input){
+            using integral_type = boost::multiprecision::number < boost::multiprecision::backends::cpp_int_modular_backend<257>>;
+
+            zkevm_word_type b = (integral_type(a) == zkevm_modulus - 1) && (integral_type(b_input) == zkevm_modulus/2) ? 1 : b_input;
+            zkevm_word_type a_abs = abs_word(a),
+                        b_abs = abs_word(b);
+
+            integral_type r_integral = (b != 0u)? integral_type(a_abs) / integral_type(b_abs) : 0u;
+            zkevm_word_type r_abs = zkevm_word_type::backend_type(r_integral.backend()),
+                        q_abs = b != 0u ? a_abs % b_abs : a_abs,
+                        r = (is_negative(a) == is_negative(b)) ? r_abs : negate_word(r_abs),
+                        q = is_negative(a)? negate_word(q_abs) : q_abs;
+
+            zkevm_word_type q_out = b != 0u ? q : 0; // according to EVM spec a % 0 = 0
+
+            return {r, q_out};
+        }
     }   // namespace blueprint
 }   // namespace nil

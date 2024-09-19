@@ -165,6 +165,8 @@ namespace nil {
                     }
                 }
                 curr_row += opcode_it->second->rows_amount() + opcode_it->second->rows_amount() % 2;
+                if( curr_row - circuit.get_start_row_index() > circuit.get_max_rows() )
+                    std::cout << "Curr_row = " << curr_row << " max_rows = " <<  circuit.get_max_rows()  << std::endl;
                 BOOST_ASSERT(curr_row - circuit.get_start_row_index() < circuit.get_max_rows());
             }
 

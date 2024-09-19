@@ -48,11 +48,13 @@ BOOST_AUTO_TEST_CASE(zkevm_err0_test_1) {
     using zkevm_machine_type = zkevm_machine_interface;
     assignment_type assignment(0, 0, 0, 0);
     circuit_type circuit;
-    zkevm_circuit<field_type> zkevm_circuit(assignment, circuit);
-    zkevm_machine_type machine = get_empty_machine(128128); // initial gas amount
+    zkevm_circuit<field_type> zkevm_circuit(assignment, circuit, 15);
+    zkevm_table<field_type> zkevm_table(zkevm_circuit, assignment);
+    zkevm_machine_type machine = get_empty_machine();
+
     // produce a not-enough-values-on-stack error
-    zkevm_circuit.assign_opcode(zkevm_opcode::err0, machine, zkevm_circuit.get_opcodes_info().get_opcode_number(zkevm_opcode::ADD));
-    zkevm_circuit.finalize_test();
+    machine.apply_opcode(zkevm_opcode::err0, zkevm_circuit.get_opcodes_info().get_opcode_number(zkevm_opcode::ADD)); zkevm_table.assign_opcode(machine);
+    zkevm_table.finalize_test();
 /*
     std::ofstream myfile;
     myfile.open("test_assignment_err1.txt");
@@ -73,14 +75,15 @@ BOOST_AUTO_TEST_CASE(zkevm_err0_test_2) {
     using zkevm_machine_type = zkevm_machine_interface;
     assignment_type assignment(0, 0, 0, 0);
     circuit_type circuit;
-    zkevm_circuit<field_type> zkevm_circuit(assignment, circuit);
-    zkevm_machine_type machine = get_empty_machine(7); // initial gas amount
+    zkevm_circuit<field_type> zkevm_circuit(assignment, circuit, 15);
+    zkevm_table<field_type> zkevm_table(zkevm_circuit, assignment);
+    zkevm_machine_type machine = get_empty_machine(8);
 
-    zkevm_circuit.assign_opcode(zkevm_opcode::PUSH32, machine,zwordc(0x1234567890_cppui_modular257));
-    zkevm_circuit.assign_opcode(zkevm_opcode::PUSH32, machine,zwordc(0x1b70726fb8d3a24da9ff9647225a18412b8f010425938504d73ebc8801e2e016_cppui_modular257));
+    machine.apply_opcode(zkevm_opcode::PUSH32, zwordc(0x1b70726fb8d3a24da9ff9647225a18412b8f010425938504d73ebc8801e2e016_cppui_modular257)); zkevm_table.assign_opcode(machine);
+    machine.apply_opcode(zkevm_opcode::PUSH32, zwordc(0x1b70726fb8d3a24da9ff9647225a18412b8f010425938504d73ebc8801e2e016_cppui_modular257)); zkevm_table.assign_opcode(machine);
     // produce an out-of-gas error
-    zkevm_circuit.assign_opcode(zkevm_opcode::err0, machine, zkevm_circuit.get_opcodes_info().get_opcode_number(zkevm_opcode::ADD));
-    zkevm_circuit.finalize_test();
+    machine.apply_opcode(zkevm_opcode::err0, zkevm_circuit.get_opcodes_info().get_opcode_number(zkevm_opcode::ADD)); zkevm_table.assign_opcode(machine);
+    zkevm_table.finalize_test();
 /*
     std::ofstream myfile;
     myfile.open("test_assignment_err2.txt");
