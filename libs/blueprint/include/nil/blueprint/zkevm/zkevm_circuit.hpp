@@ -141,8 +141,8 @@ namespace nil {
             zkevm_circuit(assignment_type &assignment_, circuit_type &circuit, std::size_t _max_rows = 249, std::size_t start_row_index_ = 1)
                 :assignment(assignment_), opcodes_info_instance(opcodes_info::instance()),
                  start_row_index(start_row_index_), max_rows(_max_rows),
-                 lookup_tables_indices(circuit.get_reserved_indices()
-            ){
+                 lookup_tables_indices(circuit.get_reserved_indices())
+            {
                 columns_manager_type col_manager(assignment); // Just helps us to deal with assignment table columns
 
                 // 5(?) constant columns. I'm not sure we really need them: satisfiability check passes even without them
@@ -608,16 +608,6 @@ namespace nil {
                         opcode_selector_constraint(opcode_num) * ( state.row_counter() - adj_opcode_height + 1);
                     // ^^^ curr_opt_constraint is in _odd_ version because it's applied
                     // at row with internal number adj_opcode_height-1, that always odd
-
-                    // save constraints to ensure correct updates of remaining gas NB: only static costs now! TODO: include dynamic costs
-                    // TODO: Done for each opcode individually
-                    // Static case will be hardcoded in zkevm_operatoin
-                    /*if( !opcodes_info_instance.is_opcode_dynamic(opcode_it.first) ) {
-                        gas_transitions += curr_opt_constraint_even * (state.gas
-                            - opcodes_info_instance.get_opcode_cost(opcode_it.first)
-                            - state.gas.next());
-                    }*/
-                    // curr_opt_constraint is in _even_ version because it's applied at row with internal number 0
 
                     auto opcode_gates = opcode_it.second->generate_gates(*this);
                     for (auto gate_it : opcode_gates) {

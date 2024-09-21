@@ -59,6 +59,10 @@ namespace nil {
 
                 using var = crypto3::zk::snark::plonk_variable<typename BlueprintFieldType::value_type>;
 
+                const witness_container_type &W() const{
+                    return _W;
+                }
+
                 /**
                  * Get Witness column global index by its internal index.
                  *

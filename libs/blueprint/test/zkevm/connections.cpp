@@ -212,9 +212,9 @@ void test_zkevm(std::string path){
 
     // using field_type = fields::goldilocks64;
     using field_type = BlueprintFieldType;
-    using arithmentization_type = nil::crypto3::zk::snark::plonk_constraint_system<field_type>;
-    using assignment_type = assignment<arithmentization_type>;
-    using circuit_type = circuit<arithmentization_type>;
+    using arithmetization_type = nil::crypto3::zk::snark::plonk_constraint_system<field_type>;
+    using assignment_type = assignment<arithmetization_type>;
+    using circuit_type = circuit<arithmetization_type>;
     using zkevm_machine_type = zkevm_machine_interface;
     assignment_type assignment(0, 0, 0, 0);
     circuit_type circuit;

@@ -37,6 +37,9 @@
 #include <nil/blueprint/components/hashes/keccak/util.hpp>
 #include <nil/blueprint/components/hashes/keccak/keccak_round.hpp>
 
+#include <nil/crypto3/hash/type_traits.hpp>
+#include <nil/crypto3/hash/algorithm/hash.hpp>
+
 namespace nil {
     namespace blueprint {
         namespace components {
@@ -51,6 +54,7 @@ namespace nil {
                 using component_type = plonk_component<BlueprintFieldType>;
                 using var = typename component_type::var;
                 using manifest_type = plonk_component_manifest;
+                using value_type = typename BlueprintFieldType::value_type;
 
                 std::size_t max_blocks;
 
@@ -60,11 +64,31 @@ namespace nil {
                     var hash_lo;
                     var RLC;
 
+                    keccak_table_map(const std::vector<std::uint32_t> witnesses){
+                        is_last = var(witnesses[0], 0);
+                        RLC = var(witnesses[1], 0);
+                        hash_hi = var(witnesses[2], 0);
+                        hash_lo = var(witnesses[3], 0);
+                    }
+
                     keccak_table_map(const keccak_table &component){
                         is_last = var(component.W(0), 0);
                         RLC = var(component.W(1), 0);
                         hash_hi = var(component.W(2), 0);
                         hash_lo = var(component.W(3), 0);
+                    }
+
+                    std::vector<std::uint32_t> witnesses(){
+                        return {
+                            std::uint32_t(is_last.index),
+                            std::uint32_t(RLC.index),
+                            std::uint32_t(hash_hi.index),
+                            std::uint32_t(hash_lo.index)
+                        };
+                    }
+
+                    std::size_t witness_amount() const {
+                        return 4;
                     }
                 };
 
@@ -97,17 +121,44 @@ namespace nil {
                 std::size_t rows_amount = max_blocks;
 
                 struct input_type {
-                    var rlc_challenge;
-                    std::vector<std::tuple<
+                    using data_item = std::pair<
                         std::vector<std::uint8_t>,
                         std::pair<typename BlueprintFieldType::value_type, typename BlueprintFieldType::value_type>
-                    >> input;
+                    >;
+                    using data_type = std::vector<data_item>;
+
+                    var rlc_challenge;
+
+                    input_type(){}
+
+                    input_type(var _rlc_challenge):rlc_challenge(_rlc_challenge){}
 
                     std::vector<std::reference_wrapper<var>> all_vars() {
                         std::vector<std::reference_wrapper<var>> res;
                         res.push_back(rlc_challenge);
                         return res;
                     }
+
+                    void fill_data(const data_type& _input){
+                        input = _input;
+                    }
+
+                    void new_buffer(const data_item &_pair){
+                        input.push_back(_pair);
+                    }
+
+                    void new_buffer(const std::vector<std::uint8_t> buffer){
+                        nil::crypto3::hashes::keccak_1600<256>::digest_type d = nil::crypto3::hash<nil::crypto3::hashes::keccak_1600<256>>(buffer);
+                        nil::crypto3::algebra::fields::field<256>::integral_type n(d);
+                        std::pair<value_type, value_type> hash_value;
+
+                        hash_value.first = (n & 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF00000000000000000000000000000000_cppui_modular257) >> 128;
+                        hash_value.second = n & 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF_cppui_modular257;
+
+                        input.push_back({buffer, hash_value});
+                    }
+
+                    data_type input;
                 };
 
                 struct result_type {
@@ -155,9 +206,11 @@ namespace nil {
                     &instance_input,
                 const std::uint32_t start_row_index
             ) {
+                std::cout << "Keccak table generate assignments" << std::endl;
                 using component_type = plonk_keccak_table<BlueprintFieldType>;
                 using value_type = typename BlueprintFieldType::value_type;
 
+                std::cout << instance_input.rlc_challenge << std::endl;
                 value_type theta = var_value(assignment, instance_input.rlc_challenge);
                 std::size_t input_idx = 0;
                 std::size_t block_counter = 0;
@@ -206,10 +259,12 @@ namespace nil {
             ) {
                 using component_type = plonk_keccak_table<BlueprintFieldType>;
                 using var = typename component_type::var;
+                std::cout << "Keccak table generate circuit" << std::endl;
 
                 bp.register_dynamic_table("keccak_table");
                 std::size_t selector_index = bp.get_dynamic_lookup_table_selector();
                 assignment.enable_selector(selector_index, start_row_index, start_row_index + component.rows_amount - 1);
+                std::cout << "Keccak table selector index " << selector_index << std::endl;
 
                 crypto3::zk::snark::plonk_lookup_table<BlueprintFieldType> keccak_table;
                 typename component_type::keccak_table_map t(component);
