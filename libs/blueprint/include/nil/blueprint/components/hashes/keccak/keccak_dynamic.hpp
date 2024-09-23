@@ -37,6 +37,8 @@
 #include <nil/blueprint/components/hashes/keccak/util.hpp>
 #include <nil/blueprint/components/hashes/keccak/keccak_round.hpp>
 
+
+
 namespace nil {
     namespace blueprint {
         namespace components {
@@ -867,8 +869,8 @@ namespace nil {
                         hash = std::get<1>(instance_input.input[input_idx]);
                         input_idx++;
                     } else {
-                        msg = {0};
-                        hash = {0xbc36789e7a1e281436464229828f817d_cppui_modular254, 0x6612f7b477d66591ff96a9e064bcc98a_cppui_modular254};
+                        msg = {};
+                        hash = keccak_component_hash<BlueprintFieldType>(msg);
                     }
                     auto padded_msg = msg;
                     padded_msg.push_back(1);

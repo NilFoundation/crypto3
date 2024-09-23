@@ -71,10 +71,13 @@ namespace nil {
             state_var stack_size;
             state_var memory_size;
             state_var gas;
-            state_var opcode;
+            state_var opcode;               // it's Id in the list of used opcodes
+            state_var real_opcode;          // real_opcode is real opcode that will be looked up in bytecode table
+            state_var bytecode_hash_hi;     // will be looked up in bytecode table
+            state_var bytecode_hash_lo;     // will be lookup up in bytecode table
 
-            state_var row_counter;           // Decreasing row counter
-            state_var step_start;             // 1 in first line of new opcode, 0 otherwise
+            state_var row_counter;          // Decreasing row counter
+            state_var step_start;           // 1 in first line of new opcode, 0 otherwise
             state_var row_counter_inv;
             state_var last_row_indicator;   // Do we really need it? I don't think so. Last opcode should be RETURN, err or padding.
             state_var opcode_parity;        // opcode%2

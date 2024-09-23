@@ -47,6 +47,15 @@ using namespace nil::crypto3::algebra;
 // We have bytecode -- so can generate bytecode circuit
 // And then check connections
 
+std::vector<std::uint8_t> hex_string_to_bytes(std::string const &hex_string) {
+    std::vector<std::uint8_t> bytes;
+    for (std::size_t i = 2; i < hex_string.size(); i += 2) {
+        std::string byte_string = hex_string.substr(i, 2);
+        bytes.push_back(std::stoi(byte_string, nullptr, 16));
+    }
+    return bytes;
+}
+
 zkevm_opcode  opcode_from_str(const std::string &str){
     if(str == "STOP")  return zkevm_opcode::STOP; else
     if(str == "ADD")  return zkevm_opcode::ADD; else
@@ -210,6 +219,12 @@ void test_zkevm(std::string path){
     boost::property_tree::read_json(ss, trace);
     ss.close();
 
+    ss.open(path + "/contract0.json");
+    boost::property_tree::ptree bytecode_json;
+    boost::property_tree::read_json(ss, bytecode_json);
+    std::vector<uint8_t> bytecode0 = hex_string_to_bytes(std::string(bytecode_json.get_child("bytecode").data().c_str()));
+    ss.close();
+
     // using field_type = fields::goldilocks64;
     using field_type = BlueprintFieldType;
     using arithmetization_type = nil::crypto3::zk::snark::plonk_constraint_system<field_type>;
@@ -218,9 +233,28 @@ void test_zkevm(std::string path){
     using zkevm_machine_type = zkevm_machine_interface;
     assignment_type assignment(0, 0, 0, 0);
     circuit_type circuit;
-    zkevm_circuit<field_type> zkevm_circuit(assignment, circuit, 499);
-    zkevm_table<field_type> zkevm_table(zkevm_circuit, assignment);
-    zkevm_machine_type machine = get_empty_machine();
+    zkevm_circuit<field_type> evm_circuit(assignment, circuit, 499, 300);
+    zkevm_table<field_type> evm_table(evm_circuit, assignment);
+
+    zkevm_machine_type machine = get_empty_machine(zkevm_keccak_hash(bytecode0));
+
+    // First constant column is for even rows.
+    std::vector<size_t> lookup_columns_indices;
+    std::cout << "Constants amount = " <<  assignment.constants_amount() << std::endl;
+    for(std::size_t i = 1; i < assignment.constants_amount(); i++) {
+        lookup_columns_indices.push_back(i);
+    }
+
+    nil::crypto3::zk::snark::pack_lookup_tables_horizontal(
+        circuit.get_reserved_indices(),
+        circuit.get_reserved_tables(),
+        circuit.get_reserved_dynamic_tables(),
+        circuit, assignment,
+        lookup_columns_indices,
+        3,
+        assignment.rows_amount(),
+        65536
+    );
 
     boost::property_tree::ptree ptrace = trace.get_child("result.structLogs");
     std::cout << "PT = " << ptrace.size() << std::endl;
@@ -247,14 +281,17 @@ void test_zkevm(std::string path){
             atoi(it->second.get_child("pc").data().c_str()),
             opcode_str.substr(0,4) == "PUSH"? stack_next[stack_next.size() - 1]: 0
         );
-        zkevm_table.assign_opcode(machine);
+        evm_table.assign_opcode(machine);
 
         storage = storage_next;
         stack = stack_next;
         memory = memory_next;
     }
 
-    zkevm_table.finalize_test();
+    typename zkevm_circuit<field_type>::bytecode_table_component::input_type bytecode_input;
+    bytecode_input.new_bytecode(bytecode0);
+
+    evm_table.finalize_test(bytecode_input);
 
 //  std::ofstream myfile;
 //    myfile.open("test_assignment.txt");

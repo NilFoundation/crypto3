@@ -102,15 +102,19 @@ namespace nil {
                 circuit(circuit_), assignment(assignment_), curr_row(circuit.get_start_row_index()){
             }
 
-            void finalize_test() {
-                finalize();
+            void finalize_test(
+                const typename zkevm_circuit<BlueprintFieldType>::bytecode_table_component::input_type &bytecode_input
+            ) {
+                finalize(bytecode_input);
                 std::cout << "Assignment rows amount = " << assignment.rows_amount() << std::endl;
             }
 
-            void finalize() {
+            void finalize(
+                const typename zkevm_circuit<BlueprintFieldType>::bytecode_table_component::input_type &bytecode_input
+            ) {
                 BOOST_ASSERT_MSG(curr_row != 0, "Row underflow in finalization");
 
-                zkevm_machine_interface empty_machine(0);
+                zkevm_machine_interface empty_machine(0, 0);
                 empty_machine.padding_state();
                 while(curr_row - circuit.get_start_row_index() < circuit.get_max_rows()-1){
                     assign_opcode(empty_machine);
@@ -121,8 +125,9 @@ namespace nil {
                     circuit.get_bytecode_witnesses()[0], circuit.get_bytecode_witnesses()[1], circuit.get_bytecode_witnesses()[2],
                     circuit.get_bytecode_witnesses()[3], circuit.get_bytecode_witnesses()[4], circuit.get_bytecode_witnesses()[5]
                 }, {}, {}, 10);
-                typename zkevm_circuit<BlueprintFieldType>::bytecode_table_component::input_type input({},{});// Add input variables
-                generate_assignments(bytecode_table, assignment, input, 0);
+
+                std::cout << "Assign bytecode_table" << std::endl;
+                generate_assignments(bytecode_table, assignment, bytecode_input, 0);
             }
 
             void assign_opcode(zkevm_machine_interface &machine) {
@@ -201,6 +206,10 @@ namespace nil {
                 std::size_t opcode_half = ((opcode_num % 4 == 3) || (opcode_num % 4 == 2));
                 for (std::size_t i = 0; i < opcode_height; i++) {
                     assignment.witness(state.opcode.index, local_row) = opcode_num;
+                    assignment.witness(state.real_opcode.index, local_row) = opcodes_info_instance.get_opcode_value(opcode);
+                    assignment.witness(state.bytecode_hash_hi.index, local_row) = w_hi<BlueprintFieldType>(machine.bytecode_hash);
+                    assignment.witness(state.bytecode_hash_lo.index, local_row) = w_lo<BlueprintFieldType>(machine.bytecode_hash);
+
                     if (i % 2 == opcode_half) {
                         components::generate_assignments(*circuit.get_opcode_selector(), assignment, {opcode_num/4}, local_row);
                     }

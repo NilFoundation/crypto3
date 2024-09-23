@@ -138,18 +138,12 @@ namespace nil {
             using var = typename crypto3::zk::snark::plonk_variable<value_type>;
             using bytecode_table_component = typename components::plonk_zkevm_bytecode_table<BlueprintFieldType>;
 
-            zkevm_circuit(assignment_type &assignment_, circuit_type &circuit, std::size_t _max_rows = 249, std::size_t start_row_index_ = 1)
+            zkevm_circuit(assignment_type &assignment_, circuit_type &circuit, std::size_t _max_rows = 249, std::size_t _max_bytecode_size = 100, std::size_t start_row_index_ = 1)
                 :assignment(assignment_), opcodes_info_instance(opcodes_info::instance()),
-                 start_row_index(start_row_index_), max_rows(_max_rows),
+                 start_row_index(start_row_index_), max_rows(_max_rows), max_bytecode_size(_max_bytecode_size),
                  lookup_tables_indices(circuit.get_reserved_indices())
             {
                 columns_manager_type col_manager(assignment); // Just helps us to deal with assignment table columns
-
-                // 5(?) constant columns. I'm not sure we really need them: satisfiability check passes even without them
-                // We really need them to run lookup argument. Should be removed when we'll use logUp.
-                for(std::size_t i = 0; i < 5; i++) {
-                    col_manager.allocate_constant_column();
-                }
 
                 for (auto &lookup_table : zkevm_circuit_lookup_tables()) {
                     if( lookup_table.second == 0 ){
@@ -167,17 +161,23 @@ namespace nil {
                 init_state(col_manager);
                 init_opcodes(circuit, col_manager);
 
+                // 5(?) constant columns. I'm not sure we really need them: satisfiability check passes even without them
+                // We really need them to run lookup argument. Should be removed when we'll use logUp.
+                for(std::size_t i = 0; i < 6; i++) {
+                    col_manager.allocate_constant_column();
+                }
+
                 col_manager.allocate_selector_column();
                 col_manager.allocate_selector_column();
-                assignment.resize_selectors(assignment.selectors_amount() + 2 + dynamic_tables_amount); // for lookup table packing
+                assignment.resize_selectors(assignment.selectors_amount() + 9 + dynamic_tables_amount); // for lookup table packing
 
                 allocate_dynamic_tables_columns(col_manager);
                 // Add for dynamic lookup tables for the constraint system
                 bytecode_table_component bytecode_table({
                     bytecode_witnesses[0], bytecode_witnesses[1], bytecode_witnesses[2],
                     bytecode_witnesses[3], bytecode_witnesses[4], bytecode_witnesses[5]
-                }, {}, {}, 10);
-                typename bytecode_table_component::input_type input({},{});// Add input variables
+                }, {}, {}, max_bytecode_size);
+                typename bytecode_table_component::input_type input;// Add input variables
 
                 col_manager.allocate_selector_column(); // Bytecode_table needs only one selector
                 generate_circuit(bytecode_table, circuit, assignment, input, 0);
@@ -313,12 +313,15 @@ namespace nil {
                 state.stack_size = typename zkevm_state_type::state_var(col_manager.allocate_witness_column());
                 state.memory_size = typename zkevm_state_type::state_var(col_manager.allocate_witness_column());
                 state.gas = typename zkevm_state_type::state_var(col_manager.allocate_witness_column());
+                state.opcode = typename zkevm_state_type::state_var(col_manager.allocate_witness_column());
+                state.real_opcode = typename zkevm_state_type::state_var(col_manager.allocate_witness_column());
+                state.bytecode_hash_hi = typename zkevm_state_type::state_var(col_manager.allocate_witness_column());
+                state.bytecode_hash_lo = typename zkevm_state_type::state_var(col_manager.allocate_witness_column());
 
                 state.row_counter = typename zkevm_state_type::state_var(col_manager.allocate_witness_column());
                 state.row_counter_inv = typename zkevm_state_type::state_var(col_manager.allocate_witness_column());
                 state.step_start = typename zkevm_state_type::state_var(col_manager.allocate_witness_column());
                 //state.last_row_indicator = typename zkevm_state_type::state_var(col_manager.allocate_witness_column());
-                state.opcode = typename zkevm_state_type::state_var(col_manager.allocate_witness_column());
                 state.opcode_parity = typename zkevm_state_type::state_var(col_manager.allocate_witness_column());
                 state.is_even = typename zkevm_state_type::state_var(col_manager.allocate_constant_column(), var::column_type::constant);
             }
@@ -484,6 +487,9 @@ namespace nil {
                 opcodes[zkevm_opcode::padding] = std::make_shared<zkevm_padding_operation<BlueprintFieldType>>();
 
                 const std::size_t range_check_table_index = circuit.get_reserved_indices().at("chunk_16_bits/full");
+                const std::size_t bytecode_table_index = circuit.get_reserved_indices().at("zkevm_bytecode");
+                std::cout << "Range check table index = " << range_check_table_index << std::endl;
+                std::cout << "Bytecode table index = " << bytecode_table_index << std::endl;
 
                 std::vector<constraint_type> middle_constraints;
                 std::vector<constraint_type> first_constraints;
@@ -583,6 +589,7 @@ namespace nil {
                 constraint_type stack_size_transitions;
                 constraint_type memory_size_transitions;
                 constraint_type gas_transitions;
+                constraint_type bytecode_lookup_dynamic_selector;
 
                 for (auto opcode_it : opcodes) {
                     if( opcode_it.second->stack_input != opcodes_info_instance.get_opcode_stack_input(opcode_it.first))
@@ -601,6 +608,7 @@ namespace nil {
                     std::size_t adj_opcode_height = opcode_height + (opcode_height % 2);
 
                     std::size_t opcode_num = opcodes_info_instance.get_opcode_number(opcode_it.first);
+                    std::size_t opcode_byte = opcodes_info_instance.get_opcode_value(opcode_it.first);
 
                     // save constraints to ensure later that internal row number has proper value at the start of the opcode
                     // We can use opcode_row_selector_constraint, but it has similar degree.
@@ -672,6 +680,7 @@ namespace nil {
                                 BOOST_ASSERT("Unknown gate class");
                         }
                     }
+                    if( opcode_byte < 256 ) bytecode_lookup_dynamic_selector += opcode_selector_constraint(opcode_num);
                     gas_transitions += opcode_row_selector_constraint(opcode_num, 0) * opcode_it.second->gas_transition(*this);
                     pc_transitions += opcode_row_selector_constraint(opcode_num, 0) * opcode_it.second->pc_transition(*this);
                     stack_size_transitions += opcode_row_selector_constraint(opcode_num, 0) * opcode_it.second->stack_size_transition(*this);
@@ -688,6 +697,20 @@ namespace nil {
                     constraint_type constraint = constraint_list[c.first];
                     middle_constraints.push_back(constraint * c.second);
                 }
+
+                middle_lookup_constraints.push_back(
+                    {
+                        bytecode_table_index,
+                        {
+                            bytecode_lookup_dynamic_selector,
+                            bytecode_lookup_dynamic_selector * state.pc(),
+                            bytecode_lookup_dynamic_selector * state.real_opcode(),
+                            bytecode_lookup_dynamic_selector,
+                            bytecode_lookup_dynamic_selector * state.bytecode_hash_hi(),
+                            bytecode_lookup_dynamic_selector * state.bytecode_hash_lo()
+                        }
+                    }
+                );
 
                 middle_selector = circuit.add_gate(middle_constraints);
                 circuit.add_lookup_gate(middle_selector, middle_lookup_constraints);
@@ -725,6 +748,7 @@ namespace nil {
             std::map<zkevm_opcode, std::shared_ptr<zkevm_operation<BlueprintFieldType>>> opcodes;
             // start and end rows for the circuit; both have to be fixed
             std::size_t max_rows; // Should be odd number because all opcodes has even rows amount and last row is also used by last_row selector
+            std::size_t max_bytecode_size; // For correct connection with bytecode circuit
             std::size_t start_row_index;
             std::size_t end_row_index;
             typename lookup_library<BlueprintFieldType>::left_reserved_type lookup_tables_indices;

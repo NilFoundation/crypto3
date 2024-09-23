@@ -342,13 +342,17 @@ namespace nil {
                 };
                 std::size_t selector_id = bp.get_dynamic_table_definition("zkevm_bytecode")->lookup_table.tag_index;
 
+                // TODO: review after lookup argument update
+                // It may be jsut constant for the fixed curve
+                auto zerohash = keccak_component_hash<BlueprintFieldType>({});
+
                 lookup_constraint_type hash_table_constraint = {
                     lookup_tables_indices.at("keccak_table"),
                     {
-                        m.tag() * (1 - m.tag.next()),
-                        m.tag() * (1 - m.tag.next()) * m.value_rlc() + (1 - m.tag() * (1 - m.tag.next())) *  0x109057df9cba2ae4cc6f2c8c33de834267af65e2b2ea38088d571b0c4e5fcb5c_cppui_modular257,
-                        m.tag() * (1 - m.tag.next()) * m.hash_hi() + (1 - m.tag() * (1 - m.tag.next())) *  0x97cea80fc2260ca27ded02e6d09f19a3_cppui_modular257,
-                        m.tag() * (1 - m.tag.next()) * m.hash_lo() + (1 - m.tag() * (1 - m.tag.next())) *  0x9853f3bc764790709249eb48cc9375fd_cppui_modular257
+                        m.tag() + 1 - m.tag(), // TODO: update math::expression constructor with constant parameter
+                        m.tag() * (1 - m.tag.next()) * m.value_rlc(),
+                        m.tag() * (1 - m.tag.next()) * m.hash_hi() + (1 - m.tag() * (1 - m.tag.next())) * zerohash.first,
+                        m.tag() * (1 - m.tag.next()) * m.hash_lo() + (1 - m.tag() * (1 - m.tag.next())) * zerohash.second
                     }
                 };
 

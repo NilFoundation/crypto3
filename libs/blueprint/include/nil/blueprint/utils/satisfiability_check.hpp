@@ -74,17 +74,16 @@ namespace nil {
             const assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &assignments,
             std::size_t table_id
         ){
-            std::cout << "Load dynamic lookup" << std::endl;
             std::set<std::vector<typename BlueprintFieldType::value_type>> result;
-            BOOST_ASSERT(table_id < bp.lookup_tables().size());
+            if( table_id > bp.lookup_tables().size() )
+                std::cout << table_id << " >= " << bp.lookup_tables().size() << std::endl;
+            BOOST_ASSERT(table_id <= bp.lookup_tables().size());
             auto &table = bp.lookup_tables()[table_id-1];
 
-            std::cout << "Table found" << table.tag_index << std::endl;
             crypto3::zk::snark::plonk_column<BlueprintFieldType> selector =
                 assignments.crypto3::zk::snark::
                     template plonk_assignment_table<BlueprintFieldType>::selector(table.tag_index);
 
-            std::cout << "Selector found" << std::endl;
             for( std::size_t selector_row = 0; selector_row < assignments.rows_amount(); selector_row++ ){
                 if( selector_row < selector.size() && !selector[selector_row].is_zero() ){
                     for( std::size_t op = 0; op < table.lookup_options.size(); op++){
@@ -98,7 +97,6 @@ namespace nil {
                 }
             }
 
-            std::cout << "Dynamic lookup loaded" << std::endl;
             return result;
         }
 
@@ -121,7 +119,6 @@ namespace nil {
             std::map<std::string, std::set<std::vector<typename BlueprintFieldType::value_type>>> used_dynamic_tables;
 
             for (const auto& i : used_gates) {
-                std::cout << "Gate " << i << std::endl;
                 crypto3::zk::snark::plonk_column<BlueprintFieldType> selector =
                     assignments.crypto3::zk::snark::
                         template plonk_assignment_table<BlueprintFieldType>::selector(
@@ -158,7 +155,6 @@ namespace nil {
             }
 
             for (const auto& i : used_lookup_gates) {
-                std::cout << "Lookup gate " << i << std::endl;
                 crypto3::zk::snark::plonk_column<BlueprintFieldType> selector =
                     assignments.crypto3::zk::snark::
                         template plonk_assignment_table<BlueprintFieldType>::selector(
@@ -166,7 +162,6 @@ namespace nil {
 
                 for (const auto& selector_row : selector_rows) {
                     if (selector_row < selector.size() && !selector[selector_row].is_zero()) {
-                        std::cout << "Selected row " << selector_row << std::endl;
                         for (std::size_t j = 0; j < lookup_gates[i].constraints.size(); j++) {
                             std::vector<typename BlueprintFieldType::value_type> input_values;
                             input_values.reserve(lookup_gates[i].constraints[j].lookup_input.size());
@@ -174,9 +169,9 @@ namespace nil {
                                 input_values.emplace_back(lookup_gates[i].constraints[j].lookup_input[k].evaluate(
                                     selector_row, assignments));
                             }
+
                             const auto table_name =
                                 bp.get_reserved_indices_right().at(lookup_gates[i].constraints[j].table_id);
-                            std::cout << table_name << std::endl;
                             try {
                                 if( bp.get_reserved_dynamic_tables().find(table_name) != bp.get_reserved_dynamic_tables().end() ){
                                     if( used_dynamic_tables.find(table_name) == used_dynamic_tables.end()){

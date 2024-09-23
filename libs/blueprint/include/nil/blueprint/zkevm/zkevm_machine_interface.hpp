@@ -39,7 +39,10 @@ namespace nil {
         public:
             using word_type = zkevm_word_type;
 
-            zkevm_machine_interface(unsigned long int _init_gas) : gas(_init_gas), pc(0), opcode_added(false) {
+            zkevm_machine_interface(
+                word_type         _bytecode_hash,
+                unsigned long int _init_gas
+            ) : bytecode_hash(_bytecode_hash), gas(_init_gas), pc(0), opcode_added(false) {
             }
 
             // It is not a part of an interface. Real machine will really run here.
@@ -432,6 +435,7 @@ namespace nil {
             std::size_t gas;
             std::size_t pc;
             word_type   additional_input;
+            word_type   bytecode_hash;
 
         private:
             bool opcode_added;

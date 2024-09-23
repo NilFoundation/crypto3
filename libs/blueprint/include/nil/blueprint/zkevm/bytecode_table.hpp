@@ -163,28 +163,7 @@ namespace nil {
                         return result;
                     }
                 };
-/*
-                template<typename ContainerType>
-                explicit zkevm_bytecode_table(ContainerType witness, std::size_t _max_bytecode_size) :
-                    component_type(witness, {}, {}, get_manifest()), max_bytecode_size(_max_bytecode_size)
-                    {};
 
-                template<typename WitnessContainerType, typename ConstantContainerType,
-                         typename PublicInputContainerType>
-                zkevm_bytecode_table(WitnessContainerType witness, ConstantContainerType constant,
-                    PublicInputContainerType public_input,
-                    std::size_t _max_bytecode_size
-                ) : component_type(witness, constant, public_input, get_manifest()), max_bytecode_size(_max_bytecode_size) {};
-
-                zkevm_bytecode_table(
-                    std::initializer_list<typename component_type::witness_container_type::value_type> witnesses,
-                    std::initializer_list<typename component_type::constant_container_type::value_type>
-                        constants,
-                    std::initializer_list<typename component_type::public_input_container_type::value_type>
-                        public_inputs,
-                    std::size_t _max_bytecode_size
-                ) : component_type(witnesses, constants, public_inputs, get_manifest()), max_bytecode_size(_max_bytecode_size){};
-*/
                 zkevm_bytecode_table(
                     const typename component_type::witness_container_type  &witnesses,
                     const typename component_type::constant_container_type &constants,
@@ -269,7 +248,6 @@ namespace nil {
 
                 std::size_t selector_index = bp.get_dynamic_lookup_table_selector();
                 assignment.enable_selector(selector_index, start_row_index, start_row_index + component.rows_amount - 1);
-                std::cout << "Bytecode table selector index = " << selector_index << std::endl;
 
                 crypto3::zk::snark::plonk_lookup_table<BlueprintFieldType> bytecode_table;
                 bytecode_table.tag_index = selector_index;
