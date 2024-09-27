@@ -46,12 +46,19 @@ namespace nil {
             class is_zero : public generic_component<FieldType, stage> {
                 using typename generic_component<FieldType, stage>::context_type;
                 using generic_component<FieldType, stage>::allocate;
+                using generic_component<FieldType, stage>::copy_constrain;
+                using generic_component<FieldType, stage>::constrain;
 
                 public:
                     using typename generic_component<FieldType,stage>::TYPE;
 
                 public:
-                    is_zero(context_type &context_object, TYPE input_x) : generic_component<FieldType,stage>(context_object) {
+                    TYPE input;
+                    TYPE res;
+
+                    is_zero(context_type &context_object, TYPE input_x, bool make_links = true) :
+                        generic_component<FieldType,stage>(context_object) {
+
                         TYPE X, I, R;
 
                         if constexpr (stage == GenerationStage::ASSIGNMENT) {
@@ -59,8 +66,20 @@ namespace nil {
                             I = (X == 0) ? 0 : X.inversed();
                         }
 
-                        allocate(X);
-                        allocate(I);
+                        allocate(X,0,0);
+                        allocate(I,0,2);
+
+                        if (make_links) {
+                            copy_constrain(X,input_x);
+                        }
+
+                        R = 1 - X*I;
+                        allocate(R,0,1);
+
+                        constrain(X*R);
+
+                        input = X;
+                        res = R;
                     };
             };
 

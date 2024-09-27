@@ -77,13 +77,13 @@ namespace nil {
                 }
 
                 constexpr static std::size_t get_rows_amount(std::size_t witness_amount) {
-                    return 1;
+                    return 3;
                 }
                 constexpr static std::size_t get_empty_rows_amount() {
-                    return 1;
+                    return 3;
                 }
 
-                constexpr static const std::size_t gates_amount = 0;
+                constexpr static const std::size_t gates_amount = 2;
                 const std::size_t rows_amount = get_rows_amount(this->witness_amount());
                 const std::size_t empty_rows_amount = get_empty_rows_amount();
                 const std::string component_name = "wrapper of BBF-components";
@@ -208,15 +208,39 @@ namespace nil {
                                                   nil::blueprint::bbf::GenerationStage::CIRCUIT>;
                 using Is_Zero = typename nil::blueprint::bbf::is_zero<BlueprintFieldType,
                                                   nil::blueprint::bbf::GenerationStage::CIRCUIT>;
+                using constraint_type = crypto3::zk::snark::plonk_constraint<BlueprintFieldType>;
+                using plonk_copy_constraint = crypto3::zk::snark::plonk_copy_constraint<BlueprintFieldType>;
 
                 context_type ct = context_type(assignment);
                 Is_Zero gc = Is_Zero(ct, instance_input.x);
 
+                gc.optimize_gates();
+
+                // compatibility layer: constraint list => gates & selectors
+                std::vector<std::pair<std::vector<constraint_type>, std::set<std::size_t>>> constraint_list = gc.poly_constraints();
+
+                for(const auto& [constraints, row_list] : constraint_list) {
+                    /*
+                    std::cout << "GATE:\n";
+                    for(const auto& c : constraints) {
+                        std::cout << c << "\n";
+                    }
+                    std::cout << "Rows: ";
+                    */
+                    std::size_t selector_index = bp.add_gate(constraints);
+                    for(std::size_t row_index : row_list) {
+                        // std::cout << row_index << " ";
+                        assignment.enable_selector(selector_index, row_index);
+                    }
+                    //std::cout << "\n";
+                }
+
+                // compatibility layer: copy constraint list
+                std::vector<plonk_copy_constraint> copy_constraints = gc.copy_constraints();
+                for(const auto& cc : copy_constraints) {
+                    bp.add_copy_constraint(cc);
+                }
 /*
-                std::size_t selector_index = generate_gates(component, bp, assignment, instance_input);
-
-                assignment.enable_selector(selector_index, start_row_index);
-
                 generate_copy_constraints(component, bp, assignment, instance_input, start_row_index);
 */
                 return typename plonk_bbf_wrapper<BlueprintFieldType>::result_type(
