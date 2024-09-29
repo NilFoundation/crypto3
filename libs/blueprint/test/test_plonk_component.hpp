@@ -179,7 +179,8 @@ namespace nil {
 
             static boost::random::mt19937 gen;
             static boost::random::uniform_int_distribution<> dist(0, 100);
-            std::size_t start_row = 0; //dist(gen);
+            //std::size_t start_row = 0; //dist(gen);
+            std::size_t start_row = dist(gen);
             // resize to ensure that if the component is empty by default (e.g. a component which only uses batching)
             if (start_row != 0) {
                 assignment.witness(0, start_row - 1) = 0u;
@@ -243,7 +244,7 @@ namespace nil {
                     component_result.all_vars(), start_row, rows_after_batching - start_row,
                     connectedness_check);
                 if (connectedness_check.t == blueprint::connectedness_check_type::type::NONE) {
-                    std::cout << "WARNING: Connectedness check is disabled." << std::endl;
+                    // std::cout << "WARNING: Connectedness check is disabled." << std::endl;
                 }
 
                 // Uncomment the following if you want to output a visual representation of the connectedness graph.

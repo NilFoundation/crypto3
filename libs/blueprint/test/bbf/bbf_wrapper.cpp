@@ -80,7 +80,8 @@ void test_bbf_wrapper(typename BlueprintFieldType::value_type input) { // input?
     };
 
     test_component<component_type, BlueprintFieldType, hash_type, Lambda>
-        (component_instance, desc, public_input, result_check, instance_input);
+        (component_instance, desc, public_input, result_check, instance_input, connectedness_check_type::type::NONE);
+        //(component_instance, desc, public_input, result_check, instance_input);
 }
 
 static const std::size_t random_tests_amount = 10;

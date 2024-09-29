@@ -146,56 +146,12 @@ namespace nil {
                                                   nil::blueprint::bbf::GenerationStage::ASSIGNMENT>;
                 using TYPE = typename Is_Zero::TYPE;
 
-                TYPE C = 1;
-
-                context_type ct = context_type(assignment);
+                context_type ct = context_type(assignment, 8, start_row_index); // max_rows = 8
                 Is_Zero gc = Is_Zero(ct, var_value(assignment, instance_input.x));
-/*
-                const std::size_t j = start_row_index;
 
-                assignment.witness(component.W(0), j) = var_value(assignment, instance_input.x);
-                assignment.witness(component.W(1), j) = var_value(assignment, instance_input.y);
-                assignment.witness(component.W(2), j) =
-                    var_value(assignment, instance_input.x) + var_value(assignment, instance_input.y);
-*/
                 return typename plonk_bbf_wrapper<BlueprintFieldType>::result_type(component, start_row_index);
             }
 
-/*
-            template<typename BlueprintFieldType>
-            std::size_t generate_gates(
-                const plonk_bbf_wrapper<BlueprintFieldType> &component,
-                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
-                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &assignment,
-                const typename plonk_bbf_wrapper<BlueprintFieldType>::input_type
-                    &instance_input) {
-
-                using var = typename plonk_bbf_wrapper<BlueprintFieldType>::var;
-
-                auto constraint_1 = var(component.W(0), 0) + var(component.W(1), 0) - var(component.W(2), 0);
-
-                return bp.add_gate(constraint_1);
-            }
-
-            template<typename BlueprintFieldType>
-            void generate_copy_constraints(
-                const plonk_bbf_wrapper<BlueprintFieldType> &component,
-                circuit<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>> &bp,
-                assignment<crypto3::zk::snark::plonk_constraint_system<BlueprintFieldType>>
-                    &assignment,
-                const typename plonk_bbf_wrapper<BlueprintFieldType>::input_type
-                    &instance_input,
-                const std::size_t start_row_index) {
-
-                using var = typename plonk_bbf_wrapper<BlueprintFieldType>::var;
-
-                const std::size_t j = start_row_index;
-                var component_x = var(component.W(0), static_cast<int>(j), false);
-                var component_y = var(component.W(1), static_cast<int>(j), false);
-                bp.add_copy_constraint({instance_input.x, component_x});
-                bp.add_copy_constraint({component_y, instance_input.y});
-            }
-*/
             template<typename BlueprintFieldType>
             typename plonk_bbf_wrapper<BlueprintFieldType>::result_type generate_circuit(
                 const plonk_bbf_wrapper<BlueprintFieldType>  &component,
@@ -211,7 +167,7 @@ namespace nil {
                 using constraint_type = crypto3::zk::snark::plonk_constraint<BlueprintFieldType>;
                 using plonk_copy_constraint = crypto3::zk::snark::plonk_copy_constraint<BlueprintFieldType>;
 
-                context_type ct = context_type(assignment);
+                context_type ct = context_type(assignment,8,start_row_index); // max_rows = 8
                 Is_Zero gc = Is_Zero(ct, instance_input.x);
 
                 gc.optimize_gates();
@@ -240,11 +196,8 @@ namespace nil {
                 for(const auto& cc : copy_constraints) {
                     bp.add_copy_constraint(cc);
                 }
-/*
-                generate_copy_constraints(component, bp, assignment, instance_input, start_row_index);
-*/
-                return typename plonk_bbf_wrapper<BlueprintFieldType>::result_type(
-                    component, start_row_index);
+
+                return typename plonk_bbf_wrapper<BlueprintFieldType>::result_type(component, start_row_index);
             }
         }    // namespace components
     }        // namespace blueprint

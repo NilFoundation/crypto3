@@ -148,6 +148,9 @@ namespace nil {
                     for(std::size_t i = 0; i < vars.size(); i++) {
                         vars[i].relative = true;
                         vars[i].rotation += shift;
+                        if (std::abs(vars[i].rotation) > 1) {
+                            BOOST_LOG_TRIVIAL(warning) << "Rotation exceeds 1 after relativization in term " << term << ".\n";
+                        }
                     }
 
                     return crypto3::math::term<VariableType>(vars, term.get_coeff());
@@ -176,44 +179,54 @@ namespace nil {
                 using allocation_log_type = assignment<crypto3::zk::snark::plonk_constraint_system<bool_field>>;
 
                 private:
-                    allocation_log_type al;
+                    std::shared_ptr<allocation_log_type> al;
                     std::size_t current_row[COLUMN_TYPES];
+                    std::vector<std::size_t> col_map[COLUMN_TYPES];
+                    std::size_t row_shift = 0; // united, for all column types
+                    std::size_t max_rows;
 
                 public:
+                    std::size_t get_col(std::size_t col, column_type t) {
+                        if (col >= col_map[t].size()) {
+                            BOOST_LOG_TRIVIAL(error) << "Column ("<< t <<") out of range ("<< col <<" >= " << (col_map[t].size()) << ").\n";
+                        }
+                        BOOST_ASSERT(col < col_map[t].size());
+                        return col_map[t][col];
+                    }
+                    std::size_t get_row(std::size_t row) {
+                        if (row >= max_rows) {
+                            BOOST_LOG_TRIVIAL(error) << "Row out of range (" << row << " >= " << max_rows << ").\n";
+                        }
+                        BOOST_ASSERT(row < max_rows);
+                        return row + row_shift;
+                    }
+
                     bool is_allocated(std::size_t col, std::size_t row, column_type t) {
                         bool_field::value_type cell;
                         switch (t) {
-                            case column_type::witness:      cell = al.witness(col,row); break;
-                            case column_type::public_input: cell = al.public_input(col,row); break;
-                            case column_type::constant:     cell = al.constant(col,row); break;
+                            case column_type::witness:      cell = al->witness(get_col(col,t),get_row(row)); break;
+                            case column_type::public_input: cell = al->public_input(get_col(col,t),get_row(row)); break;
+                            case column_type::constant:     cell = al->constant(get_col(col,t),get_row(row)); break;
                         }
                         return (cell == bool_field::value_type::one());
                     }
 
                     void mark_allocated(std::size_t col, std::size_t row, column_type t) {
+                        BOOST_ASSERT(row < max_rows);
                         switch (t) {
-                            case column_type::witness:      al.witness(col,row) = 1; break;
-                            case column_type::public_input: al.public_input(col,row) = 1; break;
-                            case column_type::constant:     al.constant(col,row) = 1; break;
+                            case column_type::witness:      al->witness(get_col(col,t),get_row(row)) = 1; break;
+                            case column_type::public_input: al->public_input(get_col(col,t),get_row(row)) = 1; break;
+                            case column_type::constant:     al->constant(get_col(col,t),get_row(row)) = 1; break;
                         }
-                    }
-
-                    std::size_t columns_amount(column_type t) {
-                        switch (t) {
-                            case column_type::witness:      return al.witnesses_amount(); break;
-                            case column_type::public_input: return al.public_inputs_amount(); break;
-                            case column_type::constant:     return al.constants_amount(); break;
-                        }
-                        return 0;
                     }
 
                     std::pair<std::size_t, std::size_t> next_free_cell(column_type t) {
                         std::size_t col = 0,
                                     row = current_row[t],
-                                    hsize = columns_amount(t);
+                                    hsize = col_map[t].size();
                         bool found = false;
 
-                        while(!found) { // TODO: number of rows can be exceeded?
+                        while((!found) && (current_row[t] < max_rows)) {
                             if (col > hsize) {
                                 current_row[t]++;
                                 row = current_row[t];
@@ -224,13 +237,35 @@ namespace nil {
                                 col++;
                             }
                         }
+
+                        if (!found) {
+                            BOOST_LOG_TRIVIAL(error) << "Insufficient space for allocation.\n";
+                        }
+                        BOOST_ASSERT(found);
+
                         return {col, row};
                     }
 
-                    basic_context(assignment_type &at) :
-                        al(at.witnesses_amount(), at.public_inputs_amount(), at.constants_amount(), at.selectors_amount()),
-                        current_row{0, 0, 0} // For all types of columns start from 0. TODO: this might not be a good idea
-                    { };
+                    basic_context(assignment_type &at, std::size_t max_rows_) :
+                        current_row{0, 0, 0}, // For all types of columns start from 0. TODO: this might not be a good idea
+                        max_rows(max_rows_)
+                    {
+                        al = std::make_shared<allocation_log_type>(at.witnesses_amount(),
+                            at.public_inputs_amount(), at.constants_amount(), at.selectors_amount());
+                        for(std::size_t i = 0; i < at.witnesses_amount(); i++) {
+                            col_map[column_type::witness].push_back(i);
+                        }
+                        for(std::size_t i = 0; i < at.public_inputs_amount(); i++) {
+                            col_map[column_type::public_input].push_back(i);
+                        }
+                        for(std::size_t i = 0; i < at.constants_amount(); i++) {
+                            col_map[column_type::constant].push_back(i);
+                        }
+                    };
+                    basic_context(assignment_type &at, std::size_t max_rows_, std::size_t row_shift_) :
+                        basic_context(at,max_rows_) {
+                        row_shift = row_shift_;
+                    };
             };
 
             template<typename FieldType, GenerationStage stage> class context;
@@ -241,6 +276,8 @@ namespace nil {
                 using plonk_copy_constraint = crypto3::zk::snark::plonk_copy_constraint<FieldType>;
                 public:
                     using TYPE = typename FieldType::value_type;
+                    using basic_context<FieldType>::get_col;
+                    using basic_context<FieldType>::get_row;
                     using basic_context<FieldType>::is_allocated;
                     using basic_context<FieldType>::mark_allocated;
 
@@ -251,12 +288,15 @@ namespace nil {
                 public:
                     void allocate(TYPE &C, size_t col, size_t row, column_type t) {
                         if (is_allocated(col, row, t)) {
-                            BOOST_LOG_TRIVIAL(warning) << "RE-allocation of " << t << " cell at col = " << col << ", row = " << row << ".";
+                            BOOST_LOG_TRIVIAL(warning) << "RE-allocation of " << t << " cell at col = " << col << ", row = " << row << ".\n";
                         }
                         switch (t) {
-                            case column_type::witness:      at.witness(col, row) = C;      break;
-                            case column_type::public_input: at.public_input(col, row) = C; break;
-                            case column_type::constant:     at.constant(col, row) = C;     break;
+                            // NB: we use get_col/get_row here because active area might differ
+                            // from the entire assignment table, while col and row are intended
+                            // to be _relative_ to the active area
+                            case column_type::witness:      at.witness(get_col(col,t), get_row(row)) = C;      break;
+                            case column_type::public_input: at.public_input(get_col(col,t), get_row(row)) = C; break;
+                            case column_type::constant:     at.constant(get_col(col,t), get_row(row)) = C;     break;
                         }
                         mark_allocated(col,row,t);
                     }
@@ -287,7 +327,13 @@ namespace nil {
                         return {};
                     }
 
-                    context(assignment_type &assignment_table) : basic_context<FieldType>(assignment_table), at(assignment_table) { };
+                    context(assignment_type &assignment_table, std::size_t max_rows) :
+                         basic_context<FieldType>(assignment_table,max_rows), at(assignment_table)
+                    { };
+
+                    context(assignment_type &assignment_table, std::size_t max_rows, std::size_t row_shift) :
+                         basic_context<FieldType>(assignment_table,max_rows,row_shift), at(assignment_table)
+                    { };
             };
 
             template<typename FieldType>
@@ -297,34 +343,39 @@ namespace nil {
 
                 using constraint_type = crypto3::zk::snark::plonk_constraint<FieldType>;
                 using plonk_copy_constraint = crypto3::zk::snark::plonk_copy_constraint<FieldType>;
+                using constraints_container_type = std::map<constraint_id_type, std::pair<constraint_type, std::set<std::size_t>>>;
                 using copy_constraints_container_type = std::vector<plonk_copy_constraint>; // TODO: maybe it's a set, not a vec?
 
                 using assignment_type = assignment<crypto3::zk::snark::plonk_constraint_system<FieldType>>;
                 public:
                     using TYPE = constraint_type;
+                    using basic_context<FieldType>::get_col;
+                    using basic_context<FieldType>::get_row;
                     using basic_context<FieldType>::is_allocated;
                     using basic_context<FieldType>::mark_allocated;
 
                 private:
                     // constraints (with unique id), and the rows they are applied to
-                    std::map<constraint_id_type, std::pair<constraint_type, std::set<std::size_t>>> constraints;
-                    copy_constraints_container_type copy_constraints;
+                    std::shared_ptr<constraints_container_type> constraints;
+                    std::shared_ptr<copy_constraints_container_type> copy_constraints;
 
                     void add_constraint(TYPE &C_rel, std::size_t row) {
                         constraint_id_type C_id = constraint_id_type(C_rel);
-                        if (constraints.find(C_id) != constraints.end()) {
-                            constraints[C_id].second.insert(row);
+                        if (constraints->find(C_id) != constraints->end()) {
+                            constraints->at(C_id).second.insert(row);
                         } else {
-                            constraints[C_id] = {C_rel, {row}};
+                            constraints->insert({C_id, {C_rel, {row}}});
                         }
                     }
 
                 public:
                     void allocate(TYPE &C, size_t col, size_t row, column_type t) {
                         if (is_allocated(col, row, t)) {
-                            BOOST_LOG_TRIVIAL(warning) << "RE-allocation of " << t << " cell at col = " << col << ", row = " << row << ".";
+                            BOOST_LOG_TRIVIAL(warning) << "RE-allocation of " << t << " cell at col = " << col << ", row = " << row << ".\n";
                         }
-                        var res = var(col, row, false, static_cast<typename var::column_type>(t)); // false <=> use absolute cell address
+                        var res = var(get_col(col,t), get_row(row), // get_col/get_row are active-area-aware
+                                      false, // false = use absolute cell address
+                                      static_cast<typename var::column_type>(t));
                         if (C != TYPE()) { // TODO: is this ok?
                             constrain(res - C);
                         }
@@ -344,7 +395,7 @@ namespace nil {
                         var B_var = boost::get<crypto3::math::term<var>>(B.get_expr()).get_vars()[0];
 
                         if (A_var != B_var) {
-                            copy_constraints.push_back({A_var,B_var});
+                            copy_constraints->push_back({A_var,B_var});
                         }
                     }
 
@@ -354,6 +405,9 @@ namespace nil {
                             BOOST_LOG_TRIVIAL(error) << "Constraint " << C << " has no variables!\n";
                         }
                         BOOST_ASSERT(has_vars);
+                        if (max_row - min_row > 2) {
+                            BOOST_LOG_TRIVIAL(warning) << "Constraint " << C << " spans over 3 rows!\n";
+                        }
                         std::size_t row = (min_row + max_row)/2;
 
                         TYPE C_rel = expression_relativize_visitor<var>::relativize(C, -row);
@@ -365,7 +419,7 @@ namespace nil {
                         // intended to
                         // shift some of the constraints so that we have less selectors
                         /*
-                        for(const auto& [id, data] : constraints) {
+                        for(const auto& [id, data] : *constraints) {
                             std::cout << "Constraint: " << data.first << "\n";
                             for(std::size_t row : data.second) {
                                 std::cout << row << " ";
@@ -379,7 +433,7 @@ namespace nil {
 
                         // drop the constraint_id from the stored id->(constraint,row_list) map:
                         std::vector<std::pair<std::vector<TYPE>, std::set<std::size_t>>> res;
-                        for(const auto& [id, data] : constraints) {
+                        for(const auto& [id, data] : *constraints) {
                             res.push_back({{data.first},data.second});
                         }
                         // join constrains into single element if they have the same row list:
@@ -396,11 +450,21 @@ namespace nil {
                         return res;
                     }
 
-                    std::vector<plonk_copy_constraint> get_copy_constraints() {
-                        return copy_constraints;
+                    std::vector<plonk_copy_constraint>& get_copy_constraints() {
+                        return *copy_constraints;
                     }
 
-                    context(assignment_type &at) : basic_context<FieldType>(at) { };
+                    context(assignment_type &at, std::size_t max_rows) : basic_context<FieldType>(at, max_rows) {
+                        constraints = std::make_shared<constraints_container_type>();
+                        copy_constraints = std::make_shared<copy_constraints_container_type>();
+                    };
+
+                    context(assignment_type &at, std::size_t max_rows, std::size_t row_shift) :
+                        basic_context<FieldType>(at, max_rows, row_shift) {
+                        constraints = std::make_shared<constraints_container_type>();
+                        copy_constraints = std::make_shared<copy_constraints_container_type>();
+                    };
+
             };
 
             template<typename FieldType, GenerationStage stage>
