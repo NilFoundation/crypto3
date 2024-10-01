@@ -134,9 +134,6 @@ namespace nil {
                             if (!constraint_result.is_zero()) {
                                 std::cout << "Constraint " << j << " from gate " << i << " on row " << selector_row
                                           << " is not satisfied." << std::endl;
-                                for(std::size_t k = 0; k < assignments.rows_amount(); k++){
-                                    std::cout << gates[i].constraints[j].evaluate(k, assignments) << " ";
-                                }
                                 std::cout << std::endl;
                                 std::cout << "Constraint: " << gates[i].constraints[j] << std::endl;
                                 std::cout << "Constraint result: " << constraint_result << std::endl;

@@ -81,7 +81,7 @@ namespace nil {
                 const std::size_t curr_row = zkevm_table.get_current_row();
                 auto witness_cols = zkevm_table.get_opcode_cols();
 
-                zkevm_word_type dest = machine.stack.top();
+                zkevm_word_type dest = machine.stack_top();
                 std::cout << "JUMP assign destination = " << dest << std::endl;
                 assignment.witness(witness_cols[0], curr_row) = w_lo<BlueprintFieldType>(dest);
             }
@@ -134,7 +134,6 @@ namespace nil {
             }
 
             void generate_assignments(zkevm_table_type &zkevm_table, const zkevm_machine_interface &machine) override {
-                zkevm_stack stack = machine.stack;
                 std::cout << "Generate assignments and gates for JUMPDEST" << std::endl;
             }
 

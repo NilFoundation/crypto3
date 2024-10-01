@@ -47,15 +47,6 @@ using namespace nil::crypto3::algebra;
 // We have bytecode -- so can generate bytecode circuit
 // And then check connections
 
-std::vector<std::uint8_t> hex_string_to_bytes(std::string const &hex_string) {
-    std::vector<std::uint8_t> bytes;
-    for (std::size_t i = 2; i < hex_string.size(); i += 2) {
-        std::string byte_string = hex_string.substr(i, 2);
-        bytes.push_back(std::stoi(byte_string, nullptr, 16));
-    }
-    return bytes;
-}
-
 zkevm_opcode  opcode_from_str(const std::string &str){
     if(str == "STOP")  return zkevm_opcode::STOP; else
     if(str == "ADD")  return zkevm_opcode::ADD; else
@@ -236,25 +227,16 @@ void test_zkevm(std::string path){
     zkevm_circuit<field_type> evm_circuit(assignment, circuit, 499, 300);
     zkevm_table<field_type> evm_table(evm_circuit, assignment);
 
-    zkevm_machine_type machine = get_empty_machine(zkevm_keccak_hash(bytecode0));
-
-    // First constant column is for even rows.
-    std::vector<size_t> lookup_columns_indices;
-    std::cout << "Constants amount = " <<  assignment.constants_amount() << std::endl;
-    for(std::size_t i = 1; i < assignment.constants_amount(); i++) {
-        lookup_columns_indices.push_back(i);
-    }
-
     nil::crypto3::zk::snark::pack_lookup_tables_horizontal(
         circuit.get_reserved_indices(),
         circuit.get_reserved_tables(),
         circuit.get_reserved_dynamic_tables(),
         circuit, assignment,
-        lookup_columns_indices,
-        3,
         assignment.rows_amount(),
         65536
     );
+
+    zkevm_machine_type machine = get_empty_machine(zkevm_keccak_hash(bytecode0));
 
     boost::property_tree::ptree ptrace = trace.get_child("result.structLogs");
     std::cout << "PT = " << ptrace.size() << std::endl;

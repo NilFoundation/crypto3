@@ -110,6 +110,15 @@ namespace nil {
             return result;
         }
 
+        zkevm_word_type zkevm_word_from_bytes(const std::vector<std::uint8_t> &buffer){
+            zkevm_word_type result;
+            for(std::size_t i = 0; i < buffer.size(); i++ ){
+                result *= 256;
+                result += buffer[i];
+            }
+            return result;
+        }
+
         template <typename BlueprintFieldType>
         typename BlueprintFieldType::value_type w_hi(const zkevm_word_type &val){
             using integral_type = boost::multiprecision::number<boost::multiprecision::backends::cpp_int_modular_backend<257>>;

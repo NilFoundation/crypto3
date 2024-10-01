@@ -328,13 +328,12 @@ namespace nil {
             }
 
             void generate_assignments(zkevm_table_type &zkevm_table, const zkevm_machine_interface &machine) override {
-                zkevm_stack stack = machine.stack;
                 using word_type = typename zkevm_stack::word_type;
                 using integral_type = boost::multiprecision::number<
                     boost::multiprecision::backends::cpp_int_modular_backend<257>>;
 
-                word_type a = stack.pop();
-                word_type input_b = stack.pop();
+                word_type a = machine.stack_top();
+                word_type input_b = machine.stack_top(1);
 
                 int shift = (integral_type(input_b) < 256) ? int(integral_type(input_b)) : 256;
                 integral_type r_integral = integral_type(a) << shift;
@@ -438,10 +437,6 @@ namespace nil {
                     assignment.witness(witness_cols[2*chunk_amount + i], curr_row + 3) = (b0p - i).is_zero()? 0 : (b0p - i).inversed();
                     assignment.witness(witness_cols[2*chunk_amount + i], curr_row + 4) = (b0pp - i).is_zero()? 0 : (b0pp - i).inversed();
                 }
-
-                // stack.push(input_b);
-                // stack.push(a);
-                stack.push(result);
             }
 
             std::size_t rows_amount() override {

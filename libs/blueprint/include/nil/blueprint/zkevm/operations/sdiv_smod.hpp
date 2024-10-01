@@ -482,9 +482,8 @@ namespace nil {
                 using integral_type = boost::multiprecision::number<
                     boost::multiprecision::backends::cpp_int_modular_backend<257>>;
 
-                zkevm_stack stack = machine.stack;
-                word_type a = stack.pop();
-                word_type b_input = stack.pop();
+                word_type a = machine.stack_top();
+                word_type b_input = machine.stack_top(1);
 
                 // According to Yellow paper, the result of -2^255 / -1 should be -2^255 (Yellow paper, page 30)
                 // To achive that we need to replace b = -1 by b = 1 in this special case. This also helps the SMOD operation
@@ -669,9 +668,6 @@ namespace nil {
                 } else {
                     BOOST_ASSERT(result == std::get<1>(eth_signed_div(a, b)));
                 }
-                // stack.push(b_input);
-                // stack.push(a);
-                stack.push(result);
             }
 
             std::size_t rows_amount() override {

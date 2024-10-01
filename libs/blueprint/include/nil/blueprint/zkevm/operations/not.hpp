@@ -121,11 +121,10 @@ namespace nil {
             }
 
             void generate_assignments(zkevm_table_type &zkevm_table, const zkevm_machine_interface &machine) override {
-                zkevm_stack stack = machine.stack;
                 using word_type = typename zkevm_stack::word_type;
                 using integral_type = boost::multiprecision::number<
                     boost::multiprecision::backends::cpp_int_modular_backend<257>>;
-                word_type a = stack.pop();
+                word_type a = machine.stack_top();
                 word_type result = word_type((~integral_type(a)) % zkevm_modulus);
 
                 const std::vector<value_type> a_chunks = zkevm_word_to_field_element<BlueprintFieldType>(a);
@@ -151,8 +150,6 @@ namespace nil {
                 }
                 carry = (carry + a_chunks[3 * (carry_amount - 1)] + b_chunks[3 * (carry_amount - 1)]) >= two_16;
                 assignment.witness(witness_cols[a_chunks.size() + carry_amount - 1], curr_row + 1) = carry;
-
-                stack.push(result);
             }
 
             std::size_t rows_amount() override {

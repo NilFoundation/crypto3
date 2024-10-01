@@ -293,9 +293,8 @@ namespace nil {
 
             void generate_assignments(zkevm_table_type &zkevm_table, const zkevm_machine_interface &machine) override {
                 using word_type = typename zkevm_stack::word_type;
-                zkevm_stack stack = machine.stack;
-                word_type a = stack.pop();
-                word_type b = stack.pop();
+                word_type a = machine.stack_top();
+                word_type b = machine.stack_top(1);
                 using integral_type = boost::multiprecision::number<
                     boost::multiprecision::backends::cpp_int_modular_backend<257>>;
                 integral_type r_integral = b != 0u ? integral_type(a) / integral_type(b) : 0u;
@@ -378,14 +377,11 @@ namespace nil {
                     }
                 }
 
-                // stack.push(b);
-                // stack.push(a);
                 // TODO: Just for testing purposes. May be removed or commented.
                 if( is_div)
                     BOOST_ASSERT(result == std::get<0>(eth_div(a,b)));
                 else
                     BOOST_ASSERT(result == std::get<1>(eth_div(a,b)));
-                stack.push(result);
             }
 
             std::size_t rows_amount() override {

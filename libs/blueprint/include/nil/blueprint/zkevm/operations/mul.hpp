@@ -157,10 +157,9 @@ namespace nil {
             }
 
             void generate_assignments(zkevm_table_type &zkevm_table, const zkevm_machine_interface &machine) override {
-                zkevm_stack stack = machine.stack;
                 using word_type = typename zkevm_stack::word_type;
-                word_type a = stack.pop();
-                word_type b = stack.pop();
+                word_type a = machine.stack_top();
+                word_type b = machine.stack_top(1);
                 word_type result = a * b;
                 const std::vector<value_type> a_chunks = zkevm_word_to_field_element<BlueprintFieldType>(a);
                 const std::vector<value_type> b_chunks = zkevm_word_to_field_element<BlueprintFieldType>(b);
@@ -210,9 +209,6 @@ namespace nil {
                 }
                 assignment.witness(witness_cols[chunk_amount], curr_row + 2) = c_2;
                 assignment.witness(witness_cols[1 + chunk_amount], curr_row + 2) = c_4;
-                //stack.push(b);
-                //stack.push(a);
-                stack.push(result);
             }
 
             std::size_t rows_amount() override {

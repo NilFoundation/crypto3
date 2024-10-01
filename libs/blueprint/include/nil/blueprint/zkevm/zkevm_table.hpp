@@ -130,13 +130,14 @@ namespace nil {
                 generate_assignments(bytecode_table, assignment, bytecode_input, 0);
             }
 
-            void assign_opcode(zkevm_machine_interface &machine) {
-                auto opcode = machine.opcode;
-                std::cout << "Assign opcode " << opcode_to_string(machine.opcode)
+            void assign_opcode(const zkevm_machine_interface &machine) {
+                auto opcode = machine.opcode();
+                std::cout << "Assign opcode " << opcode_to_string(machine.opcode())
                     << " on row " << curr_row
-                    << " pc = " << machine.pc
-                    << " stack_size = " << machine.stack.size()
-                    << " gas = " << machine.gas
+                    << " pc = " << machine.pc()
+                    << " stack_size = " << machine.stack_size()
+                    << " gas = " << machine.gas()
+                    << " is_error = " << machine.is_error()
                     << std::endl;
                 const auto &opcodes = circuit.get_opcodes();
                 auto opcode_it = opcodes.find(opcode);
@@ -163,10 +164,10 @@ namespace nil {
                     using err0_op_type = zkevm_err0_operation<BlueprintFieldType>;
                     if (opcode == zkevm_opcode::err0) {
                         auto err0_implementation = std::static_pointer_cast<err0_op_type>(opcode_it->second);
-                        err0_implementation->generate_assignments(*this, machine, machine.additional_input);
+                        err0_implementation->generate_assignments(*this, machine, machine.additional_input());
                     } else {
                         auto pushx_implementation = std::static_pointer_cast<pushx_op_type>(opcode_it->second);
-                        pushx_implementation->generate_assignments(*this, machine, machine.additional_input);
+                        pushx_implementation->generate_assignments(*this, machine, machine.additional_input());
                     }
                 }
                 curr_row += opcode_it->second->rows_amount() + opcode_it->second->rows_amount() % 2;
@@ -178,15 +179,15 @@ namespace nil {
             void advance_rows(
                 const zkevm_machine_interface &machine
             ) {
+                auto &state = circuit.get_state();
                 const auto &opcodes = circuit.get_opcodes();
-                auto opcode = machine.opcode;
-                auto opcode_it = opcodes.find(machine.opcode);
+                auto opcode = machine.opcode();
+                auto opcode_it = opcodes.find(machine.opcode());
                 if (opcode_it == opcodes.end()) {
                     BOOST_ASSERT_MSG(false, (std::string("Unimplemented opcode: ") + opcode_to_string(opcode)) != "");
                 }
                 std::size_t opcode_height = opcode_it->second->rows_amount();
 
-                const auto &state = circuit.get_state();
                 // state management
                 value_type step_start = 1;          // internal variables
                 value_type row_counter_inv;
@@ -218,10 +219,10 @@ namespace nil {
                     assignment.witness(state.row_counter.index, local_row) = current_internal_row;
                     components::generate_assignments(*(circuit.get_row_selector()), assignment, {current_internal_row/2}, local_row);
 
-                    assignment.witness(state.pc.index, local_row) = machine.pc;
-                    assignment.witness(state.gas.index, local_row) = machine.gas;
-                    assignment.witness(state.stack_size.index, local_row) = machine.stack.size();
-                    assignment.witness(state.memory_size.index, local_row) = machine.memory.size();
+                    assignment.witness(state.pc.index, local_row) = machine.pc();
+                    assignment.witness(state.gas.index, local_row) = machine.gas();
+                    assignment.witness(state.stack_size.index, local_row) = machine.stack_size();
+                    assignment.witness(state.memory_size.index, local_row) = machine.memory_size();
 
                     assignment.witness(state.step_start.index, local_row) = step_start;
                     assignment.witness(state.row_counter_inv.index, local_row) = row_counter_inv;

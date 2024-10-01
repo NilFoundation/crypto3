@@ -104,12 +104,11 @@ namespace nil {
             }
 
             void generate_assignments(zkevm_table_type &zkevm_table, const zkevm_machine_interface &machine) override {
-                zkevm_stack stack = machine.stack;
                 using word_type = typename zkevm_stack::word_type;
                 using integral_type = typename BlueprintFieldType::integral_type;
 
-                word_type a = stack.pop();
-                word_type b = stack.pop();
+                word_type a = machine.stack_top();
+                word_type b = machine.stack_top(1);
 
                 word_type result;
                 switch(bit_operation) {
@@ -136,12 +135,6 @@ namespace nil {
                     assignment.witness(witness_cols[2*i], curr_row + 2) = integral_type(r_chunks[i].data) % 256;
                     assignment.witness(witness_cols[2*i+1], curr_row + 2) = integral_type(r_chunks[i].data) / 256;
                 }
-
-                /*
-                stack.push(b);
-                stack.push(a);
-                */
-                stack.push(result);
             }
 
             std::size_t rows_amount() override {

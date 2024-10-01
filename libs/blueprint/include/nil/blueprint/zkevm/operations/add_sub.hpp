@@ -130,10 +130,9 @@ namespace nil {
             }
 
             void generate_assignments(zkevm_table_type &zkevm_table, const zkevm_machine_interface &machine) override {
-                zkevm_stack stack = machine.stack;
                 using word_type = typename zkevm_stack::word_type;
-                word_type a = stack.pop();
-                word_type b = stack.pop();
+                word_type a = machine.stack_top();
+                word_type b = machine.stack_top(1);
                 word_type result = is_add ? a + b : a - b;
                 // TODO: after memory logic would become more complicated here
                 if (!is_add) {
@@ -165,15 +164,6 @@ namespace nil {
                 }
                 carry = (carry + a_chunks[3 * (carry_amount - 1)] + b_chunks[3 * (carry_amount - 1)]) >= two_16;
                 assignment.witness(witness_cols[a_chunks.size() + carry_amount - 1], curr_row + 2) = carry;
-
-                // stack.push(b);
-                if (is_add) {
-                    stack.push(result);
-                    //stack.push(a);
-                } else {
-                    stack.push(a);
-                    //stack.push(result);
-                }
             }
 
             std::size_t rows_amount() override {

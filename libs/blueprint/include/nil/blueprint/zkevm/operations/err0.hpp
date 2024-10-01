@@ -123,14 +123,12 @@ namespace nil {
                 // cost + d3 = gas + g*2^32   <=>   g = [cost > gas]
                 constraints.push_back({position, cost + d30_var + 65536*d31_var - gas_var - g_var*(circuit_integral_type(1) << 32)});
 
-                constraints.push_back({position, (si_var - 1)*(so_var - 1)*(g_var - 1)});
+                //constraints.push_back({position, (si_var - 1)*(so_var - 1)*(g_var - 1)});
                 return {{gate_class::MIDDLE_OP, {constraints, {}}}};
             }
 
             void generate_assignments(zkevm_table_type &zkevm_table, const zkevm_machine_interface &machine,
                                       zkevm_word_type opcode_num) {
-
-                zkevm_stack stack = machine.stack;
                 using word_type = typename zkevm_stack::word_type;
                 using integral_type = boost::multiprecision::number<boost::multiprecision::backends::cpp_int_modular_backend<257>>;
                 using circuit_integral_type = typename BlueprintFieldType::integral_type;
@@ -143,8 +141,8 @@ namespace nil {
                             n = static_cast<std::size_t>(opcode / 2),
                             col = n % 44,
                             row = n / 44;
-                value_type gas   = machine.gas,
-                           stack_size = machine.stack.size();
+                value_type gas   = machine.gas(),
+                           stack_size = machine.stack_size();
 
                 auto opcode_mnemo = zkevm_table.get_opcodes_info().get_opcode_from_number(static_cast<std::size_t>(opcode));
                 std::size_t cost = zkevm_table.get_opcodes_info().get_opcode_cost(opcode_mnemo),

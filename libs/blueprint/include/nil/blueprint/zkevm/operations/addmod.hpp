@@ -329,11 +329,9 @@ namespace nil {
                 using integral_type = boost::multiprecision::number<
                     boost::multiprecision::backends::cpp_int_modular_backend<257>>;
 
-                zkevm_stack stack = machine.stack;
-
-                word_type a = stack.pop();
-                word_type b = stack.pop();
-                word_type N = stack.pop();
+                word_type a = machine.stack_top();
+                word_type b = machine.stack_top(1);
+                word_type N = machine.stack_top(2);
 
                 integral_type s_integral = integral_type(a) + integral_type(b);
                 int is_overflow = (s_integral >= zkevm_modulus);
@@ -441,11 +439,6 @@ namespace nil {
                 for (std::size_t i = 0; i < chunk_amount; i++) {
                     assignment.witness(witness_cols[i + chunk_amount], curr_row + 4) = q_out_chunks[i];
                 }
-
-                // stack.push(N);
-                // stack.push(b);
-                // stack.push(a);
-                stack.push(result);
             }
 
             std::size_t rows_amount() override {

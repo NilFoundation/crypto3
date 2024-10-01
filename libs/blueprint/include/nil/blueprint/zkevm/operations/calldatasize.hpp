@@ -71,9 +71,7 @@ namespace nil {
             }
 
             void generate_assignments(zkevm_table_type &zkevm_table, const zkevm_machine_interface &machine) override {
-                zkevm_stack stack = machine.stack;
                 std::cout << "Generate assignments and gates for CALLDATASIZE" << std::endl;
-                stack.push(0);
             }
 
             std::size_t rows_amount() override {

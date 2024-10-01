@@ -71,10 +71,7 @@ namespace nil {
             }
 
             void generate_assignments(zkevm_table_type &zkevm_table, const zkevm_machine_interface &machine) override {
-                zkevm_stack stack = machine.stack;
                 std::cout << "Generate assignments and gates for SSTORE" << std::endl;
-                stack.pop();
-                stack.pop();
             }
 
             std::size_t rows_amount() override {
@@ -126,9 +123,7 @@ namespace nil {
             }
 
             void generate_assignments(zkevm_table_type &zkevm_table, const zkevm_machine_interface &machine) override {
-                zkevm_stack stack = machine.stack;
                 std::cout << "Generate assignments and gates for SLOAD" << std::endl;
-                stack.pop();
             }
 
             std::size_t rows_amount() override {

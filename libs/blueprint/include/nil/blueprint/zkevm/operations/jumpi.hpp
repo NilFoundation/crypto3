@@ -114,8 +114,8 @@ namespace nil {
             }
 
             void generate_assignments(zkevm_table_type &zkevm_table, const zkevm_machine_interface &machine) override {
-                zkevm_word_type dest = machine.stack.top();
-                zkevm_word_type condition = machine.stack.top(1);
+                zkevm_word_type dest = machine.stack_top();
+                zkevm_word_type condition = machine.stack_top(1);
                 const std::vector<value_type> chunks = zkevm_word_to_field_element<BlueprintFieldType>(condition);
 
                 assignment_type &assignment = zkevm_table.get_assignment();

@@ -89,14 +89,13 @@ namespace nil {
                 return {{gate_class::MIDDLE_OP, {constraints, {}}}};
             }
 
-            void generate_assignments(zkevm_table_type &zkevm_table, const zkevm_machine_interface &machine,
-                                      zkevm_word_type bytecode_input) {
-                zkevm_stack stack = machine.stack;
+            void generate_assignments(
+                zkevm_table_type &zkevm_table, const zkevm_machine_interface &machine, zkevm_word_type bytecode_input
+            ) {
                 using word_type = typename zkevm_stack::word_type;
-                using integral_type = boost::multiprecision::number<
-                    boost::multiprecision::backends::cpp_int_modular_backend<257>>;
+                using integral_type = boost::multiprecision::number<boost::multiprecision::backends::cpp_int_modular_backend<257>>;
 
-                word_type a = word_type(integral_type(bytecode_input) &
+                zkevm_word_type a = word_type(integral_type(bytecode_input) &
                                         ((integral_type(1) << (8*byte_count)) - 1)); // use only byte_count lowest bytes
 
                 const std::vector<value_type> chunks = zkevm_word_to_field_element<BlueprintFieldType>(a);
@@ -110,6 +109,7 @@ namespace nil {
                     assignment.witness(witness_cols[i], curr_row) = chunks[i];
                 }
             }
+
             void generate_assignments(zkevm_table_type &zkevm_table, const zkevm_machine_interface &machine) override {
                  generate_assignments(zkevm_table, machine, 0);
             }

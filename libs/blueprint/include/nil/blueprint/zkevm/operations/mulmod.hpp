@@ -458,11 +458,9 @@ namespace nil {
                 using integral_type = boost::multiprecision::number<boost::multiprecision::backends::cpp_int_modular_backend<257>>;
                 using extended_integral_type = boost::multiprecision::number<boost::multiprecision::backends::cpp_int_modular_backend<512>>;
 
-                zkevm_stack stack = machine.stack;
-
-                word_type input_a = stack.pop();
-                word_type b = stack.pop();
-                word_type N = stack.pop();
+                word_type input_a = machine.stack_top();
+                word_type b = machine.stack_top(1);
+                word_type N = machine.stack_top(2);
 
                 word_type a = N != 0u ? input_a : 0;
 
@@ -653,11 +651,6 @@ namespace nil {
                 assignment.witness(witness_cols[4 + chunk_amount], curr_row + 7) = c_2;
                 assignment.witness(witness_cols[9 + chunk_amount], curr_row + 7) = c_4;
                 assignment.witness(witness_cols[14 + chunk_amount], curr_row + 7) = c_6;
-
-                // stack.push(N);
-                // stack.push(b);
-                // stack.push(input_a);
-                stack.push(result);
             }
 
             std::size_t rows_amount() override {

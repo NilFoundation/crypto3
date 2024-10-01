@@ -70,9 +70,7 @@ namespace nil {
             }
 
             void generate_assignments(zkevm_table_type &zkevm_table, const zkevm_machine_interface &machine) override {
-                zkevm_stack stack = machine.stack;
                 std::cout << "Generate assignments and gates for RETURN" << std::endl;
-                stack.pop();
             }
 
             constraint_type pc_transition(const zkevm_circuit_type &zkevm_circuit) override {
