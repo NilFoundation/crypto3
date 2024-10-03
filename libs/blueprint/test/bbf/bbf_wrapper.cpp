@@ -48,11 +48,11 @@ using namespace nil::crypto3;
 using namespace nil::blueprint;
 
 template <typename BlueprintFieldType>
-void test_bbf_wrapper(typename BlueprintFieldType::value_type input) { // input?
+void test_bbf_wrapper(std::vector<typename BlueprintFieldType::value_type> public_input) {
     constexpr std::size_t WitnessColumns = 15;    // TODO
     constexpr std::size_t PublicInputColumns = 1; // TODO
     constexpr std::size_t ConstantColumns = 1;    // TODO
-    constexpr std::size_t SelectorColumns = 4;    // TODO
+    constexpr std::size_t SelectorColumns = 5;    // TODO
 
     // table configuration
     zk::snark::plonk_table_description<BlueprintFieldType> desc(
@@ -67,11 +67,19 @@ void test_bbf_wrapper(typename BlueprintFieldType::value_type input) { // input?
 
     using component_type = components::bbf_wrapper<ArithmetizationType, BlueprintFieldType>;
 
-    typename BlueprintFieldType::value_type expected_res = input; // TODO
+    typename BlueprintFieldType::value_type expected_res = 0; // TODO
 
-    typename component_type::input_type instance_input = { var(0, 0, false, var::column_type::public_input) };
+    typename component_type::input_type instance_input = {
+        var(0, 0, false, var::column_type::public_input),
+        var(0, 1, false, var::column_type::public_input),
+        var(0, 2, false, var::column_type::public_input),
+        var(0, 3, false, var::column_type::public_input),
+        var(0, 4, false, var::column_type::public_input),
+        var(0, 5, false, var::column_type::public_input),
+        var(0, 6, false, var::column_type::public_input),
+        var(0, 7, false, var::column_type::public_input) };
 
-    std::vector<typename BlueprintFieldType::value_type> public_input = {input};
+//    std::vector<typename BlueprintFieldType::value_type> public_input = {input};
 
     component_type component_instance({0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14}, {0}, {0});
 
@@ -80,8 +88,7 @@ void test_bbf_wrapper(typename BlueprintFieldType::value_type input) { // input?
     };
 
     test_component<component_type, BlueprintFieldType, hash_type, Lambda>
-        (component_instance, desc, public_input, result_check, instance_input, connectedness_check_type::type::NONE);
-        //(component_instance, desc, public_input, result_check, instance_input);
+        (component_instance, desc, public_input, result_check, instance_input);
 }
 
 static const std::size_t random_tests_amount = 10;
@@ -90,14 +97,18 @@ BOOST_AUTO_TEST_SUITE(blueprint_plonk_test_suite)
 
 BOOST_AUTO_TEST_CASE(blueprint_plonk_bbf_wrapper_test) {
     using field_type = typename algebra::curves::pallas::base_field_type;
+    using integral_type = typename field_type::integral_type;
+    using value_type = typename field_type::value_type;
 
     nil::crypto3::random::algebraic_engine<field_type> generate_random;
     boost::random::mt19937 seed_seq;
     generate_random.seed(seed_seq);
 
+    integral_type base16 = integral_type(1) << 16;
+
     for (std::size_t i = 0; i < random_tests_amount; i++) {
-        auto random_input = generate_random();
-        test_bbf_wrapper<field_type>(random_input);
+        auto random_input = value_type(integral_type(generate_random().data) % base16);
+        test_bbf_wrapper<field_type>({random_input,1,random_input,random_input,random_input,random_input,random_input,random_input});
     }
 }
 

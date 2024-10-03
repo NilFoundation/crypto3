@@ -38,6 +38,8 @@
 
 #include <nil/blueprint/bbf/generic.hpp> // also included by is_zero.hpp below
 #include <nil/blueprint/bbf/is_zero.hpp>
+#include <nil/blueprint/bbf/choice_function.hpp>
+#include <nil/blueprint/bbf/carry_on_addition.hpp>
 
 namespace nil {
     namespace blueprint {
@@ -77,36 +79,29 @@ namespace nil {
                 }
 
                 constexpr static std::size_t get_rows_amount(std::size_t witness_amount) {
-                    return 3;
+                    return 5;
                 }
                 constexpr static std::size_t get_empty_rows_amount() {
-                    return 3;
+                    return 5;
                 }
 
-                constexpr static const std::size_t gates_amount = 2;
+                constexpr static const std::size_t gates_amount = 5;
                 const std::size_t rows_amount = get_rows_amount(this->witness_amount());
                 const std::size_t empty_rows_amount = get_empty_rows_amount();
                 const std::string component_name = "wrapper of BBF-components";
 
                 struct input_type {
-                    var x = var(0, 0, false); // TODO
-                    var y = var(0, 0, false); // TODO
+                    var x, q, cx[3], cy[3];
 
                     std::vector<std::reference_wrapper<var>> all_vars() {
-                        return {x, y};
+                        return {x, q, cx[0], cx[1], cx[2], cy[0], cy[1], cy[2]};
                     }
                 };
 
                 struct result_type {
-                    // TODO: probably no result at all
-                    // var output = var(0, 0, false);
-
-                    result_type(const bbf_wrapper &component, std::size_t start_row_index) {
-                        // output = var(component.W(2), start_row_index, false, var::column_type::witness);
-                    }
+                    result_type(const bbf_wrapper &component, std::size_t start_row_index) { }
 
                     std::vector<std::reference_wrapper<var>> all_vars() {
-                        // return {output};
                         return {};
                     }
                 };
@@ -144,10 +139,25 @@ namespace nil {
                                                   nil::blueprint::bbf::GenerationStage::ASSIGNMENT>;
                 using Is_Zero = typename nil::blueprint::bbf::is_zero<BlueprintFieldType,
                                                   nil::blueprint::bbf::GenerationStage::ASSIGNMENT>;
-                using TYPE = typename Is_Zero::TYPE;
+                using Choice_Function = typename nil::blueprint::bbf::choice_function<BlueprintFieldType,
+                                                  nil::blueprint::bbf::GenerationStage::ASSIGNMENT,3>;
+                using Carry_On_Addition = typename nil::blueprint::bbf::carry_on_addition<BlueprintFieldType,
+                                                  nil::blueprint::bbf::GenerationStage::ASSIGNMENT,3,16>;
+                //using TYPE = typename Is_Zero::TYPE;
+                using TYPE = typename context_type::TYPE;
 
                 context_type ct = context_type(assignment, 8, start_row_index); // max_rows = 8
-                Is_Zero gc = Is_Zero(ct, var_value(assignment, instance_input.x));
+                Is_Zero c1 = Is_Zero(ct, var_value(assignment, instance_input.x));
+
+                std::array<TYPE,3> input_x = {var_value(assignment,instance_input.cx[0]),
+                                              var_value(assignment,instance_input.cx[1]),
+                                              var_value(assignment,instance_input.cx[2])};
+                std::array<TYPE,3> input_y = {var_value(assignment,instance_input.cy[0]),
+                                              var_value(assignment,instance_input.cy[1]),
+                                              var_value(assignment,instance_input.cy[2])};
+
+                Choice_Function c2 = Choice_Function(ct, var_value(assignment,instance_input.q), input_x, input_y);
+                Carry_On_Addition c3 = Carry_On_Addition(ct, input_x, input_y);
 
                 return typename plonk_bbf_wrapper<BlueprintFieldType>::result_type(component, start_row_index);
             }
@@ -164,16 +174,28 @@ namespace nil {
                                                   nil::blueprint::bbf::GenerationStage::CIRCUIT>;
                 using Is_Zero = typename nil::blueprint::bbf::is_zero<BlueprintFieldType,
                                                   nil::blueprint::bbf::GenerationStage::CIRCUIT>;
+                using Choice_Function = typename nil::blueprint::bbf::choice_function<BlueprintFieldType,
+                                                  nil::blueprint::bbf::GenerationStage::CIRCUIT,3>;
+                using Carry_On_Addition = typename nil::blueprint::bbf::carry_on_addition<BlueprintFieldType,
+                                                  nil::blueprint::bbf::GenerationStage::CIRCUIT,3,16>;
                 using constraint_type = crypto3::zk::snark::plonk_constraint<BlueprintFieldType>;
                 using plonk_copy_constraint = crypto3::zk::snark::plonk_copy_constraint<BlueprintFieldType>;
+                using lookup_constraint_type = crypto3::zk::snark::plonk_lookup_constraint<BlueprintFieldType>;
+                using TYPE = typename context_type::TYPE;
 
                 context_type ct = context_type(assignment,8,start_row_index); // max_rows = 8
-                Is_Zero gc = Is_Zero(ct, instance_input.x);
+                Is_Zero c1 = Is_Zero(ct, instance_input.x);
 
-                gc.optimize_gates();
+                std::array<TYPE,3> input_x = {instance_input.cx[0],instance_input.cx[1],instance_input.cx[2]};
+                std::array<TYPE,3> input_y = {instance_input.cy[0],instance_input.cy[1],instance_input.cy[2]};
+
+                Choice_Function c2 = Choice_Function(ct, instance_input.q, input_x, input_y);
+                Carry_On_Addition c3 = Carry_On_Addition(ct, input_x, input_y);
+
+                ct.optimize_gates();
 
                 // compatibility layer: constraint list => gates & selectors
-                std::vector<std::pair<std::vector<constraint_type>, std::set<std::size_t>>> constraint_list = gc.poly_constraints();
+                std::vector<std::pair<std::vector<constraint_type>, std::set<std::size_t>>> constraint_list = ct.get_constraints();
 
                 for(const auto& [constraints, row_list] : constraint_list) {
                     /*
@@ -192,9 +214,30 @@ namespace nil {
                 }
 
                 // compatibility layer: copy constraint list
-                std::vector<plonk_copy_constraint> copy_constraints = gc.copy_constraints();
+                std::vector<plonk_copy_constraint> copy_constraints = ct.get_copy_constraints();
                 for(const auto& cc : copy_constraints) {
                     bp.add_copy_constraint(cc);
+                }
+
+                // compatibility layer: lookup constraint list
+                std::vector<std::pair<std::vector<std::pair<std::string,std::vector<constraint_type>>>, std::set<std::size_t>>>
+                lookup_constraints = ct.get_lookup_constraints();
+                std::set<std::string> lookup_tables;
+                for(const auto& [lookup_list, row_list] : lookup_constraints) {
+                    std::vector<lookup_constraint_type> lookup_gate;
+                    for(const auto& single_lookup_constraint : lookup_list) {
+                        std::string table_name = single_lookup_constraint.first;
+                        if (lookup_tables.find(table_name) == lookup_tables.end()) {
+                            bp.reserve_table(table_name);
+                            lookup_tables.insert(table_name);
+                        }
+                        std::size_t table_index = bp.get_reserved_indices().at(table_name);
+                        lookup_gate.push_back({table_index,single_lookup_constraint.second});
+                    }
+                    std::size_t selector_index = bp.add_lookup_gate(lookup_gate);
+                    for(std::size_t row_index : row_list) {
+                        assignment.enable_selector(selector_index, row_index);
+                    }
                 }
 
                 return typename plonk_bbf_wrapper<BlueprintFieldType>::result_type(component, start_row_index);

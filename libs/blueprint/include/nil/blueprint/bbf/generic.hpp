@@ -246,6 +246,22 @@ namespace nil {
                         return {col, row};
                     }
 
+                    void new_line(column_type t) {
+                        std::size_t col;
+                        do {
+                            auto [c, r] = next_free_cell(t);
+                            col = c;
+                            if (col > 0) {
+                                current_row[t]++;
+                            }
+                        } while ((col > 0) && (current_row[t] < max_rows));
+
+                        if (current_row[t] == max_rows) {
+                            BOOST_LOG_TRIVIAL(error) << "Insufficient space for starting a new row.\n";
+                        }
+                        BOOST_ASSERT(col == 0);
+                    }
+
                     basic_context(assignment_type &at, std::size_t max_rows_) :
                         current_row{0, 0, 0}, // For all types of columns start from 0. TODO: this might not be a good idea
                         max_rows(max_rows_)
@@ -274,6 +290,7 @@ namespace nil {
             class context<FieldType, GenerationStage::ASSIGNMENT> : public basic_context<FieldType> { // assignment-specific definition
                 using assignment_type = assignment<crypto3::zk::snark::plonk_constraint_system<FieldType>>;
                 using plonk_copy_constraint = crypto3::zk::snark::plonk_copy_constraint<FieldType>;
+                using lookup_constraint_type = std::pair<std::string,std::vector<typename FieldType::value_type>>;
                 public:
                     using TYPE = typename FieldType::value_type;
                     using basic_context<FieldType>::get_col;
@@ -314,6 +331,9 @@ namespace nil {
                             BOOST_LOG_TRIVIAL(warning) << "Assignment violates polynomial constraint (" << C << " != 0)\n";
                         }
                     }
+                    void lookup(std::vector<TYPE> &C, std::string table_name) {
+                        // TODO: actually check membership of C in table?
+                    }
 
                     void optimize_gates() {
                         BOOST_LOG_TRIVIAL(error) << "optimize_gates() called at assignment stage.\n";
@@ -324,6 +344,10 @@ namespace nil {
                     }
                     std::vector<plonk_copy_constraint> get_copy_constraints() {
                         BOOST_LOG_TRIVIAL(error) << "get_copy_constraints() called at assignment stage.\n";
+                        return {};
+                    }
+                    std::vector<std::pair<std::vector<lookup_constraint_type>, std::set<std::size_t>>> get_lookup_constraints() {
+                        BOOST_LOG_TRIVIAL(error) << "get_lookup_constraints() called at assignment stage.\n";
                         return {};
                     }
 
@@ -340,11 +364,14 @@ namespace nil {
             class context<FieldType, GenerationStage::CIRCUIT> : public basic_context<FieldType> { // circuit-specific definition
                 using constraint_id_type = gate_id<FieldType>;
                 using var = crypto3::zk::snark::plonk_variable<typename FieldType::value_type>;
-
                 using constraint_type = crypto3::zk::snark::plonk_constraint<FieldType>;
                 using plonk_copy_constraint = crypto3::zk::snark::plonk_copy_constraint<FieldType>;
                 using constraints_container_type = std::map<constraint_id_type, std::pair<constraint_type, std::set<std::size_t>>>;
                 using copy_constraints_container_type = std::vector<plonk_copy_constraint>; // TODO: maybe it's a set, not a vec?
+                using lookup_constraints_container_type = std::map<std::pair<std::string,constraint_id_type>, // <table_name,expressions_id>
+                                                                   std::pair<std::vector<constraint_type>,std::set<std::size_t>>>;
+                                                                   // ^^^ expressions, rows
+                using lookup_constraint_type = std::pair<std::string,std::vector<constraint_type>>; // NB: NOT exactly as plonk!!!
 
                 using assignment_type = assignment<crypto3::zk::snark::plonk_constraint_system<FieldType>>;
                 public:
@@ -357,7 +384,10 @@ namespace nil {
                 private:
                     // constraints (with unique id), and the rows they are applied to
                     std::shared_ptr<constraints_container_type> constraints;
+                    // copy constraints as in BP
                     std::shared_ptr<copy_constraints_container_type> copy_constraints;
+                    // lookup constraints with table name, unique id and row list
+                    std::shared_ptr<lookup_constraints_container_type> lookup_constraints;
 
                     void add_constraint(TYPE &C_rel, std::size_t row) {
                         constraint_id_type C_id = constraint_id_type(C_rel);
@@ -365,6 +395,14 @@ namespace nil {
                             constraints->at(C_id).second.insert(row);
                         } else {
                             constraints->insert({C_id, {C_rel, {row}}});
+                        }
+                    }
+                    void add_lookup_constraint(std::string table_name, std::vector<TYPE> &C_rel, std::size_t row) {
+                        constraint_id_type C_id = constraint_id_type(C_rel);
+                        if (lookup_constraints->find({table_name,C_id}) != lookup_constraints->end()) {
+                            lookup_constraints->at({table_name,C_id}).second.insert(row);
+                        } else {
+                            lookup_constraints->insert({{table_name,C_id}, {C_rel, {row}}});
                         }
                     }
 
@@ -414,6 +452,51 @@ namespace nil {
                         add_constraint(C_rel, row);
                     }
 
+                    void lookup(std::vector<TYPE> &C, std::string table_name) {
+                        std::set<std::size_t> base_rows = {};
+
+                        // Choose the best row to relativize. Different expressions in a single lookup might accept
+                        // up to 3 different rows for relativization. We take the intersection for all expressions in
+                        // the constraint.
+                        for(TYPE c_part : C) {
+                            auto [has_vars, min_row, max_row] = expression_row_range_visitor<var>::row_range(c_part);
+                            if (has_vars) { // NB: not having variables seems to be ok for a part of a lookup expression
+                                if (max_row - min_row > 2) {
+                                    BOOST_LOG_TRIVIAL(warning) << "Expression " << c_part << " in lookup constraint spans over 3 rows!\n";
+                                }
+                                std::size_t row = (min_row + max_row)/2;
+                                std::set<std::size_t> current_base_rows = {row};
+                                if (max_row - min_row <= 1) {
+                                    current_base_rows.insert(row+1);
+                                }
+                                if (max_row == min_row) {
+                                    current_base_rows.insert(row-1);
+                                }
+                                if (base_rows.empty()) {
+                                    base_rows = current_base_rows;
+                                } else {
+                                    std::set<std::size_t> new_base_rows;
+                                    std::set_intersection(base_rows.begin(), base_rows.end(),
+                                                          current_base_rows.begin(), current_base_rows.end(),
+                                                          std::inserter(new_base_rows, new_base_rows.end()));
+                                    base_rows = new_base_rows;
+                                }
+                            }
+                        }
+                        if (base_rows.empty()) {
+                            BOOST_LOG_TRIVIAL(error) << "Lookup constraint expressions have no variables or have incompatible spans!\n";
+                        }
+                        BOOST_ASSERT(!base_rows.empty());
+
+                        std::size_t row = (base_rows.size() == 3) ? *(std::next(base_rows.begin())) : *(base_rows.begin());
+                        std::vector<TYPE> res;
+                        for(TYPE c_part : C) {
+                            TYPE c_part_rel = expression_relativize_visitor<var>::relativize(c_part, -row);
+                            res.push_back(c_part_rel);
+                        }
+                        add_lookup_constraint(table_name, res, row);
+                    }
+
                     void optimize_gates() {
                         // NB: std::map<constraint_id_type, std::pair<constraint_type, std::set<std::size_t>>> constraints;
                         // intended to
@@ -428,6 +511,7 @@ namespace nil {
                         }
                         */
                     }
+
                     std::vector<std::pair<std::vector<TYPE>, std::set<std::size_t>>> get_constraints() {
                         // joins constraints with identic selectors into a single gate
 
@@ -454,15 +538,50 @@ namespace nil {
                         return *copy_constraints;
                     }
 
+                    std::vector<std::pair<std::vector<lookup_constraint_type>, std::set<std::size_t>>> get_lookup_constraints() {
+                        // std::map<std::pair<std::string,constraint_id_type>, // <table_name,expressions_id>
+                        //          std::pair<std::vector<constraint_type>,std::set<std::size_t>>> // expressions, rows
+
+                        std::vector<std::pair<std::vector<lookup_constraint_type>, std::set<std::size_t>>> res;
+                        for(const auto& [id, data] : *lookup_constraints) {
+                            res.push_back({{{id.first,data.first}}, data.second});
+                        }
+                        // join constrains into single element if they have the same row list:
+                        for(std::size_t i = 0; i < res.size(); i++) {
+                            for(std::size_t j = i + 1; j < res.size(); ) {
+                                if (res[j].second == res[i].second) {
+                                    res[i].first.insert(res[i].first.end(), res[j].first.begin(), res[j].first.end());
+                                    res.erase(res.begin() + j);
+                                } else {
+                                    j++;
+                                }
+                            }
+                        }
+                        /*
+                        for(const auto& [lcs, rows] : res) {
+                            for(const auto& [table, cs] : lcs) {
+                                std::cout << "Table " << table << ": ";
+                                for(const auto& c : cs) { std::cout << c << ", "; }
+                            }
+                            std::cout << "Rows: ";
+                            for(const auto& r : rows) { std::cout << r << " "; }
+                            std::cout << "\n";
+                        }
+                        */
+                        return res;
+                    }
+
                     context(assignment_type &at, std::size_t max_rows) : basic_context<FieldType>(at, max_rows) {
                         constraints = std::make_shared<constraints_container_type>();
                         copy_constraints = std::make_shared<copy_constraints_container_type>();
+                        lookup_constraints = std::make_shared<lookup_constraints_container_type>();
                     };
 
                     context(assignment_type &at, std::size_t max_rows, std::size_t row_shift) :
                         basic_context<FieldType>(at, max_rows, row_shift) {
                         constraints = std::make_shared<constraints_container_type>();
                         copy_constraints = std::make_shared<copy_constraints_container_type>();
+                        lookup_constraints = std::make_shared<lookup_constraints_container_type>();
                     };
 
             };
@@ -497,22 +616,21 @@ namespace nil {
                         ct.constrain(C);
                     }
 
-                    void optimize_gates() {
-                        ct.optimize_gates();
+                    void lookup(std::vector<TYPE> &C, std::string table_name) {
+                        ct.lookup(C,table_name);
                     }
 
-                    std::vector<std::pair<std::vector<TYPE>, std::set<std::size_t>>> poly_constraints() {
-                        return ct.get_constraints();
-                    }
-
-                    std::vector<plonk_copy_constraint> copy_constraints() {
-                        return ct.get_copy_constraints();
+                    void lookup(TYPE &C, std::string table_name) {
+                        std::vector<TYPE> input = {C};
+                        ct.lookup(input,table_name);
                     }
 
                     generic_component(context_type &context_object, // context object, created outside
                                       bool crlf = true              // do we assure a component starts on a new row? Default is "yes"
                                      ) : ct(context_object) {
-                        // TODO: Implement crlf parameter consequences
+                        if (crlf) { // TODO: Implement crlf parameter consequences
+                            ct.new_line(column_type::witness);
+                        }
                     };
             };
 
