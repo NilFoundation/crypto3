@@ -180,10 +180,11 @@ namespace nil {
 
                 private:
                     std::shared_ptr<allocation_log_type> al;
-                    std::size_t current_row[COLUMN_TYPES];
+                protected:
                     std::vector<std::size_t> col_map[COLUMN_TYPES];
                     std::size_t row_shift = 0; // united, for all column types
                     std::size_t max_rows;
+                    std::size_t current_row[COLUMN_TYPES];
 
                 public:
                     std::size_t get_col(std::size_t col, column_type t) {
@@ -211,6 +212,19 @@ namespace nil {
                         return (cell == bool_field::value_type::one());
                     }
 
+                    void print_witness_allocation_log() {
+                        for(std::size_t j = 0; j < col_map[column_type::witness].size(); j++) {
+                            std::cout << (j < 10 ? " " : "") << j << " ";
+                        }
+                        std::cout << "\n";
+                        for(std::size_t i = 0; i < max_rows; i++) {
+                            for(std::size_t j = 0; j < col_map[column_type::witness].size(); j++) {
+                                std::cout << " " << (is_allocated(j,i,column_type::witness) ? "*" : "_") << " ";
+                            }
+                            std::cout << "\n";
+                        }
+                    }
+
                     void mark_allocated(std::size_t col, std::size_t row, column_type t) {
                         BOOST_ASSERT(row < max_rows);
                         switch (t) {
@@ -227,7 +241,7 @@ namespace nil {
                         bool found = false;
 
                         while((!found) && (current_row[t] < max_rows)) {
-                            if (col > hsize) {
+                            if (col >= hsize) {
                                 current_row[t]++;
                                 row = current_row[t];
                                 col = 0;
@@ -291,6 +305,7 @@ namespace nil {
                 using assignment_type = assignment<crypto3::zk::snark::plonk_constraint_system<FieldType>>;
                 using plonk_copy_constraint = crypto3::zk::snark::plonk_copy_constraint<FieldType>;
                 using lookup_constraint_type = std::pair<std::string,std::vector<typename FieldType::value_type>>;
+                using basic_context<FieldType>::col_map;
                 public:
                     using TYPE = typename FieldType::value_type;
                     using basic_context<FieldType>::get_col;
@@ -351,6 +366,19 @@ namespace nil {
                         return {};
                     }
 
+                    context subcontext(std::vector<std::size_t> W, std::size_t new_row_shift, std::size_t new_max_rows) {
+                         context res = *this;
+                         std::vector<std::size_t> new_W = {};
+                         for(std::size_t i = 0; i < W.size(); i++) {
+                             new_W.push_back(col_map[column_type::witness][W[i]]);
+                         }
+                         res.col_map[column_type::witness] = new_W;
+                         res.row_shift += new_row_shift;
+                         res.max_rows = new_max_rows;
+                         res.current_row[column_type::witness] = 0; // reset to 0, because in the new column set everything is different
+                         return res;
+                    }
+
                     context(assignment_type &assignment_table, std::size_t max_rows) :
                          basic_context<FieldType>(assignment_table,max_rows), at(assignment_table)
                     { };
@@ -372,6 +400,7 @@ namespace nil {
                                                                    std::pair<std::vector<constraint_type>,std::set<std::size_t>>>;
                                                                    // ^^^ expressions, rows
                 using lookup_constraint_type = std::pair<std::string,std::vector<constraint_type>>; // NB: NOT exactly as plonk!!!
+                using basic_context<FieldType>::col_map;
 
                 using assignment_type = assignment<crypto3::zk::snark::plonk_constraint_system<FieldType>>;
                 public:
@@ -569,6 +598,19 @@ namespace nil {
                         }
                         */
                         return res;
+                    }
+
+                    context subcontext(std::vector<std::size_t> W, std::size_t new_row_shift, std::size_t new_max_rows) {
+                         context res = *this;
+                         std::vector<std::size_t> new_W = {};
+                         for(std::size_t i = 0; i < W.size(); i++) {
+                             new_W.push_back(col_map[column_type::witness][W[i]]);
+                         }
+                         res.col_map[column_type::witness] = new_W;
+                         res.row_shift += new_row_shift;
+                         res.max_rows = new_max_rows;
+                         res.current_row[column_type::witness] = 0; // reset to 0, because in the new column set everything is different
+                         return res;
                     }
 
                     context(assignment_type &at, std::size_t max_rows) : basic_context<FieldType>(at, max_rows) {

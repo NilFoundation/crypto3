@@ -72,20 +72,20 @@ namespace nil {
 
                 static manifest_type get_manifest() {
                     static manifest_type manifest = manifest_type(
-                        std::shared_ptr<manifest_param>(new manifest_single_value_param(3)), // TODO
-                        false
+                        std::shared_ptr<manifest_param>(new manifest_single_value_param(3)), // TODO: this has nothing to do with reality,
+                        false                                                                // to be dropped eventually
                     );
                     return manifest;
                 }
 
                 constexpr static std::size_t get_rows_amount(std::size_t witness_amount) {
-                    return 5;
+                    return 3;
                 }
                 constexpr static std::size_t get_empty_rows_amount() {
-                    return 5;
+                    return 3;
                 }
 
-                constexpr static const std::size_t gates_amount = 5;
+                constexpr static const std::size_t gates_amount = 5; // TODO: this is very unoptimized!
                 const std::size_t rows_amount = get_rows_amount(this->witness_amount());
                 const std::size_t empty_rows_amount = get_empty_rows_amount();
                 const std::string component_name = "wrapper of BBF-components";
@@ -147,6 +147,7 @@ namespace nil {
                 using TYPE = typename context_type::TYPE;
 
                 context_type ct = context_type(assignment, 8, start_row_index); // max_rows = 8
+
                 Is_Zero c1 = Is_Zero(ct, var_value(assignment, instance_input.x));
 
                 std::array<TYPE,3> input_x = {var_value(assignment,instance_input.cx[0]),
@@ -156,8 +157,19 @@ namespace nil {
                                               var_value(assignment,instance_input.cy[1]),
                                               var_value(assignment,instance_input.cy[2])};
 
-                Choice_Function c2 = Choice_Function(ct, var_value(assignment,instance_input.q), input_x, input_y);
-                Carry_On_Addition c3 = Carry_On_Addition(ct, input_x, input_y);
+                // ct.print_witness_allocation_log();
+
+                std::vector<std::size_t> ct2_area = {2,3,4,5};
+                context_type ct2 = ct.subcontext(ct2_area,0,4);
+                Choice_Function c2 = Choice_Function(ct2, var_value(assignment,instance_input.q), input_x, input_y);
+
+                // ct.print_witness_allocation_log();
+
+                std::vector<std::size_t> ct3_area = {7,8,9,10,11};
+                context_type ct3 = ct.subcontext(ct3_area,0,4);
+                Carry_On_Addition c3 = Carry_On_Addition(ct3, input_x, input_y);
+
+                // ct.print_witness_allocation_log();
 
                 return typename plonk_bbf_wrapper<BlueprintFieldType>::result_type(component, start_row_index);
             }
@@ -189,8 +201,13 @@ namespace nil {
                 std::array<TYPE,3> input_x = {instance_input.cx[0],instance_input.cx[1],instance_input.cx[2]};
                 std::array<TYPE,3> input_y = {instance_input.cy[0],instance_input.cy[1],instance_input.cy[2]};
 
-                Choice_Function c2 = Choice_Function(ct, instance_input.q, input_x, input_y);
-                Carry_On_Addition c3 = Carry_On_Addition(ct, input_x, input_y);
+                std::vector<std::size_t> ct2_area = {2,3,4,5};
+                context_type ct2 = ct.subcontext(ct2_area,0,4);
+                Choice_Function c2 = Choice_Function(ct2, instance_input.q, input_x, input_y);
+
+                std::vector<std::size_t> ct3_area = {7,8,9,10,11};
+                context_type ct3 = ct.subcontext(ct3_area,0,4);
+                Carry_On_Addition c3 = Carry_On_Addition(ct3, input_x, input_y);
 
                 ct.optimize_gates();
 
