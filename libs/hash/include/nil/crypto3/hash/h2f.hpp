@@ -89,8 +89,8 @@ namespace nil {
                 constexpr static std::size_t len_in_bytes = count * m * L;
 
                 typedef typename std::conditional<(ExpandMsgVariant::rfc_xmd == expand_msg_variant),
-                                                  detail::expand_message_xmd<k, len_in_bytes, hash_type, Params>,
-                                                  void>::type expand_message_type;
+                                                  detail::expand_message_xmd<k, len_in_bytes, hash_type>,
+                                                  detail::expand_message_xof<k, len_in_bytes, hash_type> >::type expand_message_type;
                 static_assert(!std::is_void<expand_message_type>::value, "Undefined expand_message_type.");
 
                 typedef std::array<field_value_type, count> result_type;

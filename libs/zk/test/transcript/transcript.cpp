@@ -42,6 +42,9 @@
 #include <nil/crypto3/hash/block_to_field_elements_wrapper.hpp>
 #include <nil/crypto3/hash/poseidon.hpp>
 #include <nil/crypto3/hash/keccak.hpp>
+#include <nil/crypto3/hash/sha2.hpp>
+#include <nil/crypto3/hash/h2f.hpp>
+#include <nil/crypto3/hash/shake.hpp>
 
 #include <nil/crypto3/zk/transcript/fiat_shamir.hpp>
 
@@ -136,21 +139,17 @@ void test_transcript(typename curve_type::base_field_type::value_type const& exp
 
 BOOST_AUTO_TEST_CASE(mnt4_keccak) {
     test_transcript<algebra::curves::mnt4_298, hashes::keccak_1600<256>>
-        (0xb985b0419fda7e26db3867b38cbb55465717e8d3ff208768cac6949bd68c2b7_cppui_modular298);
+        (0x2b4e9c317f18745b6b89cbb97728923a2d797e261f8320d90f204192c7aabd2b397a0cc155c_cppui_modular298);
 }
 
 BOOST_AUTO_TEST_CASE(mnt6_keccak) {
     test_transcript<algebra::curves::mnt6_298, hashes::keccak_1600<256>>
-        (0x56d23a0a6f75fe3a7670906b341b29cdde80696fc418771e3c84910217546ef1_cppui_modular298);
+        (0x25a45c6b7d107961d135e640abfb1840cefd9c8ea318f7f33cd327cd55dabdd18c125d6c6b_cppui_modular298);
 }
 
 BOOST_AUTO_TEST_CASE(bls12_keccak) {
-    test_transcript<algebra::curves::bls12_381, hashes::keccak_1600<256>>
-        (0x7cc24317960f68f067e0a1cfe610fe3db024d52b064ff2115ea0f594602f0784_cppui_modular381);
-    /* TODO: no marshalling for bls12-377 curve
-    test_transcript<algebra::curves::bls12_377, hashes::keccak_1600<256>>
-        (0x0_cppui_modular377);
-    */
+    test_transcript<algebra::curves::bls12_381, hashes::sha2<256>>
+        (0x122a878f445070db1680540fb6e8105eb8edd62767b2269d24ba2d76c319340226b15b9740c3ae669d995c3d48efc66c_cppui_modular381);    
 }
 
 BOOST_AUTO_TEST_CASE(pallas_poseidon) {

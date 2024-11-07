@@ -22,12 +22,14 @@
 // SOFTWARE.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_KECCAK_PADDING_HPP
-#define CRYPTO3_KECCAK_PADDING_HPP
+#ifndef CRYPTO3_SHAKE_PADDING_HPP
+#define CRYPTO3_SHAKE_PADDING_HPP
 
-#include <nil/crypto3/hash/detail/keccak/keccak_policy.hpp>
 #include <nil/crypto3/detail/inject.hpp>
 #include <nil/crypto3/detail/unbounded_shift.hpp>
+#include <nil/crypto3/hash/detail/keccak/keccak_padding.hpp>
+#include <nil/crypto3/hash/detail/shake/shake_policy.hpp>
+
 
 namespace nil {
     namespace crypto3 {
@@ -35,7 +37,7 @@ namespace nil {
             namespace detail {
                 // pad10*1 scheme
                 template<typename Policy>
-                class keccak_1600_padder {
+                class shake_padder {
                     typedef Policy policy_type;
 
                     constexpr static const std::size_t word_bits = policy_type::word_bits;
@@ -49,63 +51,46 @@ namespace nil {
                     constexpr static const std::size_t block_words = policy_type::block_words;
                     typedef typename policy_type::block_type block_type;
 
-                    // constexpr static const std::size_t digest_bits = policy_type::digest_bits;
-                    // typedef typename policy_type::digest_type digest_type;
-
                     typedef ::nil::crypto3::detail::injector<stream_endian::big_octet_big_bit, stream_endian::little_octet_little_bit, word_bits,
                                                              block_words>
                         injector_type;
 
-                    bool is_last;
-
                 public:
-                    keccak_1600_padder() : is_last(true) {
-                    }
-
                     static std::vector<block_type> get_padded_blocks(const block_type& block, std::size_t block_seen) {
+                        // SHA3 padding consists of 11 11 10 0...0 1 (1111 + 10*1 keccak padding)
                         using namespace nil::crypto3::detail;
 
                         std::vector<block_type> padded_blocks;
                         block_type new_block = block;
-                        // set variable to 10
-                        word_type padding_start = high_bits<word_bits>(~word_type(), 1);
+                        // set variable to 1111
+                        word_type shake_specific_bits = high_bits<word_bits>(~word_type(), 4);
                         // get how many bits from it could fit into current block
-                        const std::size_t padding_start_bits_for_first_block = std::min(block_bits - block_seen, std::size_t{2});
+                        const std::size_t shake_specific_bits_n_for_first_block = std::min(block_bits - block_seen, std::size_t{4});
                         // inject this amount of bits
-                        injector_type::inject(padding_start, padding_start_bits_for_first_block, new_block, block_seen);
+                        injector_type::inject(shake_specific_bits, shake_specific_bits_n_for_first_block, new_block, block_seen);
 
                         if (block_seen == block_bits) {
                             // if current block is full, copy it to result vector, reset counter. Since we need
-                            // to add, at least, the last 1 bit (and mb the rest of padding_start)
+                            // to add, at least, the last 1 bit (and mb the rest of sha_specific_bits)
                             padded_blocks.push_back(new_block);
                             block_seen = 0;
                         }
 
-                        if (padding_start_bits_for_first_block < 2) {
-                            // if not all padding_start was injected, we inject the rest of the padding_start to the next block
-                            injector_type::inject(padding_start, 2 - padding_start_bits_for_first_block, new_block,
-                                                    block_seen, padding_start_bits_for_first_block);
+                        if (shake_specific_bits_n_for_first_block < 4) {
+                            // if not all sha_specific_bits was injected, we inject the rest to the next block
+                            injector_type::inject(shake_specific_bits, 4 - shake_specific_bits_n_for_first_block, new_block,
+                                                    block_seen, shake_specific_bits_n_for_first_block);
                         }
 
-                        // fill the rest of the block with zeros
-                        block_type zeros;
-                        std::fill(zeros.begin(), zeros.end(), 0);
-                        injector_type::inject(zeros, block_bits - 1 - block_seen, new_block, block_seen);
-
-                        // add the last 1
-                        injector_type::inject(high_bits<word_bits>(~word_type(), 1), 1, new_block,
-                                                block_seen);
-
-                        padded_blocks.push_back(new_block);
-
-                        BOOST_ASSERT(block_seen == block_bits);
+                        auto keccak_padding_result = keccak_1600_padder<Policy>::get_padded_blocks(new_block, block_seen);
+                        padded_blocks.insert(padded_blocks.end(), std::make_move_iterator(keccak_padding_result.begin()), std::make_move_iterator(keccak_padding_result.end()));
 
                         return padded_blocks;
                     }
                 };
             }    // namespace detail
-        }        // namespace hashes
-    }            // namespace crypto3
+        }    // namespace hashes
+    }    // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_KECCAK_PADDING_HPP
+#endif    // CRYPTO3_SHAKE_PADDING_HPP

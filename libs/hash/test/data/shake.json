@@ -1,0 +1,18 @@
+{
+    "data_128": {
+      "a": "85c8de88d28866bf0868090b3961162bf82392f690d9e4730910f4af7c6ab3ee",
+      "abc": "5881092dd818bf5cf8a3ddb793fbcba74097d5c526a6d35f97b83351940f2cc8",
+      "message digest": "cbef732961b55b4c31396796577df491b6eed61d8949ce967226801e411e53f0",
+      "abcdefghijklmnopqrstuvwxyz": "961c919c0854576e561320e81514bf3724197d0715e16a364520384ee997f6ef",
+      "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq": "1a96182b50fb8c7e74e0a707788f55e98209b8d91fade8f32f8dd5cff7bf21f5",
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789": "54dd201e53249910db3c7d366574fbb64e71fae442a4bac13439f26dd4896883"
+    },
+    "data_256": {
+      "a": "867e2cb04f5a04dcbd592501a5e8fe9ceaafca50255626ca736c138042530ba4",
+      "abc": "483366601360a8771c6863080cc4114d8db44530f8f1e1ee4f94ea37e78b5739",
+      "message digest": "718e224088856840ade4dc73487e15826a07ecb8ed5e2bda526cc1acddb99d00",
+      "abcdefghijklmnopqrstuvwxyz": "b7b78b04a3dd30a265c8886c33fda94799853de5d3d10541fd4e9f4613701c61",
+      "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq": "4d8c2dd2435a0128eefbb8c36f6f87133a7911e18d979ee1ae6be5d4fd2e3329",
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789": "31f19a097c723e91fa59b0998dd8523c2a9e7e13b4025d6b48fcbc328973a108"
+    }
+  }
